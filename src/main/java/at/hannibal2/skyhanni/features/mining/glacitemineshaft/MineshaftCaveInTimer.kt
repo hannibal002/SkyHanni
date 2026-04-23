@@ -3,13 +3,13 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.blendRGB
+import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -19,10 +19,11 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.ChatFormatting
+import java.awt.Color
 import kotlin.math.pow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object MineshaftCaveInTimer {
@@ -79,27 +80,12 @@ object MineshaftCaveInTimer {
         }
 
         val timeLeft = CAVE_IN_DURATION - caveInTimerStart.passedSince()
-
-        val warningFraction = config.warningThreshold / CAVE_IN_DURATION.inPartialSeconds
-        val cautionFraction = config.cautionThreshold / CAVE_IN_DURATION.inPartialSeconds
-
-        fun blend(from: LorenzColor, to: LorenzColor, t: Double, speed: Double) =
-            blendRGB(from, to, t.pow(1.0 / speed))
-
-        val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
-        val caveInColor = when {
-            percentage < warningFraction ->
-                blend(LorenzColor.GREEN, LorenzColor.YELLOW, percentage / warningFraction, warningFraction)
-            percentage < cautionFraction ->
-                blend(LorenzColor.YELLOW, LorenzColor.RED, (percentage - warningFraction) / (cautionFraction - warningFraction), cautionFraction - warningFraction)
-            else -> LorenzColor.RED.toColor()
-        }
-
         val caveInText = if (timeLeft.isNegative()) "Caved in!" else timeLeft.format()
 
         display = buildList {
             val componentBuilder = componentBuilder {
                 appendWithColor("Entrance caves in: ", ChatFormatting.WHITE)
+                val caveInColor = getColor(timeLeft)
                 appendWithColor(caveInText, caveInColor.rgb)
             }
             add(Renderable.text(componentBuilder))
@@ -114,6 +100,27 @@ object MineshaftCaveInTimer {
                 val estimatedTimeText = estimatedTime?.format() ?: "§7Calculating..."
                 add("§fEstimated time left: §e$estimatedTimeText".let(Renderable::text))
             }
+        }
+    }
+
+    private fun getColor(timeLeft: Duration): Color {
+        val warningFraction = config.warningThreshold / CAVE_IN_DURATION.inPartialSeconds
+        val cautionFraction = config.cautionThreshold / CAVE_IN_DURATION.inPartialSeconds
+
+        fun blend(from: LorenzColor, to: LorenzColor, progress: Double, speed: Double) =
+            ColorUtils.blendRGB(from, to, progress.pow(1.0 / speed))
+
+        val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
+        return when {
+            percentage < warningFraction ->
+                blend(LorenzColor.GREEN, LorenzColor.YELLOW, percentage / warningFraction, warningFraction)
+
+            percentage < cautionFraction -> {
+                val range = cautionFraction - warningFraction
+                blend(LorenzColor.YELLOW, LorenzColor.RED, (percentage - warningFraction) / range, range)
+            }
+
+            else -> LorenzColor.RED.toColor()
         }
     }
 
