@@ -104,20 +104,20 @@ object MineshaftCaveInTimer {
     }
 
     private fun getColor(timeLeft: Duration): Color {
-        val warningFraction = config.warningThreshold / CAVE_IN_DURATION.inPartialSeconds
-        val cautionFraction = config.cautionThreshold / CAVE_IN_DURATION.inPartialSeconds
+        val cautionFraction = 1.0 - config.cautionThreshold / CAVE_IN_DURATION.inPartialSeconds
+        val warningFraction = 1.0 - config.warningThreshold / CAVE_IN_DURATION.inPartialSeconds
+        val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
 
         fun blend(from: LorenzColor, to: LorenzColor, progress: Double, speed: Double) =
             ColorUtils.blendRGB(from, to, progress.pow(1.0 / speed))
 
-        val percentage = (1.0 - (timeLeft / CAVE_IN_DURATION)).coerceIn(0.0, 1.0)
         return when {
-            percentage < warningFraction ->
-                blend(LorenzColor.GREEN, LorenzColor.YELLOW, percentage / warningFraction, warningFraction)
+            percentage < cautionFraction ->
+                LorenzColor.GREEN.toColor()
 
-            percentage < cautionFraction -> {
-                val range = cautionFraction - warningFraction
-                blend(LorenzColor.YELLOW, LorenzColor.RED, (percentage - warningFraction) / range, range)
+            percentage < warningFraction -> {
+                val blendRange = warningFraction - cautionFraction
+                blend(LorenzColor.YELLOW, LorenzColor.RED, (percentage - cautionFraction) / blendRange, blendRange)
             }
 
             else -> LorenzColor.RED.toColor()
