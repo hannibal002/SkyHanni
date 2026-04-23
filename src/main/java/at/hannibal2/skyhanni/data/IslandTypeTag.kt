@@ -33,6 +33,18 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
     BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+
+    /** islands without npc locations that are fixed. */
+    NO_FIXED_NPC_LOCATIONS(
+        IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST, IslandType.KUUDRA_ARENA,
+        IslandType.CATACOMBS,
+        IslandType.GARDEN,
+        IslandType.GARDEN_GUEST,
+        IslandType.MINESHAFT,
+        IslandType.NONE,
+        IslandType.ANY,
+        IslandType.UNKNOWN,
+    ),
     ;
 
     private val types: EnumSet<IslandType> = types.fold(
@@ -52,7 +64,9 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
+    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+
+    operator fun contains(type: IslandType) = type in types
 
     @SkyHanniModule
     companion object {
