@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
@@ -829,6 +830,9 @@ class ProfileSpecificStorage(
                 "}"
         }
     }
+
+    @Expose
+    var infernoMinionProfitTracker: InfernoMinionProfitTracker.Data = InfernoMinionProfitTracker.Data()
 
     // - misc
     @Expose

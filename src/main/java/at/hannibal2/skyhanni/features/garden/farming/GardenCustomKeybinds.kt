@@ -2,24 +2,28 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
+
+    private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
@@ -28,28 +32,27 @@ object GardenCustomKeybinds {
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
 
     @JvmStatic
-    fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
-        val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
-                cir.returnValue = false
+    fun shouldCancelKeyInput(key: InputConstants.Key, pressed: Boolean): Boolean {
+        if (!isActive()) return false
+        var handled = false
+        for ((keyBinding, override) in map) {
+            if (override == keyBinding.key.value) continue
+            if (override == GLFW.GLFW_KEY_UNKNOWN) {
+                if (key.value == keyBinding.key.value) {
+                    handled = true
+                }
+                continue
             }
-            return
-        }
-
-        cir.returnValue = override.isKeyHeld()
-    }
-
-    @JvmStatic
-    fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
-        val override = map[keyBinding] ?: run {
-            if (map.containsValue(keyBinding.key.value)) {
-                cir.returnValue = false
+            if (key.value == override) {
+                keyBinding.isDown = pressed
+                handled = true
+                continue
             }
-            return
+            if (key.value == keyBinding.key.value) {
+                handled = true
+            }
         }
-        cir.returnValue = override.isKeyClicked()
+        return handled
     }
 
     @HandleEvent
@@ -60,7 +63,7 @@ object GardenCustomKeybinds {
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
@@ -96,9 +99,15 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
+    private fun isHoldingTool() = InventoryUtils.getItemInHand()?.getInternalNameOrNull()?.let { heldItem ->
+        heldItem.isFarmingTool() ||
+            (config.mousemat && heldItem == SQUEAKY_MOUSEMAT) ||
+            (config.fishingRod && heldItem.isFishingRod())
+    } ?: false
+
     private fun isActive(): Boolean =
         isEnabled() &&
-            GardenApi.toolInHand != null &&
+            isHoldingTool() &&
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
