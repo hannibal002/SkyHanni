@@ -128,19 +128,24 @@ object RiftWiltedBerberisHelper {
             isOnFarmland = LocationUtils.getBlockBelowPlayer().getBlockAt() == Blocks.FARMLAND
         }
 
-        // ToDo: when warping back into the lobby after only seeing a partial sequence and the first being broken, the sequence is stuck with invalid renders, could not recreate
+        // TODO: when warping back into the lobby after only seeing a partial sequence and the first being broken, the sequence is stuck
+        //  with invalid renders, could not recreate
         if (!config.respawnSequence) return
         for ((center, seq) in fieldSequences) {
             if (seq.sequence.isEmpty()) continue
-            val dist = center.distanceIgnoreY(LocationUtils.playerLocation())
-            if (dist > 20.0) {
-                seq.isAway = true
-                continue
-            }
-            if (seq.isAway) {
-                seq.isAway = false
-                if (seq.isValid) validateSequence(seq) else validatePartialSequence(seq)
-            }
+            updateFieldProximity(center, seq)
+        }
+    }
+
+    private fun updateFieldProximity(center: LorenzVec, seq: BerberisSequence) {
+        val dist = center.distanceIgnoreY(LocationUtils.playerLocation())
+        if (dist > 20.0) {
+            seq.isAway = true
+            return
+        }
+        if (seq.isAway) {
+            seq.isAway = false
+            if (seq.isValid) validateSequence(seq) else validatePartialSequence(seq)
         }
     }
 
@@ -180,25 +185,27 @@ object RiftWiltedBerberisHelper {
             return
         }
 
-        with(berberis) {
-            val isMoving = currentParticles != location
-            if (isMoving) {
-                if (currentParticles.distance(location) > 3) {
-                    previous = null
-                    moving = true
-                }
-                if (!moving) {
-                    previous = currentParticles
-                }
-            }
-            if (!isMoving) {
-                y = location.y - 1
-            }
+        berberis.updateParticlePosition(location)
+    }
 
-            moving = isMoving
-            currentParticles = location
-            lastTime = SimpleTimeMark.now()
+    private fun WiltedBerberis.updateParticlePosition(location: LorenzVec) {
+        val isMoving = currentParticles != location
+        if (isMoving) {
+            if (currentParticles.distance(location) > 3) {
+                previous = null
+                moving = true
+            }
+            if (!moving) {
+                previous = currentParticles
+            }
         }
+        if (!isMoving) {
+            y = location.y - 1
+        }
+
+        moving = isMoving
+        currentParticles = location
+        lastTime = SimpleTimeMark.now()
     }
 
     private fun handleRespawnParticle(location: LorenzVec) {
@@ -274,72 +281,85 @@ object RiftWiltedBerberisHelper {
             for (seq in fieldSequences.values) {
                 if (!seq.isRendering || seq.isAway) continue
                 val current = seq.currentTarget ?: continue
-                val next = seq.nextTarget
-                val third = seq.thirdTarget
-                val previous = seq.previousTarget
-
-                event.drawFilledBoundingBox(axisAlignedBB(current), Color.GREEN.toChromaColor(), 0.7f)
-                event.drawDynamicText(current.up(), "§aWilted Berberis", 1.5, seeThroughBlocks = false)
-
-                // Line from the last harvested position to the current target
-                if (previous != null) {
-                    event.draw3DLine(
-                        previous.add(0.5, 0.5, 0.5),
-                        current.add(0.5, 0.5, 0.5),
-                        Color.GREEN.toChromaColor(),
-                        3,
-                        false,
-                    )
-                }
-
-                if (next != null) {
-                    event.drawFilledBoundingBox(axisAlignedBB(next), Color.YELLOW.toChromaColor(), 0.5f)
-                    event.draw3DLine(
-                        current.add(0.5, 0.5, 0.5),
-                        next.add(0.5, 0.5, 0.5),
-                        Color.YELLOW.toChromaColor(),
-                        3,
-                        false,
-                    )
-
-                    if (third != null) {
-                        event.drawFilledBoundingBox(axisAlignedBB(third), Color.RED.toChromaColor(), 0.3f)
-                        event.draw3DLine(
-                            next.add(0.5, 0.5, 0.5),
-                            third.add(0.5, 0.5, 0.5),
-                            Color.RED.toChromaColor(),
-                            3,
-                            false,
-                        )
-                    }
-                }
+                event.renderSequenceWaypoints(seq, current)
             }
         }
 
         // Suppress particles whenever the sequence renderer is active
-        // ToDo: for some reason not working on partial sequences even if condition true while debugging
+        // TODO: for some reason not working on partial sequences even if condition true while debugging
         val sequenceIsGuiding = config.respawnSequence &&
             fieldSequences.values.any { it.isRendering && !it.isAway && it.currentTarget != null }
         if (sequenceIsGuiding) return
 
-        for (berberis in list) {
-            with(berberis) {
-                if (currentParticles.distanceToPlayer() > 20) continue
-                if (y == 0.0) continue
+        list.forEach { it.renderParticleBerberis(event) }
+    }
 
-                val location = currentParticles.fixLocation(berberis)
-                // TODO add chroma color support via config
-                if (!moving) {
-                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW.toChromaColor(), 0.7f)
-                    event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, seeThroughBlocks = false)
-                } else {
-                    event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE.toChromaColor(), 0.5f)
-                    previous?.fixLocation(berberis)?.let {
-                        event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY.toChromaColor(), 0.2f)
-                        event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE.toChromaColor(), 3, false)
-                    }
-                }
+    private fun WiltedBerberis.renderParticleBerberis(event: SkyHanniRenderWorldEvent) {
+        if (currentParticles.distanceToPlayer() > 20) return
+        if (y == 0.0) return
+
+        val location = currentParticles.fixLocation(this)
+        // TODO add chroma color support via config
+        if (!moving) {
+            event.drawFilledBoundingBox(axisAlignedBB(location), Color.YELLOW.toChromaColor(), 0.7f)
+            event.drawDynamicText(location.up(), "§eWilted Berberis", 1.5, seeThroughBlocks = false)
+        } else {
+            event.drawFilledBoundingBox(axisAlignedBB(location), Color.WHITE.toChromaColor(), 0.5f)
+            previous?.fixLocation(this)?.let {
+                event.drawFilledBoundingBox(axisAlignedBB(it), Color.LIGHT_GRAY.toChromaColor(), 0.2f)
+                event.draw3DLine(it.add(0.5, 0.0, 0.5), location.add(0.5, 0.0, 0.5), Color.WHITE.toChromaColor(), 3, false)
             }
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderSequenceWaypoints(seq: BerberisSequence, current: LorenzVec) {
+        val next = seq.nextTarget
+        val third = seq.thirdTarget
+        val previous = seq.previousTarget
+
+        drawFilledBoundingBox(axisAlignedBB(current), Color.GREEN.toChromaColor(), 0.7f)
+        drawDynamicText(current.up(), "§aWilted Berberis", 1.5, seeThroughBlocks = false)
+
+        drawPreviousTargetLine(previous, current)
+        drawNextTargets(next, current, third)
+    }
+
+    // Line from the last harvested position to the current target
+    private fun SkyHanniRenderWorldEvent.drawPreviousTargetLine(previous: LorenzVec?, current: LorenzVec) {
+        if (previous == null) return
+        draw3DLine(
+            previous.add(0.5, 0.5, 0.5),
+            current.add(0.5, 0.5, 0.5),
+            Color.GREEN.toChromaColor(),
+            3,
+            false,
+        )
+    }
+
+    private fun SkyHanniRenderWorldEvent.drawNextTargets(
+        next: LorenzVec?,
+        current: LorenzVec,
+        third: LorenzVec?,
+    ) {
+        if (next == null) return
+        drawFilledBoundingBox(axisAlignedBB(next), Color.YELLOW.toChromaColor(), 0.5f)
+        draw3DLine(
+            current.add(0.5, 0.5, 0.5),
+            next.add(0.5, 0.5, 0.5),
+            Color.YELLOW.toChromaColor(),
+            3,
+            false,
+        )
+
+        if (third != null) {
+            drawFilledBoundingBox(axisAlignedBB(third), Color.RED.toChromaColor(), 0.3f)
+            draw3DLine(
+                next.add(0.5, 0.5, 0.5),
+                third.add(0.5, 0.5, 0.5),
+                Color.RED.toChromaColor(),
+                3,
+                false,
+            )
         }
     }
 
@@ -359,7 +379,8 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    // ToDo: It might be possible to not instantly invalidate but instead check if there is a start point in the sequence which works and skip forward to that
+    // TODO: It might be possible to not instantly invalidate but instead check if there is a start point in the sequence
+    //  which works and skip forward to that
     private fun validateSequence(seq: BerberisSequence) {
         for ((index, location) in seq.sequence.withIndex()) {
             val block = location.getBlockAt()
