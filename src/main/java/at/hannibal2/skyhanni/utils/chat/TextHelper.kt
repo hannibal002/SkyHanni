@@ -29,12 +29,10 @@ import java.util.Optional
 
 @Suppress("TooManyFunctions")
 object TextHelper {
-
     val NEWLINE = "\n".asComponent()
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
-    val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =

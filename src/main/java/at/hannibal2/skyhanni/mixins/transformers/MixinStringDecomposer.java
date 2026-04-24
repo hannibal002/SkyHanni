@@ -24,7 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(StringDecomposer.class)
 public abstract class MixinStringDecomposer {
-
     @Unique private static final String HEX_CHARS = "0123456789abcdef";
 
     @Unique private static int skyhanni$hexState = -1;
@@ -131,6 +130,6 @@ public abstract class MixinStringDecomposer {
         ordinal = 2
     )
     private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(index = 9) char colorCode) {
-        return ChromaFontManager.setChromaColorStyle(style, text, colorCode);
+        return ChromaFontManager.setChromaColorStyle(style, colorCode);
     }
 }
