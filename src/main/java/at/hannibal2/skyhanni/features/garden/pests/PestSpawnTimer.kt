@@ -229,8 +229,9 @@ object PestSpawnTimer {
         } else {
             val cooldownValue = when {
                 maxPests -> "§cMax Pests!"
+                ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
-                ready || pestCooldownEndTime.isInPast() -> "§aReady!"
+                pestCooldownEndTime.isInPast() -> "§aReady!"
                 else -> pestCooldownEndTime.timeUntil().format()
             }
             "§ePest Cooldown: §b$cooldownValue"
