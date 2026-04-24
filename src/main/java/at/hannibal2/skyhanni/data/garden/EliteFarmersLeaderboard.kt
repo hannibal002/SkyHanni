@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -35,7 +36,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
@@ -97,23 +97,23 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onCropCollectionAdd(event: CropCollectionAddEvent) {
-        if (event.cropCollectionType == CropCollectionType.UNKNOWN) return
-        val leaderboardType = EliteLeaderboardType.Crop(event.crop, EliteLeaderboardMode.MONTHLY)
+    private fun onCropCollectionAdd(event: CropCollectionAddEvent) {
+        if (event.cropCollectionType == UNKNOWN) return
+        val leaderboardType = EliteLeaderboardType.Crop(event.crop, MONTHLY)
         val currentAmount = leaderboardAmountMap?.get(leaderboardType) ?: event.amount.toDouble()
         leaderboardAmountMap?.set(leaderboardType, currentAmount + event.amount.toDouble())
     }
 
     @HandleEvent
-    fun onPestKill(event: PestKillEvent) {
-        addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.ALL_TIME))
-        addPestKill(EliteLeaderboardType.Pest(event.pestType, EliteLeaderboardMode.MONTHLY))
-        addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.MONTHLY))
-        addPestKill(EliteLeaderboardType.Pest(null, EliteLeaderboardMode.ALL_TIME))
+    private fun onPestKill(event: PestKillEvent) {
+        addPestKill(EliteLeaderboardType.Pest(event.pestType, ALL_TIME))
+        addPestKill(EliteLeaderboardType.Pest(event.pestType, MONTHLY))
+        addPestKill(EliteLeaderboardType.Pest(null, MONTHLY))
+        addPestKill(EliteLeaderboardType.Pest(null, ALL_TIME))
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = GARDEN)
+    private fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
         eliteLeaderboardData.forEach { lbType ->
             if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
@@ -246,8 +246,8 @@ object EliteFarmersLeaderboard {
 
     private fun getCropCollection(crop: CropType, leaderboardMode: EliteLeaderboardMode): Double? {
         return when (leaderboardMode) {
-            EliteLeaderboardMode.ALL_TIME -> crop.getCollection().toDouble()
-            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.get(EliteLeaderboardType.Crop(crop, EliteLeaderboardMode.MONTHLY))
+            ALL_TIME -> crop.getCollection().toDouble()
+            MONTHLY -> leaderboardAmountMap?.get(EliteLeaderboardType.Crop(crop, MONTHLY))
         }
     }
 
@@ -323,7 +323,6 @@ object EliteFarmersLeaderboard {
         )
     }
 
-
     private suspend fun loadLeaderboardPosition(leaderboardType: EliteLeaderboardType): Int? {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
         if (profileId == "") return null
@@ -379,8 +378,8 @@ object EliteFarmersLeaderboard {
     }
 
     private fun getUpcomingPlayerCount(currentPos: Int, leaderboardType: EliteLeaderboardType): Int {
-        if (LeaderboardTextEntry.OVERTAKE !in getLeaderboardConfig(leaderboardType).display.text.get()) return 0
-        if (leaderboardType.mode == EliteLeaderboardMode.ALL_TIME) {
+        if (OVERTAKE !in getLeaderboardConfig(leaderboardType).display.text.get()) return 0
+        if (leaderboardType.mode == ALL_TIME) {
             return when {
                 currentPos > 20_000 -> 100
                 currentPos > 10_000 -> 50
@@ -388,7 +387,7 @@ object EliteFarmersLeaderboard {
                 currentPos > 1_000 -> 20
                 else -> 10
             }
-        } else if (leaderboardType.mode == EliteLeaderboardMode.MONTHLY) {
+        } else if (leaderboardType.mode == MONTHLY) {
             return when {
                 currentPos > 5_000 -> 100
                 currentPos > 1000 -> 50
@@ -439,8 +438,8 @@ object EliteFarmersLeaderboard {
     ) {
         val crop = leaderboardType.crop ?: return
         when (leaderboardType.mode) {
-            EliteLeaderboardMode.ALL_TIME -> crop.setCollectionCounter(apiData.amount.toLong())
-            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.set(leaderboardType, apiData.amount)
+            ALL_TIME -> crop.setCollectionCounter(apiData.amount.toLong())
+            MONTHLY -> leaderboardAmountMap?.set(leaderboardType, apiData.amount)
         }
     }
 
@@ -527,7 +526,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {
@@ -539,13 +538,13 @@ object EliteFarmersLeaderboard {
     private const val BETTER_THAN_DEV_ACHIEVEMENT = "Better Than Dev Achievement"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Better than the devs".asComponent(),
             description = componentBuilder {
                 append("Pass one of the")
                 append(" SkyHanni ") {
-                    withColor(TextHelper.chromaStyle)
+                    withColor(ChromaFontManager.chromaTextColor)
                 }
                 append("contributors in the farming leaderboards")
             },

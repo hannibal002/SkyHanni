@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.append
@@ -31,9 +32,8 @@ class ExtendedChatColor(
 
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onCommandRegistration(event: CommandRegistrationEvent) {
+        private fun onCommandRegistration(event: CommandRegistrationEvent) {
             event.registerBrigadier("shtestrainbow") {
                 description = "Sends a rainbow in chat"
                 category = CommandCategory.DEVELOPER_TEST
@@ -62,7 +62,7 @@ class ExtendedChatColor(
                             append("example") {
                                 underlined = true
                                 hover = Component.literal("ඞ")
-                                withColor(TextHelper.chromaStyle)
+                                withColor(ChromaFontManager.chromaTextColor)
                             }
                             append(". ")
                             append {
