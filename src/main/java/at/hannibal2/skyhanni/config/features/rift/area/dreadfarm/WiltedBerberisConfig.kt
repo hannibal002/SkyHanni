@@ -30,4 +30,12 @@ class WiltedBerberisConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var muteOthersSounds: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Respawn Sequence",
+        desc = "Track and show the Wilted Berberis respawn sequence to farm efficiently.",
+    )
+    @ConfigEditorBoolean
+    var respawnSequence: Boolean = true
 }
