@@ -33,11 +33,15 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.getRawBaseStats
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -68,9 +72,12 @@ import net.minecraft.client.gui.components.debug.DebugScreenEntries
 import net.minecraft.client.gui.components.debug.DebugScreenEntry
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.Identifier
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
 import java.io.File
+import java.util.Locale
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -336,6 +343,9 @@ object SkyHanniDebugsAndTests {
         )
     }
 
+    private var skinId: String? = null
+    private var skinIdTime: SimpleTimeMark = SimpleTimeMark.farPast()
+
     @HandleEvent(GuiKeyPressEvent::class)
     fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
@@ -455,6 +465,33 @@ object SkyHanniDebugsAndTests {
         val originalOre = event.originalOre?.let { "$it " }.orEmpty()
         val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
+    }
+
+    @HandleEvent(GuiRenderEvent::class)
+    fun updateSkinId() {
+        val stack = stackUnderCursor() ?: return
+        if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
+
+        val internalName = stack.getInternalNameOrNull() ?: return
+        skinId = internalName.asString()
+        skinIdTime = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onCopyCosmeticsData() {
+        if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
+        val stack = stackUnderCursor() ?: return
+        if (stack.item != Items.PLAYER_HEAD) return
+        if (skinId == null) return
+        if (skinIdTime.passedSince() > 2.minutes) return
+
+        val skullTexture = stack.getSkullTexture()
+        val skullOwner = stack.getSkullOwner()
+        val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
+        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
+
+        OSUtils.copyToClipboard(formatted)
+        ChatUtils.chat("§eCopied cosmetic data to the clipboard!")
     }
 
     @HandleEvent
