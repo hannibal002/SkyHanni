@@ -208,7 +208,7 @@ class ConfigManager {
 
     private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
-        if (HypixelData.hypixelAlpha) return
+        if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         logger.log("saveConfig: $reason")
         try {
             logger.log("Saving $fileName file")
