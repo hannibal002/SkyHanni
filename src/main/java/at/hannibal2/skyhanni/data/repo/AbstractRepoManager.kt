@@ -47,7 +47,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     abstract val commonShortNameCased: String
 
     /**
-     * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.zip")
+     * The resource path of the backup repo. (e.g., "assets/skyhanni/repo.tar.gz")
      * This MUST be provided for the backup repo to work.
      */
     open val backupRepoResourcePath: String? = null
@@ -69,9 +69,12 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     private val eventCtor by lazy {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
-    private val repoZipFile by lazy {
-        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].zip
+    private val repoTgzFile by lazy {
+        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].tar.gz
         // e.g., 'sh-repo-main' or 'neu-repo-master'
+        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
+    }
+    private val legacyRepoZipFile by lazy {
         File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
     }
     private val commitStorage: RepoCommitStorage by lazy {
@@ -292,12 +295,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
         @Suppress("InjectDispatcher")
         withContext(Dispatchers.IO) {
-            Files.copy(inputStream, repoZipFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(inputStream, repoTgzFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         }
-        if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
-            progress.update("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
-            logger.throwError("Failed to load backup repo from zip file: ${repoZipFile.absolutePath}")
+        if (!repoFileSystem.loadFromTgz(progress, repoTgzFile)) {
+            progress.update("Failed to load backup repo from tar.gz file: ${repoTgzFile.absolutePath}")
+            logger.throwError("Failed to load backup repo from tar.gz file: ${repoTgzFile.absolutePath}")
         }
+        deleteArchiveFiles()
 
         isUsingBackup = true
         progress.update("writeToFile: switchToBackupRepo")
@@ -414,13 +418,13 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     /**
      * Determines the latest commit on the GitHub repo and compares it to the current commit.
-     * If out of date, will download the latest commit zip file and unpack it into the repo directory.
+     * If out of date, will download the latest commit tar.gz file and unpack it into the repo directory.
      * Will automatically switch to the backup repo if the download fails or the unpacking fails,
      * unless `switchToBackupOnFail` is false.
      *
      * @param command If true, will report the status of the repo to the user.
      * @param silentError If true, will not log errors to the console.
-     * @param forceReset If true, will always download the latest commit zip file, even if the repo is up to date.
+     * @param forceReset If true, will always download the latest commit tar.gz file, even if the repo is up to date.
      * @param switchToBackupOnFail If true, will switch to the backup repo if the download or unpacking fails.
      * @return [FetchUnpackResult.SUCCESS] if the repo was successfully fetched and unpacked,
      *         [FetchUnpackResult.SWITCHED_TO_BACKUP] if the backup repo was used,
@@ -454,11 +458,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("prepCleanRepoFileSystem")
         prepCleanRepoFileSystem(progress)
 
-        progress.update("downloadCommitZipToFile")
-        if (!gitRepo.downloadCommitZipToFile(repoZipFile)) {
-            progress.update("Failed to download the repo zip file from GitHub.")
-            logger.error("Failed to download the repo zip file from GitHub.")
-            dumpDiagnosticsToLog("operation" to "download zip", "destination" to repoZipFile.name)
+        progress.update("downloadCommitTgzToFile")
+        if (!gitRepo.downloadCommitTgzToFile(repoTgzFile)) {
+            progress.update("Failed to download the repo tar.gz file from GitHub.")
+            logger.error("Failed to download the repo tar.gz file from GitHub.")
+            dumpDiagnosticsToLog("operation" to "download tar.gz", "destination" to repoTgzFile.name)
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
             else {
                 progress.update("FetchUnpackResult.FAILED")
@@ -466,15 +470,20 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             }
         }
 
-        progress.update("loadFromZip")
-        // Actually unpack the repo zip file into our local 'file system'
-        return if (!repoFileSystem.loadFromZip(progress, repoZipFile)) {
-            progress.update("Failed to unpack the downloaded zip file.")
-            logger.error("Failed to unpack the downloaded zip file.")
-            dumpDiagnosticsToLog("operation" to "unpack zip", "zipFile" to repoZipFile.name, "zipSize" to repoZipFile.length())
+        progress.update("loadFromTgz")
+        // Actually unpack the repo tar.gz file into our local 'file system'
+        return if (!repoFileSystem.loadFromTgz(progress, repoTgzFile)) {
+            progress.update("Failed to unpack the downloaded tar.gz file.")
+            logger.error("Failed to unpack the downloaded tar.gz file.")
+            dumpDiagnosticsToLog(
+                "operation" to "unpack tar.gz",
+                "tgzFile" to repoTgzFile.name,
+                "tgzSize" to repoTgzFile.length(),
+            )
             if (switchToBackupOnFail) switchToBackupRepo(progress)
             else FetchUnpackResult.FAILED
         } else {
+            deleteArchiveFiles()
             progress.update("writeToFile: fetchAndUnpackRepo")
             commitStorage.writeToFile(comparison.latest)
             isUsingBackup = false
@@ -495,7 +504,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("mkdirs")
         repoDirectory.mkdirs()
         progress.update("createNewFile")
-        repoZipFile.createNewFile()
+        repoTgzFile.createNewFile()
         progress.update("done with prepCleanRepoFileSystem")
     }
 
@@ -511,6 +520,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             return
         }
         shouldManuallyReload = false
+        deleteArchiveFiles()
         loadingError = false
         successfulConstants.clear()
         unsuccessfulConstants.clear()
@@ -547,6 +557,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         } else {
             progress.end("done reloading $commonShortName repo")
         }
+    }
+
+    private fun deleteArchiveFiles() {
+        repoTgzFile.delete()
+        legacyRepoZipFile.delete()
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {

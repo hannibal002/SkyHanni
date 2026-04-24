@@ -38,21 +38,21 @@ class GitRepo(
         return RepoCommit(sha = apiResponse.sha, time = apiResponse.commit.committer.date)
     }
 
-    suspend fun downloadCommitZipToFile(destinationZip: File, shaOverride: String? = null): Boolean {
+    suspend fun downloadCommitTgzToFile(destinationTgz: File, shaOverride: String? = null): Boolean {
         val shaToUse = shaOverride ?: getLatestCommit(!shouldError)?.sha ?: run {
-            if (shouldError) ErrorManager.skyHanniError("Cannot get full archive URL without a valid SHA")
+            if (shouldError) ErrorManager.skyHanniError("Cannot get full tar.gz URL without a valid SHA")
             return false
         }
-        val fullArchiveUrl = "https://github.com/$user/$repo/archive/$shaToUse.zip"
+        val fullArchiveUrl = "https://github.com/$user/$repo/archive/$shaToUse.tar.gz"
         return try {
             if (shouldError) {
                 SkyHanniMod.logger.info("Downloading $shaToUse for $location\nUrl: $fullArchiveUrl")
             }
-            ApiUtils.getZipResponse(destinationZip, fullArchiveUrl, location, !shouldError)
+            ApiUtils.getZipResponse(destinationTgz, fullArchiveUrl, location, !shouldError)
             true
         } catch (e: Exception) {
-            ErrorManager.logErrorWithData(e, "Failed to download archive from $fullArchiveUrl")
-            SkyHanniMod.logger.error("Failed to download archive from $fullArchiveUrl", e)
+            ErrorManager.logErrorWithData(e, "Failed to download tar.gz from $fullArchiveUrl")
+            SkyHanniMod.logger.error("Failed to download tar.gz from $fullArchiveUrl", e)
             false
         }
     }
