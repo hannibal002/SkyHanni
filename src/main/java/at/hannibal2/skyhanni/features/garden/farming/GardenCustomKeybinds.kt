@@ -55,6 +55,17 @@ object GardenCustomKeybinds {
         return handled
     }
 
+    @JvmStatic
+    fun shouldCancelKeyClick(key: InputConstants.Key): Boolean {
+        if (!isActive()) return false
+        for ((keyBinding, override) in map) {
+            if (override == keyBinding.key.value) continue
+            if (key.value == keyBinding.key.value) return true
+            if (override != GLFW.GLFW_KEY_UNKNOWN && key.value == override) return true
+        }
+        return false
+    }
+
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return

@@ -28,6 +28,13 @@ public class MixinKeyBinding {
         }
     }
 
+    @Inject(method = "click", at = @At("HEAD"), cancellable = true)
+    private static void noClick(InputConstants.Key key, CallbackInfo ci) {
+        if (GardenCustomKeybinds.shouldCancelKeyClick(key)) {
+            ci.cancel();
+        }
+    }
+
     @Inject(method = "consumeClick", at = @At("HEAD"), cancellable = true)
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
         KeyMapping keyBinding = (KeyMapping) (Object) this;
