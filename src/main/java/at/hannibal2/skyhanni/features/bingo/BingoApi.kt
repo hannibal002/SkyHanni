@@ -231,7 +231,7 @@ object BingoApi {
         val shouldHideBingoNpc = !isInBingoEventWindow()
         if (shouldHideBingoNpc != bingoNpcHidden) {
             bingoNpcHidden = shouldHideBingoNpc
-            IslandGraphs.node("Bingo", GraphNodeTag.NPC).enabled = !shouldHideBingoNpc
+            IslandGraphs.nodeOrNull("Bingo", GraphNodeTag.NPC)?.enabled = !shouldHideBingoNpc
         }
     }
 
