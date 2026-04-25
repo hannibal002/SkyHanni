@@ -63,6 +63,10 @@ class About {
 
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
-        val mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin") }
+        val mixin: Runnable = Runnable { openBrowser("https://github.com/FabricMC/Mixin") }
+
+        @ConfigOption(name = "MixinExtras", desc = "MixinExtras is available under the MIT License")
+        @ConfigEditorButton(buttonText = "Source")
+        val mixinExtras: Runnable = Runnable { openBrowser("https://github.com/LlamaLad7/MixinExtras") }
     }
 }
