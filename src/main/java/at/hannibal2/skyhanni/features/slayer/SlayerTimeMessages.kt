@@ -35,28 +35,44 @@ object SlayerTimeMessages {
         val isNewPersonalBest = timeToKillDuration < (currentPb ?: Duration.INFINITE)
         if (isNewPersonalBest) ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, timeToKillDuration)
 
-        val messages = buildList {
-            if (config.timeToKill) add(
-                if (compact) "$bossDisplayName §etook §b$timeToKill"
-                else "It took §b$timeToKill§e to kill $bossDisplayName",
-            )
-
-            if (config.timeToKillPersonalBests) {
-                val currentPbDisplay = currentPb?.format(showMilliSeconds = true) ?: "None"
-
-                add(
-                    if (isNewPersonalBest) {
-                        if (compact) "§e§lNEW PB! $bossDisplayName §ein §c$currentPbDisplay §e-> §a$timeToKill"
-                        else "§e§lNEW PERSONAL BEST! §a$timeToKill §7(Previous $currentPbDisplay) §efor $bossDisplayName"
-                    } else {
-                        if (compact) "$bossDisplayName §ePB: §6$currentPbDisplay"
-                        else "$bossDisplayName §ePersonal best: §6$currentPbDisplay"
-                    },
-                )
-            }
-        }
+        val messages = buildTimeMessages(isNewPersonalBest, currentPb, compact, bossDisplayName, timeToKill)
 
         messages.forEach { ChatUtils.chat(it) }
+    }
+
+    private fun buildTimeMessages(
+        isNewPersonalBest: Boolean,
+        currentPb: Duration?,
+        compact: Boolean,
+        bossDisplayName: String,
+        timeToKill: String,
+    ): List<String> = buildList {
+        if (config.timeToKill) add(
+            if (compact) "$bossDisplayName §etook §b$timeToKill"
+            else "It took §b$timeToKill§e to kill $bossDisplayName",
+        )
+
+        if (config.timeToKillPersonalBests) {
+            val currentPbDisplay = currentPb?.format(showMilliSeconds = true)
+
+            add(
+                if (isNewPersonalBest) {
+                    when (currentPbDisplay) {
+                        null -> {
+                            if (compact) "§e§lNEW PB! $bossDisplayName §ein §a$timeToKill"
+                            else "§e§lNEW PERSONAL BEST! §a$timeToKill §efor $bossDisplayName"
+                        }
+                        else -> {
+                            if (compact) "§e§lNEW PB! $bossDisplayName §ein §c$currentPbDisplay §e-> §a$timeToKill"
+                            else "§e§lNEW PERSONAL BEST! §a$timeToKill §7(Previous $currentPbDisplay) §efor $bossDisplayName"
+                        }
+                    }
+                } else {
+                    if (compact) "$bossDisplayName §ePB: §6$currentPbDisplay"
+                    else "$bossDisplayName §ePersonal best: §6$currentPbDisplay"
+                },
+            )
+        }
     }
 
     @HandleEvent
