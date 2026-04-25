@@ -1,30 +1,35 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.jsonobjects.other.ChangelogJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.CommandArgument
 import at.hannibal2.skyhanni.utils.CommandContextAwareObject
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.toQueryString
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.ModVersion
+import com.google.gson.Gson
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.future.await
+import moe.nea.libautoupdate.GithubReleaseUpdateSource.GithubRelease
 import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChangelogViewer {
+
+    private val gson = Gson()
+
     internal val cache: NavigableMap<ModVersion, Map<String, List<String>>> = TreeMap()
 
     internal var openTime = SimpleTimeMark.farPast()
@@ -33,13 +38,13 @@ object ChangelogViewer {
     internal lateinit var endVersion: ModVersion
 
     internal var shouldMakeNewList = false
+    private val dataFetchCoroutine = CoroutineSettings(
+        "changelog viewer fetch data", timeout = 15.seconds,
+    ).withIOContext()
     private var fetchJob: Job? = null
 
     internal var shouldShowBeta = SkyHanniMod.isBetaVersion
     internal var showTechnicalDetails = false
-
-    internal val primaryColor = LorenzColor.DARK_GRAY.toColor().addAlpha(218)
-    internal val primary2Color = LorenzColor.DARK_GRAY.toColor().darker().addAlpha(220)
 
     fun showChangelog(currentVersion: String, targetVersion: String) =
         showChangelog(ModVersion.fromString(currentVersion), ModVersion.fromString(targetVersion))
@@ -62,7 +67,7 @@ object ChangelogViewer {
 
     private fun setupFetchJob() {
         if (fetchJob?.isActive == true) return
-        fetchJob = SkyHanniMod.launchIOCoroutine("changelog viewer fetch data", timeout = 1.minutes) { getChangelog() }
+        fetchJob = dataFetchCoroutine.launch { getChangelog() }
     }
 
     private fun openChangelog() {
@@ -70,31 +75,60 @@ object ChangelogViewer {
     }
 
     private suspend fun getChangelog() {
-        val url = "https://api.github.com/repos/hannibal002/SkyHanni/releases?per_page=100&page="
-        val data = mutableListOf<ChangelogJson>()
-        var pageNumber = 1
-        while (data.isEmpty() || ModVersion.fromString(data.last().tagName) > startVersion) {
-            val pagedUrl = "$url$pageNumber"
-            val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github").assertSuccessWithData()
-                ?: ErrorManager.skyHanniError("Changelog Loading Failed")
-            val page = ConfigManager.gson.fromJson<List<ChangelogJson>>(jsonObject)
-            data.addAll(page)
-            pageNumber++
-        }
-        val neededData = data.filter {
-            val sub = ModVersion.fromString(it.tagName)
-            sub.isInBetween(startVersion, endVersion)
-        }
-        neededData.forEach { entry ->
-            cache[ModVersion.fromString(entry.tagName)] = formatData(formatString(getBasic(entry.body)))
+        when (val updateSource = SkyHanniMod.feature.dev.debug.updateSource.get()) {
+            SkyHanniUpdateSource.MODRINTH -> {
+                val source = updateSource.source as ModrinthUpdateSource
+                source.getReleases(includeChangelog = true).await()
+                    ?.forEach { release ->
+                        cache[release.versionNumber] = formatChangelog(release.changelog.orEmpty())
+                    }
+                    ?: error("Changelog Loading Failed")
+            }
+
+            SkyHanniUpdateSource.GITHUB -> {
+                val source = updateSource.source as CustomGithubReleaseUpdateSource
+                buildList {
+                    var pageNumber = 1
+                    while (true) {
+                        val pagedUrl = source.releaseApiUrl + mapOf(
+                            "per_page" to 100,
+                            "page" to pageNumber,
+                        ).toQueryString()
+                        val (_, jsonObject) = ApiUtils.getJsonResponse(pagedUrl, apiName = "github")
+                            .assertSuccessWithData()
+                            ?: error("Changelog Loading Failed")
+
+                        // We cannot use ConfigManager.gson here because it excludes fields without
+                        // @Expose annotations, and GithubRelease comes from libautoupdate
+                        val page = gson.fromJson<List<GithubRelease>>(jsonObject)
+
+                        addAll(page)
+
+                        if (page.isEmpty()) break
+                        if (ModVersion.fromString(page.last().tagName) <= startVersion) break
+
+                        pageNumber++
+                    }
+                }
+                    .forEach {
+                        cache[ModVersion.fromString(it.tagName)] = formatChangelog(it.body.orEmpty())
+                    }
+            }
         }
     }
 
+    private fun formatChangelog(body: String): Map<String, List<String>> =
+        formatData(formatString(getBasic(body)))
+
+    // These patterns parse internal changelog formatting, not Hypixel game messages, and do not need remote update capability.
+    private val trailingNewlinePattern = "\\s*\r?\n$".toRegex()
+    private val lineBreakPattern = "\r?\n".toRegex()
+
     private fun formatData(text: String): Map<String, List<String>> {
         var headline = 0
-        return text // Bolding markdown
-            .replace("\\s*\r\n$".toRegex(), "") // Remove trailing empty Lines
-            .split("\r\n") // Split at newlines
+        return text // Bolding Markdown
+            .replace(trailingNewlinePattern, "") // Remove trailing empty lines
+            .split(lineBreakPattern) // Split at newlines
             .map { it.trimEnd() } // Remove trailing empty stuff
             .groupBy {
                 if (it.startsWith("§l§9")) {
@@ -124,12 +158,12 @@ object ChangelogViewer {
 
     private fun getBasic(body: String): String = body.replace("[^]]\\(https://github[\\w/.?$&#]*\\)".toRegex(), "") // Remove GitHub link
         .replace("#+\\s*".toRegex(), "§l§9") // Formatting for headings
-        .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for sub points
+        .replace("(\n[ \t]+)[+\\-*][^+\\-*]".toRegex(), "$1§7") // Formatting for subpoints
         .replace("\n[+\\-*][^+\\-*]".toRegex(), "\n§a") // Formatting for points
         .replace("(- [^-\r\n]*(?:\r\n|$))".toRegex(), "§b§l$1") // Color contributors
-        .replace("\\[(.+?)\\]\\(.+?\\)".toRegex(), "$1") // Random Links
-        .replace("`", "\"") // Fix Code Blocks to look better
-        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove Version from Body
+        .replace("\\[(.+?)]\\(.+?\\)".toRegex(), "$1") // Random links
+        .replace("`", "\"") // Fix code blocks to look better
+        .replace("§l§9(?:Version|SkyHanni)[^\r\n]*\r\n".toRegex(), "") // Remove version from body
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -178,7 +212,7 @@ object ChangelogViewer {
         return if (!version.isValid()) {
             errorMessage =
                 "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
-                "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+                    "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
             null
         } else {
             version

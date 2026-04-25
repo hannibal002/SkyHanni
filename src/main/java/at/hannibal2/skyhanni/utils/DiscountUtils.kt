@@ -36,7 +36,7 @@ object DiscountUtils {
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double {
-        val lowestNPCPrice = getRecipes(this).filter { it.recipeType != NeuRecipeType.NPC_SHOP && it !in pastRecipes }
+        val lowestNPCPrice = getRecipes(this).filter { it.recipeType == NeuRecipeType.NPC_SHOP && it !in pastRecipes }
             .map { it.getRecipePrice(priceSource, pastRecipes + it) }
             .filter { it > 0 }
             .minOrNull() ?: return 0.0
