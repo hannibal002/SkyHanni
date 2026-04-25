@@ -45,13 +45,17 @@ class About {
         @ConfigEditorButton(buttonText = "Source")
         val moulConfig: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/MoulConfig") }
 
-        @ConfigOption(name = "NotEnoughUpdates", desc = "NotEnoughUpdates is available under the LGPL 3.0 License or later version")
+        @ConfigOption(name = "NotEnoughUpdates-REPO", desc = "NotEnoughUpdates-REPO is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
-        val notEnoughUpdates: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates") }
+        val notEnoughUpdates: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO") }
 
-        @ConfigOption(name = "Forge", desc = "Forge is available under the LGPL 3.0 license")
+        @ConfigOption(name = "Fabric Loader", desc = "Fabric Loader is available under the Apache-2.0 license")
         @ConfigEditorButton(buttonText = "Source")
-        val forge: Runnable = Runnable { openBrowser("https://github.com/MinecraftForge/MinecraftForge") }
+        val fabricLoader: Runnable = Runnable { openBrowser("https://github.com/FabricMC/fabric-loader") }
+
+        @ConfigOption(name = "Fabric API", desc = "Fabric API is available under the Apache-2.0 license")
+        @ConfigEditorButton(buttonText = "Source")
+        val fabricApi: Runnable = Runnable { openBrowser("https://github.com/FabricMC/fabric-api") }
 
         @ConfigOption(name = "LibAutoUpdate", desc = "LibAutoUpdate is available under the BSD 2 Clause License")
         @ConfigEditorButton(buttonText = "Source")
@@ -59,6 +63,6 @@ class About {
 
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
-        val mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin/") }
+        val mixin: Runnable = Runnable { openBrowser("https://github.com/SpongePowered/Mixin") }
     }
 }
