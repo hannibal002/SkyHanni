@@ -97,7 +97,7 @@ object BeachBallCatchHelper {
     private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
         val counter = predictor.bounceCounter
         val (qualityColor, quality) = when {
-            counter <= 1 -> "§c" to null
+            counter <= 1 -> "§c" to null // aww man
             counter <= 5 -> "§f" to "DECENT"
             counter <= 15 -> "§a" to "GOOD"
             counter <= 25 -> "§5" to "AMAZING"
