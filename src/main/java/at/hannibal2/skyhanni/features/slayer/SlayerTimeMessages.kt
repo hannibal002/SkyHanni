@@ -20,10 +20,10 @@ object SlayerTimeMessages {
 
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
-        val (bossType, timeToKill) = with(event.data) { bossType to timeToKill }
-        if (!bossType.isSlayer || !event.data.entity.belongsToPlayer()) return
-
-        if (event.data.bossType == BossType.SLAYER_SPIDER_5_1) return
+        val data = event.data
+        val bossType = data.bossType
+        if (!bossType.isSlayer || !data.entity.belongsToPlayer()) return
+        if (bossType == BossType.SLAYER_SPIDER_5_1) return
 
         val compact = config.compact
 
