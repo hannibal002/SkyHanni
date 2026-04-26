@@ -139,7 +139,7 @@ enum class ElectionCandidate(
 
         fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
 
-        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>): ElectionCandidate? {
+        fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>?): ElectionCandidate? {
             val mayor = getMayorFromName(name) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Unknown mayor found",
@@ -151,7 +151,7 @@ enum class ElectionCandidate(
                 return null
             }
 
-            mayor.addPerks(perksJson.mapNotNull { it.toPerk() })
+            mayor.addPerks(perksJson.orEmpty().mapNotNull { it.toPerk() })
             ElectionApi.repoPerks?.let { mayor.addAdditionalPerks(it) }
             return mayor
         }
