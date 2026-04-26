@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -143,7 +142,6 @@ object PestSpawnTimer {
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         val timeDiff = lastCropBrokenTime.passedSince()
 
         if (timeDiff > longestCropBrokenTime) {
@@ -231,8 +229,9 @@ object PestSpawnTimer {
         } else {
             val cooldownValue = when {
                 maxPests -> "§cMax Pests!"
+                ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
-                ready || pestCooldownEndTime.isInPast() -> "§aReady!"
+                pestCooldownEndTime.isInPast() -> "§aReady!"
                 else -> pestCooldownEndTime.timeUntil().format()
             }
             "§ePest Cooldown: §b$cooldownValue"
