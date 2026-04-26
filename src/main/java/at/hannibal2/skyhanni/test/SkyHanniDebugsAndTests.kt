@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
@@ -467,8 +468,8 @@ object SkyHanniDebugsAndTests {
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun updateSkinId() {
+    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
+    fun onRenderUpdateSkinId() {
         val stack = stackUnderCursor() ?: return
         if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
 
@@ -477,15 +478,15 @@ object SkyHanniDebugsAndTests {
         skinIdTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(GuiKeyPressEvent::class)
-    fun onCopyCosmeticsData() {
+    @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
+    fun onKeyPressCopyCosmeticsData() {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         if (stack.item != Items.PLAYER_HEAD) return
         if (skinId == null) return
         if (skinIdTime.passedSince() > 2.minutes) return
 
-        val skullTexture = stack.getSkullTexture()
+        val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
         val skullOwner = stack.getSkullOwner()
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
         val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
