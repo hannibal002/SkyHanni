@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.SoundUtils
 
 @SkyHanniModule
-object SuperpairsSequenceAlert {
+object SuperpairsClicksAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
