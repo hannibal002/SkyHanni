@@ -49,6 +49,8 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     // this only exists to ignore croesus openings for floors the player did prior to this feature being implemented.
     val availableCroesus: MutableMap<DungeonFloor, CroesusStorage>? get() = ProfileStorageData.profileSpecific?.dungeons?.availableCroesus
 
+    private val KISMET_FEATHER = "KISMET_FEATHER".toInternalName()
+
     var hasOpened = false
     var hasUsedKey = false
 
@@ -191,47 +193,23 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
             },
         )
 
-        if (selectedBucket == null) {
-            var sprayCosts = 0.0
-
-            /**
-            val hoverTips = if (sumSpraysUsed > 0) buildList {
-            applicableSpraysUsed.forEach { (spray, count) ->
-            val sprayString = getPricePerOrNull(spray.toInternalName())?.let { price ->
-            val sprayCost = price * count
-            sprayCosts += sprayCost
-            "§7${spray.displayName}: §a${count.shortFormat()} §7(§c-${sprayCost.shortFormat()}§7)"
-            } ?: add("§7${spray.displayName}: §a${count.addSeparators()}")
-            add(sprayString)
-            }
-            add("")
-            add("§7Total spray cost: §6${sprayCosts.addSeparators()} coins")
-            } else emptyList()
-             **/
-            profit -= sprayCosts
-
-            /**
-            val sprayCostString = if (sumSpraysUsed > 0) " §7(§c-${sprayCosts.shortFormat()}§7)" else ""
-            add(
-            Renderable.hoverTips(
-            "§aSprays used: §a$sumSpraysUsed$sprayCostString",
-            hoverTips,
-            ).toSearchable(),
-            )
-             **/
-        }
-
-        val kismetsUsed = selectedBucket?.let { bucketData.kismetsUsed[it] ?: 0 } ?: bucketData.totalKismetsUsed
-        val kismetPrice = "KISMET_FEATHER".toInternalName().getPrice()
-        val totalKismetPrice = kismetPrice * kismetsUsed
-        val kismetPriceDisplay = if (kismetsUsed != 0L) " §7(§c-${totalKismetPrice.shortFormat()}§7)" else ""
-        profit -= totalKismetPrice
-        add(Renderable.text("§7Kismets used: §e$kismetsUsed$kismetPriceDisplay").toSearchable("kismet"))
+        profit -= calculateKismet(selectedBucket, bucketData)
 
         val duration = bucketData.getTotalUptime()
         addAll(addTotalProfit(profit, bucketData.totalFloorParticipated, "run", duration, "runs"))
 
         addPriceFromButton(this)
+    }
+
+    private fun MutableList<Searchable>.calculateKismet(
+        selectedBucket: DungeonFloor?,
+        bucketData: BucketData,
+    ): Double {
+        val amount = selectedBucket?.let { bucketData.kismetsUsed[it] ?: 0 } ?: bucketData.totalKismetsUsed
+        val price = KISMET_FEATHER.getPrice() * amount
+        val priceDisplay = if (amount != 0L) " §7(§c-${price.shortFormat()}§7)" else ""
+        add(Renderable.text("§7Kismets used: §e$amount$priceDisplay").toSearchable("kismet"))
+        return price
     }
 }
 
