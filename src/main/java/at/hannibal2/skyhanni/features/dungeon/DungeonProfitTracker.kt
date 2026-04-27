@@ -10,15 +10,19 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -42,11 +46,11 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
 ) {
     val config get() = SkyHanniMod.feature.dungeon.profitTracker
 
-    // thius only exists to ignore croesuses openings for floors the player did prior to this feature being implemented.
+    // this only exists to ignore croesus openings for floors the player did prior to this feature being implemented.
     val availableCroesus: MutableMap<DungeonFloor, CroesusStorage>? get() = ProfileStorageData.profileSpecific?.dungeons?.availableCroesus
 
     var hasOpened = false
-    var hasUSedKey = false
+    var hasUsedKey = false
 
     var lastChangeTime = SimpleTimeMark.farPast()
 
@@ -61,10 +65,11 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
         }
     }
 
-    // TODO show while holding kismet or dungoen key in hand always
+    // TODO show while holding kismet or dungeon key in hand always
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!IslandTypeTag.DUNGEON_ISLANDS.isInIsland()) return false
+        if (DungeonApi.dungeonFloorEnum == DungeonFloor.E) return false
         if (lastChangeTime.passedSince() < 30.seconds) return true
 
         if (config.showAlways && IslandType.CATACOMBS.isInIsland()) {
@@ -84,7 +89,6 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     }
 
     data class BucketData(
-        @Expose var totalFloorParticipated: Long = 0L,
         @Expose var runsParticipated: MutableMap<DungeonFloor, Long> = EnumMap(DungeonFloor::class.java),
         @Expose var coinsSpent: MutableMap<DungeonFloor, Long> = EnumMap(DungeonFloor::class.java),
         @Expose var chestsOpened: MutableMap<DungeonFloor, Long> = EnumMap(DungeonFloor::class.java),
@@ -100,6 +104,9 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
                 "§7Your drop rate: §c$dropRate.",
             )
         }
+
+        val totalFloorParticipated get() = runsParticipated.sumAllValues().toLong()
+        val totalKismetsUsed get() = kismetsUsed.sumAllValues().toLong()
 
         override fun getCoinName(bucket: DungeonFloor?, item: TrackedItem) = "§6Dungeon Chest Coins"
 
@@ -119,8 +126,21 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     }
 
     @HandleEvent
-    fun onDungeonComplete(event: DungeonCompleteEvent) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (event.cleanMessage == "You used a Kismet Feather!") {
+            modify {
+                val floor = DungeonApi.dungeonFloorEnum
+                if (floor != null) {
+                    it.kismetsUsed.addOrPut(floor, 1)
+                }
 
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onDungeonComplete(event: DungeonCompleteEvent) {
+        if (event.dungeonFloor == DungeonFloor.E) return
         val dungeonFloor = event.dungeonFloor
         availableCroesus?.let {
             val floor = it[dungeonFloor] ?: run {
@@ -131,7 +151,6 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
             floor.keys++
             floor.chests++
             modify {
-                it.totalFloorParticipated++
                 it.runsParticipated.addOrPut(event.dungeonFloor, 1)
             }
         }
@@ -202,8 +221,15 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
              **/
         }
 
+        val kismetsUsed = selectedBucket?.let { bucketData.kismetsUsed[it] ?: 0 } ?: bucketData.totalKismetsUsed
+        val kismetPrice = "KISMET_FEATHER".toInternalName().getPrice()
+        val totalKismetPrice = kismetPrice * kismetsUsed
+        val kismetPriceDisplay = if (kismetsUsed != 0L) " §7(§c-${totalKismetPrice.shortFormat()}§7)" else ""
+        profit -= totalKismetPrice
+        add(Renderable.text("§7Kismets used: §e$kismetsUsed$kismetPriceDisplay").toSearchable("kismet"))
+
         val duration = bucketData.getTotalUptime()
-        addAll(addTotalProfit(profit, bucketData.totalFloorParticipated, "kill", duration, "Kills"))
+        addAll(addTotalProfit(profit, bucketData.totalFloorParticipated, "run", duration, "runs"))
 
         addPriceFromButton(this)
     }
@@ -213,5 +239,7 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
 class CroesusStorage {
     @Expose
     var chests = 0
+
+    @Expose
     var keys = 0
 }

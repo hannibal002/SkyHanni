@@ -140,7 +140,7 @@ class ProfileSpecificStorage(
 
         // we can not reuse runs data because it is inaccurate and gets autocorrected via opening the chest.
         @Expose
-        var availableCroesus: MutableMap<DungeonFloor, CroesusStorage> = mutableMapOf()
+        var availableCroesus: MutableMap<DungeonFloor, CroesusStorage> = enumMapOf()
 
         @Expose
         var profitTracker: DungeonProfitTracker.BucketData = DungeonProfitTracker.BucketData()

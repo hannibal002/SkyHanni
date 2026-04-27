@@ -245,7 +245,7 @@ object CroesusChestTracker {
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.dungeonFloor == DungeonFloor.E) return
-        addCroesusChest(event.floor)
+        addCroesusChest(event.dungeonFloor.name)
     }
 
     // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic

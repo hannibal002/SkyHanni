@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
-enum class DungeonFloor(val floor: DungeonBoss, val masterMode: Boolean) {
+enum class DungeonFloor(val boss: DungeonBoss, val masterMode: Boolean) {
     E(DungeonBoss.E, false),
 
     F1(DungeonBoss.F1, false),
@@ -39,6 +39,6 @@ enum class DungeonBoss(private val bossName: String) {
 
     companion object {
 
-        fun byBossName(bossName: String) = DungeonBoss.entries.firstOrNull { it.bossName == bossName }
+        fun byBossName(bossName: String): DungeonBoss? = entries.firstOrNull { it.bossName == bossName }
     }
 }

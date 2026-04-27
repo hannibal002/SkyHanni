@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -78,7 +77,7 @@ object DungeonApi {
         private set
     var roomId: String? = null
         private set
-    var time: Duration? = null
+    private var time: Duration? = null
     val active get() = started && !completed
 
     val bossStorage: MutableMap<DungeonBoss, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
@@ -182,10 +181,7 @@ object DungeonApi {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getCurrentBoss(): DungeonBoss? {
-        val floor = dungeonFloor ?: return null
-        return DungeonBoss.valueOf(floor.replace("M", "F"))
-    }
+    fun getCurrentBoss(): DungeonBoss? = dungeonFloorEnum?.boss
 
     private const val WATER_ROOM_ID = "-60,-60"
     val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
