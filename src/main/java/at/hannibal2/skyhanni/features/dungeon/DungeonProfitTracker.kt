@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -50,6 +51,7 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     val availableCroesus: MutableMap<DungeonFloor, CroesusStorage>? get() = ProfileStorageData.profileSpecific?.dungeons?.availableCroesus
 
     private val KISMET_FEATHER = "KISMET_FEATHER".toInternalName()
+    private val DUNGEON_CHEST_KEY = "DUNGEON_CHEST_KEY".toInternalName()
 
     var hasOpened = false
     var hasUsedKey = false
@@ -67,16 +69,14 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
         }
     }
 
-    // TODO show while holding kismet or dungeon key in hand always
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
-        if (!IslandTypeTag.DUNGEON_ISLANDS.isInIsland()) return false
         if (DungeonApi.dungeonFloorEnum == DungeonFloor.E) return false
-        if (lastChangeTime.passedSince() < 30.seconds) return true
+        if (hasItemInHand()) return true
+        if (!IslandTypeTag.DUNGEON_ISLANDS.isInIsland()) return false
 
-        if (config.showAlways && IslandType.CATACOMBS.isInIsland()) {
-            return true
-        }
+        if (config.showAlways) return true
+        if (lastChangeTime.passedSince() < 30.seconds) return true
 
         if (IslandType.DUNGEON_HUB.isInIsland()) {
             IslandGraphs.nodeOrNull("Croesus", GraphNodeTag.NPC)?.let {
@@ -89,6 +89,8 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
 
         return false
     }
+
+    private fun hasItemInHand() = InventoryUtils.itemInHandId == KISMET_FEATHER || InventoryUtils.itemInHandId == DUNGEON_CHEST_KEY
 
     data class BucketData(
         @Expose var runsParticipated: MutableMap<DungeonFloor, Long> = EnumMap(DungeonFloor::class.java),

@@ -23,7 +23,7 @@ class DungeonProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Show Always",
-        desc = "Always show the profit tracker while in a dungeon run.",
+        desc = "Always show the profit tracker while in a Dungeon or in the Dungeon Hub.",
     )
     @ConfigEditorBoolean
     var showAlways: Boolean = false
