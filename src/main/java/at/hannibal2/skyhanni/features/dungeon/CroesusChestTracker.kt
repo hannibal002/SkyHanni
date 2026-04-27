@@ -244,7 +244,7 @@ object CroesusChestTracker {
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        if (event.floor == "E") return
+        if (event.dungeonFloor == DungeonFloor.E) return
         addCroesusChest(event.floor)
     }
 

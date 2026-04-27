@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.data.model.graph.Graph
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -140,6 +141,22 @@ enum class SkyHanniTypeAdapters(
                     return null
                 }
                 return reader.nextString().toInternalName()
+            }
+        },
+    ),
+    DUNGEON_FLOOR(
+        DungeonFloor::class.java,
+        object : TypeAdapter<DungeonFloor>() {
+            override fun write(writer: JsonWriter, value: DungeonFloor?) {
+                if (value == null) writer.nullValue() else writer.value(value.asString())
+            }
+
+            override fun read(reader: JsonReader): DungeonFloor? {
+                if (reader.peek() == JsonToken.NULL) {
+                    reader.nextNull()
+                    return null
+                }
+                return DungeonFloor.getByName(reader.nextString())
             }
         },
     ),

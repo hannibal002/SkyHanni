@@ -12,6 +12,7 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
 
     abstract fun getDescription(timesGained: Long): List<String>
 
+    // TODO make it so that this field is not part of every item track anymore
     abstract fun getCoinName(item: TrackedItem): String
 
     // TODO add amount in the string

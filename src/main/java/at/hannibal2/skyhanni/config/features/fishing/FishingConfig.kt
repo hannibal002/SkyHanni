@@ -52,6 +52,7 @@ class FishingConfig {
     @Accordion
     val rareCatches: RareCatchesConfig = RareCatchesConfig()
 
+    // TODO remove prefix fishing
     @Expose
     @ConfigOption(name = "Fishing Profit Tracker", desc = "")
     @Accordion

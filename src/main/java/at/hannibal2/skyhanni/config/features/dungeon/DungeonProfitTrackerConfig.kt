@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.fishing
+package at.hannibal2.skyhanni.config.features.dungeon
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
@@ -9,30 +9,29 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class FishingProfitTrackerConfig {
+class DungeonProfitTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Count all items you pick up while fishing.")
+    @ConfigOption(name = "Enabled", desc = "Count chest rewards you gain at the end of a dungeon run.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = FishingProfitTrackerConfig::class, field = "enabled")
+    @ConfigLink(owner = DungeonProfitTrackerConfig::class, field = "enabled")
     val position: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(
-        name = "Show When Pickup",
-        desc = "Show the fishing tracker for a couple of seconds after catching something even while moving."
+        name = "Show Always",
+        desc = "Always show the profit tracker while in a dungeon run.",
     )
     @ConfigEditorBoolean
-    var showWhenPickup: Boolean = true
+    var showAlways: Boolean = false
 
-    // TODO remove suffix config
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()

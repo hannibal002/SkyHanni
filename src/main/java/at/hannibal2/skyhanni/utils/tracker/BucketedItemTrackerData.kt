@@ -15,8 +15,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
     final override fun getCoinName(item: TrackedItem): String =
         throw UnsupportedOperationException("Use getCoinName(bucket, item) instead")
 
+    // TODO allow variants that do not need this
     abstract fun getCoinName(bucket: E?, item: TrackedItem): String
 
+    // TODO allow variants that do not need this
     final override fun getCoinDescription(item: TrackedItem): List<String> =
         throw UnsupportedOperationException("Use getCoinDescription(bucket, item) instead")
 
