@@ -20,7 +20,7 @@ object CrashOnTttFail {
      */
     private val tttFailPattern by RepoPattern.pattern(
         "dungeons.tttfail.colorless",
-        "PUZZLE FAIL! (?<name>\\S*) lost Tic Tac Toe! Yikes!",
+        "PUZZLE FAIL! (?<name>\\S+) lost Tic Tac Toe! Yikes!",
     )
 
     @HandleEvent
