@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExcavatorProfitTrackerConfig {
     @Expose
@@ -28,6 +29,11 @@ class ExcavatorProfitTrackerConfig {
     @ConfigOption(name = "Track Fossil Dust", desc = "Track Fossil Dust and use it for profit calculation.")
     @ConfigEditorBoolean
     var showFossilDust: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Removes the cost of Scrap from Profit.")
+    @ConfigEditorBoolean
+    var ironmanProfitCalc: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

@@ -44,14 +44,18 @@ object CrystalNucleusProfitPer {
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
-        totalProfit -= (jungleKeyCost + partsCost)
+        if (!config.ironmanProfitCalc.get()) {
+            totalProfit -= (jungleKeyCost + partsCost)
+        }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        hover.add("")
-        hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
-        hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
+        if (!config.ironmanProfitCalc.get()) {
+            hover.add("")
+            hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
+            hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")
+        }
         hover.add("")
         hover.add("§e$totalMessage")
 

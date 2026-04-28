@@ -39,7 +39,10 @@ object ProfitPerExcavation {
 
         val scrapPrice = scrapItem.getPrice()
         map["${scrapItem.repoItemName}: §c-${scrapPrice.shortFormat()}"] = -scrapPrice
-        totalProfit -= scrapPrice
+
+        if (!config.ironmanProfitCalc.get()) {
+            totalProfit -= scrapPrice
+        }
 
         val hover = map.sortedDesc().keys.toMutableList()
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"

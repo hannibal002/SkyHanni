@@ -55,6 +55,11 @@ class CrystalNucleusTrackerConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Removes the cost of Jungle Keys & Automaton Parts from Profit.")
+    @ConfigEditorBoolean
+    var ironmanProfitCalc: Property<Boolean> = Property.of(true)
+
+    @Expose
     @ConfigOption(
         name = "Tracker Settings",
         desc = ""

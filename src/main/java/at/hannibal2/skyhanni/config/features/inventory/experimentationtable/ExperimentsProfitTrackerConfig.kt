@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ExperimentsProfitTrackerConfig {
     @Expose
@@ -22,6 +23,11 @@ class ExperimentsProfitTrackerConfig {
     @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
     @ConfigEditorDraggableList
     val hideMessages: MutableList<ExperimentationTableApi.ExperimentationMessages> = mutableListOf()
+
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Removes the cost of Experience Bottles from Profit.")
+    @ConfigEditorBoolean
+    var ironmanProfitCalc: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Track Time Spent", desc = "Track time spent doing addons and experiments.")
@@ -41,7 +47,7 @@ class ExperimentsProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()

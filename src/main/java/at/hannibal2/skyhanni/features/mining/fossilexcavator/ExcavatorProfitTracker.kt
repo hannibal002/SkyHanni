@@ -71,8 +71,9 @@ object ExcavatorProfitTracker {
                 listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
             ).toSearchable(),
         )
-
-        profit = addScrap(timesExcavated, profit)
+        if (!config.ironmanProfitCalc.get()) {
+            profit = addScrap(timesExcavated, profit)
+        }
         if (config.showFossilDust) {
             profit = addFossilDust(data.fossilDustGained, profit)
         }
