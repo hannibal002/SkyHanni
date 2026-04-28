@@ -215,7 +215,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
     @ConfigEditorBoolean
-    var crashOnTTTFail: Boolean = false
+    var crashOnTttFail: Boolean = false
 
     @Expose
     @ConfigOption(

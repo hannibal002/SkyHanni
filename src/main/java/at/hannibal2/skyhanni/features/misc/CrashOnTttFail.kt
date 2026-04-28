@@ -12,7 +12,7 @@ import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
-object CrashOnTTTFail {
+object CrashOnTttFail {
     private val config get() = SkyHanniMod.feature.misc
 
     /**
@@ -38,5 +38,5 @@ object CrashOnTTTFail {
         }
     }
 
-    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.crashOnTTTFail
+    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.crashOnTttFail
 }
