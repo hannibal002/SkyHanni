@@ -49,8 +49,9 @@ public abstract class MixinChatHud {
         }
     }
 
-    //~ if > 1.21.11 'ChatGraphicsAccess;IIZ' -> 'ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V'
-    @WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V)V")
+    //~ if < 26.1 'extractRenderState' -> 'render'
+    //~ if < 26.1 'ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;' -> 'ChatGraphicsAccess;IIZ'
+    @WrapMethod(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V")
     //~ if > 1.21.11 'int i, int j, boolean bl, Operation<Void> original' -> 'int screenHeight, int ticks, ChatComponent.DisplayMode displayMode, Operation<Void> original'
     private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int screenHeight, int ticks, ChatComponent.DisplayMode displayMode, Operation<Void> original) {
         ChromaFontManagerKt.setRenderingChat(true);

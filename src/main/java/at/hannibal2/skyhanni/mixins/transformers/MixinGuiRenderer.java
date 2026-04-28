@@ -59,8 +59,8 @@ public class MixinGuiRenderer {
 
     @WrapOperation(
         method = "addElementToMesh",
-        //~ if > 1.21.11 'gui/render/state/' -> 'gui/'
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+        //~ if < 26.1 'renderer/state/gui/' -> 'gui/render/state/'
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);

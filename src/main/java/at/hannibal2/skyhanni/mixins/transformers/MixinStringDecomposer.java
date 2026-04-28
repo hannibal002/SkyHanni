@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -12,7 +11,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -44,19 +42,18 @@ public class MixinStringDecomposer {
      * These both produce null from {@link ChatFormatting#getByCode}, so they
      * are invisible to the normal format-code pipeline and must be caught here.
      *
-     * @param style3 the current rendering style (LVT ordinal 2 in iterateFormatted)
-     * @param d the character that followed the § sign (LVT index 9 in iterateFormatted)
+     * @param d the character that followed the § sign
+     * @param original the original getByCode call
      */
     @SuppressWarnings("InvokeAssignCanReplacedWithExpression")
-    @ModifyVariable(
+    @WrapOperation(
         method = "iterateFormatted(Ljava/lang/String;ILnet/minecraft/network/chat/Style;Lnet/minecraft/network/chat/Style;Lnet/minecraft/util/FormattedCharSink;)Z",
         at = @At(
-            value = "INVOKE_ASSIGN",
+            value = "INVOKE",
             target = "Lnet/minecraft/ChatFormatting;getByCode(C)Lnet/minecraft/ChatFormatting;"
-        ),
-        name = "style3"
+        )
     )
-    private static Style skyhanni$onGetByCode(Style style3, @Local(name = "d") char d) {
+    private static ChatFormatting skyhanni$onGetByCode(char d, Operation<ChatFormatting> original) {
         if (d == '#') {
             if (skyhanni$hexState == -1) {
                 skyhanni$hexState = 0;
@@ -67,7 +64,7 @@ public class MixinStringDecomposer {
             skyhanni$hexState = -1;
             skyhanni$hexValue = 0;
         }
-        return style3;
+        return original.call(d);
     }
 
     /**
