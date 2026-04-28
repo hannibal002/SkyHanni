@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -43,6 +44,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -435,7 +437,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
+            CoroutineSettings("garden jacob contest openPopupWindow").launchCoroutine {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -444,15 +446,15 @@ object GardenNextJacobContest {
         }
     }
 
-    @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
-    @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onChestGuiRender() {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -471,7 +473,7 @@ object GardenNextJacobContest {
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
+        CoroutineSettings("garden jacob contest fetch").withIOContext().withMutex(fetchingContestsMutex).launchCoroutine {
             knownContests = EliteDevApi.fetchUpcomingContests()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
@@ -500,7 +502,7 @@ object GardenNextJacobContest {
 
     private fun sendContestsIfAble() {
         if (!haveAllContests || isCloseToNewYear()) return
-        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
+        CoroutineSettings("garden jacob contest send").withIOContext().withMutex(sendingContestsMutex).launchCoroutine {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(
