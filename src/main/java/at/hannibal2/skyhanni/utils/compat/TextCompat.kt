@@ -1,5 +1,3 @@
-@file:OptIn(kotlin.concurrent.atomics.ExperimentalAtomicApi::class)
-
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager

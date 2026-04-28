@@ -339,9 +339,7 @@ tasks.withType<KotlinCompile> {
         val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
                            else target.minecraftVersion.formattedJavaLanguageVersion
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
-        if (!isDeobf) {
-            optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
-        }
+        optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
         // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
         // leaving corrupt .class files that break subsequent incremental builds.
         // see: https://youtrack.jetbrains.com/issue/KT-85498/
