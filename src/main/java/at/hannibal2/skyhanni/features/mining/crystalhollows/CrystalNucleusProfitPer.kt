@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig.IronmanProfitType
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.JUNGLE_KEY_ITEM
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,16 +47,16 @@ object CrystalNucleusProfitPer {
 
         val jungleKeyCost = JUNGLE_KEY_ITEM.getPrice()
         val partsCost = CrystalNucleusApi.getPrecursorRunPrice { it.getPrice() }
-        if (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
+                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
             totalProfit -= (jungleKeyCost + partsCost)
         }
 
         val profitPrefix = if (totalProfit < 0) "§c" else "§6"
         val totalMessage = "Profit for Crystal Nucleus Run§e: $profitPrefix${totalProfit.shortFormat()}"
 
-        if (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+        if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
+                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
             hover.add("")
             hover.add("§cUsed §5Jungle Key§7: §c-${jungleKeyCost.shortFormat()}")
             hover.add("§cUsed §9Robot Parts§7: §c-${partsCost.shortFormat()}")

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.ExperimentationTableApi.experimentRenewPattern
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentsProfitTrackerConfig.IronmanProfitType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -192,7 +194,7 @@ object ExperimentsProfitTracker {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.ironmanProfitCalc.onToggle(tracker::update)
+        config.ironmanProfitType.onToggle(tracker::update)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -211,7 +213,7 @@ object ExperimentsProfitTracker {
 
         val startCostFormat = startCost.absoluteValue
         val bitCostFormat = data.bitCost
-        if (config.ironmanProfitCalc.get()) {
+        if (config.ironmanProfitType.get() == IronmanProfitType.NONE || (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
             add(
                 Renderable.hoverTips(
                     "§eTotal Cost: §b${bitCostFormat.shortFormat()}",

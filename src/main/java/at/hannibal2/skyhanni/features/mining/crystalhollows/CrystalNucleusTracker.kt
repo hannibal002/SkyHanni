@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.nucleus.CrystalNucleusTrackerConfig.IronmanProfitType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -139,8 +140,8 @@ object CrystalNucleusTracker {
         if (runsCompleted > 0) {
             var profit = tracker.drawItems(data, { true }, this)
             val jungleKeyCost: Double = tracker.getPricePer(JUNGLE_KEY_ITEM) * runsCompleted
-            if (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+            if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
+                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
 
                 profit -= jungleKeyCost
                 val jungleKeyCostFormat = jungleKeyCost.shortFormat()
@@ -167,8 +168,8 @@ object CrystalNucleusTracker {
             else rawConfigString
             val usageTotal = if (usesApparatus) runsCompleted else runsCompleted * 6
 
-            if (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.NONE ||
-                (config.ironmanProfitType.get() == CrystalNucleusTrackerConfig.IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
+            if (config.ironmanProfitType.get() == IronmanProfitType.NONE ||
+                (config.ironmanProfitType.get() == IronmanProfitType.ONLY_IRONMAN && !SkyBlockUtils.isIronmanProfile)) {
                 profit -= totalSapphireCost
                 val totalSapphireCostFormat = totalSapphireCost.shortFormat()
                 add(
