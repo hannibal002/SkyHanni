@@ -387,8 +387,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
     + Opens Bazaar if items aren't found in Sacks.
     + Shows the cost of required items and total upgrade cost.
-
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
++ Added Inferno Minion Profit Tracker. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5500)
 
 </details>
 <details open><summary>
@@ -1138,6 +1138,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show actual Gemstone Powder gained in chat alongside the base amount. - tristendillon (https://github.com/hannibal002/SkyHanni/pull/4907)
   + Displays format: `Gemstone Powder x1,944 (x3,888)` where the first number is base, and the second is the actual amount after multipliers.
   + Hover over the message to see a detailed breakdown of all active multipliers.
++ Added Mineshaft Cave-in Timer. - Rain (https://github.com/hannibal002/SkyHanni/pull/5620)
+    + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
 
 </details>
 <details open><summary>

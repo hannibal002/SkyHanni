@@ -68,6 +68,7 @@ enum class ItemCategory {
     GARDEN_CHIP,
     MUTATION,
     WATERING_CAN,
+    FARMING_TOOL,
 
     NONE,
     ;

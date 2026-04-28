@@ -131,7 +131,7 @@ object OwnInventoryData {
         if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
             lastWardrobeClose = SimpleTimeMark.now()
         }
-        val item = MinecraftCompat.localPlayer.getItemOnCursor() ?: return
+        val item = MinecraftCompat.localPlayerOrNull?.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)
     }
