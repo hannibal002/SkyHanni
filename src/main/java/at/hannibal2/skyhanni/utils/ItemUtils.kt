@@ -419,7 +419,9 @@ object ItemUtils {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
-        for (line in this.getLore().reversed()) {
+        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        for (line in cleanLore.reversed()) {
+            if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
@@ -435,7 +437,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
@@ -448,7 +450,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
