@@ -46,7 +46,7 @@ enum class ElectionCandidate(
     FINNEGAN(
         "Finnegan",
         "§c",
-        Perk.PELT_POCALYPSE,
+        Perk.GRAND_FEAST,
         Perk.GOATED,
         Perk.BLOOMING_BUSINESS,
         Perk.PEST_ERADICATOR,
@@ -183,7 +183,7 @@ enum class Perk(val perkName: String) {
     LONG_TERM_INVESTMENT("Long Term Investment"),
 
     // Finnegan
-    PELT_POCALYPSE("Pelt-pocalypse"),
+    GRAND_FEAST("Grand Feast"), // perkName possibly wrong
     GOATED("GOATed"),
     BLOOMING_BUSINESS("Blooming Business"),
     PEST_ERADICATOR("Pest Eradicator"),

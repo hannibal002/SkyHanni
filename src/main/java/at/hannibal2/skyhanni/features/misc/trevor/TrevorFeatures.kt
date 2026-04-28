@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -158,8 +157,9 @@ object TrevorFeatures {
             TrevorSolver.mobLocation = TrapperMobArea.NONE
         }
 
+        // TODO: Rework for Trappers Crest accessory as it now gives time and pelt buffs
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = if (Perk.PELT_POCALYPSE.isActive) 16 else 21
+            timeUntilNextReady = 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
