@@ -19,6 +19,24 @@ class KeyBindConfig {
     var enabled: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Include Squeaky Mousemat",
+        desc = "Also use custom keybinds while holding a Squeaky Mousemat in your hand.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var mousemat: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Include Fishing Rod",
+        desc = "Also use custom keybinds while holding a fishing rod in your hand.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var fishingRod: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
     @ConfigEditorBoolean
     var excludeBarn: Boolean = false

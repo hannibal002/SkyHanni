@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
@@ -14,7 +17,17 @@ import net.minecraft.client.input.KeyEvent
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
 
+@SkyHanniModule
 object KeyboardManager {
+
+    // When a screen closes (e.g. chat closed via Enter), lock Enter so it does not
+    // immediately fire as a key click in features that use isKeyClicked().
+    @HandleEvent
+    fun onGuiOpen(event: GuiScreenOpenEvent) {
+        if (event.gui != null) return
+        if (GLFW.GLFW_KEY_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_ENTER)
+        if (GLFW.GLFW_KEY_KP_ENTER.isKeyHeld()) lockedKeys.add(GLFW.GLFW_KEY_KP_ENTER)
+    }
 
     const val LEFT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = GLFW.GLFW_MOUSE_BUTTON_RIGHT
@@ -123,6 +136,7 @@ object KeyboardManager {
         this < -1 -> ErrorManager.skyHanniError(
             "Error while checking if a key is pressed. Key code is invalid: $this",
         )
+
         this == -1 -> false
         this in 0..5 -> MouseCompat.isButtonDown(this)
         else -> InputConstants.isKeyDown(Minecraft.getInstance().window, this)

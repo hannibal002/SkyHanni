@@ -209,7 +209,7 @@ object StorageApi {
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
-        val chest = event.getBlockState.block as? ChestBlock ?: return
+        val chest = event.blockState.block as? ChestBlock ?: return
         // Double Chest Check
         val otherChest = getNeighborBlocks(event.position).firstOrNull { it.second == chest }?.first
         if (otherChest == null) {

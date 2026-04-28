@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.features.event.diana.RareMobToggleConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -74,9 +75,8 @@ object RareMobWaypointShare {
      */
     private val rareMobFoundChatPattern by patternGroup.pattern(
         "dug",
-        ".* §r§eYou dug out a §.§.(?:Minos Inquisitor|Sphinx|King Minos|Manticore)§.§.!",
+        ".* §r§eYou dug out a §.§.(?:${RareDianaMob.entries.joinToString("|") { it.mobName }})§.§.!",
     )
-
 
     private var rareMob = -1
     private var lastRareMob = -1
@@ -93,8 +93,25 @@ object RareMobWaypointShare {
         val playerDisplayName: String,
         val location: LorenzVec,
         val spawnTime: SimpleTimeMark,
-        val mobName: String
+        val mobName: String,
     )
+
+    private fun RareMobToggleConfig.isEnabled(mob: RareDianaMob): Boolean = when (mob) {
+        RareDianaMob.SPHINX -> sphinx
+        RareDianaMob.MINOS_INQUISITOR -> minosInquisitor
+        RareDianaMob.MANTICORE -> manticore
+        RareDianaMob.KING_MINOS -> kingMinos
+    }
+
+    private fun isMobShareEnabled(name: String): Boolean {
+        val mob = RareDianaMob.fromName(name) ?: return true
+        return config.shareMobToggles.isEnabled(mob)
+    }
+
+    private fun isMobReceiveEnabled(name: String): Boolean {
+        val mob = RareDianaMob.fromName(name) ?: return true
+        return config.receiveMobToggles.isEnabled(mob)
+    }
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
@@ -213,7 +230,6 @@ object RareMobWaypointShare {
     private fun sendRareMob() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
-        lastShareTime = SimpleTimeMark.now()
 
         if (rareMob == -1) {
             ChatUtils.debug("Trying to send Rare Diana Mob via chat, but no mob found nearby.")
@@ -231,10 +247,11 @@ object RareMobWaypointShare {
             return
         }
         val location = rareMob.getLorenzVec().toChatFormat()
-        val mobName = rareMob.name.string.takeIfNotEmpty()?.let {
-            "| $it"
-        }.orEmpty()
-        HypixelCommands.partyChat("$location $mobName")
+        val mobName = rareMob.name.string.orEmpty()
+        if (!isMobShareEnabled(mobName)) return
+        lastShareTime = SimpleTimeMark.now()
+        val name = if (mobName.isEmpty()) "" else "| $mobName"
+        HypixelCommands.partyChat("$location $name")
     }
 
     private fun Matcher.block(): Boolean = !hasGroup("party") && !config.globalChat
@@ -251,6 +268,7 @@ object RareMobWaypointShare {
             if (rawMobName !in mob.mobAliases) continue
             mobName = mob.cleanName
         }
+        if (!isMobReceiveEnabled(mobName)) return false
 
         val optionalAn = StringUtils.optionalAn(mobName)
 

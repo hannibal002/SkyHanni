@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -207,6 +208,7 @@ class ConfigManager {
 
     private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
+        if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         logger.log("saveConfig: $reason")
         try {
             logger.log("Saving $fileName file")

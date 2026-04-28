@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
@@ -10,6 +11,7 @@ import net.minecraft.world.inventory.Slot
 
 abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val container: AbstractContainerMenu) : SkyHanniEvent() {
 
+    @PrimaryFunction("onBackgroundDrawn")
     data class BackgroundDrawnEvent(
         override val context: GuiGraphics,
         override val gui: SkyHanniGuiContainer,

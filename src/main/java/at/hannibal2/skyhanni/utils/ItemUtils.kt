@@ -93,9 +93,19 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// TODO refactor
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
+
+    private val patternGroup = RepoPattern.group("utils.item")
+
+    // <editor-fold desc="Patterns">
+    private val anvilCombinablePattern by patternGroup.pattern(
+        "anvil-combinable",
+        "Combinable in Anvil",
+    )
+    // </editor-fold>
 
     private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
     private val compactItemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> compact item name
@@ -291,8 +301,7 @@ object ItemUtils {
 
             if (this.getPetLevel() == 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
-            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
-                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+            } else if (this.getPetLevel() == 200) {
                 internalName = "${internalName.asString()}+200".toInternalName()
             } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
@@ -681,7 +690,15 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
+            val enchantName = itemStack.getLore().firstOrNull {
+                val clean = it.removeColor()
+                clean.isNotBlank() && !anvilCombinablePattern.matches(clean)
+            } ?: run {
+                val name = toString()
+                addMissingRepoItem(name, "Could not find enchanted book name for $name")
+                return "§c$name"
+            }
+            return ReplaceRomanNumerals.replaceLine(enchantName)
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())

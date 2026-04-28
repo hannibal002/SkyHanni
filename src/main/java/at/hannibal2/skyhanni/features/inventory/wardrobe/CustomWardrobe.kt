@@ -362,7 +362,12 @@ object CustomWardrobe {
 
                 val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
 
-                Renderable.doubleLayered(playerBackground, playerRenderable, false)
+                Renderable.doubleLayered(
+                    playerBackground,
+                    playerRenderable,
+                    blockBottomHover = false,
+                    forceBottomRenderFirst = true
+                )
             }
             Renderable.horizontal(slotsRenderables, horizontalSpacing)
         }

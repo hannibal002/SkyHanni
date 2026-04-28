@@ -1,6 +1,5 @@
 {
     "custom": {
-        "_note": "If you make changes here you must also make changes to all other fabric.mod.json files in other versions.",
         "modmenu": {
             "update_checker": true,
             "links": {
@@ -54,6 +53,7 @@
         "minecraft": "${minecraft}"
     },
     "breaks": {
+        "clientspoofer": "*",
         "exordium": "*"
     },
     "contact": {
