@@ -30,12 +30,11 @@ object SlayerTimeMessages {
         val bossDisplayName = if (compact) bossType.shortName else bossType.fullName
 
         val currentPb = ProfileStorageData.playerSpecific?.slayerPersonalBests?.get(bossType)
-        val timeToKillDuration = Duration.parse(timeToKill)
 
-        val isNewPersonalBest = timeToKillDuration < (currentPb ?: Duration.INFINITE)
-        if (isNewPersonalBest) ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, timeToKillDuration)
+        val isNewPersonalBest = data.timeToKill < (currentPb ?: Duration.INFINITE)
+        if (isNewPersonalBest) ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, data.timeToKill)
 
-        val messages = buildTimeMessages(isNewPersonalBest, currentPb, compact, bossDisplayName, timeToKill)
+        val messages = buildTimeMessages(isNewPersonalBest, currentPb, compact, bossDisplayName, data.timeToKillString)
 
         messages.forEach { ChatUtils.chat(it) }
     }
