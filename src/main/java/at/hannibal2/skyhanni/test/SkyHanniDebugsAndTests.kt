@@ -347,8 +347,13 @@ object SkyHanniDebugsAndTests {
     private var skinId: String? = null
     private var skinIdTime: SimpleTimeMark = SimpleTimeMark.farPast()
 
-    @HandleEvent(GuiKeyPressEvent::class)
-    fun onKeybind() {
+    @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
+    fun onGuiKeyPress() {
+        onKeyPressCopyCosmeticsData()
+        onKeybind()
+    }
+
+    private fun onKeybind() {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
@@ -469,7 +474,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderUpdateSkinId() {
+    fun onGuiRender() {
         val stack = stackUnderCursor() ?: return
         if (!stack.getLoreComponent().any { it.string.contains("Right-click to preview!") }) return
 
@@ -478,7 +483,6 @@ object SkyHanniDebugsAndTests {
         skinIdTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(GuiKeyPressEvent::class, onlyOnSkyblock = true)
     fun onKeyPressCopyCosmeticsData() {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
