@@ -406,7 +406,10 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.connection.sendChat(sendQueue.poll() ?: return)
+            val message = sendQueue.poll() ?: return
+            val connection = MinecraftCompat.localPlayer.connection
+            if (message.startsWith('/')) connection.sendCommand(message)
+            else connection.sendChat(message)
             lastMessageSent = SimpleTimeMark.now()
         }
     }
