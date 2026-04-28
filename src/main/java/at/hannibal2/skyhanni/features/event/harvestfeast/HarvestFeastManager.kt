@@ -227,7 +227,7 @@ object HarvestFeastManager {
         val now = SkyBlockTime.now()
         return data.year < now.year ||
             data.month < now.month ||
-            (data.next.all { upcoming -> upcoming.value == null } && data.current.isEmpty()) // not sure if this is right, other two should be though
+            data.current.isEmpty()
     }
 
     private fun isDataAvailable(): Boolean {
