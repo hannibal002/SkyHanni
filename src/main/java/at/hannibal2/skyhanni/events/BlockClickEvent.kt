@@ -6,6 +6,10 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.LorenzVec
 import net.minecraft.world.item.ItemStack
 
+/**
+ * Fired when the player clicks on a block.
+ * Covers both left-click (initial break and continued breaking when the block position changes) and right-click.
+ */
 @PrimaryFunction("onBlockClick")
 class BlockClickEvent(clickType: ClickType, val position: LorenzVec, itemInHand: ItemStack?) :
     WorldClickEvent(itemInHand, clickType) {
