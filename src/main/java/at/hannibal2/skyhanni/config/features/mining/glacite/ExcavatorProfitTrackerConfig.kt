@@ -34,7 +34,7 @@ class ExcavatorProfitTrackerConfig {
     @Expose
     @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option. §eRemoves the cost of Scrap from the Profit.")
     @ConfigEditorDropdown
-    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.NONE)
+    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
 
     enum class IronmanProfitType(private val displayName: String) {
         NONE("None"),
