@@ -77,9 +77,14 @@ object MinisterInCalendar {
         val ministerDisplayName = "${ministerColor}Minister ${minister.mayorName}"
         val ministerLore = buildList {
             addAll(prefix)
-            for (perk in minister.activePerks) {
-                add("$ministerColor${perk.perkName}")
-                addAll(perk.description.splitLines(170).removeResets().split("\n").map { "§7$it" })
+            val activePerks = minister.activePerks
+            if (activePerks.isEmpty()) {
+                add("§eSomehow this minister has no perks!")
+            } else {
+                for (perk in activePerks) {
+                    add("$ministerColor${perk.perkName}")
+                    addAll(perk.description.splitLines(170).removeResets().split("\n").map { "§7$it" })
+                }
             }
             addAll(suffix)
         }
