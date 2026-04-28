@@ -160,6 +160,7 @@ class ProfileSpecificStorage(
             @Expose
             var runTime: SimpleTimeMark? = null
 
+            // TODO change to DungeonFloor
             @Expose
             var floor: String? = null
 

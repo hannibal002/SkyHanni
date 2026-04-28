@@ -24,21 +24,24 @@ enum class DungeonFloor(val boss: DungeonBoss, val masterMode: Boolean) {
 
     companion object {
         fun getByName(name: String): DungeonFloor? = entries.find { it.name == name }
+        fun getByBoss(boss: DungeonBoss, masterMode: Boolean): DungeonFloor? =
+            entries.find { it.boss == boss && it.masterMode == masterMode }
     }
 }
 
-enum class DungeonBoss(private val bossName: String) {
-    E("The Watcher"),
-    F1("Bonzo"),
-    F2("Scarf"),
-    F3("The Professor"),
-    F4("Thorn"),
-    F5("Livid"),
-    F6("Sadan"),
-    F7("Necron");
+enum class DungeonBoss(private val bossName: String, private val floor: Int) {
+    E("The Watcher", 0),
+    F1("Bonzo", 1),
+    F2("Scarf", 2),
+    F3("The Professor", 3),
+    F4("Thorn", 4),
+    F5("Livid", 5),
+    F6("Sadan", 6),
+    F7("Necron", 7);
 
     companion object {
 
         fun byBossName(bossName: String): DungeonBoss? = entries.firstOrNull { it.bossName == bossName }
+        fun byFloorNumber(floor: Int): DungeonBoss = entries.firstOrNull { it.floor == floor } ?: error("unknown floor number: $floor")
     }
 }

@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -32,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
@@ -133,6 +133,14 @@ object DungeonApi {
         "tablist.playerteam.colorless",
         "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
+
+    /**
+     * REGEX-TEST: §eFloor V
+     */
+    private val croesusFloorPattern by patternGroup.pattern("croesus.chest.floor", "§eFloor (?<floor>[IV]+)")
+
+    // TODO regex text
+    private val croesusMasterPattern by patternGroup.pattern("croesus.chest.master", ".*Master.*")
 
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
@@ -494,5 +502,15 @@ object DungeonApi {
                 )
             }
         }
+    }
+
+    fun getFloorByItemStack(stack: ItemStack): DungeonFloor? {
+        val lore = stack.getLore()
+        val masterMode = croesusMasterPattern.matches(stack.hoverName)
+        val number = lore.firstNotNullOfOrNull {
+            croesusFloorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+        } ?: return null
+        val boss = DungeonBoss.byFloorNumber(number)
+        return DungeonFloor.getByBoss(boss, masterMode)
     }
 }

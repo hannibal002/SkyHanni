@@ -8,12 +8,14 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -55,6 +57,9 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
 
     var hasOpened = false
     var hasUsedKey = false
+
+    // floor type of the last viewed dungeon run in croesus
+    var lastCroesusFloor: DungeonFloor? = null
 
     var lastChangeTime = SimpleTimeMark.farPast()
 
@@ -133,11 +138,10 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.cleanMessage == "You used a Kismet Feather!") {
             modify {
-                val floor = DungeonApi.dungeonFloorEnum
+                val floor = DungeonApi.dungeonFloorEnum ?: lastCroesusFloor
                 if (floor != null) {
                     it.kismetsUsed.addOrPut(floor, 1)
                 }
-
             }
         }
     }
@@ -165,6 +169,15 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
         if (shouldShowDisplay() && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.DUNGEON_HUB)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (InventoryUtils.openInventoryName() != "Croesus") return
+        val stack = event.item ?: return
+        val floor = DungeonApi.getFloorByItemStack(stack)
+        lastCroesusFloor = floor
+        ChatUtils.chat("Floor: $floor")
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
