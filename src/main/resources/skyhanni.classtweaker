@@ -65,12 +65,9 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/
 extendable class net/minecraft/world/item/ItemStack
 accessible field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
-accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
-mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/world/item/component/PatchedDataComponentMap;
+accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
+mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
 accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
-accessible method net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/core/Holder;ILnet/minecraft/core/component/PatchedDataComponentMap;)V
-extendable class net/minecraft/core/component/PatchedDataComponentMap
-accessible method net/minecraft/core/component/PatchedDataComponentMap <init> (Lnet/minecraft/core/component/DataComponentMap;)V
 #?}
 
 inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/ChatLineData

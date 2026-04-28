@@ -1,21 +1,22 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.mixins.transformers.IItemStackAccessor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.core.Holder
+import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.component.PatchedDataComponentMap
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemStackTemplate
 import java.util.Collections
 import java.util.WeakHashMap
 
 internal class DeferredItemStack private constructor(
     private val sourceItem: Item,
-    private val factory: () -> ItemStack,
-    private val deferredComponents: DeferredPatchedDataComponentMap,
+    private val factory: () -> ItemStackTemplate,
     count: Int,
-) : ItemStack(Holder.direct(sourceItem), count, deferredComponents) {
+) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY) {
 
     private var isBuilt = false
 
@@ -23,23 +24,22 @@ internal class DeferredItemStack private constructor(
 
     internal fun rebuild() {
         if (!BuiltInRegistries.ITEM.wrapAsHolder(sourceItem).areComponentsBound()) return
-        val real = factory()
-        @Suppress("UNCHECKED_CAST")
-        val realComponents = ((real as Any) as IItemStackAccessor).`skyhanni$getPatchedComponents`()
-        deferredComponents.realDelegate = realComponents
+        val real = factory().create()
+        if (real.isEmpty) {
+            count = 0
+            isBuilt = true
+            return
+        }
         @Suppress("DEPRECATION")
         item = real.typeHolder()
+        @Suppress("DEPRECATION")
+        components = PatchedDataComponentMap.fromPatch(real.typeHolder().components(), real.componentsPatch)
         isBuilt = true
     }
 
-    internal fun invalidate() {
-        deferredComponents.realDelegate = null
-        @Suppress("DEPRECATION")
-        item = null
-        isBuilt = false
-    }
-
-    override fun copy(): ItemStack = DeferredItemStack(sourceItem, factory, this.count)
+    override fun copy(): ItemStack =
+        if (isBuilt) super.copy()
+        else DeferredItemStack(sourceItem, factory, this.count)
 
     init {
         instances.add(this)
@@ -50,8 +50,8 @@ internal class DeferredItemStack private constructor(
     companion object {
         internal val instances: MutableSet<DeferredItemStack> = Collections.newSetFromMap(WeakHashMap())
 
-        operator fun invoke(sourceItem: Item, factory: () -> ItemStack, count: Int): DeferredItemStack =
-            DeferredItemStack(sourceItem, factory, DeferredPatchedDataComponentMap(), count)
+        operator fun invoke(sourceItem: Item, factory: () -> ItemStackTemplate, count: Int): DeferredItemStack =
+            DeferredItemStack(sourceItem, factory, count)
 
         @HandleEvent
         fun onComponentsLoaded() {

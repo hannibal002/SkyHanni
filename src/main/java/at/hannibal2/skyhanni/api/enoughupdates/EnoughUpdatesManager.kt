@@ -45,6 +45,7 @@ import net.minecraft.nbt.StringTag
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
+import net.minecraft.world.item.ItemStackTemplate
 //? }
 import java.io.File
 import java.util.TreeMap
@@ -229,7 +230,7 @@ object EnoughUpdatesManager {
     //? if > 1.21.11 {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
-        val factory: () -> ItemStack = {
+        val factory: () -> ItemStackTemplate = {
             val freshStack = ItemStack(baseItem, countVal)
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
             var innerReplacements = emptyMap<String, String>()
@@ -245,7 +246,7 @@ object EnoughUpdatesManager {
                 val componentLore = processLore(neuItemRef.lore, innerReplacements).map { line -> line.value.asComponent() }
                 freshStack.setLore(componentLore)
             }
-            freshStack
+            ItemStackTemplate.fromNonEmptyStack(freshStack)
         }
         return DeferredItemStack(baseItem, factory, countVal)
     }
