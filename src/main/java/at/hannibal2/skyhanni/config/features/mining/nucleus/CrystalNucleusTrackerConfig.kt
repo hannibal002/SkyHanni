@@ -53,11 +53,24 @@ class CrystalNucleusTrackerConfig {
 
         override fun toString(): String = displayName
     }
-
+    /*
     @Expose
     @ConfigOption(name = "Ironman Profits", desc = "Removes the cost of Jungle Keys & Automaton Parts from Profit.")
     @ConfigEditorBoolean
-    var ironmanProfitCalc: Property<Boolean> = Property.of(true)
+    var ironmanProfitCalc: Property<Boolean> = Property.of(true)*/
+
+    //Alternate Version of the Selector
+    @Expose
+    @ConfigOption(name = "Ironman Profits", desc = "Select which profiles should use the Ironman price calculation option.")
+    @ConfigEditorDropdown
+    val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.NONE)
+
+    enum class IronmanProfitType(private val displayName: String) {
+        NONE("None"),
+        ONLY_IRONMAN("Only Ironman"),
+        ALL_PROFILES("All Profiles");
+        override fun toString(): String = displayName
+    }
 
     @Expose
     @ConfigOption(
