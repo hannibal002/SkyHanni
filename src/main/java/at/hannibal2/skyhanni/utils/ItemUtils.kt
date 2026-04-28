@@ -797,7 +797,7 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())

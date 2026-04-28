@@ -10,16 +10,18 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.chat.ChatHistoryGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
@@ -30,6 +32,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
+import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -106,7 +109,7 @@ object ChatManager {
     )
 
     @HandleEvent
-    fun onSendMessageToServerPacket(event: PacketSentEvent) {
+    fun onPacketSent(event: PacketSentEvent) {
         val message = getMessageFromPacket(event.packet) ?: return
         val component = message.asComponent()
         val originatingModCall = event.findOriginatingModCall()
@@ -191,24 +194,23 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      */
     fun onChatModify(original: Component): Component? {
-        val component = original
-        val message = component.formattedTextCompat().stripHypixelMessage()
+        val message = original.formattedTextCompat().stripHypixelMessage()
 
-        val key = IdentityCharacteristics(component)
-        val chatEvent = SkyHanniChatEvent.Modify(message, component)
+        val key = IdentityCharacteristics(original)
+        val chatEvent = SkyHanniChatEvent.Modify(message, original)
         chatEvent.post()
 
         val modifiedComponent = chatEvent.chatComponent
         var modified = false
-        if (modifiedComponent != component) {
+        if (modifiedComponent != original) {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
-            loggerModified.log("[original] " + component.formattedTextCompat())
+            loggerModified.log("[original] " + original.formattedTextCompat())
             loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.MODIFIED, null, modifiedComponent, reason)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modifiedComponent, reason)
         } else {
-            messageHistory[key] = MessageFilteringResult(component, ActionKind.ALLOWED, null, null, null)
+            messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null, null)
         }
 
         return modifiedComponent.takeIf { modified }
@@ -244,61 +246,126 @@ object ChatManager {
         }
     }
 
-    // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
-    //  or if the lines were sent too long ago. Same thing for the deleteChatLine function.
-    fun MutableList<GuiMessage>.editChatLine(
-        component: (Component) -> Component,
-        predicate: (GuiMessage) -> Boolean,
+    // TODO add another predicate to stop searching after a certain amount of lines have been
+    //  searched or if the lines were sent too long ago. Same thing for the deleteChatMessage
+    //  function.
+    /**
+     * Edits the first message in chat that matches the given [predicate] to the [replacement].
+     */
+    fun editMessage(
+        replacement: (Component) -> Component,
         reason: String? = null,
-    ) {
-        DelayedRun.runOrNextTick {
-            indexOfFirst {
-                predicate(it)
-            }.takeIf { it != -1 }?.let {
-                val chatLine = this[it]
-                val counter = chatLine.addedTime()
-                val id = chatLine.signature
-                val oldComponent = chatLine.content
-                val newComponent = component(chatLine.content)
+        predicate: (GuiMessage) -> Boolean = { true },
+    ) = DelayedRun.runOrNextTick {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat
 
-                val key = IdentityCharacteristics(oldComponent)
+        val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
+            predicate(it.value)
+        } ?: return@runOrNextTick
+        val counter = message.addedTime()
+        val id = message.signature
+        val oldComponent = message.content
+        val newComponent = replacement(message.content)
 
-                reason?.let { reason ->
-                    messageHistory[key]?.let { history ->
-                        history.modified = newComponent
-                        history.actionKind = ActionKind.EDITED
-                        history.actionReason = reason.uppercase()
-                    }
-                }
-                this[it] = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
+        val key = IdentityCharacteristics(oldComponent)
+
+        reason?.let { reason ->
+            messageHistory[key]?.let { history ->
+                history.modified = newComponent
+                history.actionKind = ActionKind.EDITED
+                history.actionReason = reason.uppercase()
             }
         }
+
+        val newMessage = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
+        chatGui.allMessages[messageIndex] = newMessage
+
+        var targetIndex: Int? = null
+        val iterator = chatGui.trimmedMessages.listIterator()
+        while (iterator.hasNext()) {
+            val lineIndex = iterator.nextIndex()
+            val line = iterator.next()
+            if (line.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()) {
+                if (targetIndex == null) targetIndex = lineIndex
+                iterator.remove()
+            }
+        }
+        if (targetIndex == null) {
+            ErrorManager.logErrorWithData(
+                IllegalStateException("Failed to find associated chat lines"),
+                "Error while editing message",
+                "message" to message,
+                "newMessage" to newMessage,
+            )
+            // Fall back to safe but potentially laggy path
+            chatGui.refreshTrimmedMessages()
+            return@runOrNextTick
+        }
+        val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
+        //? if < 1.21.11 {
+        chatGui.refreshTrimmedMessages()
+        throw UnsupportedOperationException("You are running an unsupported development build. Please update to 1.21.11 or above.")
+        //? } else
+        /*val lines = newMessage.splitLines(mc.font, maxWidth)
+        for ((lineIndex, line) in lines.withIndex()) {
+            val endOfEntry = lineIndex == lines.size - 1
+            val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
+            newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
+            chatGui.trimmedMessages.add(targetIndex++, newLine)
+        }*/
     }
 
-    fun MutableList<GuiMessage>.deleteChatLine(
+    /**
+     * Deletes the first message in chat that matches the given [predicate].
+     */
+    fun deleteMessage(
+        reason: String? = null,
+        predicate: (GuiMessage) -> Boolean = { true },
+    ) = deleteMessages(1, reason, predicate)
+
+    /**
+     * Deletes a maximum of [amount] messages in chat that match the given [predicate].
+     */
+    fun deleteMessages(
         amount: Int,
         reason: String? = null,
-        predicate: (GuiMessage) -> Boolean,
-    ) {
-        DelayedRun.runOrNextTick {
-            val iterator = iterator()
-            var removed = 0
-            while (iterator.hasNext() && removed < amount) {
-                val chatLine = iterator.next()
+        predicate: (GuiMessage) -> Boolean = { true },
+    ) = DelayedRun.runOrNextTick {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.chat
 
-                // chatLine can be null. maybe bc of other mods?
-                @Suppress("SENSELESS_COMPARISON")
-                if (chatLine == null) continue
+        val iterator = chatGui.allMessages.iterator()
+        var removed = 0
+        while (iterator.hasNext() && removed < amount) {
+            val message = iterator.next()
 
-                if (predicate(chatLine)) {
-                    iterator.remove()
-                    removed++
-                    val key = IdentityCharacteristics(chatLine.content)
-                    reason?.let {
-                        messageHistory[key]?.let { history ->
-                            history.actionKind = ActionKind.RETRACTED
-                            history.actionReason = it.uppercase()
-                        }
+            // message can be null. maybe bc of other mods?
+            @Suppress("SENSELESS_COMPARISON")
+            if (message == null) continue
+
+            if (predicate(message)) {
+                iterator.remove()
+
+                val found = chatGui.trimmedMessages.removeIf {
+                    it.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()
+                }
+                if (!found) {
+                    ErrorManager.logErrorWithData(
+                        IllegalStateException("Failed to find associated chat lines"),
+                        "Error while deleting message",
+                        "message" to message,
+                    )
+                    // Fall back to safe but potentially laggy path
+                    chatGui.refreshTrimmedMessages()
+                }
+
+                removed++
+                val key = IdentityCharacteristics(message.content)
+                reason?.let {
+                    messageHistory[key]?.let { history ->
+                        history.actionKind = ActionKind.RETRACTED
+                        history.actionReason = it.uppercase()
                     }
                 }
             }
@@ -320,6 +387,27 @@ object ChatManager {
             }
             simpleCallback {
                 SkyHanniMod.screenToOpen = ChatHistoryGui(getRecentMessageHistory())
+            }
+        }
+
+        event.registerBrigadier("shtesteditmessage") {
+            description = "Test message editing"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback { editMessage(replacement = { it.copy().append(" §8(edited)") }) }
+        }
+
+        event.registerBrigadier("shtestdeletemessage") {
+            description = "Test message deletion"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback(::deleteMessage)
+        }
+
+        event.registerBrigadier("shrefreshchat") {
+            description = "Force Minecraft to refresh chat lines"
+            category = CommandCategory.DEVELOPER_TEST
+            simpleCallback {
+                Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
+                ChatUtils.chat("Refreshed chat.")
             }
         }
     }
