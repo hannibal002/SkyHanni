@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -20,6 +22,8 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -79,6 +83,12 @@ object DungeonApi {
         private set
     private var time: Duration? = null
     val active get() = started && !completed
+
+    // floor type of the last viewed dungeon run in croesus
+    var lastCroesusFloor: DungeonFloor? = null
+        private set
+    var isInCroesus = false
+        private set
 
     val bossStorage: MutableMap<DungeonBoss, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
@@ -512,5 +522,30 @@ object DungeonApi {
         } ?: return null
         val boss = DungeonBoss.byFloorNumber(number)
         return DungeonFloor.getByBoss(boss, masterMode)
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (IslandType.DUNGEON_HUB.isInIsland()) {
+            if (InventoryUtils.openInventoryName() == "Croesus") {
+                if (!isInCroesus) {
+                    ChatUtils.chat("opened Croesus")
+                    isInCroesus = true
+                }
+                val stack = event.item ?: return
+                val floor = getFloorByItemStack(stack)
+                lastCroesusFloor = floor
+            }
+        }
+    }
+
+    // WHY DOES THIS EVENT GET FIRED wrongly????
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (isInCroesus) {
+            ////isInCroesus = false
+            ChatUtils.chat("closed Croesus")
+            ChatUtils.chat("reopenSameName: ${event.reopenSameName}")
+        }
     }
 }

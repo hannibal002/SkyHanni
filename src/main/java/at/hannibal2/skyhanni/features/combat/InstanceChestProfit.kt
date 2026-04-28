@@ -350,6 +350,7 @@ object InstanceChestProfit {
 
         // Slot 31 has the cost information for the chest
         items[31]?.getLore()?.forEach {
+            // TODO use ItemUtiils.readFromLore
             coinsPattern.matchMatcher(it) {
                 val amount = group("amount").formatInt()
                 itemsWithCost.put(it, -amount.toDouble())

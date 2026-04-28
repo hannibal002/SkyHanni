@@ -8,22 +8,25 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonLootEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -55,11 +58,9 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
     private val KISMET_FEATHER = "KISMET_FEATHER".toInternalName()
     private val DUNGEON_CHEST_KEY = "DUNGEON_CHEST_KEY".toInternalName()
 
+    // infos about the c urrent dungeon run lobby
     var hasOpened = false
     var hasUsedKey = false
-
-    // floor type of the last viewed dungeon run in croesus
-    var lastCroesusFloor: DungeonFloor? = null
 
     var lastChangeTime = SimpleTimeMark.farPast()
 
@@ -136,13 +137,30 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (event.cleanMessage == "You used a Kismet Feather!") {
+        // TODO use repo patterns
+        val message = event.cleanMessage
+        if (message == "You used a Kismet Feather!") {
             modify {
-                val floor = DungeonApi.dungeonFloorEnum ?: lastCroesusFloor
+                val floor = DungeonApi.dungeonFloorEnum ?: DungeonApi.lastCroesusFloor
                 if (floor != null) {
                     it.kismetsUsed.addOrPut(floor, 1)
                 }
             }
+        }
+    }
+
+    @HandleEvent
+    fun onDungeonLoot(event: DungeonLootEvent) {
+        val chestType = event.chestType
+        val cost = event.cost
+        val usedKey = event.usedKey
+        ChatUtils.chat("opened dungeon chest: $chestType")
+        ChatUtils.chat("cost: $cost")
+        ChatUtils.chat("used key: $usedKey")
+        ChatUtils.chat("loot: ${event.loot.size}")
+        for ((itemName, amount) in event.loot) {
+            val internalName = NeuInternalName.fromItemName(itemName)
+            ChatUtils.chat(" - loot: $itemName/${internalName.repoItemName} §8x$amount")
         }
     }
 
@@ -169,15 +187,6 @@ object DungeonProfitTracker : SkyHanniBucketedItemTracker<DungeonFloor, DungeonP
         if (shouldShowDisplay() && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
         }
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.DUNGEON_HUB)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (InventoryUtils.openInventoryName() != "Croesus") return
-        val stack = event.item ?: return
-        val floor = DungeonApi.getFloorByItemStack(stack)
-        lastCroesusFloor = floor
-        ChatUtils.chat("Floor: $floor")
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {

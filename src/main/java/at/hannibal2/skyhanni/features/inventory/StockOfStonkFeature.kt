@@ -82,6 +82,7 @@ object StockOfStonkFeature {
                 stonksReward = group("amount").toInt()
                 continue@loop
             }
+            // TODO use ItemUtiils.readFromLore
             bidPattern.matchMatcher(line) {
                 val cost = group("amount").formatLong().coerceAtLeast(2000000) // minimum bid is 2,000,000
                 val ratio = cost / stonksReward.transformIf({ this == 0 }, { 1 })

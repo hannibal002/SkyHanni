@@ -162,6 +162,7 @@ object FishyTreatProfit {
     private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
         val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
         for ((name, amount) in requiredItems) {
+            // TODO use ItemUtiils.readFromLore
             coinsPattern.matchMatcher(name) {
                 additionalMaterials[NeuInternalName.SKYBLOCK_COIN] = group("coins").formatInt()
             } ?: run {

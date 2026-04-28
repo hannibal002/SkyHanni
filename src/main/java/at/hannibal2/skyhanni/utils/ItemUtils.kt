@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.event.yearofthepig.PigFeaturesApi
 import at.hannibal2.skyhanni.features.misc.ReplaceRomanNumerals
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
@@ -46,8 +48,10 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.NbtCompat
@@ -104,6 +108,18 @@ object ItemUtils {
     private val anvilCombinablePattern by patternGroup.pattern(
         "anvil-combinable",
         "Combinable in Anvil",
+    )
+
+    /**
+     * REGEX-TEST:     §r§6Tusk Fossil
+     * REGEX-TEST:     §r§9☠ Fine Onyx Gemstone §r§8x2
+     * REGEX-TEST:     §r§fEnchanted Book (Ice Cold I§r§f)
+     */
+    private val chatStackPatterns by patternGroup.pattern("chat.stack", " {4}§r(?<item>.+)")
+
+    private val itemLoreNamePatterns by patternGroup.pattern(
+        "item.lore.name",
+        "\\+(?<amount>[\\d,]+) Coins",
     )
     // </editor-fold>
 
@@ -173,6 +189,9 @@ object ItemUtils {
     fun ItemStack.cleanName() = hoverName.string.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
+
+    // contains no color codes
+    fun ItemStack.getCleanLore(): List<String> = getLoreComponent().map { it.string }
 
     @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
     fun ItemStack.getLore(): List<String> {
@@ -320,7 +339,7 @@ object ItemUtils {
         }
         val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
             "ULTIMATE_ULTIMATE_",
-            "ULTIMATE_"
+            "ULTIMATE_",
         )
         return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -714,6 +733,31 @@ object ItemUtils {
         return name
     }
 
+
+    fun ItemStack.costs(): List<PrimitiveItemStack> {
+        val list = mutableListOf<PrimitiveItemStack>()
+        val cleanLore = getCleanLore()
+        println("cleanLore: $cleanLore")
+        for (line in cleanLore.sublistAfter("Cost", amount = 99)) {
+            if (line.isEmpty()) break
+            val item = readFromLore(line) ?: error("can not parse cost from line: '$line'")
+            list.add(item)
+        }
+
+        return list
+    }
+
+    fun readFromLore(line: String): PrimitiveItemStack? {
+        itemLoreNamePatterns.matchMatcher(line) {
+            val amount = group("amount").formatInt()
+            return PrimitiveItemStack(NeuInternalName.SKYBLOCK_COIN, amount)
+        }
+        // add amount support
+        val internalName = NeuInternalName.fromItemNameOrNull(line) ?: return null
+        return PrimitiveItemStack(internalName, 1)
+
+    }
+
     fun ItemStack.loreCosts(): MutableList<NeuInternalName> {
         var found = false
         val list = mutableListOf<NeuInternalName>()
@@ -970,5 +1014,26 @@ object ItemUtils {
                 withColor(ChatFormatting.WHITE)
             }
         }
+    }
+
+    // message requires color codes
+    fun readItemStackFromChat(message: String): Pair<String, Int>? {
+        val pair = chatStackPatterns.matchMatcher(message) {
+            /**
+             * TODO fix the bug that readItemAmount produces two different outputs:
+             * §r§fEnchanted Book -> §fEnchanted
+             * §fEnchanted Book §r§8x -> §fEnchanted Book
+             *
+             * also maybe this is no bug, as enchanted book is no real item?
+             */
+            val group = group("item")
+            println("group: $group")
+            readItemAmount(group)
+        } ?: return null
+        println("pair: $pair")
+
+        return readBookTypeStrippedColor(pair.first)?.let {
+            it to pair.second
+        } ?: pair
     }
 }
