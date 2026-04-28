@@ -13,7 +13,10 @@ import org.spongepowered.asm.mixin.injection.At;
 //? if > 1.21.11 {
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-//? }
+//? } else {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+*///?}
 
 @Mixin(ItemFeatureRenderer.class)
 public class MixinItemFeatureRenderer {
