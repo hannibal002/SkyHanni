@@ -157,9 +157,8 @@ object TrevorFeatures {
             TrevorSolver.mobLocation = TrapperMobArea.NONE
         }
 
-        // TODO: Rework for Trappers Crest accessory as it now gives time and pelt buffs
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = 21
+            timeUntilNextReady = 16
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
