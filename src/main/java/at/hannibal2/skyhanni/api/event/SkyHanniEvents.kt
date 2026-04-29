@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.optionalEmpty
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
@@ -53,6 +54,7 @@ object SkyHanniEvents {
         GeneratedEventPrimaryFunctionNames.map
 
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val name = "${method.declaringClass.name}.${method.name}"
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
         return when (method.parameterCount) {
             0 -> {
@@ -61,18 +63,39 @@ object SkyHanniEvents {
                     return options to listOf(primaryFunctionEventType)
                 }
                 if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
-                if (options.eventTypes.isEmpty()) return null
+                if (options.eventTypes.isEmpty()) {
+                    ErrorManager.crashInDevEnv(
+                        "Function $name must have an event parameter, a primary function " +
+                            "name, or an explicit event specification because it is " +
+                            "annotated with @HandleEvent",
+                    )
+                    return null
+                }
                 options to options.eventTypes.map { it.java }
             }
 
             1 -> {
                 val eventType = method.parameterTypes.first()
-                if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) return null
+                if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+                    ErrorManager.crashInDevEnv(
+                        "Function $name must have an event assignable from SkyHanniEvent " +
+                            "because it is annotated with @HandleEvent",
+                    )
+                    return null
+                }
                 @Suppress("UNCHECKED_CAST")
                 options to listOf(eventType as Class<out SkyHanniEvent>)
             }
 
-            else -> null
+            else -> {
+                ErrorManager.crashInDevEnv(
+                    "Function $name has too many parameters. It must have exactly one " +
+                        "event parameter, or be parameterless with a primary function " +
+                        "name or an explicit event specification because it is annotated " +
+                        "with @HandleEvent",
+                )
+                null
+            }
         }
     }
 

@@ -183,7 +183,7 @@ class ModuleProcessor(
 
                         1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
                             logger.error(
-                                "Function $name must have an event assignable from $event " +
+                                "Function $name must have an event assignable from SkyHanniEvent " +
                                     "because it is annotated with @HandleEvent",
                             )
                         }
