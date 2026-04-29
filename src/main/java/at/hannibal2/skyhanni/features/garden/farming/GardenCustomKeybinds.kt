@@ -10,14 +10,16 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -32,38 +34,28 @@ object GardenCustomKeybinds {
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
 
     @JvmStatic
-    fun shouldCancelKeyInput(key: InputConstants.Key, pressed: Boolean): Boolean {
-        if (!isActive()) return false
-        var handled = false
-        for ((keyBinding, override) in map) {
-            if (override == keyBinding.key.value) continue
-            if (override == GLFW.GLFW_KEY_UNKNOWN) {
-                if (key.value == keyBinding.key.value) {
-                    handled = true
-                }
-                continue
+    fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
+        if (!isActive()) return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.key.value)) {
+                cir.returnValue = false
             }
-            if (key.value == override) {
-                keyBinding.isDown = pressed
-                handled = true
-                continue
-            }
-            if (key.value == keyBinding.key.value) {
-                handled = true
-            }
+            return
         }
-        return handled
+
+        cir.returnValue = override.isKeyHeld()
     }
 
     @JvmStatic
-    fun shouldCancelKeyClick(key: InputConstants.Key): Boolean {
-        if (!isActive()) return false
-        for ((keyBinding, override) in map) {
-            if (override == keyBinding.key.value) continue
-            if (key.value == keyBinding.key.value) return true
-            if (override != GLFW.GLFW_KEY_UNKNOWN && key.value == override) return true
+    fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
+        if (!isActive()) return
+        val override = map[keyBinding] ?: run {
+            if (map.containsValue(keyBinding.key.value)) {
+                cir.returnValue = false
+            }
+            return
         }
-        return false
+        cir.returnValue = override.isKeyClicked()
     }
 
     @HandleEvent
