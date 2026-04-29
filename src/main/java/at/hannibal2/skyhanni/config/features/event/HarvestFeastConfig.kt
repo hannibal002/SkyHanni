@@ -1,12 +1,23 @@
 package at.hannibal2.skyhanni.config.features.event
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HarvestFeastConfig {
+
+    @Expose
+    @ConfigOption(
+        name = "Display current in-season crops",
+        desc = "Display the current in-season Harvest Feast crops."
+    )
+    @ConfigEditorBoolean
+    var displayCurrentCrops: Boolean = true
+
     @Expose
     @ConfigOption(
         name = "Fetch Upcoming Feast Data",
@@ -22,4 +33,8 @@ class HarvestFeastConfig {
     )
     @ConfigEditorDropdown
     var shareAutomatically: SharePolicy = SharePolicy.ASK
+
+    @Expose
+    @ConfigLink(owner = HarvestFeastConfig::class, field = "displayCurrentCrops")
+    val position: Position = Position(400, 10)
 }

@@ -13,9 +13,12 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,16 +27,25 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.sync.Mutex
+import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -50,8 +62,14 @@ object HarvestFeastManager {
     private val allCropsInventoryDetector by lazy { InventoryDetector(allCropsInventoryPattern) }
 
     private var currentFeastData: EliteFeastData? = null
+        set(value) {
+            field = value
+            displayDirty = true
+        }
+    private var displayDirty = false
     private var fetchedFromElite = false
     private var lastFetched = SimpleTimeMark.farPast()
+    private var display: Renderable? = null
 
     private val fetchingFeastDataMutex = Mutex()
     private val sendingFeastDataMutex = Mutex()
@@ -105,6 +123,9 @@ object HarvestFeastManager {
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!SkyBlockUtils.inSkyBlock) return
+
+        if (displayDirty) updateDisplay()
+
         if (feastInventoryDetector.isInside()) return
         fetch()
     }
@@ -247,6 +268,7 @@ object HarvestFeastManager {
             currentFeastData = EliteDevApi.fetchHarvestFeastData().takeIf { it.complete && !isOutdated(it) }
             handleFeastData()
             lastFetched = SimpleTimeMark.now()
+            displayDirty = true
         }
     }
 
@@ -274,7 +296,7 @@ object HarvestFeastManager {
 
     private fun isDataAvailable(): Boolean {
         val now = SkyBlockTime.now()
-        return now.month in 7..9 || assumeGrandFeast()
+        return now.month in 7..9 || assumeGrandFeast() || (!isCurrentOutdated && currentFeastData?.isGrandFeast == true)
     }
 
     private fun resetData() {
@@ -282,6 +304,49 @@ object HarvestFeastManager {
         profileStorage.storedHarvestFeastData = null
         lastFetched = SimpleTimeMark.farPast()
         fetchedFromElite = false
+    }
+
+    private fun updateDisplay() {
+        display = if (fetchingFeastDataMutex.isLocked) {
+            Renderable.text(Component.literal("Fetching Harvest Feast data...").withColor(0xFFFFFF55.toInt()))
+        } else {
+            Renderable.horizontal {
+                if (!isCurrentOutdated) return@horizontal renderDisplay()
+
+                addString("§cFeast data is outdated!")
+            }
+        }
+    }
+
+    private fun MutableList<Renderable>.renderDisplay() {
+        val data = currentFeastData ?: return
+
+        addString("§aCurrent: ")
+        val endStamp = data.next.toList().sortedBy { it.second ?: Long.MAX_VALUE }.firstOrNull { it.second != null }?.second?.plus(
+            SkyBlockTime.SKYBLOCK_MONTH_MILLIS
+        ) ?: Long.MAX_VALUE
+        val duration = (endStamp - System.currentTimeMillis()).milliseconds
+
+        currentFeastData?.current?.map { CropType.getByName(it) }?.forEach { crop ->
+            val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp")
+            add(
+                Renderable.item(cropStack) {
+                    scale = 1.0
+                }
+            )
+        }
+
+        addString("§7(§b${duration.format()}§7)")
+    }
+
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
+        if (!config.displayCurrentCrops) return
+        if (!SkyBlockUtils.inSkyBlock) return
+        if (!GardenApi.inGarden() && !isCurrentOutdated) return
+        if (!isDataAvailable()) return
+        val display = display ?: return
+        config.position.renderRenderable(display, posLabel = "Current Active Crops")
     }
 
     @HandleEvent

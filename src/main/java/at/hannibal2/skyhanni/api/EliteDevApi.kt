@@ -279,7 +279,9 @@ object EliteDevApi {
     }
 
     suspend fun submitHarvestFeast(postData: EliteFeastJson): Boolean {
-        return ApiUtils.postJson(feastStatic, postData.getBody()).success
+        val post = ApiUtils.postJson(feastStatic, postData.getBody())
+        println("Success: ${post.success}, '${post.message}', '${post.data}': ${postData.getBody()}")
+        return post.success
     }
     // </editor-fold>
 }
