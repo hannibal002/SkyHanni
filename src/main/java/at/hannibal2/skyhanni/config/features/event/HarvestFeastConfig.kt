@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.event
 
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig
+import at.hannibal2.skyhanni.config.enums.SharePolicy
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
@@ -21,5 +21,5 @@ class HarvestFeastConfig {
         desc = "Share the Harvest Feast data to eliteskyblock.com for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
-    var shareAutomatically: NextJacobContestConfig.ShareContestsEntry = NextJacobContestConfig.ShareContestsEntry.ASK
+    var shareAutomatically: SharePolicy = SharePolicy.ASK
 }

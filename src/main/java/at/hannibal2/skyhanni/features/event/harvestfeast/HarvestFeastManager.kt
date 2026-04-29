@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
@@ -102,6 +104,7 @@ object HarvestFeastManager {
 
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
+        if (!SkyBlockUtils.inSkyBlock) return
         if (feastInventoryDetector.isInside()) return
         fetch()
     }
@@ -126,6 +129,50 @@ object HarvestFeastManager {
             next = next.map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
+
+        currentFeastData = sendData.createData().takeIf { it.complete } ?: return
+
+        if (!config.fetchAutomatically) return
+        if (config.shareAutomatically == SharePolicy.DISABLED) return
+
+        if (config.shareAutomatically == SharePolicy.ASK) {
+            ChatUtils.clickableChat(
+                "§2Click Here to submit the current Harvest Feast data. Thank you for sharing!",
+                onClick = { trySubmitData(sendData) },
+                "§eClick to submit!",
+                oneTimeClick = true,
+            )
+        } else trySubmitData(sendData)
+    }
+
+    private fun trySubmitData(data: EliteFeastJson) {
+        if (sendingFeastDataMutex.isLocked) {
+            ChatUtils.chat { append("You already submitted data for this Harvest Feast.").withColor(0xFFFF5555.toInt()) }
+            return
+        }
+        CoroutineSettings("submit harvest feast data").withIOContext().withMutex(sendingFeastDataMutex).launchCoroutine {
+            if (EliteDevApi.submitHarvestFeast(data)) {
+                ChatUtils.chat { append("Successfully submitted harvest feast data. Thank you for sharing!").withColor(0xFF55FF55.toInt()) }
+
+                if (config.shareAutomatically == SharePolicy.ASK && !profileStorage.harvestFeastSendingAsked) {
+                    ChatUtils.clickableChat(
+                        "§2Do you want to automatically submit Harvest Feast data in the future? Click here!",
+                        onClick = {
+                            config.shareAutomatically = SharePolicy.AUTO
+                            profileStorage.harvestFeastSendingAsked = true
+                            ChatUtils.chat { append("You are now sharing Harvest Feast data automatically.").withColor(0xFF55FF55.toInt()) }
+                        },
+                        hover = "§eClick to share automatically!",
+                        oneTimeClick = true,
+                    )
+                }
+
+            } else ErrorManager.logErrorStateWithData(
+                "Failed to upload Harvest Feast data to EliteSkyBlock. If this happens again, please report this in the Discord!",
+                "failed to upload harvest feast data",
+                "data" to data,
+            )
+        }
     }
 
     private fun readCurrentActiveCrops(stacks: Map<Int, ItemStack>): List<CropType> {
@@ -205,7 +252,7 @@ object HarvestFeastManager {
 
     private fun handleFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat("Current Harvest Feast Data could not be loaded.")
+            ChatUtils.chat { append("Current Harvest Feast Data could not be loaded.").withColor(0xFFFF5555.toInt()) }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
@@ -213,8 +260,8 @@ object HarvestFeastManager {
         }
     }
 
-    private fun saveDataToStorage() {
-        profileStorage.storedHarvestFeastData = currentFeastData
+    private fun saveDataToStorage(data: EliteFeastData? = currentFeastData) {
+        profileStorage.storedHarvestFeastData = data
     }
 
     private fun isOutdated(data: EliteFeastData?): Boolean {
@@ -234,6 +281,7 @@ object HarvestFeastManager {
         currentFeastData = null
         profileStorage.storedHarvestFeastData = null
         lastFetched = SimpleTimeMark.farPast()
+        fetchedFromElite = false
     }
 
     @HandleEvent

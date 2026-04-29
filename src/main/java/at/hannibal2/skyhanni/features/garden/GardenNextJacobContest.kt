@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
+import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -300,7 +300,7 @@ object GardenNextJacobContest {
     private fun onHaveAllContests() {
         nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
         if (!isSendEnabled()) return
-        if (config.shareAutomatically == ShareContestsEntry.ASK) {
+        if (config.shareAutomatically == SharePolicy.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                 onClick = ::shareContests,
@@ -330,12 +330,12 @@ object GardenNextJacobContest {
 
     private fun shareContests() {
         if (haveAllContests) sendContestsIfAble()
-        if (profileStorage.contestSendingAsked || config.shareAutomatically != ShareContestsEntry.ASK) return
+        if (profileStorage.contestSendingAsked || config.shareAutomatically != SharePolicy.ASK) return
 
         ChatUtils.clickableChat(
             "§2Click here to automatically share future contests!",
             onClick = {
-                config.shareAutomatically = ShareContestsEntry.AUTO
+                config.shareAutomatically = SharePolicy.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 ChatUtils.chat("§2Enabled automatic sharing of future contests!")
             },
@@ -465,7 +465,7 @@ object GardenNextJacobContest {
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
+    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != SharePolicy.DISABLED
 
     private fun fetchContestsIfAble() {
         if (haveAllContests || !isFetchEnabled()) return
