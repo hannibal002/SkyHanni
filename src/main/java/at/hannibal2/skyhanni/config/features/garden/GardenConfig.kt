@@ -188,6 +188,11 @@ class GardenConfig {
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
 
     @Expose
+    @ConfigOption(name = "Farming Toolkit", desc = "")
+    @Accordion
+    val farmingToolkit: FarmingToolkitIconConfig = FarmingToolkitIconConfig()
+
+    @Expose
     @ConfigOption(
         name = "Plot Price",
         desc = "Show the price of the plot in coins when inside the Configure Plots inventory.",
