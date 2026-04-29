@@ -156,7 +156,7 @@ object HarvestFeastManager {
 
     private fun readAllCrops(items: Map<Int, ItemStack>) {
         val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
-        val next = readCropTimestamps(items, current)
+        val next = readCropTimestamps(items)
 
         val sendData = EliteFeastJson(
             current = current.map { it.cropName },
@@ -234,7 +234,7 @@ object HarvestFeastManager {
         return current
     }
 
-    private fun readCropTimestamps(items: Map<Int, ItemStack>, inSeason: List<CropType>): Map<CropType, Long?> {
+    private fun readCropTimestamps(items: Map<Int, ItemStack>): Map<CropType, Long?> {
         val outputMap = CropType.entries.associateWith { null }.toMutableMap<CropType, Long?>()
 
         items.filterKeys { it in ALL_CROPS_SLOTS }.mapNotNull { entry ->
