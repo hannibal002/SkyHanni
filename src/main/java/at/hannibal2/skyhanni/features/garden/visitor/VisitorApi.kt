@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.json.addElementsAfter
@@ -153,6 +154,14 @@ object VisitorApi {
         var lastLore = listOf<String>()
         var blockedLore = listOf<Component>()
         var blockReason: VisitorBlockReason? = null
+
+        var ignoreShoppingList: Boolean
+            get() = GardenApi.storage?.ignoredVisitors?.contains(visitorName.removeColor()) == true
+            set(value) {
+                val storage = GardenApi.storage ?: return
+                val key = visitorName.removeColor()
+                if (value) storage.ignoredVisitors.add(key) else storage.ignoredVisitors.remove(key)
+            }
 
         fun getEntity() = EntityUtils.getEntityByID(entityId)
         fun getNameTagEntity() = EntityUtils.getEntityByID(nameTagEntityId)

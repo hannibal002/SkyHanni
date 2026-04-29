@@ -61,39 +61,39 @@ object GardenVisitorShoppingList {
 
     private fun drawDisplay() = buildList {
         if (!config.enabled) return@buildList
-        val (shoppingList, newVisitors) = prepareDrawingData()
+        val (shoppingList, activeVisitors) = prepareDrawingData()
+        val newVisitors = activeVisitors.filter { it.shoppingList.isEmpty() }
+        val knownVisitors = activeVisitors.filter { it.shoppingList.isNotEmpty() }
 
         drawShoppingList(shoppingList)
-        drawVisitors(newVisitors, shoppingList)
+        drawNewVisitors(newVisitors, shoppingList)
+        drawVisitors(knownVisitors)
     }
 
     /**
      * Aggregates shopping lists from all active visitors.
-     * @return Pair of (globalShoppingList, newVisitorNames)
+     * Items from ignored visitors are excluded from the aggregated list,
+     * @return Pair of (globalShoppingList, activeVisitors)
      */
-    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<String>> {
+    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<VisitorApi.Visitor>> {
         val globalShoppingList = mutableMapOf<NeuInternalName, Int>()
-        val newVisitors = mutableListOf<String>()
+        val activeVisitors = mutableListOf<VisitorApi.Visitor>()
 
-        for ((visitorName, visitor) in VisitorApi.getVisitorsMap()) {
+        for ((_, visitor) in VisitorApi.getVisitorsMap()) {
             if (visitor.status == VisitorApi.VisitorStatus.ACCEPTED ||
                 visitor.status == VisitorApi.VisitorStatus.REFUSED
             ) continue
 
-            if (visitor.visitorName.removeColor() == "Spaceman" &&
-                config.ignoreSpaceman
-            ) continue
+            activeVisitors.add(visitor)
 
-            val shoppingList = visitor.shoppingList
-            if (shoppingList.isEmpty()) {
-                newVisitors.add(visitorName)
-            }
-            for ((internalName, amount) in shoppingList) {
+            if (visitor.ignoreShoppingList) continue
+
+            for ((internalName, amount) in visitor.shoppingList) {
                 val old = globalShoppingList.getOrDefault(internalName, 0)
                 globalShoppingList[internalName] = old + amount
             }
         }
-        return globalShoppingList to newVisitors
+        return globalShoppingList to activeVisitors
     }
 
     /**
@@ -206,8 +206,12 @@ object GardenVisitorShoppingList {
 
     /**
      * Builds the "New Visitors" section showing visitors without known requirements.
+     * Each entry is clickable to toggle ignore.
      */
-    private fun MutableList<Renderable>.drawVisitors(newVisitors: List<String>, shoppingList: Map<NeuInternalName, Int>) {
+    private fun MutableList<Renderable>.drawNewVisitors(
+        newVisitors: List<VisitorApi.Visitor>,
+        shoppingList: Map<NeuInternalName, Int>,
+    ) {
         if (newVisitors.isEmpty()) return
         if (shoppingList.isNotEmpty()) {
             addString("")
@@ -216,22 +220,24 @@ object GardenVisitorShoppingList {
         val visitorLabel = if (amount == 1) "visitor" else "visitors"
         addString("§e$amount §7new $visitorLabel:")
         for (visitor in newVisitors) {
-            drawVisitor(visitor)
+            drawNewVisitor(visitor)
         }
     }
 
     /**
-     * Draws a single visitor entry with item preview.
+     * Draws a single new-visitor entry with item preview.
+     * Click toggles [VisitorApi.Visitor.ignoreShoppingList].
      */
-    private fun MutableList<Renderable>.drawVisitor(visitorName: String) {
-        val displayName = GardenVisitorColorNames.getColoredName(visitorName)
+    private fun MutableList<Renderable>.drawNewVisitor(visitor: VisitorApi.Visitor) {
+        val visitorName = visitor.visitorName
 
         val list = mutableListOf<Renderable>()
-        list.addString(" §7- $displayName")
+        list.addString(" §7- ")
+        list.add(visitor.toClickableName())
 
         if (config.itemPreview) {
-            val visitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
-            val items = visitor?.needItems
+            val repoVisitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
+            val items = repoVisitor?.needItems
             if (items == null) {
                 ErrorManager.logErrorStateWithData(
                     "Visitor has no items in repository",
@@ -241,10 +247,11 @@ object GardenVisitorShoppingList {
                 )
                 logMissingRepoItems(visitorName)
                 list.addString(" §7(§c?§7)")
+                add(Renderable.horizontal(list))
                 return
             }
             if (items.isEmpty()) {
-                if (visitor.unknownRewards == true) {
+                if (repoVisitor.unknownRewards == true) {
                     list.addString(" §7(§fUnknown§7)")
                 } else {
                     list.addString(" §7(§fAny§7)")
@@ -257,6 +264,43 @@ object GardenVisitorShoppingList {
         }
 
         add(Renderable.horizontal(list))
+    }
+
+    private fun MutableList<Renderable>.drawVisitors(visitors: List<VisitorApi.Visitor>) {
+        if (visitors.isEmpty()) return
+        if (isNotEmpty()) addString("")
+        val amount = visitors.size
+        val visitorLabel = if (amount == 1) "Visitor" else "Visitors"
+        addString("§e$amount §7$visitorLabel:")
+        for (visitor in visitors) {
+            drawVisitor(visitor)
+        }
+    }
+
+    private fun MutableList<Renderable>.drawVisitor(visitor: VisitorApi.Visitor) {
+        val list = mutableListOf<Renderable>()
+        list.addString(" §7- ")
+        list.add(visitor.toClickableName())
+        add(Renderable.horizontal(list))
+    }
+
+    private fun VisitorApi.Visitor.toClickableName(): Renderable {
+        val displayName = if (ignoreShoppingList) {
+            "§7§m${visitorName.removeColor()}"
+        } else {
+            GardenVisitorColorNames.getColoredName(visitorName)
+        }
+        return Renderable.clickable(
+            displayName,
+            onLeftClick = {
+                ignoreShoppingList = !ignoreShoppingList
+                updateDisplay()
+            },
+            tips = listOf(
+                if (ignoreShoppingList) "§eClick to include this visitor in the shopping list."
+                else "§eClick to ignore this visitor in the shopping list.",
+            ),
+        )
     }
 
     private val visitorMissingItemsWarnTime: MutableMap<String, SimpleTimeMark> = mutableMapOf()
@@ -308,8 +352,6 @@ object GardenVisitorShoppingList {
 
     private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
-    // TODO cut this function down in smaller checks, idk which one, just less than 5 return statements so detekt is happy
-    @Suppress("ReturnCount")
     private fun showGui(): Boolean {
         if (IslandType.HUB.isInIsland()) {
             if (config.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
@@ -321,11 +363,7 @@ object GardenVisitorShoppingList {
         }
         if (config.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
-        if (GardenApi.inGarden()) {
-            if (GardenApi.onBarnPlot) return true
-            if (!config.onlyWhenClose) return true
-        }
-        return false
+        return GardenApi.inGarden() && (GardenApi.onBarnPlot || !config.onlyWhenClose)
     }
 
     @HandleEvent(ProfileJoinEvent::class)
