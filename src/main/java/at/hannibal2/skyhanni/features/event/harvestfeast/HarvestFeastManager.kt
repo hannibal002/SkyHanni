@@ -58,7 +58,6 @@ object HarvestFeastManager {
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
-    private val feastInventoryDetector by lazy { InventoryDetector(feastInventoryPattern) }
     private val allCropsInventoryDetector by lazy { InventoryDetector(allCropsInventoryPattern) }
 
     private var currentFeastData: EliteFeastData? = null
@@ -69,6 +68,7 @@ object HarvestFeastManager {
     private var displayDirty = false
     private var fetchedFromElite = false
     private var lastFetched = SimpleTimeMark.farPast()
+    private var lastSubmit: Pair<Int, Int>? = null
     private var display: Renderable? = null
 
     private val fetchingFeastDataMutex = Mutex()
@@ -125,8 +125,6 @@ object HarvestFeastManager {
         if (!SkyBlockUtils.inSkyBlock) return
 
         if (displayDirty) updateDisplay()
-
-        if (feastInventoryDetector.isInside()) return
         fetch()
     }
 
@@ -139,6 +137,9 @@ object HarvestFeastManager {
     @HandleEvent(ConfigLoadEvent::class)
     fun onConfigLoad() {
         currentFeastData = profileStorage.storedHarvestFeastData.takeUnless { isOutdated(it) }
+        lastSubmit = profileStorage.lastHarvestFeastSubmitYear
+            .takeIf { it > 0 }
+            ?.let { it to profileStorage.lastHarvestFeastSubmitMonth }
     }
 
     private fun readAllCrops(items: Map<Int, ItemStack>) {
@@ -167,11 +168,13 @@ object HarvestFeastManager {
     }
 
     private fun trySubmitData(data: EliteFeastJson) {
+        if (alreadySubmittedThisSkyBlockMonth()) return
         if (sendingFeastDataMutex.isLocked) {
-            ChatUtils.chat { append("You already submitted data for this Harvest Feast.").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat { append("You are already submitting data for this Harvest Feast.").withColor(0xFFFF5555.toInt()) }
             return
         }
         CoroutineSettings("submit harvest feast data").withIOContext().withMutex(sendingFeastDataMutex).launchCoroutine {
+            if (alreadySubmittedThisSkyBlockMonth()) return@launchCoroutine
             if (EliteDevApi.submitHarvestFeast(data)) {
                 ChatUtils.chat { append("Successfully submitted harvest feast data. Thank you for sharing!").withColor(0xFF55FF55.toInt()) }
 
@@ -187,13 +190,21 @@ object HarvestFeastManager {
                         oneTimeClick = true,
                     )
                 }
-
+                val now = SkyBlockTime.now()
+                lastSubmit = now.year to now.month
+                profileStorage.lastHarvestFeastSubmitYear = now.year
+                profileStorage.lastHarvestFeastSubmitMonth = now.month
             } else ErrorManager.logErrorStateWithData(
                 "Failed to upload Harvest Feast data to EliteSkyBlock. If this happens again, please report this in the Discord!",
                 "failed to upload harvest feast data",
                 "data" to data,
             )
         }
+    }
+
+    private fun alreadySubmittedThisSkyBlockMonth(): Boolean {
+        val now = SkyBlockTime.now()
+        return lastSubmit == (now.year to now.month)
     }
 
     private fun readCurrentActiveCrops(stacks: Map<Int, ItemStack>): List<CropType> {
@@ -230,15 +241,6 @@ object HarvestFeastManager {
                     outputMap[crop] = null
                 }
             }
-        }
-
-        val now = SkyBlockTime.now()
-        val stamp = SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
-            SkyBlockTime.SKYBLOCK_YEAR_MILLIS * now.year +
-            SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (now.month - 1)
-
-        inSeason.forEach {
-            outputMap[it] = stamp
         }
 
         return outputMap
@@ -296,7 +298,7 @@ object HarvestFeastManager {
 
     private fun isDataAvailable(): Boolean {
         val now = SkyBlockTime.now()
-        return now.month in 7..9 || assumeGrandFeast() || (!isCurrentOutdated && currentFeastData?.isGrandFeast == true)
+        return now.month in 7..9 || assumeGrandFeast() || (!isOutdated(currentFeastData) && currentFeastData?.isGrandFeast == true)
     }
 
     private fun resetData() {
@@ -304,6 +306,9 @@ object HarvestFeastManager {
         profileStorage.storedHarvestFeastData = null
         lastFetched = SimpleTimeMark.farPast()
         fetchedFromElite = false
+        lastSubmit = null
+        profileStorage.lastHarvestFeastSubmitYear = -1
+        profileStorage.lastHarvestFeastSubmitMonth = -1
     }
 
     private fun updateDisplay() {
@@ -322,9 +327,7 @@ object HarvestFeastManager {
         val data = currentFeastData ?: return
 
         addString("§aCurrent: ")
-        val endStamp = data.next.toList().sortedBy { it.second ?: Long.MAX_VALUE }.firstOrNull { it.second != null }?.second?.plus(
-            SkyBlockTime.SKYBLOCK_MONTH_MILLIS
-        ) ?: Long.MAX_VALUE
+        val endStamp = data.next.toList().sortedBy { it.second ?: Long.MAX_VALUE }.firstOrNull { it.second != null }?.second ?: Long.MAX_VALUE
         val duration = (endStamp - System.currentTimeMillis()).milliseconds
 
         currentFeastData?.current?.map { CropType.getByName(it) }?.forEach { crop ->
@@ -355,23 +358,11 @@ object HarvestFeastManager {
             description = "Prints the current feast data to chat"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-
-                val builder = StringBuilder()
-                builder.append("profile feast data(outdated: ${isOutdated(profileStorage.storedHarvestFeastData)}): ")
-                builder.appendLine(profileStorage.storedHarvestFeastData?.getBody())
-                builder.append("current feast data (outdated: $isCurrentOutdated): ")
-                builder.appendLine(currentFeastData?.getBody())
-                builder.appendLine("fetched from elite: $fetchedFromElite")
-                builder.appendLine("last fetched: ${lastFetched.passedSince()}")
-                builder.appendLine("isDataAvailable: ${isDataAvailable()}")
-                builder.appendLine("Assume grand feast: ${assumeGrandFeast()} (" +
-                    "${ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false}, " +
-                    "${ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false}, " +
-                    "${currentFeastData?.let { it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false})")
+                val dump = generateDebugString("Harvest Feast Debug Snapshot")
 
                 CoroutineSettings("copy feast data to clipboard").withIOContext().launchCoroutine {
-                    ClipboardUtils.copyToClipboardAsync(builder.toString()).await() ?: return@launchCoroutine
-                    ChatUtils.chat("Copied feast data to clipboard.")
+                    ClipboardUtils.copyToClipboardAsync(dump).await() ?: return@launchCoroutine
+                    ChatUtils.chat("Copied harvest feast debug data to clipboard.")
                 }
             }
         }
@@ -379,9 +370,47 @@ object HarvestFeastManager {
             description = "Resets current Harvest Feast data"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
+                val before = generateDebugString("Harvest Feast Reset (before)")
                 resetData()
-                ChatUtils.chat("Reset Harvest Feast data.")
+                val after = generateDebugString("Harvest Feast Reset (after)")
+                val dump = before + "\n" + after
+
+                CoroutineSettings("copy feast reset debug data to clipboard").withIOContext().launchCoroutine {
+                    ClipboardUtils.copyToClipboardAsync(dump).await()
+                }
+                ChatUtils.chat("Reset Harvest Feast data and copied before/after debug data to clipboard.")
             }
+        }
+    }
+
+    private fun generateDebugString(title: String): String {
+        val now = SkyBlockTime.now()
+        val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
+        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
+        val timeBasedGrandFeast = currentFeastData?.let {
+            it.month !in 7..9 && it.year == now.year && it.current.isNotEmpty()
+        } ?: false
+
+        val data = currentFeastData
+        val profileData = profileStorage.storedHarvestFeastData
+        val nextValues = data?.next?.values.orEmpty()
+        val nextDefined = nextValues.count { it != null }
+        val nextMissing = nextValues.size - nextDefined
+        val nextEarliest = nextValues.filterNotNull().minOrNull()
+
+        return buildString {
+            appendLine("$title:")
+            appendLine("nowSB: year=${now.year}, month=${now.month}, day=${now.day}, hour=${now.hour}, minute=${now.minute}")
+            appendLine("config: fetchAutomatically=${config.fetchAutomatically}, shareAutomatically=${config.shareAutomatically}, displayCurrentCrops=${config.displayCurrentCrops}")
+            appendLine("state: inSkyBlock=${SkyBlockUtils.inSkyBlock}, inGarden=${GardenApi.inGarden()}, displayDirty=$displayDirty, hasDisplay=${display != null}")
+            appendLine("mutex: fetchingLocked=${fetchingFeastDataMutex.isLocked}, sendingLocked=${sendingFeastDataMutex.isLocked}")
+            appendLine("fetchStatus: fetchedFromElite=$fetchedFromElite, lastFetchedAgo=${lastFetched.passedSince()}, isDataAvailable=${isDataAvailable()}, isCurrentOutdated=$isCurrentOutdated")
+            appendLine("sendStatus: alreadySubmittedThisMonth=${alreadySubmittedThisSkyBlockMonth()}, lastSubmit=$lastSubmit, storedLastSubmit=${profileStorage.lastHarvestFeastSubmitYear}-${profileStorage.lastHarvestFeastSubmitMonth}")
+            appendLine("grandFeast: assumed=${assumeGrandFeast()}, mayorPerk=$mayorGrandFeast, ministerPerk=$ministerGrandFeast, timeBased=$timeBasedGrandFeast")
+            appendLine("currentData(outdated=${isOutdated(data)}): ${data?.getBody()}")
+            appendLine("currentDataStats: complete=${data?.complete}, isGrand=${data?.isGrandFeast}, currentCount=${data?.current?.size ?: 0}, nextEntries=${data?.next?.size ?: 0}, nextDefined=$nextDefined, nextMissing=$nextMissing, nextEarliest=$nextEarliest")
+            appendLine("profileData(outdated=${isOutdated(profileData)}): ${profileData?.getBody()}")
+            appendLine("storageFlags: harvestFeastSendingAsked=${profileStorage.harvestFeastSendingAsked}")
         }
     }
 }

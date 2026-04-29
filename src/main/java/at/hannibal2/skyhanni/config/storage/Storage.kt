@@ -25,6 +25,12 @@ class Storage {
     var storedHarvestFeastData: EliteFeastData? = null
 
     @Expose
+    var lastHarvestFeastSubmitYear: Int = -1
+
+    @Expose
+    var lastHarvestFeastSubmitMonth: Int = -1
+
+    @Expose
     var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()
 
     @Expose
