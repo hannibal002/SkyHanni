@@ -269,6 +269,10 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
+        if (hasReminderShown || config.onlyWarnOnReminder) {
+            hasWarned = true
+            return
+        }
         shouldRepeatWarning = false
         TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
         ChatUtils.notifyOrDisable(
