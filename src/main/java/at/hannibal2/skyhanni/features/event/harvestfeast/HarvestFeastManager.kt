@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -44,6 +46,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
+import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -58,6 +61,7 @@ object HarvestFeastManager {
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
+    private val mainMenuInventoryDetector by lazy { InventoryDetector(feastInventoryPattern) }
     private val allCropsInventoryDetector by lazy { InventoryDetector(allCropsInventoryPattern) }
 
     private var currentFeastData: EliteFeastData? = null
@@ -126,6 +130,14 @@ object HarvestFeastManager {
 
         if (displayDirty) updateDisplay()
         fetch()
+    }
+
+    @HandleEvent
+    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!mainMenuInventoryDetector.isInside()) return
+        if (!isCurrentOutdated) return
+        event.container.slots.find { it.item.hoverName.string.removeColor().contains("all crops", ignoreCase = true) }
+            ?.highlight(Color(255, 100, 100, 100))
     }
 
     @HandleEvent
