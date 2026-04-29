@@ -47,7 +47,7 @@ object GardenCustomKeybinds {
         }
 
         cir.returnValue = when {
-            !keyBinding.isToggle() -> override.isKeyHeld()
+            !keyBinding.isToggle() -> override.isOverrideKeyHeld()
             keyBinding.isRemappedFrom(override) -> keyBinding.updateToggleState(override, isDown)
             else -> isDown
         }
@@ -122,11 +122,22 @@ object GardenCustomKeybinds {
 
     private fun primePressedToggleKeys() {
         for ((keyBinding, override) in map) {
-            if (keyBinding.isToggle() && keyBinding.isRemappedFrom(override) && override.isKeyHeld()) {
+            if (keyBinding.isToggle() && keyBinding.isRemappedFrom(override) && override.isOverrideKeyHeld()) {
                 pressedToggleKeys[keyBinding] = override
             }
         }
     }
+
+    private fun Int.isOverrideKeyHeld(): Boolean {
+        if (isMouseButton()) {
+            val handle = Minecraft.getInstance().window.handle()
+            return GLFW.glfwGetMouseButton(handle, this) == GLFW.GLFW_PRESS
+        }
+        return isKeyHeld()
+    }
+
+    private fun Int.isMouseButton(): Boolean =
+        this in GLFW.GLFW_MOUSE_BUTTON_1..GLFW.GLFW_MOUSE_BUTTON_6
 
     private fun KeyMapping.isToggle(): Boolean =
         this is ToggleKeyMapping && needsToggle.getAsBoolean()
@@ -135,7 +146,7 @@ object GardenCustomKeybinds {
         key.value != override
 
     private fun KeyMapping.updateToggleState(override: Int, isDown: Boolean): Boolean {
-        if (!override.isKeyHeld()) {
+        if (!override.isOverrideKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return isDown
         }
@@ -147,7 +158,7 @@ object GardenCustomKeybinds {
     }
 
     private fun KeyMapping.consumeToggleClick(override: Int): Boolean {
-        if (!override.isKeyHeld()) {
+        if (!override.isOverrideKeyHeld()) {
             pressedToggleKeys.remove(this, override)
             return false
         }
