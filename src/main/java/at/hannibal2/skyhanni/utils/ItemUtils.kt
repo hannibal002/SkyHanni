@@ -301,8 +301,7 @@ object ItemUtils {
 
             if (this.getPetLevel() == 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
-            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
-                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+            } else if (this.getPetLevel() == 200) {
                 internalName = "${internalName.asString()}+200".toInternalName()
             } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
@@ -420,7 +419,9 @@ object ItemUtils {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
-        for (line in this.getLore().reversed()) {
+        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        for (line in cleanLore.reversed()) {
+            if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
@@ -436,7 +437,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
@@ -449,7 +450,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
