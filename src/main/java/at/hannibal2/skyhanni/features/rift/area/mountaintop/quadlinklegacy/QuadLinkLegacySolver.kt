@@ -11,22 +11,18 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.Job
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -48,24 +44,11 @@ object QuadLinkLegacySolver {
     const val PLAYER_PIECE = 'O'
     const val EMPTY_PIECE = '_'
 
-    private val patternGroup = RepoPattern.group("rift.area.mountaintop.wizardman")
-
-    /**
-     * REGEX-TEST: Green player is Wizardman
-     * REGEX-TEST: Red player is Technoblade
-     */
-    private val playerColorPattern by patternGroup.pattern(
-        "player-color",
-        "(?<color>[A-Za-z]+) player is .*\\.?",
-    )
-
     private var solver: Solver? = null
 
     private val inInventory = AtomicBoolean(false)
     private val currentPieceCount = AtomicInteger(0)
     private var currentBoard: CharArray? = null
-    private var currentOpponentColor: String? = null
-    private var currentPlayerColor: String? = null
     private var latestResponse: QLLResponse? = null
     private var solverAdapterJob: Job? = null
 
@@ -83,8 +66,6 @@ object QuadLinkLegacySolver {
         if (!inInventory.getAndSet(false)) return
         currentPieceCount.set(0)
         currentBoard = null
-        currentOpponentColor = null
-        currentPlayerColor = null
         latestResponse = null
         solverCommand.set(null)
         solverResponse.set(null)
@@ -142,7 +123,7 @@ object QuadLinkLegacySolver {
             ?.recommendedMove
 
         config.connectFourDebugPosition.renderRenderable(
-            createDebugBoard(currentBoard, recommendedMove, currentOpponentColor, currentPlayerColor),
+            createDebugBoard(currentBoard, recommendedMove),
             posLabel = "Quad Link Legacy Debug",
         )
     }
@@ -171,8 +152,8 @@ object QuadLinkLegacySolver {
         // use InventoryUtils because hypixel keeps sending garbage inventory update packets
         val inventoryItems = InventoryUtils.getItemsInOpenChestWithNull().associate { it.containerSlot to it.item.orNull() }
 
-        val enemyColor = getPlayerColor(inventoryItems[WIZARD_PIECE_INDICATOR_SLOT]) ?: return false
-        val playerColor = getPlayerColor(inventoryItems[PLAYER_PIECE_INDICATOR_SLOT]) ?: return false
+        val enemyColor = inventoryItems[WIZARD_PIECE_INDICATOR_SLOT]?.getSkullTexture() ?: return false
+        val playerColor = inventoryItems[PLAYER_PIECE_INDICATOR_SLOT]?.getSkullTexture() ?: return false
 
         val board = CharArray(COLUMN_COUNT * ROW_COUNT) { EMPTY_PIECE }
         var pieceCount = 0
@@ -180,9 +161,9 @@ object QuadLinkLegacySolver {
         for (row in 0..<ROW_COUNT) {
             for (column in 0..<COLUMN_COUNT) {
                 val slot = column + 1 + row * 9
-                val piece = when {
-                    slotBelongsToColor(inventoryItems[slot], enemyColor) -> WIZARD_PIECE
-                    slotBelongsToColor(inventoryItems[slot], playerColor) -> PLAYER_PIECE
+                val piece = when (inventoryItems[slot]?.getSkullTexture()) {
+                    enemyColor -> WIZARD_PIECE
+                    playerColor -> PLAYER_PIECE
                     else -> EMPTY_PIECE
                 }
                 board[row * COLUMN_COUNT + column] = piece
@@ -193,36 +174,17 @@ object QuadLinkLegacySolver {
         if (pieceCount <= currentPieceCount.get()) return false
 
         currentPieceCount.set(pieceCount)
-        currentOpponentColor = enemyColor
-        currentPlayerColor = playerColor
         currentBoard = board
         return true
-    }
-
-    private fun getPlayerColor(stack: ItemStack?): String? = stack?.getLoreComponent()?.firstNotNullOfOrNull { line ->
-        playerColorPattern.matchMatcher(line.string) {
-            group("color").lowercase()
-        }
-    }
-
-    private fun slotBelongsToColor(stack: ItemStack?, color: String): Boolean {
-        val cleanedColor = color.cleanString()
-        if (stack?.displayName?.string?.cleanString()?.contains(cleanedColor) == true) return true
-
-        return stack?.getLoreComponent()?.any { line -> line.string.cleanString().contains(cleanedColor) } == true
     }
 
     private fun createDebugBoard(
         board: CharArray,
         recommendedMove: Int?,
-        opponentColor: String?,
-        playerColor: String?,
     ) = with(Renderable) {
         vertical(
             listOf(
-                text("Opponent: $opponentColor"),
-                text("Player: $playerColor"),
-                text("Move: $recommendedMove"),
+                text("Recommended Move: $recommendedMove"),
                 table(
                     List(ROW_COUNT) { row ->
                         List(COLUMN_COUNT) { column ->
