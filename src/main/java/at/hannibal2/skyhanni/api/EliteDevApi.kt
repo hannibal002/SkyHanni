@@ -275,7 +275,7 @@ object EliteDevApi {
             "requestUrl" to feastStatic.toGet(),
             "feastApiResponse" to res,
         )
-        return ConfigManager.gson.fromJson<EliteFeastData>(apiData)
+        return ApiUtils.serializeNullsGson.fromJson<EliteFeastData>(apiData)
     }
 
     suspend fun submitHarvestFeast(postData: EliteFeastJson): Boolean {
