@@ -47,4 +47,13 @@ class GreenhouseConfig {
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(180, 40)
+
+    @Expose
+    @ConfigOption(
+        name = "Phantomleaf Solver",
+        desc = "Stand still for the solver to work.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var phantomleafSolver: Boolean = true
 }
