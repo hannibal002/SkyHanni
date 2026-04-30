@@ -94,6 +94,9 @@ object RareCropTracker {
         SALTED_SUNFLOWER_SEEDS("§aSalted Sunflower Seeds", "Salted Sunflower Seeds"),
         CRYSTALIZED_MOONLIGHT("§aCrystalized Moonlight", "Crystalized Moonlight"),
         FLORAL_GELATIN("§aFloral Gelatin", "Floral Gelatin"),
+        RAREFINDER_CHIP("§9Rarefinder Chip", "Rarefinder Chip"),
+        BURROWING_SPORES("§9Burrowing Spores", "Burrowing Spores"),
+        WARTY("§5Warty", "Warty"),
         ;
 
         val chatPattern by patternGroup.pattern(
