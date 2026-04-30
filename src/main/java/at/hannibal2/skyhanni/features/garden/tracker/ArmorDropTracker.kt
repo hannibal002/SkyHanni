@@ -77,10 +77,24 @@ object ArmorDropTracker {
         SQUASH("§9Squash", "(?:§.)*RARE CROP! (?:§.)*Squash.*"),
         FERMENTO("§5Fermento", "(?:§.)*RARE CROP! (?:§.)*Fermento.*"),
         HELIANTHUS("§6Helianthus", "(?:§.)*RARE CROP! (?:§.)*Helianthus.*"),
+        SEASONING("§2Seasoning", "(?:§.)*RARE CROP! (?:§.)*Seasoning.*"),
+        CORNUCOPIA("§aCornucopia", "(?:§.)*RARE CROP! (?:§.)*Cornucopia.*"),
+        CARROT_ZEST("§aCarrot Zest", "(?:§.)*RARE CROP! (?:§.)*Carrot Zest.*"),
+        DEEPFRIES("§aDeepfries", "(?:§.)*RARE CROP! (?:§.)*Deepfries.*"),
+        AGGOURDIAN("§aAggourdian", "(?:§.)*RARE CROP! (?:§.)*Aggourdian.*"),
+        CANE_KNOT("§aCane Knot", "(?:§.)*RARE CROP! (?:§.)*Cane Knot.*"),
+        MELON_JUICE("§aMelon Juice", "(?:§.)*RARE CROP! (?:§.)*Melon Juice.*"),
+        CACTUS_FLOWER("§aCactus Flower", "(?:§.)*RARE CROP! (?:§.)*Cactus Flower.*"),
+        DESIGNER_COFFEE_BEANS("§aDesigner Coffee Beans", "(?:§.)*RARE CROP! (?:§.)*Designer Coffee Beans.*"),
+        FEASTFUNGUS("§aFeastfungus", "(?:§.)*RARE CROP! (?:§.)*Feastfungus.*"),
+        BOTROOT("§aBotroot", "(?:§.)*RARE CROP! (?:§.)*Botroot.*"),
+        SALTED_SUNFLOWER_SEEDS("§aSalted Sunflower Seeds", "(?:§.)*RARE CROP! (?:§.)*Salted Sunflower Seeds.*"),
+        CRYSTALIZED_MOONLIGHT("§aCrystalized Moonlight", "(?:§.)*RARE CROP! (?:§.)*Crystalized Moonlight.*"),
+        FLORAL_GELATIN("§aFloral Gelatin", "(?:§.)*RARE CROP! (?:§.)*Floral Gelatin.*"),
         ;
 
         val chatPattern by patternGroup.pattern(
-            name.lowercase(),
+            name.lowercase().replace('_', '-'),
             chatMessage,
         )
     }
