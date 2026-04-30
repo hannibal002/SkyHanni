@@ -701,6 +701,7 @@ object EstimatedItemValueCalculator {
                     multiplier = 2.intPow(rawLevel - 1)
                     level = 1
                 }
+
                 in data.onlyTierFivePrices if rawLevel in 6..10 -> {
                     multiplier = 2.intPow(rawLevel - 5)
                     if (multiplier > 1) level = 5
@@ -711,12 +712,15 @@ object EstimatedItemValueCalculator {
             }
             if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
-            data.endcapEnchants?.get(rawName)?.let { endcapData ->
-                if (rawLevel > endcapData.requiredLevel) {
-                    level = endcapData.requiredLevel
-                    items[endcapData.endcapItem] = 1
+            data.endcapEnchants
+                ?.get(rawName)
+                ?.takeIfNotEmpty()
+                ?.let { endcapData ->
+                    level = endcapData.minOf { it.requiredLevel }
+                    endcapData.forEach { levelData ->
+                        items[levelData.endcapItem] = 1
+                    }
                 }
-            }
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
