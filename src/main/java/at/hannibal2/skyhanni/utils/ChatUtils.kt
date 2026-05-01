@@ -408,7 +408,7 @@ object ChatUtils {
         if (lastMessageSent.passedSince() > messageDelay) {
             val message = sendQueue.poll() ?: return
             val connection = MinecraftCompat.localPlayer.connection
-            if (message.startsWith('/')) connection.sendCommand(message)
+            if (message.startsWith('/')) connection.sendCommand(message.drop(1))
             else connection.sendChat(message)
             lastMessageSent = SimpleTimeMark.now()
         }
