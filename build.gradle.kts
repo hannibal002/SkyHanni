@@ -147,7 +147,7 @@ dependencies {
     testImplementation(libs.mockk)
 
     modImplementation(libs.hypixelmodapi)
-    include(libs.hypixelmodapi.fabric)
+    modRuntimeOnly(libs.hypixelmodapi.fabric)
 
 
     modCompileOnly(libs.roughlyenoughitems) {

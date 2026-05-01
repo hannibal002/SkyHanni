@@ -33,7 +33,6 @@ import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChatManager {
@@ -158,13 +157,6 @@ object ChatManager {
         val message = original.formattedTextCompat().stripHypixelMessage()
         var cancelled = false
 
-        if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
-            HypixelData.checkForLocraw(message)
-            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
-                cancelled = true
-            }
-            return cancelled
-        }
         val key = IdentityCharacteristics(original)
         val chatEvent = SkyHanniChatEvent.Allow(message, original)
         chatEvent.post()
