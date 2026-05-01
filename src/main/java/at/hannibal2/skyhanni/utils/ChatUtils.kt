@@ -417,7 +417,7 @@ object ChatUtils {
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                if (message.startsWith('/')) it.connection.sendCommand(message)
+                if (message.startsWith('/')) it.connection.sendCommand(message.drop(1))
                 else it.connection.sendChat(message)
                 lastMessageSent = SimpleTimeMark.now()
                 return
