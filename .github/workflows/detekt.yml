@@ -10,7 +10,6 @@ on:
 permissions:
     contents: read
     pull-requests: write
-    issues: write
 
 jobs:
     detekt:
@@ -65,20 +64,20 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
 
-            -   name: Add label if detekt fails
-                if: ${{ (steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure') && steps.check_sarif.outputs.exists == 'true' }}
-                continue-on-error: true
-                uses: actions-ecosystem/action-add-labels@18f1af5e3544586314bbe15c0273249c770b2daf # v1.1.3
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Detekt'
-            -   name: Remove label if detekt passes
-                if: ${{ steps.run_detekt.outcome != 'failure' && steps.run_detekt_fork.outcome != 'failure' }}
-                continue-on-error: true
-                uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1.2.0
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Detekt'
+            # -   name: Add label if detekt fails
+            #     if: ${{ (steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure') && steps.check_sarif.outputs.exists == 'true' }}
+            #     continue-on-error: true
+            #     uses: actions-ecosystem/action-add-labels@18f1af5e3544586314bbe15c0273249c770b2daf # v1.1.3
+            #     with:
+            #         github_token: ${{ secrets.GITHUB_TOKEN }}
+            #         labels: 'Detekt'
+            # -   name: Remove label if detekt passes
+            #     if: ${{ steps.run_detekt.outcome != 'failure' && steps.run_detekt_fork.outcome != 'failure' }}
+            #     continue-on-error: true
+            #     uses: actions-ecosystem/action-remove-labels@2ce5d41b4b6aa8503e285553f75ed56e0a40bae0 # v1.2.0
+            #     with:
+            #         github_token: ${{ secrets.GITHUB_TOKEN }}
+            #         labels: 'Detekt'
 
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
@@ -120,40 +119,40 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                 run: |
                     kotlinc -script .github/scripts/process-detekt-output.kts
-            -   name: Check for duplicate comment
-                id: check_duplicate
-                uses: actions/github-script@v7
-                with:
-                    script: |
-                        const fs = require('fs');
-                        const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
-                        const m = commentBody.match(/<!--\s*detekt-sarif-hash:(-?\d+)\s*-->/);
-                        if (!m) return false;
-                        const hash = m[1];
-                        const { data: comments } = await github.rest.issues.listComments({
-                            owner: context.repo.owner,
-                            repo:  context.repo.repo,
-                            issue_number: context.issue.number
-                        });
-                        return comments.some(c => c.body.includes(hash));
-            -   name: Skip comment if duplicate
-                if: steps.check_duplicate.outputs.result == 'true'
-                run: echo "Duplicate comment found, skipping..."
+            # -   name: Check for duplicate comment
+            #     id: check_duplicate
+            #     uses: actions/github-script@v7
+            #     with:
+            #         script: |
+            #             const fs = require('fs');
+            #             const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
+            #             const m = commentBody.match(/<!--\s*detekt-sarif-hash:(-?\d+)\s*-->/);
+            #             if (!m) return false;
+            #             const hash = m[1];
+            #             const { data: comments } = await github.rest.issues.listComments({
+            #                 owner: context.repo.owner,
+            #                 repo:  context.repo.repo,
+            #                 issue_number: context.issue.number
+            #             });
+            #             return comments.some(c => c.body.includes(hash));
+            # -   name: Skip comment if duplicate
+            #     if: steps.check_duplicate.outputs.result == 'true'
+            #     run: echo "Duplicate comment found, skipping..."
 
-            -   name: Add comment to PR
-                uses: actions/github-script@v7
-                if: steps.check_duplicate.outputs.result != 'true'
-                with:
-                    github-token: ${{ secrets.GITHUB_TOKEN }}
-                    script: |
-                        const fs = require('fs');
-                        const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
-                        github.rest.issues.createComment({
-                            issue_number: context.issue.number,
-                            owner: context.repo.owner,
-                            repo: context.repo.repo,
-                            body: commentBody
-                        })
+            # -   name: Add comment to PR
+            #     uses: actions/github-script@v7
+            #     if: steps.check_duplicate.outputs.result != 'true'
+            #     with:
+            #         github-token: ${{ secrets.GITHUB_TOKEN }}
+            #         script: |
+            #             const fs = require('fs');
+            #             const commentBody = fs.readFileSync('detekt_comment.txt', 'utf8');
+            #             github.rest.issues.createComment({
+            #                 issue_number: context.issue.number,
+            #                 owner: context.repo.owner,
+            #                 repo: context.repo.repo,
+            #                 body: commentBody
+            #             })
 
             # Detekt itself uses continue-on-error so labels/comments can still run.
             # This job only executes when detekt_failed == 'true', so fail explicitly here to mark the check red.
