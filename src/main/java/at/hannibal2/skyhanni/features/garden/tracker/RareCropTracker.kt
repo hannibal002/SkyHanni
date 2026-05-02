@@ -124,7 +124,9 @@ object RareCropTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§7Rare Crop Tracker:")
-        for ((drop, amount) in data.drops.sortedDesc()) {
+        val sorted = data.drops.sortedDesc().entries
+        val maxLines = config.maxDisplayLines
+        for ((drop, amount) in if (maxLines > 0) sorted.take(maxLines) else sorted) {
             val dropName = drop.dropName
             addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }

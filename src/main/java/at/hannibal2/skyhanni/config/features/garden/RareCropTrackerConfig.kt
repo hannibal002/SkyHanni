@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.garden.GardenIndividua
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -21,6 +22,11 @@ class RareCropTrackerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideChat: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Max Lines", desc = "Maximum number of drops to show. Set to 0 to show all.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 21f, minStep = 1f)
+    var maxDisplayLines: Int = 5
 
     @Expose
     @ConfigOption(
