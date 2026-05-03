@@ -14,7 +14,7 @@ object CrashOnJoin {
         Minecraft.getInstance().delayCrash(
             CrashReport(
                 "SkyHanni Crash on Join",
-                Throwable("Joining Skyblock may lead to bans!")
+                Throwable("Joining SkyBlock may lead to bans!")
             ),
         )
     }
