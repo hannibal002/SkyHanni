@@ -305,7 +305,7 @@ object HarvestFeastManager {
         val data = data ?: return true
         val now = SkyBlockTime.now()
         return data.year < now.year ||
-            data.month < (now.month + 1) ||
+            data.month < (now.month - 1) ||
             data.current.isEmpty()
     }
 
