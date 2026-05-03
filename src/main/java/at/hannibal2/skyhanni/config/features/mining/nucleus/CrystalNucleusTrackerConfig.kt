@@ -60,9 +60,9 @@ class CrystalNucleusTrackerConfig {
     val ironmanProfitType: Property<IronmanProfitType> = Property.of(IronmanProfitType.ONLY_IRONMAN)
 
     enum class IronmanProfitType(private val displayName: String) {
-        NONE("None"),
-        ONLY_IRONMAN("Only Ironman"),
-        ALL_PROFILES("All Profiles");
+        NONE("§cNone"),
+        ONLY_IRONMAN("§7Only Ironman"),
+        ALL_PROFILES("§2All Profiles");
         override fun toString(): String = displayName
     }
 
