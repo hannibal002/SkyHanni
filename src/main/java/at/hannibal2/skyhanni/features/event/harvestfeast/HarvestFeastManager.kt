@@ -338,7 +338,7 @@ object HarvestFeastManager {
     private fun MutableList<Renderable>.renderDisplay() {
         val data = currentFeastData ?: return
 
-        addString("§aCurrent: ")
+        addString("§aIn-season: ")
         val endStamp = data.next.toList().sortedBy { it.second ?: Long.MAX_VALUE }.firstOrNull { it.second != null }?.second ?: Long.MAX_VALUE
         val duration = (endStamp - System.currentTimeMillis()).milliseconds
 
