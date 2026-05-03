@@ -41,7 +41,6 @@ object FarmingLaneFeatures {
     private var timeRemaining: Duration? = null
     private var lastSpeed = 0.0
     private var lastTimeFarming = SimpleTimeMark.farPast()
-    private var lastPlaySound = SimpleTimeMark.farPast()
     private var lastDirection = 0
     private var movementState = MovementState.CALCULATING
 
@@ -144,10 +143,6 @@ object FarmingLaneFeatures {
                 )
                 else -> titleContext.takeIf { it?.alive == true }
             }
-            if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
-                lastPlaySound = SimpleTimeMark.now()
-                playUserSound()
-            }
         }
     }
 
@@ -216,12 +211,5 @@ object FarmingLaneFeatures {
         if (!config.distanceDisplay) return
 
         config.distanceDisplayPosition.renderStrings(display, posLabel = "Lane Display")
-    }
-
-    @JvmStatic
-    fun playUserSound() {
-        with(config.laneSwitchNotification.sound) {
-            SoundUtils.createSound(name, pitch).playSound()
-        }
     }
 }

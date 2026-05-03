@@ -30,9 +30,4 @@ class LaneSwitchNotificationConfig {
     @ConfigOption(name = "Text", desc = "The text with color to be displayed as the notification.")
     @ConfigEditorText
     var text: String = "&eLane Switch incoming."
-
-    @Expose
-    @ConfigOption(name = "Sound Settings", desc = "")
-    @Accordion
-    val sound: LaneSwitchSoundSettings = LaneSwitchSoundSettings()
 }
