@@ -339,8 +339,10 @@ object HarvestFeastManager {
         val data = currentFeastData ?: return
 
         addString("§aIn-season: ")
-        val endStamp = data.next.toList().sortedBy { it.second ?: Long.MAX_VALUE }.firstOrNull { it.second != null }?.second ?: Long.MAX_VALUE
-        val duration = (endStamp - System.currentTimeMillis()).milliseconds
+        val endStamp = data.next
+            .map { (it.value?.minus(System.currentTimeMillis()))?.milliseconds ?: Duration.INFINITE }
+            .filter { it.isPositive() }
+            .minByOrNull { it.inWholeMilliseconds } ?: return
 
         currentFeastData?.current?.map { CropType.getByName(it) }?.forEach { crop ->
             val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp")
@@ -351,7 +353,7 @@ object HarvestFeastManager {
             )
         }
 
-        addString("§7(§b${duration.format()}§7)")
+        addString("§7(§b${endStamp.format()}§7)")
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
