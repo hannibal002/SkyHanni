@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.data.jsonobjects.elitedev
 
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import com.google.gson.annotations.Expose
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @KSerializable
 data class EliteFeastJson(
@@ -37,4 +40,28 @@ data class EliteFeastData(
     @Expose val isGrandFeast: Boolean,
 ) {
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
+
+    private fun getDurations(): List<Duration> {
+        return next.map { (it.value?.minus(System.currentTimeMillis()))?.milliseconds ?: Duration.INFINITE }
+    }
+
+    private fun getDuration(): Duration {
+        return getDurations()
+            .minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+    }
+
+    fun getActiveDuration(): Duration = getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+
+    fun getCurrentCrops(): List<CropType> {
+        val fromCurrent = current.map { CropType.getByName(it) }
+
+        if (getDuration().isNegative()) {
+            val groups = next.entries.groupBy { it.value }
+            val activeGroup = groups.minByOrNull { it.key ?: Long.MAX_VALUE }
+                ?.takeIf { it.value.size == 3 }
+                ?.value
+                ?.map { it.key } ?: return fromCurrent
+            return activeGroup.map { CropType.getByName(it) }
+        } else return fromCurrent
+    }
 }

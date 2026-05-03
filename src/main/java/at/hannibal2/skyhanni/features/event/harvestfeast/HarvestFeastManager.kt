@@ -47,6 +47,7 @@ import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -282,15 +283,15 @@ object HarvestFeastManager {
 
         CoroutineSettings("harvest feast data fetch").withIOContext().withMutex(fetchingFeastDataMutex).launchCoroutine {
             currentFeastData = EliteDevApi.fetchHarvestFeastData().takeIf { it.complete && !isOutdated(it) }
-            handleFeastData()
+            handleFetchedFeastData()
             lastFetched = SimpleTimeMark.now()
             displayDirty = true
         }
     }
 
-    private fun handleFeastData() {
+    private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Current Harvest Feast Data could not be loaded.").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat { append("Harvest feast data is not yet available. Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!.").withColor(0xFFFF5555.toInt()) }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
@@ -306,7 +307,7 @@ object HarvestFeastManager {
         val data = data ?: return true
         val now = SkyBlockTime.now()
         return data.year < now.year ||
-            data.month < now.month ||
+            data.month < (now.month + 1) ||
             data.current.isEmpty()
     }
 
@@ -341,12 +342,11 @@ object HarvestFeastManager {
         val data = currentFeastData ?: return
 
         addString("§aIn-season: ")
-        val endStamp = data.next
-            .map { (it.value?.minus(System.currentTimeMillis()))?.milliseconds ?: Duration.INFINITE }
-            .filter { it.isPositive() }
-            .minByOrNull { it.inWholeMilliseconds } ?: return
 
-        currentFeastData?.current?.map { CropType.getByName(it) }?.forEach { crop ->
+        val duration = data.getActiveDuration()
+        val endStamp = Clock.System.now() + duration
+
+        data.getCurrentCrops().forEach { crop ->
             val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp")
             add(
                 Renderable.item(cropStack) {
@@ -355,7 +355,7 @@ object HarvestFeastManager {
             )
         }
 
-        addString("§7(§b${endStamp.format()}§7)")
+        addString("§7(§b${duration.format()}§7)")
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
