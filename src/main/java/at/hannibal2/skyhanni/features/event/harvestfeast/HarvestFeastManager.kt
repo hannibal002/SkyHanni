@@ -47,9 +47,7 @@ import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
-import kotlin.time.Clock
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -344,7 +342,7 @@ object HarvestFeastManager {
         addString("§aIn-season: ")
 
         val duration = data.getActiveDuration()
-        val endStamp = Clock.System.now() + duration
+        val endStamp = SimpleTimeMark.now() + duration
 
         data.getCurrentCrops().forEach { crop ->
             val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp")
