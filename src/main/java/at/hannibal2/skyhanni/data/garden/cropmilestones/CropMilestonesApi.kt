@@ -213,7 +213,8 @@ object CropMilestonesApi {
 
     internal fun CropType.addMilestoneCounter(counter: Long, sendLevelUp: Boolean = true) {
         if (counter == 0L) return
-        amountToNextTierCache[this] = amountToNextTierCache[this]?.plus(counter) ?: counter
+        val existing = amountToNextTierCache[this] ?: milestoneCalculateTierProgress()
+        amountToNextTierCache[this] = existing?.plus(counter) ?: counter
         val milestoneCounter = this.getMilestoneCounter() ?: 0
         this.setMilestoneCounter(milestoneCounter + counter)
         this.milestoneCheckProgress(sendLevelUp)
