@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.api.JsonApiResponse
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.seconds
 
@@ -278,10 +279,8 @@ object EliteDevApi {
         return ApiUtils.serializeNullsGson.fromJson<EliteFeastData>(apiData)
     }
 
-    suspend fun submitHarvestFeast(postData: EliteFeastJson): Boolean {
-        val post = ApiUtils.postJson(feastStatic, postData.getBody())
-        println("Success: ${post.success}, '${post.message}', '${post.data}': ${postData.getBody()}")
-        return post.success
+    suspend fun submitHarvestFeast(postData: EliteFeastJson): JsonApiResponse<JsonElement> {
+        return ApiUtils.postJson(feastStatic, postData.getBody())
     }
     // </editor-fold>
 }

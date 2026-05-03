@@ -187,7 +187,8 @@ object HarvestFeastManager {
         }
         CoroutineSettings("submit harvest feast data").withIOContext().withMutex(sendingFeastDataMutex).launchCoroutine {
             if (alreadySubmittedThisSkyBlockMonth()) return@launchCoroutine
-            if (EliteDevApi.submitHarvestFeast(data)) {
+            val res = EliteDevApi.submitHarvestFeast(data)
+            if (res.success) {
                 ChatUtils.chat { append("Successfully submitted harvest feast data. Thank you for sharing!").withColor(0xFF55FF55.toInt()) }
 
                 if (config.shareAutomatically == SharePolicy.ASK && !profileStorage.harvestFeastSendingAsked) {
@@ -210,6 +211,7 @@ object HarvestFeastManager {
                 "Failed to upload Harvest Feast data to EliteSkyBlock. If this happens again, please report this in the Discord!",
                 "failed to upload harvest feast data",
                 "data" to data,
+                "response" to res,
             )
         }
     }
