@@ -68,6 +68,14 @@ enum class PestType(
         "PEST_LOCUST_MONSTER".toInternalName(),
         CropType.POTATO,
     ),
+    LUNAR_MOTH(
+        "Lunar Moth",
+        BossType.GARDEN_PEST_LUNAR_MOTH,
+        SprayType.MOONDEW,
+        vinyl = null,
+        "PEST_LUNAR_MOTH_MONSTER".toInternalName(),
+        crop = null, // No single crop (Sunflower, Moonflower, Wild Rose)
+    ),
     MITE(
         "Mite",
         BossType.GARDEN_PEST_MITE,
