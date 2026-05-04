@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWard
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
 import at.hannibal2.skyhanni.config.features.inventory.sacks.OutsideSackValueConfig
+import at.hannibal2.skyhanni.config.features.inventory.sacks.SackDisplayOverlayConfig
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig
@@ -111,6 +112,11 @@ class InventoryConfig {
     @ConfigOption(name = "Sack Items Display", desc = "")
     @Accordion
     val sackDisplay: SackDisplayConfig = SackDisplayConfig()
+
+    @Expose
+    @ConfigOption(name = "Sack Display Overlay", desc = "")
+    @Accordion
+    val sackDisplayOverlay: SackDisplayOverlayConfig = SackDisplayOverlayConfig()
 
     @Expose
     @ConfigOption(name = "Outside Sack Value", desc = "")
