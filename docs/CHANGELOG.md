@@ -81,6 +81,7 @@
 
 + Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 + Added Inferno Minion Profit Tracker. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5500)
++ Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 
 ### Improvements
 
@@ -167,6 +168,10 @@
 + Fixed Mute Fusion Machine not working if you're too far away. - Luna (https://github.com/hannibal002/SkyHanni/pull/5526)
 + Fixed the Composter Display showing when disabled. - Alex (https://github.com/hannibal002/SkyHanni/pull/5574)
 + Fixed sending Pest Spawn Cooldown Expired warning wrongly at Garden join. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5432)
++ Fixed Elite Leaderboards numbers overestimating and drifting over time. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5637)
++ Fixed normal Attack/Destroy key still triggering inputs with Garden Custom Keybinds active. - Luna (https://github.com/hannibal002/SkyHanni/pull/5638)
++ Fixed Pest Cooldown Timer saying Unknown when the timer was ready. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5632)
++ Fixed Armor Drop Tracker not tracking rare crop drops. - Rain
 
 #### Combat
 
@@ -264,6 +269,7 @@
 + Fixed error causing Reforge Helper to fail to prevent reforges in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/5530)
 + Fixed some enchantments being named Combinable in the Anvil instead of their actual name in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5582)
 + Fixed Wardrobe background rendering over entities. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5577)
++ Fixed error with new Farming Tool (Axes and Hoes) item category. - jani (https://github.com/hannibal002/SkyHanni/pull/5640)
 
 #### Misc
 
@@ -305,6 +311,20 @@
 + Fixed Enter keybind firing incorrectly after closing chat or inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5413)
 + Fixed Garden Custom Keybinds not respecting Attack/Destroy, Use Item/Place Block, and Sneak being set to Toggle in vanilla Minecraft accessibility settings. - Luna (https://github.com/hannibal002/SkyHanni/pull/5601)
 + Fixed the mod not finding updates if the newest SkyHanni version doesn't have a download available for your current Minecraft version. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
++ Disallow writing to config when on Alpha. - Rain (https://github.com/hannibal002/SkyHanni/pull/5631)
+    + The mod won't write to config anymore when on Alpha, removing data sync/overwriting errors between Alpha and prod.
++ Fixed an error being thrown when Bingo NPCs aren't present on the island. - Rain (https://github.com/hannibal002/SkyHanni/pull/5636)
++ Fixed Autoupdater Update Stream automatically changing to Beta when Full was selected. - Rain (https://github.com/hannibal002/SkyHanni/pull/5629)
++ Fixed error in chat when Hypixel API says the current Minister has no perks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5641)
++ Fixed error when closing inventory during world change. - Luna (https://github.com/hannibal002/SkyHanni/pull/5639)
++ Fixed errors with legacy Fishing Weapon items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5647)
++ Fixed overbloom being an unknown stat. - Rain (https://github.com/hannibal002/SkyHanni/pull/5648)
++ Fixed reforge detection for new Farming Tool item category. - Luna (https://github.com/hannibal002/SkyHanni/pull/5647)
++ Fixed the Bouncy Ball thresholds not matching the updated values. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5643)
++ Fixed config being written when on Alpha. - Rain
+    * The mod won't write to config anymore when on Alpha, removing data sync/overwriting errors between Alpha and prod.
++ Adjusted Trapper Cooldown to permanently use the lower cooldown now that Pelt-pocalypse is permanent. - Luna
++ Fixed support for Finnegan's new Grand Feast mayor perk. - Luna
 
 #### Commands
 
@@ -515,6 +535,7 @@
     + These notifications only appear once per game start unless you manually check for updates.
 + Renamed `BlockClickEvent.getBlockState` to `BlockClickEvent.blockState` to avoid implying it's a method. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
 + Split deprecated `TELEPORT` graph node tag into `WARP`, `JUMP_PAD`, and `TELEPORT_PAD`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5621)
++ Added Copy Cosmetic Skull Data feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5627)
 
 ### Removed Features
 

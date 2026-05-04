@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import net.minecraft.world.item.ItemStack
 
+/**
+ * Deprecated entries should not be removed, they are kept to avoid errors with unupdated items.
+ */
 enum class ItemCategory {
     SWORD,
     LONGSWORD,
@@ -10,10 +13,11 @@ enum class ItemCategory {
     SHORT_BOW,
     WAND,
     FISHING_ROD,
+    @Deprecated("No longer exists") FISHING_WEAPON,
     ROD_PART,
     AXE,
     GAUNTLET,
-    HOE,
+    @Deprecated("No longer exists") HOE,
     PICKAXE,
     SHOVEL,
     DRILL,
