@@ -187,6 +187,12 @@ class FilterTypesConfig {
     @FeatureToggle
     var teleportPads: Boolean = false
 
+    @Expose
+    @ConfigOption(name = "Master Chef Ted", desc = "Hide annoying messages about Kernals getting added to your Purse.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var MasterChef: Boolean = false
+
     // TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
