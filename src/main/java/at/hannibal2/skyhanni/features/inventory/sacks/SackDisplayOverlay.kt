@@ -33,7 +33,7 @@ object SackDisplayOverlay {
         for (item in displayedItems.sortedByDescending { it.getAmountInSacksOrNull() }) {
             val count = item.getAmountInSacksOrNull() ?: 0
             add(Renderable.horizontal {
-                addString(" §7- §e${count.addSeparators()}x ")
+                addString(" §7- §e${count.addSeparators()}x")
                 addItemStack(item)
                 addString(item.repoItemName)
             })
