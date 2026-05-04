@@ -44,4 +44,14 @@ class FruitDiggingConfig {
     @ConfigOption(name = "Mines Color", desc = "Color of the mines clue.")
     @ConfigEditorColour
     var minesColor: ChromaColour = LorenzColor.RED.toChromaColor()
+
+    @Expose
+    @ConfigOption(name = "Show fruit guesses", desc = "Show guesses for fruits that have not been dug up yet.")
+    @ConfigEditorBoolean
+    var displayFruitGuesses: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Fruit Guess Color", desc = "Color of the mines clue.")
+    @ConfigEditorColour
+    var fruitGuessColor: ChromaColour = LorenzColor.AQUA.toChromaColor()
 }
