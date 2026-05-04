@@ -23,6 +23,7 @@ object TalbotCircles {
     private val constraints = mutableListOf<Constraint>()
     private val candidateBlocks = mutableListOf<LorenzVec>()
 
+    @Suppress("HandleEventInspection")
     fun drawGuesses(event: SkyHanniRenderWorldEvent) {
         if (constraints.isEmpty()) return
 
