@@ -74,7 +74,7 @@ enum class PestType(
         SprayType.MOONDEW,
         vinyl = null,
         "PEST_LUNAR_MOTH_MONSTER".toInternalName(),
-        crop = null, // No single crop (Sunflower, Moonflower, Wild Rose)
+        crop = null, // Always drops Sunflower, Moonflower, *and* Wild Rose
     ),
     MITE(
         "Mite",
