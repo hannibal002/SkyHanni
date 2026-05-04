@@ -257,7 +257,7 @@ object ChatFilter {
     // MONEY
     // Auction House
     private val auctionHouseMessages = listOf(
-        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your itefm!",
+        "§b-----------------------------------------------------", "§eVisit the Auction House to collect your item!",
     )
 
     // Bazaar
