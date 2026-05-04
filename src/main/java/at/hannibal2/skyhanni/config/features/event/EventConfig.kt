@@ -63,11 +63,10 @@ class EventConfig {
     @Expose
     val century: CenturyConfig = CenturyConfig()
 
-    // TODO remove 400
     @ConfigOption(name = "Century Celebration", desc = "Features for the Century Celebration Event in SkyBlock.")
     @Accordion
     @Expose
-    val anniversaryCelebration400: CenturyCelebrationConfig = CenturyCelebrationConfig()
+    val anniversaryCelebration400: AnniversaryCenturyCelebrationConfig = AnniversaryCenturyCelebrationConfig()
 
     @ConfigOption(name = "Year of the Seal", desc = "Features for Year of the Seal.")
     @Accordion
