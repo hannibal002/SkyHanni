@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.skyhanni.mixins.hooks.ExtendedColorHook;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -28,6 +30,11 @@ public class MixinTextRendererDrawer {
     @WrapOperation(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     private TextColor wrapGetColor(Style original, Operation<TextColor> operation) {
         return ChromaFontManagerKt.forceWhiteTextColorForChroma(original.getColor());
+    }
+
+    @ModifyReturnValue(method = "getTextColor", at = @At("RETURN"))
+    private int applyExtendedColorAlpha(int color, @Local(argsOnly = true) TextColor textColor) {
+        return ExtendedColorHook.applyExtendedColorAlpha(color, textColor);
     }
 
     @ModifyArg(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;createGlyph(FFIILnet/minecraft/network/chat/Style;FF)Lnet/minecraft/client/gui/font/TextRenderable$Styled;"))
