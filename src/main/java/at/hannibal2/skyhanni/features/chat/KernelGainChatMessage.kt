@@ -29,7 +29,7 @@ object KernelGainChatMessage {
             ChatUtils.chat("§6§lRARE CROP! §2Seasoning §7§o(§e§o+1 Kernel§7§o)", prefix = false)
         }
 
-        event.blockedReason = "arachne"
+        event.blockedReason = "masterchef"
     }
 
     fun isEnabled() = Perk.GRAND_FEAST.isActive && IslandType.GARDEN.isInIsland() && config
