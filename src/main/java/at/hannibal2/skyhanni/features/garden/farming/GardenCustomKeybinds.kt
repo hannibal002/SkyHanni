@@ -13,10 +13,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,6 +36,7 @@ object GardenCustomKeybinds {
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var wasActive = false
     private var mappingsApplied = false
+    private var refreshStateOnNextApply = true
 
     @JvmStatic
     fun originalKeyName(keyBinding: KeyMapping): String? =
@@ -42,8 +45,12 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) {
-            restoreMappings()
+            val wasUsingCustomMappings = mappingsApplied
+            restoreMappings(refreshState = false)
             wasActive = false
+            if (wasUsingCustomMappings) {
+                refreshStateOnNextApply = false
+            }
         }
     }
 
@@ -70,7 +77,7 @@ object GardenCustomKeybinds {
 
     private fun update() {
         val active = mappingsApplied
-        restoreMappings()
+        restoreMappings(refreshState = false)
         with(config) {
             with(mcSettings) {
                 map = buildMap {
@@ -97,14 +104,15 @@ object GardenCustomKeybinds {
 
         wasActive = active
         if (active) {
-            applyMappings()
+            applyMappings(refreshState = refreshStateOnNextApply)
+            refreshStateOnNextApply = true
         } else {
             restoreMappings()
         }
         return active
     }
 
-    private fun applyMappings() {
+    private fun applyMappings(refreshState: Boolean = true) {
         if (mappingsApplied) return
         for ((keyBinding, override) in map) {
             originalKeys[keyBinding] = keyBinding.key
@@ -112,18 +120,35 @@ object GardenCustomKeybinds {
         }
         mappingsApplied = true
         KeyMapping.resetMapping()
-        KeyMapping.releaseAll()
+        if (refreshState) refreshState(map.keys)
     }
 
-    private fun restoreMappings() {
+    private fun restoreMappings(refreshState: Boolean = true) {
         if (!mappingsApplied) return
-        KeyMapping.releaseAll()
+        val affectedKeys = originalKeys.keys.toList()
         for ((keyBinding, originalKey) in originalKeys) {
             keyBinding.setKey(originalKey)
         }
         mappingsApplied = false
         originalKeys.clear()
         KeyMapping.resetMapping()
+        if (refreshState) refreshState(affectedKeys)
+    }
+
+    private fun refreshState(keyBindings: Iterable<KeyMapping>) {
+        for (keyBinding in keyBindings) {
+            if (keyBinding.isToggle()) continue
+            keyBinding.setDown(keyBinding.key.isDown())
+        }
+    }
+
+    private fun KeyMapping.isToggle(): Boolean =
+        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+
+    private fun InputConstants.Key.isDown(): Boolean = when (type) {
+        InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().window, value)
+        InputConstants.Type.MOUSE -> MouseCompat.isButtonDown(value)
+        else -> false
     }
 
     private fun Int.toInputKey(): InputConstants.Key = when {
