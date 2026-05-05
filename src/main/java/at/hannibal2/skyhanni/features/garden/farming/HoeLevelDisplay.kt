@@ -97,7 +97,7 @@ object HoeLevelDisplay {
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
 
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
-            add("§cNot gaining XP! (Wrong crop)")
+            add("§cCannot track XP! (Wrong crop)")
         }
     }
 
