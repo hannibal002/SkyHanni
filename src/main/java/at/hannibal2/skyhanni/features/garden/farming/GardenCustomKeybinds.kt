@@ -42,6 +42,14 @@ object GardenCustomKeybinds {
     fun originalKeyName(keyBinding: KeyMapping): String? =
         originalKeys[keyBinding]?.name
 
+    @JvmStatic
+    fun onMouseGrabRestoringKeyState() {
+        if (!isActive()) return
+        wasActive = true
+        applyMappings(refreshState = false)
+        refreshStateOnNextApply = true
+    }
+
     @HandleEvent
     fun onGuiOpen(event: GuiScreenOpenEvent) {
         if (event.gui != null) {
