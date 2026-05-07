@@ -61,6 +61,11 @@ object ScoreboardPattern {
         "^(?:§.)*Sowdust: (?:§.)*[\\d,.kKmMbB]+ §7\\(\\+[\\d.kKmMbB]+\\)",
     )
 
+    val kernelsPattern by mainSB.pattern(
+        "kernels",
+        "(?:§.)*Kernels: (?:§.)*(?<kernels>[\\d,]+) \\(\\+1\\)",
+    )
+
     /**
      * REGEX-TEST: Gems: §a350
      */

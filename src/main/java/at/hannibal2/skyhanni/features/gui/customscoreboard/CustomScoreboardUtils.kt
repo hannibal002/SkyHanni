@@ -94,6 +94,8 @@ object CustomScoreboardUtils {
         ?: ScoreboardPattern.sowdustPattern.firstMatcher(TabWidget.GARDEN_LEVEL.lines.map { it.formattedTextCompat() }) { group("sowdust") }
         ?: "0"
 
+    internal fun getKernels() = getGroup(ScoreboardPattern.kernelsPattern, getSBLines(), "kernels") ?: ""
+
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
     internal fun getHeat() = MiningApi.heatDisplay

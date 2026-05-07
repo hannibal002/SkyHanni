@@ -42,6 +42,11 @@ class ChatConfig {
     val rareDropMessages: RareDropMessagesConfig = RareDropMessagesConfig()
 
     @Expose
+    @ConfigOption(name = "Grand Feast Messages", desc = "")
+    @Accordion
+    val grandFeastMessages: GrandFeastMessagesConfig = GrandFeastMessagesConfig()
+
+    @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
     @ConfigEditorDraggableList
     val dungeonFilteredMessageTypes: MutableList<DungeonMessageTypes> = mutableListOf()

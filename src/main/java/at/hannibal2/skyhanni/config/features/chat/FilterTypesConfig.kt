@@ -187,12 +187,6 @@ class FilterTypesConfig {
     @FeatureToggle
     var teleportPads: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Master Chef Ted", desc = "Compact messages about gaining Kernels alongside Seasoning.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var masterChef: Boolean = false
-
     // TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
