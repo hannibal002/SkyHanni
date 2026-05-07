@@ -114,6 +114,11 @@ object CopyNearbyEntitiesCommand {
                 }
             }
 
+            if (entity is Display) {
+                // separate because the when also needs to trigger
+                addDisplayEntity(entity)
+            }
+
             when (entity) {
                 is ArmorStand -> addArmorStand(entity)
                 is EnderMan -> addEnderman(entity)
@@ -122,10 +127,10 @@ object CopyNearbyEntitiesCommand {
                 is RemotePlayer -> addOtherPlayer(entity)
                 is Creeper -> addCreeper(entity)
                 is WitherBoss -> addWither(entity)
-                is Display.ItemDisplay -> addItemDisplayEntity(entity)
                 is TropicalFish -> addTropicalFish(entity)
                 is Shulker -> addShulker(entity)
                 is Panda -> addPanda(entity)
+                is Display.ItemDisplay -> addItemDisplayEntity(entity)
                 is Display.BlockDisplay -> addBlockDisplayEntity(entity)
                 is Display.TextDisplay -> addTextDisplayEntity(entity)
                 is Frog -> addFrogEntity(entity)
@@ -215,16 +220,6 @@ object CopyNearbyEntitiesCommand {
         add("-  armored: '$isArmored'")
     }
 
-    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
-        add("EntityItemDisplay:")
-        val stack = entity.itemStack
-        val rotation = entity.lookAngle
-
-        add("-  itemStack:")
-        printItemStackData(stack)
-        add("-  rotation: $rotation")
-    }
-
     private fun MutableList<String>.addTropicalFish(entity: TropicalFish) {
         add("EntityTropicalFish:")
         val variety = entity.pattern
@@ -251,22 +246,39 @@ object CopyNearbyEntitiesCommand {
         add("-  hiddenGene: $hiddenGene")
     }
 
+
+    private fun MutableList<String>.addDisplayEntity(entity: Display) {
+        add("EntityDisplay:")
+        val rotation = entity.lookAngle
+        val transformation = Display.createTransformation(entity.entityData)
+
+        add("-  rotation: $rotation")
+        add("-  transformation scale: ${transformation.scale}")
+        add("-  transformation left rotation: ${transformation.leftRotation}")
+        add("-  transformation right rotation: ${transformation.rightRotation}")
+        add("-  transformation translations: ${transformation.translation}")
+    }
+
+    private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
+        add("EntityItemDisplay:")
+        val stack = entity.itemStack
+
+        add("-  itemStack:")
+        printItemStackData(stack)
+    }
+
     private fun MutableList<String>.addBlockDisplayEntity(entity: Display.BlockDisplay) {
         add("EntityBlockDisplay:")
         val block = entity.blockState.block
-        val rotation = entity.lookAngle
 
         add("-  block: ${block.name.formattedTextCompat()}")
-        add("-  rotation: $rotation")
     }
 
     private fun MutableList<String>.addTextDisplayEntity(entity: Display.TextDisplay) {
-        add("EntityBlockDisplay:")
+        add("EntityTextDisplay:")
         val text = entity.text
-        val rotation = entity.lookAngle
 
         add("-  text: $text")
-        add("-  rotation: $rotation")
     }
 
     private fun MutableList<String>.addFrogEntity(entity: Frog) {
