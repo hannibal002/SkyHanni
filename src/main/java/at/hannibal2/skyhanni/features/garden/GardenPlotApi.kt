@@ -131,7 +131,8 @@ object GardenPlotApi {
 
     class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
 
-    private var currentPlot: Plot? = null
+    var currentPlot: Plot? = null
+        private set
 
     fun checkCurrentPlot() {
         if (getCurrentPlot() != currentPlot) {

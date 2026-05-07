@@ -26,7 +26,7 @@ object GardenPlotBorders {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || !showBorders) return
-        val plot = GardenPlotApi.getCurrentPlot() ?: getClosestPlot() ?: return
+        val plot = GardenPlotApi.currentPlot ?: getClosestPlot() ?: return
         event.renderPlot(
             plot,
             LorenzColor.YELLOW.toColor(),

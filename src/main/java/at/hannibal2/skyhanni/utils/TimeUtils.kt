@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -94,6 +95,8 @@ object TimeUtils {
         in 3.minutes..10.minutes -> "§e"
         else -> default
     }
+
+    fun Duration.timerColor(default: ChatFormatting = ChatFormatting.WHITE): ChatFormatting = ChatFormatting.getByCode(timerColor("§${default.char}")[1]) ?: ChatFormatting.WHITE
 
     fun Iterable<Duration>.average(): Duration {
         var sum: Duration = Duration.ZERO

@@ -292,7 +292,7 @@ object PestApi {
     fun onPestKill(event: PestKillEvent) {
         lastPestKillTime = SimpleTimeMark.now()
         removeNearestPest()
-        GardenPlotApi.getCurrentPlot()?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
+        GardenPlotApi.currentPlot?.let { gardenPestTypes.removeFromPlot(it, event.pestType) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
