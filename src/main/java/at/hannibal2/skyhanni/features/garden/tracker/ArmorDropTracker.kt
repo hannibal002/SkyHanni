@@ -73,10 +73,10 @@ object ArmorDropTracker {
     }
 
     enum class ArmorDropType(val dropName: String, chatMessage: String) {
-        CROPIE("§aCropie", "§6§lRARE CROP! §r§f§r§aCropie §r§b\\(Armor Set Bonus\\)"),
-        SQUASH("§9Squash", "§6§lRARE CROP! §r§f§r§9Squash §r§b\\(Armor Set Bonus\\)"),
-        FERMENTO("§5Fermento", "§6§lRARE CROP! §r§f§r§5Fermento §r§b\\(Armor Set Bonus\\)"),
-        HELIANTHUS("§6Helianthus", "§6§lRARE CROP! §r§f§r§6Helianthus §r§b\\(Armor Set Bonus\\)"),
+        CROPIE("§aCropie", "(?:§.)*RARE CROP! (?:§.)*Cropie.*"),
+        SQUASH("§9Squash", "(?:§.)*RARE CROP! (?:§.)*Squash.*"),
+        FERMENTO("§5Fermento", "(?:§.)*RARE CROP! (?:§.)*Fermento.*"),
+        HELIANTHUS("§6Helianthus", "(?:§.)*RARE CROP! (?:§.)*Helianthus.*"),
         ;
 
         val chatPattern by patternGroup.pattern(

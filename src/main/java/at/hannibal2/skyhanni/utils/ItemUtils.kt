@@ -93,9 +93,19 @@ import kotlin.time.Duration.Companion.INFINITE
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// TODO refactor
 @SkyHanniModule
 @Suppress("LargeClass")
 object ItemUtils {
+
+    private val patternGroup = RepoPattern.group("utils.item")
+
+    // <editor-fold desc="Patterns">
+    private val anvilCombinablePattern by patternGroup.pattern(
+        "anvil-combinable",
+        "Combinable in Anvil",
+    )
+    // </editor-fold>
 
     private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
     private val compactItemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> compact item name
@@ -291,8 +301,7 @@ object ItemUtils {
 
             if (this.getPetLevel() == 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
-            } else if (this.getPetLevel() == 200 && internalName == "GOLDEN_DRAGON;4".toInternalName()) {
-                // NEU Lbin API only supports lvl 200 for Golden Dragon, this is an awful solution but is the most correct way.
+            } else if (this.getPetLevel() == 200) {
                 internalName = "${internalName.asString()}+200".toInternalName()
             } else if (maxLevel == 200 && this.getPetLevel() >= 100) {
                 internalName = "${internalName.asString()}+100".toInternalName()
@@ -410,7 +419,9 @@ object ItemUtils {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
-        for (line in this.getLore().reversed()) {
+        val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
+        for (line in cleanLore.reversed()) {
+            if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
                 group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
@@ -426,7 +437,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
@@ -439,7 +450,7 @@ object ItemUtils {
                     "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
-                    "lore" to getLore(),
+                    "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
@@ -678,7 +689,15 @@ object ItemUtils {
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
-            return ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0])
+            val enchantName = itemStack.getLore().firstOrNull {
+                val clean = it.removeColor()
+                clean.isNotBlank() && !anvilCombinablePattern.matches(clean)
+            } ?: run {
+                val name = toString()
+                addMissingRepoItem(name, "Could not find enchanted book name for $name")
+                return "§c$name"
+            }
+            return ReplaceRomanNumerals.replaceLine(enchantName)
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
