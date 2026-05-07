@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ServerTime
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 
@@ -21,6 +22,7 @@ enum class CropType(
     val eliteLbName: String = simpleName,
     val cropColor: LorenzColor = LorenzColor.GREEN,
     val cropShortName: String = cropName.substring(0..1),
+    val cropSurface: Block = Blocks.FARMLAND,
 ) {
 
     WHEAT(
@@ -49,6 +51,7 @@ enum class CropType(
         enchantName = "warts",
         eliteLbName = "netherwart",
         cropColor = LorenzColor.RED,
+        cropSurface = Blocks.SOUL_SAND,
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -81,12 +84,14 @@ enum class CropType(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
         { ItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus",
         cropColor = LorenzColor.GREEN,
+        cropSurface = Blocks.SAND
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { ItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom",
         enchantName = "mushrooms",
         cropColor = LorenzColor.RED,
+        cropSurface = Blocks.MYCELIUM,
     ),
     SUNFLOWER(
         "Sunflower",
@@ -141,7 +146,7 @@ enum class CropType(
             return entries.firstOrNull {
                 it.cropName.equals(itemName, ignoreCase = true) || it.simpleName.equals(
                     itemName,
-                    ignoreCase = true
+                    ignoreCase = true,
                 ) || it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
