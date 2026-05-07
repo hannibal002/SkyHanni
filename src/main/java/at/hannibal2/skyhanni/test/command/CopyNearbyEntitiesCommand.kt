@@ -127,6 +127,7 @@ object CopyNearbyEntitiesCommand {
                 is Shulker -> addShulker(entity)
                 is Panda -> addPanda(entity)
                 is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                is Display.TextDisplay -> addTextDisplayEntity(entity)
                 is Frog -> addFrogEntity(entity)
             }
             if (mob != null && mob.category != MobCategory.PLAYER) {
@@ -256,6 +257,15 @@ object CopyNearbyEntitiesCommand {
         val rotation = entity.lookAngle
 
         add("-  block: ${block.name.formattedTextCompat()}")
+        add("-  rotation: $rotation")
+    }
+
+    private fun MutableList<String>.addTextDisplayEntity(entity: Display.TextDisplay) {
+        add("EntityBlockDisplay:")
+        val text = entity.text
+        val rotation = entity.lookAngle
+
+        add("-  text: $text")
         add("-  rotation: $rotation")
     }
 
