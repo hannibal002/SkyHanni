@@ -10,6 +10,4 @@ class EntityMoveEvent<T : LivingEntity>(
     val oldLocation: LorenzVec,
     val newLocation: LorenzVec,
     val distance: Double,
-) : GenericSkyHanniEvent<T>(entity.javaClass) {
-    val isLocalPlayer get() = entity.isLocalPlayer
-}
+) : GenericSkyHanniEvent<T>(entity.javaClass)

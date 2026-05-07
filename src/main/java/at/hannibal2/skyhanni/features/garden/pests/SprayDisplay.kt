@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import net.minecraft.client.player.LocalPlayer
 
 @SkyHanniModule
 object SprayDisplay {
@@ -35,16 +37,21 @@ object SprayDisplay {
         if (!event.isMod(5, 3)) return
 
         // Todo this calculation should not be running onTick
+
+
+        if (config.expiryNotification) {
+            sendExpiredPlotsToChat(false)
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (config.displayEnabled) display = currentSprayPlot?.let { plot ->
             plot.currentSpray?.let {
                 val timer = it.expiry.timeUntil()
                 "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
             } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
         }?.let { Renderable.text(it) }
-
-        if (config.expiryNotification) {
-            sendExpiredPlotsToChat(false)
-        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -73,7 +73,6 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (!event.isLocalPlayer) return
 
         val nextData = nextTeleport ?: return
 
