@@ -34,7 +34,7 @@ object BarnFishingTimer {
 
     private val config get() = SkyHanniMod.feature.fishing.barnTimer
     private const val GLOBAL_CAP = 60
-    private const val PERSONAL_CAP = 10;
+    private const val PERSONAL_CAP = 10
     private val warningDelay = 5.seconds
     private val hubBarnFishingLocation = LorenzVec(108, 89, -252)
 
