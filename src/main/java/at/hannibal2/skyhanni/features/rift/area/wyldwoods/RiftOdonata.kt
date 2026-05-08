@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -45,7 +45,7 @@ object RiftOdonata {
     }
 
     private fun tryAdd(stand: ArmorStand) {
-        if (!stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) return
+        if (!stand.holdingSkullTexture(ODONATA_SKULL_TEXTURE)) return
         RenderLivingEntityHelper.setEntityColor(stand, config.highlightColor.toColor().addAlpha(1)) {
             isEnabled() && hasBottleInHand
         }
