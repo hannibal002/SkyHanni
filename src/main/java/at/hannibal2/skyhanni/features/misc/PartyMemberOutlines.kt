@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import java.awt.Color
 
 @SkyHanniModule
@@ -26,7 +28,9 @@ object PartyMemberOutlines {
     }
 
     private fun getEntityOutlineColor(entity: Entity): Color? {
-        if (entity !is RemotePlayer || !PartyApi.partyMembers.contains(entity.name.string)) return null
+        val playerEntity = entity as? RemotePlayer? ?: return null
+        if (!PartyApi.partyMembers.contains(playerEntity.name.string)) return null
+        if (playerEntity.equipment[EquipmentSlot.HEAD].isSkull()) return null
         return config.outlineColor.toColor()
     }
 }

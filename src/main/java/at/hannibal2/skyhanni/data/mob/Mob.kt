@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
+import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.zombie.Zombie
@@ -166,9 +168,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !isInvisible() && condition() }
+            RenderLivingEntityHelper.setEntityColor(baseEntity, color) { !isInvisible() && condition() && !baseEntity.equipment[EquipmentSlot.HEAD].isSkull()}
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColor(it, color) { !isInvisible() && condition() }
+                RenderLivingEntityHelper.setEntityColor(it, color) { !isInvisible() && condition() && !baseEntity.equipment[EquipmentSlot.HEAD].isSkull()}
             }
         }
     }

@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -24,7 +25,9 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.monster.zombie.Zombie
 import java.awt.Color
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -103,7 +106,9 @@ object SeaCreatureFeatures {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && !DungeonApi.inDungeon() && !KuudraApi.inKuudra
 
     private val getEntityOutlineColor: (entity: Entity) -> Color? = { entity ->
-        (entity as? LivingEntity)?.mob?.let { mob ->
+        val livingEntity = entity as? LivingEntity?
+        livingEntity?.mob?.let { mob ->
+            if (livingEntity.equipment[EquipmentSlot.HEAD].isSkull()) return@let null
             if (SeaCreatureSettings.getConfig(mob)?.shouldHighlight == true && entity.distanceToPlayer() < 30) {
                 LorenzColor.GREEN.toColor()
             } else null
