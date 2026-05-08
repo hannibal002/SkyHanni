@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -123,11 +125,12 @@ object QuiverApi {
     private val quiverInventoryNamePattern by group.pattern("quivername", "Quiver")
 
     /**
-     * REGEX-TEST: §7Active Arrow: §fFlint Arrow §7(§e2880§7)
+     * REGEX-TEST: Arrows Remaining: 39
+     * Arrows Remaining: 2,570
      */
-    private val quiverInventoryPattern by group.pattern(
-        "quiver.inventory",
-        "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)",
+    private val quiverInventoryCountPattern by group.pattern(
+        "quiver.inventory.count",
+       "Arrows Remaining: (?<count>(?:\\d+,)+)"
     )
 
     @HandleEvent
@@ -253,9 +256,10 @@ object QuiverApi {
         if (!isEnabled() || event.slot != 44) return
         val stack = event.itemStack
         if (stack.getExtraAttributes()?.contains("quiver_arrow") == true) {
-            for (line in stack.getLore()) {
-                quiverInventoryPattern.matchMatcher(line) {
-                    val type = group("type")
+            for (componentLine in stack.getLoreComponent()) {
+                val line = componentLine.string.removeColor()
+                val type = stack.hoverName.string.removeColor()
+                quiverInventoryCountPattern.matchMatcher(line) {
                     val amount = group("amount").formatInt()
                     val currentArrowType = getArrowByNameOrNull(type) ?: run {
                         if (arrows.isEmpty()) {
