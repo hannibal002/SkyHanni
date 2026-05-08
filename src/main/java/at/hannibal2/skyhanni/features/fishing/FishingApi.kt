@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.BaitType
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.QuiverApi.isEnabled
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.events.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
@@ -21,12 +25,16 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -77,6 +85,16 @@ object FishingApi {
 
     const val babySlugName = "Baby Magma Slug"
 
+    private val group = RepoPattern.group("data.fishing")
+
+    /**
+     * REGEX-TEST: §7Bait Remaining: §b49
+     */
+    private val baitRemainingPattern by group.pattern(
+        "bait.inventory",
+        "Bait Remaining: (?<amount>[\\d,]+)",
+    )
+
     val lavaBlocks = buildList { addLavas() }
     private val waterBlocks = buildList { addWaters() }
 
@@ -99,9 +117,16 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
+    var NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
+
     var bobber: FishingHook? = null
         private set
     var bobberHasTouchedLiquid = false
+        private set
+
+    var currentBait: BaitType? = null
+        private set
+    var currentBaitAmount: Int = 0
         private set
 
     var wearingTrophyArmor = false
@@ -154,6 +179,33 @@ object FishingApi {
 
         bobberHasTouchedLiquid = true
         FishingBobberInLiquidEvent(bobber, isWater).post()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (!isEnabled() || event.slot != 44) return
+        val stack = event.itemStack
+        val category = stack.getItemCategoryOrNull() ?: return
+        if (category != ItemCategory.BAIT) {
+            postBaitUpdate(NONE_BAIT_TYPE, 0)
+            return
+        }
+
+        val baitAmount = stack.getLoreComponent().asSequence()
+            .map { it.formattedTextCompatLessResets() }
+            .firstNotNullOfOrNull { lineText ->
+                baitRemainingPattern.matchMatcher(lineText.removeColor()) { group("amount").formatInt() }
+            } ?: return
+
+        val baitType = BaitType(stack.hoverName.formattedTextCompatLessResets(), stack.getInternalName())
+        postBaitUpdate(baitType, baitAmount)
+    }
+
+    private fun postBaitUpdate(baitType: BaitType, amount: Int) {
+        if (currentBait?.internalName == baitType.internalName && currentBaitAmount == amount) return
+        currentBait = baitType
+        currentBaitAmount = amount
+        BaitUpdateEvent(currentBait, currentBaitAmount).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
