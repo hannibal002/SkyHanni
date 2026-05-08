@@ -88,7 +88,7 @@ object FishingApi {
     private val group = RepoPattern.group("data.fishing")
 
     /**
-     * REGEX-TEST: §7Bait Remaining: §b49
+     * REGEX-TEST: Bait Remaining: 49
      */
     private val baitRemainingPattern by group.pattern(
         "bait.inventory",
