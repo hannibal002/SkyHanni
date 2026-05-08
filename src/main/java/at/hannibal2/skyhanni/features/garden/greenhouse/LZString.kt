@@ -55,7 +55,6 @@ object LZString {
     // based on https://github.com/pieroxy/lz-string/blob/master/src/_decompress.ts
     @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun decompressFromEncodedURIComponent(input: String): String {
-
         if (input.isEmpty()) return ""
 
         val reader = BitReader(input.replace(" ", "+"))
@@ -76,7 +75,7 @@ object LZString {
             0 -> readChar(0, reader)
             1 -> readChar(1, reader)
             2 -> return ""
-            else -> error("Invalid stream start")
+            else -> return ""
         }
 
         dictionary.add(first)
@@ -130,7 +129,7 @@ object LZString {
                 }
 
                 else -> {
-                    error("Bad compressed code: $code")
+                    return ""
                 }
             }
 
@@ -155,7 +154,7 @@ object LZString {
         val bits = when (type) {
             0 -> reader.readBits(8)
             1 -> reader.readBits(16)
-            else -> error("Invalid character type: $type")
+            else -> return ""
         }
 
         return bits.toChar().toString()

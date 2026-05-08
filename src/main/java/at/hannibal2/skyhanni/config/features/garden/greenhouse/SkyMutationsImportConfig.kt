@@ -11,7 +11,7 @@ class SkyMutationsImportConfig {
     @Expose
     @ConfigOption(name = "Display Type", desc = "Change the way the layout is displayed.")
     @ConfigEditorDropdown
-    var displayType: LayoutDisplayType = LayoutDisplayType
+    var displayType: LayoutDisplayType = LayoutDisplayType.ALL
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Displays the imported layout inside your greenhouse.")
