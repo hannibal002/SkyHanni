@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
+import at.hannibal2.skyhanni.utils.TimeUtils.timerColorChatFormatting
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -66,7 +66,7 @@ object SprayDisplay {
             appendWithColor("Sprayed with ", ChatFormatting.YELLOW)
             appendWithColor(sprayData.type.displayName, ChatFormatting.GREEN)
             appendWithColor(" - ", ChatFormatting.GRAY)
-            appendWithColor(timer.format(), timer.timerColor(ChatFormatting.AQUA))
+            appendWithColor(timer.format(), timer.timerColorChatFormatting(ChatFormatting.AQUA))
         }
     }
 

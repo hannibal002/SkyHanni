@@ -96,7 +96,8 @@ object TimeUtils {
         else -> default
     }
 
-    fun Duration.timerColor(default: ChatFormatting = ChatFormatting.WHITE): ChatFormatting = ChatFormatting.getByCode(timerColor("§${default.char}")[1]) ?: ChatFormatting.WHITE
+    fun Duration.timerColorChatFormatting(default: ChatFormatting = ChatFormatting.WHITE): ChatFormatting =
+        ChatFormatting.getByCode(timerColor("§${default.char}")[1]) ?: ChatFormatting.WHITE
 
     fun Iterable<Duration>.average(): Duration {
         var sum: Duration = Duration.ZERO

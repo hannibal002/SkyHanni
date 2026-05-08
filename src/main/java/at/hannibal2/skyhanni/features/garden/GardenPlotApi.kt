@@ -121,7 +121,7 @@ object GardenPlotApi {
     )
     var plots = listOf<Plot>()
 
-    fun getCurrentPlot(): Plot? {
+    private fun fetchCurrentPlot(): Plot? {
         return plots.firstOrNull { it.isPlayerInside() }
     }
 
@@ -135,8 +135,8 @@ object GardenPlotApi {
         private set
 
     fun checkCurrentPlot() {
-        if (getCurrentPlot() != currentPlot) {
-            currentPlot = getCurrentPlot()
+        if (fetchCurrentPlot() != currentPlot) {
+            currentPlot = fetchCurrentPlot()
             updateCurrentPlot()
         }
     }
@@ -396,7 +396,7 @@ object GardenPlotApi {
     @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
-        val plot = getCurrentPlot() ?: return
+        val plot = fetchCurrentPlot() ?: return
         if (plot.isBarn()) return
 
         plotSprayedTablistPattern.firstMatcher(event.lines.map { it.string.trim() }) {
