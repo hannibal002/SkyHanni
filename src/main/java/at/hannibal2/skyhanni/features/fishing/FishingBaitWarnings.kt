@@ -3,20 +3,10 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
-import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
+import at.hannibal2.skyhanni.events.BaitUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.world.entity.item.ItemEntity
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -24,16 +14,8 @@ object FishingBaitWarnings {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
-    private data class Bait(
-        private val entity: ItemEntity,
-        val bobberDistance: Double,
-        val name: String = entity.item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-    )
-
     private var lastBait: String? = null
     private var wasUsingBait = true
-
-    private val baitEntities = TimeLimitedSet<Bait>(4.seconds)
 
     @HandleEvent
     fun onWorldChange() {
@@ -41,46 +23,25 @@ object FishingBaitWarnings {
         wasUsingBait = true
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onBobber(event: FishingBobberInLiquidEvent) {
-        if (KuudraApi.inKuudra) return
-        DelayedRun.runDelayed(300.milliseconds) {
-            checkBait()
-        }
-    }
+    @HandleEvent
+    fun onBaitUpdate(event: BaitUpdateEvent) {
+        val baitType = event.currentBait
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<ItemEntity>) {
-        if (KuudraApi.inKuudra || !FishingApi.isFishing()) return
-        val bobberDistance = event.entity.distanceTo(FishingApi.bobber?.getLorenzVec() ?: return)
-        if (bobberDistance > 2) return
-        DelayedRun.runNextTick {
-            if (event.entity.item.isBait()) {
-                baitEntities += Bait(event.entity, bobberDistance)
-            }
-        }
-    }
-
-    private fun checkBait() {
-        FishingApi.bobber ?: return
-        // If user has no bait, but another player's bait spawns really close, it will be wrong.
-        val bait = baitEntities.filter { it.bobberDistance < 2 }.minByOrNull { it.bobberDistance }?.name
-        baitEntities.clear()
-
-        if (bait == null) {
-            if (config.noBaitWarning && !wasUsingBait) {
-                showNoBaitWarning()
-            }
-        } else if (config.baitChangeWarning) {
-            lastBait?.let {
-                if (it != bait) {
-                    showBaitChangeWarning(it, bait)
-                }
-            }
+        if (baitType == null || baitType == FishingApi.NONE_BAIT_TYPE) {
+            if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
+            wasUsingBait = false
+            lastBait = null
+            return
         }
 
-        wasUsingBait = bait != null
-        lastBait = bait
+        val baitName = baitType.bait
+        lastBait?.let {
+            if (it != baitName && config.baitChangeWarning) {
+                showBaitChangeWarning(it, baitName)
+            }
+        }
+        wasUsingBait = true
+        lastBait = baitName
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
