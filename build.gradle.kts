@@ -97,6 +97,12 @@ tasks.runClient {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
+tasks.register<ClientProductionRunTask>("prodClient") {
+    notCompatibleWithConfigurationCache("Interactive client launches must start a new process every time.")
+    outputs.upToDateWhen { false }
+    runDir = file("run")
+}
+
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
     this.prTitle = project.findProperty("prTitle") as? String ?: ""
@@ -124,12 +130,38 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let { modImplementation(it) }
-    target.fabricApiVersion?.let { modImplementation(it) }
-    modImplementation(libs.fabricLanguageKotlin)
-    target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
+    target.fabricLoaderVersion?.let { dep ->
+        modImplementation(dep)
+        "productionRuntimeMods"(dep) {
+            isTransitive = false
+        }
+	}
+    target.fabricApiVersion?.let { dep ->
+        modImplementation(dep)
+        "productionRuntimeMods"(dep) {
+            isTransitive = false
+        }
+    }
+    libs.fabricLanguageKotlin.let { dep ->
+        modImplementation(dep)
+        "productionRuntimeMods"(dep) {
+            isTransitive = false
+        }
+    }
+    target.modMenuVersion?.let { ver ->
+        val dep = "maven.modrinth:modmenu:$ver"
+        modImplementation(dep)
+        "productionRuntimeMods"(dep) {
+            isTransitive = false
+        }
+    }
 
-    modRuntimeOnly(libs.devauth)
+    libs.devauth.let { dep ->
+        modRuntimeOnly(dep)
+        "productionRuntimeMods"(dep) {
+            isTransitive = false
+        }
+    }
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
     shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
