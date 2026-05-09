@@ -167,7 +167,6 @@ object EliteDevApi {
         when {
             apiData.isJsonObject -> {
                 val obj = apiData.asJsonObject
-                // Common shapes: { "crops": ["CARROT", ...] } or { "current": { "crops": [...] } }
                 if (obj.has("crops") && obj.get("crops").isJsonArray) {
                     obj.getAsJsonArray("crops").forEach { if (it.isJsonPrimitive) crops.add(it.asString) }
                 } else if (obj.has("current") && obj.get("current").isJsonObject) {

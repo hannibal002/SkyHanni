@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlinx.coroutines.sync.Mutex
 import kotlin.time.Duration.Companion.minutes
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 
@@ -35,8 +35,7 @@ object FeastDisplay {
 
         maybeFetchFeastCrops()
 
-        // If no feast data is available, hide the display
-        // if (feastCrops.isEmpty()) return
+        if (feastCrops.isEmpty()) return
 
         val display = getDisplay()
         config.position.renderRenderables(display, posLabel = "Feast Crops")
@@ -46,22 +45,18 @@ object FeastDisplay {
         if (feastCrops.isEmpty()) return listOf()
 
         val crops = feastCrops.take(3)
-        val boostedCrop = crops.firstOrNull()
 
-        val itemRenderables = crops.map { crop ->
-            val isBoosted = crop == boostedCrop
-            val cropStack = crop.getItemStackCopy("garden_feast:$crop-$isBoosted").apply {
-                if (isBoosted) addEnchantGlint()
-            }
-            Renderable.item(cropStack) {
-                scale = 1.0
-            }
+        return buildList {
+            addString("§aFeast Crops")
+            add(Renderable.horizontal {
+                for (crop in crops) {
+                    val cropStack = crop.getItemStackCopy("garden_feast:$crop")
+                    add(Renderable.item(cropStack){
+                        scale = 1.0
+                    })
+                }
+            })
         }
-
-        val title = Renderable.text("§dFeast Crops")
-        val row = Renderable.horizontal(itemRenderables, spacing = 6)
-
-        return listOf(title, row)
     }
 
     private fun maybeFetchFeastCrops() {
