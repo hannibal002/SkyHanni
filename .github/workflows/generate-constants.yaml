@@ -8,6 +8,7 @@ env:
 
 on:
     push:
+        branches: [beta]
     workflow_dispatch:
 
 permissions: { }
