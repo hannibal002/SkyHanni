@@ -237,10 +237,8 @@ object ChestValue {
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-        if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest ("))
-        ) {
-            return true
-        }
+        if (name.startsWith("Ender Chest (")) return config.enableInEnderChest
+        if (name.contains("Backpack") && name.contains("Slot #")) return config.enableInBackpack
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this

@@ -22,6 +22,16 @@ class ChestValueConfig {
     var enableInOwnInventory: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Enabled in Ender Chest", desc = "Enable the feature for your Ender Chest.")
+    @ConfigEditorBoolean
+    var enableInEnderChest: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Enabled in Backpack", desc = "Enable the feature for your Backpacks.")
+    @ConfigEditorBoolean
+    var enableInBackpack: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
     @ConfigEditorBoolean
     var enableInDungeons: Boolean = false
