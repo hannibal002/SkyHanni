@@ -26,7 +26,7 @@ object FrogPetHopTimer {
     private val config get() = SkyHanniMod.feature.foraging.frogPetHop
 
     private val buffDuration = 20.seconds
-    private val warnThreshold = 4.seconds
+    private val warnThreshold get() = config.warningThreshold.seconds
 
     // Hop ability only exists on Epic rarity and above (;3 = Epic)
     private val epicFrog = "FROG;3".toInternalName()
@@ -44,12 +44,11 @@ object FrogPetHopTimer {
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
         if (!isInIsland()) return
+        if (hasFrogPet) detectJump()
         if (!event.isMod(10)) return
 
         hasFrogPet = CurrentPetApi.isCurrentPetOrHigherRarity(epicFrog)
         if (!hasFrogPet) return
-
-        detectJump()
         checkNotifications()
     }
 
@@ -73,13 +72,15 @@ object FrogPetHopTimer {
             expiringSent = true
             if (config.warningTitle) TitleManager.sendTitle("§aJump! §7(Hop buff expiring)", duration = 2.seconds)
             if (config.warningChat) ChatUtils.chat("§6Hop§7 buff expiring, §ajump now§7 to maintain your §2Foraging Fortune§7!")
-            SoundUtils.playPlingSound()
+            if (config.warningSound) SoundUtils.playPlingSound()
         }
 
         // Buff has expired
         if (!expiredSent && remaining.isNegative()) {
             expiredSent = true
+            if (config.warningTitle) TitleManager.sendTitle("§cHop expired, Jump!", duration = 2.seconds)
             if (config.expiredChat) ChatUtils.chat("§6Hop§7 buff has §cexpired§7, §ajump§7 to reactivate your §2Foraging Fortune§7!")
+            if (config.warningSound) SoundUtils.playPlingSound()
         }
     }
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -18,6 +19,16 @@ class FrogPetHopConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Warning Threshold", desc = "Warn this many seconds before the §6Hop§7 buff expires.")
+    @ConfigEditorSlider(minValue = 1f, maxValue = 10f, minStep = 1f)
+    var warningThreshold: Int = 4
+
+    @Expose
+    @ConfigOption(name = "Warning Sound", desc = "Play a sound when the §6Hop§7 buff is about to expire or has expired.")
+    @ConfigEditorBoolean
+    var warningSound: Boolean = true
 
     @Expose
     @ConfigOption(name = "Warning Title", desc = "Show a title warning when the §6Hop§7 buff is about to expire.")
