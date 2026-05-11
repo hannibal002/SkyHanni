@@ -55,7 +55,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Ticks Until In Air", desc = "Game Ticks until Player is no longer 'On Ground' for reduction")
     @ConfigEditorSlider(minValue = 1f, maxValue = 20f, minStep = 1f)
-    val ticksUntilInAir: Property<Float> = Property.of(1f)
+    val ticksUntilInAir: Property<Int> = Property.of(1)
 
     @Expose
     @ConfigOption(name = "Disable in Barn", desc = "Disable reduced sensitivity in barn plot.")
