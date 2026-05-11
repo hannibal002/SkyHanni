@@ -10,8 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import net.minecraft.client.Minecraft
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -54,7 +56,8 @@ object FrogPetHopTimer {
 
     private fun detectJump() {
         val inAir = PlayerUtils.inAir()
-        if (inAir && !wasInAir) {
+        val jumpPressed = Minecraft.getInstance().options.keyJump!!.isActive()
+        if (inAir && !wasInAir && jumpPressed) {
             lastJumpTime = SimpleTimeMark.now()
             expiringSent = false
             expiredSent = false
