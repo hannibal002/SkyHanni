@@ -83,7 +83,7 @@ object SensitivityReducer {
         if (onGround != newOnGround) {
             onGround = newOnGround
             ticksInAir++
-            if (ticksInAir == 2) tryAutoToggle()
+            if (ticksInAir == 3) tryAutoToggle()
         }
     }
 
