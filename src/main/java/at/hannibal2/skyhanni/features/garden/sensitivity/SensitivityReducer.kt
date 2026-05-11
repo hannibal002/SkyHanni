@@ -82,8 +82,12 @@ object SensitivityReducer {
 
         if (onGround != newOnGround) {
             onGround = newOnGround
-            ticksInAir++
-            if (ticksInAir == 3) tryAutoToggle()
+            val tickUntilInAir = config.ticksUntilInAir.get()
+            if (tickUntilInAir != 1f) {
+                ticksInAir++
+                if (ticksInAir == 3) tryAutoToggle()
+            }
+            else tryAutoToggle()
         }
     }
 
