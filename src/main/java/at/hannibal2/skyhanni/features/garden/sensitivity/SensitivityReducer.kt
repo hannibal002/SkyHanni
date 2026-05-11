@@ -36,6 +36,7 @@ object SensitivityReducer {
     private var onGround: Boolean = false
 
     private var shouldBeActive = false
+    private var ticksInAir = 0
 
     private val isActive get() = isAutoActive || isManualActive
     private val isAutoActive get() = SensitivityState.AUTO_REDUCED.isActive()
@@ -81,13 +82,15 @@ object SensitivityReducer {
 
         if (onGround != newOnGround) {
             onGround = newOnGround
-            tryAutoToggle()
+            ticksInAir++
+            if (ticksInAir == 2) tryAutoToggle()
         }
     }
 
     private fun tryAutoToggle() {
         if (!isAutoActive) return
 
+        ticksInAir = 0
         if (!isActive) {
             shouldBeActive = true
             MouseSensitivityManager.state = SensitivityState.AUTO_REDUCED
