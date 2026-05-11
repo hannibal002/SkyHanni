@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -68,11 +69,15 @@ object SensitivityReducer {
         config.enabled.afterChange { autoToggle() }
         config.onlyPlot.afterChange { autoToggle() }
         config.onGround.afterChange { autoToggle() }
+        config.onGroundTolerance.afterChange { autoToggle() }
     }
 
     private fun updatePlayerStatus() {
         val newInBarn = GardenApi.onUnfarmablePlot
-        val newOnGround = PlayerUtils.onGround()
+        val onGroundTolerance = config.onGroundTolerance.get()
+        val newOnGround = PlayerUtils.onGround() ||
+            (config.onGround.get() && onGroundTolerance > 0.0 && !PlayerUtils.isFlying() &&
+                PlayerUtils.getLocation().let { !LocationUtils.canSee(it, it.down(onGroundTolerance)) })
 
         if (inBarn != newInBarn) {
             inBarn = newInBarn

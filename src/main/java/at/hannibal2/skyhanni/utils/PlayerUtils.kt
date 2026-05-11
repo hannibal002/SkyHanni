@@ -47,6 +47,7 @@ object PlayerUtils {
 
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
+    fun isFlying(): Boolean = MinecraftCompat.localPlayer.getAbilities().flying
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
 

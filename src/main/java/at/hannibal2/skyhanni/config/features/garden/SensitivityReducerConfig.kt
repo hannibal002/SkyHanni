@@ -48,9 +48,14 @@ class SensitivityReducerConfig {
     var showGui: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Only in Ground", desc = "Lower sensitivity when standing on the ground.")
+    @ConfigOption(name = "Only on Ground", desc = "When enabled, lower sensitivity only while on or near the ground.")
     @ConfigEditorBoolean
     val onGround: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(name = "Only on Ground Tolerance", desc = "How close to ground counts as on ground when 'Only on Ground' is enabled. Useful for farms with small height drops.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 1f / 16f) // Block heights are multiples of 1/16
+    val onGroundTolerance: Property<Double> = Property.of(0.0)
 
     @Expose
     @ConfigOption(name = "Disable in Barn", desc = "Disable reduced sensitivity in barn plot.")
