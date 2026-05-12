@@ -206,7 +206,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val shouldAddKill = when (pest) {
                 // Field Mice drop 6 separate items, but we only want to count the kill once
                 PestType.FIELD_MOUSE -> internalName == DUNG_ITEM
+                // Lunar Moths drop 3 separate crops, but we only want to count the kill once
                 PestType.LUNAR_MOTH -> internalName == SUNFLOWER_ITEM
+                // Overclocker drops have the same format as crop drops and causes double counting kills
                 else -> internalName != OVERCLOCKER
             }
             if (shouldAddKill) addKill(pest)
