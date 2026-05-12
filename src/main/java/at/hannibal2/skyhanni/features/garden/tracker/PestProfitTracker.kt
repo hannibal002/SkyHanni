@@ -198,7 +198,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             CropType.getByNameOrNull(rawName)
                 ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
+            if (config.hideChat) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
