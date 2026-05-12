@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
@@ -49,11 +50,18 @@ class ExperimentsAddonsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Max Clicks Alert",
-        desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.",
+        name = "Max Sequence Alert",
+        desc = "Display an alert when you reach the maximum clicks or Enchanting XP gained from Chronomatron or Ultrasequencer.",
     )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var maxSequenceAlert: Boolean = true
+    @ConfigEditorDropdown
+    var maxSequenceAlertType: MaxSequenceAlertType = MaxSequenceAlertType.MAX_CLICKS
+
+    enum class MaxSequenceAlertType(val displayName: String) {
+        OFF("Off"),
+        MAX_CLICKS("Max clicks"),
+        MAX_XP("Max XP");
+
+        override fun toString() = displayName
+    }
 
 }
