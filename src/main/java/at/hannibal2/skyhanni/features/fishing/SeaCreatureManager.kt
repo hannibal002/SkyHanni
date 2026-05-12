@@ -157,4 +157,7 @@ object SeaCreatureManager {
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
     }
+
+    fun getRepoSeaCreatureByUserVisibleName(name: String): SeaCreature? = allFishingMobs.values.firstOrNull { it.name == name }
+
 }

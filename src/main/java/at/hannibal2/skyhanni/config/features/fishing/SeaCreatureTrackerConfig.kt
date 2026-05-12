@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.misc.tracker.individual.IndividualT
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -34,9 +35,22 @@ class SeaCreatureTrackerConfig {
     var hideChat: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Count Double", desc = "Count double hook catches as two catches.")
-    @ConfigEditorBoolean
-    var countDouble: Boolean = true
+    @ConfigOption(name = "Include Double Hooks", desc = "How to display Double Hooks within the Sea Creature Tracker.")
+    @ConfigEditorDropdown
+    var doubleHookDisplayType: CreatureCountDisplayType = CreatureCountDisplayType.MAIN_COUNT
+
+    @Expose
+    @ConfigOption(name = "Include Cocoons", desc = "How to display Cocooned Mobs within the Sea Creature Tracker.")
+    @ConfigEditorDropdown
+    var cocoonDisplayType: CreatureCountDisplayType = CreatureCountDisplayType.OWN_COUNT
+
+    enum class CreatureCountDisplayType(private val displayName: String) {
+        MAIN_COUNT("Show in Main Creature Count"),
+        OWN_COUNT("Show as seperate number next to Main Count"),
+        DO_NOT_SHOW("Do not show in Tracker");
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(

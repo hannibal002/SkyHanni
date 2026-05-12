@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.combat.CocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -21,12 +23,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.ItemStack
@@ -37,17 +41,29 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     val expectedLifetime = 6.4.seconds
+    /*
+    roughly where cocoon times landed for me across a few hundred cocoons
+    Might require some sort of ping based tweaking?
+    */
     var canCocoon: Boolean = false
         private set
 
     const val COCOON_SIGHT_DISTANCE = 32
 
-    /*
-     roughly where cocoon times landed for me across a few hundred cocoons
-     Might require some sort of ping based tweaking?
-     */
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val patternGroup = RepoPattern.group("combat.cocoon")
+
+    /**
+     * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
+     * REGEX-TEST: CAUGHT! You cocooned a Enderman!
+     */
+    private val cocoonChatMessage by patternGroup.pattern(
+        "spawn",
+        "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!"
+    )
+    // Yes, I am aware Hypixel don't use an in this message but
+    // seems more like a spelling mistake on their end & I ain't forging a regex test
 
     data class CocoonMob(
         val mob: Mob,
@@ -127,6 +143,14 @@ object CocoonAPI {
         logger.log("name: (${cocoonMob.name}), Type: (${cocoonMob.category}), Cocoon: (${cocoon.cocoonID}) Left World After $timeSince")
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChatMessageRecieved(event: SkyHanniChatEvent.Allow) {
+        cocoonChatMessage.matchMatcher(event.cleanMessage) {
+            CocoonChatMessageEvent(group("name")).post()
+        }
+    }
+
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
         val nearbyMobs = skyblockMobs.filter { mob -> mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
