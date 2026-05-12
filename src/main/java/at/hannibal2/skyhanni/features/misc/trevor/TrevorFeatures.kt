@@ -179,17 +179,17 @@ object TrevorFeatures {
         talbotPatternAbove.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             val angle = group("angle").toInt()
-            val playerPos = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
+            val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
             TrevorSolver.findMobHeight(height, true)
-            TalbotCircles.addResult(height, angle, playerPos)
+            TalbotCircles.addResult(height, angle, playerPosition)
             lastTheodoliteClickPosition = null
         }
         talbotPatternBelow.matchMatcher(formattedMessage) {
             val height = group("height").toInt()
             val angle = group("angle").toInt()
-            val origin = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
+            val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
             TrevorSolver.findMobHeight(height, false)
-            TalbotCircles.addResult(-height, angle, origin)
+            TalbotCircles.addResult(-height, angle, playerPosition)
             lastTheodoliteClickPosition = null
         }
         talbotPatternAt.matchMatcher(formattedMessage) {
