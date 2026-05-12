@@ -718,7 +718,8 @@ object EstimatedItemValueCalculator {
                 ?.let { endcapData ->
                     level = endcapData.minOf { it.requiredLevel }
                     endcapData.forEach { levelData ->
-                        items[levelData.endcapItem] = 1
+                        val targetLevel = levelData.requiredLevel + 1
+                        if (rawLevel >= targetLevel) items[levelData.endcapItem] = 1
                     }
                 }
 
