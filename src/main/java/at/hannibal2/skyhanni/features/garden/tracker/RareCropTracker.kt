@@ -73,6 +73,8 @@ object RareCropTracker {
 
     init {
         RareCropDropType.entries.forEach { it.chatPattern }
+
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     enum class RareCropDropType(val dropName: String, private val messageName: String) {
@@ -108,7 +110,7 @@ object RareCropTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in RareCropDropType.entries) {
-            if (!dropType.chatPattern.matches(event.cleanMessage)) continue
+            if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
             if (config.hideChat) {
                 event.blockedReason = "rare_crop_tracker"
@@ -130,10 +132,6 @@ object RareCropTracker {
             val dropName = drop.dropName
             addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
-    }
-
-    init {
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private fun shouldShowDisplay(): Boolean {

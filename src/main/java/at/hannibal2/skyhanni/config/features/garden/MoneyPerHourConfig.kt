@@ -95,7 +95,7 @@ class MoneyPerHourConfig {
     var mooshroom: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Include Rare Crops", desc = "Include the average rare crop coins/hr from your armor.")
+    @ConfigOption(name = "Include Rare Crops", desc = "Include the average rare crop coins/hr.")
     @ConfigEditorBoolean
     var armor: Boolean = true
 
