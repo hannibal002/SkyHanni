@@ -35,8 +35,10 @@ object TalbotCircles {
         }
 
         for (block in candidateBlocks) {
-            val isFluid = !block.getBlockStateAt().fluidState.isEmpty
-            val isAirOverNonAir = block.getBlockStateAt().isAir && !block.down().getBlockStateAt().isAir
+            val blockState = block.getBlockStateAt()
+            val blockStateUnder = block.down().getBlockStateAt()
+            val isFluid = !blockState.fluidState.isEmpty
+            val isAirOverNonAir = blockState.isAir && !blockStateUnder.isAir
             if (isFluid || isAirOverNonAir) {
                 val aabb = AABB(block.toBlockPos())
                 event.drawFilledBoundingBox(aabb, Color.GREEN, alphaMultiplier = .4f, seeThroughBlocks = true)
@@ -69,10 +71,11 @@ object TalbotCircles {
         val zMin = constraints.maxOf { it.playerPosition.z - it.maxRadius(yMin, yMax) }
         val zMax = constraints.minOf { it.playerPosition.z + it.maxRadius(yMin, yMax) }
 
+        candidateBlocks.clear()
+
         if (yMin > yMax || xMin > xMax || zMin > zMax) return
         if ((xMax - xMin) * (zMax - zMin) > 1_000_000) return
 
-        candidateBlocks.clear()
         for (y in yMin.toInt()..yMax.toInt())
             for (x in xMin.toInt()..xMax.toInt() step LATTICE_WIDTH)
                 for (z in zMin.toInt()..zMax.toInt() step LATTICE_WIDTH)
@@ -93,7 +96,7 @@ object TalbotCircles {
         val dy = (y.toDouble() - playerPosition.y).absoluteValue
 
         val candidateAngle = 90 - Math.toDegrees(atan2(dist, dy))
-        return (candidateAngle - angle).absoluteValue <= 3.0
+        return (candidateAngle - angle).absoluteValue <= TOLERANCE
     }
 
     fun resetCircles() {
