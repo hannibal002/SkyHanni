@@ -41,7 +41,7 @@ object RiftOdonata {
 
     @HandleEvent
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (RiftLarva.isEnabled()) tryAdd(event.entity)
+        if (isEnabled()) tryAdd(event.entity)
     }
 
     private fun tryAdd(stand: ArmorStand) {
