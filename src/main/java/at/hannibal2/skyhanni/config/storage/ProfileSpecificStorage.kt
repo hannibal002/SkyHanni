@@ -645,7 +645,7 @@ class ProfileSpecificStorage(
         var gardenBpsTracker: GardenBpsTracker.TimedData = GardenBpsTracker.TimedData()
 
         @Expose
-        var overflowHoeLevels: MutableMap<String, Int> = mutableMapOf()
+        var overflowToolLevels: MutableMap<String, Int> = mutableMapOf()
 
         @Expose
         var cropFeverTracker: CropFeverTracker.BucketData = CropFeverTracker.BucketData()
