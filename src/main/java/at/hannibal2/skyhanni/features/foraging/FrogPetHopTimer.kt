@@ -56,7 +56,11 @@ object FrogPetHopTimer {
 
     private fun detectJump() {
         val inAir = PlayerUtils.inAir()
-        val jumpPressed = Minecraft.getInstance().options.keyJump!!.isActive()
+        val jumpPressed =
+            Minecraft.getInstance()
+                .options
+                .keyJump
+                ?.isActive() == true
         if (inAir && !wasInAir && jumpPressed) {
             lastJumpTime = SimpleTimeMark.now()
             expiringSent = false
