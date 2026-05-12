@@ -28,6 +28,7 @@ object MantidKillDisplay {
     private const val MAX_BONUS = 20
     private val EXPIRE_TIME = 10.minutes
     private val config get() = PestApi.config.mantidDisplay
+
     // mantid reforge does not work like refrigerate; each pest kill time is individually stored
     private val pestExpireQueue: Queue<SimpleTimeMark> = LinkedList()
     private val isWearingMantid by RecalculatingValue(1.seconds) {
@@ -121,6 +122,7 @@ object MantidKillDisplay {
 
     private fun isEnabled() = config.enabled && GardenApi.inGarden()
     private fun shouldShow() = isEnabled() && checkShowConditions()
+
     @Suppress("ReturnCount")
     private fun checkShowConditions(): Boolean {
         for (condition in config.whenToShow) {

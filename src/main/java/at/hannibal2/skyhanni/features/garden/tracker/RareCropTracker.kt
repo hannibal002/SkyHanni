@@ -60,14 +60,14 @@ object RareCropTracker {
         ::Data,
         { it.garden.rareCropTracker },
         trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true
+        customUptimeControl = true,
     ) {
         drawDisplay(it)
     }
 
     data class Data(
         @Expose
-        var drops: MutableMap<RareCropDropType, Int> = mutableMapOf()
+        var drops: MutableMap<RareCropDropType, Int> = mutableMapOf(),
     ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
 
 

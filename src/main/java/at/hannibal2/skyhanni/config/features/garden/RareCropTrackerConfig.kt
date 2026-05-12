@@ -31,7 +31,7 @@ class RareCropTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Tracker Settings",
-        desc = ""
+        desc = "",
     )
     @Accordion
     val perTrackerConfig: GardenIndividualTrackerConfig = GardenIndividualTrackerConfig()

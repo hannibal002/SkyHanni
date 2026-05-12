@@ -27,7 +27,7 @@ object GardenUptimeManager {
         RareCropTracker.tracker,
         CropFeverTracker,
         PestProfitTracker,
-        GardenBpsTracker.tracker
+        GardenBpsTracker.tracker,
     )
     private val afkTracker = Stopwatch()
 
