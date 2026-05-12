@@ -191,7 +191,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
-- **Do not submit AI-generated content**
+- **Do not submit AI-generated content.**
     - This includes code, pull requests, issues, and review comments generated
       by tools such as GitHub Copilot, ChatGPT, Claude, or similar systems.
     - All contributions must be written and understood by the person submitting them. Using AI tools to help you
