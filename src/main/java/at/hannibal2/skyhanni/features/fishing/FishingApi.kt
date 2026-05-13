@@ -197,13 +197,16 @@ object FishingApi {
     }
 
     private fun checkAndUpdateBaitFromInventory() {
-        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: return
+        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
+            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
+            return
+        }
         extractAndPostBaitUpdate(stack)
     }
 
     private fun extractAndPostBaitUpdate(stack: ItemStack) {
-        val category = stack.getItemCategoryOrNull() ?: return
-        if (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT) {
+        val category = stack.getItemCategoryOrNull()
+        if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
             postBaitUpdate(NONE_BAIT_TYPE, 0, stack)
             return
         }
