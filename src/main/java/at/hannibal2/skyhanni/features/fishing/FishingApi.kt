@@ -118,7 +118,7 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    var NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
+    val NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
 
     private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
