@@ -43,6 +43,11 @@ class FishingConfig {
     val fishingHookDisplay: FishingHookDisplayConfig = FishingHookDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Fishing Bait Display", desc = "")
+    @Accordion
+    val fishingBaitDisplay: FishingBaitDisplayConfig = FishingBaitDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Bait Warnings", desc = "")
     @Accordion
     val fishingBaitWarnings: FishingBaitWarningsConfig = FishingBaitWarningsConfig()
