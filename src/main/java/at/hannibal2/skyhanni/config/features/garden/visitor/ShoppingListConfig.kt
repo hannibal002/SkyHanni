@@ -78,4 +78,9 @@ class ShoppingListConfig {
     @ConfigOption(name = "Ignore Spaceman", desc = "Exclude crops requested by Spaceman from the shopping list.")
     @ConfigEditorBoolean
     var ignoreSpaceman: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Ignore Taylor", desc = "Exclude crops requested by Taylor from the shopping list.")
+    @ConfigEditorBoolean
+    var ignoreTaylor: Boolean = false
 }

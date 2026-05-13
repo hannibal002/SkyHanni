@@ -67,6 +67,11 @@ object GardenVisitorShoppingList {
         drawVisitors(newVisitors, shoppingList)
     }
 
+    private fun getIgnoredVisitors(): Set<String> = buildSet {
+        if (config.ignoreSpaceman) add("Spaceman")
+        if (config.ignoreTaylor) add("Taylor")
+    }
+
     /**
      * Aggregates shopping lists from all active visitors.
      * @return Pair of (globalShoppingList, newVisitorNames)
@@ -74,15 +79,14 @@ object GardenVisitorShoppingList {
     private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<String>> {
         val globalShoppingList = mutableMapOf<NeuInternalName, Int>()
         val newVisitors = mutableListOf<String>()
+        val ignoredVisitors = getIgnoredVisitors()
 
         for ((visitorName, visitor) in VisitorApi.getVisitorsMap()) {
             if (visitor.status == VisitorApi.VisitorStatus.ACCEPTED ||
                 visitor.status == VisitorApi.VisitorStatus.REFUSED
             ) continue
 
-            if (visitor.visitorName.removeColor() == "Spaceman" &&
-                config.ignoreSpaceman
-            ) continue
+            if (visitor.visitorName.removeColor() in ignoredVisitors) continue
 
             val shoppingList = visitor.shoppingList
             if (shoppingList.isEmpty()) {
