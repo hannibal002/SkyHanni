@@ -239,7 +239,6 @@ object CFDataLoader {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!CFApi.inChocolateFactory) return
         DelayedRun.runOrNextTick {
-            if (!CFApi.inChocolateFactory) return@runOrNextTick
             updateInventoryItems(event.inventoryItems)
         }
     }
@@ -291,6 +290,8 @@ object CFDataLoader {
     }
 
     fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
+        if (!CFApi.inChocolateFactory) return
+
         val profileStorage = profileStorage ?: return
 
         val chocolateItem = InventoryUtils.getItemAtSlotIndex(CFApi.infoIndex) ?: return
