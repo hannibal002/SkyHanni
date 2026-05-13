@@ -434,12 +434,14 @@ object ItemUtils {
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
                     "Could not read category for item $name",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to category,
                     "lore" to cleanLore,
                     betaOnly = true,
@@ -461,12 +463,14 @@ object ItemUtils {
                 }
             }
             if (itemRarity == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
                     "Could not read rarity for item $name",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to rarity,
                     "lore" to cleanLore,
                     betaOnly = true,
