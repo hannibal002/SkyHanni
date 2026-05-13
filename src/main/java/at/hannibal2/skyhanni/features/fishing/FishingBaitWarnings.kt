@@ -25,7 +25,7 @@ object FishingBaitWarnings {
 
     @HandleEvent
     fun onBaitUpdate(event: BaitUpdateEvent) {
-        val baitType = event.currentBait
+        val baitType = event.baitType
 
         if (baitType == null || baitType == FishingApi.NONE_BAIT_TYPE) {
             if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
@@ -34,7 +34,7 @@ object FishingBaitWarnings {
             return
         }
 
-        val baitName = baitType.bait
+        val baitName = baitType.displayName
         lastBait?.let {
             if (it != baitName && config.baitChangeWarning) {
                 showBaitChangeWarning(it, baitName)

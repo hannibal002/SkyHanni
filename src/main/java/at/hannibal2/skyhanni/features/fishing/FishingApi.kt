@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -119,6 +120,9 @@ object FishingApi {
 
     var NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
 
+    private const val BAIT_SLOT = 44
+    private const val BAIT_HOTBAR_INDEX = 8
+
     var bobber: FishingHook? = null
         private set
     var bobberHasTouchedLiquid = false
@@ -181,13 +185,22 @@ object FishingApi {
         FishingBobberInLiquidEvent(bobber, isWater).post()
     }
 
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: return
+        extractAndPostBaitUpdate(stack)
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() || event.slot != 44) return
-        val stack = event.itemStack
+        if (!isEnabled() || event.slot != BAIT_SLOT) return
+        extractAndPostBaitUpdate(event.itemStack)
+    }
+
+    private fun extractAndPostBaitUpdate(stack: ItemStack) {
         val category = stack.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.BAIT) {
-            postBaitUpdate(NONE_BAIT_TYPE, 0)
+            postBaitUpdate(NONE_BAIT_TYPE, 0, stack)
             return
         }
 
@@ -198,14 +211,14 @@ object FishingApi {
             } ?: return
 
         val baitType = BaitType(stack.hoverName.formattedTextCompatLessResets(), stack.getInternalName())
-        postBaitUpdate(baitType, baitAmount)
+        postBaitUpdate(baitType, baitAmount, stack)
     }
 
-    private fun postBaitUpdate(baitType: BaitType, amount: Int) {
+    private fun postBaitUpdate(baitType: BaitType, amount: Int, itemStack: ItemStack) {
         if (currentBait?.internalName == baitType.internalName && currentBaitAmount == amount) return
         currentBait = baitType
         currentBaitAmount = amount
-        BaitUpdateEvent(currentBait, currentBaitAmount).post()
+        BaitUpdateEvent(currentBait, currentBaitAmount, itemStack).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
