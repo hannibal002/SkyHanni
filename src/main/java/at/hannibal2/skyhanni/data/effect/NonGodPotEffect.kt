@@ -31,8 +31,8 @@ enum class NonGodPotEffect(
 
     HARVEST_HARBINGER("Harvest Harbinger V", displayName = "§6Harvest Harbinger V"),
 
-    PEST_REPELLENT("Pest Repellent I", displayName = "§6Pest Repellent I§r"),
     PEST_REPELLENT_MAX("Pest Repellent II", displayName = "§6Pest Repellent II"),
+    PEST_REPELLENT("Pest Repellent I", displayName = "§6Pest Repellent I§r"),
 
     CURSE_OF_GREED("Curse of Greed I", displayName = "§4Curse of Greed I"),
 
