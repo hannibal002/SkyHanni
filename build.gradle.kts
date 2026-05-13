@@ -244,7 +244,7 @@ if (target == ProjectTarget.MODERN_12110) {
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
-        useXVFB = true
+        useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
     }
     loom.runs.removeIf { it.name == "clientGameTest" }
 }
