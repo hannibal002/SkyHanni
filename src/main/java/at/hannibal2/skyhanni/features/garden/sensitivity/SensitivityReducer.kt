@@ -10,11 +10,11 @@ import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.sensitivity.MouseSensitivityManager.SensitivityState
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -74,10 +74,17 @@ object SensitivityReducer {
 
     private fun updatePlayerStatus() {
         val newInBarn = GardenApi.onUnfarmablePlot
-        val onGroundTolerance = config.onGroundTolerance.get()
-        val newOnGround = PlayerUtils.onGround() ||
-            (config.onGround.get() && onGroundTolerance > 0f && !PlayerUtils.isFlying() &&
-                PlayerUtils.getLocation().let { !LocationUtils.canSee(it, it.down(onGroundTolerance)) })
+
+        val onGroundTolerance = if (config.onGround.get()) config.onGroundTolerance.get() else 0f
+        val newOnGround = when {
+            PlayerUtils.onGround() -> true
+            PlayerUtils.isFlying() -> false
+            onGroundTolerance > 0f -> PlayerUtils.getLocation().let {
+                BlockUtils.raycast(it, it.down(onGroundTolerance))?.miss == false
+            }
+
+            else -> false
+        }
 
         if (inBarn != newInBarn) {
             inBarn = newInBarn
