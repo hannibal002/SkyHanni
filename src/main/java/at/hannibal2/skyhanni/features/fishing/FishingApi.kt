@@ -128,7 +128,7 @@ object FishingApi {
     var bobberHasTouchedLiquid = false
         private set
 
-    var currentBait: BaitType? = null
+    var currentBait: BaitType = NONE_BAIT_TYPE
         private set
     var currentBaitAmount: Int = 0
         private set
