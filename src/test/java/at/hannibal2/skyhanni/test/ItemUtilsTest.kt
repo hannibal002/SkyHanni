@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraft.SharedConstants
 import net.minecraft.server.Bootstrap
 import net.minecraft.world.item.Item
@@ -67,6 +68,14 @@ class ItemUtilsTest {
             expectedRarity = LorenzRarity.MYTHIC,
             expectedCategory = ItemCategory.NONE,
         )
+    }
+
+    @Test
+    fun testRarityPatternKeepsEmptyCategoryGroup() {
+        val matcher = UtilsPatterns.rarityLoreLinePattern.matcher("MYTHIC")
+        assert(matcher.matches())
+
+        assertEquals("", matcher.group("itemCategory"))
     }
 
     @Test
