@@ -91,7 +91,7 @@ object FishingBaitDisplay {
         baitType: BaitType?,
         amount: Int,
     ): BaitDisplayEntry {
-        if (baitType == null || amount == 0 || baitType == FishingApi.NONE_BAIT_TYPE) {
+        if (baitType == null || baitType.isEmpty()) {
             return noBaitEntry
         }
 
