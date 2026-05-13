@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.SharedConstants
 import net.minecraft.server.Bootstrap
 import net.minecraft.world.item.Item
@@ -62,10 +61,10 @@ class ItemUtilsTest {
     fun testItemWithoutCategory() {
         assertItemCategoryAndRarity(
             item = Items.CAKE,
-            displayName = "§f§f§bComplete Century Cake Bundle",
+            displayName = "§dComplete Century Cake Bundle",
             lore = categorylessLore,
             internalName = "FULL_CENTURY_CAKE_PACK",
-            expectedRarity = LorenzRarity.DIVINE,
+            expectedRarity = LorenzRarity.MYTHIC,
             expectedCategory = ItemCategory.NONE,
         )
     }
@@ -74,7 +73,7 @@ class ItemUtilsTest {
     fun testRecombobulatedItemWithoutCategory() {
         assertItemCategoryAndRarity(
             item = Items.CAKE,
-            displayName = "§f§f§bComplete Century Cake Bundle",
+            displayName = "§bComplete Century Cake Bundle",
             lore = categorylessLore.dropLast(1) + "a DIVINE a",
             internalName = "FULL_CENTURY_CAKE_PACK",
             expectedRarity = LorenzRarity.DIVINE,
@@ -106,6 +105,54 @@ class ItemUtilsTest {
         )
     }
 
+    @Test
+    fun testDungeonItemWithoutCategory() {
+        assertItemCategoryAndRarity(
+            item = Items.STICK,
+            displayName = "§6Necron's Handle",
+            lore = dungeonCategorylessLore,
+            internalName = "NECRON_HANDLE",
+            expectedRarity = LorenzRarity.LEGENDARY,
+            expectedCategory = ItemCategory.NONE,
+        )
+    }
+
+    @Test
+    fun testRecombobulatedDungeonItemWithoutCategory() {
+        assertItemCategoryAndRarity(
+            item = Items.STICK,
+            displayName = "§6Necron's Handle",
+            lore = dungeonCategorylessLore.dropLast(1) + "a MYTHIC DUNGEON ITEM a",
+            internalName = "NECRON_HANDLE",
+            expectedRarity = LorenzRarity.MYTHIC,
+            expectedCategory = ItemCategory.NONE,
+        )
+    }
+
+    @Test
+    fun testDungeonItemWithCategory() {
+        assertItemCategoryAndRarity(
+            item = Items.IRON_SWORD,
+            displayName = "§6Hyperion",
+            lore = dungeonCategoryLore,
+            internalName = "HYPERION",
+            expectedRarity = LorenzRarity.LEGENDARY,
+            expectedCategory = ItemCategory.SWORD,
+        )
+    }
+
+    @Test
+    fun testRecombobulatedDungeonItemWithCategory() {
+        assertItemCategoryAndRarity(
+            item = Items.IRON_SWORD,
+            displayName = "§6Hyperion",
+            lore = dungeonCategoryLore.dropLast(1) + "a MYTHIC DUNGEON SWORD a",
+            internalName = "HYPERION",
+            expectedRarity = LorenzRarity.MYTHIC,
+            expectedCategory = ItemCategory.SWORD,
+        )
+    }
+
     private fun assertItemCategoryAndRarity(
         item: Item,
         displayName: String,
@@ -130,7 +177,7 @@ class ItemUtilsTest {
         "",
         "Right-click to consume!",
         "",
-        "DIVINE",
+        "MYTHIC",
     )
 
     private val categoryLore = listOf(
@@ -145,6 +192,31 @@ class ItemUtilsTest {
         "This item can be reforged!",
         "\u2763 Requires Farming Skill 20.",
         "EPIC FARMING TOOL",
+    )
+
+    private val dungeonCategorylessLore = listOf(
+        "Right-click to view recipes!",
+        "",
+        "LEGENDARY DUNGEON ITEM",
+    )
+
+    private val dungeonCategoryLore = listOf(
+        "Gear Score: 615",
+        "Damage: +260",
+        "Strength: +150",
+        "Ferocity: +30",
+        "Intelligence: +350",
+        "Gemstones: [\u270e] [\u2694]",
+        "",
+        "Deals +50% damage to \u2620 Wither mobs.",
+        "Grants +1 \u2741 Damage and +2 \u270e",
+        "Intelligence per Catacombs level.",
+        "",
+        "Right-click to use your class ability!",
+        "",
+        "This item can be reforged!",
+        "\u2763 Requires The Catacombs Floor VII Completion.",
+        "LEGENDARY DUNGEON SWORD",
     )
     // </editor-fold>
 }
