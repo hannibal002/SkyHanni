@@ -88,10 +88,10 @@ object FishingBaitDisplay {
 
     private fun getBaitDisplayEntry(
         itemStack: ItemStack,
-        baitType: BaitType?,
+        baitType: BaitType,
         amount: Int,
     ): BaitDisplayEntry {
-        if (baitType == null || baitType.isEmpty()) {
+        if (baitType.isEmpty()) {
             return noBaitEntry
         }
 
