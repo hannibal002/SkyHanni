@@ -140,14 +140,6 @@ object QuiverApi {
         "Arrows Remaining: (?<amount>[\\d,]+)",
     )
 
-    /**
-     * REGEX-TEST: This item is a preview of your currently selected arrow.
-     */
-    private val quiverPreviewDescriptionPattern by group.pattern(
-        "quiver.preview.description",
-        "This item is a preview of your currently selected arrow\\.",
-    )
-
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
@@ -286,8 +278,7 @@ object QuiverApi {
         }
 
         val amount = getQuiverPreviewAmount(lore) ?: return
-        val isQuiverPreview = stack.getExtraAttributes()?.contains("quiver_arrow") == true ||
-            lore.any { quiverPreviewDescriptionPattern.matches(it) }
+        val isQuiverPreview = stack.getExtraAttributes()?.contains("quiver_arrow") == true
         if (!isQuiverPreview) return
 
         val currentArrowType = stack.getQuiverPreviewArrowTypeOrNull() ?: run {
