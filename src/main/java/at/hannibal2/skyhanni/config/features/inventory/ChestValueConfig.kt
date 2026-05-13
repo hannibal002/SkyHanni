@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ChestValueConfig {
     @Expose
@@ -17,24 +19,19 @@ class ChestValueConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Enabled in own Inventory", desc = "Enable the feature for your own inventory.")
-    @ConfigEditorBoolean
-    var enableInOwnInventory: Boolean = false
+    @ConfigOption(name = "Enabled in", desc = "Select where to show the Chest Value display.")
+    @ConfigEditorDraggableList
+    val enabledIn: Property<MutableList<StorageType>> = Property.of(mutableListOf())
 
-    @Expose
-    @ConfigOption(name = "Enabled in Ender Chest", desc = "Enable the feature for your Ender Chest.")
-    @ConfigEditorBoolean
-    var enableInEnderChest: Boolean = false
+    enum class StorageType(private val displayName: String) {
+        OWN_INVENTORY("Own Inventory"),
+        ENDER_CHEST("Ender Chest"),
+        BACKPACK("Backpack"),
+        DUNGEON("Dungeon"),
+        ;
 
-    @Expose
-    @ConfigOption(name = "Enabled in Backpack", desc = "Enable the feature for your Backpacks.")
-    @ConfigEditorBoolean
-    var enableInBackpack: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
-    @ConfigEditorBoolean
-    var enableInDungeons: Boolean = false
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
+import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -53,7 +54,7 @@ object ChestValue {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isEnabled()) return
-        if (DungeonApi.inDungeon() && !config.enableInDungeons) return
+        if (DungeonApi.inDungeon() && StorageType.DUNGEON !in config.enabledIn.get()) return
         if (!inOwnInventory) {
             if (InventoryUtils.openInventoryName() == "") return
         }
@@ -76,7 +77,7 @@ object ChestValue {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val inInv = Minecraft.getInstance().screen is InventoryScreen
-        inOwnInventory = inInv && config.enableInOwnInventory
+        inOwnInventory = inInv && StorageType.OWN_INVENTORY in config.enabledIn.get()
         if (!inInventory) return
         update()
     }
@@ -237,8 +238,8 @@ object ChestValue {
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false
 
-        if (name.startsWith("Ender Chest (")) return config.enableInEnderChest
-        if (name.contains("Backpack") && name.contains("Slot #")) return config.enableInBackpack
+        if (name.startsWith("Ender Chest (")) return StorageType.ENDER_CHEST in config.enabledIn.get()
+        if (name.contains("Backpack") && name.contains("Slot #")) return StorageType.BACKPACK in config.enabledIn.get()
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this
