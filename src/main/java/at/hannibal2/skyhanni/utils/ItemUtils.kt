@@ -445,6 +445,20 @@ object ItemUtils {
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
+            } else {
+                if (itemCategory in ItemCategory.deprecated) {
+                    ErrorManager.logErrorStateWithData(
+                        "Item category $itemCategory for item $name is outdated",
+                        "ItemCategory $itemCategory is deprecated",
+                        "item category" to itemCategory,
+                        "internal name" to getInternalName(),
+                        "item name" to name,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                        "pattern result" to category,
+                        "lore" to cleanLore,
+                        betaOnly = true,
+                    )
+                }
             }
             if (itemRarity == null) {
                 ErrorManager.logErrorStateWithData(

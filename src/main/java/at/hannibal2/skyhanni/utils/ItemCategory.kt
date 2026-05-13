@@ -89,5 +89,8 @@ enum class ItemCategory {
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
+
+        @Suppress("DEPRECATION")
+        val deprecated = listOf(FISHING_WEAPON, HOE, ITEM)
     }
 }
