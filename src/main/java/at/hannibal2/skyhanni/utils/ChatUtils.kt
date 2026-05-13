@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.LinkedList
@@ -406,20 +407,25 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.connection.sendChat(sendQueue.poll() ?: return)
-            lastMessageSent = SimpleTimeMark.now()
+            val message = sendQueue.poll() ?: return
+            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
         }
     }
 
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                it.connection.sendChat(message)
-                lastMessageSent = SimpleTimeMark.now()
+                it.connection.dispatchMessage(message)
                 return
             }
         }
         sendQueue.add(message)
+    }
+
+    private fun ClientPacketListener.dispatchMessage(message: String) {
+        if (message.startsWith('/')) sendCommand(message.drop(1))
+        else sendChat(message)
+        lastMessageSent = SimpleTimeMark.now()
     }
 
     private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay

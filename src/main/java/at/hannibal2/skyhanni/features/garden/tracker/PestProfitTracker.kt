@@ -99,6 +99,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    val SUNFLOWER_ITEM = "DOUBLE_PLANT".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
@@ -202,11 +203,17 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
             addItem(pest, internalName, amount, command = false)
 
-            // Field Mice drop 6 separate items, but we only want to count the kill once
-            if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
-            // overclocker drops have the same format as crop drops and causes double counting kills
-            else if (pest != PestType.FIELD_MOUSE && internalName != OVERCLOCKER) addKill(pest)
+            val shouldAddKill = when (pest) {
+                // Field Mice drop 6 separate items, but we only want to count the kill once
+                PestType.FIELD_MOUSE -> internalName == DUNG_ITEM
+                // Lunar Moths drop 3 separate crops, but we only want to count the kill once
+                PestType.LUNAR_MOTH -> internalName == SUNFLOWER_ITEM
+                // Overclocker drops have the same format as crop drops and causes double counting kills
+                else -> internalName != OVERCLOCKER
+            }
+            if (shouldAddKill) addKill(pest)
         }
+
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
