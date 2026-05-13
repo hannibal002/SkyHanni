@@ -28,7 +28,7 @@ object UtilsPatterns {
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line.colorless",
-        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: (?!(?:a(?: \\(ID \\w\\d+\\))?)?$)(?:DUNGEON (?:ITEM(?=(?: a)?(?: \\(ID \\w\\d+\\))?$))?)?)?(?<itemCategory>.*?)(?: a)?(?: \\(ID \\w\\d+\\))?$",
+        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: DUNGEON)?(?: (?<itemCategory>[A-Z].*?))?(?: a)?(?: \\(ID \\w\\d+\\))?$",
     )
 
     /**
