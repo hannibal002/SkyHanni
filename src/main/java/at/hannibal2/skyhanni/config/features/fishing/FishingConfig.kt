@@ -76,6 +76,11 @@ class FishingConfig {
     val fishingProfitTracker: FishingProfitTrackerConfig = FishingProfitTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Treasure Fishing Tracker", desc = "")
+    @Accordion
+    val treasureFishingTracker: TreasureFishingTrackerConfig = TreasureFishingTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Totem of Corruption", desc = "")
     @Accordion
     val totemOfCorruption: TotemOfCorruptionConfig = TotemOfCorruptionConfig()
