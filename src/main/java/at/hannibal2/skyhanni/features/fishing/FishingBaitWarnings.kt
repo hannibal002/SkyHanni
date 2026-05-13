@@ -26,8 +26,7 @@ object FishingBaitWarnings {
     @HandleEvent
     fun onBaitUpdate(event: BaitUpdateEvent) {
         val baitType = event.baitType
-
-        if (baitType == null || baitType.isEmpty()) {
+        if (baitType.isEmpty()) {
             if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
             wasUsingBait = false
             lastBait = null
