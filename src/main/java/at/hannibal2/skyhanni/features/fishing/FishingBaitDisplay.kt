@@ -40,7 +40,7 @@ object FishingBaitDisplay {
     @HandleEvent
     fun onBaitUpdate(event: BaitUpdateEvent) {
         bait = getBaitDisplayEntry(event.itemStack, event.baitType, event.amount)
-        updateDisplay();
+        updateDisplay()
     }
 
     @HandleEvent
@@ -89,7 +89,7 @@ object FishingBaitDisplay {
     private fun getBaitDisplayEntry(
         itemStack: ItemStack,
         baitType: BaitType?,
-        amount: Int
+        amount: Int,
     ): BaitDisplayEntry {
         if (baitType == null || amount == 0 || baitType == FishingApi.NONE_BAIT_TYPE) {
             return noBaitEntry
