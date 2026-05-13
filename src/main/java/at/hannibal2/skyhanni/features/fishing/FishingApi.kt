@@ -199,7 +199,7 @@ object FishingApi {
 
     private fun extractAndPostBaitUpdate(stack: ItemStack) {
         val category = stack.getItemCategoryOrNull() ?: return
-        if (category != ItemCategory.BAIT) {
+        if (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT) {
             postBaitUpdate(NONE_BAIT_TYPE, 0, stack)
             return
         }
