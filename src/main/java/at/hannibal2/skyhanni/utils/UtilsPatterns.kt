@@ -22,10 +22,11 @@ object UtilsPatterns {
      * REGEX-TEST: COMMON COMBAT SHARD (ID C9)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
+     * REGEX-TEST: a DIVINE a
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line.colorless",
-        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities}) ?(?:DUNGEON )?(?<itemCategory>.*?)(?: a)?(?: \\(ID \\w\\d+\\))?$",
+        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: (?!(?:a(?: \\(ID \\w\\d+\\))?)?$)(?:DUNGEON )?)?(?<itemCategory>.*?)(?: a)?(?: \\(ID \\w\\d+\\))?$",
     )
 
     /**
