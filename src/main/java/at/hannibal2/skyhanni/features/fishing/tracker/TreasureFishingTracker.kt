@@ -31,20 +31,16 @@ object TreasureFishingTracker {
     private val config get() = SkyHanniMod.feature.fishing.treasureFishingTracker
 
     /**
-     * REGEX-TEST: §5⛃ §r§5§lGOOD CATCH! §r§fYou caught §r§bIce Essence §r§8x5§r§f!
-     * REGEX-TEST: §5⛃ §r§5§lGOOD §r§2§lJUNK§r§5§l CATCH! §r§fYou caught a §r§aRusty Coin§r§f!§r§7
-     * REGEX-TEST: §6⛃ §r§6§lGREAT CATCH! §r§fYou caught §r§aEnchanted Snow Block §r§8x8§r§f!
-     * REGEX-TEST: §6⛃ §r§6§lGREAT §r§2§lJUNK§r§6§l CATCH! §r§fYou caught a §r§9Busted Belt Buckle§r§f!
-     * REGEX-TEST: §d⛃ §r§d§lOUTSTANDING CATCH! §r§fYou caught §r§9Enchanted Fig Log §r§8x10§r§f!
-     * REGEX-TEST: §d⛃ §r§d§lOUTSTANDING §r§2§lJUNK§r§d§l CATCH! §r§fYou caught an §r§fOld Boot§r§f!
-     * REGEX-FAIL: ⛃ GOOD CATCH! You caught Ice Essence x5!
-     * REGEX-FAIL: §5⛃ §r§5§lFAIR CATCH! §r§fYou caught §r§bIce Essence §r§8x5§r§f!
-     * REGEX-FAIL: §5⛃ §r§5§lGOOD CATCH! §r§fYou found §r§bIce Essence §r§8x5§r§f!
+     * REGEX-TEST: ⛃ GOOD CATCH! You caught Ice Essence x5!
+     * REGEX-TEST: ⛃ GOOD JUNK CATCH! You caught a Rusty Coin!
+     * REGEX-TEST: ⛃ GREAT CATCH! You caught Enchanted Snow Block x8!
+     * REGEX-TEST: ⛃ GREAT JUNK CATCH! You caught a Busted Belt Buckle!
+     * REGEX-TEST: ⛃ OUTSTANDING CATCH! You caught Enchanted Fig Log x10!
+     * REGEX-TEST: ⛃ OUTSTANDING JUNK CATCH! You caught an Old Leather Boot!
      */
     private val treasureCatchPattern by RepoPattern.pattern(
         "fishing.tracker.treasure.catch",
-        "^§[56d]⛃ §r§[56d]§l(?<catchType>GOOD|GREAT|OUTSTANDING)" +
-            "(?: §r§2§lJUNK§r§[56d]§l)? CATCH! §r§fYou caught (?:an? )?§r.*$",
+        "^⛃ (?<catchType>GOOD|GREAT|OUTSTANDING)(?: JUNK)? CATCH! You caught (?:an? )?.*$",
     )
 
     private val tracker = SkyHanniTracker(
@@ -75,8 +71,7 @@ object TreasureFishingTracker {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
-        val message = event.messageComponent.getText().removePrefix("§r").trim()
-        treasureCatchPattern.matchMatcher(message) {
+        treasureCatchPattern.matchMatcher(event.cleanMessage.trim()) {
             val catch = TreasureCatch.valueOf(group("catchType"))
             tracker.modify { it.catchAmounts.addOrPut(catch, 1) }
         }
