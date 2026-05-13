@@ -187,14 +187,18 @@ object FishingApi {
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: return
-        extractAndPostBaitUpdate(stack)
+        checkAndUpdateBaitFromInventory()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() || event.slot != BAIT_SLOT) return
         extractAndPostBaitUpdate(event.itemStack)
+    }
+
+    private fun checkAndUpdateBaitFromInventory() {
+        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: return
+        extractAndPostBaitUpdate(stack)
     }
 
     private fun extractAndPostBaitUpdate(stack: ItemStack) {
@@ -259,6 +263,9 @@ object FishingApi {
         if (holdingRod) {
             // If the player is not holding a rod, we want to just save the last state
             hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
+
+            // Check bait when switching to a fishing rod
+            checkAndUpdateBaitFromInventory()
         }
     }
 
