@@ -237,6 +237,7 @@ object CFDataLoader {
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!CFApi.inChocolateFactory) return
         DelayedRun.runOrNextTick {
             if (!CFApi.inChocolateFactory) return@runOrNextTick
             updateInventoryItems(event.inventoryItems)
