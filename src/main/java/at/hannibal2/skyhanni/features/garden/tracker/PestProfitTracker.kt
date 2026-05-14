@@ -83,7 +83,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §6\\(§6\\+[\\d,]+(☘|☀)\\)",
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §6\\(§6\\+[\\d,]+([☘☀])\\)",
     )
 
     /**
