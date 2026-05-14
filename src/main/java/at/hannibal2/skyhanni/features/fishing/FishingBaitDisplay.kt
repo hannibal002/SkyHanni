@@ -87,10 +87,10 @@ object FishingBaitDisplay {
 
     private fun getBaitDisplayEntry(
         itemStack: ItemStack,
-        baitType: FishingApi.BaitType,
+        baitType: FishingApi.BaitType?,
         amount: Int,
     ): BaitDisplayEntry {
-        if (baitType.isEmpty()) {
+        if (baitType == null) {
             return noBaitEntry
         }
 
