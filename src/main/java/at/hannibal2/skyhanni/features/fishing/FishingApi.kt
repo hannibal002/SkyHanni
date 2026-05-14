@@ -64,10 +64,6 @@ object FishingApi {
         override fun toString(): String {
             return internalName.asString()
         }
-
-        fun isEmpty(): Boolean {
-            return this == NONE_BAIT_TYPE
-        }
     }
 
     /**
@@ -124,8 +120,6 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    val NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
-
     private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
 
@@ -134,7 +128,7 @@ object FishingApi {
     var bobberHasTouchedLiquid = false
         private set
 
-    var currentBait: BaitType = NONE_BAIT_TYPE
+    var currentBait: BaitType? = null
         private set
     var currentBaitAmount: Int = 0
         private set
@@ -204,7 +198,7 @@ object FishingApi {
 
     private fun checkAndUpdateBaitFromInventory() {
         val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
+            postEmptyBaitUpdate()
             return
         }
         extractAndPostBaitUpdate(stack)
@@ -213,7 +207,7 @@ object FishingApi {
     private fun extractAndPostBaitUpdate(stack: ItemStack) {
         val category = stack.getItemCategoryOrNull()
         if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, stack)
+            postEmptyBaitUpdate()
             return
         }
 
@@ -227,11 +221,15 @@ object FishingApi {
         postBaitUpdate(baitType, baitAmount, stack)
     }
 
-    private fun postBaitUpdate(baitType: BaitType, amount: Int, itemStack: ItemStack) {
-        if (currentBait.internalName == baitType.internalName && currentBaitAmount == amount) return
+    private fun postBaitUpdate(baitType: BaitType?, amount: Int, itemStack: ItemStack) {
+        if (currentBait?.internalName == baitType?.internalName && currentBaitAmount == amount) return
         currentBait = baitType
         currentBaitAmount = amount
         BaitUpdateEvent(currentBait, currentBaitAmount, itemStack).post()
+    }
+
+    private fun postEmptyBaitUpdate() {
+        postBaitUpdate(null, 0, ItemStack.EMPTY)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -277,7 +275,7 @@ object FishingApi {
             // Check bait when switching to a fishing rod
             checkAndUpdateBaitFromInventory()
         } else if (wasHoldingRod) {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
+            postEmptyBaitUpdate()
         }
     }
 

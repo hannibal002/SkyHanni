@@ -30,8 +30,7 @@ object FishingBaitWarnings {
             lastBait = null
             return
         }
-        val baitType = event.baitType
-        if (baitType.isEmpty()) {
+        val baitType = event.baitType ?: run {
             if (config.noBaitWarning && wasUsingBait) showNoBaitWarning()
             wasUsingBait = false
             lastBait = null
