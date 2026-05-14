@@ -102,10 +102,6 @@ object FishingApi {
         "Bait Remaining: (?<amount>[\\d,]+)",
     )
 
-    private val disableBaitBag by RepoPattern.pattern(
-        "fishing.chat.disablebaitbag",
-        "Use Baits From Bag is now disabled!")
-
     const val babySlugName = "Baby Magma Slug"
 
     val lavaBlocks = buildList { addLavas() }
@@ -206,16 +202,6 @@ object FishingApi {
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() || event.slot != BAIT_SLOT) return
         extractAndPostBaitUpdate(event.itemStack)
-    }
-
-    // OwnInventoryItemUpdateEvent does not fire when the bait bag is manually disabled,
-    // so we need to listen to the chat message as well
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
-        if (disableBaitBag.matches(event.cleanMessage)) {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
-        }
     }
 
     private fun checkAndUpdateBaitFromInventory() {
