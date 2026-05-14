@@ -42,8 +42,7 @@ object CocoonAPI {
 
     val expectedLifetime = 6.4.seconds
     /*
-    roughly where cocoon times landed for me across a few hundred cocoons
-    Might require some sort of ping based tweaking?
+    roughly where cocoon times landed across a few hundred logged cocoons.
     */
     var canCocoon: Boolean = false
         private set
@@ -62,8 +61,7 @@ object CocoonAPI {
         "spawn",
         "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!"
     )
-    // Yes, I am aware Hypixel don't use an in this message but
-    // seems more like a spelling mistake on their end & I ain't forging a regex test
+    // Hypixel don't use an in this message but that's a spelling mistake on their end that might get fixed
 
     data class CocoonMob(
         val mob: Mob,
