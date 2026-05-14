@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.BaitType
-import at.hannibal2.skyhanni.events.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -88,7 +87,7 @@ object FishingBaitDisplay {
 
     private fun getBaitDisplayEntry(
         itemStack: ItemStack,
-        baitType: BaitType,
+        baitType: FishingApi.BaitType,
         amount: Int,
     ): BaitDisplayEntry {
         if (baitType.isEmpty()) {
