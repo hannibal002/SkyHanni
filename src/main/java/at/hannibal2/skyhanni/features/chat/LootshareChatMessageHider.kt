@@ -21,16 +21,29 @@ object LootshareChatMessageHider {
         "§e§lLOOT SHARE §r(?:§r)*§fYou received loot for assisting §r.*§f!",
     )
 
+    /**
+     * REGEX-TEST: §e§lLOOT SHARE §fYou received a §9Glacite Walker §fShard for assisting §bMealoan§f!
+     * REGEX-TEST: §e§lLOOT SHARE §fYou received §b2 §aMossybit §fShards for assisting §bFallenYeti§f!
+     */
+    private val lootshareShardPattern by patternGroup.pattern(
+        "lootshare.shard",
+        "§e§lLOOT SHARE §fYou received (?:an?|§.(?<amount>\\d+)) §.(?<shardName>.+) §fShards? for assisting .*§f!",
+    )
+
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (!shouldHide(event.message)) return
+        if (!shouldHide(event.cleanMessage)) return
 
         event.blockedReason = "lootshare"
     }
 
     private fun shouldHide(message: String): Boolean {
         lootsharePattern.matchMatcher(message) {
+            return true
+        }
+        lootshareShardPattern.matchMatcher(message) {
             return true
         }
         return false
