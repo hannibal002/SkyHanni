@@ -14,7 +14,7 @@ object FishingBaitWarnings {
 
     private val config get() = SkyHanniMod.feature.fishing.fishingBaitWarnings
 
-    private var lastBait: String? = null
+    private var lastBait: FishingApi.BaitType? = null
     private var wasUsingBait = true
 
     @HandleEvent
@@ -25,22 +25,25 @@ object FishingBaitWarnings {
 
     @HandleEvent
     fun onBaitUpdate(event: BaitUpdateEvent) {
-        val baitType = event.baitType
-        if (baitType.isEmpty()) {
-            if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
+        if (!FishingApi.holdingRod) {
+            wasUsingBait = false
+            lastBait = null
+            return
+        }
+        val baitType = event.baitType ?: run {
+            if (config.noBaitWarning && wasUsingBait) showNoBaitWarning()
             wasUsingBait = false
             lastBait = null
             return
         }
 
-        val baitName = baitType.displayName
         lastBait?.let {
-            if (it != baitName && config.baitChangeWarning) {
-                showBaitChangeWarning(it, baitName)
+            if (it.internalName != baitType.internalName && config.baitChangeWarning) {
+                showBaitChangeWarning(it.displayName, baitType.displayName)
             }
         }
         wasUsingBait = true
-        lastBait = baitName
+        lastBait = baitType
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {

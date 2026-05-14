@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.data.QuiverApi.isEnabled
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
@@ -65,10 +63,6 @@ object FishingApi {
     data class BaitType(val displayName: String, val internalName: NeuInternalName) {
         override fun toString(): String {
             return internalName.asString()
-        }
-
-        fun isEmpty(): Boolean {
-            return this == NONE_BAIT_TYPE
         }
     }
 
@@ -126,8 +120,6 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    val NONE_BAIT_TYPE: BaitType = BaitType("None", NeuInternalName.NONE)
-
     private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
 
@@ -136,7 +128,7 @@ object FishingApi {
     var bobberHasTouchedLiquid = false
         private set
 
-    var currentBait: BaitType = NONE_BAIT_TYPE
+    var currentBait: BaitType? = null
         private set
     var currentBaitAmount: Int = 0
         private set
@@ -200,13 +192,13 @@ object FishingApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() || event.slot != BAIT_SLOT) return
+        if (event.slot != BAIT_SLOT) return
         extractAndPostBaitUpdate(event.itemStack)
     }
 
     private fun checkAndUpdateBaitFromInventory() {
         val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
+            postEmptyBaitUpdate()
             return
         }
         extractAndPostBaitUpdate(stack)
@@ -215,7 +207,7 @@ object FishingApi {
     private fun extractAndPostBaitUpdate(stack: ItemStack) {
         val category = stack.getItemCategoryOrNull()
         if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
-            postBaitUpdate(NONE_BAIT_TYPE, 0, stack)
+            postEmptyBaitUpdate()
             return
         }
 
@@ -229,11 +221,15 @@ object FishingApi {
         postBaitUpdate(baitType, baitAmount, stack)
     }
 
-    private fun postBaitUpdate(baitType: BaitType, amount: Int, itemStack: ItemStack) {
-        if (currentBait.internalName == baitType.internalName && currentBaitAmount == amount) return
+    private fun postBaitUpdate(baitType: BaitType?, amount: Int, itemStack: ItemStack) {
+        if (currentBait?.internalName == baitType?.internalName && currentBaitAmount == amount) return
         currentBait = baitType
         currentBaitAmount = amount
         BaitUpdateEvent(currentBait, currentBaitAmount, itemStack).post()
+    }
+
+    private fun postEmptyBaitUpdate() {
+        postBaitUpdate(null, 0, ItemStack.EMPTY)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -266,6 +262,7 @@ object FishingApi {
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        val wasHoldingRod = holdingRod
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
@@ -277,6 +274,8 @@ object FishingApi {
 
             // Check bait when switching to a fishing rod
             checkAndUpdateBaitFromInventory()
+        } else if (wasHoldingRod) {
+            postEmptyBaitUpdate()
         }
     }
 
