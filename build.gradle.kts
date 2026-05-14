@@ -11,6 +11,7 @@ import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.gradle.api.tasks.JavaExec
+import org.gradle.jvm.tasks.Jar as GradleJar
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
@@ -242,7 +243,7 @@ afterEvaluate {
     }
 }
 
-tasks.withType(Test::class) {
+tasks.withType<Test> {
     useJUnitPlatform()
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
@@ -347,11 +348,11 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType(JavaCompile::class) {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar::class) {
+tasks.withType<GradleJar> {
     archiveBaseName.set("SkyHanni")
     archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
