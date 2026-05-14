@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
@@ -93,17 +94,19 @@ object FishingApi {
         "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
-    const val babySlugName = "Baby Magma Slug"
-
-    private val group = RepoPattern.group("data.fishing")
-
     /**
      * REGEX-TEST: Bait Remaining: 49
      */
-    private val baitRemainingPattern by group.pattern(
-        "bait.inventory",
+    private val baitRemainingPattern by RepoPattern.pattern(
+        "fishing.bait.inventory",
         "Bait Remaining: (?<amount>[\\d,]+)",
     )
+
+    private val disableBaitBag by RepoPattern.pattern(
+        "fishing.chat.disablebaitbag",
+        "Use Baits From Bag is now disabled!")
+
+    const val babySlugName = "Baby Magma Slug"
 
     val lavaBlocks = buildList { addLavas() }
     private val waterBlocks = buildList { addWaters() }
@@ -203,6 +206,16 @@ object FishingApi {
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() || event.slot != BAIT_SLOT) return
         extractAndPostBaitUpdate(event.itemStack)
+    }
+
+    // OwnInventoryItemUpdateEvent does not fire when the bait bag is manually disabled,
+    // so we need to listen to the chat message as well
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChatMessage(event: SkyHanniChatEvent.Allow) {
+        if (!isEnabled()) return
+        if (disableBaitBag.matches(event.cleanMessage)) {
+            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
+        }
     }
 
     private fun checkAndUpdateBaitFromInventory() {
