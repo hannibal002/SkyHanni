@@ -222,7 +222,7 @@ object FishingApi {
     }
 
     private fun postBaitUpdate(baitType: BaitType, amount: Int, itemStack: ItemStack) {
-        if (currentBait?.internalName == baitType.internalName && currentBaitAmount == amount) return
+        if (currentBait.internalName == baitType.internalName && currentBaitAmount == amount) return
         currentBait = baitType
         currentBaitAmount = amount
         BaitUpdateEvent(currentBait, currentBaitAmount, itemStack).post()
