@@ -20,10 +20,12 @@ internal class DeferredItemStack private constructor(
 
     private var isBuilt = false
 
-    override fun isEmpty() = !isBuilt || super.isEmpty()
+    override fun isEmpty() = super.isEmpty()
 
     internal fun rebuild() {
+        if (isBuilt) return
         if (!BuiltInRegistries.ITEM.wrapAsHolder(sourceItem).areComponentsBound()) return
+        val pendingPatch = componentsPatch
         val real = factory().create()
         if (real.isEmpty) {
             count = 0
@@ -33,13 +35,18 @@ internal class DeferredItemStack private constructor(
         @Suppress("DEPRECATION")
         item = real.typeHolder()
         @Suppress("DEPRECATION")
-        components = PatchedDataComponentMap.fromPatch(real.typeHolder().components(), real.componentsPatch)
+        components = PatchedDataComponentMap.fromPatch(real.typeHolder().components(), real.componentsPatch).also {
+            it.applyPatch(pendingPatch)
+        }
         isBuilt = true
     }
 
     override fun copy(): ItemStack =
         if (isBuilt) super.copy()
-        else DeferredItemStack(sourceItem, factory, this.count)
+        else DeferredItemStack(sourceItem, factory, this.count).also {
+            it.applyComponents(componentsPatch)
+            it.popTime = popTime
+        }
 
     init {
         instances.add(this)
