@@ -264,6 +264,7 @@ object FishingApi {
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        val wasHoldingRod = holdingRod
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
@@ -275,6 +276,8 @@ object FishingApi {
 
             // Check bait when switching to a fishing rod
             checkAndUpdateBaitFromInventory()
+        } else if (wasHoldingRod) {
+            postBaitUpdate(NONE_BAIT_TYPE, 0, ItemStack.EMPTY)
         }
     }
 
