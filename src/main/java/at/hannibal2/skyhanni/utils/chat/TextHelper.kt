@@ -245,12 +245,12 @@ object TextHelper {
             if (split.isEmpty() || split.size == 1) {
                 currentComponent.append(string.toStyledComponent())
             } else {
-                currentComponent.append(string.toStyledComponent())
+                currentComponent.append(split.first().toStyledComponent())
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
-                for ((index, _) in split.withIndex()) {
+                for ((index, str) in split.withIndex()) {
                     if (index == 0) continue
-                    currentComponent.append(string.toStyledComponent())
+                    currentComponent.append(str.toStyledComponent())
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
                 }
