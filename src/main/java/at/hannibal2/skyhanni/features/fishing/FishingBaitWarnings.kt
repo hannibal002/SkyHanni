@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
+import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -31,7 +32,6 @@ object FishingBaitWarnings {
             return
         }
         val baitType = event.baitType ?: run {
-            if (config.noBaitWarning && wasUsingBait) showNoBaitWarning()
             wasUsingBait = false
             lastBait = null
             return
@@ -44,6 +44,11 @@ object FishingBaitWarnings {
         }
         wasUsingBait = true
         lastBait = baitType
+    }
+
+    @HandleEvent
+    fun onBobberCast(event: FishingBobberCastEvent) {
+        if (config.noBaitWarning && !wasUsingBait) showNoBaitWarning()
     }
 
     private fun showBaitChangeWarning(before: String, after: String) {
