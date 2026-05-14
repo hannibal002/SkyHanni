@@ -31,18 +31,17 @@ object FishingBaitWarnings {
             lastBait = null
             return
         }
-        val baitType = event.baitType ?: run {
-            wasUsingBait = false
-            lastBait = null
-            return
-        }
+
+        val baitType = event.baitType
 
         lastBait?.let {
-            if (it.internalName != baitType.internalName && config.baitChangeWarning) {
-                showBaitChangeWarning(it.displayName, baitType.displayName)
+            if (it != baitType && config.baitChangeWarning) {
+                val beforeName = lastBait?.displayName ?: "None"
+                val afterName = baitType?.displayName ?: "None"
+                showBaitChangeWarning(beforeName, afterName)
             }
         }
-        wasUsingBait = true
+        wasUsingBait = (baitType != null)
         lastBait = baitType
     }
 
