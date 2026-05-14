@@ -52,6 +52,18 @@ object CocoonAPI {
 
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val patternGroup = RepoPattern.group("combat.cocoon")
+
+    /**
+     * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
+     * REGEX-TEST: CAUGHT! You cocooned a Enderman!
+     */
+    private val cocoonChatMessage by patternGroup.pattern(
+        "spawn",
+        "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!"
+    )
+    // Yes, I am aware Hypixel don't use an in this message but
+    // seems more like a spelling mistake on their end & I ain't forging a regex test
 
     data class CocoonMob(
         val mob: Mob,
