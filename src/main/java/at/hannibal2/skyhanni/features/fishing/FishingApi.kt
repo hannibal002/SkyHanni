@@ -1,11 +1,10 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.BaitType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.QuiverApi.isEnabled
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.BaitUpdateEvent
+import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -60,6 +59,16 @@ object FishingApi {
         ;
 
         val tagName get() = name.lowercase()
+    }
+
+    data class BaitType(val displayName: String, val internalName: NeuInternalName) {
+        override fun toString(): String {
+            return internalName.asString()
+        }
+
+        fun isEmpty(): Boolean {
+            return this == NONE_BAIT_TYPE
+        }
     }
 
     /**
