@@ -338,6 +338,11 @@ class MiscConfig {
     var lockMouseLookChatMessage: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Unlock mouse on warp", desc = "Disable §e/shmouselock§7 when warping or teleporting")
+    @ConfigEditorBoolean
+    var lockMouseUnlockOnWarp: Boolean = true
+
+    @Expose
     @NoConfigLink
     val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
 
