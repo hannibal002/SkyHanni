@@ -125,7 +125,7 @@ object HoeLevelDisplay {
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
         if (hoeLevel < MAX_LEVEL || (hoeLevel == MAX_LEVEL && config.overflow)) {
-            add("§7Level ${hoeLevel + 1} in §e${nextLevelTimer()}")
+            add("In §b${nextLevelTimer()}")
         }
 
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
