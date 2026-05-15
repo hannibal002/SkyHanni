@@ -128,7 +128,7 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         if (FarmingWeightData.apiError || EliteFarmersLeaderboard.apiError) return errorMessage
 
         val newList = mutableListOf<Renderable>()
-        if (inventoryOpen) newList.buildModeSwitcher() else newList.addVerticalSpacer()
+        if (inventoryOpen) newList.buildModeSwitcher()
         config?.display?.text?.get()?.let { leaderboardTextEntries -> newList.addAll(leaderboardTextEntries.mapNotNull { lineMap[it] }) }
         if (inventoryOpen) newList.buildTypeSwitcher()
         return newList
