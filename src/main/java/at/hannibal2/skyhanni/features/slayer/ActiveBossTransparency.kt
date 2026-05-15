@@ -81,6 +81,8 @@ object ActiveBossTransparency {
                 if (!config.applyToPlayers) return
             }
             if (category == MobCategory.PLAYER && !config.applyToPlayers) return
+
+            if (config.hideNameTags) mob.armorStand?.isCustomNameVisible = false
         }
 
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)

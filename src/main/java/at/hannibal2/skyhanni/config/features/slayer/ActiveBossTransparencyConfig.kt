@@ -25,4 +25,9 @@ class ActiveBossTransparencyConfig {
     @ConfigOption(name = "Other Players", desc = "Also change the transparency for other players.")
     @ConfigEditorBoolean
     var applyToPlayers: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Hide Name Tags", desc = "Hide custom names of mobs when they are transparent.")
+    @ConfigEditorBoolean
+    val hideNameTags: Boolean = false
 }
