@@ -80,10 +80,15 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
      * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+78☀)
      * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
      * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
+     * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5☀)
+     * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
+     * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5☀)
      */
+	// TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
+    //  from breaking crops vs. killing pests since they use the same message
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §6\\(§6\\+[\\d,]+[☘☀]\\)",
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §.\\(§.?\\+(?:[\\d.,]+[☘☀]|Cocoaleech)\\)",
     )
 
     /**
