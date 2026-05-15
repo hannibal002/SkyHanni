@@ -338,9 +338,9 @@ class MiscConfig {
     var lockMouseLookChatMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Unlock mouse on warp", desc = "Disable §e/shmouselock§7 when warping or teleporting")
+    @ConfigOption(name = "Unlock mouse on plot tp", desc = "Disable §e/shmouselock§7 when teleporting to another plot on your garden.")
     @ConfigEditorBoolean
-    var lockMouseLookUnlockOnWarp: Boolean = true
+    var lockMouseLookUnlockOnPlotTp: Boolean = true
 
     @Expose
     @NoConfigLink
