@@ -55,6 +55,10 @@ object HoeLevelDisplay {
 
     private val patternGroup = RepoPattern.group("hoe.levels")
 
+    private var tickCounter: Int = 0
+    private var lastXpGained: Long = 0
+    private var xpPerHour: Long = 0
+    
     /**
      * REGEX-TEST: OVERFLOW! Your Turing Sugar Cane Hoe Mk. III has just dropped a Tool Exp Capsule!
      */
@@ -67,6 +71,16 @@ object HoeLevelDisplay {
     fun onTick() {
         if (!isEnabled()) return
         display = getDisplay()?.map(Renderable::text)
+        tickCounter++
+        if (tickCounter % 20 == 0) {
+            val heldItem = InventoryUtils.getItemInHand() ?: return
+            val hoeExp = heldItem.getHoeExp() ?: return
+            if (hoeExp != lastXpGained) {
+                val xpGained = hoeExp - lastXpGained
+                xpPerHour = (xpGained * 3600) / 20
+                lastXpGained = hoeExp
+            }
+        }
     }
 
     private fun getDisplay(): List<String>? = buildList {
@@ -95,7 +109,8 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
-
+        add("§7Level ${hoeLevel + 1} in §e${((next - hoeExp) * 3600) / xpPerHour} seconds")
+    }.ifEmpty { null }
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
             add("§cNot gaining XP! (Wrong crop)")
         }
