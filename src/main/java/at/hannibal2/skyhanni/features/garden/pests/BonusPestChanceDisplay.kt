@@ -22,15 +22,15 @@ object BonusPestChanceDisplay {
 
     private val config get() = PestApi.config
 
-    private val patternGroup = RepoPattern.group("garden.bonuspestchance")
+    private val patternGroup = RepoPattern.group("stats.tablist.no-color.bonus.pest")
 
     /**
      * REGEX-TEST:  Bonus Pest Chance: ൠ70
      * REGEX-TEST:  Bonus Pest Chance: ൠ70
      */
     private val bonusPestChancePattern by patternGroup.pattern(
-        "widget-no-color",
-        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
+        "chance", // bonus.pest.chance
+        " *Bonus Pest Chance: ൠ(?<value>[\\d,.]+)(?: .*)?",
     )
     private var display: Renderable? = null
 
@@ -45,12 +45,12 @@ object BonusPestChanceDisplay {
         val compact = config.pestChanceDisplay.get() == DisplayFormat.COMPACT
         bonusPestChancePattern.matchAllComponents(event.widget.lines) { line ->
             val disabled = line.iterator().any { it.style.isStrikethrough }
-            val amount = group("amount").formatInt()
+            val value = group("value").formatInt()
 
             display = Renderable.text {
                 if (compact) append("§2ൠ BPC§7: ") else append("§2ൠ Bonus Pest Chance§7: ")
                 if (disabled) append("§c§m") else append("§f")
-                append("$amount%")
+                append("$value%")
                 if (disabled && !compact) append("§r §cDISABLED")
             }
             return
