@@ -18,15 +18,15 @@ object OverbloomDisplay {
 
     private val config get() = GardenApi.config
 
-    private val patternGroup = RepoPattern.group("garden.overbloom")
+    private val patternGroup = RepoPattern.group("stats.tablist.no-color")
 
     /**
      * REGEX-TEST:  Overbloom: ☀84
      * REGEX-TEST:  Overbloom: ☀172
      */
     private val overbloomPattern by patternGroup.pattern(
-        "widget-no-color",
-        "\\s+Overbloom: ☀(?<amount>[\\d,.]+)",
+        "overbloom",
+        " *Overbloom: ☀(?<value>[\\d,.]+)(?: .*)?",
     )
     private var display: Renderable? = null
 
@@ -40,11 +40,11 @@ object OverbloomDisplay {
         if (!event.isWidget(TabWidget.STATS)) return
         val compact = config.overbloomDisplay.get() == DisplayFormat.COMPACT
         overbloomPattern.matchAllComponents(event.widget.lines) {
-            val amount = group("amount").formatInt()
+            val value = group("value").formatInt()
 
             display = Renderable.text {
                 if (compact) append("§e☀ OB§7: ") else append("§e☀ Overbloom§7: ")
-                append("§f$amount")
+                append("§f$value")
             }
             return
         }
