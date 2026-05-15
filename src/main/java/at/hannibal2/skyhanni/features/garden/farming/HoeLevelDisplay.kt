@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -40,6 +41,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoeLevelDisplay {
@@ -82,17 +84,21 @@ object HoeLevelDisplay {
             }
         }
     }
-    private fun NextLevelTimer(): String {
-        val heldItem = InventoryUtils.getItemInHand() ?: return ""
-        val hoeExp = heldItem.getHoeExp() ?: return ""
-        val hoeLevel = heldItem.getHoeLevel() ?: return ""
-        val hoeLevels = hoeLevels ?: return ""
-        val next = if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1] else hoeOverflow
-        if (xpPerHour == 0L) return "Calculating..."
-        val xpToNext = next - hoeExp
-        val secondsToNext = xpToNext * 3600 / xpPerHour
-        return "${secondsToNext.toInt()}s"
+    private fun nextLevelTimer(): String {
+        val heldItem = InventoryUtils.getItemInHand() ?: return "Unknown"
+        val hoeExp = heldItem.getHoeExp() ?: return "Unknown"
+        val hoeLevel = heldItem.getHoeLevel() ?: return "Unknown"
+        val hoeLevels = hoeLevels ?: return "Unknown"
+        val next =
+            if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1]
+            else hoeOverflow
+        if (xpPerHour <= 0L) return "Calculating..."
+        val xpToNext = (next - hoeExp).coerceAtLeast(0L)
+        val secondsLeft = xpToNext * 3600 / xpPerHour
+        val finishTime = SimpleTimeMark.now() + secondsLeft.seconds
+        return finishTime.formattedTime()
     }
+
     private fun getDisplay(): List<String>? = buildList {
         add("§6Hoe Levels")
         val heldItem = InventoryUtils.getItemInHand()
@@ -119,7 +125,7 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
-        add("§7Level ${hoeLevel + 1} in §e${NextLevelTimer()}")
+        add("§7Level ${hoeLevel + 1} in §e${nextLevelTimer()}")
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
             add("§cNot gaining XP! (Wrong crop)")
         }
