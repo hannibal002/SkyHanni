@@ -54,7 +54,7 @@ object ChestValue {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isEnabled()) return
-        if (DungeonApi.inDungeon() && StorageType.DUNGEON !in config.enabledIn.get()) return
+        if (DungeonApi.inDungeon() && !config.enableInDungeons) return
         if (!inOwnInventory) {
             if (InventoryUtils.openInventoryName() == "") return
         }

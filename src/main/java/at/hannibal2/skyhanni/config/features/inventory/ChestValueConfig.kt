@@ -27,11 +27,15 @@ class ChestValueConfig {
         OWN_INVENTORY("Own Inventory"),
         ENDER_CHEST("Ender Chest"),
         BACKPACK("Backpack"),
-        DUNGEON("Dungeon"),
         ;
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(name = "Enabled in dungeons", desc = "Enable the feature in dungeons.")
+    @ConfigEditorBoolean
+    var enableInDungeons: Boolean = false
 
     @Expose
     @ConfigOption(
