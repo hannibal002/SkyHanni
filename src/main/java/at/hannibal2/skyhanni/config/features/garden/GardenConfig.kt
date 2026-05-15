@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.config.features.garden.optimalAngles.OptimalAnglesC
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.features.garden.OverbloomDisplay
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -22,6 +23,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
 class GardenConfig {
@@ -186,6 +188,15 @@ class GardenConfig {
     @ConfigOption(name = "See Through Farming", desc = "")
     @Accordion
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
+
+    @Expose
+    @ConfigOption(name = "Overbloom Display", desc = "Displays your overbloom.")
+    @ConfigEditorDropdown
+    val overbloomDisplay: Property<OverbloomDisplay.DisplayFormat> = Property.of(OverbloomDisplay.DisplayFormat.DISABLED)
+
+    @Expose
+    @ConfigLink(owner = GardenConfig::class, field = "overbloomDisplay")
+    val overbloomDisplayPosition: Position = Position(5, -105)
 
     @Expose
     @ConfigOption(

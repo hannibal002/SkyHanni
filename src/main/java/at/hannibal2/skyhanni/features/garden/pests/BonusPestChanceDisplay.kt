@@ -48,7 +48,7 @@ object BonusPestChanceDisplay {
             val amount = group("amount").formatInt()
 
             display = Renderable.text {
-                if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+                if (compact) append("§2ൠ BPC§7: ") else append("§2ൠ Bonus Pest Chance§7: ")
                 if (disabled) append("§c§m") else append("§f")
                 append("$amount%")
                 if (disabled && !compact) append("§r §cDISABLED")
