@@ -95,8 +95,7 @@ object HoeLevelDisplay {
         if (xpPerHour <= 0L) return "Calculating..."
         val xpToNext = (next - hoeExp).coerceAtLeast(0L)
         val secondsLeft = xpToNext * 3600 / xpPerHour
-        val finishTime = SimpleTimeMark.now() + secondsLeft.seconds
-        return finishTime.formattedTime()
+        return secondsLeft.seconds.toString().substringBefore('.')
     }
 
     private fun getDisplay(): List<String>? = buildList {
