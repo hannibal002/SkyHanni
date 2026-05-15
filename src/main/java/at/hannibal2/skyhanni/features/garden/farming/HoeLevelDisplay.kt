@@ -82,7 +82,17 @@ object HoeLevelDisplay {
             }
         }
     }
-
+    private fun NextLevelTimer(): String {
+        val heldItem = InventoryUtils.getItemInHand() ?: return ""
+        val hoeExp = heldItem.getHoeExp() ?: return ""
+        val hoeLevel = heldItem.getHoeLevel() ?: return ""
+        val hoeLevels = hoeLevels ?: return ""
+        val next = if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1] else hoeOverflow
+        if (xpPerHour == 0L) return "Calculating..."
+        val xpToNext = next - hoeExp
+        val secondsToNext = xpToNext * 3600 / xpPerHour
+        return "${secondsToNext.toInt()}s"
+    }
     private fun getDisplay(): List<String>? = buildList {
         add("§6Hoe Levels")
         val heldItem = InventoryUtils.getItemInHand()
@@ -109,8 +119,7 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
-        add("§7Level ${hoeLevel + 1} in §e${((next - hoeExp) * 3600) / xpPerHour} seconds")
-    }.ifEmpty { null }
+        add("§7Level ${hoeLevel + 1} in §e${NextLevelTimer()}")
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
             add("§cNot gaining XP! (Wrong crop)")
         }
