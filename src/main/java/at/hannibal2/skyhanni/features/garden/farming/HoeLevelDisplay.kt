@@ -124,7 +124,10 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
-        add("§7Level ${hoeLevel + 1} in §e${nextLevelTimer()}")
+        if (hoeLevel < MAX_LEVEL || (hoeLevel == MAX_LEVEL && config.overflow)) {
+            add("§7Level ${hoeLevel + 1} in §e${nextLevelTimer()}")
+        }
+
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
             add("§cNot gaining XP! (Wrong crop)")
         }
