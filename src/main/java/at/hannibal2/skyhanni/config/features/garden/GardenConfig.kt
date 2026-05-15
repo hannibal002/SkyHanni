@@ -163,11 +163,6 @@ class GardenConfig {
     val atmosphericFilterDisplay: AtmosphericFilterDisplayConfig = AtmosphericFilterDisplayConfig()
 
     @Expose
-    @ConfigOption(name = "Feast Crop Display", desc = "")
-    @Accordion
-    val feastDisplay: FeastDisplayConfig = FeastDisplayConfig()
-
-    @Expose
     @ConfigOption(name = "Garden Tracker Uptime Settings", desc = "")
     @Accordion
     val trackerUptimeSettings: GardenTrackerUptimeConfig = GardenTrackerUptimeConfig()

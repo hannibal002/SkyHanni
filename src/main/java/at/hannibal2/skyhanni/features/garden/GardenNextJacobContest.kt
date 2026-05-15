@@ -91,11 +91,6 @@ object GardenNextJacobContest {
         contest.crops.contains(cropName) && config.otherGuis
     } ?: false
 
-    fun getNextContestBoostedCrop(): CropType? = nextContest?.boostedCrop
-
-    fun getNextContestCrops(limit: Int = Int.MAX_VALUE): List<CropType> =
-        nextContest?.crops?.take(limit) ?: listOf()
-
     fun resetContestData(force: Boolean = false) {
         knownContests = listOf()
         fetchedFromElite = false

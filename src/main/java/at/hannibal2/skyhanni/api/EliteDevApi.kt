@@ -128,7 +128,6 @@ object EliteDevApi {
         "EliteSkyBlock Farming Contests",
     )
 
-    private const val FEAST_API_URL = "$ELITE_API_URL/harvest-feast/current"
 
     val apiWeightsStatic = ApiStaticPath(
         "$ELITE_API_URL/weights/all",
@@ -155,49 +154,6 @@ object EliteDevApi {
     suspend fun submitContests(contests: List<EliteFarmingContest>): Boolean {
         val body = EliteContestsRequest(contests).getBody()
         return ApiUtils.postJson(contestStatic, body).success
-    }
-    // </editor-fold>
-
-    // <editor-fold desc="Feast API">
-    suspend fun fetchCurrentFeastCrops(): List<at.hannibal2.skyhanni.features.garden.CropType> = runCatching {
-        val apiResponse = ApiUtils.getTypedJsonResponse<com.google.gson.JsonElement>(FEAST_API_URL, "EliteSkyBlock Feast")
-        val (_, apiData) = apiResponse.assertSuccessWithData() ?: return@runCatching listOf<at.hannibal2.skyhanni.features.garden.CropType>()
-
-        val crops = mutableListOf<String>()
-        when {
-            apiData.isJsonObject -> {
-                val obj = apiData.asJsonObject
-                if (obj.has("crops") && obj.get("crops").isJsonArray) {
-                    obj.getAsJsonArray("crops").forEach { if (it.isJsonPrimitive) crops.add(it.asString) }
-                } else if (obj.has("current") && obj.get("current").isJsonObject) {
-                    val cur = obj.getAsJsonObject("current")
-                    if (cur.has("crops") && cur.get("crops").isJsonArray) {
-                        cur.getAsJsonArray("crops").forEach { if (it.isJsonPrimitive) crops.add(it.asString) }
-                    }
-                    if (cur.has("boosted") && cur.get("boosted").isJsonPrimitive) {
-                        val boosted = cur.getAsJsonPrimitive("boosted").asString
-                        if (boosted.isNotBlank()) crops.add(0, boosted)
-                    }
-                } else {
-                    // Look for any array values containing strings
-                    obj.entrySet().forEach { (_, v) ->
-                        if (v.isJsonArray) v.asJsonArray.forEach { if (it.isJsonPrimitive) crops.add(it.asString) }
-                    }
-                }
-            }
-            apiData.isJsonArray -> {
-                apiData.asJsonArray.forEach { if (it.isJsonPrimitive) crops.add(it.asString) }
-            }
-            apiData.isJsonPrimitive -> {
-                // single string
-                crops.add(apiData.asString)
-            }
-        }
-
-        crops.mapNotNull { name -> at.hannibal2.skyhanni.features.garden.CropType.getByNameOrNull(name) }
-    }.getOrElse {
-        ErrorManager.logErrorWithData(it, "Failed to fetch feast crops from EliteSkyBlock", "url" to FEAST_API_URL)
-        listOf()
     }
     // </editor-fold>
 
