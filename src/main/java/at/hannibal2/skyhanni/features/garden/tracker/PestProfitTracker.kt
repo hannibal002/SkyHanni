@@ -74,10 +74,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §6(§6+134☀)
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134☀)
      * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+78☀)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78☀)
      * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
      * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
      * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5☀)
