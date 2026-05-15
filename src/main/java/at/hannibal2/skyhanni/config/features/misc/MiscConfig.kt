@@ -340,7 +340,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Unlock mouse on warp", desc = "Disable §e/shmouselock§7 when warping or teleporting")
     @ConfigEditorBoolean
-    var lockMouseUnlockOnWarp: Boolean = true
+    var lockMouseLookUnlockOnWarp: Boolean = true
 
     @Expose
     @NoConfigLink
