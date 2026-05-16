@@ -158,6 +158,15 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(
+        name = "Glowing Dropped Items",
+        desc = "Give dropped items on the ground a glowing outline based on their rarity.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var glowingDroppedItems: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Boop Party", desc = "")
     @Accordion
     val boopParty: BoopPartyConfig = BoopPartyConfig()

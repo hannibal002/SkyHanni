@@ -21,34 +21,32 @@ object RenderLivingEntityHelper {
     private val entityColorCondition = ConcurrentHashMap<LivingEntity, () -> Boolean>()
 
     @JvmStatic
-    var areMobsHighlighted = false
+    @get:JvmName("isUsingCustomGlow")
+    var isUsingCustomGlow = false
         private set
 
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    private fun isEntityInGlowEvent(entity: Entity): Int {
-        return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
-    }
+    private fun getEntityGlowEventColor(entity: Entity): Int? =
+        currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb?.takeIf { it != 0 }
 
     @JvmStatic
     fun check() {
-        areMobsHighlighted = entityColorCondition.values.any { it() } || currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+        isUsingCustomGlow = entityColorCondition.values.any { it() } ||
+            currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
     }
 
     @JvmStatic
-    fun getEntityGlowColor(entity: Entity): Int? {
+    fun getEntityGlowColor(entity: Entity): Int? =
+        getLivingEntityGlowColor(entity) ?: getEntityGlowEventColor(entity)
+
+    private fun getLivingEntityGlowColor(entity: Entity): Int? {
         val livingEntity = entity as? LivingEntity ?: return null
         if (livingEntity.isInvisible && !livingEntity.hasVisibleEquipment()) return null
         val color = internalSetColorMultiplier(livingEntity, 0)
-        if (color == 0) {
-            val eventColor = isEntityInGlowEvent(entity)
-            if (eventColor == 0) {
-                return null
-            }
-            return eventColor
-        }
-        return color
+        if (color != 0) return color
+        return null
     }
 
     private fun LivingEntity.hasVisibleEquipment() =
