@@ -160,7 +160,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Glowing Dropped Items",
-        desc = "Give dropped items on the ground a glowing outline based on their rarity.",
+        desc = "Gives items on the ground that Hypixel doesn't already highlight a glowing outline based on their rarity.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
