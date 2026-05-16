@@ -34,7 +34,7 @@ class KeyBindConfig {
             "§eRequires main toggle to be enabled!",
     )
     @ConfigEditorBoolean
-    var vacuum1: Boolean = false
+    var vacuum: Boolean = false
 
     @Expose
     @ConfigOption(
