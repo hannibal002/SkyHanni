@@ -325,7 +325,7 @@ object ChatFilter {
 
     // This can happen in any island, not just mining islands
     private val hotmTokenMessages = listOf(
-        "You have unspent Tokens of the Mountain! Use /hotm to assign them!",
+        "§cYou have unspent Tokens of the Mountain! Use /hotm to assign them!",
     )
 
     /**
