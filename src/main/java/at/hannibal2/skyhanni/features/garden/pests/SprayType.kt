@@ -7,15 +7,14 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 enum class SprayType(
     val displayName: String,
     val internalName: NeuInternalName? = null,
-    val miscEffect: String? = null,
 ) {
     COMPOST("Compost"),
     PLANT_MATTER("Plant Matter"),
     DUNG("Dung"),
     HONEY_JAR("Honey Jar"),
     TASTY_CHEESE("Tasty Cheese", "CHEESE_FUEL".toInternalName()),
-    FINE_FLOUR("Fine Flour", miscEffect = "§6+20☘ Farming Fortune"),
     JELLY("Jelly"),
+    MOONDEW("Moondew"),
     ;
 
     fun toInternalName(): NeuInternalName {
@@ -25,7 +24,7 @@ enum class SprayType(
 
     fun getSprayEffect(): String = getPests().takeIf { it.isNotEmpty() }?.let { pests ->
         pests.joinToString("§7, §6") { it.displayName }
-    } ?: this.miscEffect ?: "§cUnknown Effect"
+    } ?: "§cUnknown Effect"
 
     companion object {
 

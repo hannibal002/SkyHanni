@@ -273,7 +273,7 @@ object AchievementManager {
                 Component.empty(),
                 componentBuilder {
                     appendWithColor("Value: ", ChatFormatting.GRAY)
-                    appendWithColor("$luck✴", ChatFormatting.GREEN)
+                    appendWithColor("${luck.addSeparators()}✴", ChatFormatting.GREEN)
                 },
                 Component.empty(),
                 Component.literal("Gain more by completing achievements!").withColor(ChatFormatting.DARK_GRAY),
