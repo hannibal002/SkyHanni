@@ -128,7 +128,6 @@ object EliteDevApi {
         "EliteSkyBlock Farming Contests",
     )
 
-
     val apiWeightsStatic = ApiStaticPath(
         "$ELITE_API_URL/weights/all",
         FARMING_WEIGHT_API_NAME,
