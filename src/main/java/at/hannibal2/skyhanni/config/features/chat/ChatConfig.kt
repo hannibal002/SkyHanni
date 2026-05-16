@@ -208,6 +208,15 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
+        name = "Unspent HOTM Tokens",
+        desc = "Hide the message about unspent Tokens of the Mountain.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideUnspentHotmTokens: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Shorten Coin Amounts",
         desc = "Replace coin amounts in chat messages with their shortened version.\n" +
             "e.g. §65,100,000 Coins §7-> §65.1M Coins",

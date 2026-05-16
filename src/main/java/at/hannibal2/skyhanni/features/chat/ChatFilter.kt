@@ -323,6 +323,11 @@ object ChatFilter {
         "§8§oYou can disable this messaging by toggling Lottery in your /hotf!",
     )
 
+    // This can happen in any island, not just mining islands
+    private val hotmTokenMessages = listOf(
+        "You have unspent Tokens of the Mountain! Use /hotm to assign them!",
+    )
+
     /**
      * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
      */
@@ -583,6 +588,7 @@ object ChatFilter {
         "event" to eventMessage,
         "skymall" to skymallMessages,
         "lottery" to lotteryMessages,
+        "hotm_token" to hotmTokenMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
         "masterchef" to MasterChefMessages,
@@ -649,6 +655,7 @@ object ChatFilter {
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTag.MINING.isInIsland() && message.isPresent("skymall") -> "skymall"
         generalConfig.hideLottery && !IslandTypeTag.FORAGING.isInIsland() && message.isPresent("lottery") -> "lottery"
+        generalConfig.hideUnspentHotmTokens && message.isPresent("hotm_token") -> "hotm_token"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
