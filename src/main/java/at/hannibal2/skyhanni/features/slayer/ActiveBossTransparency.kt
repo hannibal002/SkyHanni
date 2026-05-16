@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
-import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
 import at.hannibal2.skyhanni.data.mob.MobCategory
+import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNpc
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object ActiveBossTransparency {
@@ -49,41 +51,49 @@ object ActiveBossTransparency {
 
     @HandleEvent
     fun onEntityTransparencyTick(event: EntityTransparencyTickEvent<LivingEntity>) {
-        if (!isActive()) return
-        val entity = event.entity
+        if (shouldHideEntity(event.entity)) event.newTransparency = config.transparencyLevel.coerceIn(15, 70)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
+        if (config.hideNametags && shouldHideEntity(event.entity)) event.cancel()
+    }
+
+    private fun shouldHideEntity(entity: LivingEntity): Boolean {
+        if (!isActive()) return false
 
         // always show yourself
-        if (entity.isLocalPlayer) return
+        if (entity.isLocalPlayer) return false
 
         // always show npcs, they are static
-        if (entity.isDisplayNpc()) return
+        if (entity.isDisplayNpc()) return false
 
         entity.mob?.let { mob ->
 
             // always show last clicked mob
-            if (mob == lastClickedMob) return
+            if (mob == lastClickedMob) return false
 
             val category = mob.category
             if (category == MobCategory.SLAYER) {
                 // hide own slayer boss
-                if (mob.belongsToPlayer()) return
+                if (mob.belongsToPlayer()) return false
 
                 // hide carry boss
-                if (CarryTracker.isCustomer(mob.ownerNameOrEmpty)) return
+                if (CarryTracker.isCustomer(mob.ownerNameOrEmpty)) return false
 
             }
 
             // maybe also hide other players
             if (category == MobCategory.PLAYER) {
                 // always show current slayer carry customers
-                if (CarryTracker.isCustomer(mob.name)) return
+                if (CarryTracker.isCustomer(mob.name)) return false
 
-                if (!config.applyToPlayers) return
+                if (!config.applyToPlayers) return false
             }
-            if (category == MobCategory.PLAYER && !config.applyToPlayers) return
+            if (category == MobCategory.PLAYER && !config.applyToPlayers) return false
         }
 
-        event.newTransparency = config.transparencyLevel.coerceIn(15, 70)
+        return true
     }
 
     private fun isActive() = config.enabled && (SlayerApi.isInBossFight() || lastHitCarrierBoss)
