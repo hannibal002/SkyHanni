@@ -30,11 +30,6 @@ val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
-    // possible candidate. Some DCEVMs are however incompatible with some things Gradle is doing,
-    // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
-    // IntelliJ run configuration.
-    toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -164,6 +159,9 @@ dependencies {
     // Calculator
     includeImplementation(libs.keval)
 
+    // Repo mgmt
+    includeImplementation(libs.jgit)
+
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
@@ -241,7 +239,7 @@ if (target == ProjectTarget.MODERN_12110) {
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
-        useXVFB = true
+        useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
     }
     loom.runs.removeIf { it.name == "clientGameTest" }
 }
