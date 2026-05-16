@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -33,6 +35,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
@@ -531,5 +534,22 @@ object EliteFarmersLeaderboard {
                 add(it.value.apiData.toString())
             }
         }
+    }
+
+    private const val BETTER_THAN_DEV_ACHIEVEMENT = "Better Than Dev Achievement"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Better than the devs".asComponent(),
+            componentBuilder {
+                append("Pass one of the")
+                append(" SkyHanni ") {
+                    withColor(TextHelper.chromaStyle)
+                }
+                append("contributors in the farming leaderboards")
+            }
+        )
+        event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }
 }
