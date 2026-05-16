@@ -38,9 +38,9 @@ object BoopAchievement {
                     bold = true
                 }
             },
-            1f,
-            false,
-            listOf(10),
+            userLuckAmount = 1f,
+            secret = false,
+            tiers = listOf(10),
         )
         event.register(achievement, BOOP_ACHIEVEMENT)
     }

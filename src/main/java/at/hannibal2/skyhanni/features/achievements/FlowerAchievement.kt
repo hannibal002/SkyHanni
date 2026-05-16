@@ -22,8 +22,8 @@ object FlowerAchievement {
         val achievement = Achievement(
             "Fill your hotbar with flowers".asComponent(),
             "Have your hotbar look like Romero's".asComponent(),
-            30f,
-            true,
+            userLuckAmount = 30f,
+            secret = true,
         )
         event.register(achievement, ROMERO_ACHIEVEMENT)
     }
