@@ -166,7 +166,7 @@ stonecutter parameters {
         }
 
         regex(current.parsed >= "26.1") {
-            replace("\bClickType\b" to "ContainerInput", "\bContainerInput\b" to "ClickType")
+            replace("\\bClickType\\b" to "ContainerInput", "\\bContainerInput\\b" to "ClickType")
         }
     }
 
