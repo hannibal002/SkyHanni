@@ -359,7 +359,7 @@ its [privacy policy](https://eliteskyblock.com/privacy).
 A system to inject code into the original Minecraft code.
 Mixin is bundled with the Fabric Loader and does not need to be included as a runtime dependency.
 
-It allows to easy to modify methods in Minecraft itself, without conflicting with other mods.
+It allows to easily modify methods in Minecraft itself, without conflicting with other mods.
 
 For more information, see https://github.com/SpongePowered/Mixin
 or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
