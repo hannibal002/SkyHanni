@@ -44,10 +44,11 @@ object GardenVisitorTooltip {
 
     /**
      * REGEX-TEST:  §8+§c20 Copper
+     * REGEX-TEST:  §8+§c150 Copper §d❤
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
-        " §8\\+§c(?<amount>.*) Copper",
+        " §8\\+§c(?<amount>.*) Copper(?: .*)?",
     )
 
     /**

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -12,6 +11,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 
@@ -70,9 +70,9 @@ class GuiContainerHook(guiAny: Any) {
         GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, container, slot).post()
     }
 
-    fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: Int, ci: CallbackInfo) {
+    fun onMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: ClickType, ci: CallbackInfo) {
         val item = container.items.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
-        if (SlotClickEvent(gui, container, item, slot, slotId, clickedButton, ClickType.getTypeById(clickType)).post()
+        if (SlotClickEvent(gui, container, item, slot, slotId, clickedButton, clickType.post()
         ) ci.cancel()
     }
 

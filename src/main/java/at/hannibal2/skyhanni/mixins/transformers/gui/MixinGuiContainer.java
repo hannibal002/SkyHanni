@@ -91,8 +91,7 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V", at = @At("HEAD"), cancellable = true)
     private void onMouseClick(Slot slot, int slotId, int button, ClickType actionType, CallbackInfo cir) {
-        //~ if > 1.21.11 '.ordinal()' -> '.id()'
-        skyhanni$hook.onMouseClick(slot, slotId, button, actionType.ordinal(), cir);
+        skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
     }
 
     @Inject(

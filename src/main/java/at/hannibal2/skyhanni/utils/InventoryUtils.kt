@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -26,6 +25,7 @@ import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
 import kotlin.time.Duration.Companion.seconds
 
@@ -126,7 +126,7 @@ object InventoryUtils {
     internal fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.index?.let { slotNumber ->
-            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.SHIFT)
+            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.QUICK_MOVE)
             this.cancel()
         }
     }
@@ -193,17 +193,17 @@ object InventoryUtils {
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
         mouseButton: Int = 0,
-        mode: ClickType = ClickType.NORMAL,
+        mode: ClickType = ClickType.PICKUP,
     ) {
-        InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode.id)
+        InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode)
     }
 
     fun mouseClickSlot(
         slotId: Int,
         mouseButton: Int = 0,
-        mode: ClickType = ClickType.NORMAL,
+        mode: ClickType = ClickType.PICKUP,
     ) {
-        InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode.id)
+        InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode)
     }
 
     fun SkyHanniGuiContainer.slots(): List<Slot> {

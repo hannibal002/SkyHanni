@@ -41,8 +41,7 @@ object ReforgeApi {
         CLOAK(ItemCategory.CLOAK),
         BELT(ItemCategory.BELT),
         AXE(ItemCategory.AXE),
-        HOE(ItemCategory.HOE),
-        AXE_AND_HOE(ItemCategory.AXE, ItemCategory.HOE),
+        FARMING_TOOL(ItemCategory.FARMING_TOOL),
         PICKAXE(ItemCategory.PICKAXE, ItemCategory.DRILL, ItemCategory.GAUNTLET),
         EQUIPMENT(
             ItemCategory.NECKLACE, ItemCategory.CLOAK, ItemCategory.BELT,

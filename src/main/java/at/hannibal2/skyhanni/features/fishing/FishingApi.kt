@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -164,7 +164,7 @@ object FishingApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClick(event: WorldClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
         if (lastReelTime.passedSince() < .3.seconds) return
         lastReelTime = SimpleTimeMark.now()
     }

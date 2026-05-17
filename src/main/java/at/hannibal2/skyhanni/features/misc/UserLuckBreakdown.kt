@@ -279,7 +279,7 @@ object UserLuckBreakdown {
             }
 
             "skills" -> {
-                val luckString = skillOverflowLuck.values.sum()
+                val luckString = skillOverflowLuck.values.sum().addSeparators()
                 val firstHalf = arrayOf(
                     "§8Grouped",
                     "",
@@ -293,7 +293,7 @@ object UserLuckBreakdown {
                 val sourcesList = mutableListOf<String>()
                 for ((skillType, luck) in skillOverflowLuck) {
                     if (luck == 0) continue
-                    sourcesList.add(" §a+$luck✴ §f${skillType.displayName} Skill")
+                    sourcesList.add(" §a+${luck.addSeparators()}✴ §f${skillType.displayName} Skill")
                 }
                 val finalList = mutableListOf<String>()
                 finalList.addAll(firstHalf)

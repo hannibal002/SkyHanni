@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -413,7 +413,7 @@ object DungeonApi {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val position = event.position
         val blockType: ClickedBlockType = when (position.getBlockAt()) {

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -147,7 +147,7 @@ object MinionFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastClickedEntity = event.clickedEntity.getLorenzVec()
     }
@@ -155,7 +155,7 @@ object MinionFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastStorage = event.position
     }

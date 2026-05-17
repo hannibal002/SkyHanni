@@ -5,6 +5,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -42,25 +43,24 @@ val ContainerScreen.container: AbstractContainerMenu
 object InventoryCompat {
 
     /**
-     * Internal method, not meant to be called directly. Prefer `InventoryUtils.clickSlot()`.
+     * Internal method, not meant to be called directly. Prefer [InventoryUtils.clickSlot].
      */
-    fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: Int) {
+    internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ClickType) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
         //~ if > 1.21.11 'handleInventoryMouseClick' -> 'handleContainerInput'
-        controller.handleInventoryMouseClick(windowId, slotId, mouseButton, ClickType.entries[mode], player)
+        controller.handleInventoryMouseClick(windowId, slotId, mouseButton, mode, player)
     }
 
     /**
-     * Internal method, not meant to be called directly. Prefer `InventoryUtils.mouseClickSlot()`.
+     * Internal method, not meant to be called directly. Prefer [InventoryUtils.mouseClickSlot].
      */
-    fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: Int) {
+    internal fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ClickType) {
         if (slot < 0) return
         val gui = Minecraft.getInstance().screen
         if (gui is AbstractContainerScreen<*>) {
             val slotObj = gui.menu.getSlot(slot)
-            val actionType = ClickType.entries[mode]
-            gui.slotClicked(slotObj, slot, mouseButton, actionType)
+            gui.slotClicked(slotObj, slot, mouseButton, mode)
         }
     }
 

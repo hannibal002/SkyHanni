@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -152,7 +152,7 @@ object FrogMaskFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.position.getBlockAt() !in logTypes) return
 
         lastLogClick = SimpleTimeMark.now()

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.api
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.SkyHanniInventoryContainer
@@ -207,7 +207,7 @@ object StorageApi {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         if (!isPrivateIslandStorageEnabled()) return
         val chest = event.blockState.block as? ChestBlock ?: return
         // Double Chest Check
