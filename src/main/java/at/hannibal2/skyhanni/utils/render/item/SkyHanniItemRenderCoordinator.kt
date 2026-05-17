@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
@@ -37,7 +37,7 @@ internal object SkyHanniItemRenderCoordinator {
     private val projectionBuffer by lazy {
         //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
         //~ if > 1.21.11 '"SkyHanni items", -1000.0f, 1000.0f, true' -> '"SkyHanni items"'
-        CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
+        ProjectionMatrixBuffer("SkyHanni items")
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber

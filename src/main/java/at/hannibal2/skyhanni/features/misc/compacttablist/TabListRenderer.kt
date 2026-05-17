@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 //~ if > 1.21.11 'PlayerFaceRenderer' -> 'PlayerFaceExtractor'
-import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -162,9 +162,9 @@ object TabListRenderer {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
                         //~ if > 1.21.11 '.id()' -> '.texturePath()'
-                        val texture = playerInfo.skin.body().id()
+                        val texture = playerInfo.skin.body().texturePath()
                         //~ if > 1.21.11 'PlayerFaceRenderer.draw' -> 'PlayerFaceExtractor.extractRenderState'
-                        PlayerFaceRenderer.draw(
+                        PlayerFaceExtractor.extractRenderState(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )
                     }

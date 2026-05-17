@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
@@ -14,7 +14,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
 
     @PrimaryFunction("onBackgroundDrawn")
     data class BackgroundDrawnEvent(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -23,7 +23,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     ) : GuiContainerEvent(gui, container), Rendering
 
     data class PreDraw(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -32,7 +32,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
     data class PostDraw(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -62,7 +62,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     }
 
     data class ForegroundDrawnEvent(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,

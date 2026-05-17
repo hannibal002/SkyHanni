@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.Slot
 
@@ -30,7 +30,7 @@ object ToolTipData {
 
     @JvmStatic
     fun processModernTooltip(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         stack: SafeItemStack,
         originalToolTip: MutableList<Component>,
     ): MutableList<Component> {

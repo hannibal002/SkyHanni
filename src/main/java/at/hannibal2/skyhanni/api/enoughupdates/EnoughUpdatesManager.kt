@@ -42,10 +42,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.nbt.StringTag
 //? if > 1.21.11 {
-/*import at.hannibal2.skyhanni.utils.DeferredItemStack
+import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
-*///? }
+//? }
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
@@ -198,7 +198,7 @@ object EnoughUpdatesManager {
         val baseItem = convertedItem.getVanillaItem() ?: return SafeItemStack.EMPTY
 
         //? if < 26.1 {
-        val stack = SafeItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return SafeItemStack.EMPTY
+        /*val stack = SafeItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return SafeItemStack.EMPTY
 
         count?.let { stack.count = it }
         ComponentUtils.convertToComponents(stack, neuNbt)
@@ -222,12 +222,12 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
-        //? } else
-        //return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
+        *///? } else
+        return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
     }
 
     //? if > 1.21.11 {
-    /*private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
+    private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStack = {
             val freshStack = ItemStack(baseItem, countVal)
@@ -249,7 +249,7 @@ object EnoughUpdatesManager {
         }
         return DeferredItemStack(baseItem, factory, countVal)
     }
-    *///? }
+    //? }
 
     private fun SafeItemStack?.getPetLoreReplacements(): Map<String, String> {
         val petInfo = this?.getPetInfo() ?: return emptyMap()

@@ -10,7 +10,7 @@ import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
 //? if < 26.1
-private typealias VFEUsage = VertexFormatElement.Usage
+//private typealias VFEUsage = VertexFormatElement.Usage
 
 object SkyHanniVertexFormats {
 
@@ -23,7 +23,7 @@ object SkyHanniVertexFormats {
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         //~ if > 1.21.11 'usage: VFEUsage = VFEUsage.GENERIC' -> 'normalized: Boolean = false'
-        private val usage: VFEUsage = VFEUsage.GENERIC,
+        private val normalized: Boolean = false,
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
@@ -44,7 +44,7 @@ object SkyHanniVertexFormats {
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy {
             //~ if > 1.21.11 'usage' -> 'false'
-            safeRegister(registrationId, index, type, usage, count)
+            safeRegister(registrationId, index, type, false, count)
         }
     }
 
@@ -63,7 +63,7 @@ object SkyHanniVertexFormats {
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
         //~ if > 1.21.11 'usage: VFEUsage = VFEUsage.GENERIC' -> 'normalized: Boolean = false'
-        usage: VFEUsage = VFEUsage.GENERIC,
+        normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
         // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
@@ -74,7 +74,7 @@ object SkyHanniVertexFormats {
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
         //~ if > 1.21.11 'usage' -> 'normalized'
-        return VertexFormatElement.register(id, index, type, usage, count)
+        return VertexFormatElement.register(id, index, type, normalized, count)
     }
 
     val POSITION_COLOR_ROUNDED: VertexFormat by lazy {

@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAbstractAtlas
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAtlasBinPacker
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 //? if < 26.1 {
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-//? } else {
-/*import net.minecraft.client.renderer.ProjectionMatrixBuffer
+/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+*///? } else {
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f
-*///?}
+//?}
 import net.minecraft.resources.Identifier
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
@@ -60,7 +60,7 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHa
     fun SkyHanniItemRenderContext.setupAtlasRendering(
         frameNumber: Int,
         //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
-        projectionBuffer: CachedOrthoProjectionMatrixBuffer,
+        projectionBuffer: ProjectionMatrixBuffer,
     ) {
         pruneFrames(frameNumber)
         if (atlasStates.isEmpty()) return

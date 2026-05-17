@@ -23,7 +23,7 @@ typealias SafeItemStack = ItemStack
  */
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
     //~ if > 1.21.11 'ItemStack(item, count)' -> 'DeferredItemStack(item, { ItemStack(item, count) }, count)'
-    return ItemStack(item, count)
+    return DeferredItemStack(item, { ItemStack(item, count) }, count)
 }
 
 /**
@@ -32,8 +32,8 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
  */
 fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
     //~ if > 1.21.11 'ItemStack(item, count).also(extraOps)' -> 'DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)'
-    return ItemStack(item, count).also(extraOps)
+    return DeferredItemStack(item, { ItemStack(item, count).also(extraOps) }, count)
 }
 
 //~ if > 1.21.11 '= item' -> '= item!!.value()'
-val SafeItemStack.itemType: Item get() = item
+val SafeItemStack.itemType: Item get() = item!!.value()

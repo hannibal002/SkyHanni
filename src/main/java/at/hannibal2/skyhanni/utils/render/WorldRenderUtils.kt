@@ -37,15 +37,15 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 //? if > 1.21.11 {
-/*import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
-*///? }
+//? }
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
     //~ if > 1.21.11 'entity/' -> 'entity/beacon/'
-    private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
+    private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)

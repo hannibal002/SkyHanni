@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
 //? if > 1.21.11
-//import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
+import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -20,19 +20,19 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
-import net.minecraft.client.GuiMessage
-import net.minecraft.client.GuiMessageTag
+import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 //? if > 1.21.11
-//import net.minecraft.client.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 
 @SkyHanniModule
 object ClientEvents {
@@ -60,16 +60,16 @@ object ClientEvents {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
             //? if > 1.21.11
-            //ComponentsLoadedEvent.post()
+            ComponentsLoadedEvent.post()
         }
 
         // World change event
-        ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE.register { _, _ ->
+        ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             WorldChangeEvent.post()
         }
 
         //~ if > 26 'registerReloader' -> 'registerReloadListener'
-        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloader(
+        ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
             CompletableFuture.runAsync(
@@ -104,7 +104,7 @@ object ClientEvents {
             // the message doesn't get logged if we cancel it, so we do that ourselves
             val inGameHud = Minecraft.getInstance().gui
             //~ if > 1.21.11 'GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
-            val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageTag.system())
+            val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             inGameHud.chat.logChatMessage(chatHudLine)
         }
 

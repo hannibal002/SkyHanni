@@ -123,7 +123,7 @@ allprojects {
     }
 }
 
-stonecutter active "1.21.11"
+stonecutter active "26.1"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")
@@ -166,7 +166,7 @@ stonecutter parameters {
         }
 
         regex(current.parsed >= "26.1") {
-            replace("\bClickType\b", "ContainerInput")
+            replace("\bClickType\b" to "ContainerInput", "\bContainerInput\b" to "ClickType")
         }
     }
 

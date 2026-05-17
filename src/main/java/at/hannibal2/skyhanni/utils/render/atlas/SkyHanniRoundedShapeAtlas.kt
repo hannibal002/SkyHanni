@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.utils.render.atlas
 
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.gui.render.state.BlitRenderState
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.state.gui.BlitRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import org.joml.Matrix3x2f
 import com.mojang.blaze3d.systems.RenderSystem
 //? if < 26.1 {
-import at.hannibal2.skyhanni.shader.CircleShader
+/*import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -23,7 +23,7 @@ import org.joml.Vector3f
 import org.joml.Vector4f
 import java.util.OptionalDouble
 import java.util.OptionalInt
-//?}
+*///?}
 import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRoundedShapeAtlasKey, SkyHanniRoundedShapeAtlasEntry>() {
@@ -40,13 +40,13 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
     override val depthLabel = "SkyHanni rounded shape atlas depth"
 
     //? if < 26.1 {
-    private var projectionBuffer: CachedOrthoProjectionMatrixBuffer? = null
+    /*private var projectionBuffer: CachedOrthoProjectionMatrixBuffer? = null
 
     private fun getOrCreateProjectionBuffer(): CachedOrthoProjectionMatrixBuffer =
         projectionBuffer ?: CachedOrthoProjectionMatrixBuffer(
             "SkyHanni rounded shape atlas", 1000.0f, 11000.0f, true,
         ).also { projectionBuffer = it }
-    //?}
+    *///?}
 
     /**
      * Pre-renders any new static [shapes] into atlas slots before the GUI render pass.
@@ -54,7 +54,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
      */
     fun preRenderShapes(shapes: List<SkyHanniRoundedShapeAtlasKey>) {
         //? if < 26.1 {
-        if (shapes.isEmpty()) return
+        /*if (shapes.isEmpty()) return
         ensureAllocated()
 
         val toRender = shapes.filter { it !in entries }
@@ -77,11 +77,11 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         }
 
         RenderSystem.restoreProjectionMatrix()
-        //?}
+        *///?}
     }
 
     //? if < 26.1 {
-    /**
+    /*/**
      * Configures [shader] uniforms for rendering [key] centered at the atlas slot ([slotX], [slotY]).
      *
      * The [SkyHanniRoundedShapeAtlasKey.smoothness] is translated into atlas pixel space.
@@ -210,7 +210,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         RenderSystem.disableScissorForRenderTypeDraws()
         mesh.close()
     }
-    //?}
+    *///?}
 
     /**
      * Submits a blit for a shape already in the atlas. Returns false if the shape has not been
@@ -244,7 +244,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         val u1 = uContent + key.pixelWidth / size
         val v1 = vContent - key.pixelHeight / size
         //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
-        guiRenderState.submitBlitToCurrentLayer(
+        guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
                 @Suppress("UnsafeCallOnNullableType")
@@ -262,8 +262,8 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
     override fun close() {
         super.close()
         //? if < 26.1 {
-        projectionBuffer?.close()
+        /*projectionBuffer?.close()
         projectionBuffer = null
-        //?}
+        *///?}
     }
 }

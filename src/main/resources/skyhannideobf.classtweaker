@@ -36,7 +36,7 @@ accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/fu
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/core/particles/ColorParticleOption color I
 accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
-accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphics;FII)V
+accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FII)V
 accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
 accessible method net/minecraft/client/gui/components/ChatComponent getLineHeight ()I
 accessible field net/minecraft/client/Minecraft deltaTracker Lnet/minecraft/client/DeltaTracker$Timer;
@@ -62,17 +62,17 @@ accessible method net/minecraft/world/item/ItemStack <init> (Lnet/minecraft/core
 extendable class net/minecraft/core/component/PatchedDataComponentMap
 accessible method net/minecraft/core/component/PatchedDataComponentMap <init> (Lnet/minecraft/core/component/DataComponentMap;)V
 
-accessible field net/minecraft/client/gui/GuiGraphics scissorStack Lnet/minecraft/client/gui/GuiGraphics$ScissorStack;
-accessible class net/minecraft/client/gui/GuiGraphics$ScissorStack
-accessible field net/minecraft/client/gui/GuiGraphics$ScissorStack stack Ljava/util/Deque;
-accessible method net/minecraft/client/gui/GuiGraphics fill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V
+accessible field net/minecraft/client/gui/GuiGraphicsExtractor scissorStack Lnet/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack;
+accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
+accessible field net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack stack Ljava/util/Deque;
+accessible method net/minecraft/client/gui/GuiGraphicsExtractor fill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V
 accessible field net/minecraft/client/renderer/RenderPipelines GUI_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines LINES_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines DEBUG_FILLED_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
-accessible field net/minecraft/client/gui/GuiGraphics guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
-accessible method net/minecraft/client/gui/GuiGraphics innerFill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/gui/render/TextureSetup;IIIIILjava/lang/Integer;)V
-accessible method net/minecraft/client/gui/GuiGraphics innerBlit (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;IIIIFFFFI)V
+accessible field net/minecraft/client/gui/GuiGraphicsExtractor guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
+accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerFill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/gui/render/TextureSetup;IIIIILjava/lang/Integer;)V
+accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerBlit (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;IIIIFFFFI)V
 
 accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
 accessible method net/minecraft/client/gui/components/ChatComponent getWidth ()I

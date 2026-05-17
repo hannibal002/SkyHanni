@@ -21,7 +21,7 @@ public class MixinCapeFeatureRenderer {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return original;
             //~ if > 1.21.11 'itemEntityTranslucentCull' -> 'entityTranslucentCullItemTarget'
-            return RenderTypes.itemEntityTranslucentCull(skinTextures.cape().texturePath());
+            return RenderTypes.entityTranslucentCullItemTarget(skinTextures.cape().texturePath());
         }
         return original;
     }

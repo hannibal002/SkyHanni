@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.client.input.MouseButtonEvent
@@ -15,23 +15,23 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
     val mc: Minecraft = Minecraft.getInstance()
 
     //~ if > 1.21.11 'render' -> 'extractRenderState'
-    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
         //~ if > 1.21.11 'render' -> 'extractRenderState'
-        super.render(context, mouseX, mouseY, delta)
+        super.extractRenderState(context, mouseX, mouseY, delta)
         postDrawScreen(context, mouseX, mouseY, delta)
     }
 
     //~ if > 1.21.11 'renderBackground' -> 'extractBackground'
-    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    override fun extractBackground(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         try {
             //~ if > 1.21.11 'renderMenuBackground' -> 'extractMenuBackground'
-            this.renderMenuBackground(context)
+            this.extractMenuBackground(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
         }
     }
 
-    private fun postDrawScreen(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    private fun postDrawScreen(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
         try {
             onDrawScreen(mouseX, mouseY, partialTicks)
@@ -164,6 +164,6 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
         //~ if > 1.21.11 'renderMenuBackground' -> 'extractMenuBackground'
-        renderMenuBackground(DrawContextUtils.drawContext)
+        extractMenuBackground(DrawContextUtils.drawContext)
     }
 }

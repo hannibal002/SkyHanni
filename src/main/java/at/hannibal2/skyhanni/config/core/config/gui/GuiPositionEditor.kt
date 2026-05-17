@@ -65,12 +65,12 @@ class GuiPositionEditor(
         drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
         if (oldScreen != null) {
             //? if < 26.1 {
-            oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
+            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
             oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            //? } else {
-            /*oldScreen.extractBackground(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            *///? } else {
+            oldScreen.extractBackground(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
             oldScreen.extractRenderState(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            *///?}
+            //?}
         }
 
         val hoveredPos = renderRectangles()

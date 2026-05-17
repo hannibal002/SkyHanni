@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 // TODO 26.1 REI compat needed
 //? if < 26.1
-import at.hannibal2.skyhanni.compat.ReiCompat
+//import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,7 +28,7 @@ fun stackUnderCursor(): SafeItemStack? {
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
     //? if < 26.1
-    stack = ReiCompat.getHoveredStackFromRei()
+    //stack = ReiCompat.getHoveredStackFromRei()
     return stack
 }
 
@@ -49,7 +49,7 @@ object InventoryCompat {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
         //~ if > 1.21.11 'handleInventoryMouseClick' -> 'handleContainerInput'
-        controller.handleInventoryMouseClick(windowId, slotId, mouseButton, mode, player)
+        controller.handleContainerInput(windowId, slotId, mouseButton, mode, player)
     }
 
     /**

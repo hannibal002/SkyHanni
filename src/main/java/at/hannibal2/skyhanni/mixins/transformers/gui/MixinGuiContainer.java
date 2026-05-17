@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.data.ToolTipData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiContainerHook;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,52 +40,52 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(
         //~ if > 1.21.11 'renderContents' -> 'extractContents'
-        method = "renderContents",
+        method = "extractContents",
         at = @At(
             value = "INVOKE",
             //~ if > 1.21.11 'renderSlotHighlightBack' -> 'extractSlotHighlightBack'
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V"
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
         )
     )
-    private void backgroundDrawn(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    private void backgroundDrawn(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
     //~ if > 1.21.11 'render' -> 'extractRenderState'
-    @Inject(method = "render", at = @At("HEAD"), cancellable = true)
-    private void preDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
     }
 
     //~ if > 1.21.11 'render' -> 'extractRenderState'
-    @Inject(method = "render", at = @At("TAIL"))
-    private void postDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
 
     @Inject(
         //~ if > 1.21.11 'renderContents' -> 'extractContents'
-        method = "renderContents",
+        method = "extractContents",
         at = @At(
             value = "INVOKE",
             //~ if > 1.21.11 'renderSlotHighlightFront' -> 'extractSlotHighlightFront'
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphics;)V",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
             shift = At.Shift.AFTER
         )
     )
-    private void onForegroundDraw(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    private void onForegroundDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
     //~ if > 1.21.11 'renderSlot' -> 'extractSlot'
-    @Inject(method = "renderSlot", at = @At("HEAD"), cancellable = true)
-    private void onDrawSlot(GuiGraphics guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
+    private void onDrawSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
         skyhanni$hook.onDrawSlot(slot, ci);
     }
 
     //~ if > 1.21.11 'renderSlot' -> 'extractSlot'
-    @Inject(method = "renderSlot", at = @At("RETURN"))
-    private void onDrawSlotReturn(GuiGraphics guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+    @Inject(method = "extractSlot", at = @At("RETURN"))
+    private void onDrawSlotReturn(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
         skyhanni$hook.onDrawSlotPost(slot);
     }
 
@@ -96,15 +96,15 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
 
     @Inject(
         //~ if > 1.21.11 'renderContents' -> 'extractContents'
-        method = "renderContents",
+        method = "extractContents",
         at = @At(
             value = "INVOKE",
             //~ if > 1.21.11 'renderSlotHighlightBack' -> 'extractSlotHighlightBack'
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphics;)V",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
             shift = At.Shift.AFTER
         )
     )
-    private void renderBackgroundTexture(GuiGraphics context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ToolTipData.INSTANCE.setLastSlot(this.hoveredSlot);
     }
 }

@@ -14,8 +14,8 @@ object ServerTime {
     fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
         //? < 26.1 {
-        dayTime = packet.dayTime
-        //? } else
-        //dayTime = packet.gameTime
+        /*dayTime = packet.dayTime
+        *///? } else
+        dayTime = packet.gameTime
     }
 }

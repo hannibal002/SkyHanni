@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ClickType
 import net.minecraft.world.inventory.Slot
@@ -24,13 +24,13 @@ class GuiContainerHook(guiAny: Any) {
         if (CloseWindowEvent(gui, container).post()) ci.cancel()
     }
 
-    fun backgroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun backgroundDrawn(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (GlobalRender.renderDisabled) return
         GuiContainerEvent.BackgroundDrawnEvent(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 
     fun preDraw(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         mouseX: Int,
         mouseY: Int,
         partialTicks: Float,
@@ -47,12 +47,12 @@ class GuiContainerHook(guiAny: Any) {
         }
     }
 
-    fun postDraw(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun postDraw(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (GlobalRender.renderDisabled) return
         GuiContainerEvent.PostDraw(context, gui, container, mouseX, mouseY, partialTicks).post()
     }
 
-    fun foregroundDrawn(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    fun foregroundDrawn(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
         DrawContextUtils.translate(0.0, 0.0)
 
@@ -77,7 +77,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun onDrawScreenAfter(
-        context: GuiGraphics,
+        context: GuiGraphicsExtractor,
         mouseX: Int,
         mouseY: Int,
         ci: CallbackInfo,

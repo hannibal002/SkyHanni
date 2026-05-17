@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlas
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlasKey
 import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import org.joml.Matrix3x2f
 
 /**

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessageTag
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -30,9 +30,9 @@ import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 //? > 1.21.11 {
-/*import net.minecraft.world.item.ItemStackTemplate
-import net.minecraft.client.GuiMessageSource
-*///? }
+import net.minecraft.world.item.ItemStackTemplate
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//? }
 
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
@@ -175,13 +175,13 @@ var Component.stackHover: SafeItemStack?
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let {
         //~ if > 1.21.11 '.item' -> '.item.create()'
-        (it as HoverEvent.ShowItem).item
+        (it as HoverEvent.ShowItem).item.create()
     }
     set(value) {
         value?.let { new ->
             this.copyIfNeeded().withStyle {
                 //~ if > 1.21.11 'new' -> 'ItemStackTemplate.fromNonEmptyStack(new)'
-                it.withHoverEvent(HoverEvent.ShowItem(new))
+                it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
             }
         }
     }
@@ -257,7 +257,7 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
     DelayedRun.runOrNextTick {
         //~ if > 1.21.11 'displayClientMessage' -> 'sendSystemMessage'
         //~ if > 1.21.11 'message, false' -> 'message'
-        Minecraft.getInstance().player?.displayClientMessage(message, false)
+        Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
 
@@ -267,7 +267,7 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
         val chat = Minecraft.getInstance().gui.chat
         chat.deleteMessage(idToMessageSignature(id))
         //~ if > 1.21.11 ' GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
-        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+        chat.addMessage(component, idToMessageSignature(id),GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
 
@@ -308,7 +308,7 @@ fun ClickEvent.value(): String {
 fun HoverEvent.value(): Component = when (action()) {
     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
     //~ if > 1.21.11 '.item.hoverName' -> '.item.create().hoverName'
-    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
+    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
 

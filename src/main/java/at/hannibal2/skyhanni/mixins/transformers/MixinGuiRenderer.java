@@ -16,9 +16,9 @@ import java.util.function.Supplier;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.GuiElementRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
@@ -60,23 +60,23 @@ public class MixinGuiRenderer {
     @WrapOperation(
         method = "addElementToMesh",
         //~ if > 1.21.11 'gui/render/state/' -> 'gui/'
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
     //~ if > 1.21.11 'Shadow' -> 'Unique'
-    @Shadow
+    @Unique
     //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
-    private int frameNumber;
+    private int skyhanni$frameNumber;
 
     //? if > 1.21.11 {
-    /*@Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "render", at = @At("HEAD"))
     private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
         skyhanni$frameNumber++;
     }
-    *///? }
+    //? }
 
     @Shadow
     @Final
@@ -109,7 +109,7 @@ public class MixinGuiRenderer {
             getBufferSource(),
             featureRenderDispatcher,
             //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
-            frameNumber
+            skyhanni$frameNumber
         );
     }
 
@@ -127,7 +127,7 @@ public class MixinGuiRenderer {
             skyHanniState,
             renderState,
             //~ if > 1.21.11 'frameNumber' -> 'skyhanni$frameNumber'
-            frameNumber
+            skyhanni$frameNumber
         );
     }
 

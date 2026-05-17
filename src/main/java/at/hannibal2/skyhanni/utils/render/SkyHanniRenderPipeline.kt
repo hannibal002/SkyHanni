@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonR
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
 //? if < 26.1 {
-import com.mojang.blaze3d.platform.DepthTestFunction
-//? } else {
-/*import com.mojang.blaze3d.pipeline.ColorTargetState
+/*import com.mojang.blaze3d.platform.DepthTestFunction
+*///? } else {
+import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.platform.CompareOp
-*///? }
+//? }
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
@@ -32,7 +32,7 @@ enum class SkyHanniRenderPipeline(
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
     //~ if > 1.21.11 'DepthTestFunction ' -> 'CompareOp '
-    depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
+    depthTestFunction: CompareOp = CompareOp.LESS_THAN_OR_EQUAL,
     val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
     LINES(
@@ -46,7 +46,7 @@ enum class SkyHanniRenderPipeline(
         vFormat = PosColorNormal,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthTestFunction = CompareOp.ALWAYS_PASS,
         irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
@@ -57,7 +57,7 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     TRIANGLES(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -67,7 +67,7 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLES,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     TRIANGLE_FAN(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -77,7 +77,7 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     QUADS(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -85,7 +85,7 @@ enum class SkyHanniRenderPipeline(
     QUADS_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
+        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     ROUNDED_RECT(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -202,7 +202,7 @@ enum class SkyHanniRenderPipeline(
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
                 //~ if > 1.21.11 'withBlend(it)' -> 'withColorTargetState(ColorTargetState(it))'
-                blend?.let { withBlend(it) } ?: withCull?.let(this::withCull)
+                blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
                     withFragmentShader(
@@ -214,10 +214,10 @@ enum class SkyHanniRenderPipeline(
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
                 //? if < 26.1 {
-                withDepthWrite(depthWrite)
+                /*withDepthWrite(depthWrite)
                 withDepthTestFunction(depthTestFunction)
-                //? } else
-                //withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
+                *///? } else
+                withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
             }.build(),
     )
 

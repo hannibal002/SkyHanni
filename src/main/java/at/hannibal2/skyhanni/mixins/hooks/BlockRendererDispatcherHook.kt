@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 //~ if > 1.21.11 'BlockRenderDispatcher' -> 'BlockStateModelSet'
-import net.minecraft.client.renderer.block.BlockRenderDispatcher
+import net.minecraft.client.renderer.block.BlockStateModelSet
 //~ if > 1.21.11 'model.BlockStateModel' -> 'dispatch.BlockStateModel'
-import net.minecraft.client.renderer.block.model.BlockStateModel
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel
 import net.minecraft.world.level.block.state.BlockState
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 fun modifyGetModelFromBlockState(
     //~ if > 1.21.11 'blockRendererDispatcher:' -> 'modelSet:'
     //~ if > 1.21.11 'BlockRenderDispatcher' -> 'BlockStateModelSet'
-    blockRendererDispatcher: BlockRenderDispatcher,
+    modelSet: BlockStateModelSet,
     state: BlockState?,
     cir: CallbackInfoReturnable<BlockStateModel>,
 ) {
@@ -20,6 +20,6 @@ fun modifyGetModelFromBlockState(
     val returnState = MiningCommissionsBlocksColor.processState(state) ?: return
     if (returnState != state) {
         //~ if > 1.21.11 'blockRendererDispatcher.blockModelShaper.getBlockModel' -> 'modelSet.get'
-        cir.returnValue = blockRendererDispatcher.blockModelShaper.getBlockModel(returnState)
+        cir.returnValue = modelSet.get(returnState)
     }
 }

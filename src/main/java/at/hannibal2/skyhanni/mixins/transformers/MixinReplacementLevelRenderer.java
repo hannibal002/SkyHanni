@@ -22,12 +22,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if < 26.1 {
-import net.minecraft.client.Camera;
+/*import net.minecraft.client.Camera;
 import org.joml.Matrix4f;
-//? } else {
-/*import net.minecraft.client.renderer.state.level.CameraRenderState;
+*///? } else {
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
-*///?}
+//?}
 import com.mojang.blaze3d.textures.GpuSampler;
 
 // Adapted from Fabric API implementation
@@ -41,7 +41,7 @@ public class MixinReplacementLevelRenderer {
     @Unique
     //~ if > 1.21.11 'Camera' -> 'CameraRenderState'
     //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
-    Camera currentCamera;
+    CameraRenderState currentCameraState;
 
     @Unique
     DeltaTracker currentTickCounter;
@@ -59,16 +59,16 @@ public class MixinReplacementLevelRenderer {
     //~ if > 1.21.11 'fogBuffer' -> 'terrainFog'
     //~ if > 1.21.11 'boolean renderSky' -> 'boolean shouldRenderSky'
     //~ if > 1.21.11 'CallbackInfo ci' -> 'ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci'
-    private void beginRender(GraphicsResourceAllocator allocator, DeltaTracker tickCounter, boolean renderBlockOutline, Camera camera, Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix, GpuBufferSlice fogBuffer, Vector4f fogColor, boolean renderSky, CallbackInfo ci) {
+    private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
         //~ if > 1.21.11 'currentCamera = camera' -> 'currentCameraState = cameraState'
-        currentCamera = camera;
+        currentCameraState = cameraState;
         //~ if > 1.21.11 'tickCounter' -> 'deltaTracker'
-        currentTickCounter = tickCounter;
+        currentTickCounter = deltaTracker;
     }
 
     @WrapOperation(
         //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
-        method = "method_62214",
+        method = "lambda$addMainPass$0",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
     )
@@ -79,7 +79,7 @@ public class MixinReplacementLevelRenderer {
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             contextMatrixStack,
             //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
-            currentCamera,
+            currentCameraState,
             renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
             true
@@ -89,7 +89,7 @@ public class MixinReplacementLevelRenderer {
     }
 
     //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
-    @ModifyExpressionValue(method = "method_62214", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
+    @ModifyExpressionValue(method = "lambda$addMainPass$0", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
         contextMatrixStack = matrixStack;
         return matrixStack;

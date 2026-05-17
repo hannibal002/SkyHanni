@@ -27,7 +27,7 @@ object SafeItemStackUtils {
 
     init {
         //? if < 26.1
-        componentsLoaded = true
+        //componentsLoaded = true
     }
 
     @HandleEvent

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.gui.render.state.GuiItemRenderState
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
@@ -44,7 +44,7 @@ object GuiRenderUtils {
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     @Suppress("SameParameterValue")
@@ -53,7 +53,7 @@ object GuiRenderUtils {
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x2.toInt(), y2.toInt(), color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
     fun drawStringCentered(str: String, x: Int, y: Int) {
@@ -76,32 +76,32 @@ object GuiRenderUtils {
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: Component, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x.toInt(), y.toInt(), color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         //~ if > 1.21.11 '.drawString' -> '.text'
-        DrawContextUtils.drawContext.drawString(fr, str, x, y, color, shadow)
+        DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
     fun drawStrings(strings: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
@@ -112,7 +112,7 @@ object GuiRenderUtils {
         var newY = y
         for (string in strings) {
             //~ if > 1.21.11 '.drawString' -> '.text'
-            DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
+            DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
             newY += 9
         }
     }
@@ -121,7 +121,7 @@ object GuiRenderUtils {
         var newY = y
         for (string in strings) {
             //~ if > 1.21.11 '.drawString' -> '.text'
-            DrawContextUtils.drawContext.drawString(fr, string, x, newY, color, shadow)
+            DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
             newY += 9
         }
     }
@@ -408,7 +408,7 @@ object GuiRenderUtils {
          */
         val guiItemRenderState = GuiItemRenderState(
             //? if < 26.1
-            this.item.name.toString(),
+            //this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,
@@ -429,7 +429,7 @@ object GuiRenderUtils {
         )
         //~ if > 1.21.11 'gameRenderer.' -> 'gameRenderer.gameRenderState.'
         //~ if > 1.21.11 'submitPicturesInPictureState' -> 'addPicturesInPictureState'
-        Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
 
         return newRenderState.stableId
     }
