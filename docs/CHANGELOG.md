@@ -693,7 +693,7 @@
 + Added hide soulbound items from Chest Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 + Made Not Clickable Items not prevent soulbound items in trades on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 + Estimated Item Value now accurately calculates level 100 pets. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5137)
-  + This means Chest Value will seperate Level 100 pets & Calculate them properly.
+  + This means Chest Value will separate Level 100 pets & Calculate them properly.
 + Open recipe for items in more places on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5263)
   + This includes sack display and sunflower oil in composter.
 
@@ -1499,7 +1499,7 @@
 + Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
 + Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
 + Added some more information when clock offset fails to calculate. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
-+ Improved compatability between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
++ Improved compatibility between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
 + Improved performance a bit. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4519)
 + Added warning for incompatibility with Aaron’s Mod. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4277)
     + Added prompt to disable Rainbow Max Enchants in one of the two mods.
