@@ -199,8 +199,8 @@ object GraphEditor {
     )
 
     @JvmStatic
-    fun shouldCancelMinecraftInput(keyBinding: KeyMapping): Boolean =
-        isEnabled() && inEditMode && keyBinding in KeyboardManager.WasdInputMatrix
+    fun shouldCancelMinecraftInput(keyMapping: KeyMapping): Boolean =
+        isEnabled() && inEditMode && keyMapping in KeyboardManager.WasdInputMatrix
 
     fun clear() {
         GraphEditorHistory.save("clear graph")

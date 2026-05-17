@@ -13,40 +13,46 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(KeyMapping.class)
-public class MixinKeyBinding {
+public class MixinKeyMapping {
 
+    @Shadow
+    private boolean isDown;
+
+    @SuppressWarnings("FieldCanBeLocal")
     @Mutable
     @Shadow
     private int clickCount;
 
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void noIsKeyDown(CallbackInfoReturnable<Boolean> cir) {
-        KeyMapping keyBinding = (KeyMapping) (Object) this;
-        Boolean override = GardenCustomKeybinds.isKeyDown(keyBinding);
+        @SuppressWarnings("DataFlowIssue")
+        KeyMapping keyMapping = (KeyMapping) (Object) this;
+        Boolean override = GardenCustomKeybinds.isKeyDown(keyMapping, this.isDown);
         if (override != null)  cir.setReturnValue(override);
-        if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
-            if (stickyKeyBinding.needsToggle.getAsBoolean()) {
+        if (keyMapping instanceof ToggleKeyMapping stickyKeyMapping) {
+            if (stickyKeyMapping.needsToggle.getAsBoolean()) {
                 return;
             }
         }
         if (TextInput.shouldCancelMinecraftInput()) cir.setReturnValue(false);
-        if (GraphEditor.shouldCancelMinecraftInput(keyBinding)) cir.setReturnValue(false);
+        if (GraphEditor.shouldCancelMinecraftInput(keyMapping)) cir.setReturnValue(false);
     }
 
     @Inject(method = "consumeClick", at = @At("HEAD"), cancellable = true)
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
-        KeyMapping keyBinding = (KeyMapping) (Object) this;
-        Boolean override = GardenCustomKeybinds.isKeyPressed(keyBinding);
+        @SuppressWarnings("DataFlowIssue")
+        KeyMapping keyMapping = (KeyMapping) (Object) this;
+        Boolean override = GardenCustomKeybinds.isKeyPressed(keyMapping);
         if (override != null) cir.setReturnValue(override);
         if (cir.isCancelled()) {
             this.clickCount = 0;
         }
-        if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
-            if (stickyKeyBinding.needsToggle.getAsBoolean()) {
+        if (keyMapping instanceof ToggleKeyMapping stickyKeyMapping) {
+            if (stickyKeyMapping.needsToggle.getAsBoolean()) {
                 return;
             }
         }
         if (TextInput.shouldCancelMinecraftInput()) cir.setReturnValue(false);
-        if (GraphEditor.shouldCancelMinecraftInput(keyBinding)) cir.setReturnValue(false);
+        if (GraphEditor.shouldCancelMinecraftInput(keyMapping)) cir.setReturnValue(false);
     }
 }
