@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -130,6 +131,7 @@ object EliteFarmersLeaderboard {
                             }
                             val contribUUID = ContributorManager.getUUIDFromDisplayName(name)
                             if (contribUUID != null) {
+                                AchievementManager.completeAchievement(BETTER_THAN_DEV_ACHIEVEMENT)
                                 ContributorManager.getSuffix(contribUUID)?.let {
                                     append(" ")
                                     append(it) {
