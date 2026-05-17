@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
@@ -220,7 +220,7 @@ object DungeonSpiritLeapOverlay {
             ChatUtils.chat("§cCannot leap - §e${playerInfo.username} §cis dead.")
             return
         }
-        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = ClickType.CLONE)
+        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = ContainerInput.CLONE)
     }
 
     private val deadTeammateColor = colorConfig.deadTeammateColor

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 
 abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val container: AbstractContainerMenu) : SkyHanniEvent() {
@@ -77,13 +77,13 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
-        val clickType: ClickType?,
+        val clickType: ContainerInput?,
     ) : GuiContainerEvent(gui, container), Cancellable {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickType == ClickType.CLONE) return
+            if (this.clickedButton == 2 && this.clickType == ContainerInput.CLONE) return
             slot?.index?.let { slotNumber ->
-                InventoryUtils.clickSlot(slotNumber, container.containerId, mouseButton = 2, mode = ClickType.CLONE)
+                InventoryUtils.clickSlot(slotNumber, container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
                 cancel()
             }
         }

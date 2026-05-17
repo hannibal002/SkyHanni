@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
@@ -45,7 +45,7 @@ object InventoryCompat {
     /**
      * Internal method, not meant to be called directly. Prefer [InventoryUtils.clickSlot].
      */
-    internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ClickType) {
+    internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ContainerInput) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
         //~ if > 1.21.11 'handleInventoryMouseClick' -> 'handleContainerInput'
@@ -55,7 +55,7 @@ object InventoryCompat {
     /**
      * Internal method, not meant to be called directly. Prefer [InventoryUtils.mouseClickSlot].
      */
-    internal fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ClickType) {
+    internal fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ContainerInput) {
         if (slot < 0) return
         val gui = Minecraft.getInstance().screen
         if (gui is AbstractContainerScreen<*>) {

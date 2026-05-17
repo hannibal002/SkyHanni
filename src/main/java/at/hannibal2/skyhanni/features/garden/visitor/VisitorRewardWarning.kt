@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.network.chat.Component
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -71,7 +71,7 @@ object VisitorRewardWarning {
             return
         }
 
-        if (event.clickType == ClickType.QUICK_MOVE) return
+        if (event.clickType == ContainerInput.QUICK_MOVE) return
         if (isRefuseSlot) {
             VisitorApi.changeStatus(visitor, VisitorApi.VisitorStatus.REFUSED, "refused")
             // fallback if tab list is disabled

@@ -25,7 +25,7 @@ import net.minecraft.world.Container
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import kotlin.time.Duration.Companion.seconds
 
@@ -126,7 +126,7 @@ object InventoryUtils {
     internal fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.item?.getItemCategoryOrNull() == ItemCategory.SACK) return
         slot?.index?.let { slotNumber ->
-            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ClickType.QUICK_MOVE)
+            clickSlot(slotNumber, container.containerId, mouseButton = 0, mode = ContainerInput.QUICK_MOVE)
             this.cancel()
         }
     }
@@ -193,7 +193,7 @@ object InventoryUtils {
         slotId: Int,
         windowId: Int = InventoryCompat.getWindowId(),
         mouseButton: Int = 0,
-        mode: ClickType = ClickType.PICKUP,
+        mode: ContainerInput = ContainerInput.PICKUP,
     ) {
         InventoryCompat.clickInventorySlot(windowId, slotId, mouseButton, mode)
     }
@@ -201,7 +201,7 @@ object InventoryUtils {
     fun mouseClickSlot(
         slotId: Int,
         mouseButton: Int = 0,
-        mode: ClickType = ClickType.PICKUP,
+        mode: ContainerInput = ContainerInput.PICKUP,
     ) {
         InventoryCompat.mouseClickInventorySlot(slotId, mouseButton, mode)
     }

@@ -26,7 +26,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -76,7 +76,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.container.containerId, mouseButton = 2, mode = ClickType.CLONE)
+            InventoryUtils.clickSlot(37 + index, chest.container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -174,7 +174,7 @@ object HarpFeatures {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
-                if (event.clickType == ClickType.SWAP) {
+                if (event.clickType == ContainerInput.SWAP) {
                     event.cancel()
                     return
                 }

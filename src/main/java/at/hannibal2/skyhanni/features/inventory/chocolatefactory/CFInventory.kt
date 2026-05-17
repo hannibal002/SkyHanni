@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 
 @SkyHanniModule
 object CFInventory {
@@ -105,7 +105,7 @@ object CFInventory {
         ) return
 
         // this would break CFKeybinds otherwise
-        if (event.clickType == ClickType.SWAP) return
+        if (event.clickType == ContainerInput.SWAP) return
 
         // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
         if (KeyboardManager.isShiftKeyDown() && slotNumber in CFApi.rabbitSlots.keys) return

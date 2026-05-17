@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.container
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import net.minecraft.world.inventory.ClickType
+import net.minecraft.world.inventory.ContainerInput
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -32,7 +32,7 @@ object CFKeybinds {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(28 + index, chest.container.containerId, mouseButton = 2, mode = ClickType.CLONE)
+            InventoryUtils.clickSlot(28 + index, chest.container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
             break
         }
     }
@@ -43,7 +43,7 @@ object CFKeybinds {
         if (!CFApi.inChocolateFactory) return
 
         // needed to not send duplicate clicks via keybind feature
-        if (event.clickType == ClickType.SWAP) {
+        if (event.clickType == ContainerInput.SWAP) {
             event.cancel()
         }
     }
