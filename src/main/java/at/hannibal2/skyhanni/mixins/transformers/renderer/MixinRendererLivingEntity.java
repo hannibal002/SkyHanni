@@ -52,7 +52,7 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
 
 
     @ModifyArg(
-        //~ if > 1.21.11 'state/CameraRenderState;' -> 'state/level/CameraRenderState;'
+        //~ if < 26.1 'state/level/CameraRenderState;' -> 'state/CameraRenderState;'
         method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
         at = @At(value = "INVOKE",target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"),
         index = 6
@@ -97,7 +97,7 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
     public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
         if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
-            //~ if > 1.21.11 'itemEntityTranslucentCull' -> 'entityTranslucentCullItemTarget'
+            //~ if < 26.1 'entityTranslucentCullItemTarget' -> 'itemEntityTranslucentCull'
             cir.setReturnValue(RenderTypes.entityTranslucentCullItemTarget(this.getTextureLocation(state)));
         }
     }

@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-//? if > 1.21.11 {
+//? if >= 26.1 {
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 //? } else {
@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(ItemFeatureRenderer.class)
 public class MixinItemFeatureRenderer {
 
-    //~ if > 1.21.11 'render"' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V"'
+    //~ if < 26.1 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V"' -> 'render"'
     @WrapOperation(method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = itemCommand;

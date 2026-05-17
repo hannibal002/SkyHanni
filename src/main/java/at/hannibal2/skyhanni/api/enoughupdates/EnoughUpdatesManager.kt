@@ -41,7 +41,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.minecraft.nbt.StringTag
-//? if > 1.21.11 {
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
@@ -227,7 +227,7 @@ object EnoughUpdatesManager {
         return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
     }
 
-    //? if > 1.21.11 {
+    //? if >= 26.1 {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {

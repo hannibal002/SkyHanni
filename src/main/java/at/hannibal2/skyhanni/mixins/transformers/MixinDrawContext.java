@@ -20,26 +20,26 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 // TODO rename this to `MixinGuiGraphicsExtractor` when we drop 1.21.11
 public class MixinDrawContext {
 
-    //~ if > 1.21.11 'renderItem(' -> 'item('
+    //~ if < 26.1 'item(' -> 'renderItem('
     @Inject(method = "item(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;III)V", at = @At("RETURN"))
     private void drawItemPost(LivingEntity entity, Level world, ItemStack stack, int x, int y, int seed, CallbackInfo ci) {
         RenderItemHookKt.renderItemReturn((GuiGraphicsExtractor) (Object) this, stack, x, y);
     }
 
-    //~ if > 1.21.11 'renderItemDecorations(' -> 'itemDecorations('
+    //~ if < 26.1 'itemDecorations(' -> 'renderItemDecorations('
     @Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void drawItemDecorationsPost(Font textRenderer, ItemStack stack, int x, int y, String stackCountText, CallbackInfo ci) {
         RenderItemHookKt.renderItemOverlayPost((GuiGraphicsExtractor) (Object) this, stack, x, y, stackCountText);
     }
 
-    //~ if > 1.21.11 'renderComponentHoverEffect' -> 'componentHoverEffect'
+    //~ if < 26.1 'componentHoverEffect' -> 'renderComponentHoverEffect'
     @Inject(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Ljava/util/Objects;requireNonNull(Ljava/lang/Object;)Ljava/lang/Object;", shift = At.Shift.AFTER))
     private void onRenderComponentHoverEffect(Font font, Style style, int i, int j, CallbackInfo ci) {
         GuiChatHook.INSTANCE.setReplacementComponent(null);
         new ChatHoverEvent(style.getHoverEvent()).post();
     }
 
-    //~ if > 1.21.11 'renderComponentHoverEffect' -> 'componentHoverEffect'
+    //~ if < 26.1 'componentHoverEffect' -> 'renderComponentHoverEffect'
     @ModifyArg(method = "componentHoverEffect", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font;split(Lnet/minecraft/network/chat/FormattedText;I)Ljava/util/List;"), index = 0)
     private FormattedText replaceWithNewList(FormattedText originalComponent) {
         return GuiChatHook.INSTANCE.getReplacementComponent() != null ? GuiChatHook.INSTANCE.getReplacement() : originalComponent;

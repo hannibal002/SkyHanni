@@ -243,7 +243,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         val vContent = entry.v - pad
         val u1 = uContent + key.pixelWidth / size
         val v1 = vContent - key.pixelHeight / size
-        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
+        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

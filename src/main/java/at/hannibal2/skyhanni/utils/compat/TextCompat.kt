@@ -27,7 +27,7 @@ import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-//? > 1.21.11 {
+//? >= 26.1 {
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 //? }
@@ -172,13 +172,13 @@ var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
     }?.let {
-        //~ if > 1.21.11 '.item' -> '.item.create()'
+        //~ if < 26.1 '.item.create()' -> '.item'
         (it as HoverEvent.ShowItem).item.create()
     }
     set(value) {
         value?.let { new ->
             this.copyIfNeeded().withStyle {
-                //~ if > 1.21.11 'new' -> 'ItemStackTemplate.fromNonEmptyStack(new)'
+                //~ if < 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -> 'new'
                 it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
             }
         }
@@ -253,8 +253,8 @@ fun Style.setHoverShowText(text: Component): Style {
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        //~ if > 1.21.11 'displayClientMessage' -> 'sendSystemMessage'
-        //~ if > 1.21.11 'message, false' -> 'message'
+        //~ if < 26.1 'sendSystemMessage' -> 'displayClientMessage'
+        //~ if < 26.1 'message' -> 'message, false'
         Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }
@@ -264,7 +264,7 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
     DelayedRun.runOrNextTick {
         val chat = Minecraft.getInstance().gui.chat
         chat.deleteMessage(idToMessageSignature(id))
-        //~ if > 1.21.11 ' GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
+        //~ if < 26.1 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()' -> ' GuiMessageTag.system()'
         chat.addMessage(component, idToMessageSignature(id),GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
@@ -305,7 +305,7 @@ fun ClickEvent.value(): String {
 
 fun HoverEvent.value(): Component = when (action()) {
     HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-    //~ if > 1.21.11 '.item.hoverName' -> '.item.create().hoverName'
+    //~ if < 26.1 '.item.create().hoverName' -> '.item.hoverName'
     HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
     HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }

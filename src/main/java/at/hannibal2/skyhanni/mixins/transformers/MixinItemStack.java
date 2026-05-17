@@ -4,13 +4,13 @@ import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-//? if > 1.21.11
+//? if >= 26.1
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(ItemStack.class)
 public class MixinItemStack {
 
-    //? if > 1.21.11 {
+    //? if >= 26.1 {
     @Shadow private net.minecraft.core.Holder<net.minecraft.world.item.Item> item;
 
     @Inject(method = "isEmpty", at = @At("HEAD"), cancellable = true)

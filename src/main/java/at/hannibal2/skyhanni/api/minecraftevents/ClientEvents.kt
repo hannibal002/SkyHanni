@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
-//? if > 1.21.11
+//? if >= 26.1
 import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -31,7 +31,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
-//? if > 1.21.11
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 
 @SkyHanniModule
@@ -59,7 +59,7 @@ object ClientEvents {
         // Connect event
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
-            //? if > 1.21.11
+            //? if >= 26.1
             ComponentsLoadedEvent.post()
         }
 
@@ -68,7 +68,7 @@ object ClientEvents {
             WorldChangeEvent.post()
         }
 
-        //~ if > 26 'registerReloader' -> 'registerReloadListener'
+        //~ if < 26.1 'registerReloadListener' -> 'registerReloader'
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
@@ -103,7 +103,7 @@ object ClientEvents {
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
             val inGameHud = Minecraft.getInstance().gui
-            //~ if > 1.21.11 'GuiMessageTag.system()' -> 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()'
+            //~ if < 26.1 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()' -> 'GuiMessageTag.system()'
             val chatHudLine = GuiMessage(inGameHud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
             inGameHud.chat.logChatMessage(chatHudLine)
         }

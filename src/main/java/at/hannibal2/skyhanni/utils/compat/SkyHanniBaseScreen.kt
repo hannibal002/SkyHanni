@@ -14,17 +14,17 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     val mc: Minecraft = Minecraft.getInstance()
 
-    //~ if > 1.21.11 'render' -> 'extractRenderState'
+    //~ if < 26.1 'extractRenderState' -> 'render'
     override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
-        //~ if > 1.21.11 'render' -> 'extractRenderState'
+        //~ if < 26.1 'extractRenderState' -> 'render'
         super.extractRenderState(context, mouseX, mouseY, delta)
         postDrawScreen(context, mouseX, mouseY, delta)
     }
 
-    //~ if > 1.21.11 'renderBackground' -> 'extractBackground'
+    //~ if < 26.1 'extractBackground' -> 'renderBackground'
     override fun extractBackground(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         try {
-            //~ if > 1.21.11 'renderMenuBackground' -> 'extractMenuBackground'
+            //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
             this.extractMenuBackground(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
@@ -163,7 +163,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //~ if > 1.21.11 'renderMenuBackground' -> 'extractMenuBackground'
+        //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
         extractMenuBackground(DrawContextUtils.drawContext)
     }
 }

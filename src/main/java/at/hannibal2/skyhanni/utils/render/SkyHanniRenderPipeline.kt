@@ -31,7 +31,7 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    //~ if > 1.21.11 'DepthTestFunction ' -> 'CompareOp '
+    //~ if < 26.1 'CompareOp ' -> 'DepthTestFunction '
     depthTestFunction: CompareOp = CompareOp.LESS_THAN_OR_EQUAL,
     val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
@@ -201,7 +201,7 @@ enum class SkyHanniRenderPipeline(
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
-                //~ if > 1.21.11 'withBlend(it)' -> 'withColorTargetState(ColorTargetState(it))'
+                //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {

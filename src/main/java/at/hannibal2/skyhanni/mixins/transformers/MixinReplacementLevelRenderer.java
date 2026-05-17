@@ -39,8 +39,8 @@ public class MixinReplacementLevelRenderer {
     PoseStack contextMatrixStack;
 
     @Unique
-    //~ if > 1.21.11 'Camera' -> 'CameraRenderState'
-    //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
+    //~ if < 26.1 'CameraRenderState' -> 'Camera'
+    //~ if < 26.1 'currentCameraState' -> 'currentCamera'
     CameraRenderState currentCameraState;
 
     @Unique
@@ -51,23 +51,23 @@ public class MixinReplacementLevelRenderer {
     private RenderBuffers renderBuffers;
 
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
-    //~ if > 1.21.11 'allocator' -> 'resourceAllocator'
-    //~ if > 1.21.11 'tickCounter' -> 'deltaTracker'
-    //~ if > 1.21.11 'renderBlockOutline' -> 'renderOutline'
-    //~ if > 1.21.11 'Camera camera' -> 'CameraRenderState cameraState'
-    //~ if > 1.21.11 'Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix' -> 'Matrix4fc modelViewMatrix'
-    //~ if > 1.21.11 'fogBuffer' -> 'terrainFog'
-    //~ if > 1.21.11 'boolean renderSky' -> 'boolean shouldRenderSky'
-    //~ if > 1.21.11 'CallbackInfo ci' -> 'ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci'
+    //~ if < 26.1 'resourceAllocator' -> 'allocator'
+    //~ if < 26.1 'deltaTracker' -> 'tickCounter'
+    //~ if < 26.1 'renderOutline' -> 'renderBlockOutline'
+    //~ if < 26.1 'CameraRenderState cameraState' -> 'Camera camera'
+    //~ if < 26.1 'Matrix4fc modelViewMatrix' -> 'Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix'
+    //~ if < 26.1 'terrainFog' -> 'fogBuffer'
+    //~ if < 26.1 'boolean shouldRenderSky' -> 'boolean renderSky'
+    //~ if < 26.1 'ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci' -> 'CallbackInfo ci'
     private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
-        //~ if > 1.21.11 'currentCamera = camera' -> 'currentCameraState = cameraState'
+        //~ if < 26.1 'currentCameraState = cameraState' -> 'currentCamera = camera'
         currentCameraState = cameraState;
-        //~ if > 1.21.11 'tickCounter' -> 'deltaTracker'
+        //~ if < 26.1 'deltaTracker' -> 'tickCounter'
         currentTickCounter = deltaTracker;
     }
 
     @WrapOperation(
-        //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
+        //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
         method = "lambda$addMainPass$0",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
@@ -78,7 +78,7 @@ public class MixinReplacementLevelRenderer {
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             contextMatrixStack,
-            //~ if > 1.21.11 'currentCamera' -> 'currentCameraState'
+            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             currentCameraState,
             renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
@@ -88,7 +88,7 @@ public class MixinReplacementLevelRenderer {
         contextMatrixStack = null;
     }
 
-    //~ if > 1.21.11 'method_62214' -> 'lambda$addMainPass$0'
+    //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
     @ModifyExpressionValue(method = "lambda$addMainPass$0", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
         contextMatrixStack = matrixStack;

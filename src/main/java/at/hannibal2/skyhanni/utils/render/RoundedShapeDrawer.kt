@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleU
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 import com.mojang.blaze3d.buffers.GpuBufferSlice
-//~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
@@ -29,8 +29,8 @@ import com.mojang.blaze3d.textures.FilterMode
 
 object RoundedShapeDrawer {
 
-    //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
-    //~ if > 1.21.11 '"SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true' -> '"SkyHanni Rounded Shapes"'
+    //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
+    //~ if < 26.1 '"SkyHanni Rounded Shapes"' -> '"SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true'
     val projectionMatrix = ProjectionMatrixBuffer("SkyHanni Rounded Shapes")
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
@@ -77,7 +77,7 @@ object RoundedShapeDrawer {
             val w = window.width.toFloat() / window.guiScale.toFloat()
             val h = window.height.toFloat() / window.guiScale.toFloat()
             RenderSystem.setProjectionMatrix(
-                //~ if > 1.21.11 'w, h' -> 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)'
+                //~ if < 26.1 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)' -> 'w, h'
                 projectionMatrix.getBuffer(Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)),
                 ProjectionType.ORTHOGRAPHIC,
             )

@@ -25,7 +25,7 @@ import java.awt.Color
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-//~ if > 1.21.11 'client.gui.render.state.GuiRenderState' -> 'client.renderer.state.gui.GuiRenderState'
+//~ if < 26.1 'client.renderer.state.gui.GuiRenderState' -> 'client.gui.render.state.GuiRenderState'
 private typealias GuiRenderState = net.minecraft.client.renderer.state.gui.GuiRenderState
 
 @Suppress("TooManyFunctions")
@@ -440,7 +440,7 @@ object ShaderRenderUtils {
             )
             if (blitted) return
         }
-        //~ if > 1.21.11 'submitGuiElement' -> 'addGuiElement'
+        //~ if < 26.1 'addGuiElement' -> 'submitGuiElement'
         guiRenderState.addGuiElement(buildCircleState(x, y, radius, color.rgb, smoothness, angle1, angle2))
     }
 

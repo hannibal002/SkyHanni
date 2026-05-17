@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.MessageSignature;
-//? if > 1.21.11
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 
 @Mixin(GuiMessage.class)
@@ -35,15 +35,15 @@ public class MixinChatLine implements ChatLineData {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    //~ if > 1.21.11 'creationTick' -> 'addedTime'
-    //~ if > 1.21.11 'Component line' -> 'Component content'
-    //~ if > 1.21.11 'messageSignatureData' -> 'signature'
-    //~ if > 1.21.11 'GuiMessageTag messageIndicator' -> 'GuiMessageSource source, GuiMessageTag tag'
+    //~ if < 26.1 'addedTime' -> 'creationTick'
+    //~ if < 26.1 'Component content' -> 'Component line'
+    //~ if < 26.1 'signature' -> 'messageSignatureData'
+    //~ if < 26.1 'GuiMessageSource source, GuiMessageTag tag' -> 'GuiMessageTag messageIndicator'
     private void onInit(int addedTime, Component content, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
-        //~ if > 1.21.11 'component' -> 'hookComponent'
+        //~ if < 26.1 'hookComponent' -> 'component'
         Component hookComponent = GuiChatHook.getCurrentComponent();
-        //~ if > 1.21.11 'component' -> 'hookComponent'
-        //~ if > 1.21.11 'line' -> 'content'
+        //~ if < 26.1 'hookComponent' -> 'component'
+        //~ if < 26.1 'content' -> 'line'
         skyhanni$fullComponent = hookComponent == null ? content : hookComponent;
     }
 

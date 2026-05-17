@@ -29,12 +29,12 @@ internal class SkyHanniItemAtlasRenderer(
 ) {
 
     fun render(
-        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+        //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
         projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //~ if > 1.21.11 'size, size' -> '(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))'
+        //~ if < 26.1 '(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))' -> 'size, size'
         val bufferSlice = projectionBuffer.getBuffer((Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)))
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
@@ -81,7 +81,7 @@ internal class SkyHanniItemAtlasRenderer(
         val slotF = pixelSize.toFloat()
         val u1 = u + slotF / size
         val v1 = v + (-slotF) / size
-        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
+        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

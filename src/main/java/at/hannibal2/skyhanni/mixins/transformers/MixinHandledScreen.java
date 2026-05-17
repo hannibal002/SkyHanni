@@ -39,7 +39,7 @@ import java.util.List;
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinHandledScreen {
 
-    //~ if > 1.21.11 'render' -> 'extractRenderState'
+    //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (GlobalRender.INSTANCE.getRenderDisabled()) return;
@@ -55,14 +55,14 @@ public abstract class MixinHandledScreen {
         }
     }
 
-    //~ if > 1.21.11 'render' -> 'extractRenderState'
+    //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
     }
 
-    //~ if > 1.21.11 'renderContents' -> 'extractContents'
-    //~ if > 1.21.11 ';render(' -> ';extractRenderState('
+    //~ if < 26.1 'extractContents' -> 'renderContents'
+    //~ if < 26.1 ';extractRenderState(' -> ';render('
     @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
@@ -70,7 +70,7 @@ public abstract class MixinHandledScreen {
         }
     }
 
-    //~ if > 1.21.11 'renderTooltip' -> 'extractTooltip'
+    //~ if < 26.1 'extractTooltip' -> 'renderTooltip'
     @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {
         if (CustomWardrobe.shouldHideNormalTooltip()) {
@@ -100,20 +100,20 @@ public abstract class MixinHandledScreen {
         }
     }
 
-    //~ if > 1.21.11 ';drawString(' -> ';text('
-    //~ if > 1.21.11 'renderLabels' -> 'extractLabels'
+    //~ if < 26.1 ';text(' -> ';drawString('
+    //~ if < 26.1 'extractLabels' -> 'renderLabels'
     @ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
     }
 
-    //~ if > 1.21.11 'renderSlotHighlightBack' -> 'extractSlotHighlightBack'
+    //~ if < 26.1 'extractSlotHighlightBack' -> 'renderSlotHighlightBack'
     @Redirect(method = "extractSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
     private boolean canBeHighlightedBack(Slot slot) {
         return BetterContainers.slotCanBeHighlighted(slot);
     }
 
-    //~ if > 1.21.11 'renderSlotHighlightFront' -> 'extractSlotHighlightFront'
+    //~ if < 26.1 'extractSlotHighlightFront' -> 'renderSlotHighlightFront'
     @Redirect(method = "extractSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
     private boolean canBeHighlightedFront(Slot slot) {
         return BetterContainers.slotCanBeHighlighted(slot);

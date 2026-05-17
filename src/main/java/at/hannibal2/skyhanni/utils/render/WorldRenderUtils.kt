@@ -36,7 +36,7 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
-//? if > 1.21.11 {
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
 //? }
@@ -44,7 +44,7 @@ import at.hannibal2.skyhanni.utils.compat.rotation
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    //~ if > 1.21.11 'entity/' -> 'entity/beacon/'
+    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {

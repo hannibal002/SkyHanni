@@ -31,7 +31,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         context: SkyHanniItemRenderContext,
         state: SkyHanniGuiItemRenderState,
         guiRenderState: GuiRenderState,
-        //~ if > 1.21.11 'CachedOrthoProjectionMatrixBuffer' -> 'ProjectionMatrixBuffer'
+        //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
         projectionBuffer: ProjectionMatrixBuffer,
     ) {
         val texture = texture ?: return
@@ -43,7 +43,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
 
         val size = slotSize.toFloat()
-        //~ if > 1.21.11 'size, size' -> 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)'
+        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
         val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
@@ -70,7 +70,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
     ) {
         val textureView = textureView ?: return
         // u/v: full slot occupies [0,1] x [0,1] in the per-item texture
-        //~ if > 1.21.11 'submitBlitToCurrentLayer' -> 'addBlitToCurrentLayer'
+        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

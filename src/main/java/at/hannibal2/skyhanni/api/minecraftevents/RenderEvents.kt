@@ -9,20 +9,20 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
-//~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
+//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-//~ if > 1.21.11 '.v1.world.WorldRenderContext' -> '.v1.level.LevelRenderContext'
+//~ if < 26.1 '.v1.level.LevelRenderContext' -> '.v1.world.WorldRenderContext'
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-//~if > 1.21.11 '.v1.world.WorldRenderEvents' -> '.v1.level.LevelRenderEvents'
+//~if < 26.1 '.v1.level.LevelRenderEvents' -> '.v1.world.WorldRenderEvents'
 import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.resources.Identifier
-//? if > 1.21.11
+//? if >= 26.1
 import at.hannibal2.skyhanni.utils.compat.getRenderState
 
 @SkyHanniModule
@@ -35,25 +35,25 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        //~ if > 1.21.11 'SpecialGuiElementRegistry' -> 'PictureInPictureRendererRegistry'
+        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
         PictureInPictureRendererRegistry.register { ctx ->
             SkyHanniPipCoordinatorRenderer(
-                //~ if > 1.21.11 'vertexConsumers' -> 'bufferSource'
+                //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
                 ctx.bufferSource()
             )
         }
 
         // makes the lines render weird idk
-        //~ if > 1.21.11 'WorldRenderEvents' -> 'LevelRenderEvents'
-        //~ if > 1.21.11 'WorldRenderContext' -> 'LevelRenderContext'
+        //~ if < 26.1 'LevelRenderEvents' -> 'WorldRenderEvents'
+        //~ if < 26.1 'LevelRenderContext' -> 'WorldRenderContext'
         LevelRenderEvents.END_MAIN.register { event: LevelRenderContext ->
-            //~ if > 1.21.11 '.consumers() as? MultiBufferSource.BufferSource ?: return@register' -> '.bufferSource()'
+            //~ if < 26.1 '.bufferSource()' -> '.consumers() as? MultiBufferSource.BufferSource ?: return@register'
             val immediateVertexConsumers = event.bufferSource()
-            //~ if > 1.21.11 '.matrices()' -> '.poseStack()'
+            //~ if < 26.1 '.poseStack()' -> '.matrices()'
             val stack = event.poseStack()
             SkyHanniRenderWorldEvent(
                 stack,
-                //~ if > 1.21.11 'mainCamera' -> 'mainCamera.getRenderState()'
+                //~ if < 26.1 'mainCamera.getRenderState()' -> 'mainCamera'
                 event.gameRenderer().mainCamera.getRenderState(),
                 immediateVertexConsumers,
                 Minecraft.getInstance().deltaTracker.realtimeDeltaTicks,

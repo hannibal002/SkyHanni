@@ -9,15 +9,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.MessageSignature;
-//? if > 1.21.11
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 
 @Mixin(ChatComponent.class)
 public class MixinGuiNewChat {
 
-    //~ if > 1.21.11 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V' -> 'addMessage'
+    //~ if < 26.1 'addMessage' -> 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V'
     @Inject(method = "addMessage", at = @At("HEAD"))
-    //~ if > 1.21.11 'GuiMessageTag indicator' -> 'GuiMessageSource source, GuiMessageTag indicator'
+    //~ if < 26.1 'GuiMessageSource source, GuiMessageTag indicator' -> 'GuiMessageTag indicator'
     private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci) {
         GuiChatHook.setCurrentComponent(chatComponent);
     }
