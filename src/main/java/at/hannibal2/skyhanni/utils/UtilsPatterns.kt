@@ -9,6 +9,8 @@ object UtilsPatterns {
 
     private val patternGroup = RepoPattern.group("utils")
 
+    // COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC|DIVINE|SPECIAL|VERY SPECIAL|ULTIMATE
+    private val rarities = enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") }
     /**
      * REGEX-TEST: a MYTHIC ACCESSORY a
      * REGEX-TEST: a SHINY MYTHIC DUNGEON CHESTPLATE a
@@ -21,12 +23,22 @@ object UtilsPatterns {
      * REGEX-TEST: EPIC WATER SHARD (ID E5)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
+     * REGEX-TEST: a DIVINE a
+     * REGEX-TEST: LEGENDARY DUNGEON ITEM
+     * REGEX-TEST: a MYTHIC DUNGEON ITEM a
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line.colorless",
-        "^(?:Rarity: )?(?:. )?(?:SHINY )?(?<rarity>" +
-            enumJoinToPattern<LorenzRarity> { it.name.replace("_", " ") } +
-            ") ?(?:DUNGEON )?(?<itemCategory>[^()]*?)(?: .)?(?: \\(ID \\w\\d+\\))?$",
+        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: DUNGEON)? ?(?<itemCategory>[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$",
+    )
+
+    /**
+     * REGEX-TEST: RARE CROP
+     * REGEX-TEST: RARE CROPS
+     */
+    val notRarityLoreLinePattern by patternGroup.pattern(
+        "item.lore.not-rarity.line",
+        "^RARE CROPS?$",
     )
 
     /**

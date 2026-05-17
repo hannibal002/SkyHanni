@@ -167,6 +167,7 @@ object MineshaftDetection {
         ;
 
         val displayName: String = color.getChatColor() + rawName
+        override fun toString() = displayName
     }
 
     @HandleEvent

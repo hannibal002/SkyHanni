@@ -96,13 +96,13 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §7Syphon §b3 §7more to level up!
      * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
-     * REGEX-TEST: §7Syphon §b1 §7more to level up!
+     * REGEX-TEST: §7Syphon §b1 §7shard to level up!
+     * REGEX-TEST: §7Syphon §b3 §7shards to level up!
      */
     private val syphonAmountPattern by patternGroup.pattern(
         "syphon.amount",
-        "§7Syphon §b(?<amount>\\d+) §7(?:more to level up|shard to unlock)!",
+        "§7Syphon §b(?<amount>\\d+) §7shards? to (?:level up|unlock)!",
     )
 
     /**
