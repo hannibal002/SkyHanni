@@ -310,6 +310,7 @@ object ChatFilter {
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
         "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
+        "§e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
     private val skymallMessages = listOf(
@@ -460,6 +461,16 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
+    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
+    private val MasterChefPatterns = listOf(
+        "§e\\[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
+    )
+
+    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
+    private val MasterChefMessages = listOf(
+        "§e[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.",
+    )
+
     /**
      ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
      ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
@@ -542,6 +553,7 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
+        "masterchef" to MasterChefPatterns,
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -573,6 +585,7 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
+        "masterchef" to MasterChefMessages,
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
@@ -616,6 +629,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

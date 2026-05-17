@@ -18,7 +18,7 @@ object WinterApi {
      * REGEX-TEST: WOAH! [MVP+] DulceLyncis summoned TWO Reindrakes from the depths!
      */
     private val reindrakeSpawnPattern by patternGroup.pattern(
-        "reindrake.spawn_message",
+        "reindrake.spawn.message",
         "WOAH! .+ summoned (?:a Reindrake|TWO Reindrakes) from the depths!",
     )
 
