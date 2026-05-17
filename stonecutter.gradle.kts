@@ -143,7 +143,6 @@ stonecutter parameters {
             replace("EndWorldTick", "EndLevelTick")
             replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
             replace("AfterClientWorldChange", "AfterClientLevelChange")
-            replace("ClickType", "ContainerInput")
             replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
             replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
@@ -164,6 +163,10 @@ stonecutter parameters {
 
             replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
+        }
+
+        regex(current.parsed >= "26.1") {
+            replace("\bClickType\b", "ContainerInput")
         }
     }
 
