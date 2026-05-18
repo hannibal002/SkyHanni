@@ -108,7 +108,7 @@ object TpsCounter {
         lastServerTick = SimpleTimeMark.farPast()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.TPS_DISPLAY])
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.tpsDisplayPosition.renderRenderable(it, posLabel = "TPS Display") }
@@ -123,8 +123,7 @@ object TpsCounter {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.onHypixel && config.tpsDisplay &&
-        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
+    private fun isEnabled() = SkyBlockUtils.onHypixel && config.tpsDisplay
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

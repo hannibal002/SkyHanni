@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -18,7 +19,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,14 +35,17 @@ object HypixelBazaarFetcher {
 
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
+    private val bazaarFetchCoroutine = CoroutineSettings("bazaar api fetch", timeout = 1.minutes)
+
     var latestProductInformation = mapOf<NeuInternalName, BazaarData>()
+    private val isFetching = AtomicBoolean(false)
     private var lastSuccessfulFetch = SimpleTimeMark.farPast()
     private var nextFetchTime = SimpleTimeMark.farPast()
     private var failedAttempts = 0
     private var nextFetchIsManual = false
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bazaar Data Fetcher from API")
 
         val data = listOf(
@@ -57,15 +63,14 @@ object HypixelBazaarFetcher {
     }
 
     @HandleEvent
-    fun onTick() {
+    fun onSecondPassed() {
         if (!canFetch()) return
-        if (ApiUtils.isBazaarDisabled()) return
-        SkyHanniMod.launchIOCoroutine("bazaar api fetch", timeout = 1.minutes) {
-            fetchAndProcessBazaarData()
-        }
+        bazaarFetchCoroutine.launch { fetchAndProcessBazaarData() }
     }
 
     private suspend fun fetchAndProcessBazaarData() {
+        if (!isFetching.compareAndSet(expectedValue = false, newValue = true)) return
+
         nextFetchTime = SimpleTimeMark.now() + 2.minutes
         val fetchType = if (nextFetchIsManual) "manual" else "automatic"
         nextFetchIsManual = false
@@ -83,6 +88,8 @@ object HypixelBazaarFetcher {
             }
         } catch (e: Exception) {
             onError(fetchType, e)
+        } finally {
+            isFetching.store(false)
         }
     }
 
@@ -152,7 +159,9 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private fun canFetch() = SkyBlockUtils.onHypixel && nextFetchTime.isInPast()
+    private fun canFetch() = !ApiUtils.isBazaarDisabled() &&
+        SkyBlockUtils.onHypixel &&
+        nextFetchTime.isInPast()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
