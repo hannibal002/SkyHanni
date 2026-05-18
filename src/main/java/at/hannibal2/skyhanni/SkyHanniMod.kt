@@ -121,6 +121,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
 
+    val userAgent: String = "SkyHanni/${VERSION}-${PlatformUtils.MC_VERSION}"
+
     // TODO rename to config. whoever does this, have fun with 644 lines changed
     @JvmField
     var feature: SkyHanniConfig = SkyHanniConfig()

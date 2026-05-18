@@ -22,6 +22,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import java.net.URLEncoder
 import java.util.Base64
 import java.util.Locale
 import java.util.NavigableMap
@@ -591,4 +592,8 @@ object StringUtils {
     }
 
     fun String.addSkyHanniUtm(): String = "$this?utm_source=SkyHanni"
+
+    fun Map<String, Any>.toQueryString(): String = "?" + map { (k, v) ->
+        "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.toString(), "UTF-8")}"
+    }.joinToString("&")
 }

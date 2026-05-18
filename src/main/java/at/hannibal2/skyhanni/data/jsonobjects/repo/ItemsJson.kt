@@ -20,13 +20,14 @@ data class ItemsJson(
     @Expose @SerializedName("distance_enchant_data") val distanceEnchantData: Map<String, DistanceEnchantData>,
     @Expose @SerializedName("hunting_blackholes") val huntingBlackholes: List<NeuInternalName>?,
     @Expose @SerializedName("hunting_axes") val huntingAxes: List<NeuInternalName>?,
+    @Expose @SerializedName("has_legacy_gemstone_slots") val hasLegacyGemstoneSlots: List<NeuInternalName>?,
 )
 
 data class ItemValueCalculationDataJson(
     @Expose @SerializedName("always_active_enchants") val alwaysActiveEnchants: Map<String, AlwaysActiveEnchantJson>,
     @Expose @SerializedName("only_tier_one_prices") val onlyTierOnePrices: List<String>,
     @Expose @SerializedName("only_tier_five_prices") val onlyTierFivePrices: List<String>,
-    @Expose @SerializedName("endcap_enchants") val endcapEnchants: Map<String, EndCapData>? = mapOf(),
+    @Expose @SerializedName("endcap_enchants_new") val endcapEnchants: Map<String, List<EndCapData>>? = emptyMap(),
 )
 
 data class AlwaysActiveEnchantJson(
