@@ -27,7 +27,8 @@ import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-//? >= 26.1 {
+
+//? if >= 26.1 {
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 //? }

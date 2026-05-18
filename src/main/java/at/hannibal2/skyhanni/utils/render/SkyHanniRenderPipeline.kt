@@ -7,18 +7,19 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChro
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
-//? if < 26.1 {
-/*import com.mojang.blaze3d.platform.DepthTestFunction
-*///? } else {
-import com.mojang.blaze3d.pipeline.ColorTargetState
-import com.mojang.blaze3d.pipeline.DepthStencilState
-import com.mojang.blaze3d.platform.CompareOp
-//? }
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
+
+//? if > 26.1 {
+import com.mojang.blaze3d.pipeline.ColorTargetState
+import com.mojang.blaze3d.pipeline.DepthStencilState
+import com.mojang.blaze3d.platform.CompareOp
+//? } else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction*/
+//? }
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,

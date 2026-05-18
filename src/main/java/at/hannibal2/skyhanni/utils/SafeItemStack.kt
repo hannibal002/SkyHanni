@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.utils
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
-//? >= 26.1 {
+
+//? if >= 26.1
 import net.minecraft.world.item.ItemStackTemplate
-//? }
 
 /**
  * Crash-safe drop-in replacement for [ItemStack] in Minecraft 26.1+.

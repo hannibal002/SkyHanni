@@ -1,24 +1,17 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import net.minecraft.client.renderer.rendertype.RenderType;
-//? if < 26.1 {
-/*import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-*///? } else {
-import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.util.ARGB;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-//?}
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-//? if < 26.1 {
-/*@Mixin(ItemRenderer.class)
+@Mixin(ItemRenderer.class)
 public class MixinItemRenderer {
 
     @ModifyArg(method = "renderQuadList", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;FFFFII)V"), index = 5)
@@ -39,5 +32,5 @@ public class MixinItemRenderer {
         }
         return layer;
     }
-}
-*///? }
+}*/
+//?}

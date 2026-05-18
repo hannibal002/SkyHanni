@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
 //? if >= 26.1 {
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderType;

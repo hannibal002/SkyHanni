@@ -6,15 +6,16 @@ import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-//? if < 26.1 {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-*///? } else {
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
-import org.joml.Matrix4f
-//?}
 import net.minecraft.client.renderer.RenderPipelines
 import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
+
+//? if >= 26.1 {
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import org.joml.Matrix4f
+//? } else {
+/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer*/
+//?}
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 

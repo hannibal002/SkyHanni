@@ -5,13 +5,14 @@ import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAtlasBinPacker
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-//? if < 26.1 {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-*///? } else {
+import net.minecraft.resources.Identifier
+
+//? if >= 26.1 {
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f
+//? } else {
+/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer*/
 //?}
-import net.minecraft.resources.Identifier
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
 

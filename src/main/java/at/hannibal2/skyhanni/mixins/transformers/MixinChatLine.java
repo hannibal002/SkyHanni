@@ -35,15 +35,9 @@ public class MixinChatLine implements ChatLineData {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    //~ if < 26.1 'addedTime' -> 'creationTick'
-    //~ if < 26.1 'Component content' -> 'Component line'
-    //~ if < 26.1 'signature' -> 'messageSignatureData'
     //~ if < 26.1 'GuiMessageSource source, GuiMessageTag tag' -> 'GuiMessageTag messageIndicator'
     private void onInit(int addedTime, Component content, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
-        //~ if < 26.1 'hookComponent' -> 'component'
         Component hookComponent = GuiChatHook.getCurrentComponent();
-        //~ if < 26.1 'hookComponent' -> 'component'
-        //~ if < 26.1 'content' -> 'line'
         skyhanni$fullComponent = hookComponent == null ? content : hookComponent;
     }
 

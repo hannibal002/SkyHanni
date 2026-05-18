@@ -11,6 +11,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
 import net.minecraft.client.renderer.LevelRenderer;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
@@ -21,17 +22,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-//? if < 26.1 {
-/*import net.minecraft.client.Camera;
-import org.joml.Matrix4f;
-*///? } else {
+
+//?if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
+//? } else {
+/*import net.minecraft.client.Camera;
+import org.joml.Matrix4f;*/
 //?}
-import com.mojang.blaze3d.textures.GpuSampler;
 
 // Adapted from Fabric API implementation
-// The fabric api event makes our lines render strange
+// The Fabric API event makes our lines render strange
 @Mixin(LevelRenderer.class)
 public class MixinReplacementLevelRenderer {
 
@@ -51,18 +52,12 @@ public class MixinReplacementLevelRenderer {
     private RenderBuffers renderBuffers;
 
     @Inject(method = "renderLevel", at = @At(value = "HEAD"))
-    //~ if < 26.1 'resourceAllocator' -> 'allocator'
-    //~ if < 26.1 'deltaTracker' -> 'tickCounter'
-    //~ if < 26.1 'renderOutline' -> 'renderBlockOutline'
     //~ if < 26.1 'CameraRenderState cameraState' -> 'Camera camera'
     //~ if < 26.1 'Matrix4fc modelViewMatrix' -> 'Matrix4f positionMatrix, Matrix4f matrix4f, Matrix4f projectionMatrix'
-    //~ if < 26.1 'terrainFog' -> 'fogBuffer'
-    //~ if < 26.1 'boolean shouldRenderSky' -> 'boolean renderSky'
     //~ if < 26.1 'ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci' -> 'CallbackInfo ci'
     private void beginRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, ChunkSectionsToRender chunkSectionsToRender, CallbackInfo ci) {
         //~ if < 26.1 'currentCameraState = cameraState' -> 'currentCamera = camera'
         currentCameraState = cameraState;
-        //~ if < 26.1 'deltaTracker' -> 'tickCounter'
         currentTickCounter = deltaTracker;
     }
 

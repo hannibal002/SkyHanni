@@ -3,15 +3,17 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-//? if < 26.1 {
-/*import com.mojang.blaze3d.platform.DepthTestFunction;
-*///? } else {
-import com.mojang.blaze3d.pipeline.DepthStencilState;
-import com.mojang.blaze3d.platform.CompareOp;
-//?}
 import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+
+//? if >= 26.1 {
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
+//? } else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction;*/
+//?}
+
 
 @Mixin(value = RenderPipeline.class, remap = false)
 public class RenderPipelineMixin {

@@ -94,18 +94,19 @@ public class MixinGui {
         GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
     }
 
-    //~ if < 26.1 '"extractChat"' -> '"renderChat"'
-    //~ if < 26.1 ';extractRenderState(' -> ';render('
-    //~ if < 26.1 'Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V' -> 'Font;IIIZZ)V'
+    //? if >= 26.1 {
     @ModifyArg(method = "extractChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"), index = 5)
-    //~ if < 26.1 'private ChatComponent.DisplayMode' -> 'private boolean'
-    //~ if < 26.1 'ChatComponent.DisplayMode mode' -> 'boolean bool'
     private ChatComponent.DisplayMode modifyRenderText(ChatComponent.DisplayMode mode) {
-        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
-        //~ if < 26.1 'mode' -> 'bool'
         return mode;
     }
+    //? } else {
+    /*@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
+    private boolean modifyRenderText(boolean bool) {
+        if (ChatPeek.peek()) return true;
+        return bool;
+    }*/
+    //? }
 
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {

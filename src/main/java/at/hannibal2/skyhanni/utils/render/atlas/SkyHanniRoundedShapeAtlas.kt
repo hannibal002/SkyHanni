@@ -8,6 +8,8 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 import org.joml.Matrix3x2f
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.textures.FilterMode
+
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.shader.RoundedRectangleShader
@@ -24,7 +26,6 @@ import org.joml.Vector4f
 import java.util.OptionalDouble
 import java.util.OptionalInt
 *///?}
-import com.mojang.blaze3d.textures.FilterMode
 
 internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRoundedShapeAtlasKey, SkyHanniRoundedShapeAtlasEntry>() {
 
