@@ -309,5 +309,5 @@ object CrystalNucleusChatFilter {
 
     private fun shouldBlock(type: CrystalNucleusMessageTypes) = config.modifiedMessages.contains(type)
     private fun inNucleus() = SkyBlockUtils.graphArea == "Crystal Nucleus"
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

@@ -2,14 +2,14 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.blaze3d.platform.ClipboardManager
 import kotlinx.coroutines.Deferred
 import net.minecraft.client.Minecraft
 
 object ClipboardUtils {
 
-    private val clipboardCoroutineConfig = CoroutineConfig(
+    private val clipboardCoroutineSettings = CoroutineSettings(
         "clipboardAccess",
         withIOContext = true,
     )
@@ -17,7 +17,7 @@ object ClipboardUtils {
     @Deprecated("Use copyToClipboardAsync instead", ReplaceWith("copyToClipboardAsync(text).await()"))
     fun copyToClipboard(text: String, step: Int = 0) = copyToClipboardInternal(text, step)
 
-    fun copyToClipboardAsync(text: String, step: Int = 0): Deferred<Boolean?> = clipboardCoroutineConfig.async {
+    fun copyToClipboardAsync(text: String, step: Int = 0): Deferred<Boolean?> = clipboardCoroutineSettings.async {
         copyToClipboardInternal(text, step)
     }
 

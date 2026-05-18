@@ -24,7 +24,7 @@ object ForagingTutorialQuest {
     private var lastSuggestion = SimpleTimeMark.farPast()
 
     private enum class Quest(val questName: String, val npcName: String, val npcLocation: LorenzVec) {
-        FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-112.2, 73.0, -36.9)),
+        FIRST("Foraging Tutorial", "Lumber Jack", LorenzVec(-123.5, 74.0, -30.0)),
         SECOND("Into the Woods", "Charlie", LorenzVec(-275.9, 80.0, -17.1)),
         THIRD("A Helping Hand", "Kelly", LorenzVec(-350.8, 94.0, 31.7)),
         FOURTH("The Campfire Cult", "Ryan", LorenzVec(-362.7, 102.0, -90.5)),
@@ -66,7 +66,7 @@ object ForagingTutorialQuest {
                 }
             }
         }
-        if (IslandType.HUB.isCurrent() || IslandType.THE_PARK.isCurrent()) {
+        if (IslandType.HUB.isInIsland() || IslandType.THE_PARK.isInIsland()) {
             "§cYou must complete the §r§6(?<quest>.*) Quest §r§cto use this!".toPattern().matchMatcher(event.message) {
                 stepByName(group("quest"))
             }

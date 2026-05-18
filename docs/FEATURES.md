@@ -387,8 +387,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added a button in the Minion menu to obtain required items for the next upgrade from Sacks or Bazaar.
     + Opens Bazaar if items aren't found in Sacks.
     + Shows the cost of required items and total upgrade cost.
-
 + Shows how much skill experience you will get when picking up items from the minion storage. - Thunderblade73
++ Added Inferno Minion Profit Tracker. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5500)
 
 </details>
 <details open><summary>
@@ -864,6 +864,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
 + Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
 + Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
++ Hide annoying messages about Kernels getting added to your purse while farming. - Shana (https://github.com/hannibal002/SkyHanni/pull/5679)
 
 ### Garden Pests
 
@@ -1138,6 +1139,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Show actual Gemstone Powder gained in chat alongside the base amount. - tristendillon (https://github.com/hannibal002/SkyHanni/pull/4907)
   + Displays format: `Gemstone Powder x1,944 (x3,888)` where the first number is base, and the second is the actual amount after multipliers.
   + Hover over the message to see a detailed breakdown of all active multipliers.
++ Added Mineshaft Cave-in Timer. - Rain (https://github.com/hannibal002/SkyHanni/pull/5620)
+    + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
 
 </details>
 <details open><summary>
@@ -1501,6 +1504,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Matriarch Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1385)
     + Highlights the Heavy Pearls.
     + Draws a line to the Heavy Pearls.
++ Added Vanquisher Waypoint Sharing. - itsseth3 (https://github.com/hannibal002/SkyHanni/pull/5197)
+    + Sends appropriate Vanquisher spawned/shared/died message into party/all chat.
+    + Either shares instantly or upon key press.
+    + On-screen indicators: Renders title, waypoint, beacon, and tracers for party member spawns (or global if enabled).
 + Red Scoreboard Numbers - Hides the red numbers in the scoreboard sidebar on the right side of the screen.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
@@ -1862,6 +1869,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Transparent Minecraft Farming feature. - nopo (https://github.com/hannibal002/SkyHanni/pull/5178)
 + Added the ability to move and scale the Action Bar in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
 + Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
++ Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
++ Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 
 </details>
 <details open><summary>

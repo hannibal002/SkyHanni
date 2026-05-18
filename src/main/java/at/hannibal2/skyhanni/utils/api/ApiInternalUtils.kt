@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.json.fromJson
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -69,7 +68,7 @@ object ApiInternalUtils {
 
     @PublishedApi
     internal val httpClient: CloseableHttpClient = HttpClients.custom()
-        .setUserAgent("SkyHanni/${SkyHanniMod.VERSION}-${PlatformUtils.MC_VERSION}")
+        .setUserAgent(SkyHanniMod.userAgent)
         .setDefaultHeaders(defaultHeaders)
         .setDefaultRequestConfig(gatedConnectionConfig)
         .useSystemProperties()
@@ -242,7 +241,7 @@ object ApiInternalUtils {
             val raw = if (tryForceGzip) GZIPInputStream(this.content) else this.content
             val text = raw.bufferedReader(StandardCharsets.UTF_8).use { it.readText() }
             if (text.isBlank()) null
-            else ConfigManager.Companion.gson.fromJson<T>(text)
+            else ConfigManager.gson.fromJson<T>(text)
         }.getOrNull()
     }
     // </editor-fold>

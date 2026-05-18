@@ -2,9 +2,7 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.GardenBpsTrackerConfig.GardenUptimeDisplayText
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -32,7 +30,7 @@ object GardenBpsTracker {
         { it.garden.gardenBpsTracker },
         { drawDisplay(it) },
         customUptimeControl = true,
-        trackerConfig = { config.perTrackerConfig }
+        trackerConfig = { config.perTrackerConfig },
     )
 
     class TimedData : TimedTrackerData<Data>({ Data() })
@@ -44,9 +42,7 @@ object GardenBpsTracker {
 
     @HandleEvent
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         blockBreaksLastFiveTicks++
-
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -58,7 +54,7 @@ object GardenBpsTracker {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRender() {
         if (!isEnabled()) return
         tracker.renderDisplay(config.pos)
     }

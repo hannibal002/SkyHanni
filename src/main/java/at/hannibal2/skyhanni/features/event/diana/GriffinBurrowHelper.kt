@@ -587,7 +587,7 @@ object GriffinBurrowHelper {
     private fun isEnabled() = DianaApi.isDoingDiana()
 
     private fun setTestBurrow(arg: String) {
-        if (!IslandType.HUB.isCurrent()) {
+        if (!IslandType.HUB.isInIsland()) {
             ChatUtils.userError("You can only create test burrows on the hub island!")
             return
         }

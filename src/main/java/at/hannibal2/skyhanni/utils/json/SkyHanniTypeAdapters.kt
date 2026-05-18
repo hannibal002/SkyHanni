@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.features.misc.update.ModrinthVersionType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.MCVersion
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
@@ -161,13 +163,17 @@ enum class SkyHanniTypeAdapters(
         ModVersion::class.java,
         SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString),
     ),
+    MC_VERSION(
+        MCVersion::class.java,
+        SimpleStringTypeAdapter(MCVersion::asString, MCVersion::fromString),
+    ),
     ELITE_LEADERBOARD_TYPE(
         EliteLeaderboardType::class.java,
         EliteLeaderboardTypeAdapter(),
     ),
     TRACKER_DISPLAY_MODE(
         SkyHanniTracker.DefaultDisplayMode::class.java,
-        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>(),
     ),
     TIME_MARK(
         SimpleTimeMark::class.java,
@@ -260,6 +266,10 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     GRAPH(Graph::class.java, Graph.typeAdapter),
+    MODRINTH_VERSION_TYPE(
+        ModrinthVersionType::class.java,
+        SimpleStringTypeAdapter.forEnum<ModrinthVersionType>(),
+    ),
 }
 
 @Suppress("UNCHECKED_CAST")

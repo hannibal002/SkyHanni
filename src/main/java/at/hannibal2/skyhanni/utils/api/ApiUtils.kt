@@ -126,7 +126,7 @@ object ApiUtils {
         disabledApis = event.getConstant<DisabledApiJson>("misc/DisabledApi")
     }
 
-    fun isMoulberryLowestBinDisabled() = disabledApis?.disabledMoulberryLowestBin == true
+    fun isLowestBinApiDisabled() = disabledApis?.disabledEliteLbin == true
     fun isHypixelItemsDisabled() = disabledApis?.disableHypixelItems == true
     fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
 
