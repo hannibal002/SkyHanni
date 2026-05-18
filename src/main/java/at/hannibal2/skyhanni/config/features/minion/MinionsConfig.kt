@@ -69,4 +69,9 @@ class MinionsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var infernoFuelBlocker: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Inferno Minion Profit Tracker", desc = "")
+    @Accordion
+    val infernoProfitTracker: InfernoProfitTrackerConfig = InfernoProfitTrackerConfig()
 }

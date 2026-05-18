@@ -519,8 +519,11 @@ object IslandGraphs {
 
     private fun getGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
 
+    fun nodeOrNull(nodeName: String, nodeTag: GraphNodeTag): GraphNode? =
+        getGraph().getClosestNode(nodeName, nodeTag)
+
     fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
-        getGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
+        nodeOrNull(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
 
     fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
         getGraph().getNodesWithNameAndTags(nodeName, nodeTag)

@@ -36,7 +36,7 @@ class FilterTypesConfig {
     @ConfigOption(
         name = "Hypixel Lobbies",
         desc = "Hide announcements in Hypixel lobbies " +
-            "(player joins, loot boxes, prototype lobby messages, radiating generosity, Hypixel tournaments)"
+            "(player joins, loot boxes, prototype lobby messages, radiating generosity, Hypixel tournaments)",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -186,6 +186,12 @@ class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var teleportPads: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Master Chef Ted", desc = "Hide annoying messages about Kernals getting added to your purse while farming.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var masterChef: Boolean = false
 
     // TODO remove
     @Expose

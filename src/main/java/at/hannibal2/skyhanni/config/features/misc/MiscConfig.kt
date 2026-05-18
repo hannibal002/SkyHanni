@@ -158,6 +158,11 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(name = "Boop Party", desc = "")
+    @Accordion
+    val boopParty: BoopPartyConfig = BoopPartyConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -206,6 +211,11 @@ class MiscConfig {
     @ConfigOption(name = "Crash on Death", desc = "Crashes your game every time you die in SkyBlock")
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigEditorBoolean
+    var crashOnTttFail: Boolean = false
 
     @Expose
     @ConfigOption(

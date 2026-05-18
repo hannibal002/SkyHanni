@@ -32,7 +32,7 @@ object RecipeAchievement {
             "Unlock all the Recipes".asComponent(),
             50f,
             false,
-            listOf(50, 70, 90, 100),
+            listOf(50, 70, 90, 99),
         )
         event.register(achievement, RECIPE_ACHIEVEMENT)
     }
