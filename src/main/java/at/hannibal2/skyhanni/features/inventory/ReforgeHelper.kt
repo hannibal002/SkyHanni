@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,36 +48,46 @@ object ReforgeHelper {
 
     private val patternGroup = RepoPattern.group("reforge")
 
-    private val reforgeMenu by patternGroup.pattern(
+    // <editor-fold desc="Patterns">
+    private val reforgeMenuPattern by patternGroup.pattern(
         "menu.blacksmith",
         "Reforge Item",
     )
-    private val reforgeHexMenu by patternGroup.pattern(
+
+    private val reforgeHexMenuPattern by patternGroup.pattern(
         "menu.hex",
         "The Hex ➜ Reforges",
     )
 
-    /**
-     * REGEX-TEST: §aYou reforged your §r§9Gentle Dreadlord Sword §r§ainto a §r§9Heroic Dreadlord Sword§r§a!
-     */
-    private val reforgeChatMessage by patternGroup.pattern(
-        "chat.success",
-        "§aYou reforged your .* §r§ainto a .*!|§aYou applied a .* §r§ato your .*!",
+    private val clickToReforgePattern by patternGroup.pattern(
+        "lore.click-to-reforge",
+        "Click to reforge!",
     )
 
     /**
-     * REGEX-TEST: §cWait a moment before reforging again!
+     * REGEX-TEST: You reforged your Gentle Dreadlord Sword into a Heroic Dreadlord Sword!
+     * REGEX-TEST: You applied a Recombobulator 3000 to your Heroic Dreadlord Sword!
      */
-    private val reforgeChatFail by patternGroup.pattern(
-        "chat.fail",
-        "§cWait a moment before reforging again!|§cWhoa! Slow down there!",
+    private val reforgeChatSuccessPattern by patternGroup.pattern(
+        "chat.success.colorless",
+        "You reforged your .+ into an? .+!|You applied an? .+ to your .+!",
     )
+
+    /**
+     * REGEX-TEST: Wait a moment before reforging again!
+     * REGEX-TEST: Whoa! Slow down there!
+     */
+    private val reforgeChatFailPattern by patternGroup.pattern(
+        "chat.fail.colorless",
+        "Wait a moment before reforging again!|Whoa! Slow down there!",
+    )
+    // </editor-fold>
 
     private var isInReforgeMenu = false
     private var isInHexReforgeMenu = false
 
-    private fun isReforgeMenu(chestName: String) = reforgeMenu.matches(chestName)
-    private fun isHexReforgeMenu(chestName: String) = reforgeHexMenu.matches(chestName)
+    private fun isReforgeMenu(chestName: String) = reforgeMenuPattern.matches(chestName)
+    private fun isHexReforgeMenu(chestName: String) = reforgeHexMenuPattern.matches(chestName)
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && isInReforgeMenu
 
@@ -128,7 +136,8 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            if (event.slot.item?.getLoreComponent()?.last()?.string != "Click to reforge!") return
+            val lastLine = event.slot.item?.getLoreComponent()?.lastOrNull()?.string
+            if (!clickToReforgePattern.matches(lastLine)) return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -160,8 +169,9 @@ object ReforgeHelper {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
+        val message = event.cleanMessage
         when {
-            reforgeChatMessage.matches(event.message) -> {
+            reforgeChatSuccessPattern.matches(message) -> {
                 DelayedRun.runDelayed(2.ticks) {
                     itemUpdate()
                     waitForChat.set(false)
@@ -171,7 +181,7 @@ object ReforgeHelper {
                 }
             }
 
-            reforgeChatFail.matches(event.message) -> {
+            reforgeChatFailPattern.matches(message) -> {
                 DelayedRun.runDelayed(2.ticks) {
                     waitForChat.set(false)
                 }
@@ -207,7 +217,7 @@ object ReforgeHelper {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         if (!isInReforgeMenu) return
         isInReforgeMenu = false
         isInHexReforgeMenu = false
@@ -377,7 +387,7 @@ object ReforgeHelper {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!isEnabled()) return
         config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
@@ -393,10 +403,13 @@ object ReforgeHelper {
     }
 
     @HandleEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn() {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {
-                colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
+                colorReforgeStone(
+                    hoverColor,
+                    hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge",
+                )
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
             }

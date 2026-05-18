@@ -1,18 +1,24 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.InternalNameArgumentType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -45,7 +51,11 @@ object EquipmentApi {
 
     fun getAll(): List<ItemStack> = equipment?.filterNotNull() ?: emptyList()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) = equipment?.set(slot.ordinal, itemStack)
+    private fun setEquipment(slot: EquipmentSlot, itemStack: ItemStack?) {
+        val equipment = equipment ?: return
+        equipment[slot.ordinal] = itemStack
+        SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
+    }
 
     private val repoGroup = RepoPattern.group("data.equipment")
 
@@ -92,7 +102,21 @@ object EquipmentApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shspoofequipment") {
+            description = "Spoofs a SkyBlock equipment slot."
+            category = CommandCategory.DEVELOPER_TEST
+
+            arg("slot", EnumArgumentType.name<EquipmentSlot>()) { slot ->
+                argCallback("internalName", InternalNameArgumentType.internalName()) { internalName ->
+                    setEquipment(getArg(slot), internalName.getItemStack())
+                }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Equipment")
         event.addIrrelevant {
             val storage = storage ?: run {
