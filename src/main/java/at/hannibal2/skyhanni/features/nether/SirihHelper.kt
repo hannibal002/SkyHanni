@@ -22,18 +22,20 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SirihHelper {
 
+    private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
+
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
-    private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
-
     /**
-     * REGEX-TEST: §e[NPC] §dSirih§f: §rOink.
+     * REGEX-TEST: [NPC] Sirih: Oink.
+     * REGEX-TEST: [NPC] Sirih: ✆ Oink?
+     * REGEX-TEST: [NPC] Sirih: ✆ Oink.
      */
     private val sirihLine by RepoPattern.pattern(
-        "crimson.sirih.helper",
-        "§e\\[NPC] §dSirih§f: §rOink\\.",
+        "crimson.sirih.helper.colorless",
+        "\\[NPC] Sirih:(?: ✆)? Oink.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)

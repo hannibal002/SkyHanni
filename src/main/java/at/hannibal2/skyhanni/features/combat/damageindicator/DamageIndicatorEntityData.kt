@@ -28,5 +28,6 @@ class DamageIndicatorEntityData(
 
     val entity get() = mob.baseEntity
 
-    val timeToKill by lazy { foundTime.passedSince().format(TimeUnit.SECOND, showMilliSeconds = true) }
+    val timeToKill by lazy { foundTime.passedSince() }
+    val timeToKillString by lazy { timeToKill.format(TimeUnit.SECOND, showMilliSeconds = true) }
 }
