@@ -126,6 +126,11 @@ object ProfileStorageData {
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
+            if (HypixelData.profileName.isNotEmpty()) {
+                ChatUtils.debug("Profile widget missing but we already got profile name, skipping warning")
+                noTabListTime = SimpleTimeMark.farPast()
+                return
+            }
             ChatUtils.clickableChat(
                 "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +
                     "is enabled and visible.",
