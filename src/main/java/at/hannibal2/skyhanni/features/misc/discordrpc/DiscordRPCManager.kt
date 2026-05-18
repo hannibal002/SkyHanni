@@ -60,7 +60,7 @@ object DiscordRPCManager {
     private var retryJob: Job? = null
     private var lastDebugInfo: Map<String, String> = emptyMap()
 
-    private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
+    private val repoReloadCoroutine = CoroutineSettings("discord RPC manager repo reload")
     private val startCoroutine = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
     private val presenceCoroutine = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
     private val stopCoroutine = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
