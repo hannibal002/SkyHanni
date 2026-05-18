@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
@@ -320,7 +321,7 @@ object ItemUtils {
         }
         val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
             "ULTIMATE_ULTIMATE_",
-            "ULTIMATE_"
+            "ULTIMATE_",
         )
         return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -423,32 +424,53 @@ object ItemUtils {
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
+                val category = (groupOrNull("itemCategory") ?: "").replace(" ", "_")
+                val rarity = group("rarity").replace(" ", "_")
+                category to rarity
             } ?: continue
 
-            val itemCategory = getItemCategory(category, hoverName.formattedTextCompatLeadingWhiteLessResets(), cleanName)
+            val name = hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val itemCategory = getItemCategory(category, name, cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
+                    "Could not read category for item $name",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to category,
                     "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
+            } else {
+                if (itemCategory in ItemCategory.deprecated) {
+                    ErrorManager.logErrorStateWithData(
+                        "Item category $itemCategory for item $name is outdated",
+                        "ItemCategory $itemCategory is deprecated",
+                        "item category" to itemCategory,
+                        "internal name" to getInternalName(),
+                        "item name" to name,
+                        "inventory name" to InventoryUtils.openInventoryName(),
+                        "pattern result" to category,
+                        "lore" to cleanLore,
+                        betaOnly = true,
+                    )
+                }
             }
             if (itemRarity == null) {
+                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read rarity for item name().formattedTextCompatLeadingWhiteLessResets()",
+                    "Could not read rarity for item $name",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern" to pattern,
                     "pattern result" to rarity,
                     "lore" to cleanLore,
                     betaOnly = true,
@@ -462,7 +484,7 @@ object ItemUtils {
     }
 
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
-        if (itemCategory.isEmpty()) when {
+        if (itemCategory.isEmpty() || itemCategory == "ITEM") when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
