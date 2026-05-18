@@ -52,7 +52,6 @@ object StatOverlay {
                 element
             }
         }
-        val blar = configList
     }
 }
 
