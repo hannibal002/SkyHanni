@@ -55,7 +55,7 @@ object DelayedRun {
                 try {
                     block()
                 } catch (e: Exception) {
-                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing")
+                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing: ${e.message}")
                 }
             }
             inPast

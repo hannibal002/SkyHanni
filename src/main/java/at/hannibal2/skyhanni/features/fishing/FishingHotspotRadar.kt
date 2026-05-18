@@ -73,6 +73,7 @@ object FishingHotspotRadar {
         }
     }
 
+    // Do NOT use IslandTypeTag.FISHING_HOTSPOT here. we want to solely depend on the repo data, not on hard coded enums
     private fun pathFind(location: LorenzVec) {
         if (!config.guessHotspotRadarPathFind) return
 
