@@ -430,7 +430,7 @@ object DamageIndicatorManager {
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
                 if (entityData.bossType.isSlayer && config.timeToKillSlayer) {
-                    entityData.nameAbove = "§e${entityData.timeToKill}"
+                    entityData.nameAbove = "§e${entityData.timeToKillString}"
                 }
                 "§cDead"
             } else {
