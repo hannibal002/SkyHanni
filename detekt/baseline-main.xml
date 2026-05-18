@@ -142,7 +142,6 @@
     <ID>NoUnusedImports:CarnivalQuickStart.kt:at.hannibal2.skyhanni.features.event.carnival.CarnivalQuickStart.kt</ID>
     <ID>NoUnusedImports:CarnivalShopHelper.kt:at.hannibal2.skyhanni.features.inventory.CarnivalShopHelper.kt</ID>
     <ID>NoUnusedImports:ChumBucketHider.kt:at.hannibal2.skyhanni.features.fishing.ChumBucketHider.kt</ID>
-    <ID>NoUnusedImports:CollectionTracker.kt:at.hannibal2.skyhanni.features.misc.CollectionTracker.kt</ID>
     <ID>NoUnusedImports:CraftMaterialCollector.kt:at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialCollector.kt</ID>
     <ID>NoUnusedImports:ExcavatorTooltipHider.kt:at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorTooltipHider.kt</ID>
     <ID>NoUnusedImports:FavoritePowerStone.kt:at.hannibal2.skyhanni.features.inventory.FavoritePowerStone.kt</ID>

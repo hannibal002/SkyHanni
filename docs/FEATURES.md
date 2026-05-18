@@ -1381,7 +1381,6 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show all commands in SkyHanni
 + **/wiki <search term>** - using unofficial wiki instead of official wiki.
 + **/shmarkplayer <player>** - marking a player with yellow color.
-+ **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a
   particular item based on the current crop speed.
