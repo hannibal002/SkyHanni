@@ -65,10 +65,10 @@ object ActiveBossTransparency {
 
             val category = mob.category
             if (category == MobCategory.SLAYER) {
-                // hide own slayer boss
+                // always show own slayer boss
                 if (mob.belongsToPlayer()) return
 
-                // hide carry boss
+                // always show carried bosses
                 if (CarryTracker.isCustomer(mob.ownerNameOrEmpty)) return
 
             }
@@ -80,7 +80,6 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return
             }
-            if (category == MobCategory.PLAYER && !config.applyToPlayers) return
         }
 
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)
