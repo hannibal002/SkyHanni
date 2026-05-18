@@ -3,20 +3,27 @@ package at.hannibal2.skyhanni.features.garden.sensitivity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.garden.sensitivity.SensitivityReducer.REDUCING_FACTOR_HARD_BOUNDS
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object MouseSensitivityManager {
+
     private val config get() = SkyHanniMod.feature.garden.sensitivityReducer
 
-    private var lastIn: Float = Float.NaN
-    private var lastOut: Float = Float.NaN
+    private var lastIn = Float.NaN
+    private var lastOut = Float.NaN
 
     var state: SensitivityState = SensitivityState.UNCHANGED
         set(value) {
             field = value
             destroyCache()
         }
+
+    private fun reduceTransform(f: Float): Float {
+        val reducingFactor = config.reducingFactor.get().coerceIn(REDUCING_FACTOR_HARD_BOUNDS)
+        return ((f + 1f / 3f) / reducingFactor) - 1f / 3f
+    }
 
     fun getSensitivity(original: Float): Float {
         if (original != lastIn) {
@@ -33,7 +40,7 @@ object MouseSensitivityManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mouse Sensitivity")
 
         if (SensitivityState.UNCHANGED.isActive()) {
@@ -51,16 +58,8 @@ object MouseSensitivityManager {
     ) {
         UNCHANGED({ it }),
         LOCKED({ _ -> -1f / 3f }),
-        AUTO_REDUCED(
-            {
-                ((it + 1f / 3f) / config.reducingFactor.get()) - 1f / 3f
-            },
-        ),
-        MANUAL_REDUCED(
-            {
-                ((it + 1f / 3f) / config.reducingFactor.get()) - 1f / 3f
-            },
-        ),
+        AUTO_REDUCED(::reduceTransform),
+        MANUAL_REDUCED(::reduceTransform),
         ;
 
         fun apply(original: Float): Float = transform(original)

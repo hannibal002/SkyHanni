@@ -33,6 +33,8 @@ object PlayerDeathMessages {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onAllowPlayerDeath(event: PlayerDeathEvent.Allow) {
+        if (event.isSelf) return
+
         val lastTime = lastTimePlayerSeen[event.name] ?: SimpleTimeMark.farPast()
         val time = lastTime.passedSince() > 30.seconds
 

@@ -5,6 +5,7 @@ import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.task.RemapSourcesJarTask
+import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -29,11 +30,6 @@ val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
-    // possible candidate. Some DCEVMs are however incompatible with some things Gradle is doing,
-    // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
-    // IntelliJ run configuration.
-    toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -163,6 +159,9 @@ dependencies {
     // Calculator
     includeImplementation(libs.keval)
 
+    // Repo mgmt
+    includeImplementation(libs.jgit)
+
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
@@ -198,8 +197,7 @@ tasks.withType(Test::class) {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.0"
-            enableLanguageFeature("BreakContinueInInlineLambdas")
+            languageVersion = "2.2"
         }
     }
 }
@@ -241,7 +239,7 @@ if (target == ProjectTarget.MODERN_12110) {
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
-        useXVFB = true
+        useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
     }
     loom.runs.removeIf { it.name == "clientGameTest" }
 }
@@ -264,7 +262,15 @@ excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 tasks.withType<KotlinCompile> {
     compilerOptions {
         jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
-        freeCompilerArgs.addAll("-Xbackend-threads=0")
+        optIn.addAll(
+            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+        )
+        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+        // leaving corrupt .class files that break subsequent incremental builds.
+        // see: https://youtrack.jetbrains.com/issue/KT-85498/
+        freeCompilerArgs.addAll(
+            "-Xbackend-threads=1",
+        )
     }
 }
 
@@ -394,6 +400,11 @@ tasks.withType<RemapSourcesJarTask>().configureEach {
 
 tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.configureEach {
     enabled = false
+}
+
+tasks.withType<ValidateAccessWidenerTask>().configureEach {
+    // This must be explicitly declared because of configuration cache shenanigans
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {

@@ -128,6 +128,7 @@ enum class SkyblockStat(
     SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
     MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune $VALUE_PATTERN"),
     WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune $VALUE_PATTERN"),
+    OVERBLOOM("§e☀", "", " *(?:§7§m|§e)☀ Overbloom $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",

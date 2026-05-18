@@ -28,5 +28,5 @@ object ScoreboardEventDarkAuction : ScoreboardEvent() {
         ScoreboardPattern.darkAuctionCurrentItemPattern,
     )
 
-    override fun showIsland() = IslandType.DARK_AUCTION.isCurrent()
+    override fun showIsland() = IslandType.DARK_AUCTION.isInIsland()
 }

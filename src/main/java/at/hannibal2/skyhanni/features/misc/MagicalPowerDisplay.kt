@@ -130,5 +130,5 @@ object MagicalPowerDisplay {
         return this.getItemRarityOrNull()
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && !IslandType.THE_RIFT.isCurrent() && config.enabled
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && !IslandType.THE_RIFT.isInIsland() && config.enabled
 }
