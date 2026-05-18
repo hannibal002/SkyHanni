@@ -66,6 +66,7 @@
     + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
 + Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
 + Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
++ Hide annoying messages about Kernels getting added to your purse while farming. - Shana (https://github.com/hannibal002/SkyHanni/pull/5679)
 
 #### Chat
 
@@ -137,12 +138,15 @@
 + Improved Sirih Helper to also work when clicking Sirih with an Abiphone while in Pig form. - Luna (https://github.com/hannibal002/SkyHanni/pull/5586)
 + Added Boop Party for non-Bingo Profiles. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5570)
 + Changed the in-game auto-updater to not auto-update anything, rather suggest to manually update from Modrinth. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5617)
++ Changed 400th Anniversary Celebration to Century Celebration. - Shana (https://github.com/hannibal002/SkyHanni/pull/5660)
 
 #### Garden
 
 + Changed Duplicate Location Markers to no longer show after all Hoppity Egg locations on the island are found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5395)
 + Renamed Farming Weight's EliteBot display name to Elite SkyBlock. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5409)
 + Added options to use custom keybinds in the Garden while holding a Squeaky Mousemat or a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
++ Added Harvest Feast rare drops and other missing rare crops to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
++ Refactored Armor Drop Tracker to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
 
 #### Combat
 
@@ -151,6 +155,10 @@
 #### Rift
 
 + Improved Berberis Helper by using the respawn sequence. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/5615)
+
+#### Inventory
+
++ Added support for Turbo-Crop VI and VII in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5666)
 
 ### Fixes
 
@@ -172,6 +180,11 @@
 + Fixed normal Attack/Destroy key still triggering inputs with Garden Custom Keybinds active. - Luna (https://github.com/hannibal002/SkyHanni/pull/5638)
 + Fixed Pest Cooldown Timer saying Unknown when the timer was ready. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5632)
 + Fixed Armor Drop Tracker not tracking rare crop drops. - Rain
++ Fixed Copper not appearing in the Custom Scoreboard before finishing the Garden Tutorial Quests. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Fixed issues with keys not registering and keys getting stuck with Garden Custom Keybinds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5656)
++ Fixed Lunar Moth pest not being recognized. - Luna (https://github.com/hannibal002/SkyHanni/pull/5678)
++ Fixed Plot Border Key activating when in chat or other GUIs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5691)
++ Fixed Sowdust not appearing in the Custom Scoreboard when breaking crops. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
 
 #### Combat
 
@@ -230,6 +243,7 @@
 + Updated Shiny Orb Tracker to work after Shiny Shard rename to Shiny Token. - Luna (https://github.com/hannibal002/SkyHanni/pull/5518)
 + Fixed errors about Alixer and Bingo NPC in chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/5508)
 + Fixed Easter Egg waypoint not working. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
++ Fixed an error being thrown on Zombie Shootout ending due to mob despawn. - Rain (https://github.com/hannibal002/SkyHanni/pull/5670)
 
 #### Fishing
 
@@ -258,6 +272,7 @@
 + Fixed holographs not appearing in Crafting Room Helper. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
 + Fixed Dance Room Helper getting out of sync. - Luna (https://github.com/hannibal002/SkyHanni/pull/5433)
   + It should now remain accurate even if the server is lagging.
++ Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 
 #### Inventory
 
@@ -325,6 +340,14 @@
     * The mod won't write to config anymore when on Alpha, removing data sync/overwriting errors between Alpha and prod.
 + Adjusted Trapper Cooldown to permanently use the lower cooldown now that Pelt-pocalypse is permanent. - Luna
 + Fixed support for Finnegan's new Grand Feast mayor perk. - Luna
++ Added thousands separators in SkyHanni User Luck. - BrookeAFK (https://github.com/hannibal002/SkyHanni/pull/5682)
++ Fixed "Cannot read profile name from tab list" warning showing even if we already know the profile name. - Luna (https://github.com/hannibal002/SkyHanni/pull/5703)
+  Fixed compatibility with other mods detecting commands sent from skyhanni to the server as chat messages. - skies-starred
++ Fixed error getting item category on items that have no category. - Luna (https://github.com/hannibal002/SkyHanni/pull/5655)
++ Fixed error in Discord RPC that can sometimes happen when starting the game or switching lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/5676)
++ Fixed some skulls/helmets glowing through walls when they shouldn't. - Luna (https://github.com/hannibal002/SkyHanni/pull/5700)
++ Fixed Trapper cooldown registering as ready 5 seconds early. - Stella (https://github.com/hannibal002/SkyHanni/pull/5659)
++ Fixed updater suggesting downgrades in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/5667)
 
 #### Commands
 
@@ -536,6 +559,11 @@
 + Renamed `BlockClickEvent.getBlockState` to `BlockClickEvent.blockState` to avoid implying it's a method. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
 + Split deprecated `TELEPORT` graph node tag into `WARP`, `JUMP_PAD`, and `TELEPORT_PAD`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5621)
 + Added Copy Cosmetic Skull Data feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5627)
++ Added a copilot-instructions.md file to disable GitHub Copilot from commenting on PRs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5713)
++ Added SOWDUST to TabWidget enum. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Banned AI-generated code in PRs via CONTRIBUTING.md. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5713)
++ Disabled Spirit Scepter Bat mob detection rule because it is unused and has a very high false-positive rate. - Luna (https://github.com/hannibal002/SkyHanni/pull/5634)
++ Fixed COPPER entry of TabWidget enum only allowing digits. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
 
 ### Removed Features
 

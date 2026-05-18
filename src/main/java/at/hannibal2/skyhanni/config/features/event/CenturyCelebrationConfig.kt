@@ -6,7 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class AnniversaryCenturyCelebrationConfig {
+class CenturyCelebrationConfig {
 
     @ConfigOption(
         name = "Daily Highlight",
