@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,17 +12,10 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
-//~ if < 26.1 '.v1.level.LevelRenderContext' -> '.v1.world.WorldRenderContext'
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderContext
-//~if < 26.1 '.v1.level.LevelRenderEvents' -> '.v1.world.WorldRenderEvents'
-import net.fabricmc.fabric.api.client.rendering.v1.level.LevelRenderEvents
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.resources.Identifier
-//? if >= 26.1
-import at.hannibal2.skyhanni.utils.compat.getRenderState
 
 @SkyHanniModule
 object RenderEvents {
@@ -41,23 +33,6 @@ object RenderEvents {
                 //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
                 ctx.bufferSource()
             )
-        }
-
-        // makes the lines render weird idk
-        //~ if < 26.1 'LevelRenderEvents' -> 'WorldRenderEvents'
-        //~ if < 26.1 'LevelRenderContext' -> 'WorldRenderContext'
-        LevelRenderEvents.END_MAIN.register { event: LevelRenderContext ->
-            //~ if < 26.1 '.bufferSource()' -> '.consumers() as? MultiBufferSource.BufferSource ?: return@register'
-            val immediateVertexConsumers = event.bufferSource()
-            //~ if < 26.1 '.poseStack()' -> '.matrices()'
-            val stack = event.poseStack()
-            SkyHanniRenderWorldEvent(
-                stack,
-                //~ if < 26.1 'mainCamera.getRenderState()' -> 'mainCamera'
-                event.gameRenderer().mainCamera.getRenderState(),
-                immediateVertexConsumers,
-                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks,
-            ).post()
         }
     }
 
