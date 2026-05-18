@@ -6,10 +6,13 @@ import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -20,6 +23,7 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -27,6 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object GardenCustomKeybinds {
 
     private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
+    private val SUNS_GRASP = "SUNS_GRASP".toInternalName()
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
@@ -170,10 +175,15 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
-    private fun isHoldingTool() = InventoryUtils.getItemInHand()?.getInternalNameOrNull()?.let { heldItem ->
-        heldItem.isFarmingTool() ||
-            (config.mousemat && heldItem == SQUEAKY_MOUSEMAT) ||
-            (config.fishingRod && heldItem.isFishingRod())
+    private fun isHoldingTool(): Boolean = InventoryUtils.getItemInHand()?.let { heldItem ->
+        val internalName = heldItem.getInternalName()
+
+        val wearingSunsGrasp = EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP
+
+        return internalName.isFarmingTool() ||
+            (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+            (config.fishingRod && internalName.isFishingRod()) ||
+            (config.sunsGrasp && wearingSunsGrasp && heldItem.item == Items.AIR)
     } ?: false
 
     private fun isActive(): Boolean =

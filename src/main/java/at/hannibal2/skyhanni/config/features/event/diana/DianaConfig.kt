@@ -179,4 +179,13 @@ class DianaConfig {
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
     val mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Mute Bugged Spade Sounds",
+        desc = "Stops the spade from occasionally playing low-pitched Minecraft music.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteBuggedSpade: Boolean = true
 }

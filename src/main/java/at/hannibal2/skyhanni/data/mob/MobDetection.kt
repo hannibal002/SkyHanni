@@ -258,9 +258,10 @@ object MobDetection {
     @HandleEvent
     fun onEntityHealthUpdateEvent(event: EntityHealthUpdateEvent) {
         when {
-            event.entity is Bat && event.health == 6 -> {
+            // Very high false positive rate
+            /*event.entity is Bat && event.health == 6 -> {
                 entityFromPacket.add(EntityPacketType.SPIRIT_BAT to event.entity.id)
-            }
+            }*/
 
             event.entity is Villager && event.health != 20 -> {
                 entityFromPacket.add(EntityPacketType.VILLAGER to event.entity.id)
