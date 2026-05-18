@@ -5,7 +5,11 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
-@Mixin(SubmitNodeStorage.ItemSubmit.class)
+@Mixin({
+    SubmitNodeStorage.ItemSubmit.class,
+    SubmitNodeStorage.ModelSubmit.class,
+    SubmitNodeStorage.ModelPartSubmit.class,
+})
 public class MixinItemCommand implements GlowingStateStore {
 
     @Unique

@@ -150,7 +150,7 @@ object CarnivalZombieShootout {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled() || !config.lampTimer) return
 
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
@@ -236,6 +236,7 @@ object CarnivalZombieShootout {
         EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+            if (helmet.item == Items.AIR) return@mapNotNull null
             val type = toType(helmet) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not identify Zombie Shootout type",

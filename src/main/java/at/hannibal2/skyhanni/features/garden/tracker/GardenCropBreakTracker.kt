@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -50,7 +49,6 @@ object GardenCropBreakTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {
@@ -62,7 +60,7 @@ object GardenCropBreakTracker {
         val fortune = storage?.latestTrueFarmingFortune?.get(event.crop) ?: return
         addToCropMap(
             event.crop,
-            ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt()
+            ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt(),
         )
     }
 

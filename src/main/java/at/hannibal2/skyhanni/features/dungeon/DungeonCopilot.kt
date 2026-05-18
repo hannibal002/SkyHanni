@@ -13,8 +13,10 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -46,19 +48,19 @@ object DungeonCopilot {
         "(.*) §r§ehas obtained §r§a§r§[6c]§r§[8c](?<key>Wither|Blood) Key§r§e!".toPattern(),
     )
 
-    private var nextStep = ""
+    private var nextStep: Renderable? = null
     private var searchForKey = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
-        copilot(event.message)?.let {
+        handleChatMessage(event.message)?.let {
             event.blockedReason = it
         }
     }
 
-    private fun copilot(message: String): String? {
+    private fun handleChatMessage(message: String): String? {
         countdownPattern.matchMatcher(message) {
             changeNextStep("Ready up")
         }
@@ -94,7 +96,7 @@ object DungeonCopilot {
 
         if (message == "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.") {
             if (DungeonApi.getCurrentBoss() == DungeonFloor.E) {
-                changeNextStep("")
+                changeNextStep()
             } else {
                 changeNextStep("Enter Boss Room")
             }
@@ -103,8 +105,8 @@ object DungeonCopilot {
         return null
     }
 
-    private fun changeNextStep(step: String) {
-        nextStep = step
+    private fun changeNextStep(step: String? = null) {
+        nextStep = step?.let { Renderable.text(it) }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
@@ -142,16 +144,14 @@ object DungeonCopilot {
 
     @HandleEvent
     fun onWorldChange() {
-        changeNextStep("")
+        changeNextStep()
     }
 
-    private fun isEnabled(): Boolean = DungeonApi.inDungeon() && config.enabled
-
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-
-        config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
+        if (!config.enabled) return
+        val nextStep = nextStep ?: return
+        config.pos.renderRenderable(nextStep, posLabel = "Dungeon Copilot")
     }
 
     @HandleEvent
