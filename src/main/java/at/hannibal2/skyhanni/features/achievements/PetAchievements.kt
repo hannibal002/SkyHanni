@@ -59,7 +59,8 @@ object PetAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (event.repeatSeconds(10)) return
+        if (AchievementManager.isCompleted(TURTLE_ACHIEVEMENT)) return
+        if (!event.repeatSeconds(10)) return
         val pets = ProfileStorageData.petProfiles?.pets ?: return
         if (InventoryUtils.getHelmet()?.getInternalNameOrNull() != SLIME_HAT) return
         for (pet in pets) {
