@@ -5,10 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -100,12 +96,12 @@ object FruitBowlFeatures {
     )
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         highlightedPlayers.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange() {
         if (!config.display && !config.playerHighlighter) return
 
         namesMissing = updateNamesMissing()
@@ -129,7 +125,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    fun onTick() {
         if (!config.playerHighlighter) return
         for (mob in MobData.players) {
             if (mob !in highlightedPlayers) {
@@ -223,7 +219,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(canColor, canNotColor) {
                 if (playerHighlighter) {

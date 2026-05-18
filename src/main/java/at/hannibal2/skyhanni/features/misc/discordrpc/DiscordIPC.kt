@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.utils.ChatUtils
+import com.google.gson.JsonObject
 import java.io.Closeable
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -44,11 +45,37 @@ class DiscordIPC(
      */
     fun connect() {
         pipe = DiscordIPCPipeManager.open(onDebugInfo)
+        ChatUtils.debug("Discord RPC: pipe opened, sending handshake")
         sendFrame(Opcode.HANDSHAKE, clientPayload)
         val (opcode, body) = readFrame()
+        ChatUtils.debug("Discord RPC: handshake response opcode=$opcode")
         if (opcode != Opcode.FRAME) throw DiscordIPCException("Expected FRAME after handshake, got $opcode. Body: $body")
+        validateReadyBody(body)
         _connected = true
         shutdownHook = Thread(::close, "discord-rpc-shutdown").also(Runtime.getRuntime()::addShutdownHook)
+    }
+
+    /**
+     * Parses the handshake response body and verifies it contains a READY event.
+     *
+     * @param body The raw JSON string received from Discord after the handshake frame.
+     * @throws DiscordIPCException If the body is not valid JSON, contains an ERROR event,
+     *   or contains an unexpected event type.
+     */
+    @Suppress("ThrowsCount")
+    private fun validateReadyBody(body: String) {
+        val obj = runCatching { gson.fromJson(body, JsonObject::class.java) }.getOrNull()
+            ?: throw DiscordIPCException("Handshake response was not valid JSON. Body: $body")
+        when (val evt = obj.get("evt")?.asString) {
+            "READY" -> return
+            "ERROR" -> {
+                val data = obj.getAsJsonObject("data")
+                val code = data?.get("code")?.asInt
+                val message = data?.get("message")?.asString ?: "unknown error"
+                throw DiscordIPCException("Handshake rejected by Discord (error $code): $message")
+            }
+            else -> throw DiscordIPCException("Expected READY event after handshake, got evt=$evt. Body: $body")
+        }
     }
 
     var lastActivityJson: String? = null
@@ -60,6 +87,11 @@ class DiscordIPC(
     /**
      * Updates the rich presence activity displayed on the user's Discord profile.
      *
+     * Writes the SET_ACTIVITY frame then reads Discord's response inline (sequentially),
+     * handling any PING frames along the way. This avoids needing a concurrent reader loop,
+     * which would deadlock on Windows where [java.io.RandomAccessFile] serializes all I/O
+     * on a single synchronous named-pipe handle.
+     *
      * @param presence The [DiscordRichPresence] to send. Null fields are omitted from the payload.
      * @throws DiscordIPCException If the client is not connected or writing to the pipe fails.
      */
@@ -67,7 +99,35 @@ class DiscordIPC(
         if (!_connected) throw DiscordIPCException("setActivity called while not connected")
         val json = gson.toJson(buildActivityPayload(presence))
         lastActivityJson = json
+        ChatUtils.debug("Discord RPC: sending SET_ACTIVITY (${json.length} bytes)")
         sendFrame(Opcode.FRAME, json)
+        ChatUtils.debug("Discord RPC: SET_ACTIVITY write complete, reading response")
+        readUntilFrame()
+    }
+
+    /**
+     * Reads frames from Discord until a non-PING frame is received or the connection closes.
+     *
+     * PING frames are answered with PONG inline. A CLOSE frame sets [isConnected] to false.
+     * Any other frame (e.g. the SET_ACTIVITY response) is stored in [lastDiscordResponse].
+     */
+    private fun readUntilFrame() {
+        while (_connected) {
+            val (opcode, body) = readFrame()
+            when (opcode) {
+                Opcode.PING -> sendFrame(Opcode.PONG, body)
+                Opcode.CLOSE -> {
+                    _connected = false
+                    ChatUtils.debug("Discord RPC: CLOSE frame received: $body")
+                    return
+                }
+                else -> {
+                    lastDiscordResponse = body
+                    ChatUtils.debug("Discord RPC: frame received (opcode=$opcode): $body")
+                    return
+                }
+            }
+        }
     }
 
     /**
@@ -83,6 +143,7 @@ class DiscordIPC(
      * The CLOSE frame itself is optional. Discord handles disconnects gracefully without it.
      */
     override fun close() {
+        ChatUtils.debug("Discord RPC: close() called, was connected=$_connected")
         shutdownHook?.let { runCatching { Runtime.getRuntime().removeShutdownHook(it) } }
         shutdownHook = null
         _connected = false
@@ -126,35 +187,6 @@ class DiscordIPC(
         } catch (e: IOException) {
             _connected = false
             throw DiscordIPCException("IPC write failed: ${e.message}", e)
-        }
-    }
-
-    /**
-     * Blocks reading frames from Discord until the connection is closed.
-     *
-     * Responds to [Opcode.PING] with [Opcode.PONG] to keep the connection alive.
-     * Returns when [isConnected] becomes false, Discord sends a CLOSE frame, or a read error occurs.
-     *
-     * Call from a background coroutine alongside the presence-update loop.
-     */
-    internal fun readerLoop() {
-        try {
-            while (_connected) {
-                val (opcode, body) = readFrame()
-                when (opcode) {
-                    Opcode.PING -> sendFrame(Opcode.PONG, body)
-                    Opcode.CLOSE -> {
-                        _connected = false
-                        ChatUtils.debug("Discord RPC CLOSE frame: $body")
-                    }
-                    else -> {
-                        lastDiscordResponse = body
-                        ChatUtils.debug("Discord RPC frame ($opcode): $body")
-                    }
-                }
-            }
-        } catch (_: DiscordIPCException) {
-            _connected = false
         }
     }
 
