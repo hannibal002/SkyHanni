@@ -168,7 +168,7 @@ enum class CropType(
         }
 
         fun BlockClickEvent.getCropType(): CropType? =
-            getBlockState.getCropType(position)
+            blockState.getCropType(position)
 
         fun getTimeFlower(): CropType {
             val time = ServerTime.dayTime % 24000
