@@ -71,6 +71,7 @@ class ChangeLogViewerScreen : SkyHanniBaseScreen() {
         DrawContextUtils.translate(-(xTranslate - 2.0), -(yTranslate - 2.0))
 
         DrawContextUtils.translate(xTranslate.toFloat(), yTranslate.toFloat() + 5)
+
         Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
             if (!ChangelogViewer.cache.containsKeys(ChangelogViewer.startVersion, ChangelogViewer.endVersion)) {
                 ChangelogViewer.shouldMakeNewList = true

@@ -8,12 +8,23 @@ import com.google.gson.annotations.Expose
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 
+/**
+ * An unlockable Achievement for doing something in game
+ *
+ * @param name Name show in Chat and /shachievements
+ * @param description Description shown when hovering over the achievement in chat
+ * @param userLuckAmount The amount of user luck gained when unlocking the achievement
+ * @param secret Secret achievements only show their name once unlocked
+ * @param tiers For achievements that require multiple completions (10, 20) would require 10 for tier 1 and 20 to fully unlock
+ * @param hidden Hidden achievements are completely hidden until unlocked
+ */
 data class Achievement(
     private val name: Component? = null,
     private val description: Component = Component.empty(),
     var userLuckAmount: Float = 0f,
-    var secret: Boolean = false,
+    var secret: Boolean = false, // Secret achievements hide the name
     var tiers: List<Int> = listOf(),
+    var hidden: Boolean = false, // Hidden achievements are hidden until found
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {

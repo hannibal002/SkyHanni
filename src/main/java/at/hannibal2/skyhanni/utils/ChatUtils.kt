@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.LinkedList
@@ -192,6 +193,7 @@ object ChatUtils {
         prefixColor: String? = null,
         oneTimeClick: Boolean = false,
         replaceSameMessage: Boolean = false,
+        messageId: Int? = null,
     ) {
         var color: Int? = null
         if (prefixColor != null) {
@@ -208,9 +210,12 @@ object ChatUtils {
             this.onClick(expireAt, oneTimeClick, onClick)
             this.hover = hover.asComponent()
         }
-
-        if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
-        else logAndSendMessage(text)
+        messageId?.let {
+            text.send(it)
+        } ?: run {
+            if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
+            else logAndSendMessage(text)
+        }
     }
 
     /**
@@ -363,7 +368,7 @@ object ChatUtils {
 
     private fun refreshChat() {
         DelayedRun.runNextTick {
-            chatGui.rescaleChat()
+            chatGui.refreshTrimmedMessages()
         }
     }
 
@@ -402,20 +407,25 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.connection.sendChat(sendQueue.poll() ?: return)
-            lastMessageSent = SimpleTimeMark.now()
+            val message = sendQueue.poll() ?: return
+            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
         }
     }
 
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                it.connection.sendChat(message)
-                lastMessageSent = SimpleTimeMark.now()
+                it.connection.dispatchMessage(message)
                 return
             }
         }
         sendQueue.add(message)
+    }
+
+    private fun ClientPacketListener.dispatchMessage(message: String) {
+        if (message.startsWith('/')) sendCommand(message.drop(1))
+        else sendChat(message)
+        lastMessageSent = SimpleTimeMark.now()
     }
 
     private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
@@ -475,6 +485,7 @@ object ChatUtils {
         message: String,
         option: KProperty0<*>,
         oneTimeClick: Boolean = false,
+        messageId: Int? = null,
     ) {
         val hint = if (SkyHanniMod.feature.chat.hideClickableHint) "" else
             "\n§e[CLICK to disable this feature]"
@@ -484,6 +495,7 @@ object ChatUtils {
             hover = "§eClick to disable this feature!",
             oneTimeClick = oneTimeClick,
             replaceSameMessage = true,
+            messageId = messageId,
         )
     }
 
@@ -498,7 +510,9 @@ object ChatUtils {
 
     var GuiMessage.fullComponent: Component
         get() = `skyhanni$getFullComponent`()
-        set(value) { `skyhanni$setFullComponent`(value) }
+        set(value) {
+            `skyhanni$setFullComponent`(value)
+        }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
