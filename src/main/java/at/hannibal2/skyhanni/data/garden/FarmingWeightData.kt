@@ -100,9 +100,7 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we only update collections on garden join
-                }
+                EliteLeaderboardMode.ALL_TIME -> {}
 
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))

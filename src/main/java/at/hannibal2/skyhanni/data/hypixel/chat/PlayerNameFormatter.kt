@@ -137,7 +137,7 @@ object PlayerNameFormatter {
         if (!isEnabled()) return
         val component = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            TextHelper.text("§d${event.direction}") {
+            TextHelper.text("§d${event.direction.text}") {
                 append(" ")
                 append(nameFormat(event.authorComponent))
                 append("§f: ")
