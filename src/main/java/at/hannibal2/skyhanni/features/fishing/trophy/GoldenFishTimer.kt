@@ -428,7 +428,7 @@ object GoldenFishTimer {
 
     private fun isGoldenFishActive() = confirmedGoldenFishEntity != null
 
-    private fun isEnabled() = config.enabled && (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile)
+    private fun isEnabled() = config.enabled && (IslandType.CRIMSON_ISLE.isInIsland() || SkyBlockUtils.isStrandedProfile)
     private fun isActive() = isEnabled() && isFishing && hasLavaRodInInventory
 
 }

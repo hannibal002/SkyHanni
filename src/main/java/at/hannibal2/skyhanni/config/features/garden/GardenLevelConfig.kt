@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class GardenLevelConfig {
+    // Todo rename to "Enabled" and "enabled"
     @Expose
     @ConfigOption(name = "Display", desc = "Show the current Garden level and progress to the next level.")
     @ConfigEditorBoolean

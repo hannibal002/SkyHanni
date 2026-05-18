@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
@@ -8,9 +9,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.world.phys.AABB
 
-enum class IslandType(private val nameFallback: String) {
+internal interface SkyHanniIslandType {
+    fun isInIsland(): Boolean
+}
+
+enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
     THE_END("The End"),
@@ -71,6 +77,10 @@ enum class IslandType(private val nameFallback: String) {
 
     @SkyHanniModule
     companion object {
+
+        fun Collection<IslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
+        private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
+
         /**
          * The maximum amount of players that can be on an island.
          */
@@ -91,23 +101,19 @@ enum class IslandType(private val nameFallback: String) {
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
         @HandleEvent(priority = HIGHEST)
-        fun onRepoReload(event: RepositoryReloadEvent) {
-            val data = event.getConstant<IslandTypeJson>("misc/IslandType")
-
-            val islandDataMap = data.islands.mapValues {
-                val island = it.value
-                val boundingBox = island.bounds?.let { bounds ->
-                    AABB(
-                        bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
-                        bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
-                    )
-                }
-
-                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers, boundingBox)
-            }
+        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+            val data = event.getConstantAsync<IslandTypeJson>("misc/IslandType")
 
             entries.forEach { islandType ->
-                islandType.islandData = islandDataMap[islandType.name]
+                islandType.islandData = data.islands[islandType.name]?.let { island ->
+                    val boundingBox = island.bounds?.let { bounds ->
+                        AABB(
+                            bounds.minX.toDouble(), 0.0, bounds.minZ.toDouble(),
+                            bounds.maxX.toDouble(), 256.0, bounds.maxZ.toDouble(),
+                        )
+                    }
+                    IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers, boundingBox)
+                }
             }
 
             maxPlayers = data.maxPlayers
@@ -115,8 +121,7 @@ enum class IslandType(private val nameFallback: String) {
         }
     }
 
-    // TODO rename to isInIsland
-    fun isCurrent() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
+    override fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
 }
 
 data class IslandData(

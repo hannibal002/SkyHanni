@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
@@ -26,19 +24,19 @@ object CosmeticFollowingLine {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 
-    private var locations = mapOf<LorenzVec, LocationSpot>()
-    private var latestLocations = mapOf<LorenzVec, LocationSpot>()
+    private var locations = LinkedHashMap<LorenzVec, LocationSpot>()
+    private val latestLocations = LinkedHashMap<LorenzVec, LocationSpot>()
 
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
     @HandleEvent
     fun onWorldChange() {
-        locations = emptyMap()
+        locations = LinkedHashMap()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.FOLLOWING_LINE])
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
         updateClose(event)
 
@@ -49,24 +47,14 @@ object CosmeticFollowingLine {
         renderFar(event, firstPerson, color)
     }
 
-    private fun renderFar(
-        event: SkyHanniRenderWorldEvent,
-        firstPerson: Boolean,
-        color: Color,
-    ) {
+    private fun renderFar(event: SkyHanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         val last7 = locations.keys.toList().takeLast(7)
         val last2 = locations.keys.toList().takeLast(2)
 
         locations.keys.zipWithNext { a, b ->
             locations[b]?.let {
-                if (firstPerson && !it.onGround && b in last7) {
-                    // Do not render the line in the face, keep more distance while the line is in the air
-                    return
-                }
-                if (b in last2 && it.time.passedSince() < 400.milliseconds) {
-                    // Do not render the line directly next to the player, prevent laggy design
-                    return
-                }
+                if (firstPerson && !it.onGround && b in last7) return
+                if (b in last2 && it.time.passedSince() < 400.milliseconds) return
                 event.draw3DLine(a, b, color, it.getWidth(), !config.behindBlocks)
             }
         }
@@ -74,17 +62,12 @@ object CosmeticFollowingLine {
 
     private fun updateClose(event: SkyHanniRenderWorldEvent) {
         val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
-
-        latestLocations = latestLocations.editCopy {
-            val locationSpot = LocationSpot(SimpleTimeMark.now(), PlayerUtils.onGround())
-            this[playerLocation] = locationSpot
-            values.removeIf { it.time.passedSince() > 600.milliseconds }
-        }
+        latestLocations[playerLocation] = LocationSpot(SimpleTimeMark.now(), PlayerUtils.onGround())
+        latestLocations.values.removeIf { it.time.passedSince() > 600.milliseconds }
     }
 
     private fun renderClose(event: SkyHanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
-
 
         latestLocations.keys.zipWithNext { a, b ->
             latestLocations[b]?.let {
@@ -97,37 +80,26 @@ object CosmeticFollowingLine {
         val millis = time.passedSince().inWholeMilliseconds
         val percentage = millis.toDouble() / (config.secondsAlive * 1000.0)
         val maxWidth = config.lineWidth
-        val lineWidth = 1 + maxWidth - percentage * maxWidth
-        return lineWidth.toInt().coerceAtLeast(1)
+        return (1 + maxWidth - percentage * maxWidth).toInt().coerceAtLeast(1)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.FOLLOWING_LINE])
     fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
 
         if (event.isMod(5)) {
-            locations = locations.editCopy { values.removeIf { it.time.passedSince() > config.secondsAlive.seconds } }
+            locations.values.removeIf { it.time.passedSince() > config.secondsAlive.seconds }
 
             // Safety check to not cause lags
-            while (locations.size > 5_000) {
-                locations = locations.editCopy { remove(keys.first()) }
-            }
+            while (locations.size > 5_000) locations.remove(locations.keys.first())
         }
 
         if (event.isMod(2)) {
             val playerLocation = LocationUtils.playerLocation().up(0.3)
-
-            locations.keys.lastOrNull()?.let {
-                if (it.distance(playerLocation) < 0.1) return
-            }
-
-            locations = locations.editCopy {
-                this[playerLocation] = LocationSpot(SimpleTimeMark.now(), PlayerUtils.onGround())
-            }
+            if (locations.keys.lastOrNull()?.distance(playerLocation)?.let { it < 0.1 } == true) return
+            locations[playerLocation] = LocationSpot(SimpleTimeMark.now(), PlayerUtils.onGround())
         }
     }
-
-    private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.FOLLOWING_LINE.isSelected()) && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

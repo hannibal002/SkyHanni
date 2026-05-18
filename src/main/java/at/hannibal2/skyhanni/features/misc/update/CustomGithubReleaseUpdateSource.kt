@@ -14,16 +14,20 @@ import moe.nea.libautoupdate.UpdateData
 class CustomGithubReleaseUpdateSource(owner: String, repository: String) : GithubReleaseUpdateSource(owner, repository) {
 
     override fun findLatestRelease(validReleases: Iterable<GithubRelease>): UpdateData {
-        return validReleases.asSequence().maxBy { ModVersion.fromString(it.tagName) }.let { findAsset(it) }
+        return validReleases.asSequence()
+            .sortedByDescending { ModVersion.fromString(it.tagName) }
+            .firstNotNullOfOrNull { findAsset(it) }
             ?: throw IllegalStateException("No valid release found")
     }
+
+    public override fun getReleaseApiUrl(): String = super.getReleaseApiUrl()
 
     override fun findAsset(release: GithubRelease?): UpdateData? {
         release ?: return null
 
         return release.assets.stream()
             .filter { it.filterAsset() }
-            .map { it.createReleaseData(release) }
+            .map { createReleaseData(release) }
             .findFirst().orElse(null)
     }
 
@@ -34,12 +38,12 @@ class CustomGithubReleaseUpdateSource(owner: String, repository: String) : Githu
         return name.contains(VersionConstants.MC_VERSION) || name.contains(PlatformUtils.MC_VERSION)
     }
 
-    private fun GithubRelease.Download.createReleaseData(release: GithubRelease): GithubReleaseUpdateData {
+    private fun createReleaseData(release: GithubRelease): GithubReleaseUpdateData {
         return GithubReleaseUpdateData(
             release.name ?: release.tagName,
             JsonPrimitive(release.tagName),
             null,
-            browserDownloadUrl,
+            null,
             release.body,
             release.targetCommitish,
             release.created_at,

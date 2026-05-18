@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
@@ -317,5 +317,5 @@ object CompactStarlynSisters {
         personalBestVariablesAreDirty = false
     }
 
-    private fun isInIsland() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny()
+    private fun isInIsland() = IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland()
 }

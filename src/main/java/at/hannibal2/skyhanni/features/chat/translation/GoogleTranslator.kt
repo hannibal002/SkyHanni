@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +41,7 @@ object GoogleTranslator {
     fun toNativeLanguage(args: Array<String>, nativeLanguage: String) {
         val message = args.joinToString(" ").removeColor()
 
-        CoroutineConfig("translator toNativeLanguage", 10.seconds).launchCoroutine {
+        CoroutineSettings("translator toNativeLanguage", 10.seconds).launchCoroutine {
             val translation = getTranslation(message, nativeLanguage)
             val translatedMessage = translation?.get(0) ?: "Error!"
             val detectedLanguage = translation?.get(1) ?: "Error!"
@@ -53,7 +53,7 @@ object GoogleTranslator {
             ChatUtils.clickableChat(
                 "Found translation: §f$translatedMessage",
                 onClick = {
-                    CoroutineConfig("translator toNativeLanguage clickableChat", 10.seconds).launchCoroutine {
+                    CoroutineSettings("translator toNativeLanguage clickableChat", 10.seconds).launchCoroutine {
                         OSUtils.copyToClipboardAsync(translatedMessage)
                     }
                 },
@@ -70,12 +70,12 @@ object GoogleTranslator {
         val language = args[0]
         val message = args.drop(1).joinToString(" ")
 
-        CoroutineConfig("translator fromNativeLanguage").launchCoroutine {
+        CoroutineSettings("translator fromNativeLanguage").launchCoroutine {
             val translation = getTranslation(message, language, "auto")?.get(0) ?: "Error!"
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = {
-                    CoroutineConfig("translator fromNativeLanguage clickableChat").launchCoroutine {
+                    CoroutineSettings("translator fromNativeLanguage clickableChat").launchCoroutine {
                         OSUtils.copyToClipboardAsync(translation)
                     }
                 },

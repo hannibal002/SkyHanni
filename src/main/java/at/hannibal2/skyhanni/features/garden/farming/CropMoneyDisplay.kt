@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.isSpeedDataEmpty
-import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -79,7 +79,7 @@ object CropMoneyDisplay {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         if (!GardenApi.hideExtraGuis()) {
@@ -105,7 +105,7 @@ object CropMoneyDisplay {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crop Money - Extra")
         event.addIrrelevant(extraMoneyPerHour.toString())
         event.title("Crop Money - Crop")
@@ -174,7 +174,7 @@ object CropMoneyDisplay {
             }
 
             if (config.armor) {
-                val amountPerHour = GardenCropSpeed.getRecentBPS() * ArmorDropTracker.getDropsPerHour(it)
+                val amountPerHour = GardenCropSpeed.getRecentBPS() * RareCropTracker.getDropsPerHour(it)
                 extraMoneyPerHour.armorCoins = amountPerHour * it.specialDropType.toInternalName().getNpcPrice()
             }
         }

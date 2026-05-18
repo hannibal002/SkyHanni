@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
-import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatureSettingsUtils.getSeaCreatureConfig
+import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils
 
 @SkyHanniModule
 object SeaCreatureCocoonWarning {
@@ -18,13 +17,13 @@ object SeaCreatureCocoonWarning {
     private val config get() = SkyHanniMod.feature.fishing.cocoonSettings
 
     @HandleEvent
-    fun onCocoon(event: CocoonSpawnEvent) {
+    fun onCocoonSpawn(event: CocoonSpawnEvent) {
         val mob = event.cocoonMob
         if (mob.seaCreature == null) return
         if (!mob.seaCreature.isOwn) return
         val name = mob.seaCreature.name
         if (config.warnWhenCocooned) {
-            if (getSeaCreatureConfig(name)?.shouldWarnWhenCocooned == true) {
+            if (SeaCreatureSettings.getConfig(name)?.shouldWarnWhenCocooned == true) {
                 val msg = "§c$name Has Been Cocooned"
                 ChatUtils.notifyOrDisable(msg, config::warnWhenCocooned)
                 TitleManager.sendTitle(msg)
@@ -36,9 +35,9 @@ object SeaCreatureCocoonWarning {
             }
         }
         if (config.shareInPartyChat) {
-            if (getSeaCreatureConfig(name)?.shouldShareCocoonInChat == true) {
+            if (SeaCreatureSettings.getConfig(name)?.shouldShareCocoonInChat == true) {
                 if (PartyApi.isInParty()) {
-                    HypixelCommands.partyChat("I Cocooned ${StringUtils.optionalAn(name)} $name!")
+                    HypixelCommands.partyChat("My $name has been cocooned!")
                 }
             }
         }

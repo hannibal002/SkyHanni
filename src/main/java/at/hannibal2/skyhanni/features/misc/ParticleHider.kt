@@ -41,7 +41,7 @@ object ParticleHider {
         val config = config.blockBreakParticle
         return when {
             !config.hide -> false
-            config.onlyInGarden -> IslandType.GARDEN.isCurrent()
+            config.onlyInGarden -> IslandType.GARDEN.isInIsland()
             else -> true
         }
     }
