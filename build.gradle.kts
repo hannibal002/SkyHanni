@@ -275,7 +275,7 @@ tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
-    val minecraftVersion = if (isDeobf) target.minecraftVersion.versionName else target.minecraftVersion.fabricModJsonVersion
+    val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
     val props = buildMap {
         put("version", version)
         put("minecraft", minecraftVersion)
