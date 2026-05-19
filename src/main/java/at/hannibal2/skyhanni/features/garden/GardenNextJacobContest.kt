@@ -143,7 +143,7 @@ object GardenNextJacobContest {
     )
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
         if (!GardenApi.inGarden()) {

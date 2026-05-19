@@ -112,7 +112,7 @@ object HarvestFeastManager {
     )
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Harvest Feast Data")
 
         if (currentFeastData == null) {

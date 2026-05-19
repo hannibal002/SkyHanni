@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.data.jsonobjects.elitedev
 
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.utils.KSerializable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 @KSerializable
 data class EliteFeastJson(
@@ -42,7 +42,7 @@ data class EliteFeastData(
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
     private fun getDurations(): List<Duration> {
-        return next.map { (it.value?.minus(System.currentTimeMillis()))?.milliseconds ?: Duration.INFINITE }
+        return next.map { it.value?.asTimeMark()?.timeUntil() ?: Duration.INFINITE }
     }
 
     private fun getDuration(): Duration {
