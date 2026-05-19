@@ -150,7 +150,7 @@ object GardenCustomKeybinds {
     private fun refreshState(keyBindings: Iterable<KeyMapping>) {
         for (keyBinding in keyBindings) {
             if (keyBinding.isToggle()) continue
-            keyBinding.setDown(keyBinding.key.isDown())
+            keyBinding.isDown = keyBinding.key.isDown()
         }
     }
 
