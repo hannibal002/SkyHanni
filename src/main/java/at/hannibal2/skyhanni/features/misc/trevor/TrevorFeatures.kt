@@ -158,7 +158,7 @@ object TrevorFeatures {
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = 16
+            timeUntilNextReady = 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
