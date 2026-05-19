@@ -60,19 +60,8 @@ object DungeonSecretTrackerLocator {
         if (event.count != 1 || event.speed != 0f) return
 
         lastParticle = SimpleTimeMark.now()
-        val currLoc = event.location
 
-        if (lastAbilityUse.passedSince() > 1.seconds) return
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(currLoc)
-            return
-        }
-
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
-
-        if (distToLast == 0.0 || distToLast > 1.0) return
-
-        bezierFitter.addPoint(currLoc)
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 1.0, lastAbilityUse = lastAbilityUse)) return
 
         repredictPoint()
     }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
 class PolynomialFitter(private val degree: Int) {
     private val xPointMatrix: ArrayList<DoubleArray> = ArrayList()
@@ -69,6 +70,30 @@ open class BezierFitter(private val degree: Int) {
         points.clear()
         fitters.forEach { it.reset() }
         lastCurve = null
+    }
+
+    fun tryAdd(
+        location: LorenzVec,
+        maxDistanceToLast: Double,
+        lastAbilityUse: SimpleTimeMark? = null,
+        emptyCondition: (LorenzVec) -> Boolean = { false },
+        endCondition: (LorenzVec) -> Boolean = { false },
+    ): Boolean {
+        lastAbilityUse?.let {
+            if (it.passedSince() > 1.seconds) return false
+        }
+        if (isEmpty()) {
+            if (emptyCondition(location)) return false
+            addPoint(location)
+            return false
+        }
+        val distToLast = getLastPoint()?.distance(location) ?: return false
+        if (distToLast == 0.0) return false
+        if (distToLast > maxDistanceToLast) return false
+        if (endCondition(location)) return false
+
+        addPoint(location)
+        return true
     }
 }
 

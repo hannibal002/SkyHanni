@@ -24,7 +24,7 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    fun getBezierFitterCount(): Int { return bezierFitter.count() }
+    fun getBezierFitterCount(): Int = bezierFitter.count()
 
     private var lastGuess: GuessEntry? = null
 
@@ -41,18 +41,10 @@ object PreciseGuessBurrow {
         if (event.count != 2) return
         if (event.speed != -0.5f) return
         lastLavaParticle = SimpleTimeMark.now()
-        val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         GriffinBurrowHelper.removeSpadeWarnTitle()
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(currLoc)
-            return
-        }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
 
-        if (distToLast == 0.0 || distToLast > 3.0) return
-
-        bezierFitter.addPoint(currLoc)
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0)) return
 
         if (bezierFitter.count() < 6) {
             val duration = (6 - bezierFitter.count()) * 100
