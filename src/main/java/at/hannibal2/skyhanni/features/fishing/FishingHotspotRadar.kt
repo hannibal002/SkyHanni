@@ -101,8 +101,8 @@ object FishingHotspotRadar {
         )
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    fun onSecondPassed() {
         val location = hotspotLocation ?: return
         if (!isUnknown || lastUpdate.passedSince() < 3.seconds) return
         IslandGraphs.reportLocation(
@@ -130,7 +130,7 @@ object FishingHotspotRadar {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return

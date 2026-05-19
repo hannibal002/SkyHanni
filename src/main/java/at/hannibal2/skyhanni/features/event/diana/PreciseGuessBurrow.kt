@@ -82,7 +82,7 @@ object PreciseGuessBurrow {
     private var lastLavaParticle = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
@@ -100,7 +100,7 @@ object PreciseGuessBurrow {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Precise Burrow Guess")
 
         if (!DianaApi.isDoingDiana()) {

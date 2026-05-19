@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -89,16 +88,16 @@ object TrevorFeatures {
         "Location: (?<zone>.*)",
     )
     private val mobDiedPattern by patternGroup.pattern(
-        "mob.died",
-        "§aReturn to the Trapper soon to get a new animal to hunt!",
+        "mob.died.colorless",
+        "Return to the Trapper soon to get a new animal to hunt!",
     )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
         "You ran out of time and the animal disappeared!",
     )
     private val clickOptionPattern by patternGroup.pattern(
-        "clickoption",
-        "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]",
+        "clickoption.colorless",
+        "Click an option: \\[YES] - \\[NO]",
     )
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
@@ -138,7 +137,7 @@ object TrevorFeatures {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val formattedMessage = event.cleanMessage
 
-        mobDiedPattern.matchMatcher(event.message) {
+        mobDiedPattern.matchMatcher(formattedMessage) {
             TrevorSolver.resetLocation()
             TalbotCircles.resetCircles()
             if (config.mobDiedMessage) {
@@ -188,7 +187,7 @@ object TrevorFeatures {
             resetTrapper()
         }
 
-        clickOptionPattern.findMatcher(event.message) {
+        clickOptionPattern.findMatcher(formattedMessage) {
             for (sibling in event.chatComponent.siblings) {
                 val clickEvent = sibling.command ?: continue
 

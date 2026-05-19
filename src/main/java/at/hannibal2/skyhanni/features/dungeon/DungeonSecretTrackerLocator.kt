@@ -36,13 +36,13 @@ object DungeonSecretTrackerLocator {
      * REGEX-TEST: §aThere's a secret §r§e38 blocks in front of you and 15 blocks above you§r§a!
      */
     private val secretTrackerMessagePattern by patternGroup.pattern(
-        "message",
-        "There's a secret (?:§.)*(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?",
+        "message.colorless",
+        "There's a secret *(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?",
     )
 
     private val noMissingSecretsPattern by patternGroup.pattern(
-        "no.missing",
-        "§cThere are no missing secrets near you!",
+        "no.missing.colorless",
+        "There are no missing secrets near you!",
     )
 
     private var lastParticle = SimpleTimeMark.farPast()
@@ -95,13 +95,13 @@ object DungeonSecretTrackerLocator {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChatMessage(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        secretTrackerMessagePattern.findMatcher(event.message) {
+        secretTrackerMessagePattern.findMatcher(event.cleanMessage) {
             val distance1 = group("distance").toInt()
             val distance2 = groupOrNull("distance2")?.toInt() ?: 0
             secretDistance = sqrt((distance1 * distance1 + distance2 * distance2).toDouble()).toInt()
             repredictPoint()
         }
-        if (noMissingSecretsPattern.matches(event.message)) reset()
+        if (noMissingSecretsPattern.matches(event.cleanMessage)) reset()
     }
 
     private fun repredictPoint() {
@@ -114,7 +114,7 @@ object DungeonSecretTrackerLocator {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
