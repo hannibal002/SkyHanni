@@ -13,6 +13,9 @@ import net.minecraft.world.level.block.state.BlockState
  * they are all separate blocks
  *
  * This does not include uncolored blocks like glass, glass panes clay and unstained hardened clay
+ *
+ * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
  */
 enum class ColoredBlockCompat(
     private val metaColor: Int,

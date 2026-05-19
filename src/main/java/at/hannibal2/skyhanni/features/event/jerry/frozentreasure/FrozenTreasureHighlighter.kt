@@ -9,10 +9,10 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.isSkull
 import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
 import at.hannibal2.skyhanni.utils.blockhighlight.TimedHighlightBlock
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Blocks
