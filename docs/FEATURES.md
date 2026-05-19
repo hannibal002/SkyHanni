@@ -120,7 +120,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlight chests which have been rerolled inside Croesus
     + Shows kismet amount at the re-roll button
 + SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
-    + Warn shorty before a Shadow Assassin jumps to you in dungeons.
+    + Warn shortly before a Shadow Assassin jumps to you in dungeons.
 + Notifications for architect on puzzle fail. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1197)
     + Shows Title.
     + Shows button in chat to retrieve from sack.
@@ -171,7 +171,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       around items that meet that requirement.
     + Works in:
         + In NPC sell inventories, ender chests and backpacks, salvaging in the dungeon hub, player trade
-        + bazaar, action house, accessory bag, sack of sacks, fishing bag, potion bag,
+        + bazaar, auction house, accessory bag, sack of sacks, fishing bag, potion bag,
         + chests on the private island, attribute fusion, equipment GUI, Rift Motes Grubber
     + Option to allow/block clicks
 + Option to change the gray-out opacity for 'Not Clickable Items'.
@@ -289,7 +289,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Outside Sack Value Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3778)
     + Show value of all items in Sacks as GUI while not in Sacks.
 + Added Trade Value Overlay. - AxeOfTheShredded (https://github.com/hannibal002/SkyHanni/pull/3348)
-    + Doesn't suppport coins.
+    + Doesn't support coins.
 + Added Evolving Item time remaining in lore (Bottle of Jyrre, Dark Cacao Truffle, etc.). - Obsidian (https://github.com/hannibal002/SkyHanni/pull/3614)
 + Added option to highlight Current Pet in menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4068)
 + Added Fann Leveling Cost. - minhperry + Daveed (https://github.com/hannibal002/SkyHanni/pull/4061)
@@ -375,7 +375,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 </summary>
 
-- A display that show the last time the hopper inside a minion has been emptied.
+- A display that shows the last time the hopper inside a minion has been emptied.
 - A marker to the last opened minion for a couple of seconds (seen through walls)
 - Option to hide mob nametags close to minions.
 - Minion hopper coins per day display (Using the held coins in the hopper and the last time the hopper was collected to
@@ -919,7 +919,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Stereo Harmony Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1324)
     + Options to show/hide boosted crop and pest icons.
 + Added Super Craft button to visitors for ease of access. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1173)
-    + Checks if you have enough materials to craft the items and depending on that shows the button or not.
+    + Checks if you have enough materials to craft the items and shows or hides the button accordingly
 + Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
 + New "Craftable!" message when Visitor Items Needed are craftable. - Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
 + Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
@@ -1323,7 +1323,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added an option to show the Hoppity Event Card only while on islands where eggs spawn. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2940)
 + Added the ability to recolor chocolate gains from duplicate rabbits when the Time Tower is active. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2805)
 + Added Hitman statistics to Chocolate Factory stats. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2991)
-    + Allows to view remaining time for full and 28 claimable slots.
+    + Allows viewing remaining time for full and 28 claimable slots.
 + Added party mode for Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3054)
     + Using it is not recommended.
 + Added chat compact for Hitman Claim All. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3077)
@@ -1467,7 +1467,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 </summary>
 
-+ Allow to paste text from clipboard in signs
++ Allows pasting text from clipboard in signs
 + Pet Display (showing the currently selected pet as GUI element, without any fancy XP or level or percentage, but with
   auto-pet support)
 + Hiding exp Bottles lying on the ground.
@@ -1601,7 +1601,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Sends a chat message on first SkyHanni startup (starting with this feature, so this version everyone will see this
       message).
     + Shows new features after an update (starting with the next beta, not this one).
-    + Allows to change those settings anytime again with /shdefaultoptions.
+    + Allows changing those settings anytime again with /shdefaultoptions.
 + Show alert when reaching max super-pairs clicks. - pretz
     + Plays a beep sound and sends a message in chat when the player reaches the maximum number of clicks gained for
       super-pairs mini games.
