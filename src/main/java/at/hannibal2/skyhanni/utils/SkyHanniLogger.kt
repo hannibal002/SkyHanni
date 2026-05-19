@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.TimeUtils.formatCurrentTime
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.logging.FileHandler
 import java.util.logging.Formatter
@@ -11,74 +10,42 @@ import java.util.logging.LogRecord
 import java.util.logging.Logger
 import kotlin.time.Duration.Companion.days
 
-class SkyHanniLogger(filePath: String) {
+open class SkyHanniLogger(filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val fileName = "$PREFIX_PATH$filePath.log"
+    private val fullFormat by lazy {
+        SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
+    }
+    internal open val logsDir = File("config/skyhanni/logs")
+    internal open val timedFormattedDir by lazy { "$logsDir/$fullFormat" }
+    private val logFileName by lazy { "$timedFormattedDir/$filePath.log" }
 
     companion object {
-
-        private val LOG_DIRECTORY = File("config/skyhanni/logs")
-        // I'm ab to change this in another PR I CBA - daveed
-        @Suppress("PropertyName")
-        private var PREFIX_PATH: String
-        var hasDone = false
-
-        init {
-            val format = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-            PREFIX_PATH = "config/skyhanni/logs/$format/"
-        }
-    }
-
-    private lateinit var logger: Logger
-
-    private fun getLogger(): Logger {
-        if (::logger.isInitialized) {
-            return logger
-        }
-
-        val initLogger = initLogger()
-        this.logger = initLogger
-        return initLogger
+        private var deletedExpired = false
     }
 
     @Suppress("PrintStackTrace")
-    private fun initLogger(): Logger {
-        val logger = Logger.getLogger("Lorenz-Logger-" + System.nanoTime())
-        try {
-            createParent(File(fileName))
-            val handler = FileHandler(fileName)
-            handler.encoding = "utf-8"
-            logger.addHandler(handler)
-            logger.useParentHandlers = false
-            handler.formatter = object : Formatter() {
-                override fun format(logRecord: LogRecord): String {
-                    val message = logRecord.message
-                    return format.formatCurrentTime() + " $message\n"
-                }
+    private val logger: Logger by lazy {
+        Logger.getLogger("SkyHanni-Logger-" + System.nanoTime()).apply {
+            try {
+                File(logFileName).parentFile?.takeIf { !it.isDirectory }?.mkdirs()
+                FileHandler(logFileName).apply {
+                    encoding = Charsets.UTF_8.name()
+                    formatter = object : Formatter() {
+                        override fun format(logRecord: LogRecord) = "${format.formatCurrentTime()} ${logRecord.message}\n"
+                    }
+                }.let(::addHandler)
+                useParentHandlers = false
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: SecurityException) {
-            e.printStackTrace()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
 
-        if (!hasDone && SkyBlockUtils.onHypixel) {
-            hasDone = true
-            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
-        }
-
-        return logger
-    }
-
-    private fun createParent(file: File) {
-        val parent = file.parentFile
-        if (parent != null && !parent.isDirectory) {
-            parent.mkdirs()
+            if (!deletedExpired && SkyBlockUtils.onHypixel) {
+                deletedExpired = true
+                OSUtils.deleteExpiredFiles(logsDir, SkyHanniMod.feature.dev.logExpiryTime.days)
+            }
         }
     }
 
-    fun log(text: String?) {
-        getLogger().info(text)
-    }
+    fun log(text: String?) = logger.info(text)
 }

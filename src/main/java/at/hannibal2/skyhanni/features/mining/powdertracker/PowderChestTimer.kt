@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils
@@ -32,6 +32,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.entity.ChestBlockEntity
 import java.awt.Color
@@ -44,7 +46,7 @@ object PowderChestTimer {
 
     private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
-    private var display: String? = null
+    private var display: Renderable? = null
     private val minedBlocks = TimeLimitedSet<LorenzVec>(5.seconds)
     private val chests = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
     private val maxDuration = 60.seconds
@@ -64,10 +66,10 @@ object PowderChestTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onRenderOverlay() {
-        if (isEnabled()) {
-            config.position.renderString(display, posLabel = "Powder Chest Timer")
-        }
+    fun onGuiRenderOverlay() {
+        if (!isEnabled()) return
+        val display = display ?: return
+        config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
     @HandleEvent
@@ -82,6 +84,7 @@ object PowderChestTimer {
             event.oldState.`is`(Blocks.STONE) && event.newState.`is`(Blocks.AIR) -> {
                 minedBlocks.add(location)
             }
+
             !event.oldState.`is`(Blocks.CHEST) && event.newState.`is`(Blocks.CHEST) -> {
                 val mined = minedBlocks.remove(location)
                 val possibleFalsePositive = arePlayersNearby || (!mined && event.oldState.`is`(Blocks.AIR))
@@ -90,6 +93,7 @@ object PowderChestTimer {
 
                 chests[location] = maxDuration.fromNow()
             }
+
             event.oldState.`is`(Blocks.CHEST) && !event.newState.`is`(Blocks.CHEST) -> {
                 chests.remove(location)
             }
@@ -116,7 +120,8 @@ object PowderChestTimer {
     fun onTick() {
         if (!isEnabled()) return
 
-        display = drawDisplay()
+        // TODO why in god's name is this calculating onTick 🥺
+        display = drawDisplay()?.let(Renderable::text)
 
         chests.keys.removeIf { pos ->
             ((MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f

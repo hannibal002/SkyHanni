@@ -269,6 +269,6 @@ object CrimsonMinibossRespawnTimer {
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isCurrent() && config.minibossRespawnTimer
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossRespawnTimer
 
 }

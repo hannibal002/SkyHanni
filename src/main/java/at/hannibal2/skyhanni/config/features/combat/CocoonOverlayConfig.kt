@@ -8,6 +8,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CocoonOverlayConfig {
 
     @Expose
+    @ConfigOption(name = "Require Cocooning", desc = "Toggles whether overlay should only work when you can personally cocoon.")
+    @ConfigEditorBoolean
+    var requireCocoonPossible: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Show Timer", desc = "Shows Time Left till Cocoon Hatches, Can be inaccurate.")
     @ConfigEditorBoolean
     @FeatureToggle

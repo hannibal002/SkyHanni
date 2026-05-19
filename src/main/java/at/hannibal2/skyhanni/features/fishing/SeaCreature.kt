@@ -8,6 +8,7 @@ data class SeaCreature(
     val chatColor: String,
     val rare: Boolean,
     val rarity: LorenzRarity,
+    val lootshareSphereOverride: Boolean?,
 ) {
 
     val displayName = chatColor + rare() + name

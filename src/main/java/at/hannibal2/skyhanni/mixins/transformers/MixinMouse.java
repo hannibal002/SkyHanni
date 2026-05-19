@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
 import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
@@ -42,13 +43,24 @@ public class MixinMouse {
         MouseCompat.INSTANCE.handleMouseButton(input, action);
     }
 
-    @Inject(method = "handleAccumulatedMovement", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z"))
+    @Inject(
+        method = "handleAccumulatedMovement",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z")
+    )
     private void onMouseButtonHead(CallbackInfo ci, @Local(ordinal = 0) double timeDelta) {
         MouseCompat.INSTANCE.setTimeDelta(timeDelta * 10000);
     }
 
+    @Inject(
+        method = "grabMouse",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/KeyMapping;setAll()V")
+    )
+    private void onRestoreKeyStateAfterMouseGrab(CallbackInfo ci) {
+        GardenCustomKeybinds.onMouseGrabRestoringKeyState();
+    }
+
     @ModifyVariable(method = "turnPlayer", at = @At("STORE"), ordinal = 1)
     private double modifyMouseX(double value) {
-        return MouseSensitivityHook.INSTANCE.remapSensitivity((float) value);
+        return MouseSensitivityHook.remapSensitivity((float) value);
     }
 }
