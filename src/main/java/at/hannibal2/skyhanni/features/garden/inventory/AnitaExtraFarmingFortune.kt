@@ -47,9 +47,10 @@ object AnitaExtraFarmingFortune {
         var contributionFactor = 1.0
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacobTickets ?: return
         if (baseAmount > 0) {
-            for (line in event.toolTip) { realAmountPattern.matchMatcher(line) {
-                val realAmount = group("realAmount").formatDouble()
-                contributionFactor = realAmount / baseAmount
+            for (line in event.toolTip) {
+                realAmountPattern.matchMatcher(line) {
+                    val realAmount = group("realAmount").formatDouble()
+                    contributionFactor = realAmount / baseAmount
                 }
             }
         }
