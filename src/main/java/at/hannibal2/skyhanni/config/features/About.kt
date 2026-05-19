@@ -17,6 +17,7 @@ class About {
     @Transient
     var deprecatedVersionWarning: Unit? = null
 
+    @Suppress("unused")
     @ConfigOption(name = "Current Version", desc = "This is the SkyHanni version you are currently running")
     @ConfigVersionDisplay
     @SearchTag("check download update")
@@ -28,6 +29,7 @@ class About {
     @ConfigEditorDropdown
     val updateStream: Property<UpdateStream> = Property.of(UpdateStream.RELEASES)
 
+    @Suppress("unused")
     @ConfigOption(name = "Used Software", desc = "Information about used software and licenses")
     @Accordion
     @Expose
@@ -47,7 +49,7 @@ class About {
 
         @ConfigOption(name = "NotEnoughUpdates-REPO", desc = "NotEnoughUpdates-REPO is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
-        val notEnoughUpdates: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO") }
+        val notEnoughUpdatesRepo: Runnable = Runnable { openBrowser("https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO") }
 
         @ConfigOption(name = "Fabric Loader", desc = "Fabric Loader is available under the Apache-2.0 license")
         @ConfigEditorButton(buttonText = "Source")
