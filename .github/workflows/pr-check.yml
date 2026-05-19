@@ -29,10 +29,10 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
-            - name: Disable preprocessor
-              run: |
-                  mkdir -p .gradle
-                  echo skyhanni.multi-version=off > .gradle/private.properties
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
 
             -   name: Run ChangeLog verification w/retry
                 if: github.repository == 'hannibal002/SkyHanni'
@@ -50,24 +50,3 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: checkPrDescription
-
-            -   name: Save PR metadata for notify workflow
-                if: always()
-                run: |
-                    mkdir -p pr-check-artifact
-                    echo "${{ github.event.pull_request.number }}" > pr-check-artifact/pr_number.txt
-                    echo "${{ github.event.pull_request.head.sha }}" > pr-check-artifact/pr_head_sha.txt
-                    if [ "${{ job.status }}" = "success" ]; then
-                        echo "success" > pr-check-artifact/outcome.txt
-                    else
-                        echo "failure" > pr-check-artifact/outcome.txt
-                    fi
-                    if [ -f versions/1.21.10/build/changelog_errors.txt ]; then
-                        cp versions/1.21.10/build/changelog_errors.txt pr-check-artifact/
-                    fi
-            -   name: Upload PR check artifact
-                if: always()
-                uses: actions/upload-artifact@v7
-                with:
-                    name: pr-check-output
-                    path: pr-check-artifact/
