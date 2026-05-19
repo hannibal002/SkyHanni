@@ -126,9 +126,8 @@ object UpdateManager {
         logger.log("Starting update check (source: ${context.source.javaClass.simpleName}")
 
         val currentStream = config.updateStream.get()
-        if (currentStream != UpdateStream.BETA && (updateStream == UpdateStream.BETA || SkyHanniMod.isBetaVersion)) {
+        if (updateStream == UpdateStream.BETA && currentStream != UpdateStream.BETA) {
             config.updateStream.set(UpdateStream.BETA)
-            updateStream = UpdateStream.BETA
         }
 
         activePromise = context.checkUpdate(updateStream.stream)
