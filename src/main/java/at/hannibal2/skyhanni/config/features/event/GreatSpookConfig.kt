@@ -22,20 +22,6 @@ class GreatSpookConfig {
     var primalFearNotification: Boolean = false
 
     @Expose
-    @ConfigLink(owner = GreatSpookConfig::class, field = "primalFearTimer")
-    val positionTimer: Position = Position(20, 20)
-
-    @Expose
-    @ConfigOption(
-        name = "Fear Stat Display",
-        desc = "Show Fear stat as single GUI element.\n" +
-            "§eRequires tab list widget enabled and Fear selected to update live."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var fearStatDisplay: Boolean = false
-
-    @Expose
     @ConfigLink(owner = GreatSpookConfig::class, field = "fearStatDisplay")
     val positionFear: Position = Position(30, 30)
 

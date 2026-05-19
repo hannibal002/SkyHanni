@@ -88,7 +88,7 @@ enum class TabWidgetDisplay(
         }
 
         @HandleEvent
-        fun onJoin(event: ProfileJoinEvent) {
+        fun onProfileJoin(event: ProfileJoinEvent) {
             // Validation that the displayPositions in the config is correct
             val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
             if (sizeDiff == 0) return

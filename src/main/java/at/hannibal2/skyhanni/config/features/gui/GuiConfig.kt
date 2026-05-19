@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.gui
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
 import at.hannibal2.skyhanni.config.features.gui.moveablehud.ActionBarConfig
@@ -15,7 +16,7 @@ import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListC
 import at.hannibal2.skyhanni.config.features.misc.cosmetic.CosmeticConfig
 import at.hannibal2.skyhanni.data.GuiEditManager.openGuiPositionEditor
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.features.gui.StatOverlay
+import at.hannibal2.skyhanni.features.gui.StatOverlay.SkyblockStatUI
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
@@ -202,7 +203,24 @@ class GuiConfig {
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
 
     @Expose
-    @ConfigOption(name = "Stats", desc = "Add stats to list to render as a UI Element.")
-    @ConfigEditorDraggableList
-    val displayStats: MutableList<StatOverlay.SkyblockStatUI> = mutableListOf()
+    @ConfigOption(name = "Stat Display", desc = "")
+    @Accordion
+    val statDisplayer: StatDisplay = StatDisplay()
+
+    class StatDisplay {
+        @Expose
+        @ConfigOption(name = "Enabled", desc = "Enables the gui elements for the selected stats.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        var enabled: Boolean = false
+
+        @Expose
+        @ConfigOption(name = "Stats", desc = "Add stats to list to render as a UI Element.")
+        @ConfigEditorDraggableList
+        val displayStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
+        @ConfigLink(owner = StatDisplay::class, field = "enabled")
+        val displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
+    }
 }

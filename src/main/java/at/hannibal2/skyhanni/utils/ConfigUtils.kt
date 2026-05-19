@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -73,4 +74,6 @@ object ConfigUtils {
         get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
+
+    fun JsonElement.getAsPosition(): Position = throw UnsupportedOperationException(javaClass.getSimpleName())
 }

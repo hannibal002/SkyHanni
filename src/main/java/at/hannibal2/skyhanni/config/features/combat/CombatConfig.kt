@@ -51,11 +51,6 @@ class CombatConfig {
     val bestiary: BestiaryConfig = BestiaryConfig()
 
     @Expose
-    @ConfigOption(name = "Ferocity Display", desc = "")
-    @Accordion
-    val ferocityDisplay: FerocityDisplayConfig = FerocityDisplayConfig()
-
-    @Expose
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
     val flare: FlareConfig = FlareConfig()
