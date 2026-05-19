@@ -57,12 +57,13 @@ object PhantomleafSolver {
         if (lastPos?.equalsIgnoreY(currentPos) ?: false) {
             val dist = 30.0 * (1.0 - event.volume)
             updateCandidates(currentPos, dist)
-            if (candidates.isEmpty())
+            if (candidates.isEmpty()) {
                 ChatUtils.chat("No solutions found. Try moving a little.")
-            else if (candidates.size > 1)
+            } else if (candidates.size > 1) {
                 ChatUtils.chat("Multiple candidates found. Move a little to recalculate.")
+            }
         }
-        
+
         lastPos = currentPos
     }
 
