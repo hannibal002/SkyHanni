@@ -42,19 +42,25 @@ object StatOverlay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(133, "combat.ferocityDisplay.enabled") { element ->
-            if (element.asBoolean) config.displayStats.add(SkyblockStatUI.FEROCITY)
+        event.transform(134, "combat.ferocityDisplay.enabled") { element ->
+            if (element.asBoolean) {
+                config.displayStats.add(SkyblockStatUI.FEROCITY)
+                config.enabled = true
+            }
             element
         }
-        event.transform(133, "combat.ferocityDisplay.position") { element ->
+        event.transform(134, "combat.ferocityDisplay.position") { element ->
             config.displayPositions[SkyblockStatUI.FEROCITY.ordinal] = element.getAsPosition()
             element
         }
-        event.transform(133, "event.spook.fearStatDisplay") { element ->
-            if (element.asBoolean) config.displayStats.add(SkyblockStatUI.FEAR)
+        event.transform(134, "event.spook.fearStatDisplay") { element ->
+            if (element.asBoolean) {
+                config.displayStats.add(SkyblockStatUI.FEAR)
+                config.enabled = true
+            }
             element
         }
-        event.transform(133, "event.spook.positionFear") { element ->
+        event.transform(134, "event.spook.positionFear") { element ->
             config.displayPositions[SkyblockStatUI.FEAR.ordinal] = element.getAsPosition()
             element
         }

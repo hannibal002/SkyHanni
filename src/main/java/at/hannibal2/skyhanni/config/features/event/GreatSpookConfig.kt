@@ -22,8 +22,8 @@ class GreatSpookConfig {
     var primalFearNotification: Boolean = false
 
     @Expose
-    @ConfigLink(owner = GreatSpookConfig::class, field = "fearStatDisplay")
-    val positionFear: Position = Position(30, 30)
+    @ConfigLink(owner = GreatSpookConfig::class, field = "primalFearTimer")
+    val positionTimer: Position = Position(20, 20)
 
     @Expose
     @ConfigOption(name = "IRL Time Left", desc = "Show the IRL time left before The Great Spook ends.")

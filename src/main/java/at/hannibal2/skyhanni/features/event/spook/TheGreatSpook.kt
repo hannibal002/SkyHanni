@@ -152,9 +152,6 @@ object TheGreatSpook {
         if (config.primalFearTimer) displayMobCooldown?.let {
             config.positionTimer.renderRenderable(it, posLabel = "Primal Fear Timer")
         }
-        if (config.fearStatDisplay) SkyblockStat.FEAR.displayValue?.let {
-            config.positionFear.renderRenderable(Renderable.text(it), posLabel = "Fear Stat Display")
-        }
         if (config.greatSpookTimeLeft) displayGreatSpookEnd?.let {
             config.positionTimeLeft.renderRenderable(it, posLabel = "Great Spook Time Left")
         }
