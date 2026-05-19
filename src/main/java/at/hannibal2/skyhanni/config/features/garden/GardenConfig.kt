@@ -91,9 +91,9 @@ class GardenConfig {
     val jacobContest: JacobContestConfig = JacobContestConfig()
 
     @Expose
-    @ConfigOption(name = "Armor Drop Tracker", desc = "")
+    @ConfigOption(name = "Rare Crop Tracker", desc = "")
     @Accordion
-    val armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
+    val rareCropTracker: RareCropTrackerConfig = RareCropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Crop Break Tracker", desc = "")
