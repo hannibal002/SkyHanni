@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.event
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import com.google.gson.annotations.Expose
@@ -16,6 +17,7 @@ class HarvestFeastConfig {
         desc = "Display the current in-season Harvest Feast crops."
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var displayCurrentCrops: Boolean = true
 
     @Expose
@@ -28,11 +30,19 @@ class HarvestFeastConfig {
 
     @Expose
     @ConfigOption(
+        name = "Share Upcoming Feast Data",
+        desc = "Share the upcoming Feast data to eliteskyblock.com for everyone else to then fetch automatically.",
+    )
+    @ConfigEditorBoolean
+    var shareAutomatically: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Share Feast Data",
         desc = "Share the Harvest Feast data to eliteskyblock.com for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
-    var shareAutomatically: SharePolicy = SharePolicy.ASK
+    var sharePolicy: SharePolicy = SharePolicy.ASK
 
     @Expose
     @ConfigLink(owner = HarvestFeastConfig::class, field = "displayCurrentCrops")

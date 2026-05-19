@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.features.misc.reminders.Reminder
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -19,16 +18,7 @@ class Storage {
     var contestSendingAsked: Boolean = false
 
     @Expose
-    var harvestFeastSendingAsked: Boolean = false
-
-    @Expose
-    var storedHarvestFeastData: EliteFeastData? = null
-
-    @Expose
-    var lastHarvestFeastSubmitYear: Int = -1
-
-    @Expose
-    var lastHarvestFeastSubmitMonth: Int = -1
+    var harvestFeastStorage: HarvestFeatStorage = HarvestFeatStorage()
 
     @Expose
     var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()

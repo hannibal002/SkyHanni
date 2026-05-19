@@ -106,7 +106,7 @@ class NextJacobContestConfig {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(133, "garden.shareAutomatically", ::fixEnum)
+        event.transform(133, "garden.jacobContest.nextContest.shareAutomatically", ::fixEnum)
     }
 
     private fun fixEnum(jsonElement: JsonElement): JsonElement {
