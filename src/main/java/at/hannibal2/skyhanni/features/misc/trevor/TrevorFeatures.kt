@@ -348,7 +348,7 @@ object TrevorFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!config.talbotCircles && !config.solver) return
 
         if (event.itemInHand?.getInternalName() == NeuInternalName.TALBOTS_THEODOLITE) {

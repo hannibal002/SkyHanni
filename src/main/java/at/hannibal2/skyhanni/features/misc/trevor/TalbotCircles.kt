@@ -54,7 +54,7 @@ object TalbotCircles {
 
         constraints.add(Constraint(playerPosition, dY, angle))
 
-        // if too many constraints, remove oldest constraint
+        // if too many constraints, remove the oldest constraint
         if (constraints.size > MAX_CONSTRAINTS_USED) {
             constraints.removeAt(0)
         }
