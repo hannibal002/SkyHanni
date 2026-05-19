@@ -72,7 +72,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onEggSpawn(event: EggSpawnedEvent) {
+    fun onEggSpawned(event: EggSpawnedEvent) {
         if (event.eggType == currentEggType) resetData()
     }
 
@@ -224,7 +224,7 @@ object HoppityEggLocator {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
 
         if (!isEnabled()) {

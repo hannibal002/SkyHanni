@@ -117,25 +117,21 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
         require(coefficients.size == 3) { "Coefficients must be for a 3d curve!" }
     }
 
-    fun derivativeAt(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversedArray().dropLast(1)
-            for ((i, coeff) in reversed.withIndex()) {
-                result = result * t + coeff * (reversed.size - i)
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun derivativeAt(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversedArray().dropLast(1)
+        for ((i, coefficient) in reversed.withIndex()) {
+            result = result * t + coefficient * (reversed.size - i)
+        }
+        result
+    }.toLorenzVec()
 
-    fun at(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversed()
-            for (coeff in reversed) {
-                result = result * t + coeff
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun at(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversed()
+        for (coefficient in reversed) {
+            result = result * t + coefficient
+        }
+        result
+    }.toLorenzVec()
 }
