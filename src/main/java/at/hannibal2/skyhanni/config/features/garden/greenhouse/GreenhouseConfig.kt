@@ -51,7 +51,7 @@ class GreenhouseConfig {
     @Expose
     @ConfigOption(
         name = "Phantomleaf Solver",
-        desc = "Stand still for the solver to work.",
+        desc = "When harvesting phantomleaf, highlight the hiding spot green. Stand still for best results.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

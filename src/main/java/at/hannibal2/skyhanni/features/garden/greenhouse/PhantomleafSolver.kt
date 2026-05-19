@@ -22,6 +22,9 @@ object PhantomleafSolver {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
 
+    private val GREENHOUSE_PLOT_LENGTH = 10;
+    private val MUTATION_Y_LEVEL = 74.0;
+
     private var isSearchingForPhantomleaf = false
 
     private var lastPos: LorenzVec? = null
@@ -70,11 +73,11 @@ object PhantomleafSolver {
     private fun updateCandidates(center: LorenzVec, radius: Double) {
         candidates.clear()
         val rounded = center.blockCenter()
-        for (dx in -11..11) {
-            for (dz in -11..11) {
+        for (dx in -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1) {
+            for (dz in -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1) {
                 val d = hypot(rounded.x + dx - center.x, rounded.z + dz - center.z)
                 if (abs(d - radius) < 0.001)
-                    candidates.add(LorenzVec(rounded.x + dx, 74.0, rounded.z + dz))
+                    candidates.add(LorenzVec(rounded.x + dx, MUTATION_Y_LEVEL, rounded.z + dz).roundToBlock())
             }
         }
     }
@@ -86,7 +89,7 @@ object PhantomleafSolver {
 
         candidates.forEach { pos ->
             event.drawWaypointFilled(
-                pos.roundToBlock(),
+                pos,
                 if (candidates.size > 1) Color.YELLOW else Color.GREEN,
                 seeThroughBlocks = true,
                 beacon = true,
