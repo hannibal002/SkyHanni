@@ -167,8 +167,7 @@ object HarvestFeastManager {
         )
 
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
-
-        if (!config.shareAutomatically) return
+        
         if (config.sharePolicy == SharePolicy.DISABLED) return
 
         if (config.sharePolicy == SharePolicy.ASK) {
@@ -292,7 +291,7 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Harvest feast data is not yet available.!\n" +
+            ChatUtils.chat { append("Harvest feast data is not yet available.\n" +
                 "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")

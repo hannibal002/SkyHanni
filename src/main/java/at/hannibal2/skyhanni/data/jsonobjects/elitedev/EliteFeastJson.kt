@@ -66,5 +66,5 @@ data class EliteFeastData(
         } else return fromCurrent
     }
 
-    fun List<String>.toCropTypes(): List<CropType> = map { CropType.getByName(it) }
+    private fun List<String>.toCropTypes(): List<CropType> = map { CropType.getByName(it) }
 }

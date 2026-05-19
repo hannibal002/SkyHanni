@@ -18,7 +18,7 @@ class Storage {
     var contestSendingAsked: Boolean = false
 
     @Expose
-    var harvestFeastStorage: HarvestFeatStorage = HarvestFeatStorage()
+    var harvestFeastStorage: HarvestFeastStorage = HarvestFeastStorage()
 
     @Expose
     var trackerDisplayModes: MutableMap<String, SkyHanniTracker.DisplayMode> = mutableMapOf()

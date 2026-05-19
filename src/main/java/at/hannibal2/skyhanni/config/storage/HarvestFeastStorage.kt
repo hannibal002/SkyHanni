@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.storage
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import com.google.gson.annotations.Expose
 
-class HarvestFeatStorage {
+class HarvestFeastStorage {
     @Expose
     var harvestFeastSendingAsked: Boolean = false
 

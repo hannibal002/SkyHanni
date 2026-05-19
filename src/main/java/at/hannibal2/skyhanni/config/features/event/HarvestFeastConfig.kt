@@ -30,14 +30,6 @@ class HarvestFeastConfig {
 
     @Expose
     @ConfigOption(
-        name = "Share Upcoming Feast Data",
-        desc = "Share the upcoming Feast data to eliteskyblock.com for everyone else to then fetch automatically.",
-    )
-    @ConfigEditorBoolean
-    var shareAutomatically: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Share Feast Data",
         desc = "Share the Harvest Feast data to eliteskyblock.com for everyone else to then fetch automatically.",
     )
