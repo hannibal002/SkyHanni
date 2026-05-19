@@ -54,7 +54,7 @@ object AnitaExtraFarmingFortune {
                 }
             }
         }
-
+// TODO Verify and fix jacobTickets calculation with tier 0 (divides by 0)
         var goldMedals = 0
         var jacobTickets = 0
         for ((level, price) in levelPrice) {
