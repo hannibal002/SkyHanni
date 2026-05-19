@@ -66,6 +66,7 @@ object HarvestFeastManager {
     private var currentFeastData: EliteFeastData? = null
         set(value) {
             field = value
+            saveDataToStorage(value)
             displayDirty = true
         }
     private var displayDirty = false
@@ -293,7 +294,6 @@ object HarvestFeastManager {
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
-            saveDataToStorage()
         }
     }
 
