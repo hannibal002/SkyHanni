@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -23,7 +22,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -41,6 +39,9 @@ object GardenCustomKeybinds {
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var wasActive = false
     private var mappingsApplied = false
+
+    // False while a GUI is open: grabMouse() will call KeyMapping.setAll(), which handles
+    // key state refresh. onMouseGrabRestoringKeyState resets this to true once the mouse is grabbed.
     private var refreshStateOnNextApply = true
 
     @JvmStatic
@@ -151,12 +152,12 @@ object GardenCustomKeybinds {
     private fun refreshState(keyBindings: Iterable<KeyMapping>) {
         for (keyBinding in keyBindings) {
             if (keyBinding.isToggle()) continue
-            keyBinding.setDown(keyBinding.key.isDown())
+            keyBinding.isDown = keyBinding.key.isDown()
         }
     }
 
     private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+        this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun InputConstants.Key.isDown(): Boolean = when (type) {
         InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().window, value)
@@ -166,7 +167,7 @@ object GardenCustomKeybinds {
 
     private fun Int.toInputKey(): InputConstants.Key = when {
         this == GLFW.GLFW_KEY_UNKNOWN -> InputConstants.UNKNOWN
-        this in 0..5 -> InputConstants.Type.MOUSE.getOrCreate(this)
+        this in 0..<MouseCompat.NUMBER_OF_MOUSE_BUTTONS -> InputConstants.Type.MOUSE.getOrCreate(this)
         else -> InputConstants.Type.KEYSYM.getOrCreate(this)
     }
 
@@ -175,16 +176,16 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
-    private fun isHoldingTool(): Boolean = InventoryUtils.getItemInHand()?.let { heldItem ->
-        val internalName = heldItem.getInternalName()
-
+    private fun isHoldingTool(): Boolean {
         val wearingSunsGrasp = EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP
+        return InventoryUtils.getItemInHand()?.let { heldItem ->
+            val internalName = heldItem.getInternalName()
 
-        return internalName.isFarmingTool() ||
-            (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
-            (config.fishingRod && internalName.isFishingRod()) ||
-            (config.sunsGrasp && wearingSunsGrasp && heldItem.item == Items.AIR)
-    } ?: false
+            internalName.isFarmingTool() ||
+                (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+                (config.fishingRod && internalName.isFishingRod())
+        } ?: config.sunsGrasp && wearingSunsGrasp
+    }
 
     private fun isActive(): Boolean =
         isEnabled() &&

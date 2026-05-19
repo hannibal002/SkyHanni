@@ -6,8 +6,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 
+/**
+ * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
+ */
 object MouseCompat {
-    private const val NUMBER_OF_MOUSE_BUTTONS = 6
+    const val NUMBER_OF_MOUSE_BUTTONS = 6
 
     var deltaMouseY = 0.0
     var deltaMouseX = 0.0

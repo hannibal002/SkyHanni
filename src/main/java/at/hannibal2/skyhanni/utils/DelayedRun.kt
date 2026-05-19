@@ -31,6 +31,7 @@ object DelayedRun {
      */
     fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
 
+    // TODO find out why, then fix/remove duplicate function
     /**
      * I'm not sure why, but this acts different to the above one
      */
