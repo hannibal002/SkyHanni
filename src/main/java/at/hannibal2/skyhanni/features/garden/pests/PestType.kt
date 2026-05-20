@@ -49,7 +49,7 @@ enum class PestType(
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
         pluralName = "Field Mice",
-        eliteLbName = "mouse"
+        eliteLbName = "mouse",
     ),
     FLY(
         "Fly",
@@ -67,6 +67,15 @@ enum class PestType(
         VinylType.CICADA_SYMPHONY,
         "PEST_LOCUST_MONSTER".toInternalName(),
         CropType.POTATO,
+    ),
+    LUNAR_MOTH(
+        "Lunar Moth",
+        BossType.GARDEN_PEST_LUNAR_MOTH,
+        SprayType.MOONDEW,
+        vinyl = null,
+        "PEST_LUNAR_MOTH_MONSTER".toInternalName(),
+        crop = null, // Always drops Sunflower, Moonflower, *and* Wild Rose
+        eliteLbName = "lunar-moth",
     ),
     MITE(
         "Mite",
@@ -116,7 +125,7 @@ enum class PestType(
         VinylType.PRAY_FOR_ME,
         "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
         CropType.WILD_ROSE,
-        eliteLbName = "mantis"
+        eliteLbName = "mantis",
     ),
     FIREFLY(
         "Firefly",

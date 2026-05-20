@@ -50,6 +50,7 @@
 #### Event
 
 + Added Year of the Witch Stew Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/5315)
++ Added a fix for a Hypixel bug where Diana spades will sometimes play low-pitched Minecraft music. - Luna (https://github.com/hannibal002/SkyHanni/pull/5527)
 
 #### Inventory
 
@@ -66,15 +67,25 @@
     + Can choose to display data from the following modes: Total, Session, Day, Week, Month, or Year.
 + Added an option to prevent breaking crops on the Garden while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5455)
 + Added option to reduce sensitivity while holding Squeaky Mousemat. - Nick-NCSU (https://github.com/hannibal002/SkyHanni/pull/5391)
++ Hide annoying messages about Kernels getting added to your purse while farming. - Shana (https://github.com/hannibal002/SkyHanni/pull/5679)
++ Added current Harvest Feast in-season crop display. - Marie (https://github.com/hannibal002/SkyHanni/pull/5653)
+    + Displays the currently in-season Harvest Feast crops and how long they will be in season for.
 
 #### Chat
 
 + Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
   + Do /shachievements to see them all.
 
+#### Mining
+
++ Added Mineshaft Cave-in Timer. - Rain (https://github.com/hannibal002/SkyHanni/pull/5620)
+    + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
+
 #### Misc
 
 + Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
++ Added Inferno Minion Profit Tracker. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5500)
++ Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 
 ### Improvements
 
@@ -97,6 +108,7 @@
 + When a Diana burrow guess fails, we will now recommend `/particlequality extreme` instead of `/particlequality high`. - Luna (https://github.com/hannibal002/SkyHanni/pull/5470)
   + This is just to make sure we have the highest possible particle quality just in case.
 + Improved Bingo event time detection by fetching from the Hypixel API, supporting Extreme and Secret Bingos. - Luna (https://github.com/hannibal002/SkyHanni/pull/5508)
++ Added per-mob toggles to rare Diana mobs in waypoint sharing. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5501)
 
 #### Farming
 
@@ -126,11 +138,34 @@
 + Added 21 more /shachievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5489)
 + Added `/shrpcrestart` to restart Discord Rich Presence. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5537)
 + Added Rosewater Flask search tag to options related to evolving items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5525)
++ Improved Sirih Helper to also work when clicking Sirih with an Abiphone while in Pig form. - Luna (https://github.com/hannibal002/SkyHanni/pull/5586)
++ Added Boop Party for non-Bingo Profiles. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5570)
++ Changed the in-game auto-updater to not auto-update anything, rather suggest to manually update from Modrinth. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5617)
++ Changed 400th Anniversary Celebration to Century Celebration. - Shana (https://github.com/hannibal002/SkyHanni/pull/5660)
++ Added 8 new SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Made the Pet Symbiosis Achievement trigger as soon as you hold the weapon. - Luna (https://github.com/hannibal002/SkyHanni/pull/5562)
++ The day counter fix in the debug menu (F3) now works correctly when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5583)
 
 #### Garden
 
 + Changed Duplicate Location Markers to no longer show after all Hoppity Egg locations on the island are found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5395)
 + Renamed Farming Weight's EliteBot display name to Elite SkyBlock. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5409)
++ Added options to use custom keybinds in the Garden while holding a Squeaky Mousemat or a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
++ Added Harvest Feast rare drops and other missing rare crops to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
++ Refactored Armor Drop Tracker to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
+
+#### Combat
+
++ Added toggle to only show Cocoon Overlay when the player can cocoon. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
+
+#### Rift
+
++ Improved Berberis Helper by using the respawn sequence. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/5615)
++ Added Sun's Grasp support for Garden Custom Keybinds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5688)
+
+#### Inventory
+
++ Added support for Turbo-Crop VI and VII in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5666)
 
 ### Fixes
 
@@ -146,6 +181,25 @@
 + Fixed Greenhouse Growth Stage alert sometimes sending multiple times. - Luna (https://github.com/hannibal002/SkyHanni/pull/5438)
 + Fixed being able to set Sensitivity Reducer reduction factor to invalid values, causing glitched head movement. - Luna (https://github.com/hannibal002/SkyHanni/pull/5536)
 + Fixed Mute Fusion Machine not working if you're too far away. - Luna (https://github.com/hannibal002/SkyHanni/pull/5526)
++ Fixed the Composter Display showing when disabled. - Alex (https://github.com/hannibal002/SkyHanni/pull/5574)
++ Fixed sending Pest Spawn Cooldown Expired warning wrongly at Garden join. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5432)
++ Fixed Elite Leaderboards numbers overestimating and drifting over time. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5637)
++ Fixed normal Attack/Destroy key still triggering inputs with Garden Custom Keybinds active. - Luna (https://github.com/hannibal002/SkyHanni/pull/5638)
++ Fixed Pest Cooldown Timer saying Unknown when the timer was ready. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5632)
++ Fixed Armor Drop Tracker not tracking rare crop drops. - Rain
++ Fixed Copper not appearing in the Custom Scoreboard before finishing the Garden Tutorial Quests. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Fixed issues with keys not registering and keys getting stuck with Garden Custom Keybinds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5656)
++ Fixed Lunar Moth pest not being recognized. - Luna (https://github.com/hannibal002/SkyHanni/pull/5678)
++ Fixed Plot Border Key activating when in chat or other GUIs. - Luna (https://github.com/hannibal002/SkyHanni/pull/5691)
++ Fixed Sowdust not appearing in the Custom Scoreboard when breaking crops. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Fixed /shmouselock sometimes still allowing small drifts in yaw and pitch. - Luna (https://github.com/hannibal002/SkyHanni/pull/5687)
++ Fixed Anita's Extra FF cost to max out showing integer limit. - Rain (https://github.com/hannibal002/SkyHanni/pull/5771)
++ Fixed Copper Price not working for charmed visitors. - Luna (https://github.com/hannibal002/SkyHanni/pull/5731)
++ Fixed extra vinyls dropped by Cocoaleech Shard not getting added to Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5746)
++ Fixed not being able to double click to fly if Jump is bound to a mouse button with Custom Keybinds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5685)
++ Fixed Overbloom with decimals causing drops to not get added to Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5746)
++ Fixed showing Farming Lane features while in greenhouse plots. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5761)
++ Fixed some Custom Keybinds input behavior being inconsistent with vanilla Minecraft on macOS. - Luna (https://github.com/hannibal002/SkyHanni/pull/5685)
 
 #### Combat
 
@@ -168,6 +222,9 @@
 + Fixed occasional performance issues with Mob Detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5456)
 + Fixed Slayer Kill Time not counting the first phase for Tarantula Broodfather 5. - Luna (https://github.com/hannibal002/SkyHanni/pull/5466)
 + Fixed an issue where enabling Hide Particles would still show particles from other players' Totems of Corruption. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5543)
++ Fixed Cocoon Features triggering in incorrect conditions. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Fixed Cocoon Overlay showing from very far away. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Fixed Kuudra Profit Tracker showing key cost as 0. - Luna (https://github.com/hannibal002/SkyHanni/pull/5623)
 
 #### GUI
 
@@ -182,6 +239,7 @@
 + Fixed Active Effects and Cookie Buff in Compact Tab List having really long text when inactive. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
 + Fixed Active Effects in Compact Tab List being split into two lines when they shouldn't. - Luna (https://github.com/hannibal002/SkyHanni/pull/5468)
 + Fixed unpredictable SHWords replacements on 1.21.11. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5342)
++ Fixed error with SkyBlock Profile Viewer for players that have no selected Crimson Isle faction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5593)
 
 #### Item Ability
 
@@ -199,6 +257,9 @@
 + Fixed Shiny Orb Tracker not working with revamped Year of the Pig event. - Luna (https://github.com/hannibal002/SkyHanni/pull/5421)
 + Updated Shiny Orb Tracker to work after Shiny Shard rename to Shiny Token. - Luna (https://github.com/hannibal002/SkyHanni/pull/5518)
 + Fixed errors about Alixer and Bingo NPC in chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/5508)
++ Fixed Easter Egg waypoint not working. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
++ Fixed an error being thrown on Zombie Shootout ending due to mob despawn. - Rain (https://github.com/hannibal002/SkyHanni/pull/5670)
++ Fixed occasional error in chat when opening Chocolate Factory. - Luna (https://github.com/hannibal002/SkyHanni/pull/5729)
 
 #### Fishing
 
@@ -206,12 +267,16 @@
 + Fixed Tiki Mask being added to the Fishing Profit Tracker every time it was taken off the head. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5294)
 + Fixed Thunder Sparks triggering Custom Circles from the Fire Freeze feature. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5319)
 + Added support for new Reindrake spawn message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5513)
++ Fixed Personal Sea Creature Cap. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5692)
 
 #### Item
 
 + Fixed Super Crafting Anti Waste not working for recipes that craft multiple items. - Hype_the_Time (https://github.com/hannibal002/SkyHanni/pull/5174)
     + Also covers coin waste for multi-craft recipes like 16x bait.
 + Fixed mis-scaled and improper items in displays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5313)
++ Fixed error with new Farming Tool (Axes and Hoes) item category. - jani (https://github.com/hannibal002/SkyHanni/pull/5640)
++ Fixed error with new Trophy items. - Alex (https://github.com/hannibal002/SkyHanni/pull/5754)
++ Fixed item ability cooldown not being detected for Voidgloom Katanas. - Luna (https://github.com/hannibal002/SkyHanni/pull/5759)
 
 #### Dungeon
 
@@ -227,6 +292,7 @@
 + Fixed holographs not appearing in Crafting Room Helper. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5327)
 + Fixed Dance Room Helper getting out of sync. - Luna (https://github.com/hannibal002/SkyHanni/pull/5433)
   + It should now remain accurate even if the server is lagging.
++ Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 
 #### Inventory
 
@@ -235,6 +301,11 @@
 + Fixed error reading items in ItemPickupLog. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5444)
 + Fixed Ultrasequencer Helper missing first round. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5498)
 + Fixed lags when dealing with pets. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5545)
++ Fixed error causing Reforge Helper to fail to prevent reforges in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/5530)
++ Fixed some enchantments being named Combinable in the Anvil instead of their actual name in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5582)
++ Fixed Wardrobe background rendering over entities. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5577)
++ Fixed not being able to move both displays while in the trade menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5680)
++ Fixed Recipe Achievement not being possible. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 
 #### Misc
 
@@ -268,11 +339,56 @@
 + Fixed issues trying to download NEU repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5517)
 + Fixed Lobby Easter Egg Waypoints. - L3Cache (https://github.com/hannibal002/SkyHanni/pull/5542)
 + Fixed the mod sometimes saying Control (Ctrl) even when the Command (Cmd) key is expected on macOS. - Luna (https://github.com/hannibal002/SkyHanni/pull/5525)
++ Fixed Bazaar price update sometimes happening more often than it should and causing chat spam/game freezes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5585)
++ Fixed Hide Far Deaths incorrectly hiding the player's own deaths. - Luna (https://github.com/hannibal002/SkyHanni/pull/5592)
++ Fixed Lumber Jack NPC coordinates in Foraging Tutorial Quest. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5590)
++ Fixed Reindrake LS Sphere being on by default. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5557)
++ Fixed Bingo Boop Party Including Player Ranks in Party Invite. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5570)
++ Fixed Enter keybind firing incorrectly after closing chat or inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5413)
++ Fixed Garden Custom Keybinds not respecting Attack/Destroy, Use Item/Place Block, and Sneak being set to Toggle in vanilla Minecraft accessibility settings. - Luna (https://github.com/hannibal002/SkyHanni/pull/5601)
++ Fixed the mod not finding updates if the newest SkyHanni version doesn't have a download available for your current Minecraft version. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
++ Disallow writing to config when on Alpha. - Rain (https://github.com/hannibal002/SkyHanni/pull/5631)
+    + The mod won't write to config anymore when on Alpha, removing data sync/overwriting errors between Alpha and prod.
++ Fixed an error being thrown when Bingo NPCs aren't present on the island. - Rain (https://github.com/hannibal002/SkyHanni/pull/5636)
++ Fixed Autoupdater Update Stream automatically changing to Beta when Full was selected. - Rain (https://github.com/hannibal002/SkyHanni/pull/5629)
++ Fixed error in chat when Hypixel API says the current Minister has no perks. - Luna (https://github.com/hannibal002/SkyHanni/pull/5641)
++ Fixed error when closing inventory during world change. - Luna (https://github.com/hannibal002/SkyHanni/pull/5639)
++ Fixed errors with legacy Fishing Weapon items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5647)
++ Fixed overbloom being an unknown stat. - Rain (https://github.com/hannibal002/SkyHanni/pull/5648)
++ Fixed reforge detection for new Farming Tool item category. - Luna (https://github.com/hannibal002/SkyHanni/pull/5647)
++ Fixed the Bouncy Ball thresholds not matching the updated values. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5643)
++ Fixed config being written when on Alpha. - Rain
+    * The mod won't write to config anymore when on Alpha, removing data sync/overwriting errors between Alpha and prod.
++ Adjusted Trapper Cooldown to permanently use the lower cooldown now that Pelt-pocalypse is permanent. - Luna
++ Fixed support for Finnegan's new Grand Feast mayor perk. - Luna
++ Added thousands separators in SkyHanni User Luck. - BrookeAFK (https://github.com/hannibal002/SkyHanni/pull/5682)
++ Fixed "Cannot read profile name from tab list" warning showing even if we already know the profile name. - Luna (https://github.com/hannibal002/SkyHanni/pull/5703)
+  Fixed compatibility with other mods detecting commands sent from skyhanni to the server as chat messages. - skies-starred
++ Fixed error getting item category on items that have no category. - Luna (https://github.com/hannibal002/SkyHanni/pull/5655)
++ Fixed error in Discord RPC that can sometimes happen when starting the game or switching lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/5676)
++ Fixed some skulls/helmets glowing through walls when they shouldn't. - Luna (https://github.com/hannibal002/SkyHanni/pull/5700)
++ Fixed Trapper cooldown registering as ready 5 seconds early. - Stella (https://github.com/hannibal002/SkyHanni/pull/5659)
++ Fixed updater suggesting downgrades in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/5667)
++ Disabled /shtps outside Hypixel. - Luna (https://github.com/hannibal002/SkyHanni/pull/5663)
+    + The method of measurement we use is specific to Hypixel and may report zero or inaccurate TPS on other servers.
++ Fixed Attribute Menu Syphon Amount Pattern. - Alex (https://github.com/hannibal002/SkyHanni/pull/5722)
++ Fixed Chat Scroll sometimes getting reset. - nopo (https://github.com/hannibal002/SkyHanni/pull/5738)
++ Fixed Hoppity Achievement being too hard. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Fixed rare crash with invalid error manager data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5727)
++ Fixed typos in docs and config descriptions. - igrinddiana77 (https://github.com/hannibal002/SkyHanni/pull/5760)
 
 #### Commands
 
 + Fixed colored item names in `/viewrecipe` autocomplete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5434)
 + Fixed issues with GFS auto-complete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5494)
+
+#### Mining
+
++ Fixed Could not find gemstone slot price error showing up when interacting with certain items that still have outdated gemstone slots. - Luna (https://github.com/hannibal002/SkyHanni/pull/5591)
+    + If you still see any such errors, please report it to us so that we can add the items to the exclusion list.
++ Fixed custom Mineshaft type names not displaying correctly. - Rain (https://github.com/hannibal002/SkyHanni/pull/5613)
++ Fixed Mineshaft Pity Message Modification requiring the Pity Display to be enabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Fixed Quick Shafter Achievement not being granted properly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 
 ### Technical Details
 
@@ -454,6 +570,43 @@
 + Replaced lots of feature `isEnabled()` functions with new `HandleEvent` params. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5419)
 + Reworked the `RepoLogger` to extend `SkyHanniLogger`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5517)
 + Updated Kotlin language version from 2.0 to 2.2. - Luna (https://github.com/hannibal002/SkyHanni/pull/5460)
++ Changed sea creature catch detection to use the message without color codes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5528)
+    + The version with color codes should still be added as `alternate_messages` to the repo to not break older mod versions until Hypixel drops 1.21.11 support.
++ Added `SkyblockEquipmentDataUpdateEvent` for equipment updates. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Switched from Moulberry LBIN API to Elite LBIN API. - Ke5o (https://github.com/hannibal002/SkyHanni/pull/5616)
+    + Also renamed `/shfetchmoulblbins` to `/shreloadlbins`.
++ Added debug command `/shcomparewikinpc` to compare wiki data with SkyHanni graph data. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5614)
++ Added enum class to Diana waypoint sharing instead of string comparison. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5501)
++ Added graph editor validation for deprecated teleport nodes and invalid warp and jump pad names. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5621)
++ Added Modrinth as a new source for update checks and changelogs, replacing GitHub as default. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
++ Changed the Download update button to open the browser at the relevant Modrinth or GitHub release instead of queuing the update to be automatically installed. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
++ Fixed `CropClickEvent` firing when right-clicking crops. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
+    + There are currently no crops (other than Rift crops, which aren't handled by this event) that are harvested using right-click, so these were just false positives.
++ Fixed `MCVersion.currentMcVersion` being called before Minecraft set-up in gradle test. - Rain (https://github.com/hannibal002/SkyHanni/pull/5626)
++ Removed the ability to automatically download updates. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
++ Removed the ability to disable update notifications. - Luna (https://github.com/hannibal002/SkyHanni/pull/5618)
+    + These notifications only appear once per game start unless you manually check for updates.
++ Renamed `BlockClickEvent.getBlockState` to `BlockClickEvent.blockState` to avoid implying it's a method. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
++ Split deprecated `TELEPORT` graph node tag into `WARP`, `JUMP_PAD`, and `TELEPORT_PAD`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5621)
++ Added Copy Cosmetic Skull Data feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5627)
++ Added a copilot-instructions.md file to disable GitHub Copilot from commenting on PRs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5713)
++ Added SOWDUST to TabWidget enum. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Banned AI-generated code in PRs via CONTRIBUTING.md. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5713)
++ Disabled Spirit Scepter Bat mob detection rule because it is unused and has a very high false-positive rate. - Luna (https://github.com/hannibal002/SkyHanni/pull/5634)
++ Fixed COPPER entry of TabWidget enum only allowing digits. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5671)
++ Added /shspoofequipment command. - Luna (https://github.com/hannibal002/SkyHanni/pull/5688)
++ Added handling for overbloom stat in pest Rare Drops. - Rain (https://github.com/hannibal002/SkyHanni/pull/5742)
++ Added support for hidden achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Deprecated all old classless functions in file EntityCompat, duplicated them into the new class EntityCompat, and started replacing the import in some spots. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5769)
++ Enabled stack traces by default for tests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5739)
++ Implemented Harvest Feast data handling. - Marie (https://github.com/hannibal002/SkyHanni/pull/5653)
++ Optimized ItemInHandChangeEvent. - Luna (https://github.com/hannibal002/SkyHanni/pull/5562)
++ Removed deprecated CollectionUtils.optionalEmpty. - Luna (https://github.com/hannibal002/SkyHanni/pull/5600)
+    + Use Collection.orEmpty instead.
++ The build script no longer requires specifically an Adoptium JDK. - Luna (https://github.com/hannibal002/SkyHanni/pull/5630)
++ Updated credits for third party software. - Luna (https://github.com/hannibal002/SkyHanni/pull/5635)
+    + Replaced NotEnoughUpdates with NotEnoughUpdates-REPO.
+    + Replaced Forge with Fabric Loader and Fabric API.
 
 ### Removed Features
 
@@ -583,7 +736,7 @@
 + Added hide soulbound items from Chest Value. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 + Made Not Clickable Items not prevent soulbound items in trades on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5086)
 + Estimated Item Value now accurately calculates level 100 pets. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5137)
-  + This means Chest Value will seperate Level 100 pets & Calculate them properly.
+  + This means Chest Value will separate Level 100 pets & Calculate them properly.
 + Open recipe for items in more places on ironman. - nopo (https://github.com/hannibal002/SkyHanni/pull/5263)
   + This includes sack display and sunflower oil in composter.
 
@@ -1389,7 +1542,7 @@
 + Added option to show `/shnavigate` feedback in a UI element instead of chat. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4399)
 + Separated Foraging and Hunting features in the config. - Luna (https://github.com/hannibal002/SkyHanni/pull/4437)
 + Added some more information when clock offset fails to calculate. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4439)
-+ Improved compatability between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
++ Improved compatibility between SkyHanni's glow and Minecraft's glow on 1.21. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/4496)
 + Improved performance a bit. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/4519)
 + Added warning for incompatibility with Aaron’s Mod. - ninjaguardian (https://github.com/hannibal002/SkyHanni/pull/4277)
     + Added prompt to disable Rainbow Max Enchants in one of the two mods.

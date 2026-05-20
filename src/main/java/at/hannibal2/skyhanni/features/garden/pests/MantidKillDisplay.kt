@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
+import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -28,6 +28,7 @@ object MantidKillDisplay {
     private const val MAX_BONUS = 20
     private val EXPIRE_TIME = 10.minutes
     private val config get() = PestApi.config.mantidDisplay
+
     // mantid reforge does not work like refrigerate; each pest kill time is individually stored
     private val pestExpireQueue: Queue<SimpleTimeMark> = LinkedList()
     private val isWearingMantid by RecalculatingValue(1.seconds) {
@@ -121,12 +122,13 @@ object MantidKillDisplay {
 
     private fun isEnabled() = config.enabled && GardenApi.inGarden()
     private fun shouldShow() = isEnabled() && checkShowConditions()
+
     @Suppress("ReturnCount")
     private fun checkShowConditions(): Boolean {
         for (condition in config.whenToShow) {
             when (condition) {
                 MantidDisplayConfig.WhenShowDisplay.ALWAYS -> return true
-                MantidDisplayConfig.WhenShowDisplay.ARMOR -> if (ArmorDropTracker.hasArmor) return true
+                MantidDisplayConfig.WhenShowDisplay.ARMOR -> if (RareCropTracker.hasArmor) return true
                 MantidDisplayConfig.WhenShowDisplay.MANTID -> if (isWearingMantid) return true
                 MantidDisplayConfig.WhenShowDisplay.TOOL -> if (GardenApi.hasFarmingToolInHand()) return true
                 MantidDisplayConfig.WhenShowDisplay.VACUUM -> if (PestApi.hasVacuumInHand()) return true

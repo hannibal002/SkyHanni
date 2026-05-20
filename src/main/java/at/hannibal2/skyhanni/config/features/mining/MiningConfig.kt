@@ -96,7 +96,7 @@ class MiningConfig {
     val notifications: MiningNotificationsConfig = MiningNotificationsConfig()
 
     @Expose
-    @ConfigOption(name = "Don Expresso Feeding Reminder", desc = "Send a  message to teleport to Don Expresso when he is full.")
+    @ConfigOption(name = "Don Expresso Feeding Reminder", desc = "Send a message to teleport to Don Expresso when he is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     var donExpressoFeedingReminder: Boolean = true
