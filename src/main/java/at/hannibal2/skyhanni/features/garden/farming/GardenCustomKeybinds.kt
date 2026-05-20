@@ -181,8 +181,7 @@ object GardenCustomKeybinds {
         return internalName.isFarmingTool() ||
             (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
             (config.fishingRod && internalName.isFishingRod()) ||
-            // TODO confirm why we check for item air here. getItemInHand should return null if there is no item there.
-            (config.sunsGrasp && wearingSunsGrasp && heldItem.`is`(Items.AIR))
+            (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
     } ?: false
 
     private fun isActive(): Boolean =
