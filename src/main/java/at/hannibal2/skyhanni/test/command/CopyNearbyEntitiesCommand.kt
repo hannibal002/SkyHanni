@@ -250,7 +250,7 @@ object CopyNearbyEntitiesCommand {
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
         val rotation = entity.lookAngle
-        val transformation = Display.createTransformation(entity.entityData)
+        val transformation = entity.renderState()?.transformation?.get(0f) ?: return
 
         add("-  rotation: $rotation")
         add("-  transformation scale: ${transformation.scale}")
@@ -384,6 +384,7 @@ object CopyNearbyEntitiesCommand {
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
+        entityCounter = 0
     }
 
     private fun LivingEntity.asString() =

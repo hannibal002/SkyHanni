@@ -69,7 +69,6 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRe
 #accessible field net/minecraft/client/renderer/rendertype/RenderSetup outputTarget Lnet/minecraft/client/renderer/rendertype/OutputTarget;
 #accessible field net/minecraft/client/renderer/rendertype/RenderSetup layeringTransform Lnet/minecraft/client/renderer/rendertype/LayeringTransform;
 #accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/lang/String;
-#accessible method net/minecraft/world/entity/Display createTransformation (Lnet/minecraft/network/syncher/SynchedEntityData;)Lcom/mojang/math/Transformation;
 #?}
 
 inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/ChatLineData
