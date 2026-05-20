@@ -76,6 +76,8 @@ object TalbotCircles {
         if (yMin > yMax || xMin > xMax || zMin > zMax) return
         if ((xMax - xMin) * (zMax - zMin) > 1_000_000) return
 
+        // using a step size reduces computation and makes it easier for players
+        // to judge distance away compared to one big highlighted blob
         for (y in yMin.toInt()..yMax.toInt())
             for (x in xMin.toInt()..xMax.toInt() step LATTICE_WIDTH)
                 for (z in zMin.toInt()..zMax.toInt() step LATTICE_WIDTH)
