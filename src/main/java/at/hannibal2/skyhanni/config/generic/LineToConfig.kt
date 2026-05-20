@@ -15,7 +15,7 @@ open class LineToConfig(
     defaultColor: ChromaColour = LorenzColor.YELLOW.toChromaColor(255),
 ) {
     @Expose
-    @ConfigOption(name = "Toggle Line", desc = "Show a Line to Eye.")
+    @ConfigOption(name = "Toggle Line", desc = "Draw a Line to Crosshair from Target.")
     @ConfigEditorBoolean
     @FeatureToggle
     var showLine: Boolean = defaultOn
