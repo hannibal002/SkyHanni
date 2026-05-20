@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
@@ -326,6 +326,7 @@ object EliteFarmersLeaderboard {
 
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             lbData.isUnranked = true
+            lbData.lastApiAmount = null
             // correct wrong data
             leaderboardAmountMap?.remove(leaderboardType)
             leaderboardPosMap?.remove(leaderboardType)
@@ -338,7 +339,7 @@ object EliteFarmersLeaderboard {
         }
         lbData.isUnranked = false
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
-        handleUpcomingPlayers(leaderboardType, apiData)
+        handleUpcomingPlayers(leaderboardType, apiData, shouldUpdateData)
         // prefer our lb pos
         return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
@@ -374,77 +375,64 @@ object EliteFarmersLeaderboard {
     // only update data if api data has changed since last request
     private fun shouldUpdateData(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
-        val oldApiData = lbData.apiData ?: return true
-        val amountDiff = oldApiData.amount != apiData.amount
-        return amountDiff
+        val lastApiAmount = lbData.lastApiAmount ?: return true
+        return apiData.amount > lastApiAmount
     }
 
     private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
         if (apiData.rank == -1) return // no lb rank means amount is invalid
-        val diff = apiData.amount - (getAmount(leaderboardType) ?: 0.0)
         when (leaderboardType) {
-            is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData, diff)
-            is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData, diff)
-            is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData, diff)
+            is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData)
+            is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData)
+            is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData)
+        }
+        eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.apply {
+            lastApiAmount = apiData.amount
+            passedPlayers.clear()
         }
     }
 
     private fun handleWeightDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
-        if (diff >= 0.5 || abs(diff) >= 100) {
-            when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we handle all-time weight in the FarmingWeight class
-                    // we only update collections on garden join
-                }
-
-                EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
-            }
-        }
+        setWeight(leaderboardType.mode, apiData.amount)
     }
 
     private fun handleCollectionDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
         val crop = leaderboardType.crop ?: return
-        val diffWeight = diff / crop.getFactor()
-        if (diffWeight >= 0.5 || abs(diffWeight) >= 100) {
-            when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we handle all-time collections in the farming weight class
-                    // we only update collections on garden join
-                }
-
-                EliteLeaderboardMode.MONTHLY ->
-                    leaderboardAmountMap?.set(leaderboardType, apiData.amount)
-            }
+        when (leaderboardType.mode) {
+            EliteLeaderboardMode.ALL_TIME -> crop.setCollectionCounter(apiData.amount.toLong())
+            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.set(leaderboardType, apiData.amount)
         }
     }
 
     private fun handlePestDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
-        if (diff >= 1 || abs(diff) >= 150) {
-            leaderboardAmountMap?.set(leaderboardType, apiData.amount)
-        }
+        leaderboardAmountMap?.set(leaderboardType, apiData.amount)
     }
 
     private fun handleUpcomingPlayers(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
+        updatedAmount: Boolean,
     ) {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
-        lbData.lastPlayer = apiData.previous?.firstOrNull()
+        val currentAmount = getAmount(leaderboardType) ?: apiData.amount
+        val previousPlayer = apiData.previous?.firstOrNull()
+        if (updatedAmount || lbData.lastPlayer == null) {
+            lbData.lastPlayer = previousPlayer
+        } else if (previousPlayer != null && currentAmount >= previousPlayer.amount) {
+            lbData.lastPlayer = previousPlayer
+        }
         lbData.nextPlayers.clear()
         apiData.upcomingPlayers.forEach {
-            if (apiData.rank != 1) lbData.nextPlayers.add(it)
+            if (apiData.rank != 1 && it.amount > currentAmount) lbData.nextPlayers.add(it)
         }
     }
 

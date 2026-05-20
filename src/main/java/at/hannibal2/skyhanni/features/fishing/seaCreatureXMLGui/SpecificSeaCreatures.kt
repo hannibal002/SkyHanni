@@ -63,7 +63,7 @@ class SpecificSeaCreatures(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
-                            shouldRenderLootshare = seaCreature.rare,
+                            shouldRenderLootshare = seaCreature.lootshareSphereOverride ?: seaCreature.rare,
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
@@ -88,7 +88,7 @@ class SpecificSeaCreatures(
                     SpecificSeaCreatureStorageXMLHelper(
                         SpecificSeaCreatureSettings(
                             name,
-                            shouldRenderLootshare = seaCreature.rare,
+                            shouldRenderLootshare = seaCreature.lootshareSphereOverride ?: seaCreature.rare,
                             shouldShowHealthOverlay = seaCreature.rare,
                             shouldShareInChat = seaCreature.rare,
                             shouldShowKillTime = seaCreature.rare,
