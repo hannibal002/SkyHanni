@@ -255,7 +255,11 @@ enum class TabWidget(
     ),
     COPPER(
         // language=RegExp
-        "Copper: (?<amount>\\d+)",
+        "Copper: (?<copper>.+)",
+    ),
+    SOWDUST(
+        // language=RegExp
+        "Sowdust: (?<sowdust>.+)",
     ),
     PESTS(
         // language=RegExp

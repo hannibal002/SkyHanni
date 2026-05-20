@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -61,7 +61,7 @@ object FixGhostEntities {
                         if (recentlyRemovedEntities.size == 10) recentlyRemovedEntities.removeFirst()
                     }
                     hiddenEntityIds.remove(entityID)
-                }
+                },
             )
         }
     }

@@ -213,6 +213,11 @@ class MiscConfig {
     var crashOnDeath: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigEditorBoolean
+    var crashOnTttFail: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "SkyBlock XP Bar",
         desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
