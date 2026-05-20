@@ -1874,6 +1874,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added the ability to move and scale the Held Item Tooltip in the GUI Editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5218)
 + Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 + Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
++ Added Lotus Atoll island support. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5745)
 
 </details>
 <details open><summary>
