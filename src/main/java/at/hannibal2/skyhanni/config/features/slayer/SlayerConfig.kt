@@ -182,9 +182,9 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
-            event.move(127, "slayer.slayerMinibossHighlight", "slayer.miniboss.slayerMinibossHighlight")
-            event.move(127, "slayer.slayerMinibossLine", "slayer.miniboss.line.showLine")
-            event.move(127, "slayer.slayerMinibossLineWidth", "slayer.miniboss.line.lineWidth")
+            event.move(134, "slayer.slayerMinibossHighlight", "slayer.miniboss.slayerMinibossHighlight")
+            event.move(134, "slayer.slayerMinibossLine", "slayer.miniboss.line.showLine")
+            event.move(134, "slayer.slayerMinibossLineWidth", "slayer.miniboss.line.lineWidth")
         }
     }
 }

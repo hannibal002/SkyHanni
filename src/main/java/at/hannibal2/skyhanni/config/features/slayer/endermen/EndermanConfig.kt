@@ -45,7 +45,7 @@ class EndermanConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(3, "slayer.endermanHighlightNukekebi", "slayer.endermen.highlightNukekebi")
-            event.move(130, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.drawLineToNukekebi")
+            event.move(134, "slayer.endermen.drawLineToNukekebi", "slayer.endermen.drawLineToNukekebi")
         }
     }
 }

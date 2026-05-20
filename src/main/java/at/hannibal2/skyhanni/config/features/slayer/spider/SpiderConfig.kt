@@ -41,8 +41,8 @@ class SpiderConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(130, "slayer.spider.lineToBoss", "slayer.spider.lineToBoss.showLine")
-            event.move(130, "slayer.spider.slayerLineWidth", "slayer.spider.lineToBoss.slayerLineWidth")
+            event.move(134, "slayer.spider.lineToBoss", "slayer.spider.lineToBoss.showLine")
+            event.move(134, "slayer.spider.slayerLineWidth", "slayer.spider.lineToBoss.slayerLineWidth")
         }
     }
 }
