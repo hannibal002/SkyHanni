@@ -163,6 +163,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
 
+    fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
+        if (!drop.canDropFromPests) return
+        if (!PestApi.hasVacuumInHand() && !PestApi.hasLassoInHand()) return
+
+        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.itemName)
+        addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
