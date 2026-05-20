@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -47,7 +46,7 @@ object FishingBobberTimer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (deployTime.isFarPast()) return
         if (FishingApi.bobber == null) {
             deployTime = SimpleTimeMark.farPast()
@@ -57,6 +56,4 @@ object FishingBobberTimer {
         val display = Renderable.text("§aBobber: §f${elapsed.format(showMilliSeconds = true)}")
         config.pos.renderRenderable(display, posLabel = "Fishing Bobber Timer")
     }
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled.get()
 }

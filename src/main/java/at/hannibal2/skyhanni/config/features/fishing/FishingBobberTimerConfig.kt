@@ -6,7 +6,6 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.observer.Property
 
 class FishingBobberTimerConfig {
     @Expose
@@ -16,7 +15,7 @@ class FishingBobberTimerConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    val enabled: Property<Boolean> = Property.of(false)
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(
