@@ -4,6 +4,10 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 
+/**
+ * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
+ */
 object BlockCompat {
     fun getAllLogs(): List<Block> {
         val logs = mutableListOf<Block>()

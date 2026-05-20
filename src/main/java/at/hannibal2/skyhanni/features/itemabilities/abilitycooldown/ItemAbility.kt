@@ -36,7 +36,6 @@ enum class ItemAbility(
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
     ICE_SPRAY_WAND(5),
-    ATOMSPLIT_KATANA(4, "VORPAL_KATANA", "VOIDEDGE_KATANA", ignoreMageCooldownReduction = true),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
     SOS_FLARE(10),
@@ -72,6 +71,7 @@ enum class ItemAbility(
     INK_WAND("Ink Bomb", 30, "Ink Wand"),
     ROGUE_SWORD("Speed Boost", 30, "Rogue Sword", ignoreMageCooldownReduction = true),
     TALBOTS_THEODOLITE("Track", 10, "Talbot's Theodolite"),
+    ATOMSPLIT_KATANA("Soulcry", 4, "Atomsplit Katana", "Vorpal Katana", "Voidedge Katana", ignoreMageCooldownReduction = true),
 
     // doesn't have a consistent sound
     ECHO("Echo", 3, "Ancestral Spade");

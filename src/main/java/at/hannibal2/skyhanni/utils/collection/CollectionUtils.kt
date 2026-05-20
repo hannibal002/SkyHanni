@@ -563,12 +563,6 @@ object CollectionUtils {
         retainAll(sequence.toSet())
     }
 
-    @Deprecated(
-        "Use the built-in ifEmpty function with emptySet() instead",
-        ReplaceWith("this.ifEmpty { emptySet() }"),
-    )
-    fun <T> Set<T>.optionalEmpty(): Set<T> = ifEmpty { emptySet() }
-
     inline fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?): Map<K, V> =
         mapNotNull(transform).toMap()
 

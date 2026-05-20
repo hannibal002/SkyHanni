@@ -48,7 +48,9 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
     ),
     FISHING_HOTSPOT(
         IslandType.BACKWATER_BAYOU,
+        IslandType.LOTUS_ATOLL,
         IslandType.HUB,
+        IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
     )

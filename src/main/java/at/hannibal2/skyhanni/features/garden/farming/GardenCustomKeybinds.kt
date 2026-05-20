@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -151,12 +150,11 @@ object GardenCustomKeybinds {
     private fun refreshState(keyBindings: Iterable<KeyMapping>) {
         for (keyBinding in keyBindings) {
             if (keyBinding.isToggle()) continue
-            keyBinding.setDown(keyBinding.key.isDown())
+            keyBinding.isDown = keyBinding.key.isDown()
         }
     }
 
-    private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+    private fun KeyMapping.isToggle(): Boolean = this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun InputConstants.Key.isDown(): Boolean = when (type) {
         InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().window, value)
@@ -183,6 +181,7 @@ object GardenCustomKeybinds {
         return internalName.isFarmingTool() ||
             (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
             (config.fishingRod && internalName.isFishingRod()) ||
+            // TODO confirm why we check for item air here. getItemInHand should return null if there is no item there.
             (config.sunsGrasp && wearingSunsGrasp && heldItem.`is`(Items.AIR))
     } ?: false
 
