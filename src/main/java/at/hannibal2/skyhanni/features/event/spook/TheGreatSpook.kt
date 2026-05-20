@@ -36,8 +36,7 @@ object TheGreatSpook {
     private val config get() = SkyHanniMod.feature.event.spook
     private val needPrimalFear get() = config.primalFearNotification || config.primalFearTimer
 
-    var isGreatSpookActive = false
-        private set
+    private var isGreatSpookActive = false
     private var greatSpookTimeRange: ClosedRange<SimpleTimeMark>? = null
     private var greatSpookEndTime = SimpleTimeMark.farPast()
 
