@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -17,15 +19,21 @@ object DonExpressoFeedingReminder {
 
     private val patternGroup = RepoPattern.group("mining.donexpresso")
 
+    /**
+     * REGEX-TEST: [NPC] Don Expresso: I DON'T FEEL SO GOOD...
+     */
     private val fullPattern by patternGroup.pattern(
         "full",
-        "\\[NPC\\] Don Expresso: I DON'T FEEL SO GOOD\\.\\.\\."
+        "\\[NPC] Don Expresso: I DON'T FEEL SO GOOD\\.\\.\\."
     )
+    
+    private val TASTY_MITHRIL = "MITHRIL_GOURMAND".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
+        if (!config.donExpressoFeedingReminder) return
         if (!fullPattern.matches(event.cleanMessage)) return
+        if (!InventoryUtils.isItemInInventory(TASTY_MITHRIL)) return
 
         ChatUtils.clickToActionOrDisable(
             "§6Don Expresso §eis full! Click to teleport to him.",
@@ -34,6 +42,4 @@ object DonExpressoFeedingReminder {
             action = { HypixelCommands.tpToDonExpresso() },
         )
     }
-
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.donExpressoFeedingReminder
 }
