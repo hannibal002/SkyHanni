@@ -2,10 +2,15 @@ package at.hannibal2.skyhanni.config.features.garden.greenhouse
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.lwjgl.glfw.GLFW
 
 class GreenhouseConfig {
 
@@ -43,6 +48,31 @@ class GreenhouseConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlightWaterStatus: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Protect Greenhouse Slots",
+        desc = "Enable protecting greenhouse slots from being broken.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var enableProtectGreenhouseSlots: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Protect Greenhouse Slots Toggle Key",
+        desc = "Toggle the protected status of the slot you are looking at.",
+    )
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var protectGreenhouseSlotsToggleKey: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(
+        name = "Protected Slot Color",
+        desc = "Choose the color used to highlight protected greenhouse slots.",
+    )
+    @ConfigEditorColour
+    var protectGreenhouseSlotsColor: ChromaColour = LorenzColor.GOLD.toChromaColor(127)
 
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
