@@ -178,7 +178,7 @@ object CroesusChestTracker {
         inCroesusInventory = true
         pageSwitchable = true
         croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.ARROW) {
+        if (event.inventoryItems[BACK_ARROW_SLOT]?.`is`(Items.ARROW) != true) {
             currentPage = 0
         }
     }
@@ -331,7 +331,7 @@ object CroesusChestTracker {
         else -> null
     }?.let { it + currentPage * 28 }
 
-    private fun SafeItemStack.isArrow() = this.item == Items.ARROW
+    private fun SafeItemStack.isArrow() = this.`is`(Items.ARROW)
 
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }

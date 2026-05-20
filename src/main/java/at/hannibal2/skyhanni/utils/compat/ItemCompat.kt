@@ -134,16 +134,16 @@ enum class DyeCompat(
          */
         fun SafeItemStack.isDye(metadata: Int = -1): Boolean {
             if (metadata == -1) {
-                return entries.any { this.item == item }
+                return entries.any { this.`is`(it.stackType) }
             }
 
-            return this.item == fromDyeColor(metadata).stackType
+            return this.`is`(fromDyeColor(metadata).stackType)
         }
 
         private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.dyeColor == dyeColor } ?: GRAY
 
         fun toDamage(stack: SafeItemStack): Int {
-            return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
+            return entries.firstOrNull { stack.`is`(it.stackType) }?.dyeColor ?: 0
         }
 
         fun createDyeStack(dyeColor: Int, size: Int = 1): SafeItemStack =

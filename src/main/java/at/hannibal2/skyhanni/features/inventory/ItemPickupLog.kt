@@ -253,7 +253,7 @@ object ItemPickupLog {
         return runCatching {
             if (compact) getInternalName().repoItemName else default
         }.getOrElse {
-            ChatUtils.debug("Could not get dynamic name for $item - error:\n$it")
+            ChatUtils.debug("Could not get dynamic name for ${getItem()} - error:\n$it")
             default
         }
     }

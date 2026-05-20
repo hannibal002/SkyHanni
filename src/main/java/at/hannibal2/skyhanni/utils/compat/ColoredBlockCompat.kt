@@ -196,28 +196,28 @@ enum class ColoredBlockCompat(
          * No metadata means any stained-glass
          */
         fun SafeItemStack.isStainedGlass(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassBlock.asItem() }
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained-glass pane
          */
         fun SafeItemStack.isStainedGlassPane(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassPaneBlock.asItem() }
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassPaneBlock.asItem()) }
         }
 
         /**
          * No metadata means any wool
          */
         fun SafeItemStack.isWool(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.woolBlock.asItem() }
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.woolBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained clay
          */
         fun SafeItemStack.isStainedClay(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.clayBlock.asItem() }
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.clayBlock.asItem()) }
         }
 
         fun BlockState.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)

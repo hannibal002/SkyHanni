@@ -189,8 +189,8 @@ object HoppityApi {
     fun filterMayBeStray(items: Map<Int, SafeItemStack>) = items.filter { (slotIndex, stack) ->
         // Strays can only appear in the first 3 rows of the inventory, excluding the middle slot of the middle row.
         slotIndex != 13 && slotIndex in 0..26 &&
-            // Stack must not be null, and must be a skull.
-            stack.item != null && stack.item == Items.PLAYER_HEAD &&
+            // Stack must be a skull.
+            stack.`is`(Items.PLAYER_HEAD) &&
             // All strays have a display name, all the time.
             stack.hoverName.string.isNotEmpty() && stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
     }
@@ -202,7 +202,7 @@ object HoppityApi {
 
     private fun Slot.isMiscProcessable() =
         // All misc items are skulls or panes, with a display name, and lore.
-        item != null && item.item != null && (item.item == Items.PLAYER_HEAD || item.isStainedGlassPane()) &&
+        (item.`is`(Items.PLAYER_HEAD) || item.isStainedGlassPane()) &&
             item.hoverName.string.isNotEmpty() && item.getLore().isNotEmpty()
 
     private fun postApiEggFoundEvent(type: HoppityEggType, event: SkyHanniChatEvent.Allow, note: String? = null) {

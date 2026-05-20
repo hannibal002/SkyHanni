@@ -292,7 +292,7 @@ object QuiverApi {
 
     fun isHoldingBow(): Boolean {
         InventoryUtils.getItemInHand()?.let {
-            return it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            return it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         } ?: return false
     }
 
@@ -310,7 +310,7 @@ object QuiverApi {
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
-            it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         }
     }
 

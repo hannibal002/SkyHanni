@@ -103,7 +103,7 @@ object HideExCoopMembers {
         if (!config.hideExCoopMembers || !historicMembersInventory.isInside()) return
 
         event.inventoryItems.values
-            .filter { it.item == Items.PLAYER_HEAD }
+            .filter { it.`is`(Items.PLAYER_HEAD) }
             .forEach { item ->
                 addHiddenMember(item.hoverName.string.cleanPlayerName())
             }

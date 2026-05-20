@@ -399,7 +399,7 @@ object BestiaryData {
     }
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, SafeItemStack>): Boolean {
-        if (inventoryItems[52]?.item == Items.ENDER_EYE) {
+        if (inventoryItems[52]?.`is`(Items.ENDER_EYE) == true) {
             return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
         }
 

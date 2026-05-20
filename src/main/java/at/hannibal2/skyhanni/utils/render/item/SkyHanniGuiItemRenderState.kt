@@ -50,7 +50,7 @@ data class SkyHanniGuiItemRenderState(
     }
     val atlasKey by lazy {
         val baseKey = SkyHanniAtlasKey(
-            item = itemStack.item.toString(),
+            item = itemStack.getItem().toString(),
             modelIdentity = trackingState.modelIdentity,
             rotationVector = rotationVector,
         )

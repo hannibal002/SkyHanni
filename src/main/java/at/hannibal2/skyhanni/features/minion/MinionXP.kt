@@ -152,7 +152,8 @@ object MinionXP {
         when {
             MinionFeatures.minionInventoryOpen -> {
                 addXPInfoToTooltip(event)
-                if (collectItem == event.itemStack.item) {
+                val item = collectItem ?: return
+                if (event.itemStack.`is`(item)) {
                     collectItemXPList.forEachIndexed { i, item ->
                         event.toolTip.add(i + 1, item)
                     }

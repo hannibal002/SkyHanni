@@ -346,13 +346,13 @@ object ItemUtils {
     }
 
     fun SafeItemStack.getSkullTexture(): String? {
-        if (item != Items.PLAYER_HEAD) return null
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
 
     }
 
     fun SafeItemStack.getSkullOwner(): String? {
-        if (item != Items.PLAYER_HEAD) return null
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
     }
 
@@ -980,17 +980,17 @@ object ItemUtils {
 
     fun SafeItemStack.isSkull(): Boolean {
         val hasItemModel = this.getItemModel() != null
-        return item == Items.PLAYER_HEAD && !hasItemModel
+        return this.`is`(Items.PLAYER_HEAD) && !hasItemModel
     }
 
     fun SafeItemStack.getItemModel(): Item? {
         val identifier = this.get(DataComponents.ITEM_MODEL)
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
-        return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
+        return itemModel.takeUnless { it == Items.AIR || this.`is`(it) }
     }
 
     fun SafeItemStack.asTextComponent(): Component? {
-        if (item != Items.PLAYER_HEAD) return null
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         val profile = get(DataComponents.PROFILE) ?: return null
         return componentBuilder {
             append(Component.`object`(PlayerSprite(profile, true))) {

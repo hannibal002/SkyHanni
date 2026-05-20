@@ -486,7 +486,7 @@ object SkyHanniDebugsAndTests {
     fun onKeyPressCopyCosmeticsData() {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
-        if (stack.item != Items.PLAYER_HEAD) return
+        if (!stack.`is`(Items.PLAYER_HEAD)) return
         if (skinId == null) return
         if (skinIdTime.passedSince() > 2.minutes) return
 

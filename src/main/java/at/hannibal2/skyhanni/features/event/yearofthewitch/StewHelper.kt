@@ -61,7 +61,7 @@ object StewHelper {
         if (!inventoryDetector.isInside()) return
         for (slot in event.container.slots) {
             val stack = slot.item
-            if (stack.item != Items.PLAYER_HEAD) continue
+            if (!stack.`is`(Items.PLAYER_HEAD)) continue
             val status = getStewStatus(stack) ?: continue
             status.color?.let { slot.highlight(it) }
         }
@@ -72,7 +72,7 @@ object StewHelper {
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
         val requiredItems = mutableMapOf<NeuInternalName, Int>()
         for (stack in items) {
-            if (stack.item != Items.PLAYER_HEAD) continue
+            if (!stack.`is`(Items.PLAYER_HEAD)) continue
             if (getStewStatus(stack) == StewStatus.HAS_EATEN) continue
             val ingredientLine = stack.getLoreComponent().map { it.string }.nextAfter("Requires:") ?: continue
             stewItemNamePattern.matchMatcher(ingredientLine) {

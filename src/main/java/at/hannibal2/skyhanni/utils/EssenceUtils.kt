@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 
 @SkyHanniModule
@@ -140,7 +141,7 @@ object EssenceUtils {
         inventoryItems: Map<Int, SafeItemStack>,
         keyRange: IntRange,
     ) = extractPurchasedUpgrades(
-        inventoryItems.filter { it.key in keyRange && it.value.item != null },
+        inventoryItems.filter { it.key in keyRange && it.value.isNotEmpty() },
     )
 
     private fun extractPurchasedUpgrades(inventoryItems: Map<Int, SafeItemStack>) = buildMap {

@@ -32,7 +32,7 @@ object TestDragNDrop : RenderableTestSuite.TestRenderable("drag") {
                     object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as SafeItemStack
-                            if (unit.item == Items.BONE) {
+                            if (unit.`is`(Items.BONE)) {
                                 ChatUtils.chat("Oh, a bone!")
                             } else {
                                 ChatUtils.chat("Disgusting that is not a bone!")
