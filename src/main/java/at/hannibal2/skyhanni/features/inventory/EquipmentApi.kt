@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.InternalNameArgumentType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -14,6 +18,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -93,6 +98,20 @@ object EquipmentApi {
             if (item.cleanName() != chatItem) return@matchMatcher
             setEquipment(slot, item)
             lastClickedEquipment = null
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shspoofequipment") {
+            description = "Spoofs a SkyBlock equipment slot."
+            category = CommandCategory.DEVELOPER_TEST
+
+            arg("slot", EnumArgumentType.name<EquipmentSlot>()) { slot ->
+                argCallback("internalName", InternalNameArgumentType.internalName()) { internalName ->
+                    setEquipment(getArg(slot), internalName.getItemStack())
+                }
+            }
         }
     }
 

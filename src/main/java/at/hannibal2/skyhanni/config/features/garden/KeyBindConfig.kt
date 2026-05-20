@@ -37,6 +37,15 @@ class KeyBindConfig {
     var fishingRod: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Include Empty Hand with Sun's Grasp",
+        desc = "Also use custom keybinds while holding nothing in your hand if you have a Sun's Grasp equipped.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var sunsGrasp: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
     @ConfigEditorBoolean
     var excludeBarn: Boolean = false
