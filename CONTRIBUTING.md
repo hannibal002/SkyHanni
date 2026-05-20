@@ -50,7 +50,8 @@ for "Gradle JVM") is set to a Java 25 JDK.
 
 </details>
 
-Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java version for the project.
+Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
 
@@ -109,6 +110,7 @@ the [GitHub Docs](https://docs.github.com/en/pull-requests/collaborating-with-pu
 ### Creating a Pull Request
 
 If you are not very familiar with Git, you might want to check out some of these resources:
+
 - [GitHub docs](https://docs.github.com/en/get-started/learning-to-code/getting-started-with-git)
 - [Git tutorial video](https://www.youtube.com/watch?v=Ala6PHlYjmw)
 - [Learn Git Branching](https://learngitbranching.js.org)
@@ -189,6 +191,14 @@ Make sure such pull requests have a good explanation in the **What** section.
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
+- **Do not submit AI-generated content.**
+    - This includes code, pull requests, issues, and review comments generated
+      by tools such as GitHub Copilot, ChatGPT, Claude, or similar systems.
+    - All contributions must be written and understood by the person submitting them. Using AI tools to help you
+      *learn* something is fine, but the code and text you submit must be your own work.
+    - AI-generated content often introduces subtle bugs, hallucinated APIs, or misleading context that costs
+      reviewers significant time to identify. Contributors who repeatedly submit AI-generated content may be
+      blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - **My build is failing due to `detekt`, what do I do?**
@@ -196,7 +206,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline-main.xml` file,
+        - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
@@ -206,7 +216,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
-    - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with `@SkyHanniModule`
+    - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
+      `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
       the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
@@ -272,7 +283,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more informations why the title just showed up, as the title should not be too long.
+    - Also we can include more information on why the title just showed up, as the title should not be too long.
 
 ## Additional Useful Development Tools
 
@@ -336,11 +347,12 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 
 ### Elite Farmers API
 
-SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for
-some farming features.
+SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for some farming
+features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience.
-All data sent is anonymized and opt-in.
+This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience. Features that upload
+data to the Elite API are optional and opt-in. All requests to the Elite API are subject to
+its [privacy policy](https://eliteskyblock.com/privacy).
 
 ### Mixin
 

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import net.minecraft.world.entity.Entity
@@ -37,7 +37,7 @@ object SlayerMiniBossFeatures {
     }
 
     @HandleEvent
-    fun onMobSpawn(event: CocoonSpawnEvent) {
+    fun onCocoonSpawn(event: CocoonSpawnEvent) {
         val cocoon = event.cocoonMob
         if (!SlayerMiniBossType.isMiniboss(cocoon.mob.name)) return
         cocoons += cocoon.cocoonEntity
