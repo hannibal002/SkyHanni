@@ -8,13 +8,10 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import net.minecraft.SharedConstants
-import net.minecraft.server.Bootstrap
 import net.minecraft.world.item.Items
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -72,13 +69,6 @@ class GardenVisitorTooltipTest {
             "§8the required items until you've given",
             "§8the full amount!",
         )
-
-        @JvmStatic
-        @BeforeAll
-        fun bootstrapMinecraftRegistries() {
-            SharedConstants.tryDetectVersion()
-            Bootstrap.bootStrap()
-        }
 
         @Suppress("UNCHECKED_CAST")
         private fun itemNameCache(): MutableMap<String, NeuInternalName?> {
