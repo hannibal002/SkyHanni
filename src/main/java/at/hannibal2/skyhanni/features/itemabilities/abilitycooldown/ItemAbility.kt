@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import net.minecraft.world.item.ItemStack
@@ -172,8 +173,13 @@ enum class ItemAbility(
     }
 
     // TODO: give them all proper ability names and remove the fallback to the enum name
+    val displayName: String
+        get() {
+            if (abilityName != "no name") return abilityName
+            return name.allLettersFirstUppercase()
+        }
+
     override fun toString(): String {
-        if (abilityName != "no name") return abilityName
-        return super.toString()
+        return displayName
     }
 }
