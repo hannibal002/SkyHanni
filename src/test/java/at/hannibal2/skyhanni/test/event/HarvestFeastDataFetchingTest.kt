@@ -31,18 +31,16 @@ class HarvestFeastDataFetchingTest {
     }
 
     @Test
-    fun `current in-season crops have correct remaining time`() =
-        assertRemainingTime(
-            """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":1779309300,"Carrot":1779309300,"Cocoa Beans":1779272100,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":1779272100,"Potato":null,"Pumpkin":null,"Sugar Cane":1779309300,"Sunflower":null,"Wheat":null,"Wild Rose":1779272100},"year":491}""",
-            34_192.seconds,
-        )
+    fun `current in-season crops have correct remaining time`() = assertRemainingTime(
+        """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":1779309300,"Carrot":1779309300,"Cocoa Beans":1779272100,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":1779272100,"Potato":null,"Pumpkin":null,"Sugar Cane":1779309300,"Sunflower":null,"Wheat":null,"Wild Rose":1779272100},"year":491}""",
+        34_192.seconds,
+    )
 
     @Test
-    fun `current in-season crops have correct remaining time for last rotation`() =
-        assertRemainingTime(
-            """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":null,"Carrot":null,"Cocoa Beans":null,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":null,"Potato":null,"Pumpkin":null,"Sugar Cane":null,"Sunflower":null,"Wheat":null,"Wild Rose":null},"year":491}""",
-            108_592.seconds,
-        )
+    fun `current in-season crops have correct remaining time for last rotation`() = assertRemainingTime(
+        """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":null,"Carrot":null,"Cocoa Beans":null,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":null,"Potato":null,"Pumpkin":null,"Sugar Cane":null,"Sunflower":null,"Wheat":null,"Wild Rose":null},"year":491}""",
+        108_592.seconds,
+    )
 
     companion object {
         const val MOCK_TIME = 1_779_237_908_000L
