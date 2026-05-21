@@ -2,10 +2,11 @@ package at.hannibal2.skyhanni.config.features.itemability
 
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import kotlin.time.Duration
 
 class AbilityCooldownNotificationConfig {
     @Expose
@@ -31,4 +32,30 @@ class AbilityCooldownNotificationConfig {
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 5f, minStep = 0.5f)
     val titleDuration: Float = 3f
+
+    @Expose
+    @ConfigOption(
+        name = "Play Sound",
+        desc = "Play a sound when an ability cooldown reaches the threshold.",
+    )
+    @ConfigEditorBoolean
+    val playSound: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Sound Type",
+        desc = "Select which sound to play when an ability cooldown reaches the threshold.",
+    )
+    @ConfigEditorDropdown
+    val soundType: NotificationSound = NotificationSound.PLING
+
+    enum class NotificationSound(private val displayName: String) {
+        PLING("Pling"),
+        CLICK("Click"),
+        BEEP("Beep"),
+        ERROR("Error"),
+        ;
+
+        override fun toString() = displayName
+    }
 }

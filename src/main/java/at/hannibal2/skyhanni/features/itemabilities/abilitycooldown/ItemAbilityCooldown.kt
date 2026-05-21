@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.itemability.AbilityCooldownNotificationConfig
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -30,7 +31,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUtils.minutes
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -350,12 +351,25 @@ object ItemAbilityCooldown {
                 triggeredNotifications.add(notificationId)
                 // TODO: make the text itself look better, or customizable at least
                 val message = if (remainingTime <= 100.milliseconds) {
-                    "§a§l${ability.abilityName} §aready!"
+                    "§a§l${ability.displayName} §ais ready"
                 } else {
-                    "§e§l${ability.abilityName} §esoon"
+                    "§e§l${ability.displayName} §6is soon"
                 }
                 TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
+
+                if (config.playSound) {
+                    playNotificationSound(config.soundType)
+                }
             }
+        }
+    }
+
+    private fun playNotificationSound(soundType: AbilityCooldownNotificationConfig.NotificationSound) {
+        when (soundType) {
+            AbilityCooldownNotificationConfig.NotificationSound.PLING -> SoundUtils.playPlingSound()
+            AbilityCooldownNotificationConfig.NotificationSound.CLICK -> SoundUtils.playClickSound()
+            AbilityCooldownNotificationConfig.NotificationSound.BEEP -> SoundUtils.playBeepSound()
+            AbilityCooldownNotificationConfig.NotificationSound.ERROR -> SoundUtils.playErrorSound()
         }
     }
 
