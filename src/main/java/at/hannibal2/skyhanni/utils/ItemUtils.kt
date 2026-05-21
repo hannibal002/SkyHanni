@@ -448,7 +448,7 @@ object ItemUtils {
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             } else {
-                if (itemCategory in ItemCategory.deprecatedAtErrorLevel) {
+                if (itemCategory.isDeprecatedAtErrorLevel()) {
                     ErrorManager.logErrorStateWithData(
                         "Item category $itemCategory for item $name is outdated",
                         "ItemCategory $itemCategory is deprecated at error level",

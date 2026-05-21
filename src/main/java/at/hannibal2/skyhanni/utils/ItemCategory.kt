@@ -82,8 +82,6 @@ enum class ItemCategory {
 
     companion object {
 
-        val deprecatedAtErrorLevel: Set<ItemCategory> = entries.filter { it.isDeprecatedAtErrorLevel() }.toSet()
-
         fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
@@ -93,9 +91,7 @@ enum class ItemCategory {
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
 
-        private fun ItemCategory.isDeprecatedAtErrorLevel(): Boolean {
-            val field = javaClass.getField(name)
-            return field.getAnnotation(Deprecated::class.java)?.level == DeprecationLevel.ERROR
-        }
+        fun ItemCategory.isDeprecatedAtErrorLevel(): Boolean =
+            javaClass.getField(name).getAnnotation(Deprecated::class.java)?.level == DeprecationLevel.ERROR
     }
 }
