@@ -359,15 +359,14 @@ object ItemAbilityCooldown {
                     .replace("&", "§")
                 TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
 
-                if (config.playSound) {
-                    playNotificationSound(config.soundType)
-                }
+                playNotificationSound(config.soundType)
             }
         }
     }
 
     private fun playNotificationSound(soundType: AbilityCooldownNotificationConfig.NotificationSound) {
         when (soundType) {
+            AbilityCooldownNotificationConfig.NotificationSound.None -> {}
             AbilityCooldownNotificationConfig.NotificationSound.PLING -> SoundUtils.playPlingSound()
             AbilityCooldownNotificationConfig.NotificationSound.CLICK -> SoundUtils.playClickSound()
             AbilityCooldownNotificationConfig.NotificationSound.BEEP -> SoundUtils.playBeepSound()

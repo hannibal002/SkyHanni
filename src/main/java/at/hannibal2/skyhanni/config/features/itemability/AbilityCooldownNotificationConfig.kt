@@ -36,14 +36,6 @@ class AbilityCooldownNotificationConfig {
 
     @Expose
     @ConfigOption(
-        name = "Play Sound",
-        desc = "Play a sound when an ability cooldown reaches the threshold.",
-    )
-    @ConfigEditorBoolean
-    val playSound: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Sound Type",
         desc = "Select which sound to play when an ability cooldown reaches the threshold.",
     )
@@ -67,6 +59,7 @@ class AbilityCooldownNotificationConfig {
     val soonMessage: String = "&e&l{ability} &6is soon"
 
     enum class NotificationSound(private val displayName: String) {
+        None("None"),
         PLING("Pling"),
         CLICK("Click"),
         BEEP("Beep"),
