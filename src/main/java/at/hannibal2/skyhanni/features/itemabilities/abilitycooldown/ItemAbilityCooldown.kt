@@ -354,7 +354,9 @@ object ItemAbilityCooldown {
                 } else {
                     config.soonMessage
                 }
-                val message = messageTemplate.replace("{ability}", ability.displayName)
+                val message = messageTemplate
+                    .replace("{ability}", ability.displayName)
+                    .replace("&", "§")
                 TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
 
                 if (config.playSound) {
