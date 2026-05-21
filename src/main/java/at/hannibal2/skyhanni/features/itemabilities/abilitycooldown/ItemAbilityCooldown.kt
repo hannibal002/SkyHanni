@@ -349,12 +349,12 @@ object ItemAbilityCooldown {
             val remainingTime = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
             if (remainingTime <= threshold) {
                 triggeredNotifications.add(notificationId)
-                // TODO: make the text itself look better, or customizable at least
-                val message = if (remainingTime <= 100.milliseconds) {
-                    "§a§l${ability.displayName} §ais ready"
+                val messageTemplate = if (remainingTime <= 100.milliseconds) {
+                    config.readyMessage
                 } else {
-                    "§e§l${ability.displayName} §6is soon"
+                    config.soonMessage
                 }
+                val message = messageTemplate.replace("{ability}", ability.displayName)
                 TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
 
                 if (config.playSound) {

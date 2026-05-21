@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class AbilityCooldownNotificationConfig {
@@ -48,6 +49,22 @@ class AbilityCooldownNotificationConfig {
     )
     @ConfigEditorDropdown
     val soundType: NotificationSound = NotificationSound.PLING
+
+    @Expose
+    @ConfigOption(
+        name = "Ready Message",
+        desc = "Message displayed when the ability is ready. Use {ability} as a placeholder for the ability name.",
+    )
+    @ConfigEditorText
+    val readyMessage: String = "§a§l{ability} §ais ready"
+
+    @Expose
+    @ConfigOption(
+        name = "Soon Message",
+        desc = "Message displayed when the ability is nearly ready. Use {ability} as a placeholder for the ability name.",
+    )
+    @ConfigEditorText
+    val soonMessage: String = "§e§l{ability} §6is soon"
 
     enum class NotificationSound(private val displayName: String) {
         PLING("Pling"),
