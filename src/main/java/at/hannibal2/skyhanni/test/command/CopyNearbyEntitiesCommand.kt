@@ -359,6 +359,7 @@ object CopyNearbyEntitiesCommand {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
             ChatUtils.chat("$entityCounter entities copied into the clipboard!")
+            entityCounter = 0;
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
