@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import kotlin.math.max
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -346,7 +347,7 @@ object ItemAbilityCooldown {
                 continue
             }
 
-            val remainingTime = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            val remainingTime = getRemainingCooldown(ability)
             if (remainingTime <= threshold) {
                 triggeredNotifications.add(notificationId)
                 val messageTemplate = if (remainingTime <= 100.milliseconds) {
@@ -374,6 +375,10 @@ object ItemAbilityCooldown {
         }
     }
 
+    private fun getRemainingCooldown(ability: ItemAbility): Duration {
+        return ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+    }
+
     private fun checkHotBar(recheckInventorySlots: Boolean = false) {
         if (recheckInventorySlots || abilityItems.isEmpty()) {
             abilityItems = ItemUtils.getItemsInInventory(true).associateWith { hasAbility(it) }
@@ -391,7 +396,7 @@ object ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            val duration = getRemainingCooldown(ability)
             val color = specialColor ?: if (duration < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {
