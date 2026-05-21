@@ -356,8 +356,8 @@ object ItemAbilityCooldown {
                     config.soonMessage
                 }
                 val message = messageTemplate
-                    .replace("{ability}", ability.displayName)
                     .replace("&", "§")
+                    .replace("{ability}", ability.displayName)
                 TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
 
                 playNotificationSound(config.soundType)
