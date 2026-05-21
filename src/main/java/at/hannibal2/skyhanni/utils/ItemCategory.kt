@@ -45,9 +45,9 @@ enum class ItemCategory {
     TROPHY_FISH,
     ARROW,
     ARROW_POISON,
-    // TODO This used to be used as a fake category for uncategorized dungeon items.
+    // TODO This was previously used as a fake category for uncategorized dungeon items.
     //  Remove it after ensuring it doesn't break anything.
-    @Deprecated("Fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
+    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE"), level = DeprecationLevel.ERROR) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
     FISHING_BAIT,
@@ -82,6 +82,8 @@ enum class ItemCategory {
 
     companion object {
 
+        val deprecatedAtErrorLevel: Set<ItemCategory> = entries.filter { it.isDeprecatedAtErrorLevel() }.toSet()
+
         fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
@@ -91,7 +93,9 @@ enum class ItemCategory {
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
 
-        @Suppress("DEPRECATION")
-        val deprecated = listOf(FISHING_WEAPON, HOE, ITEM)
+        private fun ItemCategory.isDeprecatedAtErrorLevel(): Boolean {
+            val field = javaClass.getField(name)
+            return field.getAnnotation(Deprecated::class.java)?.level == DeprecationLevel.ERROR
+        }
     }
 }
