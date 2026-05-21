@@ -170,4 +170,10 @@ enum class ItemAbility(
             return abilityCooldownMultiplier
         }
     }
+
+    // TODO: give them all proper ability names and remove the fallback to the enum name
+    override fun toString(): String {
+        if (abilityName != "no name") return abilityName
+        return super.toString()
+    }
 }

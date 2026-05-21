@@ -29,6 +29,11 @@ class ItemAbilityConfig {
     var itemAbilityShowWhenReady: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Ability Cooldown Notifications", desc = "")
+    @Accordion
+    val abilityCooldownNotifications: AbilityCooldownNotificationConfig = AbilityCooldownNotificationConfig()
+
+    @Expose
     @ConfigOption(name = "Fire Veil", desc = "")
     @Accordion
     val fireVeilWands: FireVeilWandConfig = FireVeilWandConfig()

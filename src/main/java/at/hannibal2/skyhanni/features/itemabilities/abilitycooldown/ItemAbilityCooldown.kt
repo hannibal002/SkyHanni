@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.minutes
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -36,6 +38,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @SkyHanniModule
 object ItemAbilityCooldown {
@@ -71,6 +76,8 @@ object ItemAbilityCooldown {
     private val ALERT_FLARE = "ALERT_FLARE".toInternalName()
     private val SOS_FLARE = "SOS_FLARE".toInternalName()
     private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
+
+    private val triggeredNotifications = mutableSetOf<String>()
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
@@ -257,6 +264,7 @@ object ItemAbilityCooldown {
             ability.lastActivation = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
+        triggeredNotifications.clear()
     }
 
     @HandleEvent
@@ -314,6 +322,41 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
+        if (event.isMod(10)) {
+            checkAbilityCooldownNotifications()
+        }
+    }
+
+    private fun checkAbilityCooldownNotifications() {
+        val config = config.abilityCooldownNotifications
+        val enabledAbilities = config.enabledAbilities
+        val threshold = config.notificationThreshold.seconds
+
+        for (ability in enabledAbilities) {
+            val isOnCooldown = ability.isOnCooldown()
+            val notificationId = ability.name
+
+            if (!isOnCooldown) {
+                triggeredNotifications.remove(notificationId)
+                continue
+            }
+
+            if (notificationId in triggeredNotifications) {
+                continue
+            }
+
+            val remainingTime = ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
+            if (remainingTime <= threshold) {
+                triggeredNotifications.add(notificationId)
+                // TODO: make the text itself look better, or customizable at least
+                val message = if (remainingTime <= 100.milliseconds) {
+                    "§a§l${ability.abilityName} §aready!"
+                } else {
+                    "§e§l${ability.abilityName} §esoon"
+                }
+                TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
+            }
+        }
     }
 
     private fun checkHotBar(recheckInventorySlots: Boolean = false) {
