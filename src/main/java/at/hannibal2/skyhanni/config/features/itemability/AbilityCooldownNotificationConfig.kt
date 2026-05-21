@@ -48,7 +48,7 @@ class AbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is ready.",
     )
     @ConfigEditorText
-    val readyMessage: String = "&a&l{ability} &ais ready"
+    val readyMessage: String = "&a&l{ability}&r &ais ready"
 
     @Expose
     @ConfigOption(
@@ -56,7 +56,7 @@ class AbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is nearly ready.",
     )
     @ConfigEditorText
-    val soonMessage: String = "&e&l{ability} &6is soon"
+    val soonMessage: String = "&e&l{ability}&r &6is soon"
 
     enum class NotificationSound(private val displayName: String) {
         None("None"),
