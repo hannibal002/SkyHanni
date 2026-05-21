@@ -13,7 +13,7 @@ class NpcDayLimitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Track NPC sell coins from chat against the 500M daily limit (resets midnight GMT).",
+        desc = "Track NPC sell coins from chat against the 500M daily limit (resets midnight GMT) and show a movable HUD.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -21,35 +21,21 @@ class NpcDayLimitTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Show HUD",
-        desc = "Movable widget showing sold coins vs the 500M daily cap.",
-    )
-    @ConfigEditorBoolean
-    var showHud: Boolean = true
-
-    @Expose
-    @ConfigOption(
         name = "Number Format",
-        desc = "How coin amounts are shown on the HUD. Only applies when Show HUD is enabled.",
+        desc = "Short: 400k/500m\nLong: 400,000/500,000,000",
     )
     @ConfigEditorDropdown
-    val numberFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.CONDENSED)
+    val numberFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.SHORT)
 
     enum class NumberFormatEntry(private val displayName: String) {
-        CONDENSED("Condensed"),
-        FULL("Full"),
+        SHORT("Short"),
+        LONG("Long"),
         ;
 
         override fun toString(): String = displayName
     }
 
     @Expose
-    @ConfigLink(owner = NpcDayLimitTrackerConfig::class, field = "showHud")
+    @ConfigLink(owner = NpcDayLimitTrackerConfig::class, field = "enabled")
     val position: Position = Position(8, 520)
-
-    @Expose
-    var gmtEpochDay: Long = 0L
-
-    @Expose
-    var soldCoins: Long = 0L
 }

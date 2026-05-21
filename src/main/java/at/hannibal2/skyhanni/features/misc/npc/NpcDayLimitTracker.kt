@@ -3,23 +3,20 @@ package at.hannibal2.skyhanni.features.misc.npc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.NpcDayLimitTrackerConfig.NumberFormatEntry
-import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.ChatScreen
-import net.minecraft.client.gui.screens.inventory.ContainerScreen
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.time.LocalDate
 import java.time.ZoneOffset
-import java.util.Locale
 
 @SkyHanniModule
 object NpcDayLimitTracker {
@@ -28,6 +25,7 @@ object NpcDayLimitTracker {
     private const val POS_LABEL = "NPC Day Limit Tracker"
 
     private val config get() = SkyHanniMod.feature.misc.npcDayLimitTracker
+    private val storage get() = ProfileStorageData.profileSpecific?.npcDayLimit
 
     private val patternGroup = RepoPattern.group("misc.npcdaylimit")
 
@@ -44,81 +42,57 @@ object NpcDayLimitTracker {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.enabled) return
 
-        for (line in event.cleanMessage.split('\n')) {
-            val trimmed = line.trim()
-            if (trimmed.isEmpty()) continue
-            npcSellPattern.matchMatcher(trimmed) {
-                val amount = group("amount").replace(",", "").toLongOrNull() ?: return@matchMatcher
-                if (amount <= 0) return@matchMatcher
-                rollDayIfNeeded()
-                config.soldCoins += amount
-            }
+        npcSellPattern.matchMatcher(event.cleanMessage) {
+            val amount = group("amount").formatLong()
+            if (amount <= 0) return@matchMatcher
+            rollDayIfNeeded()
+            soldCoins += amount
         }
     }
 
-    @HandleEvent
-    fun onGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!shouldRenderInOverlayPass()) return
-        renderHud()
-    }
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
+    fun onGuiRenderOverlay() {
+        if (!config.enabled) return
 
-    @HandleEvent
-    fun onGuiOnTopRender(event: GuiRenderEvent.GuiOnTopRenderEvent) {
-        if (!shouldRenderOnTop()) return
-        renderHud()
-    }
-
-    private fun shouldRenderInOverlayPass(): Boolean {
-        if (GuiEditManager.isInGui()) return config.enabled
-        if (!config.enabled || !config.showHud || !SkyBlockUtils.inSkyBlock) return false
-        return !isDeferredScreenOpen()
-    }
-
-    private fun shouldRenderOnTop(): Boolean {
-        if (GuiEditManager.isInGui()) return false
-        if (!config.enabled || !config.showHud || !SkyBlockUtils.inSkyBlock) return false
-        return isDeferredScreenOpen()
-    }
-
-    private fun isDeferredScreenOpen(): Boolean {
-        val screen = Minecraft.getInstance().screen ?: return false
-        return screen is InventoryScreen || screen is ChatScreen || screen is ContainerScreen
-    }
-
-    private fun renderHud() {
         config.position.renderRenderable(
             Renderable.text(hudLine()),
             posLabel = POS_LABEL,
         )
     }
 
+    private var gmtEpochDay: Long
+        get() = storage?.gmtEpochDay ?: 0L
+        set(value) {
+            storage?.gmtEpochDay = value
+        }
+
+    private var soldCoins: Long
+        get() = storage?.soldCoins ?: 0L
+        set(value) {
+            storage?.soldCoins = value
+        }
+
     private fun rollDayIfNeeded() {
         val today = LocalDate.now(ZoneOffset.UTC).toEpochDay()
-        if (config.gmtEpochDay != today) {
-            config.gmtEpochDay = today
-            config.soldCoins = 0L
+        if (gmtEpochDay != today) {
+            gmtEpochDay = today
+            soldCoins = 0L
         }
     }
 
     fun soldCoinsToday(): Long {
         rollDayIfNeeded()
-        return config.soldCoins
+        return soldCoins
     }
 
     fun remainingCoinsToday(): Long {
         rollDayIfNeeded()
-        return (DAILY_LIMIT - config.soldCoins).coerceAtLeast(0L)
+        return (DAILY_LIMIT - soldCoins).coerceAtLeast(0L)
     }
 
     fun formatCoinsLabel(coins: Long): String = when (config.numberFormat.get()) {
-        NumberFormatEntry.CONDENSED -> formatCondensed(coins)
-        NumberFormatEntry.FULL -> String.format(Locale.US, "%,d", coins)
-    }
-
-    private fun formatCondensed(coins: Long): String {
-        if (coins <= 0) return "0m"
-        if (coins % 1_000_000 == 0L) return "${coins / 1_000_000}m"
-        return String.format(Locale.ROOT, "%.1fm", coins / 1_000_000.0)
+        NumberFormatEntry.SHORT -> coins.shortFormat()
+        NumberFormatEntry.LONG -> coins.addSeparators()
     }
 
     fun hudPlainText(): String {
