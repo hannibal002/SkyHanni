@@ -22,7 +22,7 @@ class AbilityCooldownNotificationConfig {
         desc = "Seconds before cooldown is ready to trigger title for all selected abilities.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
-    val notificationThreshold: Int = 5
+    val notificationThreshold: Int = 0
 
     @Expose
     @ConfigOption(
