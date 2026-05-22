@@ -472,6 +472,10 @@ object GriffinBurrowHelper {
             }
         }
 
+        if (config.drawOptimalPath) {
+            renderOptimalPath(event, playerLocation)
+        }
+
         if (RareMobWaypointShare.waypoints.isNotEmpty() && config.rareMobsSharing.focus) {
             return
         }
@@ -490,7 +494,6 @@ object GriffinBurrowHelper {
             event.drawColor(location, target.burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
         }
-
     }
 
     private fun renderRareMobs(event: SkyHanniRenderWorldEvent, playerLocation: LorenzVec) {
@@ -554,6 +557,78 @@ object GriffinBurrowHelper {
             // TODO add chroma color support via config
             event.drawColor(location, burrowType.color, config.beaconDistance != -1.0F && distance > config.beaconDistance)
             event.drawDynamicText(location.up(), text, 1.5 * config.textScale)
+        }
+    }
+
+    private fun renderOptimalPath(event: SkyHanniRenderWorldEvent, playerLocation: LorenzVec) {
+        // Held-Karp Algorithm
+        val nodes = allGuesses.toList().map { it.getCurrent() }.toMutableList()
+        nodes.add(playerLocation)
+        val n = nodes.size
+        val dist = Array(n) {DoubleArray(n){ 0.0 }}
+
+        for (i in dist.indices) {
+            for (j in i + 1 until dist.size) {
+                val cur = nodes[i].distance(nodes[j])
+                dist[i][j] = cur
+                dist[j][i] = cur
+            }
+        }
+
+        val maskSet = 1 shl n
+        val dp = Array(maskSet) {DoubleArray(n) {Double.MAX_VALUE / 2} }
+        val parent = Array(maskSet) { IntArray(n) {-1} }
+
+        for (i in 0 until n - 1) {
+            dp[1 shl i][i] = dist[n - 1][i]
+            parent[1 shl i][i] = n - 1
+        }
+        dp[1 shl n - 1][n - 1] = 0.0
+        parent[1 shl n - 1][n - 1] = -1
+
+        for (mask in 1 until maskSet) {
+            for (i in 0 until n) {
+                if (dp[mask][i] == Double.MAX_VALUE / 2) continue
+                for (next in 0 until n) {
+                    if ((mask and (1 shl next)) == 0) {
+                        val newMask = mask or (1 shl next)
+                        val newDist = dp[mask][i] + dist[i][next]
+                        if (newDist < dp[newMask][next]) {
+                            dp[newMask][next] = newDist
+                            parent[newMask][next] = i
+                        }
+                    }
+                }
+            }
+        }
+
+        // path construction
+        var end = 0
+        var minDist = Double.MAX_VALUE
+        for (i in 0 until n) {
+            if (dp[maskSet - 1][i] < minDist) {
+                minDist = dp[maskSet - 1][i]
+                end = i
+            }
+        }
+        var mask = maskSet - 1
+        while (end != -1) {
+            val prev = parent[mask][end]
+            if (prev != -1) {
+                val targetType = getGuess(nodes[end])?.burrowType
+                var color = LorenzColor.WHITE.toChromaColor()
+                val lineWidth = if (targetType != null && targetType != BurrowType.UNKNOWN) {
+                    color = targetType.color
+                    3
+                } else 2
+                if (prev == n - 1) {
+                    event.drawLineToCrosshair(nodes[end].blockCenter(), color, lineWidth, false)
+                } else if (!config.lineToNext) { // avoid conflicts
+                    event.draw3DLine(nodes[end].blockCenter(), nodes[prev].blockCenter(), color, lineWidth, false)
+                }
+                mask = mask and (1 shl end).inv()
+            }
+            end = prev
         }
     }
 

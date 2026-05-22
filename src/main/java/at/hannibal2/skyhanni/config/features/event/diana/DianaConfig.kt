@@ -68,6 +68,16 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
+        name = "Optimal Path",
+        desc = "Draw the shortest path connecting burrows and guess locations.\n" +
+        "It is recommended to disable Line To Next to avoid conflicts.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var drawOptimalPath: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Nearby Detection",
         desc = "Show burrow locations near you, include type of burrow.",
     )
