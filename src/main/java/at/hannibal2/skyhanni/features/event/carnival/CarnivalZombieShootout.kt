@@ -15,9 +15,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox

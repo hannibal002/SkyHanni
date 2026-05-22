@@ -7,6 +7,7 @@ import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
@@ -187,8 +188,12 @@ afterEvaluate {
     }
 }
 
-tasks.withType(Test::class) {
+tasks.withType<Test> {
     useJUnitPlatform()
+    testLogging {
+        showStackTraces = true
+        exceptionFormat = TestExceptionFormat.FULL
+    }
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
