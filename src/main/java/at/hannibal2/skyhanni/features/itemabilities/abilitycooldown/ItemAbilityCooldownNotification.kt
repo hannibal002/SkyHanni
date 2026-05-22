@@ -44,7 +44,7 @@ object ItemAbilityCooldownNotification {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent
     fun onWorldChange() {
         currentDisplay = null
     }
@@ -101,8 +101,8 @@ object ItemAbilityCooldownNotification {
 
     private val titleDuration: Duration
         get() {
-        return config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS)
-    }
+            return config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS)
+        }
 
     private val thresholdDuration: Duration
         get() {
