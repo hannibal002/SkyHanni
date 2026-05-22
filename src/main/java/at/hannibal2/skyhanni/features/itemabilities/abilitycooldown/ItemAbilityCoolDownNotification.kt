@@ -27,7 +27,9 @@ object ItemAbilityCoolDownNotification {
         val activation: SimpleTimeMark,
         val startTime: SimpleTimeMark,
     )
+
     private var currentDisplay: DisplayAbility? = null
+    private val notifiedCycles = mutableMapOf<ItemAbility, SimpleTimeMark>()
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onTick(event: SkyHanniTickEvent) {
@@ -41,6 +43,7 @@ object ItemAbilityCoolDownNotification {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onWorldChange() {
         currentDisplay = null
+        notifiedCycles.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -83,23 +86,39 @@ object ItemAbilityCoolDownNotification {
         val threshold = config.notificationThreshold.seconds
 
         for (ability in config.enabledAbilities) {
+            val currentCycleId = ability.lastActivation
 
-            val onCooldown = ability.isOnCooldown()
+            // Avoid ghost notifications on initial login or config changes
+            if (!notifiedCycles.containsKey(ability)) {
+                notifiedCycles[ability] = currentCycleId
+                continue
+            }
 
-            if (!onCooldown) continue
+            if (notifiedCycles[ability] == currentCycleId) continue
+
             val remaining = ability.getRemainingCooldown()
-            if (remaining > threshold) continue
 
-            val activation = ability.lastActivation
+            val shouldTrigger = if (threshold > 0.seconds) {
+                ability.isOnCooldown() && remaining <= threshold
+            } else {
+                // Special Case: threshold = 0. Trigger the moment it hits zero or goes negative.
+                remaining <= 0.seconds
+            }
 
-            currentDisplay = DisplayAbility(
-                ability = ability,
-                activation = activation,
-                startTime = SimpleTimeMark.now(),
-            )
-
-            playNotificationSound(config.soundType)
+            if (shouldTrigger) {
+                notifiedCycles[ability] = currentCycleId
+                updateCurrentDisplay(ability)
+            }
         }
+    }
+
+    private fun updateCurrentDisplay(ability: ItemAbility) {
+        currentDisplay = DisplayAbility(
+            ability = ability,
+            activation = ability.lastActivation,
+            startTime = SimpleTimeMark.now(),
+        )
+        playNotificationSound(config.soundType)
     }
 
     private fun playNotificationSound(soundType: NotificationSound) {
