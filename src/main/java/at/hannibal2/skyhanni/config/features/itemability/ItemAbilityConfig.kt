@@ -31,7 +31,7 @@ class ItemAbilityConfig {
     @Expose
     @ConfigOption(name = "Ability Cooldown Notifications", desc = "")
     @Accordion
-    val abilityCooldownNotifications: AbilityCooldownNotificationConfig = AbilityCooldownNotificationConfig()
+    val abilityCooldownNotifications: ItemAbilityCooldownNotificationConfig = ItemAbilityCooldownNotificationConfig()
 
     @Expose
     @ConfigOption(name = "Fire Veil", desc = "")

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.itemability.AbilityCooldownNotificationConfig
+import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityCooldownNotificationConfig.NotificationSound
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +26,6 @@ object ItemAbilityCoolDownNotification {
             checkAbilityCooldownNotifications()
         }
     }
-
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onWorldChange() {
@@ -68,13 +67,13 @@ object ItemAbilityCoolDownNotification {
         }
     }
 
-    private fun playNotificationSound(soundType: AbilityCooldownNotificationConfig.NotificationSound) {
+    private fun playNotificationSound(soundType: NotificationSound) {
         when (soundType) {
-            AbilityCooldownNotificationConfig.NotificationSound.None -> {}
-            AbilityCooldownNotificationConfig.NotificationSound.PLING -> SoundUtils.playPlingSound()
-            AbilityCooldownNotificationConfig.NotificationSound.CLICK -> SoundUtils.playClickSound()
-            AbilityCooldownNotificationConfig.NotificationSound.BEEP -> SoundUtils.playBeepSound()
-            AbilityCooldownNotificationConfig.NotificationSound.ERROR -> SoundUtils.playErrorSound()
+            NotificationSound.None -> {}
+            NotificationSound.PLING -> SoundUtils.playPlingSound()
+            NotificationSound.CLICK -> SoundUtils.playClickSound()
+            NotificationSound.BEEP -> SoundUtils.playBeepSound()
+            NotificationSound.ERROR -> SoundUtils.playErrorSound()
         }
     }
 

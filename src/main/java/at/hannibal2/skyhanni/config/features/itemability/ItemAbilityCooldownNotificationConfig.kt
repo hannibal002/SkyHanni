@@ -2,14 +2,13 @@ package at.hannibal2.skyhanni.config.features.itemability
 
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility
 import com.google.gson.annotations.Expose
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class AbilityCooldownNotificationConfig {
+class ItemAbilityCooldownNotificationConfig {
     @Expose
     @ConfigOption(
         name = "Ability Cooldown Notifications",
