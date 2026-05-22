@@ -79,8 +79,6 @@ object ItemAbilityCooldown {
     private val SOS_FLARE = "SOS_FLARE".toInternalName()
     private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".toInternalName()
 
-    private val triggeredNotifications = mutableSetOf<String>()
-
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
@@ -266,7 +264,6 @@ object ItemAbilityCooldown {
             ability.lastActivation = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
-        triggeredNotifications.clear()
     }
 
     @HandleEvent
@@ -324,59 +321,6 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
-        if (event.isMod(10)) {
-            checkAbilityCooldownNotifications()
-        }
-    }
-
-    private fun checkAbilityCooldownNotifications() {
-        val config = config.abilityCooldownNotifications
-        val enabledAbilities = config.enabledAbilities
-        val threshold = config.notificationThreshold.seconds
-
-        for (ability in enabledAbilities) {
-            val isOnCooldown = ability.isOnCooldown()
-            val notificationId = ability.name
-
-            if (!isOnCooldown) {
-                triggeredNotifications.remove(notificationId)
-                continue
-            }
-
-            if (notificationId in triggeredNotifications) {
-                continue
-            }
-
-            val remainingTime = getRemainingCooldown(ability)
-            if (remainingTime <= threshold) {
-                triggeredNotifications.add(notificationId)
-                val messageTemplate = if (remainingTime <= 100.milliseconds) {
-                    config.readyMessage
-                } else {
-                    config.soonMessage
-                }
-                val message = messageTemplate
-                    .replace("&", "§")
-                    .replace("{ability}", ability.displayName)
-                TitleManager.sendTitle(message, duration = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS))
-
-                playNotificationSound(config.soundType)
-            }
-        }
-    }
-
-    private fun playNotificationSound(soundType: AbilityCooldownNotificationConfig.NotificationSound) {
-        when (soundType) {
-            AbilityCooldownNotificationConfig.NotificationSound.None -> {}
-            AbilityCooldownNotificationConfig.NotificationSound.PLING -> SoundUtils.playPlingSound()
-            AbilityCooldownNotificationConfig.NotificationSound.CLICK -> SoundUtils.playClickSound()
-            AbilityCooldownNotificationConfig.NotificationSound.BEEP -> SoundUtils.playBeepSound()
-            AbilityCooldownNotificationConfig.NotificationSound.ERROR -> SoundUtils.playErrorSound()
-        }
-    }
-
-    private fun getRemainingCooldown(ability: ItemAbility): Duration {
-        return ability.lastActivation + ability.getCooldown() - SimpleTimeMark.now()
     }
 
     private fun checkHotBar(recheckInventorySlots: Boolean = false) {
@@ -396,7 +340,7 @@ object ItemAbilityCooldown {
         val specialColor = ability.specialColor
         val readyText = if (config.itemAbilityShowWhenReady) "R" else ""
         return if (ability.isOnCooldown()) {
-            val duration = getRemainingCooldown(ability)
+            val duration = ability.getRemainingCooldown()
             val color = specialColor ?: if (duration < 600.milliseconds) LorenzColor.RED else LorenzColor.YELLOW
             ItemText(color, ability.getDurationText(), true, ability.alternativePosition)
         } else {

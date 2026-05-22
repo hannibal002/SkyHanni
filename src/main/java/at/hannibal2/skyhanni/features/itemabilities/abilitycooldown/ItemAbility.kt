@@ -172,6 +172,11 @@ enum class ItemAbility(
         }
     }
 
+    // TODO: separate cooldown and uptime
+    fun getRemainingCooldown(): Duration {
+        return this.lastActivation + this.getCooldown() - SimpleTimeMark.now()
+    }
+
     // TODO: give them all proper ability names and remove the fallback to the enum name
     val displayName: String
         get() {
