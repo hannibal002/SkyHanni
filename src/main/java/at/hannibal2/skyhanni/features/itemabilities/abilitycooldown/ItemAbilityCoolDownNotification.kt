@@ -58,9 +58,8 @@ object ItemAbilityCoolDownNotification {
         config.position.renderRenderable(alertText, posLabel = "Ability Cooldown Notification")
     }
 
-    private fun buildNotificationMessage(ability: ItemAbility): String? {
-        val remainingTime = ability.getRemainingCooldown()
-        if (remainingTime < 0.milliseconds) return null
+    private fun buildNotificationMessage(ability: ItemAbility): String {
+        val remainingTime = ability.getRemainingCooldown().coerceAtLeast(0.seconds)
 
         val messageTemplate = if (remainingTime <= 100.milliseconds) {
             config.readyMessage
