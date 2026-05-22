@@ -10,7 +10,7 @@ class WrongToolAlertConfig {
     @Expose
     @ConfigOption(
         name = "Wrong Tool Alert",
-        desc = "Notifies you when you break a crop with the wrong specialised farming tool."
+        desc = "Notifies you when you break a crop with the wrong specialized farming tool."
     )
     @ConfigEditorBoolean
     @FeatureToggle
