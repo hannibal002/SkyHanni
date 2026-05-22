@@ -267,9 +267,11 @@ object HarvestFeastManager {
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
         val starting = SkyBlockTime.fromTimeMark(SimpleTimeMark.now() + time)
-        return (SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
+        return (
+            SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
                 SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
-                (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))).asTimeMark()
+                (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))
+            ).asTimeMark()
     }
 
     private fun fetch() {
@@ -288,9 +290,12 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append(
+            ChatUtils.chat {
+                append(
                     "Harvest feast data is not yet available.\n" +
-                    "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
+                        "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!"
+                ).withColor(0xFFFF5555.toInt())
+            }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true

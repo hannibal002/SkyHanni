@@ -347,8 +347,10 @@ object ErrorManager {
                 }
             }
         } catch (e: NullPointerException) {
-            ChatUtils.chat("§cFailed to format error message! " +
-                "Probably an JSON error in ChangedChatErrorsJson. Please report this on the discord.")
+            ChatUtils.chat(
+                "§cFailed to format error message! " +
+                    "Probably an JSON error in ChangedChatErrorsJson. Please report this on the discord."
+            )
             // can not use error manager inside error manager
             e.printStackTrace()
         }
