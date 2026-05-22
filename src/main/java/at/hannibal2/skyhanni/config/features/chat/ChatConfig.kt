@@ -68,7 +68,6 @@ class ChatConfig {
         name = "Copy Chat", desc = "",
     )
     @SearchTag("control")
-    @ConfigEditorBoolean
     @Accordion
     val copyChat: CopyChatConfig = CopyChatConfig()
 
