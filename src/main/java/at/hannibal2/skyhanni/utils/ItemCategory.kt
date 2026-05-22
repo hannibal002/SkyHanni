@@ -75,6 +75,7 @@ enum class ItemCategory {
     MUTATION,
     WATERING_CAN,
     FARMING_TOOL,
+    TROPHY,
 
     NONE,
     ;

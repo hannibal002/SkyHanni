@@ -63,6 +63,10 @@ object AchievementManager {
         return config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
     }
 
+    fun isCompleted(id: String): Boolean {
+        return config[id]?.data?.achieved ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)
+    }
+
     fun setAchievement(id: String, achievement: Achievement) {
         if (HypixelData.hypixelAlpha) return
         config[id] = achievement
@@ -81,30 +85,7 @@ object AchievementManager {
         }
         if (newTier > currentTier || (isMaxed && !achievement.data.achieved)) {
             if (isMaxed) achievement.data.achieved = true
-            if (shouldShowMessages) {
-                ChatUtils.chat(
-                    componentBuilder {
-                        if (achievement.secret) {
-                            append("Secret ") {
-                                withColor(ChatFormatting.GRAY)
-                            }
-                        }
-                        append("Achievement Get! ") {
-                            withColor(ChatFormatting.GOLD)
-                        }
-                        append(achievement.getName()) {
-                            withColor(ChatFormatting.GREEN)
-                        }
-                        if (!achievement.data.achieved) {
-                            append(" ${newProgress.addSeparators()}/${achievement.getAmountForNextTier()} to unlock the next tier")
-                        }
-                        append("!")
-                        hover = achievement.getDescription()
-                        command = "/shachievements"
-                    }
-                )
-                achievementSound.playSound()
-            }
+            displayMessage(achievement, newProgress)
         }
 
         config[id] = achievement
@@ -117,29 +98,39 @@ object AchievementManager {
         if (achievement.data.achieved) return
         achievement.data.achieved = true
         config[id] = achievement
-        if (shouldShowMessages) {
-            ChatUtils.chat(
-                componentBuilder {
-                    if (achievement.secret) {
-                        append("Secret ") {
-                            withColor(ChatFormatting.GRAY)
-                        }
-                    }
-                    append("Achievement Get! ") {
-                        withColor(ChatFormatting.GOLD)
-                    }
-                    append(achievement.getName()) {
-                        withColor(ChatFormatting.GREEN)
-                    }
-                    append("!")
-                    hover = achievement.getDescription()
-                    command = "/shachievements"
-                }
-            )
-            achievementSound.playSound()
-        }
+        displayMessage(achievement)
 
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement completed")
+    }
+
+    private fun displayMessage(achievement: Achievement, newProgress: Int? = null) {
+        if (!shouldShowMessages) return
+        ChatUtils.chat(
+            componentBuilder {
+                if (achievement.secret) {
+                    append("Secret ") {
+                        withColor(ChatFormatting.GRAY)
+                    }
+                } else if (achievement.hidden) {
+                    append("Hidden ") {
+                        withColor(ChatFormatting.GRAY)
+                    }
+                }
+                append("Achievement Get! ") {
+                    withColor(ChatFormatting.GOLD)
+                }
+                append(achievement.getName()) {
+                    withColor(ChatFormatting.GREEN)
+                }
+                if (!achievement.data.achieved && newProgress != null) {
+                    append(" ${newProgress.addSeparators()}/${achievement.getAmountForNextTier()} to unlock the next tier")
+                }
+                append("!")
+                hover = achievement.getDescription()
+                command = "/shachievements"
+            }
+        )
+        achievementSound.playSound()
     }
 
     const val TEST_ACHIEVEMENT = "Test Achievement"
@@ -208,7 +199,7 @@ object AchievementManager {
                 val achievementList = config
                     .map { it.value }
                     .sortedBy { it.data.achieved }
-                    .filter { it.getNameOrNull() != null }
+                    .filter { it.getNameOrNull() != null && (!it.hidden || it.data.achieved) }
                 val totalCount = achievementList.size
                 val unlocked = achievementList.count { it.data.achieved }
                 TextHelper.displayPaginatedList(
