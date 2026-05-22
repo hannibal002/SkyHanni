@@ -63,6 +63,11 @@ class GardenConfig {
     var noRodBreak: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Wrong Tool Alert", desc = "")
+    @Accordion
+    val wrongToolAlert: WrongToolAlertConfig = WrongToolAlertConfig()
+
+    @Expose
     @Category(name = "Optimal Speed", desc = "Optimal Speed Settings")
     val optimalSpeeds: OptimalSpeedConfig = OptimalSpeedConfig()
 
