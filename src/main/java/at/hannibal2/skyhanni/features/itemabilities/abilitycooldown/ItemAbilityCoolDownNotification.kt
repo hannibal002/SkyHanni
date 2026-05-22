@@ -83,7 +83,7 @@ object ItemAbilityCoolDownNotification {
             var newLastNotifiedActivation = state?.lastNotifiedActivation ?: SimpleTimeMark.farPast()
 
             // State transition: from on-cooldown to ready
-            if (previousOnCooldown && !currentOnCooldown) {
+            if (threshold == 0.seconds && previousOnCooldown && !currentOnCooldown) {
                 currentNotificationAbility = ability
                 cachedMessageTemplate = config.readyMessage
                 notificationStartTime = SimpleTimeMark.now()
