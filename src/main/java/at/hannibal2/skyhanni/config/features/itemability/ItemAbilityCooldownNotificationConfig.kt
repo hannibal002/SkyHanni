@@ -66,7 +66,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is nearly ready.",
     )
     @ConfigEditorText
-    val soonMessage: String = "&e&l{ability}&r &6in {time}s"
+    val soonMessage: String = "&e&l{ability}&r &6back in {time}s"
 
     @Expose
     @ConfigLink(owner = ItemAbilityCooldownNotificationConfig::class, field = "enabled")
