@@ -115,7 +115,7 @@ enum class ItemAbility(
     }
 
     fun getDurationText(): String {
-        val duration = (lastActivation + getCooldown()).timeUntil()
+        val duration = getRemainingCooldown()
         return if (duration < 1.6.seconds) {
             val d = (duration.inPartialSeconds)
             d.roundTo(1).oneDecimal()
@@ -174,7 +174,7 @@ enum class ItemAbility(
 
     // TODO: separate cooldown and uptime
     fun getRemainingCooldown(): Duration {
-        return this.lastActivation + this.getCooldown() - SimpleTimeMark.now()
+        return (lastActivation + getCooldown()).timeUntil()
     }
 
     // TODO: give them all proper ability names and remove the fallback to the enum name
