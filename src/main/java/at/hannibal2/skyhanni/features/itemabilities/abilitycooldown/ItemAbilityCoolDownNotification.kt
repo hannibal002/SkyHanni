@@ -84,6 +84,7 @@ object ItemAbilityCoolDownNotification {
     private fun checkAbilityCooldownNotifications() {
         val threshold = config.notificationThreshold.seconds
 
+        // TODO: optimize this by only checking abilities that are on cooldown instead of all enabled abilities
         for (ability in config.enabledAbilities) {
             val currentCycleId = ability.lastActivation
 
