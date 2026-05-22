@@ -24,7 +24,6 @@ object ItemAbilityCoolDownNotification {
 
     private data class DisplayAbility(
         val ability: ItemAbility,
-        val activation: SimpleTimeMark,
         val startTime: SimpleTimeMark,
     )
 
@@ -115,7 +114,6 @@ object ItemAbilityCoolDownNotification {
     private fun updateCurrentDisplay(ability: ItemAbility) {
         currentDisplay = DisplayAbility(
             ability = ability,
-            activation = ability.lastActivation,
             startTime = SimpleTimeMark.now(),
         )
         playNotificationSound(config.soundType)
