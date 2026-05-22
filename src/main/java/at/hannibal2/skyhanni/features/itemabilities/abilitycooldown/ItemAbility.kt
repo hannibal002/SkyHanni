@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
+import at.hannibal2.skyhanni.events.itemabilities.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -103,6 +104,8 @@ enum class ItemAbility(
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
         specialColor = color
         lastActivation = SimpleTimeMark.now() - ((cooldownInSeconds.seconds) - customCooldown.milliseconds)
+        ItemAbilityActivateEvent(this).post()
+        // TODO: add DelayedRun.runDelay(cooldown) { ItemAbilityReadyEvent(this).post() }
     }
 
     fun isOnCooldown(): Boolean = lastActivation.passedSince() < getCooldown()

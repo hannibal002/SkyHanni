@@ -4,16 +4,17 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityCooldownNotificationConfig.NotificationSound
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.itemabilities.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -28,21 +29,24 @@ object ItemAbilityCoolDownNotification {
     )
 
     private var currentDisplay: DisplayAbility? = null
-    private val notifiedCycles = mutableMapOf<ItemAbility, SimpleTimeMark>()
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onTick(event: SkyHanniTickEvent) {
+    @HandleEvent
+    fun onAbilityActivate(event: ItemAbilityActivateEvent) {
         if (!isEnabled()) return
-
-        if (event.isMod(10)) {
-            checkAbilityCooldownNotifications()
+        val ability = event.ability
+        if (ability !in config.enabledAbilities) return
+        val lastActivate = ability.lastActivation
+        val delayTime = ability.getRemainingCooldown() - getTitleDuration()
+        DelayedRun.runDelayed(delayTime) {
+            if (ability.lastActivation == lastActivate) {
+                updateCurrentDisplay(ability)
+            }
         }
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onWorldChange() {
         currentDisplay = null
-        notifiedCycles.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -50,11 +54,9 @@ object ItemAbilityCoolDownNotification {
         if (!isEnabled()) return
 
         val display = currentDisplay ?: return
-
-        val lifetime = config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS)
         val elapsed = display.startTime.passedSince()
 
-        if (elapsed > lifetime) {
+        if (elapsed > getTitleDuration()) {
             currentDisplay = null
             return
         }
@@ -81,37 +83,6 @@ object ItemAbilityCoolDownNotification {
             .replace("&", "§")
     }
 
-    private fun checkAbilityCooldownNotifications() {
-        val threshold = config.notificationThreshold.seconds
-
-        // TODO: optimize this by only checking abilities that are on cooldown instead of all enabled abilities
-        for (ability in config.enabledAbilities) {
-            val currentCycleId = ability.lastActivation
-
-            // Avoid ghost notifications on initial login or config changes
-            if (!notifiedCycles.containsKey(ability)) {
-                notifiedCycles[ability] = currentCycleId
-                continue
-            }
-
-            if (notifiedCycles[ability] == currentCycleId) continue
-
-            val remaining = ability.getRemainingCooldown()
-
-            val shouldTrigger = if (threshold > 0.seconds) {
-                ability.isOnCooldown() && remaining <= threshold
-            } else {
-                // Special Case: threshold = 0. Trigger the moment it hits zero or goes negative.
-                remaining <= 0.seconds
-            }
-
-            if (shouldTrigger) {
-                notifiedCycles[ability] = currentCycleId
-                updateCurrentDisplay(ability)
-            }
-        }
-    }
-
     private fun updateCurrentDisplay(ability: ItemAbility) {
         currentDisplay = DisplayAbility(
             ability = ability,
@@ -134,5 +105,9 @@ object ItemAbilityCoolDownNotification {
         return SkyBlockUtils.inSkyBlock &&
             config.enabled &&
             config.enabledAbilities.isNotEmpty()
+    }
+
+    private fun getTitleDuration(): Duration {
+        return config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS)
     }
 }
