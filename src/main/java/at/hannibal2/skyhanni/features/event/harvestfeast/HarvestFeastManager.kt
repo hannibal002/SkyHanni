@@ -8,17 +8,15 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -33,7 +31,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -126,10 +123,8 @@ object HarvestFeastManager {
         // TODO: Add more debug
     }
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
-        if (!SkyBlockUtils.inSkyBlock) return
-
         if (displayDirty) updateDisplay()
         fetch()
     }
@@ -167,7 +162,7 @@ object HarvestFeastManager {
         )
 
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
-        
+
         if (config.sharePolicy == SharePolicy.DISABLED) return
 
         if (config.sharePolicy == SharePolicy.ASK) {
@@ -264,15 +259,17 @@ object HarvestFeastManager {
     private fun assumeGrandFeast(): Boolean {
         val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
         val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val timeBasedGrandFeast = currentFeastData?.let { it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false
+        val timeBasedGrandFeast = currentFeastData?.let {
+            it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
+        } ?: false
         return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
         val starting = SkyBlockTime.fromTimeMark(SimpleTimeMark.now() + time)
         return (SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
-            SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
-            (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))).asTimeMark()
+                SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
+                (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))).asTimeMark()
     }
 
     private fun fetch() {
@@ -291,8 +288,9 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Harvest feast data is not yet available.\n" +
-                "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat { append(
+                    "Harvest feast data is not yet available.\n" +
+                    "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
@@ -360,11 +358,10 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
-        if (!SkyBlockUtils.inSkyBlock) return
-        if (!GardenApi.inGarden() && !isCurrentOutdated) return
+        if (!isCurrentOutdated) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")

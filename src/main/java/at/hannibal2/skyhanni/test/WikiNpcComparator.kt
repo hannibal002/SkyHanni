@@ -36,7 +36,8 @@ object WikiNpcComparator {
         }
     }
 
-    private fun customRules(raw: MutableMap<IslandType, MutableMap<String, LorenzVec>>?): MutableMap<IslandType, MutableMap<String, LorenzVec>>? {
+    private fun customRules(raw: MutableMap<IslandType, MutableMap<String, LorenzVec>>?):
+        MutableMap<IslandType, MutableMap<String, LorenzVec>>? {
         if (raw == null) return null
         for ((island, names) in raw) {
             for ((name, location) in names.toMutableMap()) {
