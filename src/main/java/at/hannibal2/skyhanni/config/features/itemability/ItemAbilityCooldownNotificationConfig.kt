@@ -66,7 +66,11 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is nearly ready.",
     )
     @ConfigEditorText
-    val soonMessage: String = "&e&l{ability}&r &6is soon"
+    val soonMessage: String = "&e&l{ability}&r &6in {time}s"
+
+    @Expose
+    @ConfigLink(owner = ItemAbilityCooldownNotificationConfig::class, field = "enabled")
+    val position: Position = Position(-475, -240, 3.4f, true)
 
     enum class NotificationSound(private val displayName: String) {
         None("None"),
