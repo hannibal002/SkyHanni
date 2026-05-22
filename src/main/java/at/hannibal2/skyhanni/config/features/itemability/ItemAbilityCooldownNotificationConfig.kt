@@ -58,7 +58,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is ready.",
     )
     @ConfigEditorText
-    val readyMessage: String = "&a&l{ability}&r &ais ready"
+    val readyMessage: String = "&e&l{ability}&r &ais ready"
 
     @Expose
     @ConfigOption(
