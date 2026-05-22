@@ -23,7 +23,6 @@ import kotlin.time.toDuration
 object ItemAbilityCooldownNotification {
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.abilityCooldownNotifications
     private val COOLDOWN_READY_GRACE_PERIOD = 100.milliseconds
-    private var worldSessionId = 0
 
     private data class DisplayAbility(
         val ability: ItemAbility,
@@ -39,18 +38,15 @@ object ItemAbilityCooldownNotification {
         if (ability !in config.enabledAbilities) return
         val lastActivate = ability.lastActivation
         val delayTime = (ability.getRemainingCooldown() - thresholdDuration).coerceAtLeast(0.seconds)
-        val worldSessionIdAtSchedule = worldSessionId
         DelayedRun.runDelayed(delayTime) {
             if (!isEnabled()) return@runDelayed
             if (ability.lastActivation != lastActivate) return@runDelayed
-            if (worldSessionId != worldSessionIdAtSchedule) return@runDelayed
             updateCurrentDisplay(ability)
         }
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onWorldChange() {
-        worldSessionId++
         currentDisplay = null
     }
 
