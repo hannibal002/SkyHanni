@@ -19,7 +19,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 @SkyHanniModule
-object ItemAbilityCoolDownNotification {
+object ItemAbilityCooldownNotification {
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.abilityCooldownNotifications
     private val COOLDOWN_READY_GRACE_PERIOD = 100.milliseconds
 
