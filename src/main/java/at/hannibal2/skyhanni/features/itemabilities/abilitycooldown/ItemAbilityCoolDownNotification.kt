@@ -20,9 +20,16 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object ItemAbilityCoolDownNotification {
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.abilityCooldownNotifications
-    private val triggeredNotifications = mutableSetOf<String>()
+
+    private data class AbilityNotificationState(
+        val wasOnCooldown: Boolean,
+        val lastNotifiedActivation: SimpleTimeMark,
+    )
+
+    private val abilityStates = mutableMapOf<ItemAbility, AbilityNotificationState>()
     private var currentNotificationAbility: ItemAbility? = null
     private var notificationStartTime: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var cachedMessageTemplate: String = ""
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onTick(event: SkyHanniTickEvent) {
@@ -35,18 +42,17 @@ object ItemAbilityCoolDownNotification {
 
     @HandleEvent(priority = HandleEvent.LOW)
     fun onWorldChange() {
-        triggeredNotifications.clear()
+        abilityStates.clear()
         currentNotificationAbility = null
         notificationStartTime = SimpleTimeMark.farPast()
+        cachedMessageTemplate = ""
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-
         val ability = currentNotificationAbility ?: return
 
-        // Clear notification if duration has elapsed
         if (notificationStartTime.passedSince() > config.titleDuration.toDouble().toDuration(DurationUnit.SECONDS)) {
             currentNotificationAbility = null
             return
@@ -58,16 +64,9 @@ object ItemAbilityCoolDownNotification {
         config.position.renderRenderable(alertText, posLabel = "Ability Cooldown Notification")
     }
 
-    private fun buildNotificationMessage(ability: ItemAbility): String {
-        val remainingTime = ability.getRemainingCooldown().coerceAtLeast(0.seconds)
-
-        val messageTemplate = if (remainingTime <= 100.milliseconds) {
-            config.readyMessage
-        } else {
-            config.soonMessage
-        }
-
-        return messageTemplate
+    private fun buildNotificationMessage(ability: ItemAbility): String? {
+        if (cachedMessageTemplate.isEmpty()) return null
+        return cachedMessageTemplate
             .replace("{ability}", ability.displayName)
             .replace("{time}", ability.getDurationText())
             .replace("&", "§")
@@ -78,25 +77,35 @@ object ItemAbilityCoolDownNotification {
         val threshold = config.notificationThreshold.seconds
 
         for (ability in enabledAbilities) {
-            val isOnCooldown = ability.isOnCooldown()
-            val notificationId = ability.name
+            val currentOnCooldown = ability.isOnCooldown()
+            val state = abilityStates[ability]
+            val previousOnCooldown = state?.wasOnCooldown ?: currentOnCooldown
+            var newLastNotifiedActivation = state?.lastNotifiedActivation ?: SimpleTimeMark.farPast()
 
-            if (!isOnCooldown) {
-                triggeredNotifications.remove(notificationId)
-                continue
-            }
-
-            if (notificationId in triggeredNotifications) {
-                continue
-            }
-
-            if (ability.getRemainingCooldown() <= threshold) {
-                triggeredNotifications.add(notificationId)
+            // State transition: from on-cooldown to ready
+            if (previousOnCooldown && !currentOnCooldown) {
                 currentNotificationAbility = ability
+                cachedMessageTemplate = config.readyMessage
                 notificationStartTime = SimpleTimeMark.now()
-
                 playNotificationSound(config.soundType)
             }
+            // Ability is currently on cooldown, and we've crossed the threshold
+            else if (currentOnCooldown) {
+                val remainingTime = ability.getRemainingCooldown()
+                if (remainingTime <= threshold && newLastNotifiedActivation != ability.lastActivation) {
+                    currentNotificationAbility = ability
+                    cachedMessageTemplate = config.soonMessage
+                    notificationStartTime = SimpleTimeMark.now()
+                    playNotificationSound(config.soundType)
+                    newLastNotifiedActivation = ability.lastActivation
+                }
+            }
+
+            // Update state for next check
+            abilityStates[ability] = AbilityNotificationState(
+                wasOnCooldown = currentOnCooldown,
+                lastNotifiedActivation = newLastNotifiedActivation,
+            )
         }
     }
 
