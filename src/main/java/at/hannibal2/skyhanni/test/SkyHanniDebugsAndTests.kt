@@ -487,13 +487,13 @@ object SkyHanniDebugsAndTests {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         if (stack.item != Items.PLAYER_HEAD) return
-        if (skinId == null) return
+        val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
 
         val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
-        val skullOwner = stack.getSkullOwner()
+        val skullOwner = stack.getSkullOwner() ?: "unknown"
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
-        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"$skullOwner:$skullTexture\"]},"
+        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
 
         OSUtils.copyToClipboard(formatted)
         ChatUtils.chat("§eCopied cosmetic data to the clipboard!")
