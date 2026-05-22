@@ -77,5 +77,5 @@ object ItemAbilityCoolDownNotification {
         }
     }
 
-    private fun isEnabled(): Boolean = SkyBlockUtils.inSkyBlock && !config.enabledAbilities.isEmpty()
+    private fun isEnabled(): Boolean = SkyBlockUtils.inSkyBlock && config.enabled && config.enabledAbilities.isNotEmpty()
 }
