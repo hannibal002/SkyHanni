@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -254,7 +254,7 @@ object ItemAbilityCooldown {
     @HandleEvent
     fun onWorldChange() {
         for (ability in ItemAbility.entries) {
-            ability.lastActivation = ServerTimeMark.farPast()
+            ability.lastActivation = SimpleTimeMark.farPast()
             ability.specialColor = null
         }
     }

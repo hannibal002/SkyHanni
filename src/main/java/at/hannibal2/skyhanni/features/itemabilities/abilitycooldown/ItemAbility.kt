@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.ServerTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -23,9 +23,9 @@ enum class ItemAbility(
     private val cooldownInSeconds: Int,
     vararg val itemNames: String,
     val alternativePosition: Boolean = false,
-    var lastActivation: ServerTimeMark = ServerTimeMark.farPast(),
+    var lastActivation: SimpleTimeMark = SimpleTimeMark.farPast(),
     var specialColor: LorenzColor? = null,
-    var lastItemClick: ServerTimeMark = ServerTimeMark.farPast(),
+    var lastItemClick: SimpleTimeMark = SimpleTimeMark.farPast(),
     val actionBarDetection: Boolean = true,
     private val ignoreMageCooldownReduction: Boolean = false,
 ) {
@@ -103,7 +103,7 @@ enum class ItemAbility(
     // TODO: change customCooldown to use Duration instead
     fun activate(color: LorenzColor? = null, customCooldown: Int = (cooldownInSeconds * 1000)) {
         specialColor = color
-        lastActivation = ServerTimeMark.now() - ((cooldownInSeconds.seconds) - customCooldown.milliseconds)
+        lastActivation = SimpleTimeMark.now() - ((cooldownInSeconds.seconds) - customCooldown.milliseconds)
         ItemAbilityActivateEvent(this).post()
         // TODO: add DelayedRun.runDelay(cooldown) { ItemAbilityReadyEvent(this).post() }
     }
@@ -128,7 +128,7 @@ enum class ItemAbility(
     }
 
     fun setItemClick() {
-        lastItemClick = ServerTimeMark.now()
+        lastItemClick = SimpleTimeMark.now()
     }
 
     companion object {

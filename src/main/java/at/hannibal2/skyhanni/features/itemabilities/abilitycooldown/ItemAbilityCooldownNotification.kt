@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.itemabilities.ItemAbilityActivateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.ServerDelayedRun
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -38,7 +37,7 @@ object ItemAbilityCooldownNotification {
         if (ability !in config.enabledAbilities) return
         val lastActivate = ability.lastActivation
         val delayTime = (ability.getRemainingCooldown() - thresholdDuration).coerceAtLeast(0.seconds)
-        ServerDelayedRun.runDelayed(delayTime) {
+        DelayedRun.runDelayed(delayTime) {
             if (!isEnabled()) return@runDelayed
             if (ability.lastActivation != lastActivate) return@runDelayed
             updateCurrentDisplay(ability)
