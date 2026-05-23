@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.test.graph.GraphEditor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.ToggleKeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -13,20 +15,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(KeyMapping.class)
 public class MixinKeyBinding {
 
-    @Inject(method = "saveString", at = @At("HEAD"), cancellable = true)
-    public void saveOriginalKey(CallbackInfoReturnable<String> cir) {
-        @SuppressWarnings("DataFlowIssue")
-        KeyMapping keyBinding = (KeyMapping) (Object) this;
-        String originalKeyName = GardenCustomKeybinds.originalKeyName(keyBinding);
-        if (originalKeyName != null) {
-            cir.setReturnValue(originalKeyName);
-        }
-    }
+    @Shadow
+    private boolean isDown;
+
+    @SuppressWarnings("FieldCanBeLocal")
+    @Mutable
+    @Shadow
+    private int clickCount;
 
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void noIsKeyDown(CallbackInfoReturnable<Boolean> cir) {
         @SuppressWarnings("DataFlowIssue")
         KeyMapping keyBinding = (KeyMapping) (Object) this;
+        GardenCustomKeybinds.isKeyDown(keyBinding, this.isDown, cir);
         if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
             if (stickyKeyBinding.needsToggle.getAsBoolean()) {
                 return;
@@ -40,6 +41,10 @@ public class MixinKeyBinding {
     public void noIsPressed(CallbackInfoReturnable<Boolean> cir) {
         @SuppressWarnings("DataFlowIssue")
         KeyMapping keyBinding = (KeyMapping) (Object) this;
+        GardenCustomKeybinds.isKeyPressed(keyBinding, cir);
+        if (cir.isCancelled()) {
+            this.clickCount = 0;
+        }
         if (keyBinding instanceof ToggleKeyMapping stickyKeyBinding) {
             if (stickyKeyBinding.needsToggle.getAsBoolean()) {
                 return;

@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 8.0.0
+## Version 9.0.0
 
 ### New Features
 
@@ -86,6 +86,7 @@
 + Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 + Added Inferno Minion Profit Tracker. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5500)
 + Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
++ Added Lotus Atoll island support. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5745)
 
 ### Improvements
 
@@ -145,6 +146,7 @@
 + Added 8 new SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 + Made the Pet Symbiosis Achievement trigger as soon as you hold the weapon. - Luna (https://github.com/hannibal002/SkyHanni/pull/5562)
 + The day counter fix in the debug menu (F3) now works correctly when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5583)
++ Added mineshaft types to /shtestisland. - Rain. (https://github.com/hannibal002/SkyHanni/pull/5625)
 
 #### Garden
 
@@ -200,6 +202,7 @@
 + Fixed Overbloom with decimals causing drops to not get added to Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5746)
 + Fixed showing Farming Lane features while in greenhouse plots. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5761)
 + Fixed some Custom Keybinds input behavior being inconsistent with vanilla Minecraft on macOS. - Luna (https://github.com/hannibal002/SkyHanni/pull/5685)
++ Reverted some changes to Custom Keybinds that caused issues. - Luna (https://github.com/hannibal002/SkyHanni/pull/5774)
 
 #### Combat
 
@@ -607,6 +610,7 @@
 + Updated credits for third party software. - Luna (https://github.com/hannibal002/SkyHanni/pull/5635)
     + Replaced NotEnoughUpdates with NotEnoughUpdates-REPO.
     + Replaced Forge with Fabric Loader and Fabric API.
++ Added Carnival Tickets Visitor Rewards. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5588)
 
 ### Removed Features
 
