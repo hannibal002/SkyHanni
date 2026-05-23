@@ -276,6 +276,10 @@ enum class SkyHanniTypeAdapters(
 fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
     SkyHanniTypeAdapters.entries.forEach {
         val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
-        registerTypeAdapter(it.clazz, adapter)
+        if (it == SkyHanniTypeAdapters.NEU_ITEMSTACK) {
+            registerTypeHierarchyAdapter(it.clazz, adapter)
+        } else {
+            registerTypeAdapter(it.clazz, adapter)
+        }
     }
 }
