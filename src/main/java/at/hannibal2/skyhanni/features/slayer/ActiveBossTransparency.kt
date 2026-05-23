@@ -56,7 +56,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (config.hideNametags && shouldHideEntity(event.entity)) event.cancel()
+        if (config.hideNametags && event.entity.mob != null && shouldHideEntity(event.entity)) event.cancel()
     }
 
     private fun shouldHideEntity(entity: LivingEntity): Boolean {
@@ -75,10 +75,10 @@ object ActiveBossTransparency {
 
             val category = mob.category
             if (category == MobCategory.SLAYER) {
-                // hide own slayer boss
+                // always show own slayer boss
                 if (mob.belongsToPlayer()) return false
 
-                // hide carry boss
+                // always show carried bosses
                 if (CarryTracker.isCustomer(mob.ownerNameOrEmpty)) return false
 
             }
@@ -90,7 +90,6 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return false
             }
-            if (category == MobCategory.PLAYER && !config.applyToPlayers) return false
         }
 
         return true
