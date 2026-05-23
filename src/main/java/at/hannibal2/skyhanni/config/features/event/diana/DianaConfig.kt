@@ -69,8 +69,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Optimal Path",
-        desc = "Draw the shortest path connecting burrows and guess locations.\n" +
-        "It is recommended to disable Line To Next to avoid conflicts.",
+        desc = "Draw the shortest path connecting burrows and guess locations.\n"
     )
     @ConfigEditorBoolean
     @FeatureToggle
