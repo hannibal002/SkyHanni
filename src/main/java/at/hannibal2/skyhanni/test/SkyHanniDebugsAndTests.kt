@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -63,6 +64,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -150,7 +152,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine("shtest command") {
+        CoroutineSettings("shtest command").launchCoroutine {
             asyncTest(args)
         }
     }
