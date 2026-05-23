@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -352,10 +352,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) {
-            firstUpdate()
-        }
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
+        firstUpdate()
     }
 
     @HandleEvent
