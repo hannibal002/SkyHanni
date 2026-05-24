@@ -807,6 +807,9 @@ class ProfileSpecificStorage(
         var flowstatePersonalBest = 0
 
         @Expose
+        var miningTracker: MiningTracker.BucketData = MiningTracker.BucketData()
+
+        @Expose
         var darkMonolithTracker: DarkMonolithFeatures.Data = DarkMonolithFeatures.Data()
     }
 

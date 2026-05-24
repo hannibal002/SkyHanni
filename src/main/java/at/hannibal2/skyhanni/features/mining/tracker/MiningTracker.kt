@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.OreCategory
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.features.mining.tracker.MiningTracker.drawDisplay
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -73,7 +72,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
     "Mining Profit Tracker",
     ::BucketData,
     { it.mining.miningTracker },
-    { drawDisplay(it) },
+    MiningTracker::drawDisplay,
     trackerConfig = { SkyHanniMod.feature.mining.miningTracker.perTrackerConfig },
 ) {
     // region Tracker init and data population
@@ -92,11 +91,11 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
 
     // (Category tracking is now handled by the selectedBucket property of BucketData)
     /**
-     * REGEX-TEST: internalName:ROUGH_RUBY_GEM
+     * REGEX-TEST: ROUGH_RUBY_GEM
      */
     private val gemstonePattern by group.pattern(
         "gemstoneidregex",
-        "^internalName:(ROUGH|FLAWED|FINE|FLAWLESS)_(.+)_GEM$",
+        "^(ROUGH|FLAWED|FINE|FLAWLESS)_(.+)_GEM$",
     )
     private var lastClickedPos: LorenzVec? = null
 
@@ -105,7 +104,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { config.enabled && SkyBlockUtils.inSkyBlock && IslandTypeTag.MINING.isInIsland() && MiningApi.isHoldingMiningTool() },
+            condition = { config.enabled && IslandTypeTag.MINING.isInIsland() && MiningApi.isHoldingMiningTool() },
             onRender = {
                 renderDisplay(config.position)
             },
@@ -161,7 +160,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
                 return super.getCustomPricePer(internalName, tracker)
             }
 
-            val matcher = gemstonePattern.matcher(internalName.toString())
+            val matcher = gemstonePattern.matcher(internalName.asString())
             if (!matcher.find()) return super.getCustomPricePer(internalName, tracker)
 
             val currentTierName = matcher.group(1)
@@ -233,7 +232,7 @@ object MiningTracker : SkyHanniBucketedItemTracker<MiningCategory, MiningTracker
         update()
         if (event.clickType != ClickType.LEFT_CLICK) return
 
-        val ore = OreBlock.getByStateOrNull(event.getBlockState)
+        val ore = OreBlock.getByStateOrNull(event.blockState)
         if (ore != null) {
             lastClickedPos = event.position
             blockUpdateControl = true
