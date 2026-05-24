@@ -6,6 +6,8 @@ object MouseSensitivityHook {
 
     @JvmStatic
     fun remapSensitivity(original: Float): Float {
+        if (MouseSensitivityManager.SensitivityState.LOCKED.isActive()) return 0f
+
         val actualSensitivity = (original - 0.2f) / 0.6f
         val mapped = MouseSensitivityManager.getSensitivity(actualSensitivity) * 0.6f + 0.2f
         check(mapped.isFinite()) {

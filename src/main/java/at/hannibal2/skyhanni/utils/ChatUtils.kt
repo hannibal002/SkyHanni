@@ -368,7 +368,7 @@ object ChatUtils {
 
     private fun refreshChat() {
         DelayedRun.runNextTick {
-            chatGui.rescaleChat()
+            chatGui.refreshTrimmedMessages()
         }
     }
 
