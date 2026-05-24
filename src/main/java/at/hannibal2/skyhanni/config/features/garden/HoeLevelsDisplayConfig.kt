@@ -28,6 +28,14 @@ class HoeLevelsDisplayConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show level timer",
+        desc = "Show timer until next level on farming tools"
+    )
+    @ConfigEditorBoolean
+    var showTimer: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Mute Hoe Sounds",
         desc = "Mutes the sound that plays when you level up the hoe."
     )

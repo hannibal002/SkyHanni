@@ -124,7 +124,7 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
-        if (hoeLevel < MAX_LEVEL || (hoeLevel == MAX_LEVEL && config.overflow)) {
+        if ((hoeLevel < MAX_LEVEL || (hoeLevel == MAX_LEVEL && config.overflow) )&& config.showTimer) {
             add("In §b${nextLevelTimer()}")
         }
 
