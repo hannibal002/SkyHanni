@@ -59,7 +59,7 @@ object SeaCreatureManager {
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
 
-        getSeaCreatureFromMessage(event.message)?.let {
+        getSeaCreatureFromMessage(event.cleanMessage)?.let {
             SeaCreatureFishEvent(it, doubleHook).post()
             if (config.seaCreatureTracker.hideChat) {
                 event.blockedReason = "sea_creature_tracker"
@@ -81,7 +81,7 @@ object SeaCreatureManager {
         if (isInterceptingColorCodeMessage(event.message)) return
         if (isInterceptingCleanMessage(event.cleanMessage)) return
 
-        getSeaCreatureFromMessage(event.message)?.let {
+        getSeaCreatureFromMessage(event.cleanMessage)?.let {
             val original = event.chatComponent.copy()
             var edited = original
 
@@ -137,8 +137,9 @@ object SeaCreatureManager {
                 val fishingExperience = seaCreature.fishingExperience
                 val rarity = seaCreature.rarity
                 val rare = seaCreature.rare
+                val lootshareSphere = seaCreature.lootshareSphereOverride
 
-                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity)
+                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere)
                 seaCreatureMap[chatMessage] = creature
                 for (alternateMessage in seaCreature.alternateMessages.orEmpty()) {
                     seaCreatureMap[alternateMessage] = creature

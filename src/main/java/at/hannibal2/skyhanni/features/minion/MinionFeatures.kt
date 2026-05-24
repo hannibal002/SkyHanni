@@ -51,7 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -67,6 +67,9 @@ import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MinionFeatures {
+
+    const val MINION_FUEL_SLOT = 19
+    const val MINION_PICKUP_SLOT = 53
 
     private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
@@ -106,6 +109,14 @@ object MinionFeatures {
     private val minionCollectItemPattern by patternGroup.pattern(
         "item.collect",
         "^§aCollect All$",
+    )
+
+    /**
+     * REGEX-TEST: You applied the eyedrops on the minion and ran out!
+     */
+    val eyedropsRanOutPattern by patternGroup.pattern(
+        "eyedrops.ranout",
+        "You applied the eyedrops on the minion and ran out!",
     )
 
     var lastMinion: LorenzVec? = null

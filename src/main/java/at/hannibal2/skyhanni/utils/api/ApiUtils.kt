@@ -7,11 +7,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetJsonResponse
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalGetZipResponse
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils.internalPostJson
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import com.google.gson.Gson
 import com.google.gson.JsonElement
 import java.io.File
 
 @SkyHanniModule
 object ApiUtils {
+
+    val serializeNullsGson: Gson = BaseGsonBuilder.gson().serializeNulls().create()
 
     // <editor-fold desc="GETs">
     /**
@@ -126,7 +130,7 @@ object ApiUtils {
         disabledApis = event.getConstant<DisabledApiJson>("misc/DisabledApi")
     }
 
-    fun isMoulberryLowestBinDisabled() = disabledApis?.disabledMoulberryLowestBin == true
+    fun isLowestBinApiDisabled() = disabledApis?.disabledEliteLbin == true
     fun isHypixelItemsDisabled() = disabledApis?.disableHypixelItems == true
     fun isBazaarDisabled() = disabledApis?.disabledBazaar == true
 

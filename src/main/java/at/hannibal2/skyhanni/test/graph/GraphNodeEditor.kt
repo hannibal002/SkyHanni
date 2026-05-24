@@ -165,9 +165,7 @@ object GraphNodeEditor {
     private fun checkIsland(tag: GraphNodeTag): Boolean {
         val islandMatches = tag.onlyIsland?.let {
             it == SkyBlockUtils.currentIsland
-        } ?: tag.onlyIslands.takeIfNotEmpty()?.let {
-            SkyBlockUtils.currentIsland in it
-        } ?: true
+        } ?: tag.onlyIslands?.isInIsland() ?: true
 
         val skyblockMatches = tag.onlySkyblock?.let {
             it == SkyBlockUtils.inSkyBlock
