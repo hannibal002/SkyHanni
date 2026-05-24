@@ -67,6 +67,8 @@ object NeuItems {
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
         private set
 
+    private var waitingOnComponents = false
+
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
             SafeItemStack(Blocks.BARRIER).itemType,
@@ -84,11 +86,24 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        DelayedRun.runOrNextTick {
-            readAllNeuItems()
-            multiplierCache.clear()
-            itemIdCache.clear()
+        multiplierCache.clear()
+        itemIdCache.clear()
+        rebuildItemNameCachesWhenReady()
+    }
+
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onComponentsLoaded() {
+        if (!waitingOnComponents) return
+        rebuildItemNameCachesWhenReady()
+    }
+
+    private fun rebuildItemNameCachesWhenReady() {
+        if (!SafeItemStackUtils.componentsLoaded) {
+            waitingOnComponents = true
+            return
         }
+        waitingOnComponents = false
+        DelayedRun.runOrNextTick(::readAllNeuItems)
     }
 
     private fun readAllNeuItems() {

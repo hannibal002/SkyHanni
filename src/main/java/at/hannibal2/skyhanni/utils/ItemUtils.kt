@@ -639,9 +639,14 @@ object ItemUtils {
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.repoItemName: String
-        get() = itemNameCache.getOrPut(this) { grabItemName() }
+        get() = if (SafeItemStackUtils.componentsLoaded) {
+            itemNameCache.getOrPut(this) { grabItemName() }
+        } else grabItemName()
 
-    val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+    val NeuInternalName.repoItemNameCompact
+        get() = if (SafeItemStackUtils.componentsLoaded) {
+            compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+        } else getRepoCompactName()
 
     private fun NeuInternalName.getRepoCompactName(): String {
         var name = repoItemName
@@ -676,6 +681,13 @@ object ItemUtils {
 
         // clear the item name cache so any potential missing items are reloaded
         itemNameCache.clear()
+        missingRepoItems.clear()
+    }
+
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onComponentsLoaded() {
+        itemNameCache.clear()
+        compactItemNameCache.clear()
         missingRepoItems.clear()
     }
 
