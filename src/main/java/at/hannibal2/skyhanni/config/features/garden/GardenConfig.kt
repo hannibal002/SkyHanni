@@ -23,7 +23,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
-import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
 class GardenConfig {
@@ -192,10 +191,10 @@ class GardenConfig {
     @Expose
     @ConfigOption(name = "Overbloom Display", desc = "Displays your overbloom.")
     @ConfigEditorDropdown
-    val overbloomDisplay: Property<OverbloomDisplay.DisplayFormat> = Property.of(OverbloomDisplay.DisplayFormat.DISABLED)
+    var overbloomDisplayFormat: OverbloomDisplay.DisplayFormat = OverbloomDisplay.DisplayFormat.DISABLED
 
     @Expose
-    @ConfigLink(owner = GardenConfig::class, field = "overbloomDisplay")
+    @ConfigLink(owner = GardenConfig::class, field = "overbloomDisplayFormat")
     val overbloomDisplayPosition: Position = Position(5, -105)
 
     @Expose
