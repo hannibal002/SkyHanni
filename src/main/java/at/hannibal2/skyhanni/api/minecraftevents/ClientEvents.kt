@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture
 @SkyHanniModule
 object ClientEvents {
 
-    var totalTicks: Int = 0
+    var totalTicks = 0
 
     init {
 

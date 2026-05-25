@@ -34,7 +34,7 @@ object MinecraftData {
 
     private var lastPingParameter = 0
 
-    var totalServerTicks: Int = 0
+    var totalServerTicks = 0
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
