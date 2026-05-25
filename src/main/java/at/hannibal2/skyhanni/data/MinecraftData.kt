@@ -29,10 +29,14 @@ object MinecraftData {
         if (lastPingParameter == packet.id) return
         lastPingParameter = packet.id
 
+        lastPingMs = SimpleTimeMark.now().toMillis()
         ServerTickEvent(++totalServerTicks).post()
     }
 
     private var lastPingParameter = 0
+
+    var lastPingMs = 0L
+        private set
 
     var totalServerTicks = 0
         private set
