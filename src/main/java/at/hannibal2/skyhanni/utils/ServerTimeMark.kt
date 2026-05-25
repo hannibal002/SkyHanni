@@ -46,7 +46,7 @@ value class ServerTimeMark internal constructor(val ticks: Long) : Comparable<Se
 
         fun now() = ServerTimeMark(MinecraftData.totalServerTicks)
 
-        private const val FAR_PAST_TICKS = Long.MIN_VALUE
+        private const val FAR_PAST_TICKS = 0L
         private const val FAR_FUTURE_TICKS = Long.MAX_VALUE
 
         private val FAR_PAST = ServerTimeMark(FAR_PAST_TICKS)

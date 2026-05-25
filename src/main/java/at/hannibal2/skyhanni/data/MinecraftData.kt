@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedServerRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -30,11 +31,16 @@ object MinecraftData {
         lastPingParameter = packet.id
 
         ServerTickEvent(++totalServerTicks).post()
+
+        DelayedServerRun.checkRuns()
     }
 
     private var lastPingParameter = 0
 
-    var totalServerTicks: Long = 0L
+    // This is started at the current time to let ServerTimeMark.farPast() be 0,
+    // and to replicate the existing SimpleTimeMark behavior
+    // ServerTimeMark used to use Long.MIN_VALUE as far past, but that caused underflow issues
+    var totalServerTicks: Long = System.currentTimeMillis()
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
