@@ -65,7 +65,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
          */
         fun nowSmooth(): ServerTimeMark {
             val delta =
-                MinecraftData.lastPingMs
+                MinecraftData.lastPingTime
                     .passedSince()
                     .inWholeMilliseconds
                     .coerceAtMost(TICK_DURATION_MS)
