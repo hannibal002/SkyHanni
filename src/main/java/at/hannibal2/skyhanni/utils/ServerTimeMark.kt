@@ -54,18 +54,12 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun toMillis() = millis
 
-    @SkyHanniModule
     companion object {
         // This could technically be any large number,
         // but this way is better for compatibility with `SimpleTimeMark`
         private val startTime = System.currentTimeMillis()
 
-        private var lastTickMs = System.currentTimeMillis()
-
-        @HandleEvent(priority = HandleEvent.HIGHEST)
-        fun onServerTick() {
-            lastTickMs = System.currentTimeMillis()
-        }
+        fun now(): ServerTimeMark = ServerTimeMark(startTime + MinecraftData.totalServerTicks * TICK_DURATION_MS)
 
         /**
          * Smooth time for UI purposes only.
@@ -73,11 +67,9 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
          */
         fun nowSmooth(): ServerTimeMark {
             // Ensure that the time doesn't jump forward more than 50ms to the next tick
-            val delta = (System.currentTimeMillis() - lastTickMs).coerceAtMost(TICK_DURATION_MS)
+            val delta = (System.currentTimeMillis() - MinecraftData.lastPingMs).coerceAtMost(TICK_DURATION_MS)
             return now().plus(delta.milliseconds)
         }
-
-        fun now(): ServerTimeMark = ServerTimeMark(startTime + MinecraftData.totalServerTicks * TICK_DURATION_MS)
 
         private const val FAR_PAST_MS = 0L
         private const val FAR_FUTURE_MS = Long.MAX_VALUE
