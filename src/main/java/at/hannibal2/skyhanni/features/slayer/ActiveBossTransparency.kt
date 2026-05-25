@@ -69,8 +69,8 @@ object ActiveBossTransparency {
         // always show npcs, they are static
         if (entity.isDisplayNpc()) return false
 
-        // primordial eggs
-        if (entity.cleanName().contains("SHOOT ME", true)) return false
+        // primordial bat
+        if (entity.cleanName().contains("Primordial Bat")) return true
 
         entity.mob?.let { mob ->
 
@@ -94,7 +94,7 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return false
             }
-        }
+        } ?: return false
 
         return true
     }
