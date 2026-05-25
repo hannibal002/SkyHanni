@@ -57,7 +57,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (config.hideNametags && shouldHideEntity(event.entity)) event.cancel()
+        if (config.hideNametags && shouldHideEntity(event.entity) && !event.entity.cleanName().contains("Primordial Bat")) event.cancel()
     }
 
     private fun shouldHideEntity(entity: LivingEntity): Boolean {
@@ -91,12 +91,7 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return false
             }
-        } ?: run {
-            // primordial bat workaround
-            if (entity.cleanName().contains("Primordial Bat")) return true
-            // dont hide if no linked mob
-            else return false
-        }
+        } ?: return false
 
         return true
     }
