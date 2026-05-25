@@ -33,7 +33,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun isFarPast(): Boolean = this == FAR_PAST
 
-    fun isFarFuture(): Boolean = millis == FAR_FUTURE_MS
+    fun isFarFuture(): Boolean = this == FAR_FUTURE
 
     fun passedSinceSmooth(): Duration = nowSmooth() - this
 
@@ -54,13 +54,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         // but this way is better parity
         private val startTime = System.currentTimeMillis()
 
-        fun now(): ServerTimeMark {
-            return ServerTimeMark(
-                startTime + MinecraftData.totalServerTicks * 50L
-            )
-        }
-
-        private var lastTickMs: Long = System.currentTimeMillis()
+        private var lastTickMs = System.currentTimeMillis()
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onServerTick() {
@@ -76,6 +70,12 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
             // Ensure that the time doesn't jump forward more than 50ms to the next tick
             val delta = (System.currentTimeMillis() - lastTickMs).coerceAtMost(50)
             return ServerTimeMark(startTime + base + delta)
+        }
+
+        fun now(): ServerTimeMark {
+            return ServerTimeMark(
+                startTime + MinecraftData.totalServerTicks * 50L
+            )
         }
 
         private const val FAR_PAST_MS = 0L
