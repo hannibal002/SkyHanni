@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedServerRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.network.protocol.common.ClientboundPingPacket
 import kotlin.time.Duration.Companion.seconds
@@ -30,7 +31,9 @@ object MinecraftData {
         if (lastPingParameter == packet.id) return
         lastPingParameter = packet.id
 
-        ServerTickEvent(++totalServerTicks).post()
+        val tick = ++totalServerTicks
+        ServerTimeMark.onServerTick()
+        ServerTickEvent(tick).post()
     }
 
     private var lastPingParameter = 0
