@@ -69,6 +69,9 @@ object ActiveBossTransparency {
         // always show npcs, they are static
         if (entity.isDisplayNpc()) return false
 
+        // primordial eggs
+        if (entity.cleanName().contains("SHOOT ME", true)) return false
+
         entity.mob?.let { mob ->
 
             // always show last clicked mob
@@ -93,7 +96,7 @@ object ActiveBossTransparency {
             }
         }
 
-        return !entity.cleanName().contains("SHOOT ME", true)
+        return true
     }
 
     private fun isActive() = config.enabled && (SlayerApi.isInBossFight() || lastHitCarrierBoss)
