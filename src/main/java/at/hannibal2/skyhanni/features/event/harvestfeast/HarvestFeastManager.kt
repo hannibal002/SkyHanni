@@ -126,10 +126,8 @@ object HarvestFeastManager {
         // TODO: Add more debug
     }
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
-        if (!SkyBlockUtils.inSkyBlock) return
-
         if (displayDirty) updateDisplay()
         fetch()
     }
@@ -360,10 +358,9 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
-        if (!SkyBlockUtils.inSkyBlock) return
         if (!GardenApi.inGarden() && !isCurrentOutdated) return
         if (!isDataAvailable()) return
         val display = display ?: return
