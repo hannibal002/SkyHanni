@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -45,6 +47,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         else -> "ServerTimeMark(millis=$millis, now=${MinecraftData.totalServerTicks})"
     }
 
+    @SkyHanniModule
     companion object {
         // This is done to be as compatible as possible with `SimpleTimeMark`,
         // This could technically just start at 1 million,
@@ -59,6 +62,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
         private var lastTickMs: Long = System.currentTimeMillis()
 
+        @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onServerTick() {
             lastTickMs = System.currentTimeMillis()
         }
@@ -80,6 +84,8 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
+        @JvmStatic
+        @JvmName("farPast")
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
