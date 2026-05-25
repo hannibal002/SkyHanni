@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -221,8 +220,8 @@ object HarvestFeastManager {
     }
 
     private fun readCurrentActiveCrops(stacks: Map<Int, ItemStack>): List<CropType> {
-        val stacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
-        val current = stacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
+        val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
+        val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
 
         if (current.size != 3) {
             ErrorManager.logErrorStateWithData(
@@ -302,13 +301,13 @@ object HarvestFeastManager {
     }
 
     private fun isOutdated(data: EliteFeastData?): Boolean {
-        val data = data ?: return true
+        val feastData = data ?: return true
         val now = SkyBlockTime.now()
-        return data.year < now.year ||
+        return feastData.year < now.year ||
             // Accept data from previous month as well since the next data is always available for at least the next 2-3 months
             // no reason to invalidate only 1 month outdated data
             data.month < (now.month - 1) ||
-            data.current.isEmpty()
+            feastData.current.isEmpty()
     }
 
     private fun isDataAvailable(): Boolean {

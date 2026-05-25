@@ -10,7 +10,8 @@ object FrustumUtils {
     //~ if < 26.1 'gameRenderer.getMainCamera().getCullFrustum()' -> 'levelRenderer.capturedFrustum'
     private val frustum get() = Minecraft.getInstance().gameRenderer.getMainCamera().getCullFrustum()
 
-    fun isVisible(box: AABB): Boolean = frustum?.isVisible(box) ?: true
+    //~ if < 26.1 'frustum.isVisible(box)' -> 'frustum?.isVisible(box) ?: true'
+    fun isVisible(box: AABB): Boolean = frustum.isVisible(box)
 
     fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =
         isVisible(AABB(minX, minY, minZ, maxX, maxY, maxZ))

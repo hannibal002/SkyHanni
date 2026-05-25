@@ -136,7 +136,7 @@ object ReforgeHelper {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.index == reforgeButton) {
-            val lastLine = event.slot.item?.getLoreComponent()?.lastOrNull()?.string
+            val lastLine = event.slot.item.getLoreComponent().lastOrNull()?.string
             if (!clickToReforgePattern.matches(lastLine)) return
             if (handleReforgeButtonClick(event)) return
         }

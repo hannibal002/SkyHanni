@@ -267,7 +267,7 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
         val chat = Minecraft.getInstance().gui.chat
         chat.deleteMessage(idToMessageSignature(id))
         //~ if < 26.1 'GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system()' -> ' GuiMessageTag.system()'
-        chat.addMessage(component, idToMessageSignature(id),GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+        chat.addMessage(component, idToMessageSignature(id), GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
     }
 }
 

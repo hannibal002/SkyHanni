@@ -49,4 +49,4 @@ private fun createItemStackTemplate(item: Item, count: Int, extraOps: SafeItemSt
 //? }
 
 //~ if < 26.1 '= item!!.value()' -> '= item'
-val SafeItemStack.itemType: Item get() = item!!.value()
+val SafeItemStack.itemType: Item get() = item!!.value() // detekt:ignore UnsafeCallOnNullableType
