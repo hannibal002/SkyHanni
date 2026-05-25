@@ -56,9 +56,8 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     @SkyHanniModule
     companion object {
-        // This is done to be as compatible as possible with `SimpleTimeMark`,
-        // This could technically just start at 1 million,
-        // but this way is better parity
+        // This could technically be any large number,
+        // but this way is better for compatibility with `SimpleTimeMark`
         private val startTime = System.currentTimeMillis()
 
         private var lastTickMs = System.currentTimeMillis()
