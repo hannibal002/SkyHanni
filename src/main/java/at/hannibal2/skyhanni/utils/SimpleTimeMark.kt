@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
