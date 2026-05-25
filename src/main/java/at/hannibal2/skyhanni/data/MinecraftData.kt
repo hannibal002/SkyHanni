@@ -30,9 +30,7 @@ object MinecraftData {
         if (lastPingParameter == packet.id) return
         lastPingParameter = packet.id
 
-        val tick = ++totalServerTicks
-        ServerTimeMark.onServerTick()
-        ServerTickEvent(tick).post()
+        ServerTickEvent(++totalServerTicks).post()
     }
 
     private var lastPingParameter = 0
