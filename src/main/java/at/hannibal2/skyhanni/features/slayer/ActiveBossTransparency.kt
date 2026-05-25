@@ -56,7 +56,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (config.hideNametags && shouldHideEntity(event.entity)) event.cancel()
+        if (config.hideNametags && entity.mob != null && shouldHideEntity(event.entity)) event.cancel()
     }
 
     private fun shouldHideEntity(entity: LivingEntity): Boolean {
@@ -90,7 +90,7 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return false
             }
-        } ?: return false
+        }
 
         return true
     }
