@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Font.class)
-public class MixinFont {
+public abstract class MixinFont {
 
     //? if < 1.21.11 {
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)

@@ -15,7 +15,7 @@ import java.util.List;
 //import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
-public class MixinStringSplitter {
+public abstract class MixinStringSplitter {
 
     //? if < 1.21.11 {
     @WrapMethod(
