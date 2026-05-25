@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 /**
  * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
@@ -57,9 +59,9 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
     companion object {
         // This could technically be any large number,
         // but this way is better for compatibility with `SimpleTimeMark`
-        private val startTime = System.currentTimeMillis()
+        private val startTime = SimpleTimeMark.now().toMillis()
 
-        fun now(): ServerTimeMark = ServerTimeMark(startTime + MinecraftData.totalServerTicks * TICK_DURATION_MS)
+        fun now(): ServerTimeMark = ServerTimeMark(startTime + MinecraftData.totalServerTicks * TICK_DURATION_MS.inWholeMilliseconds)
 
         /**
          * Smooth time for UI purposes only.
@@ -67,13 +69,13 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
          */
         fun nowSmooth(): ServerTimeMark {
             // Ensure that the time doesn't jump forward more than 50ms to the next tick
-            val delta = (System.currentTimeMillis() - MinecraftData.lastPingMs).coerceAtMost(TICK_DURATION_MS)
-            return now().plus(delta.milliseconds)
+            val delta = MinecraftData.lastPingMs.passedSince().coerceAtMost(TICK_DURATION_MS)
+            return now().plus(delta)
         }
 
         private const val FAR_PAST_MS = 0L
         private const val FAR_FUTURE_MS = Long.MAX_VALUE
-        private const val TICK_DURATION_MS = 50L
+        private val TICK_DURATION_MS = 50.toDuration(DurationUnit.MILLISECONDS)
 
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
