@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @JvmInline
 value class ServerTimeMark internal constructor(private val millis: Long) : Comparable<ServerTimeMark> {
 
-    operator fun minus(other: ServerTimeMark): Duration =
+    operator fun minus(other: ServerTimeMark) =
         (millis - other.millis).milliseconds
 
     operator fun plus(other: Duration) =
@@ -57,7 +57,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         // but this way is better for compatibility with `SimpleTimeMark`
         private val startTimeMillis = SimpleTimeMark.now().toMillis()
 
-        fun now(): ServerTimeMark = ServerTimeMark(nowMillis())
+        fun now() = ServerTimeMark(nowMillis())
 
         /**
          * Smooth time for UI purposes only.
