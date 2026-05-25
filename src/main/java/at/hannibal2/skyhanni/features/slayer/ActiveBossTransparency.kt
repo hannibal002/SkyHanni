@@ -69,9 +69,6 @@ object ActiveBossTransparency {
         // always show npcs, they are static
         if (entity.isDisplayNpc()) return false
 
-        // primordial bat
-        if (entity.cleanName().contains("Primordial Bat")) return true
-
         entity.mob?.let { mob ->
 
             // always show last clicked mob
@@ -94,7 +91,12 @@ object ActiveBossTransparency {
 
                 if (!config.applyToPlayers) return false
             }
-        } ?: return false
+        } ?: run {
+            // primordial bat workaround
+            if (entity.cleanName().contains("Primordial Bat")) return true
+            // dont hide if no linked mob
+            else return false
+        }
 
         return true
     }
