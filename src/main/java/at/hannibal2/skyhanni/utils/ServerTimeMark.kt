@@ -35,6 +35,8 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun passedSinceSmooth(): Duration = nowSmooth() - this
 
+    fun timeUntilSmooth(): Duration = -passedSinceSmooth()
+
     override fun compareTo(other: ServerTimeMark): Int = millis.compareTo(other.millis)
 
     override fun toString(): String = when (millis) {
