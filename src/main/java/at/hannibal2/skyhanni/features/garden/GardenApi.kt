@@ -88,7 +88,7 @@ object GardenApi {
             }
         }
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
-    val barnArea = AABB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
+    val barnArea = AABB(47.5, 67.0, 47.5, -47.5, 180.0, -47.5)
     private var gardenExpTiers = emptyList<Int>()
     private var extraFarmingTools = emptySet<NeuInternalName>()
 
