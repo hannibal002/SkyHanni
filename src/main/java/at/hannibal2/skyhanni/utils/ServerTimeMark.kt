@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.MinecraftData
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
@@ -12,13 +11,13 @@ import kotlin.time.Duration
  * the server's tps instead of real time, and therefore are affected by server lag.
  */
 @JvmInline
-value class ServerTimeMark internal constructor(val ticks: Long) : Comparable<ServerTimeMark> {
+value class ServerTimeMark internal constructor(private val millis: Long) : Comparable<ServerTimeMark> {
 
     operator fun minus(other: ServerTimeMark): Duration =
-        (ticks - other.ticks).ticks
+        (millis - other.millis).milliseconds
 
     operator fun plus(other: Duration) =
-        ServerTimeMark(ticks + other.inWholeTicks)
+        ServerTimeMark(millis + other.inWholeMilliseconds)
 
     operator fun minus(other: Duration): ServerTimeMark = plus(-other)
 
@@ -32,34 +31,56 @@ value class ServerTimeMark internal constructor(val ticks: Long) : Comparable<Se
 
     fun isFarPast(): Boolean = this == FAR_PAST
 
-    fun isFarFuture(): Boolean = ticks == FAR_FUTURE_TICKS
+    fun isFarFuture(): Boolean = millis == FAR_FUTURE_MS
 
-    override fun compareTo(other: ServerTimeMark): Int = ticks.compareTo(other.ticks)
+    fun passedSinceSmooth(): Duration = nowSmooth() - this
 
-    override fun toString(): String = when (ticks) {
-        FAR_PAST_TICKS -> "The Far Past"
-        FAR_FUTURE_TICKS -> "The Far Future"
-        else -> "ServerTimeMark(ticks=$ticks, now=${MinecraftData.totalServerTicks})"
+    override fun compareTo(other: ServerTimeMark): Int = millis.compareTo(other.millis)
+
+    override fun toString(): String = when (millis) {
+        FAR_PAST_MS -> "The Far Past"
+        FAR_FUTURE_MS -> "The Far Future"
+        else -> "ServerTimeMark(millis=$millis, now=${MinecraftData.totalServerTicks})"
     }
 
     companion object {
         // This is done to be as compatible as possible with `SimpleTimeMark`,
-        // This could technically just be set to 1 million or something,
+        // This could technically just start at 1 million,
         // but this way is better parity
-        private val startTime: Long = System.currentTimeMillis()
+        private val startTime = System.currentTimeMillis()
 
-        fun now() = ServerTimeMark(startTime + MinecraftData.totalServerTicks)
+        fun now(): ServerTimeMark {
+            return ServerTimeMark(
+                startTime + MinecraftData.totalServerTicks * 50L
+            )
+        }
 
-        private const val FAR_PAST_TICKS = 0L
-        private const val FAR_FUTURE_TICKS = Long.MAX_VALUE
+        private var lastTickMs: Long = System.currentTimeMillis()
 
-        private val FAR_PAST = ServerTimeMark(FAR_PAST_TICKS)
-        private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_TICKS)
+        fun onServerTick() {
+            lastTickMs = System.currentTimeMillis()
+        }
+
+        /**
+         * Smooth time for UI purposes only.
+         * Don't use for gameplay logic.
+         */
+        fun nowSmooth(): ServerTimeMark {
+            val base = MinecraftData.totalServerTicks * 50L
+            // Ensure that the time doesn't jump forward more than 50ms to the next tick
+            val delta = (System.currentTimeMillis() - lastTickMs).coerceAtMost(50)
+            return ServerTimeMark(startTime + base + delta)
+        }
+
+        private const val FAR_PAST_MS = 0L
+        private const val FAR_FUTURE_MS = Long.MAX_VALUE
+
+        private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
+        private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
         fun Duration.fromServerNow() = now() + this
     }
-
 }
