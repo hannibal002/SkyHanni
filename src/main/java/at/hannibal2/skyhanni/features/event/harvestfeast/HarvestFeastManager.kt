@@ -180,7 +180,9 @@ object HarvestFeastManager {
     private fun trySubmitData(data: EliteFeastJson) {
         if (alreadySubmittedThisSkyBlockMonth()) return
         if (sendingFeastDataMutex.isLocked) {
-            ChatUtils.chat { append("You are already submitting data for this Harvest Feast.").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat {
+                append("You are already submitting data for this Harvest Feast.").withColor(0xFFFF5555.toInt())
+            }
             return
         }
         CoroutineSettings("submit harvest feast data").withIOContext().withMutex(sendingFeastDataMutex).launchCoroutine {
@@ -289,8 +291,12 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Harvest feast data is not yet available.\n" +
-                "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat {
+                append(
+                    "Harvest feast data is not yet available.\n" +
+                        "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!"
+                ).withColor(0xFFFF5555.toInt())
+            }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
