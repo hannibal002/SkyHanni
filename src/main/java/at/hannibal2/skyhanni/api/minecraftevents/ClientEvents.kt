@@ -39,7 +39,7 @@ import net.minecraft.client.multiplayer.chat.GuiMessageSource
 @SkyHanniModule
 object ClientEvents {
 
-    var totalTicks = 0
+    var totalTicks: Int = 0
 
     init {
 
@@ -49,8 +49,6 @@ object ClientEvents {
             if (!MinecraftCompat.localWorldExists) return@register
 
             SkyHanniTickEvent(++totalTicks).post()
-
-            DelayedRun.checkRuns()
         }
 
         // Disconnect event

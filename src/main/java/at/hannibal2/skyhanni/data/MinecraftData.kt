@@ -31,16 +31,11 @@ object MinecraftData {
         lastPingParameter = packet.id
 
         ServerTickEvent(++totalServerTicks).post()
-
-        DelayedServerRun.checkRuns()
     }
 
     private var lastPingParameter = 0
 
-    // This is started at the current time to let ServerTimeMark.farPast() be 0,
-    // and to replicate the existing SimpleTimeMark behavior
-    // ServerTimeMark used to use Long.MIN_VALUE as far past, but that caused underflow issues
-    var totalServerTicks: Long = System.currentTimeMillis()
+    var totalServerTicks: Int = 0
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
