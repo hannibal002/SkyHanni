@@ -1,3 +1,5 @@
+@file:Suppress("VanillaItemStackImport")
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
