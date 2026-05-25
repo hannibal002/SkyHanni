@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.MinecraftData
+import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -13,29 +14,33 @@ import kotlin.time.Duration.Companion.milliseconds
 @JvmInline
 value class ServerTimeMark internal constructor(private val millis: Long) : Comparable<ServerTimeMark> {
 
-    operator fun minus(other: ServerTimeMark): Duration =
+    operator fun minus(other: ServerTimeMark) =
         (millis - other.millis).milliseconds
 
     operator fun plus(other: Duration) =
         ServerTimeMark(millis + other.inWholeMilliseconds)
 
-    operator fun minus(other: Duration): ServerTimeMark = plus(-other)
+    operator fun minus(other: Duration) = plus(-other)
 
     fun passedSince(): Duration = now() - this
 
     fun timeUntil(): Duration = -passedSince()
 
+    fun passedSinceSmooth(): Duration = nowSmooth() - this
+
+    fun timeUntilSmooth(): Duration = -passedSinceSmooth()
+
     fun isInPast(): Boolean = timeUntil().isNegative()
 
     fun isInFuture(): Boolean = timeUntil().isPositive()
 
-    fun isFarPast(): Boolean = this == FAR_PAST
+    fun isFarPast() = millis == FAR_PAST_MS
 
-    fun isFarFuture(): Boolean = millis == FAR_FUTURE_MS
+    fun isFarFuture() = millis == FAR_FUTURE_MS
 
-    fun passedSinceSmooth(): Duration = nowSmooth() - this
+    fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
-    fun timeUntilSmooth(): Duration = -passedSinceSmooth()
+    fun absoluteDifference(other: ServerTimeMark) = abs(millis - other.millis).milliseconds
 
     override fun compareTo(other: ServerTimeMark): Int = millis.compareTo(other.millis)
 
@@ -45,41 +50,40 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         else -> "ServerTimeMark(millis=$millis, now=${MinecraftData.totalServerTicks})"
     }
 
+    fun toMillis() = millis
+
     companion object {
-        // This is done to be as compatible as possible with `SimpleTimeMark`,
-        // This could technically just start at 1 million,
-        // but this way is better parity
-        private val startTime = System.currentTimeMillis()
+        // This could technically be any large number,
+        // but this way is better for compatibility with `SimpleTimeMark`
+        private val startTimeMillis = SimpleTimeMark.now().toMillis()
 
-        fun now(): ServerTimeMark {
-            return ServerTimeMark(
-                startTime + MinecraftData.totalServerTicks * 50L
-            )
-        }
-
-        private var lastTickMs: Long = System.currentTimeMillis()
-
-        fun onServerTick() {
-            lastTickMs = System.currentTimeMillis()
-        }
+        fun now() = ServerTimeMark(nowMillis())
 
         /**
          * Smooth time for UI purposes only.
          * Don't use for gameplay logic.
          */
         fun nowSmooth(): ServerTimeMark {
-            val base = MinecraftData.totalServerTicks * 50L
-            // Ensure that the time doesn't jump forward more than 50ms to the next tick
-            val delta = (System.currentTimeMillis() - lastTickMs).coerceAtMost(50)
-            return ServerTimeMark(startTime + base + delta)
+            val delta =
+                MinecraftData.lastPingTime
+                    .passedSince()
+                    .inWholeMilliseconds
+                    .coerceAtMost(TICK_DURATION_MS)
+
+            return ServerTimeMark(nowMillis() + delta)
         }
+
+        private fun nowMillis(): Long = startTimeMillis + MinecraftData.totalServerTicks * TICK_DURATION_MS
 
         private const val FAR_PAST_MS = 0L
         private const val FAR_FUTURE_MS = Long.MAX_VALUE
+        private const val TICK_DURATION_MS = 50L
 
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
+        @JvmStatic
+        @JvmName("farPast")
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.network.protocol.common.ClientboundPingPacket
 import kotlin.time.Duration.Companion.seconds
@@ -30,14 +29,16 @@ object MinecraftData {
         if (lastPingParameter == packet.id) return
         lastPingParameter = packet.id
 
-        val tick = ++totalServerTicks
-        ServerTimeMark.onServerTick()
-        ServerTickEvent(tick).post()
+        lastPingTime = SimpleTimeMark.now()
+        ServerTickEvent(++totalServerTicks).post()
     }
 
     private var lastPingParameter = 0
 
-    var totalServerTicks: Int = 0
+    var lastPingTime = SimpleTimeMark.farPast()
+        private set
+
+    var totalServerTicks = 0
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
