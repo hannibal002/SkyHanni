@@ -1,3 +1,5 @@
+@file:Suppress("AnnotationOnSameLine")
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull

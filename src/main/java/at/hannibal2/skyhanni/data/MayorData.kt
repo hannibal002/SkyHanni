@@ -1,3 +1,5 @@
+@file:Suppress("AnnotationOnSameLine")
+
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.ElectionApi.currentMayor

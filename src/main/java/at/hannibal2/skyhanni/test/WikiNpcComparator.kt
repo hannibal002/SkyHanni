@@ -146,7 +146,7 @@ object WikiNpcComparator {
 
                     shPos != null && wikiPos != null -> {
                         val dist = shPos.distance(wikiPos)
-                        /**
+                        /*
                          * this cant be a precise check.
                          * the wiki uses the block location the npc stands on,
                          * and skyhanni uses the location of where the user should stand when talking to the npc
