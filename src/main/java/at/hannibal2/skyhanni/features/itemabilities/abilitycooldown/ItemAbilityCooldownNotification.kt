@@ -58,27 +58,28 @@ object ItemAbilityCooldownNotification {
             currentDisplay = null
             return
         }
+        val ability = display.ability
+        val remainingCooldown = ability.getRemainingCooldown()
+        if (config.titleDuration <= config.notificationThreshold && remainingCooldown < 0.seconds) {
+            currentDisplay = null
+            return
+        }
 
-        val message = buildNotificationMessage(display.ability)
+        val template = if (remainingCooldown <= COOLDOWN_READY_GRACE_PERIOD) {
+            config.readyMessage
+        } else {
+            config.soonMessage
+        }
+        val message = template
+            .replace("{ability}", ability.displayName)
+            .replace("{time}", ability.getDurationText())
+            .replace("&", "§")
         val alertText = Renderable.text(message)
 
         config.position.renderRenderable(
             alertText,
             posLabel = "Ability Cooldown Notification",
         )
-    }
-
-    private fun buildNotificationMessage(ability: ItemAbility): String {
-        val template = if (ability.getRemainingCooldown() <= COOLDOWN_READY_GRACE_PERIOD) {
-            config.readyMessage
-        } else {
-            config.soonMessage
-        }
-
-        return template
-            .replace("{ability}", ability.displayName)
-            .replace("{time}", ability.getDurationText())
-            .replace("&", "§")
     }
 
     private fun updateCurrentDisplay(ability: ItemAbility) {
