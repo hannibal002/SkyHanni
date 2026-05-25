@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat.isLocalPlayer
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
@@ -56,7 +57,7 @@ object ActiveBossTransparency {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (config.hideNametags && event.entity.mob != null && shouldHideEntity(event.entity)) event.cancel()
+        if (config.hideNametags && shouldHideEntity(event.entity)) event.cancel()
     }
 
     private fun shouldHideEntity(entity: LivingEntity): Boolean {
@@ -92,7 +93,7 @@ object ActiveBossTransparency {
             }
         }
 
-        return true
+        return !entity.cleanName().contains("SHOOT ME", true)
     }
 
     private fun isActive() = config.enabled && (SlayerApi.isInBossFight() || lastHitCarrierBoss)
