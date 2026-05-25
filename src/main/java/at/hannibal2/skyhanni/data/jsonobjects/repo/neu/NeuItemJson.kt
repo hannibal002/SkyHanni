@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuCraftingRecipeJ
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
@@ -28,7 +29,7 @@ data class NeuItemJson(
      * and perform further conversion ourselves. Don't use this field.
      */
     @Expose
-    @Deprecated("Use neuNbt or nbtTag instead", ReplaceWith("neuNbt or nbtTag"))
+    @Legacy("Use neuNbt or nbtTag instead", ReplaceWith("neuNbt or nbtTag"))
     @SerializedName("nbttag")
     private val nbtTagAny: Any,
     @Expose val damage: Int? = null,

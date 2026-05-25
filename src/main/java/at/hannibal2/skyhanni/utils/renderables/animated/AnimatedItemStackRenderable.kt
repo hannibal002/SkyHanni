@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables.animated
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceLocalStorage
@@ -45,7 +46,7 @@ class AnimatedItemStackRenderable internal constructor(
     }
 
     @Suppress("DEPRECATION")
-    @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
+    @Legacy("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {

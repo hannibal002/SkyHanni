@@ -12,11 +12,11 @@ enum class ItemCategory {
     SHORT_BOW,
     WAND,
     FISHING_ROD,
-    @Deprecated("No longer exists") FISHING_WEAPON,
+    @Legacy("No longer exists") FISHING_WEAPON,
     ROD_PART,
     AXE,
     GAUNTLET,
-    @Deprecated("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
+    @Legacy("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
     PICKAXE,
     SHOVEL,
     DRILL,
@@ -46,7 +46,7 @@ enum class ItemCategory {
     ARROW_POISON,
     // TODO This used to be used as a fake category for uncategorized dungeon items.
     //  Remove it after ensuring it doesn't break anything.
-    @Deprecated("Fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
+    @Legacy("Fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
     FISHING_BAIT,

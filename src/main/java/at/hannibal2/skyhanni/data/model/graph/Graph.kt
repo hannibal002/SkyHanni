@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -59,7 +60,7 @@ value class Graph(
     fun toPositionsList() = map { it.position }
     fun toJson(): String = gson.toJson(this)
 
-    @Deprecated("See parent deprecation")
+    @Legacy("See parent deprecation")
     @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     override fun <T> toArray(generator: IntFunction<Array<T>>): Array<T> =
         (nodes as Collection<GraphNode>).toArray(generator)
