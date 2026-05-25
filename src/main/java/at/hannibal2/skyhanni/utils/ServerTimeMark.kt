@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.data.MinecraftData
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 /**
  * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
@@ -57,23 +55,29 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
     companion object {
         // This could technically be any large number,
         // but this way is better for compatibility with `SimpleTimeMark`
-        private val startTime = SimpleTimeMark.now().toMillis()
+        private val startTimeMillis = SimpleTimeMark.now().toMillis()
 
-        fun now(): ServerTimeMark = ServerTimeMark(startTime + MinecraftData.totalServerTicks * TICK_DURATION_MS.inWholeMilliseconds)
+        fun now(): ServerTimeMark = ServerTimeMark(nowMillis())
 
         /**
          * Smooth time for UI purposes only.
          * Don't use for gameplay logic.
          */
         fun nowSmooth(): ServerTimeMark {
-            // Ensure that the time doesn't jump forward more than 50ms to the next tick
-            val delta = MinecraftData.lastPingMs.passedSince().coerceAtMost(TICK_DURATION_MS)
-            return now().plus(delta)
+            val delta =
+                MinecraftData.lastPingMs
+                    .passedSince()
+                    .inWholeMilliseconds
+                    .coerceAtMost(TICK_DURATION_MS)
+
+            return ServerTimeMark(nowMillis() + delta)
         }
+
+        private fun nowMillis(): Long = startTimeMillis + MinecraftData.totalServerTicks * TICK_DURATION_MS
 
         private const val FAR_PAST_MS = 0L
         private const val FAR_FUTURE_MS = Long.MAX_VALUE
-        private val TICK_DURATION_MS = 50.toDuration(DurationUnit.MILLISECONDS)
+        private const val TICK_DURATION_MS = 50L
 
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
