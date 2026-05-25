@@ -34,7 +34,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerInput
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min

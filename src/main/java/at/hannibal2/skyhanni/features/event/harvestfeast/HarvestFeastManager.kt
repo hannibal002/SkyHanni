@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -153,7 +153,7 @@ object HarvestFeastManager {
             ?.let { it to profileStorage.lastHarvestFeastSubmitMonth }
     }
 
-    private fun readAllCrops(items: Map<Int, ItemStack>) {
+    private fun readAllCrops(items: Map<Int, SafeItemStack>) {
         val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
         val next = readCropTimestamps(items)
 
@@ -219,7 +219,7 @@ object HarvestFeastManager {
         return lastSubmit == (now.year to now.month)
     }
 
-    private fun readCurrentActiveCrops(stacks: Map<Int, ItemStack>): List<CropType> {
+    private fun readCurrentActiveCrops(stacks: Map<Int, SafeItemStack>): List<CropType> {
         val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
         val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
 
@@ -234,7 +234,7 @@ object HarvestFeastManager {
         return current
     }
 
-    private fun readCropTimestamps(items: Map<Int, ItemStack>): Map<CropType, SimpleTimeMark?> {
+    private fun readCropTimestamps(items: Map<Int, SafeItemStack>): Map<CropType, SimpleTimeMark?> {
         val outputMap = CropType.entries.associateWith { null }.toMutableMap<CropType, SimpleTimeMark?>()
 
         items.filterKeys { it in ALL_CROPS_SLOTS }.forEach { (_, stack) ->
