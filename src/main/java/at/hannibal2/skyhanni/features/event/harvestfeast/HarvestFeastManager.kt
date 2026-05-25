@@ -117,9 +117,12 @@ object HarvestFeastManager {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Harvest Feast Data")
 
+        val now = SkyBlockTime.now()
+
         if (currentFeastData == null) {
-            val now = SkyBlockTime.now()
             event.addIrrelevant("Harvest Feast data is null for year ${now.year} and month ${now.month}.")
+        } else {
+            event.addIrrelevant("Harvest Feast data was successfully loaded for year ${now.year} and month ${now.month}.")
         }
 
         // TODO: Add more debug
