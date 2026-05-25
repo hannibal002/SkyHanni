@@ -43,8 +43,12 @@ value class ServerTimeMark internal constructor(val ticks: Long) : Comparable<Se
     }
 
     companion object {
+        // This is done to be as compatible as possible with `SimpleTimeMark`,
+        // This could technically just be set to 1 million or something,
+        // but this way is better parity
+        private val startTime: Long = System.currentTimeMillis()
 
-        fun now() = ServerTimeMark(MinecraftData.totalServerTicks)
+        fun now() = ServerTimeMark(startTime + MinecraftData.totalServerTicks)
 
         private const val FAR_PAST_TICKS = 0L
         private const val FAR_FUTURE_TICKS = Long.MAX_VALUE

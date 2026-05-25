@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
+@SkyHanniModule
 object DelayedServerRun {
     private val tasks = mutableListOf<Pair<() -> Any, ServerTimeMark>>()
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, ServerTimeMark>>()
@@ -25,7 +28,8 @@ object DelayedServerRun {
 
     fun runNextTick(run: () -> Unit) = futureTasks.add(run to ServerTimeMark.farPast())
 
-    fun checkRuns() {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onServerTick() {
         tasks.removeIf { (runnable, time) ->
             val inPast = time.isInPast()
             if (inPast) {
