@@ -21,7 +21,6 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object ItemAbilityCooldownNotification {
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.abilityCooldownNotifications
-    private val COOLDOWN_READY_GRACE_PERIOD = 100.milliseconds
 
     private data class DisplayAbility(
         val ability: ItemAbility,
@@ -60,12 +59,13 @@ object ItemAbilityCooldownNotification {
         }
         val ability = display.ability
         val remainingCooldown = ability.getRemainingCooldown()
-        if (config.titleDuration <= config.notificationThreshold && remainingCooldown < 0.seconds) {
+        // this is mostly a sanity check specifically for when titleDuration == notificationThreshold.
+        if (config.titleDuration <= config.notificationThreshold && remainingCooldown <= 0.seconds) {
             currentDisplay = null
             return
         }
 
-        val template = if (remainingCooldown <= COOLDOWN_READY_GRACE_PERIOD) {
+        val template = if (remainingCooldown <= 0.seconds) {
             config.readyMessage
         } else {
             config.soonMessage
