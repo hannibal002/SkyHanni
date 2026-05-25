@@ -468,10 +468,8 @@ tasks.withType<Detekt>().configureEach {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
     }
     val isTargetVersion = target == ProjectTarget.MODERN_26100
-    val isCi = System.getenv("CI") == "true"
     val skipDetekt = project.findProperty("skipDetekt") == "true"
-    val deobf = isDeobf
-    onlyIf { isTargetVersion && (!deobf || isCi) && !skipDetekt }
+    onlyIf { isTargetVersion && !skipDetekt }
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
