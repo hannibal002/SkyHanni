@@ -91,10 +91,12 @@ object SensitivityReducer {
 
     @HandleEvent
     fun onTick() {
-        manualState?.setActive()
-            ?: if (!shouldAutoReduce()) SensitivityState.UNCHANGED.setActive()
-            else if (!config.lockMouse) SensitivityState.REDUCED.setActive()
-            else SensitivityState.LOCKED.setActive()
+        state = when {
+            manualState != null -> manualState
+            !shouldAutoReduce() -> SensitivityState.UNCHANGED
+            !config.lockMouse -> SensitivityState.REDUCED
+            else -> SensitivityState.LOCKED
+        }
     }
 
     private fun shouldAutoReduce(): Boolean {
@@ -102,29 +104,33 @@ object SensitivityReducer {
 
         if (!GardenApi.inGarden()) return false
 
-        if (config.mode.none {
-                when (it) {
-                    SensitivityReducerConfig.Mode.TOOL -> GardenApi.toolInHand != null
-                    SensitivityReducerConfig.Mode.FISHING_ROD -> FishingApi.holdingRod
-                    SensitivityReducerConfig.Mode.KEYBIND -> config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
-                    SensitivityReducerConfig.Mode.MOUSEMAT -> GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT
-                    SensitivityReducerConfig.Mode.VACUUM -> PestApi.hasVacuumInHand()
-                    SensitivityReducerConfig.Mode.SPRAYONATOR -> PestApi.hasSprayonatorInHand()
-                }
-            }) return false
+        if (!isAutoTriggered()) return false
 
         if (config.onlyPlot && GardenApi.onUnfarmablePlot) return false
 
-        if (config.onGround) {
-            // explanation: player is onGround, tolerance > 0, player isnt flying, check raycast
-            val tolerance = config.onGroundTolerance
-            if (!PlayerUtils.onGround() && (tolerance <= 0f || PlayerUtils.isFlying() || PlayerUtils.getLocation().let {
-                    // return if miss != false, miss == false means the raycast hit a block (player is close to ground)
-                    BlockUtils.raycast(it, it.down(tolerance))?.miss != false
-                })) return false
-        }
+        if (config.onGround && !isOnGround()) return false
 
         return true
+    }
+
+    private fun isAutoTriggered() {
+        return config.mode.any {
+            when (it) {
+                SensitivityReducerConfig.Mode.TOOL -> GardenApi.toolInHand != null
+                SensitivityReducerConfig.Mode.FISHING_ROD -> FishingApi.holdingRod
+                SensitivityReducerConfig.Mode.KEYBIND -> config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
+                SensitivityReducerConfig.Mode.MOUSEMAT -> GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT
+                SensitivityReducerConfig.Mode.VACUUM -> PestApi.hasVacuumInHand()
+                SensitivityReducerConfig.Mode.SPRAYONATOR -> PestApi.hasSprayonatorInHand()
+            }
+        }
+    }
+
+    private fun isOnGround() {
+        if (PlayerUtils.onGround()) return true
+        val tolerance = config.onGroundTolerance
+        if (tolerance <= 0f || PlayerUtils.isFlying()) return false
+        return PlayerUtils.getLocation().let { BlockUtils.raycast(it, it.down(tolerance))?.miss == false }
     }
 
     @HandleEvent
@@ -164,26 +170,23 @@ object SensitivityReducer {
     @HandleEvent
     fun onGuiRenderOverlay() {
         if (!config.showGui) return
+        if (SensitivityState.UNCHANGED.isActive()) return
 
-        if (SensitivityState.REDUCED.isActive()) {
-            config.position.renderRenderable(
-                Renderable.text("§eSensitivity Lowered"),
-                posLabel = "Sensitivity Reducer",
-            )
-        } else if (SensitivityState.LOCKED.isActive()) {
-            config.position.renderRenderable(
-                Renderable.text("§eMouse Locked"),
-                posLabel = "Sensitivity Reducer",
-            )
-        }
+        config.position.renderRenderable(
+            Renderable.text("§e" + if (SensitivityState.REDUCED.isActive()) "Sensitivity Lowered" else "Mouse Locked"),
+            posLabel = "Sensitivity Reducer",
+        )
     }
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        val addData = if (SensitivityState.UNCHANGED.isActive()) event::addIrrelevant else event::addData
+
         event.title("Sensitivity Reducer")
-        event.addData {
+        addData {
             add("current state: $state")
             add("manual state: $manualState")
+            add("reducing factor: " + config.reducingPercent.fractionOf(100.0))
         }
     }
 
