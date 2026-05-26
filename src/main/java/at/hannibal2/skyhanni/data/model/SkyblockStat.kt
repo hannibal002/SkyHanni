@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -11,9 +12,12 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
@@ -85,11 +89,7 @@ enum class SkyblockStat(
         " *§9⚓ Double Hook Chance §f(?<value>\\d+(?:\\.\\d+)?)%",
     ),
     TREASURE_CHANCE("§6⛃", " *Treasure Chance: ⛃(?<value>\\d+(?:\\.\\d+)?)", " *§6⛃ Treasure Chance §f(?<value>\\d+(?:\\.\\d+)?)%"),
-    BONUS_PEST_CHANCE(
-        "§2ൠ",
-        " *(?:§r§7§m)?Bonus Pest Chance: ൠ$VALUE_PATTERN",
-        " *(?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?$VALUE_PATTERN",
-    ),
+    BONUS_PEST_CHANCE("§2ൠ", " *(?:§r§7§m)?Bonus Pest Chance: ൠ$VALUE_PATTERN", " *(?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?$VALUE_PATTERN"),
     COMBAT_WISDOM("§3☯", " *Combat Wisdom: ☯$VALUE_PATTERN", " *§3☯ Combat Wisdom §f$VALUE_PATTERN"),
     MINING_WISDOM("§3☯", " *Mining Wisdom: ☯$VALUE_PATTERN", " *§3☯ Mining Wisdom §f$VALUE_PATTERN"),
     FARMING_WISDOM("§3☯", " *Farming Wisdom: ☯$VALUE_PATTERN", " *§3☯ Farming Wisdom §f$VALUE_PATTERN"),
@@ -128,7 +128,7 @@ enum class SkyblockStat(
     SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
     MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune $VALUE_PATTERN"),
     WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune $VALUE_PATTERN"),
-    OVERBLOOM("§e☀", "", " *(?:§7§m|§e)☀ Overbloom $VALUE_PATTERN"),
+    OVERBLOOM("§e☀", " *Overbloom: ☀$VALUE_PATTERN", " *§e☀ Overbloom $VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",
@@ -168,6 +168,8 @@ enum class SkyblockStat(
     UNKNOWN("§c?", "", "")
     ;
 
+    var lastSource: StatSourceType = StatSourceType.UNKNOWN
+    var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
     var lastKnownValue: Double?
         get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
@@ -175,22 +177,20 @@ enum class SkyblockStat(
         }
 
     @Suppress("UNNECESSARY_SAFE_CALL")
-    val icon: String
-        get() = resourcePackOverrides?.get(name) ?: hypixelIcon
+    val icon: String get() = resourcePackOverrides?.get(name) ?: hypixelIcon
 
-    var lastSource: StatSourceType = StatSourceType.UNKNOWN
+    val capitalizedName = name.lowercase().allLettersFirstUppercase()
+    val iconWithName get() = "$icon $capitalizedName"
 
-    var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
+    val formattedDisplay get() = iconWithName + (lastKnownValue?.let { " §f" + it.roundToInt() } ?: " §c???")
 
-    private val capitalizedName = name.lowercase().allLettersFirstUppercase()
-
-    val iconWithName
-        get() = "$icon $capitalizedName"
+    fun renderFormattedDisplay(position: Position, transform: ((String) -> String)? = null) =
+        position.renderRenderable(
+            Renderable.text(formattedDisplay.let { transform?.invoke(it) ?: it }),
+            "$capitalizedName Stat Display",
+        )
 
     private val keyName = name.lowercase().replace('_', '.')
-
-    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
-
     val tablistPattern by RepoPattern.pattern("stats.tablist.no-color.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
 

@@ -242,7 +242,7 @@ object FarmingFortuneDisplay {
             }
         } else getCurrentFarmingFortune()
 
-        val farmingFortuneText = if (config.compactFormat) "§6FF§7: " else "§6Farming Fortune§7: "
+        val farmingFortuneText = if (config.compactFormat) " §6FF§7: " else " §6Farming Fortune§7: "
         val fortuneColorCode = if (ffReduction > 0) "§c" else "§e"
         val fortuneAmount = if (!recentlySwitchedTool && farmingFortune != -1.0) {
             farmingFortune.roundTo(0).addSeparators()
