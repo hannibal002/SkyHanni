@@ -47,8 +47,8 @@ class FarmingFortuneConfig {
 
     @Expose
     @ConfigOption(
-        name = "Call Phillip Instead",
-        desc = "Use Phillip's contact to call him when the fortune buff expires.",
+        name = "Call Phillip",
+        desc = "Click on the chat warning to call Phillip instead of warping to barn",
     )
     @ConfigEditorBoolean
     var callPhillip: Boolean = false
