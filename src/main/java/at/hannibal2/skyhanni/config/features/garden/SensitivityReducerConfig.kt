@@ -67,5 +67,5 @@ class SensitivityReducerConfig {
 
     @Expose
     @ConfigLink(owner = SensitivityReducerConfig::class, field = "showGui")
-    val position: Position = Position(400, 400, 1f)
+    val position: Position = Position(400, 200)
 }
