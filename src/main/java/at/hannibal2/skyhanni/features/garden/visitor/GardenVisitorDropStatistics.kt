@@ -134,7 +134,7 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onVisitorAccept(event: VisitorAcceptEvent) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (!ProfileStorageData.loaded) return
         val storage = GardenApi.storage?.visitorDrops ?: return
 
@@ -147,7 +147,7 @@ object GardenVisitorDropStatistics {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (!ProfileStorageData.loaded) return
         if (lastAccept.passedSince() > 1.seconds) return
 
@@ -293,7 +293,7 @@ object GardenVisitorDropStatistics {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
         if (GardenApi.hideExtraGuis()) return
-        if (config.onlyOnBarn.get() && !GardenApi.onBarnPlot) return
+        if (config.onlyOnBarn.get() && !GardenApi.onMainBarn) return
         config.pos.renderRenderables(display, posLabel = "Visitor Stats")
     }
 

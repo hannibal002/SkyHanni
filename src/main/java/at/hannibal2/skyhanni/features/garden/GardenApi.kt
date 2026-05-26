@@ -74,9 +74,11 @@ object GardenApi {
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
         get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET)
-    private var inBarn = false
-    val onBarnPlot get() = inBarn && inGarden()
-    val onUnfarmablePlot get() = inGarden() && (inBarn || GardenPlotApi.inGreenhouse())
+    private var inBarnPlot = false
+    private var inMainBarn = false
+    val onBarnPlot get() = inBarnPlot && inGarden()
+    val onMainBarn get() = inMainBarn && inGarden()
+    val onUnfarmablePlot get() = inGarden() && (inMainBarn || GardenPlotApi.inGreenhouse())
     val storage get() = ProfileStorageData.profileSpecific?.garden
     val config get() = SkyHanniMod.feature.garden
     var totalAmountVisitorsExisting = 0
@@ -88,7 +90,8 @@ object GardenApi {
             }
         }
     private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
-    val barnArea = AABB(47.5, 67.0, 47.5, -47.5, 180.0, -47.5)
+    val barnPlotArea = AABB(47.5, 67.0, 47.5, -47.5, 180.0, -47.5)
+    val mainBarnArea = AABB(35.5, 67.0, -4.5, -32.5, 100.0, -46.5)
     private var gardenExpTiers = emptyList<Int>()
     private var extraFarmingTools = emptySet<NeuInternalName>()
 
@@ -112,7 +115,8 @@ object GardenApi {
     fun onTick(event: SkyHanniTickEvent) {
         if (!inGarden()) return
         if (event.isMod(10, 1)) {
-            inBarn = barnArea.isPlayerInside()
+            inMainBarn = mainBarnArea.isPlayerInside()
+            inBarnPlot = barnPlotArea.isPlayerInside()
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments

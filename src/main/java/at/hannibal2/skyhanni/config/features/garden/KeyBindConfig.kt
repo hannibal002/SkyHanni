@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -46,9 +47,23 @@ class KeyBindConfig {
     var sunsGrasp: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
+    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the main barn area, or the whole barn plot.")
+    @ConfigEditorDropdown
+    var excludeBarn: ExcludeBarn = ExcludeBarn.OFF
+
+    enum class ExcludeBarn(private val displayName: String) {
+        OFF("Off"),
+        MAIN("Main Barn Area"),
+        FULL("Full Barn Plot"),
+        ;
+
+        override fun toString() = displayName
+    }
+
+    @Expose
+    @ConfigOption(name = "Exclude Greenhouse", desc = "Disable this feature while on a greenhouse plot.")
     @ConfigEditorBoolean
-    var excludeBarn: Boolean = false
+    var excludeGreenhouse: Boolean = true
 
     @ConfigOption(name = "Disable All", desc = "Disable all keys.")
     @ConfigEditorButton(buttonText = "Disable")

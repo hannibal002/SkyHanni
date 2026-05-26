@@ -128,7 +128,7 @@ object VisitorListener {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTooltip(event: ToolTipEvent) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
 
@@ -137,7 +137,7 @@ object VisitorListener {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
@@ -148,7 +148,7 @@ object VisitorListener {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         for (visitor in VisitorApi.getVisitors()) {

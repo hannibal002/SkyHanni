@@ -88,7 +88,7 @@ object VisitorRewardWarning {
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onTooltip(event: ToolTipTextEvent) {
-        if (!GardenApi.onBarnPlot) return
+        if (!GardenApi.onMainBarn) return
         if (!VisitorApi.inInventory) return
         val visitor = VisitorApi.getVisitor(lastClickedNpc) ?: return
         if (config.bypassKey.isKeyHeld()) return

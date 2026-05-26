@@ -38,14 +38,14 @@ object GardenVisitorStatus {
         ) return
         if (!event.isMod(10, 2)) return
 
-        if (GardenApi.onBarnPlot) {
+        if (GardenApi.onMainBarn) {
             checkVisitorsReady()
         }
     }
 
     @HandleEvent(OwnInventoryItemUpdateEvent::class)
     fun onOwnInventoryItemUpdate() {
-        if (GardenApi.onBarnPlot) {
+        if (GardenApi.onMainBarn) {
             update()
         }
     }

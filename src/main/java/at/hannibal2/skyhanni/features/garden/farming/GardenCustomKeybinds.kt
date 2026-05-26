@@ -2,14 +2,17 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.garden.KeyBindConfig
+import at.hannibal2.skyhanni.config.features.garden.KeyBindConfig.ExcludeBarn
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -166,7 +169,9 @@ object GardenCustomKeybinds {
     private fun isEnabled(): Boolean =
         GardenApi.inGarden() &&
             config.enabled &&
-            !(GardenApi.onUnfarmablePlot && config.excludeBarn)
+            !(GardenPlotApi.inGreenhouse() && config.excludeGreenhouse) &&
+            !(GardenApi.onMainBarn && config.excludeBarn == KeyBindConfig.ExcludeBarn.MAIN) &&
+            !(GardenApi.onBarnPlot && config.excludeBarn == KeyBindConfig.ExcludeBarn.FULL)
 
     private fun isHoldingTool(): Boolean = InventoryUtils.getItemInHand()?.let { heldItem ->
         val internalName = heldItem.getInternalName()
@@ -226,5 +231,8 @@ object GardenCustomKeybinds {
         event.move(3, "garden.keyBindBack", "garden.keyBind.back")
         event.move(3, "garden.keyBindJump", "garden.keyBind.jump")
         event.move(3, "garden.keyBindSneak", "garden.keyBind.sneak")
+        event.transform(134, "garden.keyBind.excludeBarn") {
+            ConfigUtils.migrateBooleanToEnum(it, ExcludeBarn.MAIN, ExcludeBarn.OFF)
+        }
     }
 }
