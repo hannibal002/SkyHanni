@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class WormholeFinderConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Detect wormhole arrows spawned by Hypixel below the player and set a waypoint to the nearest wormhole.")
+    @ConfigOption(name = "Enabled", desc = "Detect wormhole arrows and set a waypoint to the nearest wormhole.")
     @FeatureToggle
     @ConfigEditorBoolean
     var enabled: Boolean = true
