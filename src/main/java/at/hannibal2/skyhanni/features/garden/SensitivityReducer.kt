@@ -49,21 +49,9 @@ object SensitivityReducer {
      * REGEX-TEST: Warping...
      */
     private val teleportPattern by RepoPattern.pattern(
-        "chat.garden.teleport.colorless",
+        "garden.sensitivityreducer.chat.teleport-no-color",
         "Teleported you to .*!|Warping\\.\\.\\.",
     )
-
-    private enum class SensitivityState(val transform: (Double) -> Double) {
-        UNCHANGED({ it }),
-        REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
-        LOCKED({ 0.0 }),
-        ;
-
-        fun isActive() = state == this
-        fun setActive() {
-            state = this
-        }
-    }
 
     @JvmStatic
     fun remapSensitivity(original: Double): Double = state.transform(original)
@@ -71,16 +59,16 @@ object SensitivityReducer {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.disableOnTeleport) return
+        val state = manualState ?: return
 
-        manualState?.let {
-            if (teleportPattern.matches(event.chatComponent)) {
-                manualState = null
-                ChatUtils.notifyOrDisable(
-                    if (it == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
+        if (teleportPattern.matches(event.chatComponent)) {
+            manualState = null
+            ChatUtils.notifyOrDisable(
+                if (state == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
                     else "Mouse rotation has been unlocked because you teleported.",
-                    config::disableOnTeleport, messageId = commandMessageId,
-                )
-            }
+                config::disableOnTeleport,
+                messageId = commandMessageId,
+            )
         }
     }
 
@@ -104,26 +92,13 @@ object SensitivityReducer {
 
         if (!GardenApi.inGarden()) return false
 
-        if (!isAutoTriggered()) return false
+        if (config.mode.none { it.isActive() }) return false
 
         if (config.onlyPlot && GardenApi.onUnfarmablePlot) return false
 
         if (config.onGround && !isOnGround()) return false
 
         return true
-    }
-
-    private fun isAutoTriggered() {
-        return config.mode.any {
-            when (it) {
-                SensitivityReducerConfig.Mode.TOOL -> GardenApi.toolInHand != null
-                SensitivityReducerConfig.Mode.FISHING_ROD -> FishingApi.holdingRod
-                SensitivityReducerConfig.Mode.KEYBIND -> config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
-                SensitivityReducerConfig.Mode.MOUSEMAT -> GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT
-                SensitivityReducerConfig.Mode.VACUUM -> PestApi.hasVacuumInHand()
-                SensitivityReducerConfig.Mode.SPRAYONATOR -> PestApi.hasSprayonatorInHand()
-            }
-        }
     }
 
     private fun isOnGround() {
@@ -170,23 +145,24 @@ object SensitivityReducer {
     @HandleEvent
     fun onGuiRenderOverlay() {
         if (!config.showGui) return
-        if (SensitivityState.UNCHANGED.isActive()) return
+        if (state == SensitivityState.UNCHANGED) return
 
         config.position.renderRenderable(
-            Renderable.text("§e" + if (SensitivityState.REDUCED.isActive()) "Sensitivity Lowered" else "Mouse Locked"),
+            Renderable.text("§e" + if (state == SensitivityState.REDUCED)) "Sensitivity Lowered" else "Mouse Locked"),
             posLabel = "Sensitivity Reducer",
         )
     }
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        val addData = if (SensitivityState.UNCHANGED.isActive()) event::addIrrelevant else event::addData
-
         event.title("Sensitivity Reducer")
-        addData {
+
+        if (state == SensitivityState.UNCHANGED) event.addIrrelevant {
+            add("not enabled")
+        } else event.addData {
             add("current state: $state")
             add("manual state: $manualState")
-            add("reducing factor: " + config.reducingPercent.fractionOf(100.0))
+            add("reducing factor: " + if (SensitivityReducer.LOCKED) 0.0 else config.reducingPercent.fractionOf(100.0))
         }
     }
 
@@ -206,12 +182,28 @@ object SensitivityReducer {
             }
             newList
         }
-        event.transform(134, "$base.reducingFactor") {
-            event.add(134, "$base.reducingPercent") {
-                JsonPrimitive((1.0.fractionOf(it.asFloat) * 100.0).roundTo(2))
-            }
-            it
+        event.move(134, "$base.reducingFactor", "$base.reducingPercent")
+        event.transform(134, "$base.reducingPercent") {
+            JsonPrimitive((1f.fractionOf(it.asFloat) * 100f).toFloat().roundTo(2))
         }
-        event.remove(134, "$base.reducingFactor")
+    }
+
+    private enum class SensitivityState(val transform: (Double) -> Double) {
+        UNCHANGED({ it }),
+        REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
+        LOCKED({ 0.0 }),
+        ;
+    }
+
+    enum class Mode(private val displayName: String, val isActive: () -> Boolean) {
+        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
+        TOOL("Farming tool", { GardenApi.toolInHand != null }),
+        FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
+        MOUSEMAT("Squeaky Mousemat", { GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT }),
+        VACUUM("Vacuum", { PestApi.hasVacuumInHand() }),
+        SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
+        ;
+
+        override fun toString() = displayName
     }
 }
