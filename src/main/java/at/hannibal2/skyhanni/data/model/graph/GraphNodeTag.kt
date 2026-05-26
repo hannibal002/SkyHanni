@@ -135,7 +135,7 @@ enum class GraphNodeTag(
         LorenzColor.LIGHT_PURPLE,
         "Fishing Wormhole",
         "A wormhole where you can fish Reality Hopper.",
-        onlyIslands = setOf(IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE),
+        onlyIslands = IslandTypeTag.WORMHOLE,
     ),
 
     FAIRY_SOUL(

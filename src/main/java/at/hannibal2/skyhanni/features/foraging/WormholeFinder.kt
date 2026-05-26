@@ -126,7 +126,7 @@ object WormholeFinder {
     val GOLD_FROGGLES = "FROGGLES_GOLD".toInternalName()
 
     fun wearingFroggles(): Boolean {
-        val id = InventoryUtils.getHelmet().getInternalName()
+        val id = InventoryUtils.getHelmet()?.getInternalName() ?: return false
         return id == DIAMOND_FROGGLES || id == GOLD_FROGGLES
     }
 }

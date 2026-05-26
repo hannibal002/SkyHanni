@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.isDeprecatedAtErrorLevel
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName

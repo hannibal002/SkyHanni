@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -167,7 +168,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         if (!drop.canDropFromPests) return
         if (!PestApi.hasVacuumInHand() && !PestApi.hasLassoInHand()) return
 
-        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.itemName)
+        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.dropName)
         addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
     }
 
