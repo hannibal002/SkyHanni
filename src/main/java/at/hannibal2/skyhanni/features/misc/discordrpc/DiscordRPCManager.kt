@@ -123,7 +123,7 @@ object DiscordRPCManager {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        stackingEnchants = event.getConstantAsync<EnchantsJson>("EnchantsJson").stacking
+        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
     }
 
     @HandleEvent
