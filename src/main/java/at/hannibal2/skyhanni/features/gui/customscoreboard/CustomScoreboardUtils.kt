@@ -96,6 +96,8 @@ object CustomScoreboardUtils {
         ?: TabWidget.SOWDUST.matchMatcherFirstLine { group("sowdust") }
         ?: "0"
 
+    internal fun getKernels() = getGroup(ScoreboardPattern.kernelsPattern, getSBLines(), "kernels") ?: ""
+
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
     internal fun getHeat() = MiningApi.heatDisplay
