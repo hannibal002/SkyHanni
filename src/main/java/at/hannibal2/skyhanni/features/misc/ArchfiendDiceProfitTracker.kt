@@ -4,9 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -17,7 +20,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -26,6 +33,7 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
+import net.minecraft.ChatFormatting
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -159,6 +167,9 @@ object ArchfiendDiceProfitTracker {
             val number = group("number").toIntOrNull() ?: return@matchMatcher
             val isHighClass = group("isHighClass").isNotEmpty()
             trackDiceRoll(number, isHighClass)
+
+            val achievement = AchievementManager.getAchievement(DICE_ACHIEVEMENT)
+            AchievementManager.updateTieredAchievement(DICE_ACHIEVEMENT, achievement.data.progress + 1)
         }
     }
 
@@ -241,5 +252,24 @@ object ArchfiendDiceProfitTracker {
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }
+    }
+
+    private const val DICE_ACHIEVEMENT = "100 dice rolls"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Professional Gambler".asComponent(),
+            componentBuilder {
+                append("Spin 100 dice")
+                append(" I doubt you make money from this...") {
+                    withColor(ChatFormatting.DARK_GRAY)
+                }
+            },
+            7f,
+            false,
+            listOf(100),
+        )
+        event.register(achievement, DICE_ACHIEVEMENT)
     }
 }
