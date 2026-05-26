@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -263,6 +264,7 @@ object DiscordRPCManager {
             largeImageKey = DiscordLocationKey.getDiscordIconKey(location),
             largeImageText = location,
             buttons = buildList {
+                if (!MinecraftCompat.localPlayerExists) return@buildList
                 if (config.showEliteSkyBlockButton.get()) DiscordRichPresence.Button(
                     label = "Open EliteSkyBlock",
                     url = getEliteSbUrl(),

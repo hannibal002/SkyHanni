@@ -60,5 +60,5 @@ object RiftLarva {
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.highlight.get()
+    private fun isEnabled() = RiftApi.inRift() && config.highlight.get()
 }
