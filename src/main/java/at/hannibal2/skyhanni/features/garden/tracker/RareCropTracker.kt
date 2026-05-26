@@ -78,10 +78,7 @@ object RareCropTracker {
         tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
-    enum class RareCropDropType(
-        val dropName: String,
-        val pestType: PestType? = null,
-    ) {
+    enum class RareCropDropType(val dropName: String, val pestType: PestType? = null) {
         CROPIE("§aCropie"),
         SQUASH("§9Squash"),
         FERMENTO("§5Fermento"),
