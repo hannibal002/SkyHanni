@@ -27,9 +27,12 @@ class LaneSwitchNotificationConfig {
     var secondsBefore: Int = 5
 
     @Expose
-    @ConfigOption(name = "Text", desc = "The text with color to be displayed as the notification.")
+    @ConfigOption(
+        name = "Text",
+        desc = "The text with color to be displayed as the notification. Use %s for time left and \\n for newline.",
+    )
     @ConfigEditorText
-    var text: String = "&eLane Switch incoming."
+    var text: String = "&eLane Switch incoming.\\n&c%s"
 
     @Expose
     @ConfigOption(name = "Sound Settings", desc = "")

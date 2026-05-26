@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -134,16 +135,17 @@ object FarmingLaneFeatures {
     }
 
     private fun showWarning() {
+        val timeRemaining = timeRemaining ?: return
         with(config.laneSwitchNotification) {
             if (!enabled) return
-            titleContext = when (titleContext) {
-                null -> TitleManager.sendTitle(
-                    text.replace("&", "§"),
-                    duration = secondsBefore.seconds,
-                    weight = 1.1,
-                )
-                else -> titleContext.takeIf { it?.alive == true }
-            }
+            val text = text.replace("&", "§").replace("%s", timeRemaining.format(showMilliSeconds = true))
+            if (titleContext?.alive == true) titleContext?.stop()
+            titleContext = TitleManager.sendTitle(
+                text.substringBefore("\\n"),
+                text.substringAfter("\\n", "").takeIfNotEmpty(),
+                0.1.seconds,
+                weight = 1.1,
+            )
             if (lastPlaySound.passedSince() >= sound.repeatDuration.ticks) {
                 lastPlaySound = SimpleTimeMark.now()
                 playUserSound()
@@ -161,13 +163,13 @@ object FarmingLaneFeatures {
         val timeRemaining = (currentDistance / speed).seconds
         FarmingLaneFeatures.timeRemaining = timeRemaining
         val warnAt = config.laneSwitchNotification.secondsBefore.seconds
-        if (timeRemaining >= warnAt) {
+        if (timeRemaining > warnAt) {
             lastTimeFarming = SimpleTimeMark.now()
             return false
         }
 
         // When the player was not inside the farm previously
-        return lastTimeFarming.passedSince() < warnAt
+        return lastTimeFarming.passedSince() <= warnAt
     }
 
     private fun calculateMovementState(speed: Double): MovementState {
