@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.SkyHanniConfig
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTooltip
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -12,6 +13,7 @@ import net.minecraft.world.item.Items
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -25,17 +27,20 @@ class GardenVisitorTooltipTest {
         SkyHanniMod.feature = SkyHanniConfig()
         SkyHanniMod.feature.garden.visitors.inventory.exactAmountAndTime = false
         SkyHanniMod.feature.garden.visitors.rewardWarning.notifyInChat = false
+        SkyHanniMod.feature.garden.visitors.rewardWarning.drops.add(VisitorReward.VISITORS_GRATITUDE)
         itemNameCache()["§9Enchanted Sugar Cane"] = "ENCHANTED_SUGAR_CANE".toInternalName()
+        itemNameCache()["Visitors' Gratitude"] = "VISITORS_GRATITUDE".toInternalName()
     }
 
     @AfterEach
     fun tearDown() {
         itemNameCache().remove("§9Enchanted Sugar Cane")
+        itemNameCache().remove("Visitors' Gratitude")
         SkyHanniMod.feature = oldConfig
     }
 
     @Test
-    fun `visitor tooltip parses copper line with heart suffix`() {
+    fun `visitor tooltip parses copper line and rare reward with heart suffix`() {
         val offerItem = ItemUtils.createItemStack(Items.GREEN_TERRACOTTA, "§aAccept Offer", spacemanLore)
         val visitor = VisitorApi.Visitor(
             visitorName = "§cSpaceman",
@@ -48,6 +53,8 @@ class GardenVisitorTooltipTest {
         }
 
         assertNotNull(visitor.pricePerCopper)
+        assertTrue("VISITORS_GRATITUDE".toInternalName() in visitor.allRewards)
+        assertTrue(VisitorReward.VISITORS_GRATITUDE in visitor.getRewardWarningAwards())
     }
 
     companion object {
