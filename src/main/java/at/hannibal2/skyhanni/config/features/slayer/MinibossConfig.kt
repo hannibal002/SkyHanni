@@ -22,6 +22,11 @@ class MinibossConfig {
     val minibossLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
 
     @Expose
+    @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Mobs when your own Slayer Boss is active.")
+    @ConfigEditorBoolean
+    val shouldBossInterruptLine: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Miniboss cocoons in line color below (even when line is disabled).")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -31,4 +36,9 @@ class MinibossConfig {
     @ConfigOption(name = "Line To Cocoon with Miniboss", desc = "")
     @Accordion
     val cocoonLine: LineToConfig = LineToConfig(defaultColor = LorenzColor.AQUA.toChromaColor(255))
+
+    @Expose
+    @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Cocoon when your own Slayer Boss is active.")
+    @ConfigEditorBoolean
+    val shouldBossInterruptCocoonLine: Boolean = true
 }

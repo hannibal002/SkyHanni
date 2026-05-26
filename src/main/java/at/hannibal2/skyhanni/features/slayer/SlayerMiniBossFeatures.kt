@@ -55,7 +55,7 @@ object SlayerMiniBossFeatures {
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!SlayerApi.isInAnyArea) return
-        if (config.minibossLine.showLine) {
+        if (config.minibossLine.showLine && !(SlayerApi.isInBossFight() && config.shouldBossInterruptLine)) {
             for (mob in miniBosses) {
                 if (!mob.baseEntity.canBeSeen(10)) continue
                 event.drawLineToCrosshair(
@@ -66,7 +66,7 @@ object SlayerMiniBossFeatures {
                 )
             }
         }
-        if (config.cocoonLine.showLine) {
+        if (config.cocoonLine.showLine && !(SlayerApi.isInBossFight() && config.shouldBossInterruptCocoonLine)) {
             for (mob in cocoons) {
                 if (!mob.canBeSeen(10)) continue
                 event.drawLineToCrosshair(
