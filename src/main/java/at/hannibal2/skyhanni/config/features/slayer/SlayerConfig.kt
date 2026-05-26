@@ -182,9 +182,31 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
-            event.move(134, "slayer.slayerMinibossHighlight", "slayer.miniboss.slayerMinibossHighlight")
-            event.move(134, "slayer.slayerMinibossLine", "slayer.miniboss.line.showLine")
-            event.move(134, "slayer.slayerMinibossLineWidth", "slayer.miniboss.line.lineWidth")
+            event.transform(134, "slayer.miniboss") { minibossElement ->
+                event.transform(134, "slayer") { element ->
+                    val oldHighlightEnabled = element.asJsonObject.get("slayerMinibossHighlight").asBoolean
+                    if (oldHighlightEnabled) {
+                        minibossElement.asJsonObject.remove("slayerMinibossHighlight")
+                        minibossElement.asJsonObject.addProperty("slayerMinibossHighlight", true)
+                        minibossElement.asJsonObject.remove("cocoonHighlight")
+                        minibossElement.asJsonObject.addProperty("cocoonHighlight", true)
+                    }
+                    val oldLineEnabled = element.asJsonObject.get("slayerMinibossLine").asBoolean
+                    if (oldLineEnabled) {
+                        minibossElement.asJsonObject.remove("minibossLine.showLine")
+                        minibossElement.asJsonObject.addProperty("minibossLine.showLine", true)
+                        minibossElement.asJsonObject.remove("cocoonLine.showLine")
+                        minibossElement.asJsonObject.addProperty("cocoonLine.showLine", true)
+                    }
+                    val oldLineWidth = element.asJsonObject.get("slayerMinibossLineWidth").asInt
+                    minibossElement.asJsonObject.remove("minibossLine.lineWidth")
+                    minibossElement.asJsonObject.addProperty("minibossLine.lineWidth", oldLineWidth)
+                    minibossElement.asJsonObject.remove("cocoonLine.lineWidth")
+                    minibossElement.asJsonObject.addProperty("cocoonLine.lineWidth", oldLineWidth)
+                    element
+                }
+                minibossElement
+            }
         }
     }
 }
