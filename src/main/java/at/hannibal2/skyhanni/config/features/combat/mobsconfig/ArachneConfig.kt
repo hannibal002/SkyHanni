@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.combat.mobsconfig
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.generic.LineToConfig
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -84,22 +85,20 @@ class ArachneConfig {
             val oldArachnePath = "combat.mobs"
             val newArachneBossPath = "$oldArachnePath.arachneSettings.boss"
             val newArachneKeeperPath = "$oldArachnePath.arachneSettings.keeper"
-            event.move(130, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
-            event.move(130, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
-            event.transform(130, oldArachnePath) { element ->
+            event.move(134, "$oldArachnePath.lineToArachne", "$newArachneBossPath.line.showLine")
+            event.move(134, "$oldArachnePath.lineToArachneWidth", "$newArachneBossPath.line.lineWidth")
+            event.transform(134, oldArachnePath) { element ->
                 val oldEnabled = element.asJsonObject.get("arachneBossHighlighter").asBoolean
                 if (!oldEnabled) {
-                    element.asJsonObject.remove(".arachneSettings.boss.bossHighlight")
-                    element.asJsonObject.remove(".arachneSettings.boss.broodHighlight")
-                    element.asJsonObject.addProperty(".arachneSettings.boss.bossHighlight", false)
-                    element.asJsonObject.addProperty(".arachneSettings.boss.broodHighlight", false)
+                    element.asJsonObject.replaceWithBoolean(".arachneSettings.boss.bossHighlight", false)
+                    element.asJsonObject.replaceWithBoolean(".arachneSettings.boss.broodHighlight", false)
                 }
                 element
             }
-            event.move(130, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
-            event.move(130, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
-            event.move(130, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
-            event.move(130, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
+            event.move(134, "$oldArachnePath.showArachneSpawnTimer", "$newArachneBossPath.showSpawnTimer")
+            event.move(134, "$oldArachnePath.arachneKillTimer", "$newArachneBossPath.killTimer")
+            event.move(134, "$oldArachnePath.hideNameTagArachneMinis", "$newArachneBossPath.hideNameTagOfBroods")
+            event.move(134, "$oldArachnePath.arachneKeeperHighlight", "$newArachneKeeperPath.arachneKeeperHighlight")
         }
     }
 }

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator.replaceWithBoolean
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
@@ -74,6 +75,16 @@ class SlayerConfig {
     val slayerTimeMessages: SlayerTimeMessagesConfig = SlayerTimeMessagesConfig()
 
     @Expose
+    @ConfigOption(name = "Active Boss Transparency", desc = "")
+    @Accordion
+    val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
+
+    @Expose
+    @ConfigOption(name = "Miniboss Settings", desc = "")
+    @Accordion
+    val miniboss: MinibossConfig = MinibossConfig()
+
+    @Expose
     @ConfigOption(name = "Remaining Kills", desc = "Display the names and remaining amount of mob kills needed until the boss spawns.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -92,16 +103,6 @@ class SlayerConfig {
     @Expose
     @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
     val remainingKillsPosition: Position = Position(410, 110)
-
-    @Expose
-    @ConfigOption(name = "Active Boss Transparency", desc = "")
-    @Accordion
-    val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
-
-    @Expose
-    @ConfigOption(name = "Miniboss Settings", desc = "")
-    @Accordion
-    val miniboss: MinibossConfig = MinibossConfig()
 
     @Expose
     @ConfigOption(
@@ -182,30 +183,25 @@ class SlayerConfig {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
-            event.transform(134, "slayer.miniboss") { minibossElement ->
-                event.transform(134, "slayer") { element ->
-                    val oldHighlightEnabled = element.asJsonObject.get("slayerMinibossHighlight").asBoolean
-                    if (oldHighlightEnabled) {
-                        minibossElement.asJsonObject.remove("slayerMinibossHighlight")
-                        minibossElement.asJsonObject.addProperty("slayerMinibossHighlight", true)
-                        minibossElement.asJsonObject.remove("cocoonHighlight")
-                        minibossElement.asJsonObject.addProperty("cocoonHighlight", true)
-                    }
-                    val oldLineEnabled = element.asJsonObject.get("slayerMinibossLine").asBoolean
-                    if (oldLineEnabled) {
-                        minibossElement.asJsonObject.remove("minibossLine.showLine")
-                        minibossElement.asJsonObject.addProperty("minibossLine.showLine", true)
-                        minibossElement.asJsonObject.remove("cocoonLine.showLine")
-                        minibossElement.asJsonObject.addProperty("cocoonLine.showLine", true)
-                    }
-                    val oldLineWidth = element.asJsonObject.get("slayerMinibossLineWidth").asInt
-                    minibossElement.asJsonObject.remove("minibossLine.lineWidth")
-                    minibossElement.asJsonObject.addProperty("minibossLine.lineWidth", oldLineWidth)
-                    minibossElement.asJsonObject.remove("cocoonLine.lineWidth")
-                    minibossElement.asJsonObject.addProperty("cocoonLine.lineWidth", oldLineWidth)
-                    element
+            event.transform(134, "slayer") { element ->
+                val elementObj = element.asJsonObject
+                val oldHighlightEnabled = elementObj.get("slayerMinibossHighlight").asBoolean
+
+                if (oldHighlightEnabled) {
+                    elementObj.replaceWithBoolean(".miniboss.slayerMinibossHighlight", true)
+                    elementObj.replaceWithBoolean(".miniboss.cocoonHighlight", true)
                 }
-                minibossElement
+                val oldMinibossLineEnabled = elementObj.get("slayerMinibossLine").asBoolean
+                if (oldMinibossLineEnabled) {
+                    elementObj.replaceWithBoolean(".miniboss.minibossLine.showLine", true)
+                    elementObj.replaceWithBoolean(".miniboss.cocoonLine.showLine", true)
+                }
+                val width = elementObj.get("slayerMinibossLineWidth")
+                elementObj.remove(".miniboss.minibossLine.lineWidth")
+                elementObj.add(".miniboss.minibossLine.lineWidth", width)
+                elementObj.remove(".miniboss.cocoonLine.lineWidth")
+                elementObj.add(".miniboss.cocoonLine.lineWidth", width)
+                element
             }
         }
     }

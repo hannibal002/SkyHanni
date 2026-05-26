@@ -197,6 +197,12 @@ object ConfigUpdaterMigrator {
         return count
     }
 
+    fun JsonObject.replaceWithBoolean(path: String, newState: Boolean): JsonObject {
+        this.remove(path)
+        this.addProperty(path, newState)
+        return this
+    }
+
     fun fixConfig(config: JsonObject): JsonObject {
         val lastVersion = (config["lastVersion"] as? JsonPrimitive)?.asIntOrNull ?: -1
         if (lastVersion > CONFIG_VERSION) {

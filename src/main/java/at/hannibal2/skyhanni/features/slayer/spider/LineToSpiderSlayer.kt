@@ -35,13 +35,13 @@ object LineToSpiderSlayer {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!SlayerApi.isInAnyArea || !config.lineToBoss.showLine) return
+        if (!SlayerApi.isInAnyArea || !config.lineToTaraBoss.showLine) return
         val seenMobs = bosses.filter { it.baseEntity.canBeSeen(30) && it.isAlive }
         seenMobs.forEach { mob ->
             event.drawLineToCrosshair(
                 mob.baseEntity.getLorenzVec().up(),
-                config.lineToBoss.color,
-                config.lineToBoss.lineWidth,
+                config.lineToTaraBoss.color,
+                config.lineToTaraBoss.lineWidth,
                 true,
             )
         }
