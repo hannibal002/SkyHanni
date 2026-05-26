@@ -48,5 +48,8 @@ private fun createItemStackTemplate(item: Item, count: Int, extraOps: SafeItemSt
     ItemStackTemplate.fromNonEmptyStack(ItemStackTemplate(item, count).create().also(extraOps))
 //? }
 
-//~ if < 26.1 '= item!!.value()' -> '= item'
-val SafeItemStack.itemType: Item get() = item!!.value()
+val SafeItemStack.itemType: Item get() {
+    //~ if < 26.1 'item?.value() ?: Items.AIR' -> 'item ?: Items.AIR'
+    val holder = item ?: return Items.AIR
+    return holder.value()
+}
