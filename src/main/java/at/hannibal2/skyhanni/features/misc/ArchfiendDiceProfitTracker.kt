@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.events.PurseChangeCause
+import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -45,12 +46,6 @@ object ArchfiendDiceProfitTracker {
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".toInternalName()
     private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
     private val ARCHFIEND_DYE = "DYE_ARCHFIEND".toInternalName()
-
-    // Constants for roll costs and win amounts (in coins)
-    private const val ARCHFIEND_DICE_ROLL_COST = 666_000L
-    private const val ARCHFIEND_DICE_WIN_COST = 15_000_000L
-    private const val HIGH_CLASS_ARCHFIEND_DICE_ROLL_COST = 6_600_000L
-    private const val HIGH_CLASS_ARCHFIEND_DICE_WIN_COST = 100_000_000L
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
     private val tracker = SkyHanniItemTracker(
@@ -171,59 +166,46 @@ object ArchfiendDiceProfitTracker {
         if (number !in 1..7) return
 
         val diceItem = if (isHighClass) HIGH_CLASS_ARCHFIEND_DICE else ARCHFIEND_DICE
-        val rollCost = if (isHighClass) HIGH_CLASS_ARCHFIEND_DICE_ROLL_COST else ARCHFIEND_DICE_ROLL_COST
-        val winCost = if (isHighClass) HIGH_CLASS_ARCHFIEND_DICE_WIN_COST else ARCHFIEND_DICE_WIN_COST
 
-        // Get current prices from auction house
-        val dicePrice = diceItem.getPriceOrNull()?.toLong() ?: 0L
-        val dyePrice = ARCHFIEND_DYE.getPriceOrNull()?.toLong() ?: 0L
-
-        // Track the roll cost as a negative coin item
-        tracker.addItem(NeuInternalName.SKYBLOCK_COIN, -rollCost.toInt(), command = false)
-
-        // Update statistics
         tracker.modify { data ->
-            // Get profit delta from the roll
-            val profitDelta = when (number) {
-                6 -> -dicePrice + winCost
-                7 -> -dicePrice + dyePrice
-                else -> 0L
-            }
+            if (isHighClass) data.highClassDiceRolls++ else data.archfiendDiceRolls++
 
-            if (isHighClass) {
-                data.highClassDiceRolls++
-                data.highClassDiceProfit -= rollCost
-                data.highClassDiceProfit += profitDelta
-                when (number) {
-                    6 -> data.highClassDice6Count++
-                    7 -> data.highClassDice7Count++
+            // Update statistics
+            when (number) {
+                6 -> {
+                    // Lost dice, gained coins
+                    tracker.addItem(diceItem, -1, command = false)
                 }
-            } else {
-                data.archfiendDiceRolls++
-                data.archfiendDiceProfit -= rollCost
-                data.archfiendDiceProfit += profitDelta
-                when (number) {
-                    6 -> data.archfiendDice6Count++
-                    7 -> data.archfiendDice7Count++
+                7 -> {
+                    // Lost dice, gained dye
+                    tracker.addItem(diceItem, -1, command = false)
+                    tracker.addItem(ARCHFIEND_DYE, 1, command = false)
                 }
-            }
-        }
-
-        // Track items for wins
-        when (number) {
-            6 -> {
-                // Lost dice, gained coins
-                tracker.addItem(diceItem, -1, command = false)
-                tracker.addItem(NeuInternalName.SKYBLOCK_COIN, winCost.toInt(), command = false)
-            }
-            7 -> {
-                // Lost dice, gained dye
-                tracker.addItem(diceItem, -1, command = false)
-                tracker.addItem(ARCHFIEND_DYE, 1, command = false)
             }
         }
     }
 
+    @HandleEvent
+    fun onPurseChange(event: PurseChangeEvent) {
+        if (!isEnabled()) return
+
+        val coins = event.coins.toInt()
+        when (event.reason) {
+            PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS,
+            PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
+                tracker.modify { data -> data.highClassDiceProfit += coins }
+                lastCatchTime = SimpleTimeMark.now()
+                tracker.addCoins(event.coins.toInt(), command = false)
+            }
+            PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND,
+            PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND -> {
+                tracker.modify { data -> data.highClassDiceProfit += coins }
+                lastCatchTime = SimpleTimeMark.now()
+                tracker.addCoins(event.coins.toInt(), command = false)
+            }
+            else -> return
+        }
+    }
 
     private var lastCatchTime = SimpleTimeMark.farPast()
 

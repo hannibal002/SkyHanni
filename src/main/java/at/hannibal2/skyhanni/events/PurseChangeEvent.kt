@@ -1,16 +1,20 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
+@PrimaryFunction("onPurseChange")
 class PurseChangeEvent(val coins: Double, val purse: Double, val reason: PurseChangeCause) : SkyHanniEvent()
 
 enum class PurseChangeCause {
     GAIN_MOB_KILL,
     GAIN_TALISMAN_OF_COINS,
-    GAIN_DICE_ROLL,
+    GAIN_DICE_ROLL_HIGH_CLASS,
+    GAIN_DICE_ROLL_ARCHFIEND,
     GAIN_UNKNOWN,
 
     LOSE_SLAYER_QUEST_STARTED,
-    LOSE_DICE_ROLL_COST,
+    LOSE_DICE_ROLL_COST_HIGH_CLASS,
+    LOSE_DICE_ROLL_COST_ARCHFIEND,
     LOSE_UNKNOWN,
 }
