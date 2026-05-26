@@ -3,37 +3,26 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
-import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
-import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
+import at.hannibal2.skyhanni.features.misc.ArchfiendDiceProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.evictOldestEntry
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.ChatFormatting
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -44,14 +33,6 @@ object ItemAddManager {
         SHARD("Went into Hunting Box"),
         COMMAND("Invented via command"),
     }
-
-    private val ARCHFIEND_DICE = "ARCHFIEND_DICE".toInternalName()
-    private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
-
-    private val diceRollChatPattern by RepoPattern.pattern(
-        "data.itemmanager.diceroll",
-        "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
-    )
 
     private var inSackInventory = false
     private var lastSackInventoryLeave = SimpleTimeMark.farPast()
@@ -90,11 +71,12 @@ object ItemAddManager {
     fun onItemAdd(event: ItemAddInInventoryEvent) {
 
         val internalName = event.internalName
-        if (internalName == ARCHFIEND_DICE || internalName == HIGH_CLASS_ARCHFIEND_DICE) {
-            if (lastDiceRoll.passedSince() < 500.milliseconds) {
+        if (ArchfiendDiceProfitTracker.isDice(internalName)) {
+            if (ArchfiendDiceProfitTracker.hasRecentDiceRoll()) {
                 return
             }
         }
+
 
         Source.ITEM_ADD.addItem(internalName, event.amount)
     }
@@ -149,35 +131,10 @@ object ItemAddManager {
         "§r$itemName §7(§8x$amount§7) §e$source §b$passedSince ago §7(§b$time§7)"
     }
 
-    private var lastDiceRoll = SimpleTimeMark.farPast()
     private val superCraftedItems = TimeLimitedSet<NeuInternalName>(30.seconds)
-
-    private const val DICE_ACHIEVEMENT = "100 dice rolls"
-
-    @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
-        val achievement = Achievement(
-            "Professional Gambler".asComponent(),
-            componentBuilder {
-                append("Spin 100 dice")
-                append(" I doubt you make money from this...") {
-                    withColor(ChatFormatting.DARK_GRAY)
-                }
-            },
-            7f,
-            false,
-            listOf(100),
-        )
-        event.register(achievement, DICE_ACHIEVEMENT)
-    }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (diceRollChatPattern.matches(event.message)) {
-            lastDiceRoll = SimpleTimeMark.now()
-            val achievement = AchievementManager.getAchievement(DICE_ACHIEVEMENT)
-            AchievementManager.updateTieredAchievement(DICE_ACHIEVEMENT, achievement.data.progress + 1)
-        }
         craftedPattern.matchMatcher(event.message) {
             val internalName = NeuInternalName.fromItemName(group("item"))
             if (!SackApi.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
