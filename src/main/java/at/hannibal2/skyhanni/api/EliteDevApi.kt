@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.api
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteBazaarResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsRequest
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteContestsResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteItemResponse
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
@@ -32,8 +34,11 @@ import at.hannibal2.skyhanni.utils.api.ApiStaticPath
 import at.hannibal2.skyhanni.utils.api.ApiStaticPostPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.api.JsonApiResponse
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EliteDevApi {
@@ -57,7 +62,7 @@ object EliteDevApi {
             description = "Fetches the specified Elite resource from $ELITE_DOMAIN"
             category = CommandCategory.DEVELOPER_DEBUG
             argCallback("resource", EnumArgumentType.lowercase<EliteResourceType>()) { resource ->
-                SkyHanniMod.launchIOCoroutine("shfetcheliteresource command") {
+                CoroutineSettings("shfetcheliteresource command", 10.seconds).launchCoroutine {
                     fetchResourceCommand(resource)
                 }
             }
@@ -131,6 +136,11 @@ object EliteDevApi {
     val apiWeightsStatic = ApiStaticPath(
         "$ELITE_API_URL/weights/all",
         FARMING_WEIGHT_API_NAME,
+    )
+
+    private val feastStatic = ApiStaticPostPath(
+        "$ELITE_API_URL/harvest-feast/current",
+        "EliteSkyblock Harvest Feast Upload"
     )
 
     private const val LEADERBOARD_URL = "$ELITE_API_URL/leaderboard/"
@@ -256,5 +266,21 @@ object EliteDevApi {
     private suspend fun fetchItemResources() = fetchResources<EliteItemResponse>("items")
     private suspend fun fetchAuctionResources() = fetchResources<EliteAuctionsResponse>("auctions")
     private suspend fun fetchBazaarResources() = fetchResources<EliteBazaarResponse>("bazaar")
+    // </editor-fold>
+
+    // <editor-fold desc="Harvest Feast">
+    suspend fun fetchHarvestFeastData(): EliteFeastData {
+        val res = ApiUtils.getTypedJsonResponse<JsonObject>(feastStatic.toGet())
+        val (_, apiData) = res.assertSuccessWithData() ?: ErrorManager.skyHanniError(
+            "Failed to fetch the next Harvest Feast data. Please report this error if it continues to occur",
+            "requestUrl" to feastStatic.toGet(),
+            "feastApiResponse" to res,
+        )
+        return ApiUtils.serializeNullsGson.fromJson<EliteFeastData>(apiData)
+    }
+
+    suspend fun submitHarvestFeast(postData: EliteFeastJson): JsonApiResponse<JsonElement> {
+        return ApiUtils.postJson(feastStatic, postData.getBody())
+    }
     // </editor-fold>
 }
