@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.features.garden.SensitivityReducer.Mode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -19,19 +20,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Mode", desc = "Decide when the mouse sensitivity should be lowered.")
     @ConfigEditorDraggableList
-    val mode: MutableList<Mode> = mutableListOf(Mode.TOOL)
-
-    enum class Mode(private val displayName: String) {
-        TOOL("Farming tool"),
-        FISHING_ROD("Fishing Rod"),
-        KEYBIND("Holding Keybind"),
-        MOUSEMAT("Squeaky Mousemat"),
-        VACUUM("Vacuum"),
-        SPRAYONATOR("Sprayonator"),
-        ;
-
-        override fun toString() = displayName
-    }
+    val mode: MutableList<Mode> = mutableListOf(Mode.KEYBIND, Mode.TOOL)
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
