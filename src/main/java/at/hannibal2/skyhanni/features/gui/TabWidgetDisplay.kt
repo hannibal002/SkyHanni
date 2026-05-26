@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -89,18 +90,7 @@ enum class TabWidgetDisplay(
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            // Validation that the displayPositions in the config is correct
-            val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
-            if (sizeDiff == 0) return
-            if (sizeDiff < 0) {
-                ErrorManager.skyHanniError(
-                    "Invalid State of config.displayPositions",
-                    "Display" to TabWidgetDisplay.entries,
-                    "Positions" to config.displayPositions,
-                )
-            } else {
-                config.displayPositions.addAll(List(sizeDiff) { Position() })
-            }
+            config.displayPositions = updateConfigPositionList(config.displayPositions, TabWidgetDisplay.entries, "gui.tabWidget.displayPositions")
         }
     }
 }

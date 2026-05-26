@@ -21,7 +21,7 @@ import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 @Language("RegExp")
-private const val VALUE_PATTERN = "(?<value>[\\d,.]+)(?: .*)?"
+private const val VALUE_PATTERN = "(?:§f)?(?<value>[\\d,.]+)(?:.*)?"
 
 @Suppress("MaxLineLength")
 enum class SkyblockStat(
@@ -115,20 +115,20 @@ enum class SkyblockStat(
     MINING_FORTUNE("§6☘", " *Mining Fortune: ☘$VALUE_PATTERN", " *§6☘ Mining Fortune §f$VALUE_PATTERN"),
     FEAR("§5☠", " *Fear: ☠$VALUE_PATTERN", " *§5☠ Fear §f$VALUE_PATTERN"),
     COLD_RESISTANCE("§b❄", " *Cold Resistance: ❄$VALUE_PATTERN", ""),
-    WHEAT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wheat Fortune $VALUE_PATTERN"),
-    CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune $VALUE_PATTERN"),
-    POTATO_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Potato Fortune $VALUE_PATTERN"),
-    PUMPKIN_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Pumpkin Fortune $VALUE_PATTERN"),
-    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Slice Fortune $VALUE_PATTERN"),
-    MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune $VALUE_PATTERN"),
-    CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune $VALUE_PATTERN"),
-    NETHER_STALK_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune $VALUE_PATTERN"),
-    COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune $VALUE_PATTERN"),
-    SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune $VALUE_PATTERN"),
-    SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune $VALUE_PATTERN"),
-    MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune $VALUE_PATTERN"),
-    WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune $VALUE_PATTERN"),
-    OVERBLOOM("§e☀", "", " *(?:§7§m|§e)☀ Overbloom $VALUE_PATTERN"),
+    WHEAT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wheat Fortune §f$VALUE_PATTERN"),
+    CARROT_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Carrot Fortune §f$VALUE_PATTERN"),
+    POTATO_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Potato Fortune §f$VALUE_PATTERN"),
+    PUMPKIN_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Pumpkin Fortune §f$VALUE_PATTERN"),
+    MELON_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Melon Slice Fortune §f$VALUE_PATTERN"),
+    MUSHROOM_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Mushroom Fortune §f$VALUE_PATTERN"),
+    CACTUS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cactus Fortune §f$VALUE_PATTERN"),
+    NETHER_STALK_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Nether Wart Fortune §f$VALUE_PATTERN"),
+    COCOA_BEANS_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Cocoa Beans Fortune §f$VALUE_PATTERN"),
+    SUGAR_CANE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sugar Cane Fortune §f$VALUE_PATTERN"),
+    SUNFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Sunflower Fortune §f$VALUE_PATTERN"),
+    MOONFLOWER_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Moonflower Fortune §f$VALUE_PATTERN"),
+    WILD_ROSE_FORTUNE("§6☘", "", " *(?:§7§m|§6)☘ Wild Rose Fortune §f$VALUE_PATTERN"),
+    OVERBLOOM("§e☀", " *Overbloom: §r§e☀$VALUE_PATTERN", " *(?:§7§m|§e)☀ Overbloom §f$VALUE_PATTERN"),
 
     MINING_SPREAD(
         "§e▚",
@@ -189,7 +189,9 @@ enum class SkyblockStat(
 
     private val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
+    val displayValueInt get() = lastKnownValue?.roundToInt()
+
+    val displayValueDouble get() = lastKnownValue
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.no-color.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)

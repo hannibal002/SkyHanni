@@ -39,5 +39,5 @@ class TabWidgetConfig {
 
     @Expose
     @ConfigLink(owner = TabWidgetConfig::class, field = "enabled")
-    val displayPositions: PositionList = PositionList(TabWidgetDisplay.entries.size)
+    var displayPositions: PositionList = PositionList(TabWidgetDisplay.entries.size)
 }

@@ -209,18 +209,22 @@ class GuiConfig {
 
     class StatDisplay {
         @Expose
-        @ConfigOption(name = "Enabled", desc = "Enables the gui elements for the selected stats.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        var enabled: Boolean = false
-
-        @Expose
         @ConfigOption(name = "Stats", desc = "Add stats to list to render as a UI Element.")
         @ConfigEditorDraggableList
         val displayStats: MutableList<SkyblockStatUI> = mutableListOf()
 
         @Expose
+        @ConfigOption(name = "Show Shortened", desc = "Stats in this List will only show Icon and Value.")
+        @ConfigEditorDraggableList
+        val shortenedStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
+        @ConfigOption(name = "Stats To Round", desc = "Stats that are present in this list will have their number rounded.")
+        @ConfigEditorDraggableList
+        val integerStats: MutableList<SkyblockStatUI> = mutableListOf()
+
+        @Expose
         @ConfigLink(owner = StatDisplay::class, field = "enabled")
-        val displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
+        var displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
     }
 }

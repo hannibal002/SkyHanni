@@ -2,27 +2,39 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.event.spook.TheGreatSpook.isGreatSpookActive
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConfigUtils.getAsPosition
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object StatOverlay {
     private val config get() = SkyHanniMod.feature.gui.statDisplayer
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender() {
+        if (config.displayStats.isEmpty()) return
         config.displayStats.forEach { statToDisplay ->
-            if (statToDisplay.extraCondition) {
-                statToDisplay.stat.displayValue?.let {
-                    statToDisplay.position.renderRenderable(Renderable.text(it), posLabel = "${statToDisplay.posLabel} Stat Display")
-                }
-            }
+            if (!statToDisplay.extraCondition()) return@forEach
+            val stat = statToDisplay.stat
+            val statText = if (config.shortenedStats.contains(statToDisplay))
+                stat.icon
+            else stat.iconWithName
+            val statNum = if (config.integerStats.contains(statToDisplay))
+                stat.displayValueInt else stat.displayValueDouble ?: return@forEach
+            val displayText = "$statText $statNum"
+
+            statToDisplay.position.renderRenderable(Renderable.text(displayText), posLabel = "${statToDisplay.posLabel} Stat Display")
         }
     }
 
@@ -30,40 +42,69 @@ object StatOverlay {
     enum class SkyblockStatUI(
         val stat: SkyblockStat,
         val posLabel: String,
-        val extraCondition: Boolean = true,
+        val extraCondition: () -> Boolean = { true },
     ) {
         FEROCITY(SkyblockStat.FEROCITY, "Ferocity"),
-        FEAR(SkyblockStat.FEAR, "Fear", isGreatSpookActive),
-        OVERBLOOM(SkyblockStat.OVERBLOOM, "Overbloom");
+        FEAR(SkyblockStat.FEAR, "Fear", { isGreatSpookActive }) ,
+        OVERBLOOM(SkyblockStat.OVERBLOOM, "Overbloom", { GardenApi.inGarden() }),
+        BONUS_PEST_CHANCE(SkyblockStat.BONUS_PEST_CHANCE, "Bonus Pest Chance", { GardenApi.inGarden() }),
+        MAGIC_FIND(SkyblockStat.MAGIC_FIND, "Magic Find");
 
         val position get() = config.displayPositions[ordinal]
+
+        override fun toString(): String = this.stat.iconWithName
     }
 
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        config.displayPositions = updateConfigPositionList(
+            config.displayPositions,
+            SkyblockStatUI.entries,
+            "gui.statDisplayer.displayPositions")
+    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(134, "combat.ferocityDisplay.enabled") { element ->
-            if (element.asBoolean) {
-                config.displayStats.add(SkyblockStatUI.FEROCITY)
-                config.enabled = true
+        while (config.displayPositions.size < SkyblockStatUI.entries.size) {
+            config.displayPositions.add(Position(10, 80))
+        }
+        val shortenedStats: MutableList<SkyblockStatUI> = mutableListOf()
+        val displayStats = buildList {
+            if (event.oldBoolean("combat.ferocityDisplay.enabled")) add(SkyblockStatUI.FEROCITY)
+            if (event.oldBoolean("event.spook.fearStatDisplay")) add(SkyblockStatUI.FEAR)
+            event.transform(134, "garden.pests.pestChanceDisplay") {
+                val oldMode = it.asJsonObject["pestChanceDisplay"].asString
+                when (oldMode) {
+                    "COMPACT" ->  {
+                        shortenedStats.add(SkyblockStatUI.BONUS_PEST_CHANCE)
+                        add(SkyblockStatUI.BONUS_PEST_CHANCE)
+                    }
+                    "FULL" -> add(SkyblockStatUI.BONUS_PEST_CHANCE)
+                }
+                it
             }
-            element
         }
-        event.transform(134, "combat.ferocityDisplay.position") { element ->
-            config.displayPositions[SkyblockStatUI.FEROCITY.ordinal] = element.getAsPosition()
-            element
+        event.add(134, "gui.statDisplayer.displayStats") {
+            ConfigManager.gson.toJsonTree(displayStats)
         }
-        event.transform(134, "event.spook.fearStatDisplay") { element ->
-            if (element.asBoolean) {
-                config.displayStats.add(SkyblockStatUI.FEAR)
-                config.enabled = true
+        event.add(134, "gui.statDisplayer.displayPositions") {
+            val positions = PositionList(SkyblockStatUI.entries.size)
+            event.oldPosition("combat.ferocityDisplay.position")?.let {
+                positions[SkyblockStatUI.FEROCITY.ordinal] = it
             }
-            element
+            event.oldPosition("event.spook.positionFear")?.let {
+                positions[SkyblockStatUI.FEAR.ordinal] = it
+            }
+            event.oldPosition("garden.pests.pestChanceDisplayPosition")?.let {
+                positions[SkyblockStatUI.BONUS_PEST_CHANCE.ordinal] = it
+            }
+            ConfigManager.gson.toJsonTree(positions)
         }
-        event.transform(134, "event.spook.positionFear") { element ->
-            config.displayPositions[SkyblockStatUI.FEAR.ordinal] = element.getAsPosition()
-            element
-        }
-    }
-}
 
+        event.remove(134, "combat.ferocityDisplay.enabled")
+        event.remove(134, "combat.ferocityDisplay.position")
+        event.remove(134, "event.spook.fearStatDisplay")
+        event.remove(134, "event.spook.positionFear")
+    }
+
+}

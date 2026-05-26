@@ -5,11 +5,13 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
+import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardRankConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearEntries
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -122,6 +124,11 @@ enum class EliteLeaderboards(
                     }
                 }
             }
+        }
+
+        @HandleEvent
+        fun onProfileJoin(event: ProfileJoinEvent) {
+            config.displayPositions = updateConfigPositionList(config.displayPositions, EliteLeaderboards.entries, "garden.eliteFarmersLeaderboards.displayPositions")
         }
 
         @HandleEvent
