@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,18 +26,21 @@ object PestSpawn {
 
     /**
      * REGEX-TEST: GROSS! A ൠ Pest has appeared in Plot - S 4!
+     * REGEX-TEST: GROSS! A ൠ Pest has appeared in The Barn!
      */
-    private val onePestPattern by patternGroup.pattern(
+    private val onePestPattern by patternGroup.list(
         "one.colorless",
         ".*! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
+        ".*! A ൠ Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
      * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in Plot - 14!
      */
-    private val multiplePestsPattern by patternGroup.pattern(
+    private val multiplePestsPattern by patternGroup.list(
         "multiple.colorless",
         ".*! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
+        ".*! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
@@ -59,11 +63,11 @@ object PestSpawn {
         val message = event.cleanMessage
         var blocked = false
 
-        onePestPattern.matchMatcher(message) {
+        onePestPattern.matchMatchers(message) {
             spawn(1, listOf(group("plot")))
             blocked = true
         }
-        multiplePestsPattern.matchMatcher(message) {
+        multiplePestsPattern.matchMatchers(message) {
             spawn(group("amount").toInt(), listOf(group("plot")))
             blocked = true
         }
@@ -96,12 +100,13 @@ object PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
+            val tpName = if (plotName == "The Barn") "barn" else plotName
             ChatUtils.clickableChat(
                 message,
                 onClick = {
-                    HypixelCommands.teleportToPlot(plotName)
+                    HypixelCommands.teleportToPlot(tpName)
                 },
-                "§eClick to run /plottp $plotName!",
+                "§eClick to run /plottp $tpName!",
             )
         }
     }
