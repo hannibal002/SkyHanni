@@ -35,8 +35,8 @@ object SensitivityReducer {
     private val commandMessageId = ChatUtils.getUniqueMessageId()
     private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
 
-    private var state: SensitivityState = SensitivityState.UNCHANGED
-    private var manualState: SensitivityState? = null
+    private var state: State = State.UNCHANGED
+    private var manualState: State? = null
         set(value) {
             field = value
             onTick()
@@ -64,7 +64,7 @@ object SensitivityReducer {
         if (teleportPattern.matches(event.chatComponent)) {
             manualState = null
             ChatUtils.notifyOrDisable(
-                if (state == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
+                if (state == State.REDUCED) "Mouse sensitivity has been restored because you teleported."
                     else "Mouse rotation has been unlocked because you teleported.",
                 config::disableOnTeleport,
                 messageId = commandMessageId,
@@ -79,11 +79,12 @@ object SensitivityReducer {
 
     @HandleEvent
     fun onTick() {
+        // TODO: drop the `State` prefix when context-sensitive resolution is enabled
         state = when {
             manualState != null -> manualState
-            !shouldAutoReduce() -> SensitivityState.UNCHANGED
-            !config.lockMouse -> SensitivityState.REDUCED
-            else -> SensitivityState.LOCKED
+            !shouldAutoReduce() -> State.UNCHANGED
+            !config.lockMouse -> State.REDUCED
+            else -> State.LOCKED
         }
     }
 
@@ -114,8 +115,8 @@ object SensitivityReducer {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                if (manualState != SensitivityState.REDUCED) {
-                    manualState = SensitivityState.REDUCED
+                if (manualState != State.REDUCED) {
+                    manualState = State.REDUCED
                     ChatUtils.chat(
                         "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.",
                         messageId = commandMessageId,
@@ -131,8 +132,8 @@ object SensitivityReducer {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
             simpleCallback {
-                if (manualState != SensitivityState.LOCKED) {
-                    manualState = SensitivityState.LOCKED
+                if (manualState != State.LOCKED) {
+                    manualState = State.LOCKED
                     ChatUtils.chat("Mouse rotation is now locked. Type /shlockmouse to unlock your mouse.", messageId = commandMessageId)
                 } else {
                     manualState = null
@@ -145,10 +146,10 @@ object SensitivityReducer {
     @HandleEvent
     fun onGuiRenderOverlay() {
         if (!config.showGui) return
-        if (state == SensitivityState.UNCHANGED) return
+        if (state == State.UNCHANGED) return
 
         config.position.renderRenderable(
-            Renderable.text("§e" + if (state == SensitivityState.REDUCED)) "Sensitivity Lowered" else "Mouse Locked"),
+            Renderable.text("§e" + if (state == State.REDUCED)) "Sensitivity Lowered" else "Mouse Locked"),
             posLabel = "Sensitivity Reducer",
         )
     }
@@ -157,7 +158,7 @@ object SensitivityReducer {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Sensitivity Reducer")
 
-        if (state == SensitivityState.UNCHANGED) event.addIrrelevant {
+        if (state == State.UNCHANGED) event.addIrrelevant {
             add("not enabled")
         } else event.addData {
             add("current state: $state")
@@ -188,7 +189,7 @@ object SensitivityReducer {
         }
     }
 
-    private enum class SensitivityState(val transform: (Double) -> Double) {
+    private enum class State(val transform: (Double) -> Double) {
         UNCHANGED({ it }),
         REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
         LOCKED({ 0.0 }),
