@@ -56,6 +56,8 @@ object ArchfiendDiceProfitTracker {
     private val ARCHFIEND_DYE = "DYE_ARCHFIEND".toInternalName()
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
+    private var lastDiceActivity = SimpleTimeMark.farPast()
+
     private val tracker = SkyHanniItemTracker(
         "Archfiend Dice Profit Tracker",
         ::Data,
@@ -63,26 +65,42 @@ object ArchfiendDiceProfitTracker {
         trackerConfig = { config.perTrackerConfig }
     ) { drawDisplay(it) }
 
+    data class DiceData(
+        @Expose var rolls: Long = 0L,
+        @Expose var sixes: Long = 0L,
+        @Expose var jackpots: Long = 0L,
+        @Expose var profit: Long = 0L,
+    )
+
     data class Data(
-        @Expose var archfiendDiceRolls: Long = 0L,
-        @Expose var highClassDiceRolls: Long = 0L,
-        @Expose var archfiendDice6Count: Long = 0L,
-        @Expose var archfiendDice7Count: Long = 0L,
-        @Expose var highClassDice6Count: Long = 0L,
-        @Expose var highClassDice7Count: Long = 0L,
-        @Expose var archfiendDiceProfit: Long = 0L,
-        @Expose var highClassDiceProfit: Long = 0L,
+        @Expose var archfiend: DiceData = DiceData(),
+        @Expose var highClass: DiceData = DiceData(),
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
-            val totalRolls = archfiendDiceRolls + highClassDiceRolls
-            val rolls6 = archfiendDice6Count + highClassDice6Count
-            val hitRate = if (totalRolls > 0) (rolls6.toDouble() / totalRolls).formatPercentage() else "0%"
-            val totalProfit = archfiendDiceProfit + highClassDiceProfit
+            val totalRolls = archfiend.rolls + highClass.rolls
+            val totalSixes = archfiend.sixes + highClass.sixes
+            val totalJackpots = archfiend.jackpots + highClass.jackpots
+            val totalSpecialRolls = totalSixes + totalJackpots
+
+            val specialRate = if (totalRolls > 0) {
+                (totalSpecialRolls.toDouble() / totalRolls).formatPercentage()
+            } else {
+                "0%"
+            }
+
+            val jackpotRate = if (totalRolls > 0) {
+                (totalJackpots.toDouble() / totalRolls).formatPercentage()
+            } else {
+                "0%"
+            }
+
+            val totalProfit = archfiend.profit + highClass.profit
             val profitFormatted = totalProfit.shortFormat()
 
             return listOf(
                 "§7Rolled §e${totalRolls.addSeparators()} §7times.",
-                "§7Hit rate on 6: §c$hitRate",
+                "§7Special roll rate: §a$specialRate",
+                "§7Jackpot rate: §6$jackpotRate",
                 "§7Total profit: §e$profitFormatted",
             )
         }
@@ -103,47 +121,50 @@ object ArchfiendDiceProfitTracker {
 
         val profit = tracker.drawItems(data, { true }, this)
 
-        val totalRolls = data.archfiendDiceRolls + data.highClassDiceRolls
+        val totalRolls = data.archfiend.rolls + data.highClass.rolls
+
         add(
             Renderable.hoverTips(
                 "§7Total rolls: §e${totalRolls.addSeparators()}",
                 listOf(
-                    "§7Archfiend: §e${data.archfiendDiceRolls.addSeparators()}",
-                    "§7High Class: §e${data.highClassDiceRolls.addSeparators()}",
+                    "§7Archfiend: §e${data.archfiend.rolls.addSeparators()}",
+                    "§7High Class: §e${data.highClass.rolls.addSeparators()}",
                 ),
             ).toSearchable(),
         )
 
-        val totalHits = data.archfiendDice6Count + data.highClassDice6Count
+        val totalSixes = data.archfiend.sixes + data.highClass.sixes
+        val totalJackpots = data.archfiend.jackpots + data.highClass.jackpots
+        val totalSpecialRolls = totalSixes + totalJackpots
+
         add(
             Renderable.hoverTips(
-                "§7Times rolled 6: §e${totalHits.addSeparators()}",
+                "§7Special rolls: §e${totalSpecialRolls.addSeparators()}",
                 listOf(
-                    "§7Archfiend: §e${data.archfiendDice6Count.addSeparators()}",
-                    "§7High Class: §e${data.highClassDice6Count.addSeparators()}",
+                    "§76s: §e${totalSixes.addSeparators()}",
+                    "§7Jackpots: §6${totalJackpots.addSeparators()}",
+                    "",
+                    "§7Archfiend 6s: §e${data.archfiend.sixes.addSeparators()}",
+                    "§7High Class 6s: §e${data.highClass.sixes.addSeparators()}",
+                    "",
+                    "§7Archfiend Jackpots: §6${data.archfiend.jackpots.addSeparators()}",
+                    "§7High Class Jackpots: §6${data.highClass.jackpots.addSeparators()}",
                 ),
             ).toSearchable(),
         )
 
-        val totalJackpots = data.archfiendDice7Count + data.highClassDice7Count
-        add(
-            Renderable.hoverTips(
-                "§7Times rolled 7 (Jackpot): §e${totalJackpots.addSeparators()}",
-                listOf(
-                    "§7Archfiend: §e${data.archfiendDice7Count.addSeparators()}",
-                    "§7High Class: §e${data.highClassDice7Count.addSeparators()}",
-                ),
-            ).toSearchable(),
-        )
+        val totalProfit = data.archfiend.profit + data.highClass.profit
+        val totalProfitFormatted = totalProfit.shortFormat()
 
-        val archfiendProfitFormatted = data.archfiendDiceProfit.shortFormat()
-        val highClassProfitFormatted = data.highClassDiceProfit.shortFormat()
-        val archfiendProfitColor = if (data.archfiendDiceProfit >= 0) "§a" else "§c"
-        val highClassProfitColor = if (data.highClassDiceProfit >= 0) "§a" else "§c"
+        val archfiendProfitFormatted = data.archfiend.profit.shortFormat()
+        val highClassProfitFormatted = data.highClass.profit.shortFormat()
+
+        val archfiendProfitColor = if (data.archfiend.profit >= 0) "§a" else "§c"
+        val highClassProfitColor = if (data.highClass.profit >= 0) "§a" else "§c"
 
         add(
             Renderable.hoverTips(
-                "§7Profit per type:",
+                "§7Profit per type: §e$totalProfitFormatted",
                 listOf(
                     "§7Archfiend: $archfiendProfitColor$archfiendProfitFormatted",
                     "§7High Class: $highClassProfitColor$highClassProfitFormatted",
@@ -152,7 +173,16 @@ object ArchfiendDiceProfitTracker {
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, totalRolls, "roll", duration, "Rolls"))
+
+        addAll(
+            tracker.addTotalProfit(
+                profit,
+                totalRolls,
+                "roll",
+                duration,
+                "Rolls",
+            ),
+        )
 
         tracker.addPriceFromButton(this)
     }
@@ -160,35 +190,50 @@ object ArchfiendDiceProfitTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
+
         diceRollChatPattern.matchMatcher(event.message) {
             lastDiceRoll = SimpleTimeMark.now()
-            lastCatchTime = SimpleTimeMark.now()
+            lastDiceActivity = SimpleTimeMark.now()
 
             val number = group("number").toIntOrNull() ?: return@matchMatcher
             val isHighClass = group("isHighClass").isNotEmpty()
+
             trackDiceRoll(number, isHighClass)
 
             val achievement = AchievementManager.getAchievement(DICE_ACHIEVEMENT)
-            AchievementManager.updateTieredAchievement(DICE_ACHIEVEMENT, achievement.data.progress + 1)
+            AchievementManager.updateTieredAchievement(
+                DICE_ACHIEVEMENT,
+                achievement.data.progress + 1,
+            )
         }
     }
 
     private fun trackDiceRoll(number: Int, isHighClass: Boolean) {
         if (number !in 1..7) return
 
-        val diceItem = if (isHighClass) HIGH_CLASS_ARCHFIEND_DICE else ARCHFIEND_DICE
+        val diceItem = if (isHighClass) {
+            HIGH_CLASS_ARCHFIEND_DICE
+        } else {
+            ARCHFIEND_DICE
+        }
 
         tracker.modify { data ->
-            if (isHighClass) data.highClassDiceRolls++ else data.archfiendDiceRolls++
+            val diceData = if (isHighClass) {
+                data.highClass
+            } else {
+                data.archfiend
+            }
 
-            // Update statistics
+            diceData.rolls++
+
             when (number) {
                 6 -> {
-                    // Lost dice, gained coins
+                    diceData.sixes++
                     tracker.addItem(diceItem, -1, command = false)
                 }
+
                 7 -> {
-                    // Lost dice, gained dye
+                    diceData.jackpots++
                     tracker.addItem(diceItem, -1, command = false)
                     tracker.addItem(ARCHFIEND_DYE, 1, command = false)
                 }
@@ -201,27 +246,36 @@ object ArchfiendDiceProfitTracker {
         if (!isEnabled()) return
 
         val coins = event.coins.toInt()
+
         when (event.reason) {
             PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS,
             PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
-                tracker.modify { data -> data.highClassDiceProfit += coins }
-                lastCatchTime = SimpleTimeMark.now()
-                tracker.addCoins(event.coins.toInt(), command = false)
+                tracker.modify { data ->
+                    data.highClass.profit += coins
+                }
+
+                lastDiceActivity = SimpleTimeMark.now()
+
+                tracker.addCoins(coins, command = false)
             }
+
             PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND,
             PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND -> {
-                tracker.modify { data -> data.highClassDiceProfit += coins }
-                lastCatchTime = SimpleTimeMark.now()
-                tracker.addCoins(event.coins.toInt(), command = false)
+                tracker.modify { data ->
+                    data.archfiend.profit += coins
+                }
+
+                lastDiceActivity = SimpleTimeMark.now()
+
+                tracker.addCoins(coins, command = false)
             }
+
             else -> return
         }
     }
 
-    private var lastCatchTime = SimpleTimeMark.farPast()
-
     private val shouldShow: Boolean
-        get() = config.enabled && lastCatchTime.passedSince() < 3.seconds
+        get() = config.enabled && lastDiceActivity.passedSince() < 3.seconds
 
     init {
         RenderDisplayHelper(
@@ -236,7 +290,7 @@ object ArchfiendDiceProfitTracker {
 
     @HandleEvent
     fun onWorldChange() {
-        lastCatchTime = SimpleTimeMark.farPast()
+        lastDiceActivity = SimpleTimeMark.farPast()
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock
