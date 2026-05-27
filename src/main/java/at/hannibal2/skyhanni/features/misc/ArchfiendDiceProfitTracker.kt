@@ -243,7 +243,7 @@ object ArchfiendDiceProfitTracker {
         val coins = event.coins.toInt()
         when (event.reason) {
             PurseChangeCause.LOSE_DICE_ROLL_COST,
-            PurseChangeCause.GAIN_DICE_ROLL -> {
+            PurseChangeCause.GAIN_DICE_ROLL, -> {
                 lastDiceActivity = SimpleTimeMark.now()
                 tracker.addCoins(coins, command = false)
             }
@@ -255,7 +255,7 @@ object ArchfiendDiceProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() && (holdingDice || lastDiceActivity.passedSince() < 3.seconds) },
+            condition = { isEnabled() && (holdingDice || lastDiceActivity.passedSince() < 10.seconds) },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
@@ -280,8 +280,6 @@ object ArchfiendDiceProfitTracker {
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }
-        // /shrolldice arch 6
-        // /shrolldice highclass 7
         event.registerBrigadier("shrollblazedice") {
             description = "Manually track a dice roll. Usage: /shrolldice <arch|highclass> <number>"
             category = CommandCategory.DEVELOPER_DEBUG
