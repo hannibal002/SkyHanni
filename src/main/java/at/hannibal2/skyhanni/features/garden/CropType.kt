@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.ServerTime
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -167,7 +167,7 @@ enum class CropType(
         }
 
         fun getTimeFlower(): CropType {
-            val time = ServerTime.dayTime % 24000
+            val time = MinecraftCompat.serverTime % 24000
             // pretty sure great spook will break this
             return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }

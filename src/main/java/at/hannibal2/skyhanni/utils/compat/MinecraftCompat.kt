@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
 
 /**
@@ -27,4 +30,18 @@ object MinecraftCompat {
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+
+    //~ if < 26.1 'gameTime' -> 'dayTime'
+    val clientTime get(): Long = localWorldOrNull?.gameTime ?: 0L
+
+    @JvmStatic
+    var serverTime: Long = 0L
+        private set
+
+    @HandleEvent
+    internal fun onPacketReceived(event: PacketReceivedEvent) {
+        val packet = event.packet as? ClientboundSetTimePacket ?: return
+        //~ if < 26.1 '.gameTime' -> '.dayTime'
+        serverTime = packet.gameTime
+    }
 }
