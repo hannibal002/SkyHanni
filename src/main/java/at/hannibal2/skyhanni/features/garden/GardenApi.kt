@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -209,8 +209,8 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    @HandleEvent
+    fun onProfileDataReady(event: ProfileDataReadyEvent) {
         GardenBestCropTime.reset()
     }
 
