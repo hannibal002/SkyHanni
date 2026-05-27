@@ -15,7 +15,7 @@ import java.util.List;
 //import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
-public class MixinTextHandler {
+public abstract class MixinStringSplitter {
 
     //? if < 1.21.11 {
     @WrapMethod(
@@ -30,7 +30,7 @@ public class MixinTextHandler {
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"
     )
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
-        return VisualWordsHook.INSTANCE.withoutWordChanges(() -> original.call(text, maxWidth, style));
+        return VisualWordsHook.withoutWordChanges(() -> original.call(text, maxWidth, style));
     }
 
     @ModifyVariable(
@@ -40,7 +40,7 @@ public class MixinTextHandler {
         argsOnly = true
     )
     private FormattedText modifyStringVisitable(FormattedText visitable) {
-        return VisualWordsHook.INSTANCE.modifyFormattedText(visitable);
+        return VisualWordsHook.modifyFormattedText(visitable);
     }
 
 }

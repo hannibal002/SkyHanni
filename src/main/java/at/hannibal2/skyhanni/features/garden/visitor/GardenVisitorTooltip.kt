@@ -44,10 +44,11 @@ object GardenVisitorTooltip {
 
     /**
      * REGEX-TEST:  §8+§c20 Copper
+     * REGEX-TEST:  §8+§c150 Copper §d❤
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
-        " §8\\+§c(?<amount>.*) Copper",
+        " §8\\+§c(?<amount>.*) Copper(?: .*)?",
     )
 
     /**
@@ -140,7 +141,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -223,7 +225,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -262,6 +265,8 @@ object GardenVisitorTooltip {
 
         visitor.blockReason = visitor.blockReason()
     }
+
+    private fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
 
     private fun getCropType(internalName: NeuInternalName) =
         CropType.getByNameOrNull(

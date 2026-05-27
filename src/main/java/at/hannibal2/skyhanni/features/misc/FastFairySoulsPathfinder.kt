@@ -231,7 +231,7 @@ object FastFairySoulsPathfinder {
     }
 
     private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
-    private val calculatingMessageId = ChatUtils.getUniqueMessageId()
+    private val calculatingMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private var calculating = false
     private var calculatingStart = SimpleTimeMark.farPast()

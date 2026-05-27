@@ -664,10 +664,11 @@ object EstimatedItemValueCalculator {
         return getTotalAndNames(items)
     }
 
-    private fun fetchEnchantmentItems(
+    internal fun fetchEnchantmentItems(
         enchantments: Map<String, Int>,
         internalName: NeuInternalName,
         data: ItemValueCalculationDataJson,
+        isBazaarItem: (NeuInternalName) -> Boolean = { it.isBazaarItem() },
     ): Map<NeuInternalName, Int> {
 
         val items = mutableMapOf<NeuInternalName, Int>()
@@ -693,16 +694,26 @@ object EstimatedItemValueCalculator {
                 false
             }
             if (isAlwaysActive) continue
+
+            val endcapData = data.endcapEnchants
+                ?.get(rawName)
+                ?.takeIfNotEmpty()
             var level = rawLevel
+            endcapData?.let {
+                val minRequiredLevel = it.minOf { levelData -> levelData.requiredLevel }
+                if (rawLevel >= minRequiredLevel) level = minRequiredLevel
+            }
+
             var multiplier = 1
 
             when (rawName) {
-                in data.onlyTierOnePrices if rawLevel in 2..5 -> {
-                    multiplier = 2.intPow(rawLevel - 1)
+                in data.onlyTierOnePrices if level in 2..5 -> {
+                    multiplier = 2.intPow(level - 1)
                     level = 1
                 }
-                in data.onlyTierFivePrices if rawLevel in 6..10 -> {
-                    multiplier = 2.intPow(rawLevel - 5)
+
+                in data.onlyTierFivePrices if level in 6..10 -> {
+                    multiplier = 2.intPow(level - 5)
                     if (multiplier > 1) level = 5
                 }
             }
@@ -711,16 +722,16 @@ object EstimatedItemValueCalculator {
             }
             if (rawName in EstimatedItemValue.stackingEnchants.keys) level = 1
 
-            data.endcapEnchants?.get(rawName)?.let { endcapData ->
-                if (rawLevel > endcapData.requiredLevel) {
-                    level = endcapData.requiredLevel
-                    items[endcapData.endcapItem] = 1
+            endcapData?.let {
+                it.forEach { levelData ->
+                    val targetLevel = levelData.requiredLevel + 1
+                    if (rawLevel >= targetLevel) items[levelData.endcapItem] = 1
                 }
             }
 
             val enchantmentName = "$rawName;$level".toInternalName()
 
-            if (enchantmentName.isBazaarItem()) {
+            if (isBazaarItem(enchantmentName)) {
                 items[enchantmentName] = multiplier
             }
         }
