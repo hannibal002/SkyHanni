@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
-import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -300,15 +300,39 @@ object BlazeDiceProfitTracker {
 
                         if (isHighClass) {
                             // high class roll cost
-                            onPurseChange(PurseChangeEvent(-6_666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS))
+                            onPurseChange(
+                                PurseChangeEvent(
+                                    -PurseApi.HIGH_CLASS_COST,
+                                    PurseApi.currentPurse,
+                                    PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS
+                                )
+                            )
                             if (num == 6) {
-                                onPurseChange(PurseChangeEvent(100.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS))
+                                onPurseChange(
+                                    PurseChangeEvent(
+                                        PurseApi.HIGH_CLASS_PROFIT,
+                                        PurseApi.currentPurse,
+                                        PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS
+                                    )
+                                )
                             }
                         } else {
                             // archfiend roll cost
-                            onPurseChange(PurseChangeEvent(-666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND))
+                            onPurseChange(
+                                PurseChangeEvent(
+                                    -PurseApi.ARCHFIEND_COST,
+                                    PurseApi.currentPurse,
+                                    PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND
+                                )
+                            )
                             if (num == 6) {
-                                onPurseChange(PurseChangeEvent(15.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND))
+                                onPurseChange(
+                                    PurseChangeEvent(
+                                        -PurseApi.ARCHFIEND_PROFIT,
+                                        PurseApi.currentPurse,
+                                        PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND
+                                    )
+                                )
                             }
                         }
                     }

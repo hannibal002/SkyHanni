@@ -40,6 +40,11 @@ object PurseApi {
     var currentPurse = 0.0
         private set
 
+    const val ARCHFIEND_COST = 666_666.0
+    const val HIGH_CLASS_COST = 6_666_666.0
+    val ARCHFIEND_PROFIT = 15.million
+    val HIGH_CLASS_PROFIT = 100.million
+
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
@@ -65,11 +70,11 @@ object PurseApi {
             }
 
             // TODO relic of coins support
-            if (diff == 15.million) {
+            if (diff == ARCHFIEND_PROFIT) {
                 return PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND
             }
 
-            if (diff == 100.million) {
+            if (diff == HIGH_CLASS_PROFIT) {
                 return PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS
             }
 
@@ -84,11 +89,11 @@ object PurseApi {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
             }
 
-            if (diff == -666_666.0) {
+            if (diff == -ARCHFIEND_COST) {
                 return PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND
             }
 
-            if (diff == -6_666_666.0) {
+            if (diff == -HIGH_CLASS_COST) {
                 return PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS
             }
 
