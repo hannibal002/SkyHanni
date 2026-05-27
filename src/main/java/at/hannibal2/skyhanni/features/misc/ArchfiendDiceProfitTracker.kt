@@ -150,7 +150,6 @@ object ArchfiendDiceProfitTracker {
             ).toSearchable(),
         )
 
-        // Show roll costs separately, like slayer does with spawn costs
         val totalRollCost = data.archfiend.rollCost + data.highClass.rollCost
         val totalRollCostFormatted = totalRollCost.shortFormat()
         add(
