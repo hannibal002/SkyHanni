@@ -77,7 +77,7 @@ object EstimatedItemValue {
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
         hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots ?: emptyList()
-        stackingEnchants = event.getConstantAsync<EnchantsJson>("EnchantsJson").stacking
+        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
     }
 
     // TODO test if this can go now since NEU pv is gone (SB-PV mod support?)
