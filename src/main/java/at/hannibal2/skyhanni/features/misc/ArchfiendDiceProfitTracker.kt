@@ -70,7 +70,7 @@ object ArchfiendDiceProfitTracker {
     data class DiceData(
         @Expose var rolls: Long = 0L,
         @Expose var sixes: Long = 0L,
-        @Expose var jackpots: Long = 0L,
+        @Expose var dyeCount: Long = 0L,
         @Expose var rollCost: Long = 0L,
     )
 
@@ -81,8 +81,8 @@ object ArchfiendDiceProfitTracker {
         override fun getDescription(timesGained: Long): List<String> {
             val totalRolls = archfiend.rolls + highClass.rolls
             val totalSixes = archfiend.sixes + highClass.sixes
-            val totalJackpots = archfiend.jackpots + highClass.jackpots
-            val totalSpecialRolls = totalSixes + totalJackpots
+            val totalDyes = archfiend.dyeCount + highClass.dyeCount
+            val totalSpecialRolls = totalSixes + totalDyes
 
             val specialRate = if (totalRolls > 0) {
                 (totalSpecialRolls.toDouble() / totalRolls).formatPercentage()
@@ -90,15 +90,15 @@ object ArchfiendDiceProfitTracker {
                 "0%"
             }
 
-            val jackpotRate = if (totalRolls > 0) {
-                (totalJackpots.toDouble() / totalRolls).formatPercentage()
+            val dyeRate = if (totalRolls > 0) {
+                (totalDyes.toDouble() / totalRolls).formatPercentage()
             } else {
                 "0%"
             }
 
             return listOf(
                 "§7Special roll rate: §a$specialRate",
-                "§7Jackpot rate: §6$jackpotRate",
+                "§7Dye drop rate: §6$dyeRate",
             )
         }
 
@@ -131,21 +131,21 @@ object ArchfiendDiceProfitTracker {
         )
 
         val totalSixes = data.archfiend.sixes + data.highClass.sixes
-        val totalJackpots = data.archfiend.jackpots + data.highClass.jackpots
-        val totalSpecialRolls = totalSixes + totalJackpots
+        val totalDyes = data.archfiend.dyeCount + data.highClass.dyeCount
+        val totalSpecialRolls = totalSixes + totalDyes
 
         add(
             Renderable.hoverTips(
                 "§7Special rolls: §e${totalSpecialRolls.addSeparators()}",
                 listOf(
                     "§76s: §e${totalSixes.addSeparators()}",
-                    "§7Jackpots: §6${totalJackpots.addSeparators()}",
+                    "§7Dye drops (7s): §6${totalDyes.addSeparators()}",
                     "",
                     "§7Archfiend 6s: §e${data.archfiend.sixes.addSeparators()}",
                     "§7High Class 6s: §e${data.highClass.sixes.addSeparators()}",
                     "",
-                    "§7Archfiend Jackpots: §6${data.archfiend.jackpots.addSeparators()}",
-                    "§7High Class Jackpots: §6${data.highClass.jackpots.addSeparators()}",
+                    "§7Archfiend Dyes: §6${data.archfiend.dyeCount.addSeparators()}",
+                    "§7High Class Dyes: §6${data.highClass.dyeCount.addSeparators()}",
                 ),
             ).toSearchable(),
         )
@@ -226,7 +226,7 @@ object ArchfiendDiceProfitTracker {
                 }
 
                 7 -> {
-                    diceData.jackpots++
+                    diceData.dyeCount++
                     data.addItem(diceItem, -1, command = false)
                     data.addItem(ARCHFIEND_DYE, 1, command = false)
                 }
