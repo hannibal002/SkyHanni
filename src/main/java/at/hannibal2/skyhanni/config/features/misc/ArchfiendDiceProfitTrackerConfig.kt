@@ -9,15 +9,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class BlazeDiceProfitTrackerConfig {
+class ArchfiendDiceProfitTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Track profits from Archfiend/High Class Dice rolls.")
+    @ConfigOption(name = "Enabled", desc = "Track profits from Archfiend Dice rolls.")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = BlazeDiceProfitTrackerConfig::class, field = "enabled")
+    @ConfigLink(owner = ArchfiendDiceProfitTrackerConfig::class, field = "enabled")
     val position: Position = Position(20, 20)
 
     @Expose

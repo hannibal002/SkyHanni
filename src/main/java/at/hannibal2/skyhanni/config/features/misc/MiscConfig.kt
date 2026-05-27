@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.minion.MinionsConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskFeaturesConfig
 import at.hannibal2.skyhanni.config.features.misc.navigation.NavigationConfig
 import at.hannibal2.skyhanni.config.features.misc.tracker.UniversalTrackerConfig
+import at.hannibal2.skyhanni.config.features.misc.ArchfiendDiceProfitTrackerConfig
 import at.hannibal2.skyhanni.config.features.pets.PetConfig
 import at.hannibal2.skyhanni.config.features.stranded.StrandedConfig
 import com.google.gson.annotations.Expose
@@ -143,9 +144,9 @@ class MiscConfig {
     val cakeCounter: CakeCounterConfig = CakeCounterConfig()
 
     @Expose
-    @ConfigOption(name = "Blaze Dice Profit Tracker", desc = "")
+    @ConfigOption(name = "Archfiend Dice Profit Tracker", desc = "")
     @Accordion
-    val blazeDiceProfitTracker: BlazeDiceProfitTrackerConfig = BlazeDiceProfitTrackerConfig()
+    val archfiendDiceProfitTracker: ArchfiendDiceProfitTrackerConfig = ArchfiendDiceProfitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Frog Mask Features", desc = "")
