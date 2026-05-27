@@ -28,4 +28,3 @@ class ArchfiendDiceProfitTrackerConfig {
     @Accordion
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 }
-

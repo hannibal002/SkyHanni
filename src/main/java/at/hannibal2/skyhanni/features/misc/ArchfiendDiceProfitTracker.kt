@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
+import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -69,7 +71,7 @@ object ArchfiendDiceProfitTracker {
         @Expose var rolls: Long = 0L,
         @Expose var sixes: Long = 0L,
         @Expose var jackpots: Long = 0L,
-        @Expose var profit: Long = 0L,
+        @Expose var rollCost: Long = 0L,
     )
 
     data class Data(
@@ -94,14 +96,10 @@ object ArchfiendDiceProfitTracker {
                 "0%"
             }
 
-            val totalProfit = archfiend.profit + highClass.profit
-            val profitFormatted = totalProfit.shortFormat()
-
             return listOf(
                 "§7Rolled §e${totalRolls.addSeparators()} §7times.",
                 "§7Special roll rate: §a$specialRate",
                 "§7Jackpot rate: §6$jackpotRate",
-                "§7Total profit: §e$profitFormatted",
             )
         }
 
@@ -119,7 +117,7 @@ object ArchfiendDiceProfitTracker {
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         addSearchString("§e§lArchfiend Dice Profit Tracker")
 
-        val profit = tracker.drawItems(data, { true }, this)
+        var profit = tracker.drawItems(data, { true }, this)
 
         val totalRolls = data.archfiend.rolls + data.highClass.rolls
 
@@ -153,24 +151,19 @@ object ArchfiendDiceProfitTracker {
             ).toSearchable(),
         )
 
-        val totalProfit = data.archfiend.profit + data.highClass.profit
-        val totalProfitFormatted = totalProfit.shortFormat()
-
-        val archfiendProfitFormatted = data.archfiend.profit.shortFormat()
-        val highClassProfitFormatted = data.highClass.profit.shortFormat()
-
-        val archfiendProfitColor = if (data.archfiend.profit >= 0) "§a" else "§c"
-        val highClassProfitColor = if (data.highClass.profit >= 0) "§a" else "§c"
-
+        // Show roll costs separately, like slayer does with spawn costs
+        val totalRollCost = data.archfiend.rollCost + data.highClass.rollCost
+        val totalRollCostFormatted = totalRollCost.shortFormat()
         add(
             Renderable.hoverTips(
-                "§7Profit per type: §e$totalProfitFormatted",
+                "§7Dice Roll Costs: §c$totalRollCostFormatted",
                 listOf(
-                    "§7Archfiend: $archfiendProfitColor$archfiendProfitFormatted",
-                    "§7High Class: $highClassProfitColor$highClassProfitFormatted",
+                    "§7Archfiend: §c${data.archfiend.rollCost.shortFormat()}",
+                    "§7High Class: §c${data.highClass.rollCost.shortFormat()}",
                 ),
             ).toSearchable(),
         )
+        profit += totalRollCost
 
         val duration = data.getTotalUptime()
 
@@ -229,13 +222,13 @@ object ArchfiendDiceProfitTracker {
             when (number) {
                 6 -> {
                     diceData.sixes++
-                    tracker.addItem(diceItem, -1, command = false)
+                    data.addItem(diceItem, -1, command = false)
                 }
 
                 7 -> {
                     diceData.jackpots++
-                    tracker.addItem(diceItem, -1, command = false)
-                    tracker.addItem(ARCHFIEND_DYE, 1, command = false)
+                    data.addItem(diceItem, -1, command = false)
+                    data.addItem(ARCHFIEND_DYE, 1, command = false)
                 }
             }
         }
@@ -247,30 +240,30 @@ object ArchfiendDiceProfitTracker {
 
         val coins = event.coins.toInt()
 
-        when (event.reason) {
-            PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS,
-            PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
-                tracker.modify { data ->
-                    data.highClass.profit += coins
+        tracker.modify { data ->
+            when (event.reason) {
+                PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS -> {
+                    lastDiceActivity = SimpleTimeMark.now()
+                    data.addCoins(coins, command = false)
                 }
 
-                lastDiceActivity = SimpleTimeMark.now()
-
-                tracker.addCoins(coins, command = false)
-            }
-
-            PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND,
-            PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND -> {
-                tracker.modify { data ->
-                    data.archfiend.profit += coins
+                PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
+                    lastDiceActivity = SimpleTimeMark.now()
+                    data.highClass.rollCost += coins
                 }
 
-                lastDiceActivity = SimpleTimeMark.now()
+                PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND -> {
+                    lastDiceActivity = SimpleTimeMark.now()
+                    data.addCoins(coins, command = false)
+                }
 
-                tracker.addCoins(coins, command = false)
+                PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND -> {
+                    lastDiceActivity = SimpleTimeMark.now()
+                    data.archfiend.rollCost += coins
+                }
+
+                else -> return@modify
             }
-
-            else -> return
         }
     }
 
@@ -305,6 +298,44 @@ object ArchfiendDiceProfitTracker {
             description = "Resets the Archfiend Dice Profit Tracker"
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
+        }
+        // /shrolldice arch 6
+        // /shrolldice highclass 7
+        event.registerBrigadier("shrolldice") {
+            description = "Manually track a dice roll. Usage: /shrolldice <arch|highclass> <number>"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("type", BrigadierArguments.string()) { type ->
+                arg("number", BrigadierArguments.integer(1, 7)) { number ->
+                    callback {
+                        val typeStr = getArg(type)
+                        val isHighClass = when (typeStr.lowercase()) {
+                            "archfiend", "arch_fiend", "arch" -> false
+                            "highclass", "high_class", "high" -> true
+                            else -> {
+                                SkyHanniMod.logger.warn("Invalid dice type: $typeStr")
+                                return@callback
+                            }
+                        }
+
+                        val num = getArg(number)
+                        trackDiceRoll(num, isHighClass)
+
+                        if (isHighClass) {
+                            // high class roll cost
+                            onPurseChange(PurseChangeEvent(-6_666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS))
+                            if (num == 6 || num == 7) {
+                                onPurseChange(PurseChangeEvent(100.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS))
+                            }
+                        } else {
+                            // archfiend roll cost
+                            onPurseChange(PurseChangeEvent(-666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND))
+                            if (num == 6 || num == 7) {
+                                onPurseChange(PurseChangeEvent(15.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND))
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 

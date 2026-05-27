@@ -78,7 +78,7 @@ SkyHanniItemTracker<Data : ItemTrackerData<*>>(
 
     open fun addCoins(amount: Int, command: Boolean) {
         modify {
-            it.addItem(SKYBLOCK_COIN, amount, command)
+            it.addCoins(amount, command)
         }
     }
 
