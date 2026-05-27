@@ -186,7 +186,6 @@ object ArchfiendDiceProfitTracker {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
         diceRollChatPattern.matchMatcher(event.message) {
             lastDiceActivity = SimpleTimeMark.now()
 
@@ -238,7 +237,6 @@ object ArchfiendDiceProfitTracker {
 
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
-        if (!isEnabled()) return
         val coins = event.coins.toInt()
         when (event.reason) {
             PurseChangeCause.LOSE_DICE_ROLL_COST,
