@@ -205,9 +205,6 @@ dependencies {
     // Calculator
     includeImplementation(libs.keval)
 
-    // Repo mgmt
-    includeImplementation(libs.jgit)
-
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)

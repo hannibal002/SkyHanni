@@ -344,8 +344,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         progress.update("displayRepoStatus for $commonName")
         if (joinEvent) return onJoinStatusError(progress)
 
-        val currentDownloadedCommit = gitRepo.getLocalHeadSha(repoDirectory)
-            ?: commitStorage.readFromFile()?.sha ?: "unknown"
+        val currentDownloadedCommit = commitStorage.readFromFile()?.sha ?: "unknown"
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
             logger.chat("$commonName repo working fine! Commit hash: §b$currentDownloadedCommit§r")
             reportExtraStatusInfo()
@@ -434,18 +433,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         forceReset: Boolean = false,
         switchToBackupOnFail: Boolean = true,
     ): FetchUnpackResult {
-        progress.update("try loading repo from jgit")
-        with(gitRepo) {
-            if (repoFileSystem.loadFromJGit()) {
-                progress.update("loaded from jgit")
-                isUsingBackup = false
-                return FetchUnpackResult.SUCCESS
-            } else {
-                progress.update("failed to load repo from jgit")
-                dumpDiagnosticsToLog("operation" to "jgit load")
-            }
-        }
-
         progress.update("fetchAndUnpackRepo")
         val comparison = getCommitComparison(silentError) ?: run {
             return if (switchToBackupOnFail) switchToBackupRepo(progress)
@@ -571,7 +558,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         debug("  localCommit: sha=${localRepoCommit.sha ?: "none"}, time=${localRepoCommit.time ?: "none"}")
         debug("  usingBackup: $isUsingBackup")
         debug("  repoDir: exists=${repoDirectory.exists()}, files=$fileCount, path=${repoDirectory.absolutePath}")
-        debug("  gitPresent: ${repoDirectory.resolve(".git").exists()}")
         debug("  fileSystem: ${repoFileSystem::class.simpleName}")
         debug("  successful: ${successfulConstants.size}, failed: ${unsuccessfulConstants.size}")
         if (unsuccessfulConstants.isNotEmpty()) {
