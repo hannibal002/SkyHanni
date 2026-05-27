@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -74,16 +75,21 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §6(§6+1,344☘)
+     * REGEX-TEST: §6§lRARE DROP! §9Mutant Nether Wart §8x9 §e(§e+134☀)
      * REGEX-TEST: §6§lRARE DROP! §9Enchanted Cookie §8x9 §6(§6+1,810☘)
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
-     * REGEX-TEST: §6§lPET DROP! §r§6Slug §6(§6+1300☘)
+     * REGEX-TEST: §6§lPET DROP! §r§6Slug §e(§e+78☀)
      * REGEX-TEST: §6§lRARE DROP! §9Squeaky Toy §6(§6+1,549☘)
      * REGEX-TEST: §6§lRARE DROP! §6Squeaky Mousemat §6(§6+1,549☘)
+     * REGEX-TEST: §6§lRARE DROP! §aWings of Harmony Vinyl §e(§e+139.5☀)
+     * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
+     * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5☀)
      */
+	// TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
+    //  from breaking crops vs. killing pests since they use the same message
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? §6\\(§6\\+[\\d,]+☘\\)",
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[☘☀]|Cocoaleech)\\)",
     )
 
     /**
@@ -99,6 +105,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
+    val SUNFLOWER_ITEM = "DOUBLE_PLANT".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
@@ -157,6 +164,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
 
+    fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
+        if (!drop.canDropFromPests) return
+        if (!PestApi.hasVacuumInHand() && !PestApi.hasLassoInHand()) return
+
+        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.dropName)
+        addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
@@ -198,15 +213,21 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             CropType.getByNameOrNull(rawName)
                 ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
+            if (config.hideChat) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
-            // Field Mice drop 6 separate items, but we only want to count the kill once
-            if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
-            // overclocker drops have the same format as crop drops and causes double counting kills
-            else if (pest != PestType.FIELD_MOUSE && internalName != OVERCLOCKER) addKill(pest)
+            val shouldAddKill = when (pest) {
+                // Field Mice drop 6 separate items, but we only want to count the kill once
+                PestType.FIELD_MOUSE -> internalName == DUNG_ITEM
+                // Lunar Moths drop 3 separate crops, but we only want to count the kill once
+                PestType.LUNAR_MOTH -> internalName == SUNFLOWER_ITEM
+                // Overclocker drops have the same format as crop drops and causes double counting kills
+                else -> internalName != OVERCLOCKER
+            }
+            if (shouldAddKill) addKill(pest)
         }
+
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return

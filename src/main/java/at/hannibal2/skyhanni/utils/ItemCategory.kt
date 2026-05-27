@@ -17,7 +17,7 @@ enum class ItemCategory {
     ROD_PART,
     AXE,
     GAUNTLET,
-    @Deprecated("No longer exists") HOE,
+    @Deprecated("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
     PICKAXE,
     SHOVEL,
     DRILL,
@@ -45,7 +45,9 @@ enum class ItemCategory {
     TROPHY_FISH,
     ARROW,
     ARROW_POISON,
-    ITEM,
+    // TODO This was previously used as a fake category for uncategorized dungeon items.
+    //  Remove it after ensuring it doesn't break anything.
+    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE"), level = DeprecationLevel.ERROR) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
     FISHING_BAIT,
@@ -73,6 +75,7 @@ enum class ItemCategory {
     MUTATION,
     WATERING_CAN,
     FARMING_TOOL,
+    TROPHY,
 
     NONE,
     ;
@@ -87,5 +90,8 @@ enum class ItemCategory {
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
+
+        fun ItemCategory.isDeprecatedAtErrorLevel(): Boolean =
+            javaClass.getField(name).getAnnotation(Deprecated::class.java)?.level == DeprecationLevel.ERROR
     }
 }
