@@ -97,7 +97,6 @@ object ArchfiendDiceProfitTracker {
             }
 
             return listOf(
-                "§7Rolled §e${totalRolls.addSeparators()} §7times.",
                 "§7Special roll rate: §a$specialRate",
                 "§7Jackpot rate: §6$jackpotRate",
             )
