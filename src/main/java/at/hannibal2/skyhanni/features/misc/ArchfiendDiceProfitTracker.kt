@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.achievements.Achievement
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.compat.append
@@ -57,8 +57,8 @@ object ArchfiendDiceProfitTracker {
     private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
     private val ARCHFIEND_DYE = "DYE_ARCHFIEND".toInternalName()
 
-    private var lastDiceRoll = SimpleTimeMark.farPast()
     private var lastDiceActivity = SimpleTimeMark.farPast()
+    private var holdingDice = false
 
     private val tracker = SkyHanniItemTracker(
         "Archfiend Dice Profit Tracker",
@@ -180,12 +180,15 @@ object ArchfiendDiceProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        holdingDice = isDice(event.newItem)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-
         diceRollChatPattern.matchMatcher(event.message) {
-            lastDiceRoll = SimpleTimeMark.now()
             lastDiceActivity = SimpleTimeMark.now()
 
             val number = group("number").toIntOrNull() ?: return@matchMatcher
@@ -237,7 +240,6 @@ object ArchfiendDiceProfitTracker {
     @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
-
         val coins = event.coins.toInt()
         when (event.reason) {
             PurseChangeCause.LOSE_DICE_ROLL_COST,
@@ -249,14 +251,11 @@ object ArchfiendDiceProfitTracker {
         }
     }
 
-    private val shouldShow: Boolean
-        get() = config.enabled && lastDiceActivity.passedSince() < 3.seconds
-
     init {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() && config.enabled && shouldShow },
+            condition = { isEnabled() && (holdingDice || lastDiceActivity.passedSince() < 3.seconds) },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
@@ -268,11 +267,11 @@ object ArchfiendDiceProfitTracker {
         lastDiceActivity = SimpleTimeMark.farPast()
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock
+    private fun isEnabled() = config.enabled
 
     fun isDice(internalName: NeuInternalName) = internalName == ARCHFIEND_DICE || internalName == HIGH_CLASS_ARCHFIEND_DICE
 
-    fun hasRecentDiceRoll() = lastDiceRoll.passedSince() < 500.milliseconds
+    fun hasRecentDiceRoll() = lastDiceActivity.passedSince() < 500.milliseconds
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -283,7 +282,7 @@ object ArchfiendDiceProfitTracker {
         }
         // /shrolldice arch 6
         // /shrolldice highclass 7
-        event.registerBrigadier("shrolldice") {
+        event.registerBrigadier("shrollblazedice") {
             description = "Manually track a dice roll. Usage: /shrolldice <arch|highclass> <number>"
             category = CommandCategory.DEVELOPER_DEBUG
             arg("type", BrigadierArguments.string()) { type ->
