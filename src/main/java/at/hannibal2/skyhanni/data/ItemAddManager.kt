@@ -77,7 +77,6 @@ object ItemAddManager {
             }
         }
 
-
         Source.ITEM_ADD.addItem(internalName, event.amount)
     }
 
