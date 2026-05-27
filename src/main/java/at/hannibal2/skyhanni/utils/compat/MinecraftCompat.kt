@@ -36,8 +36,6 @@ object MinecraftCompat {
 
     @JvmStatic
     var serverTime: Long = 0L
-        //? if >= 26.1
-        get() = localWorldOrNull?.defaultClockTime ?: field
         private set
 
     @HandleEvent
