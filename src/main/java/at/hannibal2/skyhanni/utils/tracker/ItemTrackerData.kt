@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
@@ -23,10 +22,6 @@ abstract class ItemTrackerData<T : SessionUptime>(clazz: KClass<T>) : TrackerDat
     override fun reset() {
         super.reset()
         items.clear()
-    }
-
-    open fun addCoins(amount: Int, command: Boolean) {
-        addItem(SKYBLOCK_COIN, amount, command)
     }
 
     open fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) {
