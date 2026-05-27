@@ -55,6 +55,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
     companion object {
         // This could technically be any large number,
         // but this way is better for compatibility with `SimpleTimeMark`
+        // This is used to ensure no values are close to FAR_PAST_MS (which is 0)
         private val startTimeMillis = SimpleTimeMark.now().toMillis()
 
         fun now() = ServerTimeMark(nowMillis())
