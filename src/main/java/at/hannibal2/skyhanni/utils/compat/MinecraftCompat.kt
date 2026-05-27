@@ -31,17 +31,23 @@ object MinecraftCompat {
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 
-    //~ if < 26.1 'gameTime' -> 'dayTime'
-    val clientTime get(): Long = localWorldOrNull?.gameTime ?: 0L
+    //~ if < 26.1 'defaultClockTime' -> 'dayTime'
+    val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
 
     @JvmStatic
     var serverTime: Long = 0L
+        //? if >= 26.1
+        get() = localWorldOrNull?.defaultClockTime ?: field
         private set
 
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
-        //~ if < 26.1 '.gameTime' -> '.dayTime'
-        serverTime = packet.gameTime
+        //? if >= 26.1 {
+        val defaultClock = localWorldOrNull?.dimensionType()?.defaultClock()?.orElse(null) ?: return
+        serverTime = packet.clockUpdates[defaultClock]?.totalTicks() ?: serverTime
+        //?} else {
+        /*serverTime = packet.dayTime
+        *///?}
     }
 }
