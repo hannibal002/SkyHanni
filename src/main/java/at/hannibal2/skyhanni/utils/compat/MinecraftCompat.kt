@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientLevel
@@ -13,6 +14,7 @@ import net.minecraft.world.entity.Entity
  * This is a compatibility layer that helps with multiple minecraft versions and mixins.
  * This class should be used in utils/data/api classes and not in feature classes.
  */
+@SkyHanniModule
 object MinecraftCompat {
 
     val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
