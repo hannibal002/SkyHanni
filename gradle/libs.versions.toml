@@ -2,8 +2,6 @@
 libautoupdate = "1.3.1"
 moulconfig = "4.7.0"
 jbAnnotations = "24.1.0"
-hypixelmodapi = "1.0.1"
-hypixelmodapi-fabric = "1.0.1+build.1+mc1.21"
 fabricLanguageKotlin = "1.13.11+kotlin.2.3.21"
 roughlyenoughitems = "19.0.806"
 autoservice-ksp = "1.1.0"
@@ -34,8 +32,6 @@ libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate
 jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotations" }
 autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoservice-ksp" }
 autoservice-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice-annotations" }
-hypixelmodapi = { module = "net.hypixel:mod-api", version.ref = "hypixelmodapi" }
-hypixelmodapi-fabric = { module = "maven.modrinth:hypixel-mod-api", version.ref = "hypixelmodapi-fabric" }
 fabricLanguageKotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabricLanguageKotlin" }
 roughlyenoughitems = { module = "me.shedaniel:RoughlyEnoughItems-api-fabric", version.ref = "roughlyenoughitems" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }

@@ -189,11 +189,11 @@ dependencies {
     testImplementation(libs.mockk.agent)
 
     if (isDeobf) {
-        implementation(libs.hypixelmodapi)
-        runtimeOnly(libs.hypixelmodapi.fabric)
+        implementation(target.hypixelModApiVersion)
+        runtimeOnly(target.hypixelModApiFabricVersion)
     } else {
-        modImplementation(libs.hypixelmodapi)
-        modRuntimeOnly(libs.hypixelmodapi.fabric)
+        modImplementation(target.hypixelModApiVersion)
+        modRuntimeOnly(target.hypixelModApiFabricVersion)
     }
 
     if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
@@ -271,11 +271,13 @@ tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val hypixelModApiVersion = target.hypixelModApiFabricVersion.split(":").last()
     val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
     val props = buildMap {
         put("version", version)
         put("minecraft", minecraftVersion)
         put("fapi", fapiVersion)
+        put("hypixelmodapi", hypixelModApiVersion)
     }
 
     props.forEach(inputs::property)

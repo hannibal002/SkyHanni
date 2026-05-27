@@ -7,6 +7,8 @@ enum class ProjectTarget(
     val mappingStyle: MappingStyle,
     val fabricLoaderVersion: String? = null,
     val fabricApiVersion: String? = null,
+    val hypixelModApiVersion: String = "net.hypixel:mod-api:1.0.1",
+    val hypixelModApiFabricVersion: String = "maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21",
     val modMenuVersion: String? = null,
     val modrinthInfo: ModrinthInfo? = null,
 ) {
@@ -27,6 +29,8 @@ enum class ProjectTarget(
         MappingStyle.NONE,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.6",
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.147.0+26.1.2",
+        hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
+        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
         modMenuVersion = "18.0.0-alpha.8",
         modrinthInfo = ModrinthInfo.FABRIC_26_1,
     ),
