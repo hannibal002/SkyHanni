@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
-import at.hannibal2.skyhanni.features.misc.ArchfiendDiceProfitTracker
+import at.hannibal2.skyhanni.features.misc.BlazeDiceProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -71,8 +71,8 @@ object ItemAddManager {
     fun onItemAdd(event: ItemAddInInventoryEvent) {
 
         val internalName = event.internalName
-        if (ArchfiendDiceProfitTracker.isDice(internalName)) {
-            if (ArchfiendDiceProfitTracker.hasRecentDiceRoll()) {
+        if (BlazeDiceProfitTracker.isDice(internalName)) {
+            if (BlazeDiceProfitTracker.hasRecentDiceRoll()) {
                 return
             }
         }

@@ -65,7 +65,7 @@ object PurseApi {
             }
 
             // TODO relic of coins support
-            if (diff == diff == 15.million) {
+            if (diff == 15.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND
             }
 

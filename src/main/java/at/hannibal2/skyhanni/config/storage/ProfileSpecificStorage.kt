@@ -59,7 +59,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
-import at.hannibal2.skyhanni.features.misc.ArchfiendDiceProfitTracker
+import at.hannibal2.skyhanni.features.misc.BlazeDiceProfitTracker
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
 import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
@@ -878,7 +878,7 @@ class ProfileSpecificStorage(
     }
 
     @Expose
-    var archfiendDiceProfitTracker: ArchfiendDiceProfitTracker.Data = ArchfiendDiceProfitTracker.Data()
+    var archfiendDiceProfitTracker: BlazeDiceProfitTracker.Data = BlazeDiceProfitTracker.Data()
 
     // - nether
     @Expose

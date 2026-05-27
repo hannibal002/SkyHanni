@@ -40,9 +40,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ArchfiendDiceProfitTracker {
+object BlazeDiceProfitTracker {
 
-    private val config get() = SkyHanniMod.feature.misc.archfiendDiceProfitTracker
+    private val config get() = SkyHanniMod.feature.misc.blazeDiceProfitTracker
 
     /**
      * REGEX-TEST: §eYour §r§5Archfiend Dice §r§erolled a §r§56§r§e! Bonus: §r§c12❤
