@@ -298,13 +298,13 @@ object ArchfiendDiceProfitTracker {
                         if (isHighClass) {
                             // high class roll cost
                             onPurseChange(PurseChangeEvent(-6_666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST))
-                            if (num == 6 || num == 7) {
+                            if (num == 6) {
                                 onPurseChange(PurseChangeEvent(100.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL))
                             }
                         } else {
                             // archfiend roll cost
                             onPurseChange(PurseChangeEvent(-666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST))
-                            if (num == 6 || num == 7) {
+                            if (num == 6) {
                                 onPurseChange(PurseChangeEvent(15.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL))
                             }
                         }
