@@ -281,9 +281,9 @@ object ArchfiendDiceProfitTracker {
         }
         event.registerBrigadier("shrollblazedice") {
             description = "Manually track a dice roll. Usage: /shrolldice <arch|highclass> <number>"
-            category = CommandCategory.DEVELOPER_DEBUG
-            arg("type", BrigadierArguments.string()) { type ->
-                arg("number", BrigadierArguments.integer(1, 7)) { number ->
+            category = CommandCategory.DEVELOPER_TEST
+            arg("type", BrigadierArguments.string(), listOf("archfiend", "highclass")) { type ->
+                arg("number", BrigadierArguments.integer(1, 7), (1..7).map { it.toString() }) { number ->
                     callback {
                         val typeStr = getArg(type)
                         val isHighClass = when (typeStr.lowercase()) {
