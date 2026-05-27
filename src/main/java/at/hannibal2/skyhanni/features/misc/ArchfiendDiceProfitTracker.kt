@@ -234,14 +234,14 @@ object ArchfiendDiceProfitTracker {
                     data.archfiend.rollCost += coins.toLong()
                 }
             }
-            PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS -> {
+            PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
                 lastDiceActivity = SimpleTimeMark.now()
                 tracker.modify { data ->
                     data.highClass.rollCost += coins.toLong()
                 }
             }
             PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND,
-            PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS,
+            PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS,
             -> {
                 lastDiceActivity = SimpleTimeMark.now()
                 tracker.addCoins(coins, command = false)
@@ -304,7 +304,7 @@ object ArchfiendDiceProfitTracker {
                                 PurseChangeEvent(
                                     -PurseApi.HIGH_CLASS_COST,
                                     PurseApi.currentPurse,
-                                    PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS
+                                    PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS
                                 )
                             )
                             if (num == 6) {
@@ -312,7 +312,7 @@ object ArchfiendDiceProfitTracker {
                                     PurseChangeEvent(
                                         PurseApi.HIGH_CLASS_PROFIT,
                                         PurseApi.currentPurse,
-                                        PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS
+                                        PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS
                                     )
                                 )
                             }

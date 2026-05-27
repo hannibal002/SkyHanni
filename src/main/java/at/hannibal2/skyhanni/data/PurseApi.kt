@@ -75,7 +75,7 @@ object PurseApi {
             }
 
             if (diff == HIGH_CLASS_PROFIT) {
-                return PurseChangeCause.GAIN_DICE_ROLL_HIGHCLASS
+                return PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS
             }
 
             if (Minecraft.getInstance().screen == null) {
@@ -94,7 +94,7 @@ object PurseApi {
             }
 
             if (diff == -HIGH_CLASS_COST) {
-                return PurseChangeCause.LOSE_DICE_ROLL_COST_HIGHCLASS
+                return PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS
             }
 
             return PurseChangeCause.LOSE_UNKNOWN
