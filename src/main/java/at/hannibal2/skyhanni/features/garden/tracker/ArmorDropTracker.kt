@@ -1,19 +1,17 @@
 package at.hannibal2.skyhanni.features.garden.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RareCropDropInfo
-import at.hannibal2.skyhanni.data.jsonobjects.repo.RareCropDropsJson
-import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -21,11 +19,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
@@ -36,12 +32,11 @@ import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object RareCropTracker {
+object ArmorDropTracker {
 
-    private val config get() = GardenApi.config.rareCropTracker
+    private val config get() = GardenApi.config.armorDropTracker
 
-    private val patternGroup = RepoPattern.group("garden.rarecrops")
-    private val repoReloadCoroutine = CoroutineSettings("rare crop tracker repo reload")
+    private val patternGroup = RepoPattern.group("garden.armordrops")
 
     /**
      * REGEX-TEST: FERMENTO_CHESTPLATE
@@ -58,108 +53,91 @@ object RareCropTracker {
     }
 
     val tracker = SkyHanniTracker(
-        "Rare Crop Tracker",
+        "Armor Drop Tracker",
         ::Data,
-        { it.garden.rareCropTracker },
+        { it.garden.armorDropTracker },
         trackerConfig = { config.perTrackerConfig },
-        customUptimeControl = true,
+        customUptimeControl = true
     ) {
         drawDisplay(it)
     }
 
     data class Data(
         @Expose
-        var drops: MutableMap<RareCropDropType, Int> = mutableMapOf(),
+        var drops: MutableMap<ArmorDropType, Int> = mutableMapOf()
     ) : TrackerData<SessionUptime.Garden>(SessionUptime.Garden::class)
 
 
     init {
-        RareCropDropType.entries.forEach { it.chatPattern }
-
-        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+        ArmorDropType.entries.forEach { it.chatPattern }
     }
 
-    enum class RareCropDropType(val dropName: String, val pestType: PestType? = null) {
-        CROPIE("§aCropie"),
-        SQUASH("§9Squash"),
-        FERMENTO("§5Fermento"),
-        HELIANTHUS("§6Helianthus"),
-        SEASONING("§2Seasoning"),
-        CORNUCOPIA("§aCornucopia", PestType.FLY),
-        CARROT_ZEST("§aCarrot Zest", PestType.CRICKET),
-        DEEPFRIES("§aDeepfries", PestType.LOCUST),
-        AGGOURDIAN("§aAggourdian", PestType.RAT),
-        CANE_KNOT("§aCane Knot", PestType.MOSQUITO),
-        MELON_JUICE("§aMelon Juice", PestType.EARTHWORM),
-        CACTUS_FLOWER("§aCactus Flower", PestType.MITE),
-        DESIGNER_COFFEE_BEANS("§aDesigner Coffee Beans", PestType.MOTH),
-        FEASTFUNGUS("§aFeastfungus", PestType.SLUG),
-        BOTROOT("§aBotroot", PestType.BEETLE),
-        SALTED_SUNFLOWER_SEEDS("§aSalted Sunflower Seeds", PestType.DRAGONFLY),
-        CRYSTALIZED_MOONLIGHT("§aCrystalized Moonlight", PestType.FIREFLY),
-        FLORAL_GELATIN("§aFloral Gelatin", PestType.PRAYING_MANTIS),
-        RAREFINDER_CHIP("§9Rarefinder Chip"),
-        BURROWING_SPORES("§9Burrowing Spores"),
-        WARTY("§5Warty"),
+    enum class ArmorDropType(val dropName: String, chatMessage: String) {
+        CROPIE("§aCropie", "(?:§.)*RARE CROP! (?:§.)*Cropie.*"),
+        SQUASH("§9Squash", "(?:§.)*RARE CROP! (?:§.)*Squash.*"),
+        FERMENTO("§5Fermento", "(?:§.)*RARE CROP! (?:§.)*Fermento.*"),
+        HELIANTHUS("§6Helianthus", "(?:§.)*RARE CROP! (?:§.)*Helianthus.*"),
         ;
 
-        val canDropFromPests: Boolean = pestType != null
-
         val chatPattern by patternGroup.pattern(
-            name.lowercase().replace('_', '-'),
-            "(?:§.)*(?:VERY )?RARE CROP! (?:§.)*${dropName.removeColor()}.*",
+            name.lowercase(),
+            chatMessage,
         )
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        for (dropType in RareCropDropType.entries) {
+        for (dropType in ArmorDropType.entries) {
             if (!dropType.chatPattern.matches(event.message)) continue
             addDrop(dropType)
-            PestProfitTracker.addRareCropDrop(dropType)
             if (config.hideChat) {
-                event.blockedReason = "rare_crop_tracker"
+                event.blockedReason = "farming_armor_drops"
             }
         }
     }
 
-    private fun addDrop(drop: RareCropDropType) {
+    private fun addDrop(drop: ArmorDropType) {
         tracker.modify {
             it.drops.addOrPut(drop, 1)
         }
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
-        addSearchString("§7Rare Crop Tracker:")
-        val sorted = data.drops.sortedDesc().entries
-        val maxLines = config.maxDisplayLines
-        for ((drop, amount) in if (maxLines > 0) sorted.take(maxLines) else sorted) {
+        addSearchString("§7Armor Drop Tracker:")
+        for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
             addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
     }
 
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
+    }
+
     private fun shouldShowDisplay(): Boolean {
         if (!GardenApi.inGarden()) return false
         if (!config.enabled) return false
+        if (!hasArmor) return false
         if (!GardenApi.hasFarmingToolInHand()) return false
 
         return true
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandJoin(event: IslandJoinEvent) {
-        tracker.firstUpdate()
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (event.newIsland == IslandType.GARDEN) {
+            tracker.firstUpdate()
+        }
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val data = event.getConstantAsync<RareCropDropsJson>("ArmorDrops")
-        rareCropDropInfo = data.specialCrops
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
+        armorDropInfo = data.specialCrops
     }
 
-    private var rareCropDropInfo = mapOf<String, RareCropDropInfo>()
-    private var currentRareCropDropChance = 0.0
+    private var armorDropInfo = mapOf<String, ArmorDropInfo>()
+    private var currentArmorDropChance = 0.0
     private var lastCalculationTime = SimpleTimeMark.farPast()
 
     private fun checkArmor(): Boolean {
@@ -175,20 +153,20 @@ object RareCropTracker {
         if (lastCalculationTime.passedSince() > 5.seconds) {
             lastCalculationTime = SimpleTimeMark.now()
 
-            val rareCropDropName = crop.specialDropType
-            val armorName = rareCropDropInfo[rareCropDropName]?.armorType ?: return 0.0
+            val armorDropName = crop.specialDropType
+            val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
                 .count { it.contains(armorName) || it.contains("FERMENTO") || it.contains("HELIANTHUS") }
 
-            val dropRates = rareCropDropInfo[rareCropDropName]?.chance ?: return 0.0
+            val dropRates = armorDropInfo[armorDropName]?.chance ?: return 0.0
             var dropRate = 0.0
             if (pieceCount > 0 && dropRates.size >= pieceCount) {
                 dropRate = dropRates[pieceCount - 1]
             }
-            currentRareCropDropChance = (dropRate * 60 * 60.0) / 100
+            currentArmorDropChance = (dropRate * 60 * 60.0) / 100
         }
-        return currentRareCropDropChance
+        return currentArmorDropChance
     }
 
     @HandleEvent
@@ -204,24 +182,12 @@ object RareCropTracker {
         }
         event.move(87, "garden.farmingArmorDrop.pos", "garden.armorDropTracker.position")
         event.move(88, "garden.farmingArmorDrop", "garden.armorDropTracker")
-        event.move(133, "garden.armorDropTracker", "garden.rareCropTracker")
-        event.move(133, "#profile.garden.armorDropTracker", "#profile.garden.rareCropTracker")
-        event.move(
-            133,
-            "storage.trackerDisplayModes.Armor Drop Tracker",
-            "storage.trackerDisplayModes.Rare Crop Tracker",
-        )
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetrarecroptracker") {
-            description = "Resets the Rare Crop Tracker"
-            category = CommandCategory.USERS_RESET
-            simpleCallback { tracker.resetCommand() }
-        }
         event.registerBrigadier("shresetarmordroptracker") {
-            description = "Resets the Rare Crop Tracker"
+            description = "Resets the Armor Drop Tracker"
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }

@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
@@ -44,24 +42,9 @@ object SkyBlockIslandTest {
                 ChatUtils.chat("Test island was not set.")
             }
 
-            literal("mineshaft") {
-                MineshaftDetection.MineshaftType.entries.forEach { mineshaftType ->
-                    literalCallback(mineshaftType.name.lowercase()) {
-                        testIsland = IslandType.MINESHAFT
-                        ChatUtils.chat("Set test island to ${IslandType.MINESHAFT.displayName}")
-                        GlaciteMineshaftDetectEvent(mineshaftType).post()
-                    }
-                }
-                callback {
-                    testIsland = IslandType.MINESHAFT
-                    ChatUtils.chat("Set test island to ${IslandType.MINESHAFT.displayName}")
-                    GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
-                }
-            }
-
-            argCallback("island", EnumArgumentType.lowercase<IslandType>(isGreedy = true)) { islandType ->
-                testIsland = islandType
-                ChatUtils.chat("Set test island to ${islandType.displayName}")
+            argCallback("island", EnumArgumentType.lowercase<IslandType>(isGreedy = true)) {
+                testIsland = it
+                ChatUtils.chat("Set test island to ${it.displayName}")
             }
             simpleCallback { ChatUtils.userError("Usage: /shtestisland <island name>/reset") }
         }

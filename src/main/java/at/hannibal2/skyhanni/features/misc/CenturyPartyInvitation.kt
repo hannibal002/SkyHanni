@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -27,8 +29,6 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CenturyPartyInvitation {
-
-    private val CENTURY_PARTY_INVITATION = "CENTURY_PARTY_INVITATION".toInternalName()
 
     private val config get() = SkyHanniMod.feature.misc.centuryPartyInvitation
 
@@ -87,7 +87,7 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onItemInHandChange() {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!isEnabled()) return
 
         colorsNeeded = updateColorsNeeded()
@@ -97,13 +97,16 @@ object CenturyPartyInvitation {
 
     private fun updateColorsNeeded(): Set<LorenzColor> {
         val hand = InventoryUtils.getItemInHand() ?: return emptySet()
-        if (hand.getInternalNameOrNull() != CENTURY_PARTY_INVITATION) return emptySet()
+        if (hand.getInternalNameOrNull() != "CENTURY_PARTY_INVITATION".toInternalName()) return emptySet()
 
-        return buildSet {
-            for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
-                readLine(line, hand)?.let(::add)
+        val set = mutableSetOf<LorenzColor>()
+        for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
+            readLine(line, hand)?.let {
+                set.add(it)
             }
         }
+
+        return set
     }
 
     private fun readLine(line: String, hand: ItemStack): LorenzColor? {
@@ -201,7 +204,7 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(canColor, canNotColor) {
                 if (isEnabled()) {

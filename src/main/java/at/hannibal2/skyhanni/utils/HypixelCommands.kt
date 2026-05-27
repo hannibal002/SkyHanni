@@ -191,10 +191,6 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
-    fun call(npc: String) {
-        send("call $npc")
-    }
-
     fun callback(uuid: String) {
         send("cb $uuid")
     }

@@ -159,7 +159,7 @@ object HoeLevelDisplay {
                 Component.empty(),
                 componentBuilder {
                     appendWithColor("Value: ", ChatFormatting.GRAY)
-                    appendWithColor("${luck.addSeparators()}✴", ChatFormatting.GREEN)
+                    appendWithColor("$luck✴", ChatFormatting.GREEN)
                 },
                 Component.empty(),
                 Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY),

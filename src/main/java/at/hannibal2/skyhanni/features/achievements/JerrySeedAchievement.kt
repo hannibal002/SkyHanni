@@ -28,7 +28,6 @@ object JerrySeedAchievement {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdated(event: OwnInventoryItemUpdateEvent) {
-        if (AchievementManager.isCompleted(JERRYSEED_ACHIEVEMENT)) return
         val stack = event.itemStack
         if (stack.getInternalNameOrNull() != JERRYSEED) return
         val enchantments = stack.getHypixelEnchantments() ?: return

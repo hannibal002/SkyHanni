@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
@@ -27,8 +26,6 @@ import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
-
-// TODO do the same thing here as in EntityCompat, no more functions/members that are classless
 
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
@@ -247,8 +244,8 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
         val chat = Minecraft.getInstance().gui.chat
-        ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
-        DelayedRun.runOrNextTick { chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system()) }
+        chat.deleteMessage(idToMessageSignature(id))
+        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
     }
 }
 

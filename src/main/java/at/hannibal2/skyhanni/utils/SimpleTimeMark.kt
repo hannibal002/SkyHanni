@@ -64,15 +64,13 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
-    fun toSeconds() = millis / 1000
-
     fun toSkyBlockTime(): SkyBlockTime = SkyBlockTime.fromTimeMark(this)
 
     fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
     companion object {
 
-        fun now() = SimpleTimeMark(timeProvider.currentTimeMillis())
+        fun now() = SimpleTimeMark(System.currentTimeMillis())
 
         private const val FAR_PAST_MS = 0L
         private const val FAR_FUTURE_MS = Long.MAX_VALUE
@@ -85,25 +83,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
-        fun fromUnixSeconds(seconds: Long) = SimpleTimeMark(seconds * 1000)
-
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
         fun OffsetDateTime.asTimeMark() = SimpleTimeMark(toInstant().toEpochMilli())
-
-        internal var timeProvider: TimeProvider = SystemTimeProvider
-
-        internal fun resetTimeProvider() {
-            timeProvider = SystemTimeProvider
-        }
-
-        internal fun interface TimeProvider {
-            fun currentTimeMillis(): Long
-        }
-
-        private object SystemTimeProvider : TimeProvider {
-            override fun currentTimeMillis(): Long = System.currentTimeMillis()
-        }
     }
 }

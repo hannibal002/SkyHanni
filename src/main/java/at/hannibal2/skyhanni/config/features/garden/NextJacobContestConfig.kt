@@ -1,13 +1,8 @@
 package at.hannibal2.skyhanni.config.features.garden
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.features.garden.CropType
-import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -71,7 +66,16 @@ class NextJacobContestConfig {
         desc = "Share the list of upcoming Contests to eliteskyblock.com for everyone else to then fetch automatically.",
     )
     @ConfigEditorDropdown
-    var shareAutomatically: SharePolicy = SharePolicy.ASK
+    var shareAutomatically: ShareContestsEntry = ShareContestsEntry.ASK
+
+    enum class ShareContestsEntry(private val displayName: String) {
+        ASK("Ask When Needed"),
+        AUTO("Share Automatically"),
+        DISABLED("Disabled"),
+        ;
+
+        override fun toString() = displayName
+    }
 
     @Expose
     @ConfigOption(name = "Warning", desc = "Show a warning shortly before a new Jacob's Contest starts.")
@@ -103,20 +107,4 @@ class NextJacobContestConfig {
     @Expose
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
     val inventoryPosition: Position = Position(394, 124)
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(133, "garden.jacobContest.nextContest.shareAutomatically", ::fixEnum)
-    }
-
-    private fun fixEnum(jsonElement: JsonElement): JsonElement {
-        val oldValue = jsonElement.asString
-        val newValue = when (oldValue) {
-            "ASK" -> SharePolicy.ASK
-            "AUTO" -> SharePolicy.AUTO
-            "DISABLED" -> SharePolicy.DISABLED
-            else -> return jsonElement
-        }
-        return ConfigManager.gson.toJsonTree(newValue)
-    }
 }

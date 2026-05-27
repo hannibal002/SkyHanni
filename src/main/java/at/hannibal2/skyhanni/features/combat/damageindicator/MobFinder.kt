@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -72,7 +72,6 @@ class MobFinder {
     // F5
     private var floor5lividEntity: RemotePlayer? = null
     private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
-
     // TODO use RepoPattern
     private val correctLividPattern = "\\[BOSS] (.*) Livid: Impossible! How did you figure out which one I was\\?!".toPattern()
 

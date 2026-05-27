@@ -299,10 +299,7 @@ object EnchantParser {
 
             stackingEnchants.forEach { stacking ->
                 currentItem?.let { item ->
-                    val progString: String = stacking.progressString(item)
-                    if (progString.isNotEmpty()) {
-                        loreList.add(loreList.size - 1, Component.literal(progString))
-                    }
+                    loreList.add(loreList.size - 1, Component.literal(stacking.progressString(item)))
                 }
             }
         }

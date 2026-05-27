@@ -149,7 +149,7 @@ object MineshaftPityDisplay {
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.spreadBlocksBroken }
 
-            if (counterUntilPity < 100 && everFoundPityWidget) {
+            if (counterUntilPity < 100 && counterUntilPity != 0) {
                 AchievementManager.completeAchievement(SHAFT_ACHIEVEMENT)
             }
 
@@ -208,7 +208,7 @@ object MineshaftPityDisplay {
 
     @HandleEvent
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!MiningApi.inGlacialTunnels() && !MiningApi.inDwarvenBaseCamp()) return
+        if (!isDisplayEnabled()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {

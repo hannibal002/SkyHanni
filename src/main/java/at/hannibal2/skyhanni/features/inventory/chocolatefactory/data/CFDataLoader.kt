@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFUpgradeWarnin
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -238,9 +237,8 @@ object CFDataLoader {
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!CFApi.inChocolateFactory) return
-        DelayedRun.runOrNextTick {
-            updateInventoryItems(event.inventoryItems)
-        }
+
+        updateInventoryItems(event.inventoryItems)
     }
 
     @HandleEvent
@@ -290,8 +288,6 @@ object CFDataLoader {
     }
 
     fun updateInventoryItems(inventory: Map<Int, ItemStack>) {
-        if (!CFApi.inChocolateFactory) return
-
         val profileStorage = profileStorage ?: return
 
         val chocolateItem = InventoryUtils.getItemAtSlotIndex(CFApi.infoIndex) ?: return

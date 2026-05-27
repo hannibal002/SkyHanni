@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.config.enums.SharePolicy
+import at.hannibal2.skyhanni.config.features.garden.NextJacobContestConfig.ShareContestsEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -44,7 +43,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
@@ -143,7 +141,7 @@ object GardenNextJacobContest {
     )
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
         if (!GardenApi.inGarden()) {
@@ -300,7 +298,7 @@ object GardenNextJacobContest {
     private fun onHaveAllContests() {
         nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
         if (!isSendEnabled()) return
-        if (config.shareAutomatically == SharePolicy.ASK) {
+        if (config.shareAutomatically == ShareContestsEntry.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
                 onClick = ::shareContests,
@@ -330,12 +328,12 @@ object GardenNextJacobContest {
 
     private fun shareContests() {
         if (haveAllContests) sendContestsIfAble()
-        if (profileStorage.contestSendingAsked || config.shareAutomatically != SharePolicy.ASK) return
+        if (profileStorage.contestSendingAsked || config.shareAutomatically != ShareContestsEntry.ASK) return
 
         ChatUtils.clickableChat(
             "§2Click here to automatically share future contests!",
             onClick = {
-                config.shareAutomatically = SharePolicy.AUTO
+                config.shareAutomatically = ShareContestsEntry.AUTO
                 SkyHanniMod.feature.storage.contestSendingAsked = true
                 ChatUtils.chat("§2Enabled automatic sharing of future contests!")
             },
@@ -437,7 +435,7 @@ object GardenNextJacobContest {
             if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
         }
         if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            CoroutineSettings("garden jacob contest openPopupWindow").launchCoroutine {
+            SkyHanniMod.launchCoroutine("garden jacob contest openPopupWindow") {
                 DialogUtils.openPopupWindow(
                     title = "SkyHanni Jacob Contest Notification",
                     message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
@@ -446,15 +444,15 @@ object GardenNextJacobContest {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
-    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onChestGuiRender() {
+    @HandleEvent
+    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -465,7 +463,7 @@ object GardenNextJacobContest {
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
     private fun isFetchEnabled() = isEnabled() && config.fetchAutomatically
-    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != SharePolicy.DISABLED
+    private fun isSendEnabled() = isFetchEnabled() && config.shareAutomatically != ShareContestsEntry.DISABLED
 
     private fun fetchContestsIfAble() {
         if (haveAllContests || !isFetchEnabled()) return
@@ -473,7 +471,7 @@ object GardenNextJacobContest {
         // Allows retries every 10 minutes when it's after 1 day into the new year
         if (lastFetchAttempted.passedSince() < 10.minutes || nextContestsAvailableAt.isInFuture()) return
 
-        CoroutineSettings("garden jacob contest fetch").withIOContext().withMutex(fetchingContestsMutex).launchCoroutine {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest fetch", fetchingContestsMutex) {
             knownContests = EliteDevApi.fetchUpcomingContests()
             handleFetchedContests()
             lastFetchAttempted = SimpleTimeMark.now()
@@ -502,7 +500,7 @@ object GardenNextJacobContest {
 
     private fun sendContestsIfAble() {
         if (!haveAllContests || isCloseToNewYear()) return
-        CoroutineSettings("garden jacob contest send").withIOContext().withMutex(sendingContestsMutex).launchCoroutine {
+        SkyHanniMod.launchIOCoroutineWithMutex("garden jacob contest send", sendingContestsMutex) {
             if (EliteDevApi.submitContests(knownContests)) {
                 ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(

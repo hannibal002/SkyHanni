@@ -91,9 +91,9 @@ class GardenConfig {
     val jacobContest: JacobContestConfig = JacobContestConfig()
 
     @Expose
-    @ConfigOption(name = "Rare Crop Tracker", desc = "")
+    @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    val rareCropTracker: RareCropTrackerConfig = RareCropTrackerConfig()
+    val armorDropTracker: ArmorDropTrackerConfig = ArmorDropTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Crop Break Tracker", desc = "")
@@ -186,11 +186,6 @@ class GardenConfig {
     @ConfigOption(name = "See Through Farming", desc = "")
     @Accordion
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
-
-    @Expose
-    @ConfigOption(name = "Farming Toolkit", desc = "")
-    @Accordion
-    val farmingToolkit: FarmingToolkitIconConfig = FarmingToolkitIconConfig()
 
     @Expose
     @ConfigOption(

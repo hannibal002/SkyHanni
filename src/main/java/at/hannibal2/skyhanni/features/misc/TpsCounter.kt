@@ -90,11 +90,6 @@ object TpsCounter {
     }
 
     private fun tpsCommand() {
-        if (!SkyBlockUtils.onHypixel) {
-            ChatUtils.userError("This command only works on Hypixel!")
-            return
-        }
-
         val text = getTpsString()
         ChatUtils.chat(text)
 

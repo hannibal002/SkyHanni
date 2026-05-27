@@ -40,7 +40,7 @@ object BetterWikiFromMenus {
 
         if (inBiblioInventory) {
             if (isWiki) {
-                WikiManager.sendWikiMessage(useIndependent = true)
+                WikiManager.sendWikiMessage(useUnofficial = true)
                 return
             }
 

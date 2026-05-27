@@ -7,7 +7,6 @@ import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
@@ -31,6 +30,11 @@ val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+    // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
+    // possible candidate. Some DCEVMs are however incompatible with some things Gradle is doing,
+    // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
+    // IntelliJ run configuration.
+    toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -188,12 +192,8 @@ afterEvaluate {
     }
 }
 
-tasks.withType<Test> {
+tasks.withType(Test::class) {
     useJUnitPlatform()
-    testLogging {
-        showStackTraces = true
-        exceptionFormat = TestExceptionFormat.FULL
-    }
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
@@ -244,7 +244,7 @@ if (target == ProjectTarget.MODERN_12110) {
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
-        useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
+        useXVFB = true
     }
     loom.runs.removeIf { it.name == "clientGameTest" }
 }

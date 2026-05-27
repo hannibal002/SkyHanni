@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
-import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
@@ -42,11 +41,9 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
 
         context.scale(2F, 2F)
-        val hasNewerVersion = nextVersion?.let {
-            SkyHanniMod.modVersion < ModVersion.fromString(it)
-        } == true
+        val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
         val versionText = "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
-            if (hasNewerVersion) "➜ §a$nextVersion" else ""
+            if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else ""
 
         context.drawStringCenteredScaledMaxWidth(
             versionText.asStructuredText(),

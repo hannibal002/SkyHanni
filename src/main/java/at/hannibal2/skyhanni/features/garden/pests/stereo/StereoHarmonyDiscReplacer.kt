@@ -44,6 +44,6 @@ object StereoHarmonyDiscReplacer {
             }
         }
 
-        event.replace(replacementStack.copy())
+        event.replace(replacementStack)
     }
 }

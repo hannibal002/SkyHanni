@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
-import at.hannibal2.skyhanni.utils.ItemCategory.Companion.isDeprecatedAtErrorLevel
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -31,7 +30,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils.getMaxLevel
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
@@ -322,7 +320,7 @@ object ItemUtils {
         }
         val rawInternalName = NeuItems.getInternalName(this)?.asString()?.replace(
             "ULTIMATE_ULTIMATE_",
-            "ULTIMATE_",
+            "ULTIMATE_"
         )
         return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -425,53 +423,32 @@ object ItemUtils {
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                val category = (groupOrNull("itemCategory") ?: "").replace(" ", "_")
-                val rarity = group("rarity").replace(" ", "_")
-                category to rarity
+                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
-            val name = hoverName.formattedTextCompatLeadingWhiteLessResets()
-            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemCategory = getItemCategory(category, hoverName.formattedTextCompatLeadingWhiteLessResets(), cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
-                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $name",
+                    "Could not read category for item ${this.hoverName.formattedTextCompatLeadingWhiteLessResets()}",
                     "Failed to read category from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
-                    "pattern" to pattern,
                     "pattern result" to category,
                     "lore" to cleanLore,
                     betaOnly = true,
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
-            } else {
-                if (itemCategory.isDeprecatedAtErrorLevel()) {
-                    ErrorManager.logErrorStateWithData(
-                        "Item category $itemCategory for item $name is outdated",
-                        "ItemCategory $itemCategory is deprecated at error level",
-                        "item category" to itemCategory,
-                        "internal name" to getInternalName(),
-                        "item name" to name,
-                        "inventory name" to InventoryUtils.openInventoryName(),
-                        "pattern result" to category,
-                        "lore" to cleanLore,
-                        betaOnly = true,
-                    )
-                }
             }
             if (itemRarity == null) {
-                val pattern = UtilsPatterns.rarityLoreLinePattern.pattern()
                 ErrorManager.logErrorStateWithData(
-                    "Could not read rarity for item $name",
+                    "Could not read rarity for item name().formattedTextCompatLeadingWhiteLessResets()",
                     "Failed to read rarity from item rarity via item lore",
                     "internal name" to getInternalName(),
-                    "item name" to name,
+                    "item name" to hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "inventory name" to InventoryUtils.openInventoryName(),
-                    "pattern" to pattern,
                     "pattern result" to rarity,
                     "lore" to cleanLore,
                     betaOnly = true,
@@ -485,7 +462,7 @@ object ItemUtils {
     }
 
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
-        if (itemCategory.isEmpty() || itemCategory == "ITEM") when {
+        if (itemCategory.isEmpty()) when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
             UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
@@ -798,7 +775,7 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())

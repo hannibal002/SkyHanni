@@ -27,7 +27,6 @@ object SuperpairsAchievement {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onInventoryFullyOpened(event: InventoryUpdatedEvent) {
-        if (AchievementManager.isCompleted(CHRONOMATRON_ACHIEVEMENT)) return
         if (!ExperimentationTableApi.inChronomatron) return
         if (ExperimentsAddonsHelper.currentChronomatronRound >= 20) {
             AchievementManager.completeAchievement(CHRONOMATRON_ACHIEVEMENT)

@@ -77,15 +77,6 @@ object ContributorManager {
         event.register(achievement, CONTRIBUTOR_ACHIEVEMENT)
     }
 
-    fun getUUIDFromDisplayName(displayName: String): UUID? {
-        for ((uuid, entry) in contributors.entries) {
-            if (entry.displayName == displayName) {
-                return uuid
-            }
-        }
-        return null
-    }
-
     fun getSuffix(uuid: UUID): Component? {
         return contributors[uuid]?.componentSuffix ?: Component.literal(contributors[uuid]?.suffix ?: return null)
     }

@@ -317,39 +317,28 @@ object ErrorManager {
         val rawMessage = message.removeColor()
 
         var hideError = false
-        try {
-            for (repoError in repoErrors) {
-                for (string in repoError.messageStartsWith) {
-                    if (rawMessage.startsWith(string)) {
-                        hideError = true
-                    }
-                }
-                for (string in repoError.messageContains) {
-                    if (rawMessage.contains(string)) {
-                        hideError = true
-                    }
-                }
-                for (string in repoError.messageExact) {
-                    if (rawMessage == string) {
-                        hideError = true
-                    }
-                }
-                if (hideError) {
-                    repoError.replaceMessage?.let {
-                        finalMessage = it
-                        hideError = false
-                    }
-                    repoError.customMessage?.let {
-                        ChatUtils.userError(it)
-                        return null
-                    }
-                    break
+        for (repoError in repoErrors) {
+            for (string in repoError.messageStartsWith) {
+                if (rawMessage.startsWith(string)) {
+                    hideError = true
                 }
             }
-        } catch (e: NullPointerException) {
-            ChatUtils.chat("§cFailed to format error message! Probably an JSON error in ChangedChatErrorsJson. Please report this on the discord.")
-            // can not use error manager inside error manager
-            e.printStackTrace()
+            for (string in repoError.messageExact) {
+                if (rawMessage == string) {
+                    hideError = true
+                }
+            }
+            if (hideError) {
+                repoError.replaceMessage?.let {
+                    finalMessage = it
+                    hideError = false
+                }
+                repoError.customMessage?.let {
+                    ChatUtils.userError(it)
+                    return null
+                }
+                break
+            }
         }
 
         if (finalMessage.last() !in ".?!") {

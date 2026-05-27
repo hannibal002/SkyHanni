@@ -2,11 +2,8 @@ package at.hannibal2.skyhanni.features.rift.area.westvillage
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -28,33 +25,17 @@ import net.minecraft.world.entity.monster.Silverfish
 object VerminHighlighter {
     private val config get() = RiftApi.config.area.westVillage.verminHighlight
 
-    private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
     private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
     private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @HandleEvent
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (shouldDiscover()) tryAdd(event.entity)
+        if (isEnabled()) tryAdd(event.entity)
     }
 
     @HandleEvent
     fun onEntityMaxHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (shouldDiscover()) tryAdd(event.entity)
-    }
-
-    @HandleEvent
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<LivingEntity>) {
-        if (shouldDiscover()) tryAdd(event.entity)
-    }
-
-    @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (event.newItem == TURBOMAX_VACUUM) refreshLoadedEntities()
-    }
-
-    @HandleEvent
-    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
-        if (event.area == "West Village" || event.area == "Infested House") refreshLoadedEntities()
+        if (isEnabled()) tryAdd(event.entity)
     }
 
     fun tryAdd(entity: LivingEntity) {
@@ -63,18 +44,13 @@ object VerminHighlighter {
         RenderLivingEntityHelper.setEntityColor(entity, color) { isEnabled() }
     }
 
+    // This only gets called on config change, so the performance impact is minimal
+    @OptIn(AllEntitiesGetter::class)
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.color) {
-            refreshLoadedEntities()
+            EntityUtils.getEntities<LivingEntity>().forEach(::tryAdd)
         }
-    }
-
-    // This only gets called for explicit one-shot refreshes, so the performance impact is minimal.
-    @OptIn(AllEntitiesGetter::class)
-    private fun refreshLoadedEntities() {
-        if (!shouldDiscover()) return
-        EntityUtils.getEntities<LivingEntity>().forEach(::tryAdd)
     }
 
     private fun isVermin(entity: LivingEntity): Boolean = when (entity) {
@@ -84,10 +60,8 @@ object VerminHighlighter {
         else -> false
     }
 
-    private fun hasItemInHand() = InventoryUtils.itemInHandId == TURBOMAX_VACUUM
+    private fun hasItemInHand() = InventoryUtils.itemInHandId == "TURBOMAX_VACUUM".toInternalName()
 
-    private fun shouldDiscover() = RiftApi.inRift() && RiftApi.inWestVillage() && config.enabled
-
-    fun isEnabled() = shouldDiscover() && hasItemInHand()
+    fun isEnabled() = RiftApi.inRift() && RiftApi.inWestVillage() && config.enabled && hasItemInHand()
 
 }
