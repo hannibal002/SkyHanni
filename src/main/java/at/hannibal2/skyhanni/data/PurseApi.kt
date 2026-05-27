@@ -65,11 +65,8 @@ object PurseApi {
             }
 
             // TODO relic of coins support
-            if (diff == 100.million) {
-                return PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS
-            }
-            if (diff == 15.million) {
-                return PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND
+            if (diff == 15.million || diff == 100.million) {
+                return PurseChangeCause.GAIN_DICE_ROLL
             }
 
             if (Minecraft.getInstance().screen == null) {
@@ -83,11 +80,8 @@ object PurseApi {
                 return PurseChangeCause.LOSE_SLAYER_QUEST_STARTED
             }
 
-            if (diff == -6_666_666.0) {
-                return PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS
-            }
-            if (diff == -666_666.0) {
-                return PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND
+            if (diff == -6_666_666.0 || diff == -666_666.0) {
+                return PurseChangeCause.LOSE_DICE_ROLL_COST
             }
 
             return PurseChangeCause.LOSE_UNKNOWN

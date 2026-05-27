@@ -239,31 +239,13 @@ object ArchfiendDiceProfitTracker {
         if (!isEnabled()) return
 
         val coins = event.coins.toInt()
-
-        tracker.modify { data ->
-            when (event.reason) {
-                PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS -> {
-                    lastDiceActivity = SimpleTimeMark.now()
-                    data.addCoins(coins, command = false)
-                }
-
-                PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS -> {
-                    lastDiceActivity = SimpleTimeMark.now()
-                    data.highClass.rollCost += coins
-                }
-
-                PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND -> {
-                    lastDiceActivity = SimpleTimeMark.now()
-                    data.addCoins(coins, command = false)
-                }
-
-                PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND -> {
-                    lastDiceActivity = SimpleTimeMark.now()
-                    data.archfiend.rollCost += coins
-                }
-
-                else -> return@modify
+        when (event.reason) {
+            PurseChangeCause.LOSE_DICE_ROLL_COST,
+            PurseChangeCause.GAIN_DICE_ROLL -> {
+                lastDiceActivity = SimpleTimeMark.now()
+                tracker.addCoins(coins, command = false)
             }
+            else -> return
         }
     }
 
@@ -322,15 +304,15 @@ object ArchfiendDiceProfitTracker {
 
                         if (isHighClass) {
                             // high class roll cost
-                            onPurseChange(PurseChangeEvent(-6_666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_HIGH_CLASS))
+                            onPurseChange(PurseChangeEvent(-6_666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST))
                             if (num == 6 || num == 7) {
-                                onPurseChange(PurseChangeEvent(100.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_HIGH_CLASS))
+                                onPurseChange(PurseChangeEvent(100.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL))
                             }
                         } else {
                             // archfiend roll cost
-                            onPurseChange(PurseChangeEvent(-666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST_ARCHFIEND))
+                            onPurseChange(PurseChangeEvent(-666_666.0, 0.0, PurseChangeCause.LOSE_DICE_ROLL_COST))
                             if (num == 6 || num == 7) {
-                                onPurseChange(PurseChangeEvent(15.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL_ARCHFIEND))
+                                onPurseChange(PurseChangeEvent(15.million, 0.0, PurseChangeCause.GAIN_DICE_ROLL))
                             }
                         }
                     }
