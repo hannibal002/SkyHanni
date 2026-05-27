@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.ChatFormatting
+import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,6 +60,7 @@ object ArchfiendDiceProfitTracker {
 
     private var lastDiceActivity = SimpleTimeMark.farPast()
     private var holdingDice = false
+    private var lastDiceTypeRolled = NeuInternalName.NONE
 
     private val tracker = SkyHanniItemTracker(
         "Archfiend Dice Profit Tracker",
@@ -203,7 +205,7 @@ object ArchfiendDiceProfitTracker {
     private fun trackDiceRoll(number: Int, isHighClass: Boolean) {
         if (number !in 1..7) return
 
-        val diceItem = if (isHighClass) {
+        lastDiceTypeRolled = if (isHighClass) {
             HIGH_CLASS_ARCHFIEND_DICE
         } else {
             ARCHFIEND_DICE
@@ -221,12 +223,12 @@ object ArchfiendDiceProfitTracker {
             when (number) {
                 6 -> {
                     diceData.jackpots++
-                    data.addItem(diceItem, -1, command = false)
+                    data.addItem(lastDiceTypeRolled, -1, command = false)
                 }
 
                 7 -> {
                     diceData.dyeCount++
-                    data.addItem(diceItem, -1, command = false)
+                    data.addItem(lastDiceTypeRolled, -1, command = false)
                     data.addItem(ARCHFIEND_DYE, 1, command = false)
                 }
             }
@@ -237,8 +239,18 @@ object ArchfiendDiceProfitTracker {
     fun onPurseChange(event: PurseChangeEvent) {
         val coins = event.coins.toInt()
         when (event.reason) {
-            PurseChangeCause.LOSE_DICE_ROLL_COST,
-            PurseChangeCause.GAIN_DICE_ROLL, -> {
+            PurseChangeCause.LOSE_DICE_ROLL_COST -> {
+                lastDiceActivity = SimpleTimeMark.now()
+                tracker.modify { data ->
+                    val diceData = when (lastDiceTypeRolled) {
+                        HIGH_CLASS_ARCHFIEND_DICE -> data.highClass
+                        ARCHFIEND_DICE -> data.archfiend
+                        else -> return@modify
+                    }
+                    diceData.rollCost += coins.toLong()
+                }
+            }
+            PurseChangeCause.GAIN_DICE_ROLL -> {
                 lastDiceActivity = SimpleTimeMark.now()
                 tracker.addCoins(coins, command = false)
             }
