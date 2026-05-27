@@ -279,8 +279,8 @@ object ArchfiendDiceProfitTracker {
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
         }
-        event.registerBrigadier("shrollblazedice") {
-            description = "Manually track a dice roll. Usage: /shrolldice <arch|highclass> <number>"
+        event.registerBrigadier("shrollarchfienddice") {
+            description = "Manually track an archfiend dice roll. Usage: /shrollarchfienddice <arch|highclass> <number>"
             category = CommandCategory.DEVELOPER_TEST
             arg("type", BrigadierArguments.string(), listOf("archfiend", "highclass")) { type ->
                 arg("number", BrigadierArguments.integer(1, 7), (1..7).map { it.toString() }) { number ->
