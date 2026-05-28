@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
 
+// TODO maybe rename this class to IslandTypeGroup
 /**
  * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
  */
@@ -45,6 +46,18 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         IslandType.ANY,
         IslandType.UNKNOWN,
     ),
+    FISHING_HOTSPOT(
+        IslandType.BACKWATER_BAYOU,
+        IslandType.LOTUS_ATOLL,
+        IslandType.HUB,
+        IslandType.THE_PARK,
+        IslandType.CRIMSON_ISLE,
+        IslandType.WINTER,
+    ),
+    WORMHOLE(
+        IslandType.LOTUS_ATOLL,
+        IslandType.CRIMSON_ISLE,
+    )
     ;
 
     private val types: EnumSet<IslandType> = types.fold(

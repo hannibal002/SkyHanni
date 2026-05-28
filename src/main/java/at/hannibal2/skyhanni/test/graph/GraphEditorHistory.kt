@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW
 
 object GraphEditorHistory {
 
-    private val undoRedoMessageId = ChatUtils.getUniqueMessageId()
+    private val undoRedoMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private data class HistoryEntry(
         val state: GraphEditorState,

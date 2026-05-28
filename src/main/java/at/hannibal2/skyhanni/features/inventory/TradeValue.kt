@@ -134,11 +134,11 @@ object TradeValue {
 
         if (indicator == 0) {
             yourDisplay = buildList {
-                addToList(map.values, "§eTrade Value")
+                addToList(map.values, "§eTrade Value Your")
             }
         } else {
             otherDisplay = buildList {
-                addToList(map.values, "§eTrade Value")
+                addToList(map.values, "§eTrade Value Other")
             }
         }
     }

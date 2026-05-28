@@ -52,7 +52,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
-    private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
+    private val cooldownOverMessageId = ChatUtils.getUniqueCustomMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"
@@ -229,8 +229,9 @@ object PestSpawnTimer {
         } else {
             val cooldownValue = when {
                 maxPests -> "§cMax Pests!"
+                ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
-                ready || pestCooldownEndTime.isInPast() -> "§aReady!"
+                pestCooldownEndTime.isInPast() -> "§aReady!"
                 else -> pestCooldownEndTime.timeUntil().format()
             }
             "§ePest Cooldown: §b$cooldownValue"

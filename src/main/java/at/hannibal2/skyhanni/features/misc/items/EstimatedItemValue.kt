@@ -1,19 +1,17 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemValueCalculationDataJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantsJson
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantsJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -32,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.client.Minecraft
@@ -39,14 +38,20 @@ import net.minecraft.world.item.ItemStack
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
+private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String, List<String>>>
+
 @SkyHanniModule
 object EstimatedItemValue {
 
     val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
+
+    private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
+    private val neuRepoReloadCoroutine = CoroutineSettings("estimated item value neu repo reload")
+
     private var display = emptyList<Renderable>()
     private val cache = mutableMapOf<ItemStack, List<Renderable>>()
     private var lastToolTipTime = 0L
-    var gemstoneUnlockCosts = HashMap<NeuInternalName, HashMap<String, List<String>>>()
+    var gemstoneUnlockCosts = NeuGemstoneCostJson()
     var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
     var crimsonPrestigeCosts = mapOf<String, Map<NeuInternalName, Int>>()
@@ -55,25 +60,24 @@ object EstimatedItemValue {
     var itemValueCalculationData: ItemValueCalculationDataJson? = null
         private set
 
-    var stackingEnchants: Map<String, StackingEnchantData> = emptyMap()
+    internal var stackingEnchants: Map<String, Enchant.Stacking> = emptyMap()
         private set
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        gemstoneUnlockCosts =
-            event.getConstant<HashMap<NeuInternalName, HashMap<String, List<String>>>>("gemstonecosts")
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
+        gemstoneUnlockCosts = event.getConstantAsync<NeuGemstoneCostJson>("gemstonecosts")
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ItemsJson>("Items")
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val data = event.getConstantAsync<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
         hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots ?: emptyList()
-        stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
+        stackingEnchants = event.getConstantAsync<EnchantsJson>("EnchantsJson").stacking
     }
 
     // TODO test if this can go now since NEU pv is gone (SB-PV mod support?)
@@ -86,7 +90,7 @@ object EstimatedItemValue {
     private var renderedItems = 0
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         renderedItems = 0
     }
 
@@ -121,7 +125,7 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         tryRendering()
     }
 
@@ -137,12 +141,12 @@ object EstimatedItemValue {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         cache.clear()
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(
                 enchantmentsCap,

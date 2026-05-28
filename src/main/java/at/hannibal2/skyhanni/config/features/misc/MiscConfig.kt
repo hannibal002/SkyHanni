@@ -213,6 +213,11 @@ class MiscConfig {
     var crashOnDeath: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigEditorBoolean
+    var crashOnTttFail: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "SkyBlock XP Bar",
         desc = "Replaces the vanilla XP bar with a SkyBlock XP bar.\n" +
@@ -436,6 +441,11 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")

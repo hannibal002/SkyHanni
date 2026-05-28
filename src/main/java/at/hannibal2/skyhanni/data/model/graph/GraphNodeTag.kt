@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.model.graph
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.LorenzColor
 
 enum class GraphNodeTag(
@@ -9,7 +10,8 @@ enum class GraphNodeTag(
     val cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
-    val onlyIslands: Set<IslandType> = emptySet(),
+    // only show the node tag in the graph editor when on those islands. this is just a debug visual thing, no user impact
+    val onlyIslands: IslandTypeTag? = null,
     val onlySkyblock: Boolean? = true,
 ) {
     DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev.", onlySkyblock = null), // E.g. Spawn points, todos, etc
@@ -125,7 +127,15 @@ enum class GraphNodeTag(
         LorenzColor.AQUA,
         "Fishing Hotspot",
         "A possible hotspot where you can fish.",
-        onlyIslands = setOf(IslandType.BACKWATER_BAYOU, IslandType.HUB, IslandType.CRIMSON_ISLE),
+        onlyIslands = IslandTypeTag.FISHING_HOTSPOT,
+    ),
+
+    FISHING_WORMHOLE(
+        "fishing_wormhole",
+        LorenzColor.LIGHT_PURPLE,
+        "Fishing Wormhole",
+        "A wormhole where you can fish Reality Hopper.",
+        onlyIslands = IslandTypeTag.WORMHOLE,
     ),
 
     FAIRY_SOUL(
@@ -140,7 +150,7 @@ enum class GraphNodeTag(
         LorenzColor.YELLOW,
         "Hideonleaf",
         "The green Shulkers.",
-        onlyIslands = setOf(IslandType.GALATEA),
+        onlyIsland = IslandType.GALATEA,
     ),
 
     ;
