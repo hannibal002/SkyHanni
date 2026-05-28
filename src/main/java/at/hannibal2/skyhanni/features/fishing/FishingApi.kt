@@ -42,6 +42,9 @@ import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
 import net.minecraft.world.item.ItemStack
@@ -197,6 +200,7 @@ object FishingApi {
     }
 
     private fun checkAndUpdateBaitFromInventory() {
+        if (hasGuiOpen()) return
         val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
             postEmptyBaitUpdate()
             return
@@ -230,6 +234,11 @@ object FishingApi {
 
     private fun postEmptyBaitUpdate() {
         postBaitUpdate(null, 0, ItemStack.EMPTY)
+    }
+
+    private fun hasGuiOpen(): Boolean {
+        val screen = Minecraft.getInstance().screen
+        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)
