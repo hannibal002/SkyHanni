@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.ItemBuyApi.buy
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -36,9 +37,14 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import org.apache.logging.log4j.Level
+import org.apache.logging.log4j.LogManager
+import org.apache.logging.log4j.Logger
+import kotlin.collections.orEmpty
 import kotlin.time.Duration.Companion.minutes
 
 /**
@@ -66,8 +72,37 @@ object GardenVisitorShoppingList {
         val knownVisitors = activeVisitors.filter { it.shoppingList.isNotEmpty() }
 
         drawShoppingList(shoppingList)
-        drawNewVisitors(newVisitors, shoppingList)
-        drawVisitors(knownVisitors)
+        drawVisitorSection(
+            visitors = newVisitors,
+            header = "new visitor",
+            renderer = {
+                drawNewVisitor(it)
+            },
+        )
+        drawVisitorSection(
+            visitors = knownVisitors,
+            header = "Visitor",
+            renderer = {
+                drawVisitor(it)
+            },
+        )
+    }
+
+    private fun MutableList<Renderable>.drawVisitorSection(
+        visitors: List<VisitorApi.Visitor>,
+        header: String,
+        renderer: MutableList<Renderable>.(VisitorApi.Visitor) -> Unit,
+    ) {
+        if (visitors.isEmpty()) return
+
+        if (isNotEmpty()) addString("")
+
+        val amount = visitors.size
+        val noun = if (amount == 1) header else "${header}s"
+
+        addString("§e$amount §7$noun:")
+
+        visitors.forEach { renderer(it) }
     }
 
     /**
@@ -205,26 +240,6 @@ object GardenVisitorShoppingList {
     }
 
     /**
-     * Builds the "New Visitors" section showing visitors without known requirements.
-     * Each entry is clickable to toggle ignore.
-     */
-    private fun MutableList<Renderable>.drawNewVisitors(
-        newVisitors: List<VisitorApi.Visitor>,
-        shoppingList: Map<NeuInternalName, Int>,
-    ) {
-        if (newVisitors.isEmpty()) return
-        if (shoppingList.isNotEmpty()) {
-            addString("")
-        }
-        val amount = newVisitors.size
-        val visitorLabel = if (amount == 1) "visitor" else "visitors"
-        addString("§e$amount §7new $visitorLabel:")
-        for (visitor in newVisitors) {
-            drawNewVisitor(visitor)
-        }
-    }
-
-    /**
      * Draws a single new-visitor entry with item preview.
      * Click toggles [VisitorApi.Visitor.ignoreShoppingList].
      */
@@ -264,17 +279,6 @@ object GardenVisitorShoppingList {
         }
 
         add(Renderable.horizontal(list))
-    }
-
-    private fun MutableList<Renderable>.drawVisitors(visitors: List<VisitorApi.Visitor>) {
-        if (visitors.isEmpty()) return
-        if (isNotEmpty()) addString("")
-        val amount = visitors.size
-        val visitorLabel = if (amount == 1) "Visitor" else "Visitors"
-        addString("§e$amount §7$visitorLabel:")
-        for (visitor in visitors) {
-            drawVisitor(visitor)
-        }
     }
 
     private fun MutableList<Renderable>.drawVisitor(visitor: VisitorApi.Visitor) {
@@ -369,5 +373,20 @@ object GardenVisitorShoppingList {
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
         updateDisplay()
+    }
+
+    val logger: Logger = LogManager.getLogger("SkyHanni")
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(132, "garden.visitors.shoppingList.ignoreSpaceman") { entry ->
+            if (entry.asBoolean) {
+                event.add(132, "#profile.garden.ignoredVisitors") {
+                    JsonArray().apply { add("Spaceman") }
+                }
+            }
+            entry
+        }
+        event.remove(132, "garden.visitors.shoppingList.ignoreSpaceman")
     }
 }
