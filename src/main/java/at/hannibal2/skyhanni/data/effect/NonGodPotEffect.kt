@@ -22,6 +22,7 @@ enum class NonGodPotEffect(
     GLOWING_MUSH("Glowing Mush Mixin", true, displayName = "§2Glowing Mush Mixin"),
     HOT_CHOCOLATE("Hot Chocolate Mixin I", true, displayName = "§6Hot Chocolate Mixin I"),
     MASON_JAR("Celestial Mason Jar I", true, displayName = "§dCelestial Mason Jar Mixin"),
+    HOTSPOT_TONIC("Hotspot Tonic", true, displayName = "§2Hotspot Tonic Mixin"),
 
     DEEP_TERROR("Deepterror", true, displayName = "§4Deepterror"),
 
