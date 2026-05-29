@@ -50,6 +50,7 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyBlockPos Lnet/minecraft/core/BlockPos;
 accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
 accessible field net/minecraft/world/entity/Avatar POSES Ljava/util/Map;
+accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/GuiMessage;)V
 
 #? < 1.21.11 {
 accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRenderType state Lnet/minecraft/client/renderer/rendertype/RenderType$CompositeState;
@@ -71,7 +72,9 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType$CompositeRe
 #accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/lang/String;
 #?}
 
-inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/ChatLineData
+inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
+inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
+inject-interface net/minecraft/client/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
 inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
