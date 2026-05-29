@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -163,6 +164,14 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
 
+    fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
+        if (!drop.canDropFromPests) return
+        if (!PestApi.hasVacuumInHand() && !PestApi.hasLassoInHand()) return
+
+        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.dropName)
+        addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
@@ -204,7 +213,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             CropType.getByNameOrNull(rawName)
                 ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
+            if (config.hideChat) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
