@@ -40,6 +40,11 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Elite Foraging Leaderboard", desc = "")
+    @Accordion
+    val leaderboard: ForagingLeaderboardConfig = ForagingLeaderboardConfig()
+
+    @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
     @ConfigEditorBoolean
     @FeatureToggle

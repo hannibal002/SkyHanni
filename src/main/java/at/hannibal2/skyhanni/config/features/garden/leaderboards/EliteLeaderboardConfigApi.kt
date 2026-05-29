@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultiModeTypeRankGoalConfig
@@ -17,11 +18,13 @@ object EliteLeaderboardConfigApi {
     private val weightConfig get() = GardenApi.config.eliteFarmersLeaderboards.farmingWeightLeaderboard
     private val cropConfig get() = GardenApi.config.eliteFarmersLeaderboards.cropCollectionLeaderboard
     private val pestConfig get() = GardenApi.config.eliteFarmersLeaderboards.pestKillsLeaderboard
+    private val foragingConfig get() = SkyHanniMod.feature.foraging.leaderboard
 
     fun getLeaderboardConfig(leaderboardType: EliteLeaderboardType): EliteLeaderboardGenericConfig<*, *> = when (leaderboardType) {
         is EliteLeaderboardType.Weight -> weightConfig
         is EliteLeaderboardType.Crop -> cropConfig
         is EliteLeaderboardType.Pest -> pestConfig
+        is EliteLeaderboardType.ForagingLog -> foragingConfig
     }
 
     fun getConfigFromClass(leaderboardType: KClass<out EliteLeaderboardType>): EliteLeaderboardGenericConfig<*, *>? =
@@ -29,6 +32,7 @@ object EliteLeaderboardConfigApi {
             EliteLeaderboardType.Weight::class -> weightConfig
             EliteLeaderboardType.Crop::class -> cropConfig
             EliteLeaderboardType.Pest::class -> pestConfig
+            EliteLeaderboardType.ForagingLog::class -> foragingConfig
             else -> null
         }
 

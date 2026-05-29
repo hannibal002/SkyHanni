@@ -29,11 +29,6 @@ open class EliteDisplayGenericConfig {
     @ConfigEditorBoolean
     val leaderboard: Property<Boolean> = Property.of(true)
 
-    @Expose
-    @ConfigOption(name = "Show Outside Garden", desc = "Show this display outside of the garden.")
-    @ConfigEditorBoolean
-    var showOutsideGarden: Boolean = false
-
 
     // While it would be nice to specify this per class, doing it this way makes it a lot easier to work with
     enum class LeaderboardTextEntry(private val displayName: String) {

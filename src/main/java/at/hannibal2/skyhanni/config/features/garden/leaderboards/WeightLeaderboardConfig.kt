@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.GardenDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.SingleTypeRankGoalConfig
 import com.google.gson.annotations.Expose
@@ -16,7 +16,7 @@ class WeightLeaderboardConfig : EliteLeaderboardGenericConfig<
     { WeightDisplayConfig() },
 )
 
-class WeightDisplayConfig : EliteDisplayGenericConfig() {
+class WeightDisplayConfig : GardenDisplayGenericConfig() {
 
     @Expose
     @ConfigOption(

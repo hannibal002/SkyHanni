@@ -1,5 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
-
+﻿package at.hannibal2.skyhanni.features.garden.leaderboarddisplays
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.reflect.KClass
-
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
@@ -29,28 +27,23 @@ enum class EliteLeaderboards(
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
     PEST("Pest Kills", PestDisplay(), EliteLeaderboardType.Pest::class)
     ;
-
     val isEnabled get() = config.enabled && this in config.display.get()
     val position get() = config.displayPositions[ordinal]
     override fun toString() = displayName
-
     @SkyHanniModule
     companion object EliteLeaderboardDisplayManager {
         val config get() = GardenApi.config.eliteFarmersLeaderboards
         private val cropConfig get() = config.cropCollectionLeaderboard
         private val pestConfig get() = config.pestKillsLeaderboard
         private val weightConfig get() = config.farmingWeightLeaderboard
-
         fun getFromTypeOrNull(type: KClass<out EliteLeaderboardType>) = entries.firstOrNull {
             it.leaderboardType == type
         }
-
         fun updateDisplays() {
             config.display.get().forEach { leaderboard ->
                 leaderboard.display.lastUpdate = SimpleTimeMark.farPast()
             }
         }
-
         @HandleEvent
         fun onGuiRender() {
             if (config.displayPositions.isEmpty()) return
@@ -59,13 +52,11 @@ enum class EliteLeaderboards(
                 leaderboard.display.renderDisplay(leaderboard.position)
             }
         }
-
         fun resetDisplays() {
             EliteLeaderboards.entries.forEach { leaderboard ->
                 leaderboard.display.reset()
             }
         }
-
         @HandleEvent
         fun onConfigLoad() {
             val weightConfigs = listOf(
@@ -74,37 +65,31 @@ enum class EliteLeaderboards(
                 weightConfig.rankGoals.rankGoal,
                 weightConfig.gamemode,
             )
-
             val cropConfigs = listOf(
                 cropConfig.rankGoals.useRankGoal,
                 cropConfig.rankGoals.rankGoalTypes,
                 cropConfig.gamemode,
             )
-
             val pestConfigs = listOf(
                 pestConfig.rankGoals.useRankGoal,
                 pestConfig.rankGoals.rankGoalTypes,
                 pestConfig.gamemode
             )
-
             weightConfigs.forEach {
                 it.afterChange {
                     clearCategories(EliteLeaderboardType.Weight::class)
                 }
             }
-
             cropConfigs.forEach {
                 it.afterChange {
                     clearCategories(EliteLeaderboardType.Crop::class)
                 }
             }
-
             pestConfigs.forEach {
                 it.afterChange {
                     clearCategories(EliteLeaderboardType.Pest::class)
                 }
             }
-
             for (crop in CropType.entries) {
                 for (mode in EliteLeaderboardMode.entries) {
                     val leaderboardType = EliteLeaderboardType.Crop(crop, mode)
@@ -113,7 +98,6 @@ enum class EliteLeaderboards(
                     }
                 }
             }
-
             for (pest in (PestType.entries + null)) {
                 for (mode in EliteLeaderboardMode.entries) {
                     val leaderboardType = EliteLeaderboardType.Pest(pest, mode)
@@ -123,7 +107,6 @@ enum class EliteLeaderboards(
                 }
             }
         }
-
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
@@ -137,28 +120,22 @@ enum class EliteLeaderboards(
             event.move(3, "garden.eliteFarmingWeightIgnoreLow", "garden.eliteFarmingWeights.ignoreLow")
             event.move(14, "garden.eliteFarmingWeight.offScreenDropMessage", "garden.eliteFarmingWeights.showLbChange")
             event.move(34, "garden.eliteFarmingWeights.ETAGoalRank", "garden.eliteFarmingWeights.etaGoalRank")
-
             val base = "#garden.farmingWeight"
             event.move(101, "$base.lastFarmingWeightLeaderboard", "$base.lastLeaderboard")
-
             val displayList: List<FarmingWeightTextEntry> = buildList {
                 add(FarmingWeightTextEntry.WEIGHT_POSITION)
                 event.transform(117, "garden.eliteFarmingWeights.overtakeETA") { entry ->
                     if (entry.asBoolean) add(FarmingWeightTextEntry.OVERTAKE)
                     entry
                 }
-
             }
-
             event.add(120, "garden.eliteFarmingWeights.text") {
                 ConfigManager.gson.toJsonTree(displayList)
             }
-
             val oldConfig = "garden.eliteFarmingWeights"
             val newConfig = "garden.eliteFarmersLeaderboards.farmingWeightLeaderboard"
             val display = "$newConfig.display"
             val rankGoal = "$newConfig.rankGoals"
-
             // While pest and crop leaderboards are new, we'll guess if players want them on or off based on their other preferences
             val leaderboardDisplayList: List<EliteLeaderboards> = buildList {
                 event.transform(120, "$oldConfig.display") { entry ->
@@ -182,7 +159,6 @@ enum class EliteLeaderboards(
                 positionList[WEIGHT.ordinal] = ConfigManager.gson.fromJson<Position>(entry)
                 ConfigManager.gson.toJsonTree(positionList)
             }
-
             event.move(120, "$oldConfig.showOutsideGarden", "$display.showOutsideGarden")
             event.move(120, "$oldConfig.text", "$display.text")
             event.move(120, "$oldConfig.leaderboard", "$display.leaderboard")
@@ -196,13 +172,10 @@ enum class EliteLeaderboards(
             }
             event.move(120, "$oldConfig.ignoreLow", "$display.ignoreLow")
         }
-
-
         enum class FarmingWeightTextEntry(private val displayName: String) {
             WEIGHT_POSITION("§6Farming Weight: §e104,481.49 §7[§b#5§7]"),
             OVERTAKE("§e170.21 §7(§b12h 32m 15s§7) §7behind §bChissl")
             ;
-
             override fun toString() = displayName
         }
     }
