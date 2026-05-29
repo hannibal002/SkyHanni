@@ -77,7 +77,7 @@ object FishingApi {
      */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?<tier>BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     /**
@@ -340,9 +340,14 @@ object FishingApi {
     }
 
     private fun isWearingTrophyArmor(): Boolean =
-        InventoryUtils.getArmor().all {
-            trophyArmorNames.matches(it?.getInternalName()?.asString())
-        }
+        InventoryUtils.getArmor()
+            .mapNotNull { stack ->
+                val internalName = stack?.getInternalName()?.asString() ?: return@mapNotNull null
+                trophyArmorNames.matchMatcher(internalName) { group("tier") }
+            }
+            .groupingBy { it }
+            .eachCount()
+            .any { (_, count) -> count >= 2 }
 
     fun isWearingEmberArmor(): Boolean =
         InventoryUtils.getArmor().all {

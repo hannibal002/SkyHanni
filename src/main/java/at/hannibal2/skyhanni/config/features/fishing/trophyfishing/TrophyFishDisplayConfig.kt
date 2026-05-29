@@ -41,7 +41,7 @@ class TrophyFishDisplayConfig {
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing a full Hunter Armor or Ember Armor.")
+    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing at least two matching Hunter Armor pieces or a full Ember Armor set.")
     @ConfigEditorBoolean
     val requireArmor: Property<Boolean> = Property.of(false)
 
