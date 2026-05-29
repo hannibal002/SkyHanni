@@ -443,6 +443,11 @@ class MiscConfig {
     var warnAboutPcTimeOffset: Boolean = true
 
     @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
     @ConfigEditorBoolean
     @FeatureToggle

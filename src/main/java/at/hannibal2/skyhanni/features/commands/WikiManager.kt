@@ -32,7 +32,7 @@ object WikiManager {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
         // Apparently the above got changed again at some point but never got a migration
-        event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useUnofficial")
+        event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useIndependent")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -69,22 +69,22 @@ object WikiManager {
         wikiTheItem(stack, config.menuOpenWiki)
     }
 
-    fun getSearchUrl(search: String, useUnofficial: Boolean = config.useUnofficial): String {
-        val wiki = if (useUnofficial) data.unofficial else data.official
-        val urlSearchPrefix = wiki.urlPrefix + wiki.searchPrefix
+    fun getSearchUrl(search: String, useIndependent: Boolean = config.useIndependent): String {
+        val wiki = if (useIndependent) data.unofficial else data.official
+        val urlSearchPrefix = wiki.fullSearchPrefix
         return "$urlSearchPrefix${URLEncoder.encode(search, "UTF-8")}&scope=internal"
     }
 
-    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useUnofficial: Boolean = config.useUnofficial) {
+    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useIndependent: Boolean = config.useIndependent) {
         val itemDisplayName =
             item.hoverName.formattedTextCompatLeadingWhiteLessResets().replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 
-        sendWikiMessage(wikiUrlSearch, itemDisplayName.removeColor(), autoOpen, useUnofficial)
+        sendWikiMessage(wikiUrlSearch, itemDisplayName.removeColor(), autoOpen, useIndependent)
     }
 
-    fun otherWikiCommands(args: Array<String>, useUnofficial: Boolean, wikithis: Boolean = false) {
+    fun otherWikiCommands(args: Array<String>, useIndependent: Boolean, wikithis: Boolean = false) {
         if (wikithis && !SkyBlockUtils.inSkyBlock) {
             ChatUtils.userError("You must be in SkyBlock to do this!")
             return
@@ -98,23 +98,23 @@ object WikiManager {
                 ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
-            wikiTheItem(itemInHand, false, useUnofficial = useUnofficial)
+            wikiTheItem(itemInHand, false, useIndependent = useIndependent)
             return
         }
         if (search == "") {
-            sendWikiMessage(useUnofficial = useUnofficial)
+            sendWikiMessage(useIndependent = useIndependent)
             return
         }
-        sendWikiMessage(search, useUnofficial = useUnofficial)
+        sendWikiMessage(search, useIndependent = useIndependent)
     }
 
     fun sendWikiMessage(
         search: String? = null,
         displaySearch: String? = search,
         autoOpen: Boolean = config.autoOpenWiki,
-        useUnofficial: Boolean = config.useUnofficial,
+        useIndependent: Boolean = config.useIndependent,
     ) {
-        val wiki = if (useUnofficial) data.unofficial else data.official
+        val wiki = if (useIndependent) data.unofficial else data.official
 
         if (search.isNullOrBlank()) {
             ChatUtils.clickableLinkChat(
@@ -124,7 +124,7 @@ object WikiManager {
         } else {
             ChatUtils.clickableLinkChat(
                 "§7Click §e§lHERE §7to find §a$displaySearch §7on the §6${wiki.name}§7!",
-                getSearchUrl(search, useUnofficial = useUnofficial),
+                getSearchUrl(search, useIndependent = useIndependent),
                 "§7Search for §a$search §7on the §6${wiki.name}§7",
                 autoOpen,
             )
@@ -133,17 +133,17 @@ object WikiManager {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shunofficialwiki") {
-            aliases = listOf("shfandomwiki")
-            description = "Searches the unofficial wiki with SkyHanni's own method."
+        event.registerBrigadier("shindependentwiki") {
+            aliases = listOf("shunofficialwiki", "shfandomwiki")
+            description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
             legacyCallbackArgs { otherWikiCommands(it, true) }
         }
-        event.registerBrigadier("shunofficialwikithis") {
-            aliases = listOf("shfandomwikithis")
-            description = "Searches the unofficial wiki with SkyHanni's own method."
+        event.registerBrigadier("shindependentwikithis") {
+            aliases = listOf("shunofficialwikithis", "shfandomwikithis")
+            description = "Searches the independent wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            legacyCallbackArgs { otherWikiCommands(it, useUnofficial = true, wikithis = true) }
+            legacyCallbackArgs { otherWikiCommands(it, useIndependent = true, wikithis = true) }
         }
         event.registerBrigadier("shofficialwiki") {
             description = "Searches the official wiki with SkyHanni's own method."
@@ -153,7 +153,7 @@ object WikiManager {
         event.registerBrigadier("shofficialwikithis") {
             description = "Searches the official wiki with SkyHanni's own method."
             category = CommandCategory.USERS_ACTIVE
-            legacyCallbackArgs { otherWikiCommands(it, useUnofficial = false, wikithis = true) }
+            legacyCallbackArgs { otherWikiCommands(it, useIndependent = false, wikithis = true) }
         }
     }
 
