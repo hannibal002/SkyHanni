@@ -105,8 +105,14 @@ object InventoryUtils {
     fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
         countItemsInLowerInventory(predicate) > 0
 
+    fun containsInLowerInventoryInternalName(predicate: (NeuInternalName) -> Boolean): Boolean =
+        countItemsInLowerInventoryInternalName(predicate) > 0
+
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean): Int =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.count }
+
+    fun countItemsInLowerInventoryInternalName(predicate: (NeuInternalName) -> Boolean): Int =
+        countItemsInLowerInventory { it.getInternalNameOrNull()?.let(predicate) ?: false }
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage")) ||
@@ -175,7 +181,7 @@ object InventoryUtils {
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.containerSlot == slotIndex }
 
-    fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+    fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventoryInternalName { it == this }
 
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
 
