@@ -6,20 +6,24 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import com.google.gson.annotations.Expose
+import com.google.gson.annotations.SerializedName
 import kotlin.time.Duration
 
 @KSerializable
 data class EliteFeastJson(
     @Expose val current: List<String>,
-    @Expose val next: Map<String, SimpleTimeMark?>,
+    @Expose @SerializedName("next") private val _next: Map<String, Long?>,
     @Expose val isGrandFeast: Boolean,
 ) {
+    val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
+
     val isComplete = current.size == 3
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
+
     fun createData(): EliteFeastData {
         val now = SkyBlockTime.now()
-        return EliteFeastData(
+        return EliteFeastData.of(
             year = now.year,
             month = now.month,
             complete = isComplete,
@@ -27,6 +31,14 @@ data class EliteFeastJson(
             next = next,
             isGrandFeast = isGrandFeast,
         )
+    }
+
+    companion object {
+        fun of(
+            current: List<String>,
+            next: Map<String, SimpleTimeMark?>,
+            isGrandFeast: Boolean,
+        ) = EliteFeastJson(current, _next = next.mapValues { it.value?.toSeconds() }, isGrandFeast)
     }
 }
 
@@ -36,9 +48,18 @@ data class EliteFeastData(
     @Expose val month: Int,
     @Expose val complete: Boolean,
     @Expose val current: List<String>,
-    @Expose val next: Map<String, SimpleTimeMark?>,
+    @Expose @SerializedName("next") private val _next: Map<String, Long?>,
     @Expose val isGrandFeast: Boolean,
 ) {
+    val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
+
+    private val feastEndTime: SimpleTimeMark
+        get() = if (isGrandFeast) {
+            SkyBlockTime(year, GRAND_FEAST_END_MONTH, GRAND_FEAST_END_DAY).toTimeMark()
+        } else {
+            SkyBlockTime(year, HARVEST_FEAST_END_MONTH, HARVEST_FEAST_END_DAY).toTimeMark()
+        }
+
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
     private fun getDurations(): List<Duration> {
@@ -50,7 +71,10 @@ data class EliteFeastData(
             .minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
     }
 
-    fun getActiveDuration(): Duration = getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+    fun getActiveDuration(): Duration {
+        if (next.values.all { it == null }) return feastEndTime.timeUntil()
+		return getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+	}
 
     fun getCurrentCrops(): List<CropType> {
         val fromCurrent = current.toCropTypes()
@@ -67,4 +91,27 @@ data class EliteFeastData(
     }
 
     private fun List<String>.toCropTypes(): List<CropType> = map { CropType.getByName(it) }
+
+    companion object {
+        private const val HARVEST_FEAST_END_MONTH = 10
+        private const val HARVEST_FEAST_END_DAY = 1
+        private const val GRAND_FEAST_END_MONTH = 3
+        private const val GRAND_FEAST_END_DAY = 27
+
+        fun of(
+            year: Int,
+            month: Int,
+            complete: Boolean,
+            current: List<String>,
+            next: Map<String, SimpleTimeMark?>,
+            isGrandFeast: Boolean,
+        ) = EliteFeastData(
+            year,
+            month,
+            complete,
+            current,
+            _next = next.mapValues { it.value?.toSeconds() },
+            isGrandFeast,
+        )
+    }
 }

@@ -13,7 +13,7 @@ import org.joml.Matrix3x2f
  * Coordinates rounded shape rendering across frames.
  *
  * Shapes are either served from the [SkyHanniRoundedShapeAtlas] (pre-rendered once, then
- * blitted cheaply each frame) or submitted as direct deferred [net.minecraft.client.gui.render.state.GuiElementRenderState]s.
+ * blitted cheaply each frame) or submitted as direct deferred [net.minecraft.client.renderer.state.gui.GuiElementRenderState]s.
  *
  * ## Behavior
  * [preRenderAtlas] is hooked into the preparePictureInPicture phase alongside the item atlas.
@@ -53,7 +53,7 @@ object SkyHanniRoundedShapeRenderManager {
     /**
      * Attempts to submit a blit for [key] from the atlas.
      * Returns false if the shape is not yet in the atlas; the caller should then
-     * submit a deferred [net.minecraft.client.gui.render.state.GuiElementRenderState] via [ShaderRenderUtils] instead.
+     * submit a deferred [net.minecraft.client.renderer.state.gui.GuiElementRenderState] via [ShaderRenderUtils] instead.
      *
      * Registers [key] as a candidate for atlas pre-rendering next frame.
      *

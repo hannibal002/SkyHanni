@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.ChatLineData;
+import at.hannibal2.skyhanni.mixins.hooks.GuiMessageData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
+import at.hannibal2.skyhanni.mixins.hooks.MessageIdStore;
+import at.hannibal2.skyhanni.utils.ChatUtils;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,7 +19,22 @@ import net.minecraft.network.chat.MessageSignature;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 
 @Mixin(GuiMessage.class)
-public class MixinChatLine implements ChatLineData {
+public abstract class MixinGuiMessage implements GuiMessageData, MessageIdStore {
+
+    @Unique
+    private int skyhanni$messageId;
+
+    @Unique
+    @Override
+    public int skyhanni$getMessageId() {
+        return skyhanni$messageId;
+    }
+
+    @Unique
+    @Override
+    public void skyhanni$setMessageId(int id) {
+        throw new UnsupportedOperationException("setMessageId is not supported on GuiMessage");
+    }
 
     @Unique
     private Component skyhanni$fullComponent;
@@ -35,10 +53,18 @@ public class MixinChatLine implements ChatLineData {
     }
 
     @Inject(method = "<init>", at = @At("RETURN"))
-    //~ if < 26.1 'GuiMessageSource source, GuiMessageTag tag' -> 'GuiMessageTag messageIndicator'
-    private void onInit(int addedTime, Component content, MessageSignature signature, GuiMessageSource source, GuiMessageTag tag, CallbackInfo ci) {
-        Component hookComponent = GuiChatHook.getCurrentComponent();
-        skyhanni$fullComponent = hookComponent == null ? content : hookComponent;
-    }
+    private void onInit(
+        int addedTime,
+        Component content,
+        MessageSignature signature,
+        //? if >= 26.1
+        GuiMessageSource source,
+        GuiMessageTag tag,
+        CallbackInfo ci
+    ) {
+        skyhanni$messageId = ChatUtils.getUniqueGuiMessageId();
 
+        Component component = GuiChatHook.getCurrentComponent();
+        skyhanni$fullComponent = component == null ? content : component;
+    }
 }

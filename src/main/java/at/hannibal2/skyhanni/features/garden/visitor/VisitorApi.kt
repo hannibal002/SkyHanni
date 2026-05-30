@@ -311,6 +311,17 @@ object VisitorApi {
         event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
         }
+        event.transform(134, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(
+                arrayOf(
+                    VisitorReward.VISITORS_GRATITUDE,
+                    VisitorReward.FARMING_CONTEST_DISPLAY,
+                    VisitorReward.ASTRONAUT_PERSONALITY,
+                    VisitorReward.FAST_FOOD_BARN_SKIN,
+                    VisitorReward.JELLY_GREENHOUSE_SKIN,
+                )
+            )
+        }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
 

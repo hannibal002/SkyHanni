@@ -23,6 +23,7 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
+import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
@@ -155,24 +156,21 @@ open class Enchant : Comparable<Enchant> {
 
     class Stacking : Enchant() {
         @Expose
-        private val nbtNum: String? = null
+        val nbtNum: String = ""
 
         @Expose
-        @Suppress("UnusedPrivateProperty")
-        private val statLabel: String? = null
+        private val statLabel: String = ""
 
         @Expose
-        private val stackLevel: TreeSet<Int>? = null
+        val stackLevel: List<Int> = emptyList()
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
 
         fun progressString(item: SafeItemStack): String {
-            val nbtKey = nbtNum ?: return ""
-            val levels = stackLevel ?: return ""
-            val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
-            val progress = item.extraAttributes.getDoubleOrDefault(nbtKey).roundTo(0).toInt()
+            val label = statLabel.splitCamelCase().replaceFirstChar { it.uppercase() }.replace("Xp", "XP")
+            val progress = item.extraAttributes.getDoubleOrDefault(nbtNum).roundTo(0).toInt()
             if (progress == 0) return ""
-            val nextLevel = levels.higher(progress)
+            val nextLevel = stackLevel.minByOrNull { it > progress }
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
             return "§7$label: §c${progress.shortFormat()} §7$tail"
         }

@@ -14,7 +14,7 @@ object MuteBuggedSpade {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.muteBuggedSpade || !DianaApi.isDoingDiana()) return
         val isRealMusic = event.pitch == 1f && event.volume == 1f && event.location.isZero()
-        if (event.soundName == "music.overworld.desert" && !isRealMusic) {
+        if (event.soundName.startsWith("music") && !isRealMusic) {
             event.cancel()
         }
     }

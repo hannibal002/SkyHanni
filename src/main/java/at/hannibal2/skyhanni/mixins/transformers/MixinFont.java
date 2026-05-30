@@ -9,30 +9,30 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(Font.class)
-public class MixinTextRenderer {
+public abstract class MixinFont {
 
     @ModifyVariable(method = "prepareText(Lnet/minecraft/util/FormattedCharSequence;FFIZZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence modifyOrderedText(FormattedCharSequence value) {
-        return VisualWordsHook.INSTANCE.modifyOrderedText(value);
+        return VisualWordsHook.modifyOrderedText(value);
     }
 
     @ModifyVariable(method = "prepareText(Ljava/lang/String;FFIZI)Lnet/minecraft/client/gui/Font$PreparedText;", index = 1, at = @At("HEAD"), argsOnly = true)
     private String modifyString(String value) {
-        return VisualWordsHook.INSTANCE.modifyString(value);
+        return VisualWordsHook.modifyString(value);
     }
 
     @ModifyVariable(method = "width(Lnet/minecraft/util/FormattedCharSequence;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedCharSequence modifyWidthOrderedText(FormattedCharSequence value) {
-        return VisualWordsHook.INSTANCE.modifyOrderedText(value);
+        return VisualWordsHook.modifyOrderedText(value);
     }
 
     @ModifyVariable(method = "width(Ljava/lang/String;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private String modifyWidthString(String value) {
-        return VisualWordsHook.INSTANCE.modifyString(value);
+        return VisualWordsHook.modifyString(value);
     }
 
     @ModifyVariable(method = "width(Lnet/minecraft/network/chat/FormattedText;)I", index = 1, at = @At("HEAD"), argsOnly = true)
     private FormattedText modifyWidthFormattedText(FormattedText value) {
-        return VisualWordsHook.INSTANCE.modifyFormattedText(value);
+        return VisualWordsHook.modifyFormattedText(value);
     }
 }

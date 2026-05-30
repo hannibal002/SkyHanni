@@ -141,7 +141,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -224,7 +225,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -263,6 +265,8 @@ object GardenVisitorTooltip {
 
         visitor.blockReason = visitor.blockReason()
     }
+
+    private fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
 
     private fun getCropType(internalName: NeuInternalName) =
         CropType.getByNameOrNull(

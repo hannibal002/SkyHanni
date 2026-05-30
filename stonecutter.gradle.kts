@@ -143,30 +143,17 @@ stonecutter parameters {
             replace("EndWorldTick", "EndLevelTick")
             replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
             replace("AfterClientWorldChange", "AfterClientLevelChange")
-            replace("GuiGraphics", "GuiGraphicsExtractor")
             replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
+            replace("net/minecraft/client/GuiMessage", "net/minecraft/client/multiplayer/chat/GuiMessage")
             replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
-
-            listOf(
-                "GlyphRenderState",
-                "GuiElementRenderState",
-                "GuiRenderState",
-                "GuiItemRenderState",
-                "BlitRenderState",
-                "pip.PictureInPictureRenderState"
-            ).forEach {
-                replace(
-                    "import net.minecraft.client.gui.render.state.$it",
-                    "import net.minecraft.client.renderer.state.gui.$it"
-                )
-            }
-
+            replace("import net.minecraft.client.gui.render.state", "import net.minecraft.client.renderer.state.gui")
             replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
         }
 
         regex(current.parsed >= "26.1") {
             replace("\\bClickType\\b" to "ContainerInput", "\\bContainerInput\\b" to "ClickType")
+            replace("\\bGuiGraphics\\b" to "GuiGraphicsExtractor", "\\bGuiGraphicsExtractor\\b" to "GuiGraphics")
         }
     }
 

@@ -450,10 +450,10 @@ object ItemUtils {
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             } else {
-                if (itemCategory in ItemCategory.deprecated) {
+                if (itemCategory.isDeprecated()) {
                     ErrorManager.logErrorStateWithData(
                         "Item category $itemCategory for item $name is outdated",
-                        "ItemCategory $itemCategory is deprecated",
+                        "ItemCategory $itemCategory is deprecated at error level",
                         "item category" to itemCategory,
                         "internal name" to getInternalName(),
                         "item name" to name,
@@ -812,7 +812,7 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())

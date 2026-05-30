@@ -46,9 +46,9 @@ enum class ItemCategory {
     TROPHY_FISH,
     ARROW,
     ARROW_POISON,
-    // TODO This used to be used as a fake category for uncategorized dungeon items.
+    // TODO This was previously used as a fake category for uncategorized dungeon items.
     //  Remove it after ensuring it doesn't break anything.
-    @Legacy("Fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
+    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
     FISHING_BAIT,
@@ -81,6 +81,8 @@ enum class ItemCategory {
     NONE,
     ;
 
+    fun isDeprecated(): Boolean = this.javaClass.getField(name).getAnnotation(Deprecated::class.java) != null
+
     companion object {
 
         fun Collection<ItemCategory>.containsItem(stack: SafeItemStack?) =
@@ -91,8 +93,5 @@ enum class ItemCategory {
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
-
-        @Suppress("DEPRECATION")
-        val deprecated = listOf(FISHING_WEAPON, HOE, ITEM)
     }
 }

@@ -13,13 +13,13 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import java.util.List;
 
 @Mixin(StringSplitter.class)
-public class MixinTextHandler {
+public abstract class MixinStringSplitter {
 
     @WrapMethod(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"
     )
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
-        return VisualWordsHook.INSTANCE.withoutWordChanges(() -> original.call(text, maxWidth, style));
+        return VisualWordsHook.withoutWordChanges(() -> original.call(text, maxWidth, style));
     }
 
     @ModifyVariable(
@@ -29,7 +29,7 @@ public class MixinTextHandler {
         argsOnly = true
     )
     private FormattedText modifyStringVisitable(FormattedText visitable) {
-        return VisualWordsHook.INSTANCE.modifyFormattedText(visitable);
+        return VisualWordsHook.modifyFormattedText(visitable);
     }
 
 }

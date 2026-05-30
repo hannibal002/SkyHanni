@@ -307,6 +307,7 @@ object EffectApi {
             val effect = stack.getNonGodPotEffectOrNull() ?: continue
             for (line in stack.getLore()) {
                 if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
+                if (line.endsWith("PAUSED")) continue
                 val duration = try {
                     TimeUtils.getDuration(line.split("§f")[1])
                 } catch (e: IndexOutOfBoundsException) {

@@ -18,15 +18,13 @@ import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectOutlineRende
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedTexturedRectRenderState
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
 import org.joml.Matrix3x2f
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.roundToInt
-
-//~ if < 26.1 'client.renderer.state.gui.GuiRenderState' -> 'client.gui.render.state.GuiRenderState'
-private typealias GuiRenderState = net.minecraft.client.renderer.state.gui.GuiRenderState
 
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {
