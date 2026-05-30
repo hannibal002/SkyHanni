@@ -72,7 +72,7 @@ object InventoryUtils {
     }
 
     fun getItemIdsInOpenChest(): Set<NeuInternalName> {
-        return getItemsInOpenChest().mapNotNull { it.item?.getInternalNameOrNull() }.toSet()
+        return getItemsInOpenChest().mapNotNull { it.item.getInternalNameOrNull() }.toSet()
     }
 
     // only works while not in an inventory

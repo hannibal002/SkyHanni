@@ -118,11 +118,10 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
-stonecutter active "1.21.10"
+stonecutter active "1.21.11"
 
 stonecutter handlers {
     inherit("accesswidener", "classtweaker")
@@ -133,11 +132,5 @@ stonecutter handlers {
 }
 
 stonecutter parameters {
-    replacements {
-        string(current.parsed >= "1.21.11") {
-            replace("com.google.gson.internal.`\$Gson\$Types`", "com.google.gson.internal.GsonTypes")
-        }
-    }
-
     filters.include("**/*.fsh", "**/*.vsh")
 }
