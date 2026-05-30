@@ -36,6 +36,9 @@ object GraphEditorNodeOperations {
             addEdge(it, node)
         }
         GraphEditor.updateCache()
+        if (state.autoSelectNode) {
+            state.activeNode = node
+        }
     }
 
     fun addEdge(node1: GraphingNode?, node2: GraphingNode?, direction: EdgeDirection = EdgeDirection.BOTH): Boolean {

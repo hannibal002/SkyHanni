@@ -66,6 +66,7 @@ object GraphEditorRenderer {
         add("§eExit: §6${config.exitKey.name()}")
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${config.placeKey.name()}")
+            add("§eAuto Select: §6${config.autoSelectNodeKey.name()}")
             add("§eSelect: §6${config.selectKey.name()}")
             add("§eSelect (Look): §6${config.selectRaycastKey.name()}")
             add("§eConnect: §6${config.connectKey.name()}")

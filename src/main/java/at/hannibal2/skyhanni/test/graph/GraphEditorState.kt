@@ -24,6 +24,7 @@ class GraphEditorState {
     var selectedEdge: GraphingEdge? = null
     var dissolvePossible = false
 
+    var autoSelectNode = false
     var seeThroughBlocks = true
     var inEditMode = false
     var inTutorialMode = false
