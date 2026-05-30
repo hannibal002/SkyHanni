@@ -54,7 +54,11 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
     ),
-    ;
+    WORMHOLE(
+        IslandType.LOTUS_ATOLL,
+        IslandType.CRIMSON_ISLE,
+    ),
+  ;
 
     private val types: EnumSet<IslandType> = types.fold(
         EnumSet.noneOf(IslandType::class.java),
