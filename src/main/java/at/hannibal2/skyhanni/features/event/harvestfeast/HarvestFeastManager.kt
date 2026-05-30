@@ -159,7 +159,7 @@ object HarvestFeastManager {
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next.map { it.key.cropName to it.value }.toMap(),
+            next = next.filterValues { it != null }.map { it.key.cropName to it.value!! }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
@@ -370,7 +370,7 @@ object HarvestFeastManager {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
-        if (!isCurrentOutdated) return
+        if (isCurrentOutdated) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")
