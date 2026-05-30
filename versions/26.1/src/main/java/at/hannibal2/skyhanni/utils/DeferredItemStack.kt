@@ -64,7 +64,7 @@ internal class DeferredItemStack private constructor(
 
         @HandleEvent
         fun onComponentsLoaded() {
-            instances.forEach { it.rebuild() }
+            instances.toList().forEach { it.rebuild() }
         }
     }
 }
