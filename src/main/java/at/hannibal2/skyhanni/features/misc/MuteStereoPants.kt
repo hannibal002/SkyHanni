@@ -33,6 +33,8 @@ object MuteStereoPants {
 
     private val playersWearingStereoPants = TimeLimitedSet<Player>(1.seconds)
 
+    // We cache the players seen wearing Stereo Pants for a second, as well as allow a distance of 5.0 rather than 0.5,
+    // to avoid the sounds getting through for a moment when you take them off or you're moving
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.muteStereoPants) return
@@ -45,7 +47,6 @@ object MuteStereoPants {
             return
         }
 
-        // The sound can be within 0.5 blocks in each direction, but we allow 5.0 to compensate for latency
         for (player in EntityUtils.getEntitiesInBoundingBox<Player>(event.location.boundingCenter(5.0))) {
             if (player.getItemBySlot(EquipmentSlot.LEGS)?.getInternalName() == MUSIC_PANTS) {
                 playersWearingStereoPants.add(player)
