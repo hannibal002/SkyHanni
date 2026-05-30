@@ -426,7 +426,7 @@ object ItemUtils {
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                val category = (groupOrNull("itemCategory") ?: "").replace(" ", "_")
+                val category = (groupOrNull("itemCategory").orEmpty()).replace(" ", "_")
                 val rarity = group("rarity").replace(" ", "_")
                 category to rarity
             } ?: continue

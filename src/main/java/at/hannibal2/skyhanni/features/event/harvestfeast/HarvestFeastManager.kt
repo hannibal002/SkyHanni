@@ -264,15 +264,18 @@ object HarvestFeastManager {
         val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
         val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
         val timeBasedGrandFeast = currentFeastData?.let {
-            it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false
+            it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
+        } ?: false
         return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
         val starting = SkyBlockTime.fromTimeMark(SimpleTimeMark.now() + time)
-        return (SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
+        return (
+            SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
             SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
-            (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))).asTimeMark()
+            (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))
+            ).asTimeMark()
     }
 
     private fun fetch() {
@@ -364,7 +367,7 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (!isCurrentOutdated) return

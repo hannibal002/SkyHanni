@@ -44,7 +44,6 @@ import net.minecraft.nbt.StringTag
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.ItemStackTemplate
 //? }
 import java.io.File
@@ -231,7 +230,7 @@ object EnoughUpdatesManager {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {
-            val freshStack = ItemStack(baseItem, countVal)
+            val freshStack = SafeItemStack(baseItem, countVal)
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
             var innerReplacements = emptyMap<String, String>()
             if (useReplacements) {

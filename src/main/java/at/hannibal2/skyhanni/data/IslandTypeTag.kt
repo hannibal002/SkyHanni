@@ -53,7 +53,7 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
-    )
+    ),
     ;
 
     private val types: EnumSet<IslandType> = types.fold(
