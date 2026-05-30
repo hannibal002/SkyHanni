@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MinecraftData
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -65,6 +66,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
          * Don't use for gameplay logic.
          */
         fun nowSmooth(): ServerTimeMark {
+            if (!SkyHanniMod.feature.dev.mainToggles.smoothServerTime) return now()
             val delta =
                 MinecraftData.lastPingTime
                     .passedSince()
