@@ -43,8 +43,7 @@ public abstract class MixinGuiGraphics {
         return GuiChatHook.getReplacementComponent() != null ? GuiChatHook.getReplacement() : originalComponent;
     }
 
-    //? if > 1.21.10 {
-    /*@ModifyArg(
+    @ModifyArg(
         method = "drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)V",
         at = @At(
             value = "INVOKE",
@@ -67,6 +66,6 @@ public abstract class MixinGuiGraphics {
             false,
             textState.scissor
         );
-    }*///?}
+    }
 
 }
