@@ -964,7 +964,7 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() = Minecraft.getInstance().gameRenderer.mainCamera.let { exactLocation(it) }
+    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)

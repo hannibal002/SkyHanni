@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -16,7 +17,7 @@ public abstract class MixinChatComponent {
         method = "addMessageToDisplayQueue",
         at = @At(
             value = "NEW",
-            target = "net/minecraft/client/multiplayer/chat/GuiMessage$Line"
+            target = "net/minecraft/client/GuiMessage$Line"
         )
     )
     private GuiMessage.Line addMessageId(
@@ -32,3 +33,4 @@ public abstract class MixinChatComponent {
         return line;
     }
 }
+*///?}

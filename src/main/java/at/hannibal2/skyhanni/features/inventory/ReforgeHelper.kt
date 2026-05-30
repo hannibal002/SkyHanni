@@ -466,4 +466,3 @@ object ReforgeHelper {
         return listOf(table)
     }
 }
-

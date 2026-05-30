@@ -219,7 +219,7 @@ object MobFilter {
         else -> true
     }
 
-    internal fun Player.isRealPlayer() = (uuid.version() == 4)
+    fun Player.isRealPlayer() = uuid.version() == 4
 
     fun LivingEntity.isDisplayNpc() =
         (this is Player && isNpc() && displayNpcNameCheck(this.name.formattedTextCompatLessResets())) ||

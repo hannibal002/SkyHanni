@@ -315,8 +315,12 @@ object ChatManager {
         val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
-            val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
+            //? if >= 26.1 {
+            val newLine = GuiMessage.Line(message, line, endOfEntry)
+            //?} else {
+            /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
             newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
+            *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
         }
     }

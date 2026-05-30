@@ -21,7 +21,6 @@ import org.joml.Matrix4f
 /*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer*/
 //?}
 
-
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
     private val textureView: GpuTextureView,

@@ -137,9 +137,7 @@ dependencies {
     @Suppress("UnstableApiUsage")
     if (!isDeobf) {
         if (target.mappingDependency == "official") {
-            mappings(loom.layered {
-                officialMojangMappings()
-            })
+            mappings(loom.officialMojangMappings())
         } else {
             mappings(target.mappingDependency)
         }

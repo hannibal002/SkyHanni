@@ -30,11 +30,13 @@ public abstract class MixinGuiMessage implements GuiMessageData, MessageIdStore 
         return skyhanni$messageId;
     }
 
-    @Unique
+    //? if < 26.1 {
+    /*@Unique
     @Override
     public void skyhanni$setMessageId(int id) {
         throw new UnsupportedOperationException("setMessageId is not supported on GuiMessage");
     }
+    *///?}
 
     @Unique
     private Component skyhanni$fullComponent;

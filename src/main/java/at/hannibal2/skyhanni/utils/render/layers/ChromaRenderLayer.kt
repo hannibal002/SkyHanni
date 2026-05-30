@@ -4,29 +4,31 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.enableRenderPassScissorStateIfAble
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.VertexFormat
-import org.joml.Vector3f
-import org.joml.Vector4f
+import net.minecraft.client.renderer.rendertype.RenderSetup
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.resources.Identifier
 import org.joml.Matrix4f
-import net.minecraft.client.renderer.rendertype.RenderType
-import net.minecraft.client.renderer.rendertype.RenderSetup
-import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
+import org.joml.Vector3f
+import org.joml.Vector4f
 
 class ChromaRenderLayer(
     name: String,
     texture: Identifier? = null,
 ) : RenderType(
     name,
-    texture?.let {
-        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("texture", texture).createRenderSetup()
-    } ?: RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_STANDARD()).createRenderSetup(),
+    if (texture == null) {
+        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_STANDARD())
+    } else {
+        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("texture", texture)
+    }.createRenderSetup(),
 ) {
-    override fun draw(buffer: MeshData) {
 
+    override fun draw(buffer: MeshData) {
         val renderPipeline = this.state.pipeline
         val matrix4fStack = RenderSystem.getModelViewStack()
         val consumer = this.state.layeringTransform.modifier

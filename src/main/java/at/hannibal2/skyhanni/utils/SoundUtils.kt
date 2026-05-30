@@ -53,7 +53,8 @@ object SoundUtils {
         }
     }
 
-    private fun SoundInstance.setLevel(level: Float) = Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
+    private fun SoundInstance.setLevel(level: Float) =
+        Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
 
     fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)

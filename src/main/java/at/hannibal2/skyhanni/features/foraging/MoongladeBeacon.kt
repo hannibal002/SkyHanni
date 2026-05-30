@@ -334,7 +334,7 @@ object MoongladeBeacon {
 
     private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
         val tuningData = if (this.item.hasEnchantGlint()) enchantedTuning else normalTuning
-        val stackColor = this.item.orNull()?.itemType?.getColorOrNull() ?: return false
+        val stackColor = this.item.itemType.getColorOrNull() ?: return false
         block.invoke(tuningData to stackColor)
         return true
     }
@@ -479,7 +479,7 @@ object MoongladeBeacon {
             }
         }
 
-        private fun readCurrentFromSlot(slot: Slot) = slot.item.orNull()?.let { stack ->
+        private fun readCurrentFromSlot(slot: Slot) = slot.item.let { stack ->
             if (isEnchanted && !upgradingStrength) return@let
             val ours = BeaconPieceTarget.OURS
             when (slot.containerSlot) {

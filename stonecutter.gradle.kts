@@ -119,7 +119,6 @@ allprojects {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://maven.gegy.dev/releases/") // mojbackward
     }
 }
 
