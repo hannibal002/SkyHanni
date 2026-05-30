@@ -34,4 +34,12 @@ class MainTogglesConfig {
     )
     @ConfigEditorBoolean
     var pingApi: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Smooth Server Time",
+        desc = "Smooth the server time to prevent sudden jumps for timers that rely on it"
+    )
+    @ConfigEditorBoolean
+    var smoothServerTime: Boolean = true
 }
