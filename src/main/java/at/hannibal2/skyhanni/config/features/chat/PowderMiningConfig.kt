@@ -46,8 +46,8 @@ class PowderMiningConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hide Compact",
-        desc = "Hide compact messages when they found Enchanted Hard Stone."
+        name = "Compact Enchant",
+        desc = "Hide compact messages about getting a Enchanted Hard Stone."
     )
     @ConfigEditorBoolean
     var hideCompact: Boolean = false
