@@ -13,13 +13,13 @@ import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 
-//? if > 26.1 {
+//? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.platform.CompareOp
-//? } else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction*/
-//? }
+//?} else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction
+*///?}
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -214,11 +214,12 @@ enum class SkyHanniRenderPipeline(
                 }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
-                //? if < 26.1 {
+                //? if >= 26.1 {
+                withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
+                //?} else {
                 /*withDepthWrite(depthWrite)
                 withDepthTestFunction(depthTestFunction)
-                *///? } else
-                withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
+                *///?}
             }.build(),
     )
 

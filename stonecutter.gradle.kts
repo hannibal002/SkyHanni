@@ -125,8 +125,6 @@ allprojects {
 stonecutter active "26.1"
 
 stonecutter handlers {
-    inherit("accesswidener", "classtweaker")
-
     configure("fsh", "vsh") {
         commenter = line("//")
     }
@@ -134,25 +132,25 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed >= "26.1") {
-            replace("ClientWorldEvents", "ClientLevelEvents")
-            replace("START_WORLD_TICK", "START_LEVEL_TICK")
-            replace("StartWorldTick", "StartLevelTick")
-            replace("END_WORLD_TICK", "END_LEVEL_TICK")
-            replace("EndWorldTick", "EndLevelTick")
-            replace("AFTER_CLIENT_WORLD_CHANGE", "AFTER_CLIENT_LEVEL_CHANGE")
-            replace("AfterClientWorldChange", "AfterClientLevelChange")
-            replace("import net.minecraft.client.GuiMessage", "import net.minecraft.client.multiplayer.chat.GuiMessage")
-            replace("net/minecraft/client/GuiMessage", "net/minecraft/client/multiplayer/chat/GuiMessage")
-            replace("import net.minecraft.client.GuiMessageTag", "import net.minecraft.client.multiplayer.chat.GuiMessageTag")
-            replace("import net.minecraft.client.gui.render.state", "import net.minecraft.client.renderer.state.gui")
-            replace("DepthTestFunction.LEQUAL_DEPTH_TEST", "CompareOp.LESS_THAN_OR_EQUAL")
-            replace("DepthTestFunction.NO_DEPTH_TEST", "CompareOp.ALWAYS_PASS")
+        string(current.parsed < "26.1") {
+            replace("AFTER_CLIENT_LEVEL_CHANGE", "AFTER_CLIENT_WORLD_CHANGE")
+            replace("AfterClientLevelChange", "AfterClientWorldChange")
+            replace("ClientLevelEvents", "ClientWorldEvents")
+            replace("CompareOp.ALWAYS_PASS", "DepthTestFunction.NO_DEPTH_TEST")
+            replace("CompareOp.LESS_THAN_OR_EQUAL", "DepthTestFunction.LEQUAL_DEPTH_TEST")
+            replace("END_LEVEL_TICK", "END_WORLD_TICK")
+            replace("EndLevelTick", "EndWorldTick")
+            replace("START_LEVEL_TICK", "START_WORLD_TICK")
+            replace("StartLevelTick", "StartWorldTick")
+            replace("classTweaker v1 official", "classTweaker v1 named")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
+            replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
         }
 
-        regex(current.parsed >= "26.1") {
-            replace("\\bClickType\\b" to "ContainerInput", "\\bContainerInput\\b" to "ClickType")
-            replace("\\bGuiGraphics\\b" to "GuiGraphicsExtractor", "\\bGuiGraphicsExtractor\\b" to "GuiGraphics")
+        regex(current.parsed < "26.1") {
+            replace("\\bContainerInput\\b" to "ClickType", "\\bClickType\\b" to "ContainerInput")
+            replace("\\bGuiGraphicsExtractor\\b" to "GuiGraphics", "\\bGuiGraphics\\b" to "GuiGraphicsExtractor")
         }
     }
 

@@ -15,9 +15,9 @@ import net.minecraft.util.Util
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.platform.CompareOp
-//? } else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction*/
-//? }
+//?} else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction
+*///?}
 
 object SkyHanniRenderLayers {
 
@@ -75,11 +75,12 @@ object SkyHanniRenderLayers {
             .withFragmentShader("core/rendertype_text")
             .withSampler("Sampler0")
             .withSampler("Sampler2")
-            //? if < 26.1 {
-            /*.withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            *///? } else
+            //? if >= 26.1 {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            //?} else {
+            /*.withDepthWrite(false)
+            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            *///?}
             .build(),
     )
 
@@ -90,11 +91,12 @@ object SkyHanniRenderLayers {
             .withFragmentShader("core/rendertype_text_intensity")
             .withSampler("Sampler0")
             .withSampler("Sampler2")
-            //? if < 26.1 {
-            /*.withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            *///? } else
+            //? if >= 26.1 {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, -1.0f, -10.0f))
+            //} else {
+            /*.withDepthWrite(false)
+            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            *///?}
             .build(),
     )
 
@@ -105,11 +107,12 @@ object SkyHanniRenderLayers {
             .withFragmentShader("core/rendertype_text_background")
             .withSampler("Sampler2")
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_LIGHTMAP, VertexFormat.Mode.QUADS)
-            //? if < 26.1 {
-            /*.withDepthWrite(false)
-            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
-            *///? } else
+            //? if >= 26.1 {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+            //} else {
+            /*.withDepthWrite(false)
+            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            *///?}
             .build(),
     )
 

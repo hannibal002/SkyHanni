@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 //? if >= 26.1 {
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderType;
-//? } else {
+//?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 *///?}
@@ -33,16 +33,7 @@ public class MixinItemFeatureRenderer {
         }
     }
 
-    //? if < 26.1 {
-    /*@ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V", ordinal = 1), index = 2)
-    private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
-        Object obj = itemCommand;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
-        }
-        return outlineConsumer;
-    }
-    *///? } else {
+    //? if >= 26.1 {
     @WrapOperation(
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
@@ -53,5 +44,14 @@ public class MixinItemFeatureRenderer {
         }
         return original.call(outlineConsumer, renderType);
     }
-    //? }
+    //?} else {
+    /*@ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V", ordinal = 1), index = 2)
+    private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
+        Object obj = itemCommand;
+        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
+        }
+        return outlineConsumer;
+    }
+    *///?}
 }

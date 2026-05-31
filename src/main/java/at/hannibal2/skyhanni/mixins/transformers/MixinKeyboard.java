@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-// TODO 26.1 rei compat needed
-//? if < 26.1
-//import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
@@ -16,6 +13,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+
+// TODO 26.1 rei compat needed
+//? if < 26.1
+//import at.hannibal2.skyhanni.compat.ReiCompat;
 
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboard {
@@ -43,7 +44,7 @@ public class MixinKeyboard {
          * modifiers = 2: Control
          * modifiers = 4: Alt
          */
-        // todo on 1.8 it first checks TextInput.isActive() before posting, however im not sure if this is needed
+        // TODO on 1.8 it first checks TextInput.isActive() before posting, however im not sure if this is needed
         // and as of now that file would need to be recoded to work with 1.21 so it hasn't been put here
         // there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive() with that somehow
         // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager

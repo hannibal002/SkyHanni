@@ -10,22 +10,14 @@ import org.spongepowered.asm.mixin.injection.At;
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.platform.CompareOp;
-//? } else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction;*/
-//?}
-
+//?} else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction;
+*///?}
 
 @Mixin(value = RenderPipeline.class, remap = false)
 public class RenderPipelineMixin {
 
-    //? if < 26.1 {
-    /*@ModifyReturnValue(method = "getDepthTestFunction", at = @At("RETURN"))
-    private DepthTestFunction setGlowDepth(DepthTestFunction original) {
-        RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
-        if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
-        return SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive() ? CompareOp.LESS_THAN_OR_EQUAL : original;
-    }
-    *///? } else {
+    //? if >= 26.1 {
     @ModifyReturnValue(method = "getDepthStencilState", at = @At("RETURN"))
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
@@ -35,5 +27,12 @@ public class RenderPipelineMixin {
             ? new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, original.writeDepth(), original.depthBiasScaleFactor(), original.depthBiasConstant())
             : new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);
     }
-    //?}
+    //?} else {
+    /*@ModifyReturnValue(method = "getDepthTestFunction", at = @At("RETURN"))
+    private DepthTestFunction setGlowDepth(DepthTestFunction original) {
+        RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
+        if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
+        return SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive() ? CompareOp.LESS_THAN_OR_EQUAL : original;
+    }
+    *///?}
 }

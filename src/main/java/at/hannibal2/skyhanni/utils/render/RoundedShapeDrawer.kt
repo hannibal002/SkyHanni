@@ -19,13 +19,14 @@ import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleU
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 import com.mojang.blaze3d.buffers.GpuBufferSlice
-//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
 import org.joml.Vector4f
 import org.joml.Vector3f
 import com.mojang.blaze3d.textures.FilterMode
+
+//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 
 object RoundedShapeDrawer {
 

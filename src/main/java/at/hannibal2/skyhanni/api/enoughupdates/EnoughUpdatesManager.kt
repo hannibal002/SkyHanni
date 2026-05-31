@@ -37,18 +37,19 @@ import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import net.minecraft.nbt.StringTag
+import java.io.File
+import java.util.TreeMap
+import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.minecraft.nbt.StringTag
+
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
-//? }
-import java.io.File
-import java.util.TreeMap
-import kotlin.math.floor
+//?}
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -197,7 +198,9 @@ object EnoughUpdatesManager {
         val convertedItem = ComponentUtils.convertMinecraftIdToModern(itemId, damage ?: 0)
         val baseItem = convertedItem.getVanillaItem() ?: return SafeItemStack.EMPTY
 
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
+        //?} else {
         /*val stack = SafeItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return SafeItemStack.EMPTY
 
         count?.let { stack.count = it }
@@ -222,8 +225,7 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
-        *///? } else
-        return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
+        *///?}
     }
 
     //? if >= 26.1 {
@@ -249,7 +251,7 @@ object EnoughUpdatesManager {
         }
         return DeferredItemStack(baseItem, factory, countVal)
     }
-    //? }
+    //?}
 
     private fun SafeItemStack?.getPetLoreReplacements(): Map<String, String> {
         val petInfo = this?.getPetInfo() ?: return emptyMap()

@@ -11,10 +11,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 //? if >= 26.1 {
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.Unique;
-//? }
+//?}
 
 @Mixin(GameRenderer.class)
 public class MixinGameRenderer {
@@ -30,33 +31,35 @@ public class MixinGameRenderer {
     }
     //?}
 
-    //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"'
-    //~ if < 26.1 'Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V' -> 'Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V'
+    //? if >= 26.1 {
     @Inject(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    //~ if < 26.1 'shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci' -> 'tick, CallbackInfo ci, @Local GuiGraphics context'
-    //~ if < 26.1 'deltaTracker' -> 'tickCounter'
     private void onRenderStartPhase(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
-        //~ if < 26.1 'skyhanni$guiGraphics' -> 'context'
-        if (MinecraftCompat.INSTANCE.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, true).post();
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, true).post();
     }
 
-    //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"'
-    //~ if < 26.1 ';extractSavingIndicator(' -> ';renderSavingIndicator('
     @Inject(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    //~ if < 26.1 'shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci' -> 'tick, CallbackInfo ci, @Local GuiGraphics context'
-    //~ if < 26.1 'deltaTracker' -> 'tickCounter'
     private void onRenderEndPhase(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
-        //~ if < 26.1 'skyhanni$guiGraphics' -> 'context'
-        if (MinecraftCompat.INSTANCE.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, false).post();
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, false).post();
     }
 
-    //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"'
-    //~ if < 26.1 ';extractRenderState(' -> ';render('
     @Inject(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
-    //~ if < 26.1 'shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci' -> 'tick, CallbackInfo ci, @Local GuiGraphics context'
-    //~ if < 26.1 'deltaTracker' -> 'tickCounter'
     private void onRenderTail(DeltaTracker deltaTracker, boolean shouldRenderLevel, boolean resourcesLoaded, CallbackInfo ci) {
-        //~ if < 26.1 'skyhanni$guiGraphics' -> 'context'
         GuiEditManager.renderLast(skyhanni$guiGraphics);
     }
+    //?} else {
+    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"))
+    private void onRenderStartPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, true).post();
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
+    private void onRenderEndPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, false).post();
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;render(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
+    private void onRenderTail(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
+        GuiEditManager.renderLast(context);
+    }
+    *///?}
 }

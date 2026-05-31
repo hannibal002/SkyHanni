@@ -39,10 +39,11 @@ import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
-//? }
+//?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
@@ -144,7 +145,7 @@ object WorldRenderUtils {
             seeThroughBlocks = seeThroughBlocks,
         )
 
-        // todo use seeThroughBlocks
+        // TODO use seeThroughBlocks
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(location.x, location.y + 1, location.z, color.rgb)
     }
 

@@ -65,7 +65,7 @@ public abstract class MixinHandledScreen {
     //~ if < 26.1 ';extractRenderState(' -> ';render('
     @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (MinecraftCompat.INSTANCE.getLocalWorldExists() && MinecraftCompat.INSTANCE.getLocalPlayerExists()) {
+        if (MinecraftCompat.getLocalWorldExists() && MinecraftCompat.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
         }
     }

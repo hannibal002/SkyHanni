@@ -63,9 +63,8 @@ runDirectory.mkdirs()
 // Minecraft configuration:
 @OptIn(StonecutterExperimentalAPI::class)
 loom.apply {
-    val classTweakerName = if (isDeobf) "skyhannideobf.classtweaker" else "skyhanni.classtweaker"
     val classTweakerFile = sc.process(
-        rootProject.file("src/main/resources/$classTweakerName"),
+        rootProject.file("src/main/resources/skyhanni.classtweaker"),
         "build/skyhanni.classtweaker",
     )
     if (classTweakerFile.exists()) {
@@ -283,16 +282,6 @@ tasks.processResources {
 
     filesMatching("fabric.mod.json") {
         expand(props)
-    }
-
-    if (isDeobf) {
-        // The named-namespace classtweaker is correct for remapped builds,
-        // but 26.1 runs official mappings with no remapping step, so we have to bundle the
-        // official-namespace variant instead.
-        exclude("skyhanni.classtweaker")
-        from(rootProject.file("src/main/resources/skyhannideobf.classtweaker")) {
-            rename { "skyhanni.classtweaker" }
-        }
     }
 }
 

@@ -20,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
 //? if >= 26.1
 import net.minecraft.client.gui.components.ChatComponent;
 
@@ -100,13 +101,13 @@ public class MixinGui {
         if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
         return mode;
     }
-    //? } else {
-    /*@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
-    private boolean modifyRenderText(boolean bool) {
+    //?} else {
+    /*@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
+    private boolean modifyRenderText(boolean isChatting) {
         if (ChatPeek.peek()) return true;
-        return bool;
-    }*/
-    //? }
+        return isChatting;
+    }
+    *///?}
 
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {

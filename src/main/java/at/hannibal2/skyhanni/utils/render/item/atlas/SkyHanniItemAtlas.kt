@@ -10,9 +10,9 @@ import net.minecraft.resources.Identifier
 //? if >= 26.1 {
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f
-//? } else {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer*/
-//?}
+//?} else {
+/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+*///?}
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
 

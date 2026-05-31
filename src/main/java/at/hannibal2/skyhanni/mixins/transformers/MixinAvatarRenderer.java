@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AvatarRenderer.class)
-public class MixinPlayerEntityRenderer {
+public class MixinAvatarRenderer {
 
     // Moved to EntityRenderer in 26.1+
     //? if < 26.1 {
@@ -25,7 +25,7 @@ public class MixinPlayerEntityRenderer {
         }
         return text;
     }
-    *///? }
+    *///?}
 
     @Inject(method = "isEntityUpsideDown(Lnet/minecraft/world/entity/Avatar;)Z", at = @At("HEAD"), cancellable = true)
     private void shouldFlipUpsideDown(Avatar entity, CallbackInfoReturnable<Boolean> cir) {

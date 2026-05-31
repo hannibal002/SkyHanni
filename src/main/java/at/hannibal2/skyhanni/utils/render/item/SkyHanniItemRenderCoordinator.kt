@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
+
+//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 
 @SkyHanniModule
 internal object SkyHanniItemRenderCoordinator {

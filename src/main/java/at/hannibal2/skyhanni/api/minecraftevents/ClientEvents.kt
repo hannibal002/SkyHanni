@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientShutdownEvent
-//? if >= 26.1
-import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -31,8 +29,11 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
-//? if >= 26.1
+
+//? if >= 26.1 {
+import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//?}
 
 @SkyHanniModule
 object ClientEvents {

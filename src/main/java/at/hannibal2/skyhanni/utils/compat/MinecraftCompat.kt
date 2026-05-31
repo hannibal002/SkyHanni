@@ -23,12 +23,14 @@ object MinecraftCompat {
 
     val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
 
+    @JvmStatic
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
     val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("level is null")
 
     val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
 
+    @JvmStatic
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible

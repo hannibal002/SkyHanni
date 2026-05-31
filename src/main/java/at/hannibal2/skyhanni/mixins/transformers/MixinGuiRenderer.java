@@ -76,7 +76,7 @@ public class MixinGuiRenderer {
     private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
         skyhanni$frameNumber++;
     }
-    //? }
+    //?}
 
     @Shadow
     @Final

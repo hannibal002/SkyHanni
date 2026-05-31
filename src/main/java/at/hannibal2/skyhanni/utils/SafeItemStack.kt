@@ -46,7 +46,7 @@ fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit
 //? if >= 26.1 {
 private fun createItemStackTemplate(item: Item, count: Int, extraOps: SafeItemStack.() -> Unit): ItemStackTemplate =
     ItemStackTemplate.fromNonEmptyStack(ItemStackTemplate(item, count).create().also(extraOps))
-//? }
+//?}
 
-//~ if < 26.1 'item?.value() ?: Items.AIR' -> 'item'
+//~ if < 26.1 ' item?.value() ?: Items.AIR' -> ' item'
 val SafeItemStack.itemType: Item get() = item?.value() ?: Items.AIR

@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 //? if >= 26.1 {
 import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//? }
+//?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
 
@@ -256,8 +256,7 @@ fun Style.setHoverShowText(text: Component): Style {
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        //~ if < 26.1 'sendSystemMessage' -> 'displayClientMessage'
-        //~ if < 26.1 'message' -> 'message, false'
+        //~ if < 26.1 'sendSystemMessage(message)' -> 'displayClientMessage(message, false)'
         Minecraft.getInstance().player?.sendSystemMessage(message)
     }
 }

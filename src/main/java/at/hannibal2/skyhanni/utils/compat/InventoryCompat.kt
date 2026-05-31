@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-// TODO 26.1 REI compat needed
-//? if < 26.1
-//import at.hannibal2.skyhanni.compat.ReiCompat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,6 +12,10 @@ import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+
+// TODO 26.1 REI compat needed
+//? if < 26.1
+//import at.hannibal2.skyhanni.compat.ReiCompat
 
 fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
     val stack = this.containerMenu.carried

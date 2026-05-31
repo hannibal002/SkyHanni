@@ -90,11 +90,12 @@ object ShaderRenderUtils {
     ) {
         if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
 
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawRoundTexturedRectDeferred(x, y, width, height, radius, smoothness, texture, alpha)
+        //?} else {
         /*RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
         RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
-        *///? } else
-        drawRoundTexturedRectDeferred(x, y, width, height, radius, smoothness, texture, alpha)
+        *///?}
     }
 
     /**
@@ -111,11 +112,12 @@ object ShaderRenderUtils {
      * It is best kept at its default.
      */
     fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawRoundRectDeferred(x, y, width, height, color, radius, smoothness)
+        //?} else {
         /*RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
         RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
-        *///? } else
-        drawRoundRectDeferred(x, y, width, height, color, radius, smoothness)
+        *///?}
     }
 
     /**
@@ -143,7 +145,9 @@ object ShaderRenderUtils {
         radius: Int = 10,
         blur: Float = 0.7f,
     ) {
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawRoundRectOutlineDeferred(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
+        //?} else {
         /*RoundedRectangleOutlineShader.applyBaseSettings(radius, width, height, x, y) {
             this.borderThickness = borderThickness.toFloat()
             // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
@@ -158,8 +162,7 @@ object ShaderRenderUtils {
             x + width + borderAdjustment, y + height + borderAdjustment,
             topColor, bottomColor,
         )
-        *///? } else
-        drawRoundRectOutlineDeferred(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
+        *///?}
     }
 
     /**
@@ -186,11 +189,12 @@ object ShaderRenderUtils {
         radius: Int = 10,
         smoothness: Float = 1f,
     ) {
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawRoundGradientRectDeferred(x, y, width, height, topColor, bottomColor, radius, smoothness)
+        //?} else {
         /*RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
         RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
-        *///? } else
-        drawRoundGradientRectDeferred(x, y, width, height, topColor, bottomColor, radius, smoothness)
+        *///?}
     }
 
     /**
@@ -217,7 +221,9 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f,
     ) {
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawFilledCircleDeferred(x, y, color, radius, smoothness, angle1, angle2)
+        //?} else {
         /*val radiusIn = radius * GuiScreenUtils.scaleFactor
         val diameter = radius * 2
         CircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
@@ -225,8 +231,7 @@ object ShaderRenderUtils {
             this.angle2 = angle2 - Math.PI.toFloat()
         }
         RoundedShapeDrawer.drawCircle(x - 5, y - 5, x + diameter + 5, y + diameter + 5, color.rgb)
-        *///? } else
-        drawFilledCircleDeferred(x, y, color, radius, smoothness, angle1, angle2)
+        *///?}
     }
 
     /**
@@ -259,7 +264,9 @@ object ShaderRenderUtils {
         smoothness: Float = 1.5f,
         reverse: Boolean = false,
     ) {
-        //? if < 26.1 {
+        //? if >= 26.1 {
+        drawRadialGradientFilledCircleDeferred(x, y, radius, startColor, endColor, angle, progress, phaseOffset, smoothness, reverse)
+        //?} else {
         /*val radiusIn = radius * GuiScreenUtils.scaleFactor
         val diameter = radius * 2
         RadialGradientCircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
@@ -271,8 +278,7 @@ object ShaderRenderUtils {
             this.endColor = endColor.destructToFloatArray()
         }
         RoundedShapeDrawer.drawGradientCircle(x - 5, y - 5, x + diameter + 5, y + diameter + 5, startColor, endColor)
-        *///? } else
-        drawRadialGradientFilledCircleDeferred(x, y, radius, startColor, endColor, angle, progress, phaseOffset, smoothness, reverse)
+        *///?}
     }
 
     private fun buildRoundedStateParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedRenderStateParams {

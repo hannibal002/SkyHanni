@@ -13,9 +13,9 @@ import kotlin.math.roundToInt
 //? if >= 26.1 {
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f
-//? } else {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer*/
-//?}
+//?} else {
+/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+*///?}
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
