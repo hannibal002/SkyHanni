@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -51,7 +52,7 @@ object PowderTracker {
      */
     private val compactedPattern by patternGroup.pattern(
         "compacted",
-        "§b§lCOMPACT! §r§fYou found an §r§a(?<item>.+?)§r§f!",
+        "§b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!",
     )
 
     private var lastChestPicked = SimpleTimeMark.farPast()
@@ -231,15 +232,8 @@ object PowderTracker {
         }
     }
 
-    fun getCompactItem(msg: String): NeuInternalName? {
-        return compactedPattern.matchMatcher(msg) {
-            val compactedItem = groupOrNull("item") ?: return null
-            return fromItemNameOrNull(compactedItem)
-        }
-    }
-
     fun isCompactHardStoneMessage(msg: String): Boolean {
-        return getCompactItem(msg) == "ENCHANTED_HARD_STONE".toInternalName()
+        return compactedPattern.matches(msg)
     }
 
     private fun formatDisplay(map: List<Searchable>) = buildList {
