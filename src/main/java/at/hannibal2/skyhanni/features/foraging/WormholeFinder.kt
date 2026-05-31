@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
@@ -13,6 +15,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -46,14 +49,18 @@ object WormholeFinder {
     fun onTick(event: SkyHanniTickEvent) {
         if (!config.enabled) return
         if (!event.isMod(10)) return
-        if (!wearingFroggles()) return
+        if (!wearingFroggles()) {
+            matchedWormholes = emptyList()
+            return
+        }
 
         val playerPos = playerLocation()
         val rawArrows = playerPos.getEntitiesNearby<Display.TextDisplay>(3.0)
+        if (rawArrows.isEmpty()) return
 
         matchedWormholes = rawArrows.mapNotNull { matchArrow(it) }.distinct()
 
-        if (matchedWormholes.isNotEmpty()) {
+        if (matchedWormholes.isNotEmpty() && config.pathFind) {
             val newTarget = matchedWormholes.minByOrNull { it.position.distanceSqToPlayer() }
             if (newTarget != null && newTarget != currentTarget) {
                 currentTarget = newTarget
@@ -64,12 +71,7 @@ object WormholeFinder {
                     condition = { config.enabled },
                 )
             }
-        } else {
-            val last = lastPlayerPos
-            val isMoving = last != null && run { val d = playerPos - last; d.x * d.x + d.z * d.z > 0.25 }
-            if (rawArrows.isNotEmpty() && !isMoving) currentTarget = null
         }
-        lastPlayerPos = playerPos
     }
 
     private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {

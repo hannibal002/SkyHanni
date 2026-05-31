@@ -18,4 +18,9 @@ class WormholeFinderConfig {
     @ConfigEditorBoolean
     var departureAlert: Boolean = true
 
+    @Expose
+    @ConfigOption(name = "Pathfind to Wormhole", desc = "Shows a path to the next wormhole.")
+    @ConfigEditorBoolean
+    var pathFind: Boolean = true
+
 }
