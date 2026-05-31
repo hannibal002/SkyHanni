@@ -134,11 +134,9 @@ object PowderTracker {
             lastChestPicked = SimpleTimeMark.now()
         }
 
-        getCompactItem(msg)?.let { internalName ->
-            if (internalName == "ENCHANTED_HARD_STONE".toInternalName()) {
-                tracker.modify {
-                    it.totalHardStoneCompacted += 1
-                }
+        if (isCompactHardStoneMessage(msg)) {
+            tracker.modify {
+                it.totalHardStoneCompacted += 1
             }
         }
 
@@ -238,6 +236,10 @@ object PowderTracker {
             val compactedItem = groupOrNull("item") ?: return null
             return fromItemNameOrNull(compactedItem)
         }
+    }
+
+    fun isCompactHardStoneMessage(msg: String): Boolean {
+        return getCompactItem(msg) == "ENCHANTED_HARD_STONE".toInternalName()
     }
 
     private fun formatDisplay(map: List<Searchable>) = buildList {

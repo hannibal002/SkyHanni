@@ -279,10 +279,7 @@ object PowderMiningChatFilter {
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
         if (serendipityPattern.matches(message) && config.hideCrystalSerendipity) return "serendipity"
-        if (config.hideCompact) PowderTracker.getCompactItem(message)?.let {
-            if (it == "ENCHANTED_HARD_STONE".toInternalName())
-                return "compact_hard_stone"
-        }
+        if (config.hideCompact && PowderTracker.isCompactHardStoneMessage(message)) return "compact_hard_stone"
         // Closing or opening a reward 'loop' with the spam of ▬
         if (chestWrapperPattern.matches(message)) {
             unclosedRewards = !unclosedRewards
