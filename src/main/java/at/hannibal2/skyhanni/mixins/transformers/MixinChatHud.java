@@ -49,16 +49,28 @@ public abstract class MixinChatHud {
         }
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render'
-    //~ if < 26.1 'ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;' -> 'ChatGraphicsAccess;IIZ'
+    //? if >= 26.1 {
     @WrapMethod(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V")
-    //~ if < 26.1 'int screenHeight, int ticks, ChatComponent.DisplayMode displayMode, Operation<Void> original' -> 'int i, int j, boolean bl, Operation<Void> original'
-    private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int screenHeight, int ticks, ChatComponent.DisplayMode displayMode, Operation<Void> original) {
+    //?} else {
+    /*@WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V")
+    *///?}
+    private void wrapRender(
+        ChatComponent.ChatGraphicsAccess chatGraphicsAccess,
+        int screenHeight,
+        int ticks,
+        //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
+        ChatComponent.DisplayMode displayMode,
+        Operation<Void> original
+    ) {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
-        //~ if < 26.1 'screenHeight, ticks, displayMode' -> 'i, j, bl'
-        original.call(chatGraphicsAccess, screenHeight, ticks, displayMode);
+        original.call(
+            chatGraphicsAccess,
+            screenHeight,
+            ticks,
+            displayMode
+        );
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);

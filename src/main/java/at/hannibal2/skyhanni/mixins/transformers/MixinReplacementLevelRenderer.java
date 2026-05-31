@@ -76,7 +76,6 @@ public class MixinReplacementLevelRenderer {
     }
 
     @WrapOperation(
-        //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
         method = "lambda$addMainPass$0",
         slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
@@ -97,7 +96,6 @@ public class MixinReplacementLevelRenderer {
         contextMatrixStack = null;
     }
 
-    //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
     @ModifyExpressionValue(method = "lambda$addMainPass$0", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
     private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
         contextMatrixStack = matrixStack;

@@ -133,24 +133,23 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.1") {
-            replace("AFTER_CLIENT_LEVEL_CHANGE", "AFTER_CLIENT_WORLD_CHANGE")
-            replace("AfterClientLevelChange", "AfterClientWorldChange")
-            replace("ClientLevelEvents", "ClientWorldEvents")
+            replace(";extractRenderState(", ";render(")
+            replace(";text", ";drawString")
             replace("CompareOp.ALWAYS_PASS", "DepthTestFunction.NO_DEPTH_TEST")
             replace("CompareOp.LESS_THAN_OR_EQUAL", "DepthTestFunction.LEQUAL_DEPTH_TEST")
-            replace("END_LEVEL_TICK", "END_WORLD_TICK")
-            replace("EndLevelTick", "EndWorldTick")
-            replace("START_LEVEL_TICK", "START_WORLD_TICK")
-            replace("StartLevelTick", "StartWorldTick")
+            replace("ContainerInput", "ClickType")
+            replace("GuiGraphicsExtractor", "GuiGraphics")
+            replace("InteractClickType", "InteractClickType") // prevent replacement
+            replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
+            replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
             replace("classTweaker v1 official", "classTweaker v1 named")
+            replace("drawContext.text", "drawContext.drawString")
+            replace("extractContents", "renderContents")
+            replace("extractSlot", "renderSlot")
+            replace("lambda\$addMainPass\$0", "method_62214")
             replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
             replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
-        }
-
-        regex(current.parsed < "26.1") {
-            replace("\\bContainerInput\\b" to "ClickType", "\\bClickType\\b" to "ContainerInput")
-            replace("\\bGuiGraphicsExtractor\\b" to "GuiGraphics", "\\bGuiGraphics\\b" to "GuiGraphicsExtractor")
         }
     }
 

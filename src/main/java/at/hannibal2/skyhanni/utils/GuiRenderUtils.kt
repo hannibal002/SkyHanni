@@ -43,7 +43,6 @@ object GuiRenderUtils {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
@@ -52,7 +51,6 @@ object GuiRenderUtils {
         val strLen = fr.width(str)
         val x2 = x - strLen / 2f
         val y2 = y - fr.lineHeight / 2f
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x2.toInt(), y2.toInt(), color, shadow)
     }
 
@@ -75,32 +73,26 @@ object GuiRenderUtils {
     }
 
     fun drawString(str: String, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: String, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: Component, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: Component, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Float, y: Float, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x.toInt(), y.toInt(), color, shadow)
     }
 
     fun drawString(str: FormattedCharSequence, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
-        //~ if < 26.1 '.text' -> '.drawString'
         DrawContextUtils.drawContext.text(fr, str, x, y, color, shadow)
     }
 
@@ -111,7 +103,6 @@ object GuiRenderUtils {
     fun drawStrings(strings: List<String>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
-            //~ if < 26.1 '.text' -> '.drawString'
             DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
             newY += 9
         }
@@ -120,7 +111,6 @@ object GuiRenderUtils {
     fun drawTexts(strings: List<Component>, x: Int, y: Int, color: Int = -1, shadow: Boolean = true) {
         var newY = y
         for (string in strings) {
-            //~ if < 26.1 '.text' -> '.drawString'
             DrawContextUtils.drawContext.text(fr, string, x, newY, color, shadow)
             newY += 9
         }
@@ -427,9 +417,11 @@ object GuiRenderUtils {
             frameNumber = frameNumber,
             alpha = alpha,
         )
-        //~ if < 26.1 'gameRenderer.gameRenderState.' -> 'gameRenderer.'
-        //~ if < 26.1 'addPicturesInPictureState' -> 'submitPicturesInPictureState'
+        //? if >= 26.1 {
         Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
+        //?} else {
+        /*Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        *///?}
 
         return newRenderState.stableId
     }

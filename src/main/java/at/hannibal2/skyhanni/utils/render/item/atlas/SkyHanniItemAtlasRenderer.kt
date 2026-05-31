@@ -6,20 +6,17 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.renderer.state.gui.BlitRenderState
-import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+import net.minecraft.client.renderer.state.gui.BlitRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
 
-//? if >= 26.1 {
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
+//? if >= 26.1
 import org.joml.Matrix4f
-//?} else {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-*///?}
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -30,7 +27,6 @@ internal class SkyHanniItemAtlasRenderer(
 ) {
 
     fun render(
-        //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
         projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
@@ -82,7 +78,6 @@ internal class SkyHanniItemAtlasRenderer(
         val slotF = pixelSize.toFloat()
         val u1 = u + slotF / size
         val v1 = v + (-slotF) / size
-        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

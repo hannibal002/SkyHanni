@@ -13,6 +13,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.resources.Identifier
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
@@ -25,14 +26,16 @@ import org.joml.Vector4f
 import org.joml.Vector3f
 import com.mojang.blaze3d.textures.FilterMode
 
-//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
-
 object RoundedShapeDrawer {
 
-    //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-    //~ if < 26.1 '"SkyHanni Rounded Shapes"' -> '"SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true'
-    val projectionMatrix = ProjectionMatrixBuffer("SkyHanni Rounded Shapes")
+    val projectionMatrix = ProjectionMatrixBuffer(
+        "SkyHanni Rounded Shapes",
+        //? if < 26.1 {
+        /*1000.0f,
+        11000.0f,
+        true,
+        *///?}
+    )
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     var circleUniform = SkyHanniCircleUniform()

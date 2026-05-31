@@ -20,11 +20,17 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 *///?}
 
 @Mixin(ItemFeatureRenderer.class)
-public class MixinItemFeatureRenderer {
+public abstract class MixinItemFeatureRenderer {
 
-    //~ if < 26.1 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V"' -> 'render"'
-    @WrapOperation(method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
-    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand) {
+    @WrapOperation(
+        //? if >= 26.1 {
+        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        //?} else {
+        /*method = "render",
+        *///?}
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
+    )
+    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
             original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
@@ -36,7 +42,11 @@ public class MixinItemFeatureRenderer {
     //? if >= 26.1 {
     @WrapOperation(
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
+        )
+    )
     private VertexConsumer modifyOutlineVertexConsumerProvider(OutlineBufferSource outlineConsumer, RenderType renderType, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
@@ -45,7 +55,15 @@ public class MixinItemFeatureRenderer {
         return original.call(outlineConsumer, renderType);
     }
     //?} else {
-    /*@ModifyArg(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V", ordinal = 1), index = 2)
+    /*@ModifyArg(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V",
+            ordinal = 1
+        ),
+        index = 2
+    )
     private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {

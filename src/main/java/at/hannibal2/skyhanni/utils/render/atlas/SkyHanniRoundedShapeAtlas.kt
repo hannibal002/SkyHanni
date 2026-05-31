@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.vertex.Tesselator
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector4f
@@ -41,10 +41,10 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
     override val depthLabel = "SkyHanni rounded shape atlas depth"
 
     //? if < 26.1 {
-    /*private var projectionBuffer: CachedOrthoProjectionMatrixBuffer? = null
+    /*private var projectionBuffer: ProjectionMatrixBuffer? = null
 
-    private fun getOrCreateProjectionBuffer(): CachedOrthoProjectionMatrixBuffer =
-        projectionBuffer ?: CachedOrthoProjectionMatrixBuffer(
+    private fun getOrCreateProjectionBuffer(): ProjectionMatrixBuffer =
+        projectionBuffer ?: ProjectionMatrixBuffer(
             "SkyHanni rounded shape atlas", 1000.0f, 11000.0f, true,
         ).also { projectionBuffer = it }
     *///?}
@@ -244,7 +244,6 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
         val vContent = entry.v - pad
         val u1 = uContent + key.pixelWidth / size
         val v1 = vContent - key.pixelHeight / size
-        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

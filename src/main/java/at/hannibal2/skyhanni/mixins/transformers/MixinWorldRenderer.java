@@ -32,14 +32,12 @@ public class MixinWorldRenderer {
         return true;
     }
 
-    //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
-    //~ if < 26.1 'lambda$addMainPass$0' -> 'method_62214'
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;

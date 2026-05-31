@@ -12,10 +12,16 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(Screen.class)
 public class MixinScreen {
 
-    //~ if < 26.1 'extractRenderStateWithTooltipAndSubtitles' -> 'renderWithTooltipAndSubtitles'
-    //~ if < 26.1 ';extractBackground(' -> ';renderBackground('
-    @WrapOperation(method = "extractRenderStateWithTooltipAndSubtitles", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"))
-    private void wrapRenderBackground(Screen instance, GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
+    @WrapOperation(
+        //~ if < 26.1 'extractRenderStateWithTooltipAndSubtitles' -> 'renderWithTooltipAndSubtitles'
+        method = "extractRenderStateWithTooltipAndSubtitles",
+        at = @At(
+            value = "INVOKE",
+            //~ if < 26.1 'extractBackground' -> 'renderBackground'
+            target = "Lnet/minecraft/client/gui/screens/Screen;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V"
+        )
+    )
+    private void wrapExtractBackground(Screen instance, GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
         original.call(instance, context, mouseX, mouseY, deltaTicks);
         new ScreenDrawnEvent(context, Minecraft.getInstance().screen).post();
     }

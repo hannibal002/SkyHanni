@@ -11,5 +11,6 @@ fun CameraRenderState.rotation(): Quaternionf = orientation
 fun Camera.getRenderState(): CameraRenderState = CameraRenderState().apply {
     val deltaTracker = Minecraft.getInstance().deltaTracker
     val partialTicks = this@getRenderState.getCameraEntityPartialTicks(deltaTracker)
+    //~ if < 26.1 'extractRenderState' -> 'render'
     this@getRenderState.extractRenderState(this, partialTicks)
 }

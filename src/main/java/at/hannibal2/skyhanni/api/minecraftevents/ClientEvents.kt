@@ -1,3 +1,4 @@
+//~ if < 26.1 'ClientLevelEvents' -> 'ClientWorldEvents' {
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -65,6 +66,7 @@ object ClientEvents {
         }
 
         // World change event
+        //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             WorldChangeEvent.post()
         }
@@ -167,3 +169,4 @@ object ClientEvents {
     fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
 
 }
+//~}

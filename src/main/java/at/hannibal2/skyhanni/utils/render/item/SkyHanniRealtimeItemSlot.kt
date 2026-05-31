@@ -4,18 +4,15 @@ import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
+import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-import net.minecraft.client.renderer.RenderPipelines
 import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
 
-//? if >= 26.1 {
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
+//? if >= 26.1
 import org.joml.Matrix4f
-//?} else {
-/*import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
-*///?}
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -32,7 +29,6 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         context: SkyHanniItemRenderContext,
         state: SkyHanniGuiItemRenderState,
         guiRenderState: GuiRenderState,
-        //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
         projectionBuffer: ProjectionMatrixBuffer,
     ) {
         val texture = texture ?: return
@@ -71,7 +67,6 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
     ) {
         val textureView = textureView ?: return
         // u/v: full slot occupies [0,1] x [0,1] in the per-item texture
-        //~ if < 26.1 'addBlitToCurrentLayer' -> 'submitBlitToCurrentLayer'
         guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,

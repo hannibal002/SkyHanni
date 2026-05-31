@@ -20,6 +20,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(GuiGraphicsExtractor.class)
+// prevent replacement
+//~ if < 26.1 'MixinGuiGraphicsExtractor' -> 'MixinGuiGraphicsExtractor'
 public abstract class MixinGuiGraphicsExtractor {
 
     //~ if < 26.1 'item(' -> 'renderItem('
@@ -28,7 +30,7 @@ public abstract class MixinGuiGraphicsExtractor {
         RenderItemHookKt.renderItemReturn((GuiGraphicsExtractor) (Object) this, stack, x, y);
     }
 
-    //~ if < 26.1 'itemDecorations(' -> 'renderItemDecorations('
+    //~ if < 26.1 'itemDecorations' -> 'renderItemDecorations'
     @Inject(method = "itemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("RETURN"))
     private void drawItemDecorationsPost(Font textRenderer, ItemStack stack, int x, int y, String stackCountText, CallbackInfo ci) {
         RenderItemHookKt.renderItemOverlayPost((GuiGraphicsExtractor) (Object) this, stack, x, y, stackCountText);
@@ -48,11 +50,13 @@ public abstract class MixinGuiGraphicsExtractor {
     }
 
     @ModifyArg(
-        method = "drawString(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)V",
+        //~ if < 26.1 'text' -> 'drawString'
+        method = "text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)V",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'renderer/state/gui/' -> 'gui/render/state/'
-            target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;submitText(Lnet/minecraft/client/renderer/state/gui/GuiTextRenderState;)V"
+            //~ if < 26.1 'renderer/state/gui' -> 'gui/render/state'
+            //~ if < 26.1 'addText' -> 'submitText'
+            target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addText(Lnet/minecraft/client/renderer/state/gui/GuiTextRenderState;)V"
         ),
         index = 0
     )

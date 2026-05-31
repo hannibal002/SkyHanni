@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
-
-//~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-import net.minecraft.client.renderer.ProjectionMatrixBuffer
 
 @SkyHanniModule
 internal object SkyHanniItemRenderCoordinator {
@@ -36,9 +34,14 @@ internal object SkyHanniItemRenderCoordinator {
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
-        //~ if < 26.1 'ProjectionMatrixBuffer' -> 'CachedOrthoProjectionMatrixBuffer'
-        //~ if < 26.1 '"SkyHanni items"' -> '"SkyHanni items", -1000.0f, 1000.0f, true'
-        ProjectionMatrixBuffer("SkyHanni items")
+        ProjectionMatrixBuffer(
+            "SkyHanni items",
+            //? if < 26.1 {
+            /*-1000.0f,
+            1000.0f,
+            true,
+            *///?}
+        )
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber

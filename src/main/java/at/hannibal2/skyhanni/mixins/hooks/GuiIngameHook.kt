@@ -18,7 +18,6 @@ object GuiIngameHook {
         color: Int,
         shadow: Boolean,
     ) = ScoreboardData.tryToReplaceScoreboardLine(text).let {
-        //~ if < 26.1 '.text' -> '.drawString'
         drawContext.text(renderer, it, x, y, color, shadow)
     }
 
