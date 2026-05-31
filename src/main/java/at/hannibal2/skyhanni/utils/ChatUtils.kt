@@ -463,7 +463,7 @@ object ChatUtils {
         clickableChat(
             "$message$hint",
             onClick = {
-                if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
+                if (KeyboardManager.isConfigModifyKeyDown()) {
                     option.jumpToEditor()
                 } else {
                     action()

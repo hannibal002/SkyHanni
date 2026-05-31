@@ -92,6 +92,14 @@ class BazaarConfig {
     var craftMaterialsFromBazaar: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Custom Craft Multiplier",
+        desc = "Add a custom multiplying option."
+    )
+    @ConfigEditorSlider(minValue = 2f, maxValue = 2048f, minStep = 1f)
+    var customCraftMaterialsMultiplier: Int = 1
+
+    @Expose
     @ConfigLink(owner = BazaarConfig::class, field = "craftMaterialsFromBazaar")
     val craftMaterialsFromBazaarPosition: Position = Position(50, 50, centerX = true, centerY = false)
 }

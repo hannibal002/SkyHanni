@@ -95,6 +95,8 @@ object KeyboardManager {
     fun isPastingKeysDown() =
         isModifierKeyDown() && GLFW.GLFW_KEY_V.isKeyHeld()
 
+    fun isConfigModifyKeyDown() = isShiftKeyDown() || isModifierKeyDown()
+
     private fun Int.matchesClosureKey() =
         Minecraft.getInstance().options.keyInventory.matches(KeyEvent(this, this, 0))
 

@@ -9,9 +9,11 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -21,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
@@ -132,8 +133,11 @@ object CraftMaterialCollector {
     }
 
     private fun MutableList<Renderable>.addMultipliers() {
-        for (m in listOf(1, 5, 16, 32, 64, 512)) {
+        val customMultiplier = config.customCraftMaterialsMultiplier
+        val multiplierList = listOf(1, 5, 16, 32, 64, 512) + if (customMultiplier != 1) customMultiplier
+        for (m in multiplierList) {
             val isThisMultiply = m == multiplier
+            val isThisCustomMultiplier = m == customMultiplier
             val nameColor = if (isThisMultiply) "§a" else "§e"
             val priceColor = if (isThisMultiply) "§6" else "§7"
             val price = priceColor + calculateTotalPrice(neededMaterials, m).shortFormat()
@@ -146,6 +150,9 @@ object CraftMaterialCollector {
                         onLeftClick = {
                             multiplier = m
                             updateDisplay()
+
+                            if (!isThisCustomMultiplier && !KeyboardManager.isConfigModifyKeyDown()) return@clickable
+                            config::customCraftMaterialsMultiplier.jumpToEditor()
                         },
                     ),
                 )
