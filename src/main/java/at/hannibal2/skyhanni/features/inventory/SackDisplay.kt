@@ -237,9 +237,7 @@ object SackDisplay {
 
     private fun MutableList<Renderable>.drawRunesDisplay() {
         if (SackApi.runeItem.isEmpty()) return
-
-        val totalRunes = SackApi.runeItem.values.sumOf { it.lvl1 + it.lvl2 + it.lvl3 }
-        addString("§7Runes: §e${totalRunes.addSeparators()} §7total")
+        addString("§7Runes:")
         val table = buildMap {
             for ((name, rune) in sort(SackApi.runeItem.toList())) {
                 val (stack, lv1, lv2, lv3) = rune
