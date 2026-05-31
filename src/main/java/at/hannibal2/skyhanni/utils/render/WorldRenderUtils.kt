@@ -26,7 +26,6 @@ import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
 import net.minecraft.client.renderer.LightTexture
-import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -187,10 +186,7 @@ object WorldRenderUtils {
         val buf = vertexConsumers.getBuffer(layer)
         matrices.pushPose()
 
-        //? < 1.21.11 {
-        ShapeRenderer.addChainedFilledBoxVertices(
-            //?} else
-            //addChainedFilledBoxVertices(
+        addChainedFilledBoxVertices(
             matrices,
             buf,
             effectiveAABB.minX, effectiveAABB.minY, effectiveAABB.minZ,
@@ -955,7 +951,7 @@ object WorldRenderUtils {
     }
 
     fun getViewerPos() =
-        Minecraft.getInstance().gameRenderer.mainCamera?.let { exactLocation(it) } ?: LorenzVec()
+        exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)

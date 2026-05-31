@@ -6,6 +6,10 @@ import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.Entity
 
+/**
+ * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
+ */
 object MinecraftCompat {
 
     val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
@@ -22,6 +26,5 @@ object MinecraftCompat {
 
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
-    //~ if > 1.21.10 'isF3Visible' -> 'isOverlayVisible'
-    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isF3Visible
+    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 }

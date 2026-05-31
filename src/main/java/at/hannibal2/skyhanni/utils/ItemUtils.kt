@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
+import at.hannibal2.skyhanni.utils.ItemCategory.Companion.isDeprecatedAtErrorLevel
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -448,10 +449,10 @@ object ItemUtils {
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             } else {
-                if (itemCategory in ItemCategory.deprecated) {
+                if (itemCategory.isDeprecatedAtErrorLevel()) {
                     ErrorManager.logErrorStateWithData(
                         "Item category $itemCategory for item $name is outdated",
-                        "ItemCategory $itemCategory is deprecated",
+                        "ItemCategory $itemCategory is deprecated at error level",
                         "item category" to itemCategory,
                         "internal name" to getInternalName(),
                         "item name" to name,
@@ -797,7 +798,7 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())

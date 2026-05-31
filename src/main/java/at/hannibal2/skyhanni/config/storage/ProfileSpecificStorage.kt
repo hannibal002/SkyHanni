@@ -865,6 +865,17 @@ class ProfileSpecificStorage(
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
 
+    @Expose
+    var npcDayLimit: NpcDayLimitStorage = NpcDayLimitStorage()
+
+    class NpcDayLimitStorage {
+        @Expose
+        var gmtEpochDay: Long = 0L
+
+        @Expose
+        var soldCoins: Long = 0L
+    }
+
     // - nether
     @Expose
     var crimsonIsle: CrimsonIsleStorage = CrimsonIsleStorage()

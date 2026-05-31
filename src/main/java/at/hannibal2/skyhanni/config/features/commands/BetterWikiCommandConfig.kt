@@ -28,13 +28,13 @@ class BetterWikiCommandConfig {
 
     @Expose
     @ConfigOption(
-        name = "Use Unofficial Wiki",
-        desc = "Use the unofficial wiki instead of the official one in most wiki-related chat messages.",
+        name = "Use Independent Wiki",
+        desc = "Use the independent wiki instead of the official one in most wiki-related chat messages.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("fandom hypixel")
-    var useUnofficial: Boolean = false
+    var useIndependent: Boolean = true
 
     @Expose
     @ConfigOption(

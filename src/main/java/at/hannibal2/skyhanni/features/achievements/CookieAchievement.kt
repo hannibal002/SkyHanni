@@ -26,6 +26,7 @@ object CookieAchievement {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (AchievementManager.isCompleted(COOKIE_ACHIEVEMENT)) return
         if (!event.repeatSeconds(100)) return
         val time = BitsApi.cookieBuffTime ?: return
         if (time.timeUntil() > 180.days) {
