@@ -77,7 +77,6 @@ object GraphEditorInput {
             return
         }
         if (handleThroughBlocks()) return
-        if (handleAutoSelect()) return
         if (config.dijkstraKey.isKeyClicked()) {
             ChatUtils.debug("testDijkstra")
             GraphEditor.feedBackInTutorial("Calculated shortest route and cleared active node.")
@@ -138,15 +137,6 @@ object GraphEditorInput {
             if (state.seeThroughBlocks) "Graph is visible though walls." else "Graph is invisible behind walls.",
         )
 
-        return true
-    }
-
-    private fun handleAutoSelect(): Boolean {
-        if (!config.autoSelectNodeKey.isKeyClicked()) return false
-        state.autoSelectNode = !state.autoSelectNode
-        GraphEditor.feedBackInTutorial(
-            if (state.autoSelectNode) "Auto Select Node is now on." else "Auto Select Node is now off."
-        )
         return true
     }
 

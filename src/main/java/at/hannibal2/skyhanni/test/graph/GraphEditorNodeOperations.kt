@@ -36,7 +36,7 @@ object GraphEditorNodeOperations {
             addEdge(it, node)
         }
         GraphEditor.updateCache()
-        if (state.autoSelectNode) {
+        if (GraphEditor.config.autoSelectNode) {
             state.activeNode = node
         }
     }
