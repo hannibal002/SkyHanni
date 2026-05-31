@@ -11,8 +11,12 @@ import at.hannibal2.skyhanni.data.MiningEventsApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.PowderEvent
+import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -47,7 +51,7 @@ object PowderTracker {
      */
     private val compactedPattern by patternGroup.pattern(
         "compacted",
-        "§b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!",
+        "§b§lCOMPACT! §r§fYou found an §r§a(?<item>.+?)§r§f!",
     )
 
     private var lastChestPicked = SimpleTimeMark.farPast()
@@ -130,9 +134,11 @@ object PowderTracker {
             lastChestPicked = SimpleTimeMark.now()
         }
 
-        compactedPattern.matchMatcher(msg) {
-            tracker.modify {
-                it.totalHardStoneCompacted += 1
+        getCompactItem(msg)?.let { internalName ->
+            if (internalName == "ENCHANTED_HARD_STONE".toInternalName()) {
+                tracker.modify {
+                    it.totalHardStoneCompacted += 1
+                }
             }
         }
 
@@ -224,6 +230,13 @@ object PowderTracker {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
             tracker.firstUpdate()
+        }
+    }
+
+    fun getCompactItem(msg: String): NeuInternalName? {
+        return compactedPattern.matchMatcher(msg) {
+            val compactedItem = groupOrNull("item") ?: return null
+            return fromItemNameOrNull(compactedItem)
         }
     }
 

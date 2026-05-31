@@ -44,6 +44,14 @@ class PowderMiningConfig {
     @ConfigEditorBoolean
     var hideCrystalSerendipity: Boolean = false
 
+    @Expose
+    @ConfigOption(
+        name = "Hide Compact",
+        desc = "Hide compact messages when they found Enchanted Hard Stone."
+    )
+    @ConfigEditorBoolean
+    var hideCompact: Boolean = false
+
     enum class SimplePowderMiningRewardTypes(val displayName: String) {
         ASCENSION_ROPE("§9Ascension Rope"),
         WISHING_COMPASS("§aWishing Compass"),

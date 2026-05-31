@@ -15,8 +15,11 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowde
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningConfig.SimplePowderMiningRewardTypes.YOGGIE
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneConfig.GemstoneFilterEntry
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -276,6 +279,10 @@ object PowderMiningChatFilter {
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
         if (serendipityPattern.matches(message) && config.hideCrystalSerendipity) return "serendipity"
+        if (config.hideCompact) PowderTracker.getCompactItem(message)?.let {
+            if (it == "ENCHANTED_HARD_STONE".toInternalName())
+                return "compact_hard_stone"
+        }
         // Closing or opening a reward 'loop' with the spam of ▬
         if (chestWrapperPattern.matches(message)) {
             unclosedRewards = !unclosedRewards
