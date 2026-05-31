@@ -259,6 +259,14 @@ object PowderMiningChatFilter {
         "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
+    /**
+     * REGEX-TEST: SERENDIPTOUS! Your Crystal Serendipity attribute doubled your rewards!
+     */
+    private val serendipityPattern by patternGroup.pattern(
+        "powder.serendipity",
+        "SERENDIPTOUS! Your Crystal Serendipity attribute doubled your rewards!",
+    )
+
     @Suppress("CyclomaticComplexMethod")
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
@@ -267,6 +275,7 @@ object PowderMiningChatFilter {
         if (alreadyLootedPattern.matches(message)) return "powder_mining_dupe"
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
+        if (serendipityPattern.matches(message) && config.hideCrystalSerendipity) return "serendipity"
         // Closing or opening a reward 'loop' with the spam of ▬
         if (chestWrapperPattern.matches(message)) {
             unclosedRewards = !unclosedRewards

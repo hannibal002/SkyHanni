@@ -36,6 +36,14 @@ class PowderMiningConfig {
     @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
     var essenceThreshold: Int = 5
 
+    @Expose
+    @ConfigOption(
+        name = "Crystal Serendipity",
+        desc = "Hide Crystal Serendipity messages"
+    )
+    @ConfigEditorBoolean
+    var hideCrystalSerendipity: Boolean = false
+
     enum class SimplePowderMiningRewardTypes(val displayName: String) {
         ASCENSION_ROPE("§9Ascension Rope"),
         WISHING_COMPASS("§aWishing Compass"),
