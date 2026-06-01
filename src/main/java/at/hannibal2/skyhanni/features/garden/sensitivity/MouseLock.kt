@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.sensitivity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -80,5 +81,11 @@ object MouseLock {
                 if (isActive) unlockMouse() else lockMouse()
             }
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(135, "misc.lockMouseLookChatMessage", "garden.mouseLock.chatMessage")
+        event.move(135, "misc.lockedMouseDisplay", "garden.mouseLock.display")
     }
 }
