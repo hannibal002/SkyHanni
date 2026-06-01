@@ -142,7 +142,7 @@ object BazaarApi {
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
         if (config.copyInfoToClipboard) amount?.let {
-            CoroutineSettings("searchForBazaarItem copyToClipboard", 0.seconds).launchCoroutine {
+            CoroutineSettings("searchForBazaarItem copyToClipboard").launchCoroutine {
                 val copied = OSUtils.copyToClipboardAsync(it.toString()) ?: false
                 if (!copied) ChatUtils.chat("§cFailed to copy amount to clipboard")
             }
