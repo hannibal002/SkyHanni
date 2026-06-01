@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ItemBuyApi.buy
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -37,6 +38,13 @@ object CraftMaterialCollector {
     private var display = listOf<Renderable>()
     private var neededMaterials = listOf<PrimitiveItemStack>()
     private var multiplier = 1
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.customCraftMaterialsMultiplier.whenChanged { _, _ ->
+            updateDisplay()
+        }
+    }
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -133,26 +141,29 @@ object CraftMaterialCollector {
     }
 
     private fun MutableList<Renderable>.addMultipliers() {
-        val customMultiplier = config.customCraftMaterialsMultiplier
-        val multiplierList = listOf(1, 5, 16, 32, 64, 512) + if (customMultiplier != 1) customMultiplier
-        for (m in multiplierList) {
+        val customMultiplier = config.customCraftMaterialsMultiplier.get().toInt()
+        val multiplierList = listOf(1, 5, 16, 32, 64, 512) + listOfNotNull(customMultiplier.takeIf { it != 1 })
+        for ((i, m) in multiplierList.withIndex()) {
             val isThisMultiply = m == multiplier
-            val isThisCustomMultiplier = m == customMultiplier
+            val isThisCustomMultiplier = (m == customMultiplier) && i == multiplierList.size - 1
             val nameColor = if (isThisMultiply) "§a" else "§e"
             val priceColor = if (isThisMultiply) "§6" else "§7"
             val price = priceColor + calculateTotalPrice(neededMaterials, m).shortFormat()
-            val text = "${nameColor}Multiply x$m $price"
+            val prefix = if (isThisCustomMultiplier) "Custom: " else ""
+            val text = "$prefix${nameColor}Multiply x$m $price"
             if (!isThisMultiply) {
                 add(
                     Renderable.clickable(
                         text,
-                        tips = listOf("§eClick here to multiply the items needed times $m!"),
+                        tips = listOf("§eClick here to multiply the items needed times $m!") +
+                            listOfNotNull(if (isThisCustomMultiplier) "§eShift-click to change this multiplier!" else null),
                         onLeftClick = {
-                            multiplier = m
-                            updateDisplay()
-
-                            if (!isThisCustomMultiplier && !KeyboardManager.isConfigModifyKeyDown()) return@clickable
-                            config::customCraftMaterialsMultiplier.jumpToEditor()
+                            if (isThisCustomMultiplier && KeyboardManager.isConfigModifyKeyDown()) {
+                                config::customCraftMaterialsMultiplier.jumpToEditor()
+                            } else {
+                                multiplier = m
+                                updateDisplay()
+                            }
                         },
                     ),
                 )
