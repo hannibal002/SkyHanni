@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -120,7 +120,6 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
 
     var bobber: FishingHook? = null
@@ -191,8 +190,7 @@ object FishingApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (event.slot != BAIT_SLOT) return
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
         extractAndPostBaitUpdate(event.itemStack)
     }
 
