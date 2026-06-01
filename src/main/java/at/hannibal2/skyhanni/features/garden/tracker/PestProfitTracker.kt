@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -111,6 +112,11 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 
+    private val noMessageDrops = setOf(
+        "PESTERMINATOR;1",
+        "ULTIMATE_SUNSET;1",
+    ).toInternalNames()
+
     data class BucketData(
         @Expose private var totalPestsKills: Long = 0L,
         @Expose var pestKills: MutableMap<PestType, Long> = EnumMap(PestType::class.java),
@@ -166,7 +172,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
         if (!drop.canDropFromPests) return
-        if (!PestApi.hasVacuumInHand() && !PestApi.hasLassoInHand()) return
+        if (!PestApi.hasVacuumOrLassoInHand()) return
 
         val internalName = NeuInternalName.fromItemNameOrInternalName(drop.dropName)
         addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
@@ -176,6 +182,15 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
+            return
+        }
+
+        if (event.source == ItemAddManager.Source.ITEM_ADD &&
+            event.internalName in noMessageDrops &&
+            PestApi.hasVacuumOrLassoInHand()
+        ) {
+            val pest = PestType.getByItemInternalNameOrNull(event.internalName) ?: return
+            addItem(pest, event.internalName, event.amount, false)
         }
     }
 
@@ -231,7 +246,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
-            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
             val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
 
             addItem(pest, internalName, amount, command = false)
@@ -395,7 +410,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
                 val pest = pestTypeMap.getOrPut(item) {
-                    PestType.getByInternalNameItemOrNull(item) ?: PestType.UNKNOWN
+                    PestType.getByItemInternalNameOrNull(item) ?: PestType.UNKNOWN
                 }
 
                 // If the map for the pest already contains this item, combine the amounts
