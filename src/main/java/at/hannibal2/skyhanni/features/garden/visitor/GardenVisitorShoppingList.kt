@@ -322,7 +322,7 @@ object GardenVisitorShoppingList {
         if (config.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
         if (GardenApi.inGarden()) {
-            if (GardenApi.onBarnPlot) return true
+            if (GardenApi.onMainBarn) return true
             if (!config.onlyWhenClose) return true
         }
         return false

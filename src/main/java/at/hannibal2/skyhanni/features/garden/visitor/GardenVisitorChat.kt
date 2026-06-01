@@ -115,7 +115,7 @@ object GardenVisitorChat {
      * Used as fallback when tab list hasn't updated yet.
      */
     private fun doesVisitorEntityExist(name: String) =
-        EntityUtils.getEntitiesInBoundingBox<RemotePlayer>(GardenApi.barnArea).any {
+        EntityUtils.getEntitiesInBoundingBox<RemotePlayer>(GardenApi.mainBarnArea).any {
             it.name.formattedTextCompatLessResets().trim().equals(name, true)
         }
 
