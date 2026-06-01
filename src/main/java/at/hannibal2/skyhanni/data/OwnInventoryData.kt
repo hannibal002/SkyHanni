@@ -35,7 +35,7 @@ object OwnInventoryData {
 
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
-    private var lastWardrobeClose = SimpleTimeMark.farPast()
+    private val armorSlots = 36..39
 
     /**
      * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
@@ -56,8 +56,10 @@ object OwnInventoryData {
             if (windowId == 0) {
                 val slot = packet.slot
                 val item = packet.item ?: return
-                DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item, slot).post()
+                if (slot !in armorSlots) {
+                    DelayedRun.runNextTick {
+                        OwnInventoryItemUpdateEvent(item, slot).post()
+                    }
                 }
             }
         }
@@ -81,32 +83,20 @@ object OwnInventoryData {
         if (!dirty) return
         dirty = false
 
-
-        val armorInternalNames = InventoryUtils.getArmorInternalNames()
-
-        if (lastWardrobeClose.passedSince() < 2.seconds) {
-            lastWardrobeClose = SimpleTimeMark.farPast()
-            for (name in armorInternalNames) {
-                ignoreItem(1.seconds, name)
-            }
-        }
-
-        val map = getCurrentItems(armorInternalNames)
+        val map = getCurrentItems()
         for ((internalName, amount) in map) {
             calculateDifference(internalName, amount)
         }
         itemAmounts = map
     }
 
-    private fun getCurrentItems(
-        armorInternalNames: Set<NeuInternalName> = InventoryUtils.getArmorInternalNames(),
-    ): MutableMap<NeuInternalName, Int> {
+    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
         val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
             map.addOrPut(internalName, itemStack.count)
         }
-        for (name in armorInternalNames) {
+        for (name in InventoryUtils.getArmorInternalNames()) {
             map.addOrPut(name, 1)
         }
         return map
@@ -128,9 +118,6 @@ object OwnInventoryData {
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
-        if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
-            lastWardrobeClose = SimpleTimeMark.now()
-        }
         val item = MinecraftCompat.localPlayerOrNull?.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)
