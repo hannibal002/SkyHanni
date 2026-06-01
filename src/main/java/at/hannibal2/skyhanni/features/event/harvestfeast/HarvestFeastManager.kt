@@ -160,7 +160,7 @@ object HarvestFeastManager {
         val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
         val next = readCropTimestamps(items)
 
-        val sendData = EliteFeastJson(
+        val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
             next = next.map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),

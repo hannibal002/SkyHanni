@@ -274,7 +274,7 @@ object TextHelper {
 
     private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit<T>(
         { style, string ->
-            if (string.isNullOrEmpty()) Optional.empty()
+            if (string.isEmpty()) Optional.empty()
             else visitor(style, string)
         },
         Style.EMPTY,

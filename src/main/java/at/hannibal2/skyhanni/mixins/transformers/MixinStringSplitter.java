@@ -11,26 +11,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 import java.util.List;
-//? if > 1.21.10
-//import java.util.function.BiConsumer;
 
 @Mixin(StringSplitter.class)
-public class MixinTextHandler {
-
-    //? if < 1.21.11 {
-    @WrapMethod(
-        method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;Lnet/minecraft/network/chat/FormattedText;)Ljava/util/List;"
-    )
-    private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, FormattedText wrappedLinePrefix, Operation<List<FormattedText>> original) {
-        return VisualWordsHook.INSTANCE.withoutWordChanges(() -> original.call(text, maxWidth, style, wrappedLinePrefix));
-    }
-    //? }
+public abstract class MixinStringSplitter {
 
     @WrapMethod(
         method = "splitLines(Lnet/minecraft/network/chat/FormattedText;ILnet/minecraft/network/chat/Style;)Ljava/util/List;"
     )
     private List<FormattedText> dontWrapOtherLines(FormattedText text, int maxWidth, Style style, Operation<List<FormattedText>> original) {
-        return VisualWordsHook.INSTANCE.withoutWordChanges(() -> original.call(text, maxWidth, style));
+        return VisualWordsHook.withoutWordChanges(() -> original.call(text, maxWidth, style));
     }
 
     @ModifyVariable(
@@ -40,7 +29,7 @@ public class MixinTextHandler {
         argsOnly = true
     )
     private FormattedText modifyStringVisitable(FormattedText visitable) {
-        return VisualWordsHook.INSTANCE.modifyFormattedText(visitable);
+        return VisualWordsHook.modifyFormattedText(visitable);
     }
 
 }
