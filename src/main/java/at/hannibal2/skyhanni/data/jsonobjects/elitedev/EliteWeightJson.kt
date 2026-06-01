@@ -38,15 +38,13 @@ data class WeightProfile(
     @Expose val uncountedCrops: Map<String, Int>,
     @Expose val pests: Map<String, Int>,
     @Expose val lastUpdated: SimpleTimeMark,
-    /** Foraging log collection counts keyed by [ForagingLogType.eliteLbName] (e.g. "oak", "spruce").
-     *  Populated by the Elite API when ?collections=true is passed to the weight endpoint. */
-    @Expose val foraging: Map<String, Long> = emptyMap(),
 )
 
 data class EliteLeaderboard(
     @Expose val rank: Int,
     @Expose val amount: Double,
     @Expose val minAmount: Double,
+    @Expose val initialAmount: Double,
     @Expose val upcomingRank: Int,
     @Expose val upcomingPlayers: List<EliteLeaderboardPlayer>,
     @Expose val previous: List<EliteLeaderboardPlayer>?,

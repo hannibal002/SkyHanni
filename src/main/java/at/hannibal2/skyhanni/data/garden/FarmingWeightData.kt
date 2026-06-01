@@ -171,22 +171,7 @@ object FarmingWeightData {
                 CropType.getByNameOrNull(name)?.let { ignoredCollection[it] = value.toLong() }
             }
 
-            // Seed foraging log collections from the weight API response when available.
-            // The Elite API may include foraging collection counts in the WeightProfile.foraging map
-            // (keyed by ForagingLogType.eliteLbName, e.g. "oak", "spruce").
-            // This is the only way to get the correct all-time total for unranked players,
-            // since the leaderboard endpoint returns amount=0 for unranked.
-            if (apiData.foraging.isNotEmpty()) {
-                with(ForagingCollectionApi) {
-                    for (logType in ForagingLogType.entries) {
-                        val apiAmount = apiData.foraging[logType.eliteLbName] ?: continue
-                        val current = logType.getCollection()
-                        if (apiAmount > current) {
-                            logType.setCollectionCounter(apiAmount)
-                        }
-                    }
-                }
-            }
+
             bonusWeight = apiData.bonusWeight.sumAllValues()
 
             weightGain = 0.0

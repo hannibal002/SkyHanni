@@ -85,17 +85,14 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
     open fun currentLeaderboardType(): EliteLeaderboardType? {
         val enum = currentEnum ?: run {
             val now = SimpleTimeMark.now()
-            // Always check for a type change so a newly broken log switches immediately
-            val newDefault = getDefaultEnum()
-            if (newDefault != lastAutoSelectedEnum) {
-                // Type changed — switch immediately, reset debounce timer
-                lastEnumSwitchTime = now
-                lastAutoSelectedEnum = newDefault
-                newDefault
-            } else if (lastEnumSwitchTime.passedSince() < 5.seconds) {
-                // Same type, still within debounce — return cached to avoid unnecessary API churn
+            if (lastEnumSwitchTime.passedSince() < 5.seconds) {
                 lastAutoSelectedEnum
             } else {
+                val newDefault = getDefaultEnum()
+                if (newDefault != lastAutoSelectedEnum) {
+                    lastEnumSwitchTime = now
+                    lastAutoSelectedEnum = newDefault
+                }
                 newDefault
             }
         }
@@ -205,28 +202,19 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
             )
         }
         return if (isUnranked(leaderboardType)) {
-            val minAmount = leaderboardMinAmount(leaderboardType)
+            val minAmount = leaderboardMinAmount(leaderboardType) ?: 0.0
             // the amount eligible to enter every other leaderboard is the all-time amount for that lb, except for the monthly weight lb
             // which doesn't include bonus weight because kaeso personally hates me and wants to make this more annoying than it should be
             val isMonthly = currentMode == EliteLeaderboardMode.MONTHLY
             val isWeightMonthly = currentMode == EliteLeaderboardMode.MONTHLY && leaderboardType is EliteLeaderboardType.Weight
 
-            // If minAmount hasn't been returned from the API yet (null) or the API returned 0 for this
-            // leaderboard type (can happen for newer/unsupported log types), there is nothing useful to
-            // show — fall through to "Loading player…" instead of displaying a confusing "0 until ranked!".
-            if (minAmount == null || minAmount <= 0.0) return Renderable.text("§bLoading player...")
-
-            // For monthly leaderboards, compare the player's monthly amount against the monthly minimum.
-            // Using the ALL_TIME amount here causes a negative result for prolific players whose lifetime
-            // collection already exceeds the monthly minimum threshold even though they haven't farmed
-            // enough *this month* to be ranked — e.g. 500k lifetime Dark Oak vs a 100k monthly minimum.
-            val currentAmount = when {
-                isWeightMonthly -> getWeight(EliteLeaderboardMode.MONTHLY, cropWeightOnly = true)
-                isMonthly -> getAmount(leaderboardType) // monthly mode → compare monthly vs monthly
-                else -> getAmount(leaderboardType, EliteLeaderboardMode.ALL_TIME)
+            val currentAmount = if (isWeightMonthly) {
+                getWeight(EliteLeaderboardMode.MONTHLY, cropWeightOnly = true)
+            } else {
+                getAmount(leaderboardType, EliteLeaderboardMode.ALL_TIME)
             }
 
-            val weightUntil = (minAmount - (currentAmount ?: 0.0)).coerceAtLeast(0.0)
+            val weightUntil = minAmount - (currentAmount ?: 0.0)
             val overtakeEta = overtakeEta(weightUntil)
             val untilRankedTextColor = if (overtakeEta == "") "§7" else "§e"
             val untilRankedText = if (isMonthly) "until eligible!" else "until ranked!"
