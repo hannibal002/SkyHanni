@@ -178,10 +178,10 @@ object HolographicEntities {
 
         val client = Minecraft.getInstance()
         @Suppress("UNCHECKED_CAST")
-        val renderer = client.entityRenderDispatcher?.getRenderer(entity) as? EntityRenderer<T, EntityRenderState> ?: return
+        val renderer = client.entityRenderDispatcher.getRenderer(entity) as? EntityRenderer<T, EntityRenderState> ?: return
         val gameRenderer = client.gameRenderer ?: return
         val entityRenderState = holographicEntity.cachedRenderState
-            ?: renderer.createRenderState()?.also { holographicEntity.cachedRenderState = it }
+            ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
             ?: return
         val cameraRenderState = gameRenderer.levelRenderState.cameraRenderState ?: return
         val cameraPos = cameraRenderState.pos

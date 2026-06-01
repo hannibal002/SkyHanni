@@ -14,8 +14,8 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 fun LocalPlayer.getItemOnCursor(): ItemStack? {
-    val stack = this.containerMenu?.carried
-    if (stack?.isEmpty == true) return null
+    val stack = this.containerMenu.carried
+    if (stack.isEmpty) return null
     return stack
 }
 

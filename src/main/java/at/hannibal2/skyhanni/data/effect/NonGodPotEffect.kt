@@ -21,6 +21,7 @@ enum class NonGodPotEffect(
     BLAZE("Gabagoey", true, displayName = "§fGabagoey"),
     GLOWING_MUSH("Glowing Mush Mixin", true, displayName = "§2Glowing Mush Mixin"),
     HOT_CHOCOLATE("Hot Chocolate Mixin I", true, displayName = "§6Hot Chocolate Mixin I"),
+    MASON_JAR("Celestial Mason Jar I", true, displayName = "§dCelestial Mason Jar Mixin"),
 
     DEEP_TERROR("Deepterror", true, displayName = "§4Deepterror"),
 
@@ -30,8 +31,8 @@ enum class NonGodPotEffect(
 
     HARVEST_HARBINGER("Harvest Harbinger V", displayName = "§6Harvest Harbinger V"),
 
-    PEST_REPELLENT("Pest Repellent I", displayName = "§6Pest Repellent I§r"),
     PEST_REPELLENT_MAX("Pest Repellent II", displayName = "§6Pest Repellent II"),
+    PEST_REPELLENT("Pest Repellent I", displayName = "§6Pest Repellent I§r"),
 
     CURSE_OF_GREED("Curse of Greed I", displayName = "§4Curse of Greed I"),
 
