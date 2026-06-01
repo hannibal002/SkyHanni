@@ -13,7 +13,6 @@ enum class MinecraftVersion(
     val versionNameOverride: String? = null,
     val moulconfigMinecraftVersionOverride: String? = null,
 ) {
-    MC12110("1.21.10", 21),
     MC12111("1.21.11", 21),
     ;
 
