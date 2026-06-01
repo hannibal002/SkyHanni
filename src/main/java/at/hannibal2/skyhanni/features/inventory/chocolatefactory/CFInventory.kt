@@ -67,7 +67,7 @@ object CFInventory {
                 slot.highlight(LorenzColor.RED)
             }
             if (slotIndex == CFApi.milestoneIndex) {
-                unclaimedRewardsPattern.firstMatcher(slot.item?.getLore().orEmpty()) {
+                unclaimedRewardsPattern.firstMatcher(slot.item.getLore()) {
                     slot.highlight(LorenzColor.RED)
                 }
             }
