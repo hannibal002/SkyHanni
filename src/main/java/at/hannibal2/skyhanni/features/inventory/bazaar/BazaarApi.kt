@@ -49,7 +49,6 @@ import kotlin.time.Duration.Companion.seconds
 object BazaarApi {
 
     private val storage get() = ProfileStorageData.playerSpecific?.bazaar
-    private val config get() = SkyHanniMod.feature.misc
 
     private var loadedNpcPriceData = false
 
@@ -141,7 +140,8 @@ object BazaarApi {
         if (SkyBlockUtils.noTradeMode) return
         if (DungeonApi.inDungeon() || KuudraApi.inKuudra) return
         HypixelCommands.bazaar(displayName.removeColor())
-        if (config.copyInfoToClipboard) amount?.let { ClipboardUtils.copyToClipboardAsyncWithResponse(it.toString(), info = "Amount") }
+        if (ClipboardUtils.shouldCopyAutomatically())
+            amount?.let { ClipboardUtils.copyToClipboardAsyncWithResponse(it.toString(), info = "Amount") }
         currentSearchedItem = displayName.removeColor()
     }
 
