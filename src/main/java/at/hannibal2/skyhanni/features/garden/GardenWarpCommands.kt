@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
-import at.hannibal2.skyhanni.features.garden.sensitivity.MouseLock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -45,14 +44,12 @@ object GardenWarpCommands {
         if (message == "/barn") {
             event.cancel()
             HypixelCommands.teleportToPlot("barn")
-            MouseLock.unlockMouse()
         }
 
         tpPlotPattern.matchMatcher(event.message) {
             event.cancel()
             val plotName = group("plot")
             HypixelCommands.teleportToPlot(plotName)
-            MouseLock.unlockMouse()
         }
     }
 
@@ -76,7 +73,6 @@ object GardenWarpCommands {
                 if (lastWarpTime.passedSince() < 2.seconds) return
                 lastWarpTime = SimpleTimeMark.now()
 
-                MouseLock.unlockMouse()
                 HypixelCommands.teleportToPlot("barn")
             }
 
