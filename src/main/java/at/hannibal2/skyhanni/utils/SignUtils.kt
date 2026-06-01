@@ -59,8 +59,7 @@ object SignUtils {
         val copyClicked = KeyboardManager.isCopyingKeysDown()
         if (!copyLastClicked && copyClicked && gui is AbstractSignEditScreen) copyConfig.launch {
             val newLine = gui.signText[gui.line].unformattedTextCompat()
-            val copied = OSUtils.copyToClipboardAsync(newLine) ?: false
-            if (!copied) ChatUtils.chat("§cFailed to copy sign text to clipboard")
+            ClipboardUtils.copyToClipboardAsyncWithResponse(newLine, info = "Sign text")
         }
         copyLastClicked = copyClicked
     }

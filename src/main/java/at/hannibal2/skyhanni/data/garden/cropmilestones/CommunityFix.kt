@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -72,12 +73,13 @@ object CommunityFix {
         }
 
         if (data.isNotEmpty()) {
-            ChatUtils.chat(
-                "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
-                    "Correct data got put into clipboard. " +
-                    "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e.",
+            ClipboardUtils.copyToClipboardAsyncWithResponse(
+                "```${data.joinToString("\n")}```",
+                info =
+                    "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
+                        "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e." +
+                        "Correct data",
             )
-            OSUtils.copyToClipboard("```${data.joinToString("\n")}```")
         } else {
             if (showWhenAllCorrect) {
                 ChatUtils.chat("No wrong crop milestone steps found!")
@@ -144,7 +146,7 @@ object CommunityFix {
         totalFixedValues += fixed
         ChatUtils.chat("Fixed: $fixed/$alreadyCorrect, total fixes: $totalFixedValues")
         val s = ConfigManager.gson.toJsonTree(cropMilestoneRepoData).toString()
-        OSUtils.copyToClipboard("\"crop_milestones\":$s,")
+        ClipboardUtils.copyToClipboardAsyncWithResponse("\"crop_milestones\":$s,", info = "Crop Milestones")
     }
 
     private fun tryFix(crop: CropType, tier: Int, amount: Int): Boolean {

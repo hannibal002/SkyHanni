@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.Calculator
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -154,6 +154,7 @@ object GetFromSackApi {
                 ChatUtils.debug("Couldn't find an item with this name or identifier! ${event.message}")
                 return
             }
+
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
         }
@@ -169,7 +170,10 @@ object GetFromSackApi {
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax$amount §9$item §efrom bazaar",
         onClick = {
-            OSUtils.copyToClipboard(amount.toString())
+            if (ClipboardUtils.shouldCopyAutomatically()) ClipboardUtils.copyToClipboardAsyncWithResponse(
+                amount.toString(),
+                info = "amount",
+            )
             HypixelCommands.bazaar(item.removeColor())
         },
         "§eClick to find on the bazaar!",

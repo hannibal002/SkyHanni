@@ -343,7 +343,9 @@ object CropMilestonesApi {
 
         clickableChat(
             messages.joinToString("\n"),
-            { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
+            {
+                ClipboardUtils.copyToClipboardAsyncWithResponse(levelUpLine.removeColor(), info = "Message")
+            },
             "Click to copy!",
             prefix = false
         )

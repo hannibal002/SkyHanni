@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,9 +12,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
+import kotlin.time.Duration.Companion.seconds
 
 object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
@@ -47,8 +50,7 @@ object CopyChat {
             else -> chatLine.fullComponent.string.removeColor() to "message"
         }
 
-        ClipboardUtils.copyToClipboard(clipboard)
-        ChatUtils.chat("Copied $infoMessage to clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(clipboard, info = infoMessage)
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {

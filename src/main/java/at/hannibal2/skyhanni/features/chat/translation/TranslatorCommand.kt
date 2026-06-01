@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -96,7 +97,7 @@ object TranslatorCommand {
                 "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
                 onClick = {
                     CoroutineSettings("shtranslateadvanced clickableChat", 10.seconds).launchCoroutine {
-                        OSUtils.copyToClipboardAsync(translatedMessage)
+                        ClipboardUtils.copyToClipboardAsync(translatedMessage)
                     }
                 },
                 "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)",

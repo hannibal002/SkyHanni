@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -77,12 +78,11 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                 if (isHovered && KeyboardManager.isShiftKeyDown() && msg.hoverExtraInfo.isNotEmpty()) queuedTooltip = msg.hoverExtraInfo
                 if (isHovered && (isMouseButtonDown && !wasMouseButtonDown)) {
                     if (KeyboardManager.isShiftKeyDown()) {
-                        OSUtils.copyToClipboard(msg.message.convertToJsonString())
+                        ClipboardUtils.copyToClipboardAsyncWithResponse(msg.message.convertToJsonString(), info = "Structured chat line")
                         ChatUtils.chat("Copied structured chat line to clipboard", false)
                     } else {
                         val message = msg.message.formattedTextCompat().stripHypixelMessage()
-                        OSUtils.copyToClipboard(message)
-                        ChatUtils.chat("Copied chat line to clipboard")
+                        ClipboardUtils.copyToClipboardAsyncWithResponse(message, info = "Chat line")
                     }
                 }
                 offsetMouseY -= size * 10

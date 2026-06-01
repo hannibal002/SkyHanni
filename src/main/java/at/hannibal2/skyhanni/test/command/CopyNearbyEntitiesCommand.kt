@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
@@ -379,8 +380,7 @@ object CopyNearbyEntitiesCommand {
 
         if (entityCounter != 0) {
             val string = resultList.joinToString("\n")
-            OSUtils.copyToClipboard(string)
-            ChatUtils.chat("$entityCounter entities copied into the clipboard!")
+            ClipboardUtils.copyToClipboardAsyncWithResponse(string, info = "$entityCounter entities")
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }

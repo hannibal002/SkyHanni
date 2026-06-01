@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -187,7 +188,7 @@ object WikiNpcComparator {
                 "see console for more infos or click here to copy to clipboard.",
             onClick = {
                 CoroutineSettings("put wiki npc comparison data to clipboard").launchCoroutine {
-                    OSUtils.copyToClipboardAsync(result.joinToString("\n"))
+                    ClipboardUtils.copyToClipboardAsync(result.joinToString("\n"))
                 }
             },
         )

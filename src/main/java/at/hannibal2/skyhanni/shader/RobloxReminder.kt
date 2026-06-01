@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.shader
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.NotificationManager
@@ -9,12 +10,14 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
@@ -112,7 +115,9 @@ object RobloxReminder {
             onClick = {
                 val lru = "QcXgW9w4wQd=v?hctaw/moc.ebutuoy.www//:sptth".reversed()
                 ChatUtils.chat("Error copied into the clipboard, please report it on the SkyHanni Discord!")
-                OSUtils.copyToClipboard("I got rick rolled. For proof, click on $lru")
+                CoroutineSettings("copyToClipboard rickroll").launchCoroutine {
+                    ClipboardUtils.copyToClipboardAsync("I got rick rolled. For proof, click on $lru")
+                }
                 OSUtils.openBrowser(lru)
             },
             hover = "§eClick to copy!",

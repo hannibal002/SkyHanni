@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -45,8 +46,7 @@ object TestCopyRngMeterValues {
         }
         if (map.isEmpty()) return
 
-        OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
-        ChatUtils.debug("${map.size} items saved to clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(ConfigManager.gson.toJson(map), info = "${map.size} items")
     }
 
     @HandleEvent

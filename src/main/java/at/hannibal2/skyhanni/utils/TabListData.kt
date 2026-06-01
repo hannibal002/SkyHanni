@@ -61,11 +61,8 @@ object TabListData {
         }
 
         val outputString = "Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
-        val copied = OSUtils.copyToClipboardAsync(outputString) ?: false
-        if (!copied) return ChatUtils.chat("Failed to copy tab list data to clipboard!")
-
         val copyFormat = if (asComponents) "components" else "formatted text"
-        ChatUtils.chat("Tab list $copyFormat copied into the clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(outputString, info = "Tab list data ($copyFormat)")
     }
 
     private fun readTabList(): List<Component>? {

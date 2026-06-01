@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.async
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.SkyHanniConfig
@@ -11,10 +13,12 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getPrivateFieldValue
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.Shimmy
 import com.google.gson.JsonElement
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -27,6 +31,7 @@ import java.time.temporal.TemporalAccessor
 import java.time.temporal.TemporalAmount
 import java.util.Date
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 // TODO in the future change something here
 //  ^ Convert the command functions to suspend funs, use coroutines
@@ -182,7 +187,10 @@ object SkyHanniConfigSearchResetCommand {
             builder.append("\n")
         }
         builder.append("```")
-        OSUtils.copyToClipboard(builder.toString())
+
+        CoroutineSettings("copyToClipboard config search", 0.seconds).launchCoroutine {
+            ClipboardUtils.copyToClipboardAsync(builder.toString())
+        }
         return "§eCopied search result ($size) to clipboard."
     }
 

@@ -1,25 +1,35 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.async
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import com.mojang.blaze3d.platform.ClipboardManager
-import kotlinx.coroutines.Deferred
 import net.minecraft.client.Minecraft
+import kotlin.time.Duration.Companion.seconds
 
 object ClipboardUtils {
+
+    private val config get() = SkyHanniMod.feature.misc
 
     private val clipboardCoroutineSettings = CoroutineSettings(
         "clipboardAccess",
         withIOContext = true,
     )
 
-    @Deprecated("Use copyToClipboardAsync instead", ReplaceWith("copyToClipboardAsync(text).await()"))
-    fun copyToClipboard(text: String, step: Int = 0) = copyToClipboardInternal(text, step)
+    fun copyToClipboardAsyncWithResponse(text: String, step: Int = 0, info: String? = null) {
+        val name = info ?: "Information"
 
-    fun copyToClipboardAsync(text: String, step: Int = 0): Deferred<Boolean?> = clipboardCoroutineSettings.async {
-        copyToClipboardInternal(text, step)
+        CoroutineSettings("copyToClipboard $name").launchCoroutine {
+            val copied = copyToClipboardAsync(text, step) ?: false
+            ChatUtils.chat(if (copied) "$name was copied to clipboard." else "§cFailed to copy $name to clipboard.")
+        }
     }
+
+    suspend fun copyToClipboardAsync(text: String, step: Int = 0): Boolean? = clipboardCoroutineSettings.async {
+        copyToClipboardInternal(text, step)
+    }.await()
 
     private fun copyToClipboardInternal(text: String, step: Int = 0): Boolean = runCatching {
         ClipboardManager().setClipboard(Minecraft.getInstance().window, text)
@@ -45,4 +55,6 @@ object ClipboardUtils {
             null
         } else readFromClipboard(step + 1)
     }
+
+    fun shouldCopyAutomatically() = config.copyInfoToClipboard
 }

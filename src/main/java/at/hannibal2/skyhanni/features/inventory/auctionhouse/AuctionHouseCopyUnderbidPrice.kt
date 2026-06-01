@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -64,7 +65,7 @@ object AuctionHouseCopyUnderbidPrice {
 
         val price = internalName.getPrice().toLong()
         if (price <= 0) {
-            OSUtils.copyToClipboard("")
+            ClipboardUtils.copyToClipboardAsyncWithResponse("", info = "Underbid price")
             return
         }
         copyPrice(price * item.count)
@@ -83,7 +84,7 @@ object AuctionHouseCopyUnderbidPrice {
 
     private fun copyPrice(price: Long) {
         val underbidPrice = price - 1
-        OSUtils.copyToClipboard("$underbidPrice")
+        ClipboardUtils.copyToClipboardAsyncWithResponse("$underbidPrice", info = "${underbidPrice.addSeparators()} (Copy underbid Price)")
         ChatUtils.chat(
             "Copied ${underbidPrice.addSeparators()} to clipboard. (Copy Underbid Price)",
         )

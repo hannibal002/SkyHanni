@@ -167,7 +167,7 @@ object HarvestFeastManager {
         )
 
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
-        
+
         if (config.sharePolicy == SharePolicy.DISABLED) return
 
         if (config.sharePolicy == SharePolicy.ASK) {
@@ -264,7 +264,8 @@ object HarvestFeastManager {
     private fun assumeGrandFeast(): Boolean {
         val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
         val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val timeBasedGrandFeast = currentFeastData?.let { it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false
+        val timeBasedGrandFeast =
+            currentFeastData?.let { it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false
         return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
     }
 
@@ -291,8 +292,12 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Harvest feast data is not yet available.\n" +
-                "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat {
+                append(
+                    "Harvest feast data is not yet available.\n" +
+                        "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!",
+                ).withColor(0xFFFF5555.toInt())
+            }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
@@ -353,7 +358,7 @@ object HarvestFeastManager {
             add(
                 Renderable.item(cropStack) {
                     scale = 1.0
-                }
+                },
             )
         }
 
@@ -376,10 +381,10 @@ object HarvestFeastManager {
             description = "Copies the current harvest feast data"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-                CoroutineSettings("copy feast data to clipboard").withIOContext().launchCoroutine {
-                    ClipboardUtils.copyToClipboardAsync(currentFeastData?.getBody().toString()).await() ?: return@launchCoroutine
-                    ChatUtils.chat("Copied harvest feast debug data to clipboard.")
-                }
+                ClipboardUtils.copyToClipboardAsyncWithResponse(
+                    currentFeastData?.getBody().toString(),
+                    info = "Harvest feast debug data",
+                )
             }
         }
         event.registerBrigadier("shresetfeastdata") {

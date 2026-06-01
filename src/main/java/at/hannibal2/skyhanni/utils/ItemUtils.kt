@@ -856,7 +856,7 @@ object ItemUtils {
         val priceFormat = "$priceColor${price.shortFormat()}"
         val componentText = " §8- §r$name $priceFormat".asComponent()
         componentText.onClick {
-            ClipboardUtils.copyToClipboard(internalName.asString())
+            ClipboardUtils.copyToClipboardAsyncWithResponse(internalName.asString(), info = "InternalName")
         }
         componentText.onHover(
             listOf(

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
@@ -18,8 +19,7 @@ object CopyActionBarCommand {
         var actionBar = ActionBarData.getActionBar()
         if (noFormattingCodes) actionBar = actionBar.removeColor()
 
-        OSUtils.copyToClipboard(actionBar)
-        ChatUtils.chat("Action bar name copied to clipboard $status formatting codes!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(actionBar, info = "Action bar name $status formatting codes")
     }
 
     @HandleEvent

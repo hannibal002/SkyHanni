@@ -142,7 +142,7 @@ object ErrorManager {
         val name = if (fullErrorMessage) "Full error" else "Error"
         ChatUtils.chat(
             errorMessage?.let {
-                val copied = ClipboardUtils.copyToClipboardAsync(it).await() ?: false
+                val copied = ClipboardUtils.copyToClipboardAsync(it) ?: false
                 if (copied) "$name copied into the clipboard, please report it on the SkyHanni discord!"
                 else "$name could not be copied to clipboard!"
             } ?: "Error id not found!",

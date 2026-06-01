@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -65,8 +66,7 @@ object DebugCommand {
         }
 
         list.add("```")
-        OSUtils.copyToClipboard(list.joinToString("\n"))
-        ChatUtils.chat("§eCopied SkyHanni debug data in the clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(list.joinToString("\n"), info = "SkyHanni debug data")
     }
 
     private fun profileType(event: DebugDataCollectEvent) {

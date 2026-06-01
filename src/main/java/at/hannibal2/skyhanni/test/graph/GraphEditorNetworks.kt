@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -65,11 +66,10 @@ object GraphEditorNetworks {
         val clusterNodes = state.nodes.filter { it in cluster }.toSet()
         val graph = GraphEditorIO.compileGraph(nodeSubset = clusterNodes)
         val json = graph.toJson()
-        OSUtils.copyToClipboard(json)
 
         val nodeCount = clusterNodes.size.addSeparators()
         val edgeCount = state.edges.count { it.node1 in cluster && it.node2 in cluster }.addSeparators()
-        ChatUtils.chat("Copied network with $nodeCount nodes and $edgeCount edges to clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(json, info = "Network with $nodeCount nodes and $edgeCount edges")
     }
 
     fun findNetworks() {

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data.model
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -126,7 +127,7 @@ open class TextInput {
 
         private fun handleTextInput(char: Char?) {
             if (KeyboardManager.isCopyingKeysDown()) {
-                OSUtils.copyToClipboard(textBox)
+                ClipboardUtils.copyToClipboardAsyncWithResponse(textBox, info = "Text")
                 return
             }
             if (KeyboardManager.isPastingKeysDown()) {

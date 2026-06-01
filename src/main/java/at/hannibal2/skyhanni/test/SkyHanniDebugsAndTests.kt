@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -306,7 +307,7 @@ object SkyHanniDebugsAndTests {
     private fun copyLocation(parameter: String? = null) {
         val location = LocationUtils.playerLocation().add(0.001, 0.001, 0.001).roundTo(1)
         val (clipboard, format) = formatLocation(location, parameter)
-        OSUtils.copyToClipboard(clipboard)
+        ClipboardUtils.copyToClipboardAsyncWithResponse(clipboard, info = "Current location ($format format)")
         ChatUtils.chat("Copied the current location to clipboard ($format format)!", replaceSameMessage = true)
     }
 
@@ -358,7 +359,7 @@ object SkyHanniDebugsAndTests {
         val stack = stackUnderCursor() ?: return
         val internalName = stack.getInternalNameOrNull() ?: return
         val rawInternalName = internalName.asString()
-        OSUtils.copyToClipboard(rawInternalName)
+        ClipboardUtils.copyToClipboardAsyncWithResponse(rawInternalName, info = "§7$rawInternalName §e")
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
@@ -495,8 +496,7 @@ object SkyHanniDebugsAndTests {
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
         val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
 
-        OSUtils.copyToClipboard(formatted)
-        ChatUtils.chat("§eCopied cosmetic data to the clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(formatted, info = "Cosmetic data")
     }
 
     @HandleEvent
@@ -534,7 +534,7 @@ object SkyHanniDebugsAndTests {
             callback {
                 val name = "SkyHanni ${SkyHanniMod.VERSION} on Minecraft ${PlatformUtils.MC_VERSION}"
                 ChatUtils.chat("§eYou are using $name")
-                OSUtils.copyToClipboard(name)
+                ClipboardUtils.copyToClipboardAsyncWithResponse(name, info = "SkyHanni version")
             }
         }
         event.registerBrigadier("shtestgardenvisitors") {
@@ -551,8 +551,7 @@ object SkyHanniDebugsAndTests {
                     ChatUtils.userError("No item in hand!")
                 } else {
                     val internalName = hand.getInternalName().asString()
-                    OSUtils.copyToClipboard(internalName)
-                    ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
+                    ClipboardUtils.copyToClipboardAsyncWithResponse(internalName, info = "§7$internalName §e")
                 }
             }
         }

@@ -39,7 +39,6 @@ object CopyPlaytime {
         val profile = HypixelData.profileName.firstLetterUppercase()
         text.add(0, "${PlayerUtils.getName()}'s - $profile Playtime Stats")
 
-        ClipboardUtils.copyToClipboard(text.joinToString("\n") { it.removeColor() })
-        ChatUtils.chat("Copied playtime stats into clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(text.joinToString("\n") { it.removeColor() }, info = "Playtime stats")
     }
 }
