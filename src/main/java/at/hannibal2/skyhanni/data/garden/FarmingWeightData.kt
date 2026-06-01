@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.foraging.ForagingCollectionApi
-import at.hannibal2.skyhanni.data.foraging.ForagingDebugLog
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -70,7 +69,7 @@ object FarmingWeightData {
         updateCollections()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onProfileJoin(event: ProfileJoinEvent) {
         updateCollections()
     }

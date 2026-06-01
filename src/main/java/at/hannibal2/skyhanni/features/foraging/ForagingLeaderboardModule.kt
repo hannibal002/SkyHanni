@@ -55,7 +55,7 @@ object ForagingLeaderboardModule {
     @HandleEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         val inSkyBlock = SkyBlockUtils.inSkyBlock
-        val inForagingIsland = IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland()
+        val inForagingIsland = IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland() || IslandType.PRIVATE_ISLAND.isInIsland()
         val forceDisplay = debugConfig.forceDisplay
 
         if (forceDisplay != lastForceDisplay) {
@@ -72,10 +72,6 @@ object ForagingLeaderboardModule {
             return
         }
 
-        // Foraging leaderboard also needs a valid profile id for elite API calls.
-        if (FarmingWeightData.profileId.isBlank()) {
-            FarmingWeightData.updateCollections()
-        }
 
         logDebug(
             "render foraging lb forceDisplay=$forceDisplay forcedType=${debugConfig.forcedLogType.get()} " +

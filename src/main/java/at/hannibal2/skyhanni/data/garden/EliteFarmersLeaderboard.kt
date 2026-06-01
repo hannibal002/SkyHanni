@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.foraging.ForagingCollectionApi
-import at.hannibal2.skyhanni.data.foraging.ForagingDebugLog
+
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.events.foraging.ForagingCollectionAddEvent
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
@@ -386,8 +386,6 @@ object EliteFarmersLeaderboard {
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             lbData.isUnranked = true
             lbData.lastApiAmount = null
-            if (leaderboardType is EliteLeaderboardType.ForagingLog)
-                ForagingDebugLog.log("loadLBPos", leaderboardType.foragingLog, "UNRANKED path — apiData.rank=${apiData.rank} amount=${apiData.amount}")
             // correct wrong data
             leaderboardAmountMap?.remove(leaderboardType)
             leaderboardPosMap?.remove(leaderboardType)

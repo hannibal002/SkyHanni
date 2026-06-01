@@ -46,10 +46,10 @@ class ForagingDisplay : EliteLeaderboardDisplayBase<ForagingLogType, EliteLeader
 
     override fun isEnabled(): Boolean =
         foragingConfig.enabled && SkyBlockUtils.inSkyBlock &&
-            (debugConfig.forceDisplay || IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland())
+            (debugConfig.forceDisplay || IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland() || IslandType.PRIVATE_ISLAND.isInIsland())
 
     override fun inIslandEnabled(): Boolean =
-        debugConfig.forceDisplay || IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland()
+        debugConfig.forceDisplay || IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland() || IslandType.PRIVATE_ISLAND.isInIsland()
     // No live foraging speed tracking, so no ETA
     override fun overtakeEta(amountUntil: Double): String = ""
     override fun MutableList<Renderable>.buildTypeSwitcher() {
@@ -65,7 +65,7 @@ class ForagingDisplay : EliteLeaderboardDisplayBase<ForagingLogType, EliteLeader
         )
     }
     override fun shouldShowDisplay(): Boolean {
-        val inAllowedIsland = IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland()
+        val inAllowedIsland = IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland() || IslandType.PRIVATE_ISLAND.isInIsland()
         if (!debugConfig.forceDisplay && !inAllowedIsland) return false
         if (debugConfig.forceDisplay) return true
         if (currentEnum != null) return true
