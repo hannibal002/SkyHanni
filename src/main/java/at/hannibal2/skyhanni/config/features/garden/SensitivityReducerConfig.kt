@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.garden.SensitivityReducer.Mode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
@@ -12,6 +13,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class SensitivityReducerConfig {
+    @ConfigOption(
+        name = "Note",
+        desc = "You can type §e/shmouselock §rto lock your mouse rotation, and §e/shsensreduce §rto reduce your sensitivity.",
+    )
+    @ConfigEditorInfoText
+    val notice: String = ""
+
     @Expose
     @ConfigOption(name = "Auto Enable", desc = "Automatically lower mouse sensitivity while in the garden.")
     @ConfigEditorBoolean
@@ -61,11 +69,20 @@ class SensitivityReducerConfig {
     val onlyPlot: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Auto disable on teleport", desc = "Disable /shmouselock and /shsensreduce when teleporting to another plot.")
+    @ConfigOption(name = "Unlock on Teleport", desc = "Choose whether teleporting to a plot should unlock your mouse rotation.")
     @ConfigEditorBoolean
-    val disableOnTeleport: Boolean = true
+    val unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
 
     @Expose
     @ConfigLink(owner = SensitivityReducerConfig::class, field = "showGui")
-    val position: Position = Position(400, 200)
+    val display: Position = Position(400, 200)
+
+    enum class UnlockOnTeleport(private val displayName: String, val condition: (String) -> Boolean) {
+        ALWAYS("Always", { true }),
+        BARN_ONLY("Barn Only", { it == "The Barn" }),
+        NEVER("Never", { false }),
+        ;
+
+        override fun toString() = displayName
+    }
 }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -37,6 +38,7 @@ object GardenWarpCommands {
         if (message == "/home") {
             event.cancel()
             HypixelCommands.warp("garden")
+            ChatUtils.chat("§aTeleported you to the spawn location!", prefix = false)
         }
 
         if (message == "/barn") {

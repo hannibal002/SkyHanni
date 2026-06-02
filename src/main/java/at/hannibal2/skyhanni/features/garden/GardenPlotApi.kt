@@ -291,10 +291,9 @@ object GardenPlotApi {
 
     fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
 
-    fun Plot.sendTeleportTo() {
-        if (isBarn()) HypixelCommands.teleportToPlot("barn")
-        else HypixelCommands.teleportToPlot(name)
-    }
+    val Plot.tpName get() = if (isBarn()) "barn" else name
+
+    fun Plot.sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
 
     init {
         val plotMap = listOf(
