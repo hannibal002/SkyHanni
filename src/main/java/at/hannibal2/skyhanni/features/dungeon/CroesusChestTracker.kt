@@ -56,12 +56,6 @@ object CroesusChestTracker {
     private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
 
     /**
-     * REGEX-TEST: §eFloor V
-     */
-    private val floorPattern by patternGroup.pattern("chest.floor", "§eFloor (?<floor>[IV]+)")
-    private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
-
-    /**
      * REGEX-TEST: §eInfernal Tier
      */
     private val kuudraPattern by patternGroup.pattern("chest.kuudra", "§e(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
@@ -162,14 +156,16 @@ object CroesusChestTracker {
 
             val lore = item.getLore()
 
-            if (run.floor == null || run.floor == "F0") run.floor =
-                (if (masterPattern.matches(item.hoverName)) "M" else "F") + (
-                    lore.firstNotNullOfOrNull {
-                        floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
-                    } ?: "0"
-                    )
-            if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
-                ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
+            if (run.floor == null || run.floor == "F0") {
+                val floor = DungeonApi.getFloorByItemStack(item)
+                run.floor = floor?.name ?: "F0"
+            }
+            val cleanName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            if (run.floor == "F0" && kuudraPattern.matches(cleanName)) {
+                val rawTier = lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }
+                val kuudraTier = KuudraApi.getKuudraRunTierNumber(rawTier)
+                run.floor = "T$kuudraTier"
+            }
             run.openState = OpenedState.getOpenState(lore)
         }
     }
@@ -244,8 +240,8 @@ object CroesusChestTracker {
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        if (event.floor == "E") return
-        addCroesusChest(event.floor)
+        if (event.dungeonFloor == DungeonFloor.E) return
+        addCroesusChest(event.dungeonFloor.name)
     }
 
     // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic

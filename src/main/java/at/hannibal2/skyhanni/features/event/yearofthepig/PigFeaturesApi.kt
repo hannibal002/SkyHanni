@@ -150,6 +150,7 @@ object PigFeaturesApi {
     }
 
     private fun handleLootedOrb(reward: String) {
+        // TODO use ItemUtiils.readFromLore
         coinsRewardPattern.matchMatcher(reward) {
             val amount = group("amount").formatIntOrNull() ?: return@matchMatcher
             ShinyOrbLootedEvent(coins = amount).post()

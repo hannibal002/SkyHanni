@@ -32,12 +32,6 @@ object CorpseApi {
      */
     private val endPattern by chatPatternGroup.pattern("end", "§a§l▬{64}")
 
-    /**
-     * REGEX-TEST:     §r§9☠ Fine Onyx Gemstone §r§8x2
-     * REGEX-TEST:     §r§fEnchanted Book (Ice Cold I§r§f)
-     */
-    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
-
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
 
@@ -65,21 +59,9 @@ object CorpseApi {
             inLoot = false
             return
         }
-        var pair = itemPattern.matchMatcher(message) {
-            /**
-             * TODO fix the bug that readItemAmount produces two different outputs:
-             * §r§fEnchanted Book -> §fEnchanted
-             * §fEnchanted Book §r§8x -> §fEnchanted Book
-             *
-             * also maybe this is no bug, as enchanted book is no real item?
-             */
-            ItemUtils.readItemAmount(group("item"))
-        } ?: return
 
-        if (pair.first.startsWith("§fEnchanted Book (")) {
-            val book = ItemUtils.readBookTypeStrippedColor(pair.first) ?: return
-            pair = book to pair.second
+        ItemUtils.readItemStackFromChat(message)?.let {
+            loot.add(it)
         }
-        loot.add(pair)
     }
 }

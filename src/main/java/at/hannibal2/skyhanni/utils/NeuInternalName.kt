@@ -46,6 +46,7 @@ value class NeuInternalName private constructor(private val internalName: String
                 val (name, level) = internalName.split(";", limit = 2)
                 "ENCHANTED_BOOK_${name}_$level"
             }
+
             else -> internalName
         }
 
@@ -85,6 +86,7 @@ value class NeuInternalName private constructor(private val internalName: String
         fun List<String>.toInternalNames(): List<NeuInternalName> = mapTo(mutableListOf()) { it.toInternalName() }
 
         private val itemNameCache = mutableMapOf<String, NeuInternalName?>()
+
 
         fun fromItemNameOrNull(itemName: String): NeuInternalName? = itemNameCache.getOrPut(itemName) {
             ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet")) ?: getCoins(itemName)

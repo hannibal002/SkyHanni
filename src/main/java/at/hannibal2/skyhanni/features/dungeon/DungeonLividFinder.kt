@@ -183,7 +183,7 @@ object DungeonLividFinder {
 
     @HandleEvent(DungeonBossRoomEnterEvent::class)
     fun onBossStart() {
-        if (DungeonApi.getCurrentBoss() != DungeonFloor.F5) return
+        if (DungeonApi.getCurrentBoss() != DungeonBoss.F5) return
         color = LorenzColor.RED
     }
 
@@ -246,7 +246,7 @@ object DungeonLividFinder {
         event.drawLineToCrosshair(location.add(x = 0.5, z = 0.5), color, 3, true)
     }
 
-    private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonFloor.F5
+    private fun inLividBossRoom() = DungeonApi.inBossRoom && DungeonApi.getCurrentBoss() == DungeonBoss.F5
 
     private fun RemotePlayer.highlight(color: LorenzColor?) {
         if (color == null) {

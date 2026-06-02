@@ -14,6 +14,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class DungeonConfig {
+
+    @Expose
+    @ConfigOption(name = "Dungeon Profit Tracker", desc = "")
+    @Accordion
+    val profitTracker: DungeonProfitTrackerConfig = DungeonProfitTrackerConfig()
+
     @Expose
     @ConfigOption(
         name = "Clicked Blocks",

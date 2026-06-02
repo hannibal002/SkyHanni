@@ -17,7 +17,10 @@ import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.OpenLastStorage
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.OpenedState
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker.generateMaxChestAsList
+import at.hannibal2.skyhanni.features.dungeon.CroesusStorage
+import at.hannibal2.skyhanni.features.dungeon.DungeonBoss
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
+import at.hannibal2.skyhanni.features.dungeon.DungeonProfitTracker
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
@@ -133,7 +136,14 @@ class ProfileSpecificStorage(
 
     class DungeonStorage {
         @Expose
-        var bosses: MutableMap<DungeonFloor, Int> = enumMapOf()
+        var bosses: MutableMap<DungeonBoss, Int> = enumMapOf()
+
+        // we can not reuse runs data because it is inaccurate and gets autocorrected via opening the chest.
+        @Expose
+        var availableCroesus: MutableMap<DungeonFloor, CroesusStorage> = enumMapOf()
+
+        @Expose
+        var profitTracker: DungeonProfitTracker.BucketData = DungeonProfitTracker.BucketData()
 
         @Expose
         var runs: MutableList<DungeonRunInfo> = generateMaxChestAsList()
@@ -150,6 +160,7 @@ class ProfileSpecificStorage(
             @Expose
             var runTime: SimpleTimeMark? = null
 
+            // TODO change to DungeonFloor
             @Expose
             var floor: String? = null
 
@@ -421,6 +432,7 @@ class ProfileSpecificStorage(
     var fishing: FishingStorage = FishingStorage()
 
     class FishingStorage {
+        // TODO remove prefix fishing
         @Expose
         var fishingProfitTracker: FishingProfitTracker.Data = FishingProfitTracker.Data()
 

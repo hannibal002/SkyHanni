@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
@@ -20,8 +22,11 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -38,6 +43,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
@@ -52,7 +59,11 @@ object DungeonApi {
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
+    // TODO change to DungeonFloor
+    @Deprecated("use dungeonFloorEnum")
     var dungeonFloor: String? = null
+        private set
+    var dungeonFloorEnum: DungeonFloor? = null
         private set
     var started = false
         private set
@@ -66,13 +77,20 @@ object DungeonApi {
         private set
     var isUniqueClass = false
         private set
-    var time: String = ""
+    var timeDisplay: String = ""
         private set
     var roomId: String? = null
         private set
+    private var time: Duration? = null
     val active get() = started && !completed
 
-    val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
+    // floor type of the last viewed dungeon run in croesus
+    var lastCroesusFloor: DungeonFloor? = null
+        private set
+    var isInCroesus = false
+        private set
+
+    val bossStorage: MutableMap<DungeonBoss, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
     private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
@@ -126,6 +144,14 @@ object DungeonApi {
         "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
 
+    /**
+     * REGEX-TEST: §eFloor V
+     */
+    private val croesusFloorPattern by patternGroup.pattern("croesus.chest.floor", "§eFloor (?<floor>[IV]+)")
+
+    // TODO regex text
+    private val croesusMasterPattern by patternGroup.pattern("croesus.chest.master", ".*Master.*")
+
     enum class DungeonBlessings(var power: Int) {
         LIFE(0),
         POWER(0),
@@ -173,10 +199,7 @@ object DungeonApi {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getCurrentBoss(): DungeonFloor? {
-        val floor = dungeonFloor ?: return null
-        return DungeonFloor.valueOf(floor.replace("M", "F"))
-    }
+    fun getCurrentBoss(): DungeonBoss? = dungeonFloorEnum?.boss
 
     private const val WATER_ROOM_ID = "-60,-60"
     val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
@@ -202,7 +225,9 @@ object DungeonApi {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
-            DungeonEnterEvent(floor).post()
+            val dungeonFloor = DungeonFloor.getByName(floor) ?: error("unknown dungeon floor: '$floor'")
+            dungeonFloorEnum = dungeonFloor
+            DungeonEnterEvent(dungeonFloor).post()
             return
         }
         if (!inDungeon()) return
@@ -211,7 +236,12 @@ object DungeonApi {
             return
         }
         timePattern.firstMatcher(event.added) {
-            time = "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+            val minutes = groupOrNull("minutes")
+            val seconds = group("seconds")
+            timeDisplay = "${minutes ?: "00"}:$seconds"
+            val m = minutes?.formatInt() ?: 0
+            val s = seconds.formatInt()
+            time = (m * 60 + s).seconds
             return
         }
     }
@@ -256,6 +286,7 @@ object DungeonApi {
     @HandleEvent
     fun onWorldChange() {
         dungeonFloor = null
+        dungeonFloorEnum = null
         started = false
         inBossRoom = false
         isUniqueClass = false
@@ -263,17 +294,19 @@ object DungeonApi {
         playerClassLevel = -1
         completed = false
         playerTeamClasses.clear()
-        time = ""
+        timeDisplay = ""
         roomId = null
+        time = null
         DungeonBlessings.reset()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
+        val floorEnum = dungeonFloorEnum ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
-            DungeonStartEvent(floor).post()
+            DungeonStartEvent(floorEnum).post()
         }
         if (event.cleanMessage.matches(uniqueClassBonus)) {
             isUniqueClass = true
@@ -281,7 +314,7 @@ object DungeonApi {
 
         killPattern.matchMatcher(event.cleanMessage) {
             val bossCollections = bossStorage ?: return
-            val boss = DungeonFloor.byBossName(group("boss"))
+            val boss = DungeonBoss.byBossName(group("boss"))
             if (matches() && boss != null && boss !in bossCollections) {
                 bossCollections.addOrPut(boss, 1)
             }
@@ -289,7 +322,9 @@ object DungeonApi {
         }
         dungeonComplete.matchMatcher(event.cleanMessage) {
             completed = true
-            DungeonCompleteEvent(floor).post()
+            val time = time ?: error("time is null")
+            DungeonCompleteEvent(floorEnum, floor, time).post()
+
             return
         }
     }
@@ -307,7 +342,7 @@ object DungeonApi {
     }
 
     private fun readOneMaxCollection(
-        bossCollections: MutableMap<DungeonFloor, Int>,
+        bossCollections: MutableMap<DungeonBoss, Int>,
         inventoryItems: Map<Int, ItemStack>,
         inventoryName: String,
     ) {
@@ -316,7 +351,7 @@ object DungeonApi {
                 item.getLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "§7To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                        val floor = DungeonFloor.byBossName(name) ?: return
+                        val floor = DungeonBoss.byBossName(name) ?: return
                         val lore = inventoryItems[4]?.getLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
@@ -330,7 +365,7 @@ object DungeonApi {
     }
 
     private fun readAllCollections(
-        bossCollections: MutableMap<DungeonFloor, Int>,
+        bossCollections: MutableMap<DungeonBoss, Int>,
         inventoryItems: Map<Int, ItemStack>,
     ) {
         nextItem@ for (stack in inventoryItems.values) {
@@ -350,7 +385,7 @@ object DungeonApi {
                     }
                 }
             }
-            val floor = DungeonFloor.byBossName(name) ?: continue
+            val floor = DungeonBoss.byBossName(name) ?: continue
             bossCollections[floor] = kills
         }
     }
@@ -368,7 +403,7 @@ object DungeonApi {
             add("dungeonFloor: $dungeonFloor")
             add("started: $started")
             add("getRoomID: $roomId")
-            add("time: $time")
+            add("time: $timeDisplay")
             add("inBossRoom: $inBossRoom")
             add("")
             add("playerClass: $playerClass")
@@ -476,6 +511,41 @@ object DungeonApi {
                     ),
                 )
             }
+        }
+    }
+
+    fun getFloorByItemStack(stack: ItemStack): DungeonFloor? {
+        val lore = stack.getLore()
+        val masterMode = croesusMasterPattern.matches(stack.hoverName)
+        val number = lore.firstNotNullOfOrNull {
+            croesusFloorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+        } ?: return null
+        val boss = DungeonBoss.byFloorNumber(number)
+        return DungeonFloor.getByBoss(boss, masterMode)
+    }
+
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (IslandType.DUNGEON_HUB.isInIsland()) {
+            if (InventoryUtils.openInventoryName() == "Croesus") {
+                if (!isInCroesus) {
+                    ChatUtils.chat("opened Croesus")
+                    isInCroesus = true
+                }
+                val stack = event.item ?: return
+                val floor = getFloorByItemStack(stack)
+                lastCroesusFloor = floor
+            }
+        }
+    }
+
+    // WHY DOES THIS EVENT GET FIRED wrongly????
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        if (isInCroesus) {
+            ////isInCroesus = false
+            ChatUtils.chat("closed Croesus")
+            ChatUtils.chat("reopenSameName: ${event.reopenSameName}")
         }
     }
 }

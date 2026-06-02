@@ -686,6 +686,7 @@ object ChatFilter {
     private fun powderMiningBlock(event: SkyHanniChatEvent.Modify) {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
+            // TODO find out if we can replace this with ItemUtils.readItemStackFromChat
             genericMiningRewardMessage.matchMatcher(event.message) {
                 val reward = groupOrEmpty("reward")
                 val amountFormat = groupOrNull("amount")?.let {

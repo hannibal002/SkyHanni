@@ -31,11 +31,6 @@ object FossilExcavatorApi {
     private val endPattern by chatPatternGroup.pattern("end", "§a§l▬{64}")
 
     /**
-     * REGEX-TEST:     §r§6Tusk Fossil
-     */
-    private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
-
-    /**
      * REGEX-TEST: §cYou didn't find anything. Maybe next time!
      */
     private val emptyPattern by chatPatternGroup.pattern("empty", "§cYou didn't find anything. Maybe next time!")
@@ -49,7 +44,7 @@ object FossilExcavatorApi {
 
     val excavatorInventory = InventoryDetector(
         checkInventoryName = { it == "Fossil Excavator" },
-        onCloseInventory = { inExcavatorMenu = false }
+        onCloseInventory = { inExcavatorMenu = false },
     )
 
     @HandleEvent
@@ -83,20 +78,8 @@ object FossilExcavatorApi {
             inLoot = false
             return
         }
-        var pair = itemPattern.matchMatcher(message) {
-            /**
-             * TODO fix the bug that readItemAmount produces two different outputs:
-             * §r§fEnchanted Book -> §fEnchanted
-             * §fEnchanted Book §r§8x -> §fEnchanted Book
-             *
-             * also maybe this is no bug, as enchanted book is no real item?
-             */
-            ItemUtils.readItemAmount(group("item"))
-        } ?: return
-
-        ItemUtils.readBookTypeStrippedColor(pair.first)?.let {
-            pair = it to pair.second
+        ItemUtils.readItemStackFromChat(message)?.let {
+            loot.add(it)
         }
-        loot.add(pair)
     }
 }

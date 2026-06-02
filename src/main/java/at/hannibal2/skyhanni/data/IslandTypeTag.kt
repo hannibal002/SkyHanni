@@ -28,6 +28,8 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
     FORAGING(IslandType.THE_PARK, IslandType.GALATEA),
     FORAGING_CUSTOM_TREES(IslandType.GALATEA),
 
+    DUNGEON_ISLANDS(IslandType.DUNGEON_HUB, IslandType.CATACOMBS),
+
     HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
