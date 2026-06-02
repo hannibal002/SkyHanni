@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -43,6 +43,9 @@ import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.seconds
@@ -120,7 +123,6 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
 
     var bobber: FishingHook? = null
@@ -191,12 +193,12 @@ object FishingApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (event.slot != BAIT_SLOT) return
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
         extractAndPostBaitUpdate(event.itemStack)
     }
 
     private fun checkAndUpdateBaitFromInventory() {
+        if (hasGuiOpen()) return
         val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
             postEmptyBaitUpdate()
             return
@@ -230,6 +232,11 @@ object FishingApi {
 
     private fun postEmptyBaitUpdate() {
         postBaitUpdate(null, 0, SafeItemStack.EMPTY)
+    }
+
+    private fun hasGuiOpen(): Boolean {
+        val screen = Minecraft.getInstance().screen
+        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)

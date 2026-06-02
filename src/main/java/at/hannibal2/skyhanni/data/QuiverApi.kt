@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -259,8 +259,8 @@ object QuiverApi {
     }
 
     @HandleEvent
-    fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (!isEnabled() || event.slot != 44) return
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
+        if (!isEnabled()) return
         val stack = event.itemStack
         val lore = stack.getLoreComponent().map { it.string }
 
