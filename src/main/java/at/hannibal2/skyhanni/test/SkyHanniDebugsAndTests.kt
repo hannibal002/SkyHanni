@@ -619,8 +619,10 @@ object SkyHanniDebugsAndTests {
             callback {
                 if (SkyBlockUtils.inSkyBlock) {
                     ChatUtils.chat("§eYou are currently in ${SkyBlockUtils.currentIsland}.")
+                } else if (SkyBlockUtils.onHypixel) {
+                    ChatUtils.chat("§eYou are on Hypixel, but not in SkyBlock.")
                 } else {
-                    ChatUtils.chat("§eYou are not in SkyBlock.")
+                    ChatUtils.chat("§eYou not on Hypixel.")
                 }
             }
         }

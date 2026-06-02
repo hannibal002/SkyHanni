@@ -4,23 +4,34 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.IslandLeaveEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
-import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object HypixelLocationApi {
+
+    private val patternGroup = RepoPattern.group("api.hypixellocation")
+
+    private val lobbyTypePattern by patternGroup.pattern(
+        "lobbytype",
+        "(?<lobbyType>.*lobby)\\d+",
+    )
 
     var inHypixel: Boolean = false
         private set
@@ -34,6 +45,8 @@ object HypixelLocationApi {
     var serverId: String? = null
         private set
 
+    val serverName get() = serverId.orEmpty()
+
     var inAlpha: Boolean = false
         private set
 
@@ -46,24 +59,34 @@ object HypixelLocationApi {
     var map: String? = null
         private set
 
-    var isGuest: Boolean = false
+    var lobbyName: String? = null
         private set
 
-    // TODO re-enable the setting once the hypixel mod api works fine
-//     val config get() = SkyHanniMod.feature.dev.hypixelModApi
-    val config get() = false
+    var lobbyType: String? = null
+        private set
+
+    val inLobby get() = !lobbyName.isNullOrEmpty()
+    val inLimbo get() = serverId == "limbo"
+
+    var isGuest: Boolean = false
+        private set
 
     private val logger = SkyHanniLogger("debug/hypixel_api")
 
     private var sentIslandEvent = false
     private var internalIsland = IslandType.NONE
+    private var previousIsland = IslandType.NONE
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onHypixelJoin(event: HypixelApiJoinEvent) {
         logger.log(event.toString())
         logger.log("Connected to Hypixel")
         inAlpha = event.alpha
+        val wasInHypixel = inHypixel
         inHypixel = true
+        if (!wasInHypixel) {
+            HypixelJoinEvent.post()
+        }
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
@@ -75,6 +98,11 @@ object HypixelLocationApi {
         mode = event.mode
         map = event.map
         serverId = event.serverName
+        lobbyName = event.lobbyName
+        lobbyType = event.lobbyName?.let { name ->
+            lobbyTypePattern.matchMatcher(name) { group("lobbyType") }
+        }
+        isGuest = false
 
         // Set island to NONE when you leave skyblock
         if (!inSkyblock) {
@@ -86,8 +114,8 @@ object HypixelLocationApi {
 
         val newIsland = IslandType.getByIdOrUnknown(mode)
         if (newIsland == IslandType.UNKNOWN) {
-            ChatUtils.debug("Unknown island detected: '$newIsland'")
-            logger.log("Unknown Island detected: '$newIsland'")
+            ChatUtils.debug("Unknown island mode detected: '$mode'")
+            logger.log("Unknown island mode detected: '$mode'")
         } else {
             logger.log("Island detected: '$newIsland'")
         }
@@ -120,8 +148,16 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
-        // TODO: post island change event
-        return
+
+        if (oldIsland != IslandType.NONE) {
+            IslandLeaveEvent(oldIsland).post()
+        }
+        if (island != IslandType.NONE) {
+            IslandJoinEvent(island = island, previousIsland = previousIsland).post()
+            previousIsland = island
+        }
+
+        IslandChangeEvent(island, oldIsland).post()
     }
 
     @HandleEvent
@@ -133,7 +169,17 @@ object HypixelLocationApi {
     }
 
     @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) = reset()
+    fun onDisconnect(event: ClientDisconnectEvent) {
+        if (inSkyblock || island != IslandType.NONE) {
+            internalIsland = IslandType.NONE
+            changeIsland()
+        }
+        val wasInHypixel = inHypixel
+        reset()
+        if (wasInHypixel) {
+            HypixelLeaveEvent.post()
+        }
+    }
 
     private fun reset() {
         logger.log("Disconnected")
@@ -145,37 +191,11 @@ object HypixelLocationApi {
         serverType = null
         mode = null
         map = null
+        lobbyName = null
+        lobbyType = null
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
-    }
-
-    fun checkEquals() {
-        runNextSecond {
-            val isHypixelEqual = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) == inHypixel
-            val isSkyblockEqual = HypixelData.skyBlock == inSkyblock
-            val otherIsland = HypixelData.skyBlockIsland
-            val isIslandEqual = otherIsland == island || otherIsland == IslandType.NONE || island == IslandType.NONE
-            val isServerIdEqual = !inSkyblock || HypixelData.serverId == serverId || serverId == "limbo"
-            if (isHypixelEqual && isSkyblockEqual && isIslandEqual && isServerIdEqual) return@runNextSecond
-            sendError()
-        }
-    }
-
-    private fun runNextSecond(run: () -> Unit) = DelayedRun.runDelayed(1.seconds, run)
-
-    private fun sendError() {
-        if (!config) return
-        val data = debugData
-        logger.log("ERROR: ${data.joinToString(transform = ::dataToString)}")
-        @Suppress("SpreadOperator")
-        ErrorManager.logErrorStateWithData(
-            "HypixelData check comparison with HypixelModAPI failed. Please report in discord.",
-            "HypixelData comparison failed",
-            *data,
-            betaOnly = true,
-            noStackTrace = true,
-        )
     }
 
     private val debugData
@@ -189,6 +209,8 @@ object HypixelLocationApi {
             "HypixelData.serverId" to HypixelData.serverId,
             "serverId" to serverId,
             "serverType" to serverType,
+            "lobbyName" to lobbyName,
+            "lobbyType" to lobbyType,
             "map" to map,
         )
 
