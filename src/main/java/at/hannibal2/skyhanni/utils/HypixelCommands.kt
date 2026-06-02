@@ -211,10 +211,6 @@ object HypixelCommands {
         send("viewstash $type")
     }
 
-    fun locraw() {
-        send("locraw")
-    }
-
     fun starlynSisters() {
         send("starlynsisterlevels")
     }

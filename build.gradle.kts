@@ -189,11 +189,11 @@ dependencies {
     testImplementation(libs.mockk.agent)
 
     if (isDeobf) {
-        shadowImpl(libs.hypixelmodapi)
-        shadowOnly(libs.hypixelmodapi.fabric)
+        implementation(libs.hypixelmodapi)
+        runtimeOnly(libs.hypixelmodapi.fabric)
     } else {
         modImplementation(libs.hypixelmodapi)
-        include(libs.hypixelmodapi.fabric)
+        modRuntimeOnly(libs.hypixelmodapi.fabric)
     }
 
     if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
