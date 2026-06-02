@@ -10,16 +10,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 
-//? if >= 26.1
-import org.junit.jupiter.api.Disabled
-
 @ExtendWith(BootstrapExtension::class)
-//? if >= 26.1 {
-@Disabled(
-    "ItemModifierTest uses 1.8.9 NBT test data. MC 26.1 requires data-pack-bound registry components " +
-    "before ItemStack can be created, which is not available in the test environment.",
-)
-//?}
 class ItemModifierTest {
 
     @Test
