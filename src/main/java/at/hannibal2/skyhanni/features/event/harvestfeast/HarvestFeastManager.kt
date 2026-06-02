@@ -273,8 +273,8 @@ object HarvestFeastManager {
         val starting = SkyBlockTime.fromTimeMark(SimpleTimeMark.now() + time)
         return (
             SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
-            SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
-            (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))
+                SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
+                (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))
             ).asTimeMark()
     }
 
