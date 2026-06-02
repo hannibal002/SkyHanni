@@ -288,7 +288,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             textVertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
+            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
             15728880,
         )
@@ -346,7 +346,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             textVertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
+            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
             15728880,
         )

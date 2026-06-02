@@ -84,6 +84,23 @@ object SkyHanniRenderLayers {
             .build(),
     )
 
+    private val TEXT_POLYGON_OFFSET_NO_DEPTH_WRITE_PIPELINE: RenderPipeline = RenderPipelines.register(
+        RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET, RenderPipelines.FOG_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, "text_polygon_offset_no_depth_write"))
+            .withVertexShader("core/rendertype_text")
+            .withFragmentShader("core/rendertype_text")
+            .withSampler("Sampler0")
+            .withSampler("Sampler2")
+            //? if >= 26.1 {
+            .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, -1.0f, -10.0f))
+            //?} else {
+            /*.withDepthWrite(false)
+            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            .withDepthBias(-1.0f, -10.0f)
+            *///?}
+            .build(),
+    )
+
     private val TEXT_INTENSITY_NO_DEPTH_WRITE_PIPELINE: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(RenderPipelines.TEXT_SNIPPET, RenderPipelines.FOG_SNIPPET)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, "text_intensity_no_depth_write"))
@@ -123,6 +140,17 @@ object SkyHanniRenderLayers {
                 .withTexture("Sampler0", texture)
                 .useLightmap()
                 .bufferSize(786432)
+                .createRenderSetup(),
+        )
+    }
+
+    private val TEXT_POLYGON_OFFSET_NO_DEPTH_WRITE: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
+        RenderType.create(
+            "skyhanni_text_polygon_offset_no_depth_write",
+            RenderSetup.builder(TEXT_POLYGON_OFFSET_NO_DEPTH_WRITE_PIPELINE)
+                .withTexture("Sampler0", texture)
+                .useLightmap()
+                .sortOnUpload()
                 .createRenderSetup(),
         )
     }
@@ -181,7 +209,9 @@ object SkyHanniRenderLayers {
 
     fun getTextNoDepthWrite(renderType: RenderType): RenderType = when (renderType.name) {
         "text" -> renderType.sampler0Texture()?.let(TEXT_NO_DEPTH_WRITE::apply) ?: renderType
+        "text_polygon_offset" -> renderType.sampler0Texture()?.let(TEXT_POLYGON_OFFSET_NO_DEPTH_WRITE::apply) ?: renderType
         "text_intensity" -> renderType.sampler0Texture()?.let(TEXT_INTENSITY_NO_DEPTH_WRITE::apply) ?: renderType
+        "text_intensity_polygon_offset" -> renderType.sampler0Texture()?.let(TEXT_INTENSITY_NO_DEPTH_WRITE::apply) ?: renderType
         "text_background" -> TEXT_BACKGROUND_NO_DEPTH_WRITE
         else -> renderType
     }
