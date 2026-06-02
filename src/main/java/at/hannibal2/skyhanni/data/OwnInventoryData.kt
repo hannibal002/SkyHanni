@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -36,6 +37,7 @@ object OwnInventoryData {
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
     private var lastWardrobeClose = SimpleTimeMark.farPast()
+    private var armorAtWardrobeClose: Set<NeuInternalName> = emptySet()
 
     /**
      * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
@@ -85,9 +87,12 @@ object OwnInventoryData {
         val armorInternalNames = InventoryUtils.getArmorInternalNames()
 
         if (lastWardrobeClose.passedSince() < 2.seconds) {
-            lastWardrobeClose = SimpleTimeMark.farPast()
-            for (name in armorInternalNames) {
-                ignoreItem(1.seconds, name)
+            val newPieces = armorInternalNames - armorAtWardrobeClose
+            if (newPieces.isNotEmpty()) {
+                for (name in newPieces) {
+                    ignoreItem(2.seconds, name, 1)
+                }
+                lastWardrobeClose = SimpleTimeMark.farPast()
             }
         }
 
@@ -130,6 +135,7 @@ object OwnInventoryData {
     fun onInventoryClose() {
         if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
             lastWardrobeClose = SimpleTimeMark.now()
+            armorAtWardrobeClose = InventoryUtils.getArmorInternalNames()
         }
         val item = MinecraftCompat.localPlayerOrNull?.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
@@ -201,24 +207,46 @@ object OwnInventoryData {
         ignoreItem(duration) { it == internalName }
     }
 
+    fun ignoreItem(duration: Duration, internalName: NeuInternalName, count: Int) {
+        ignoreItem(duration, count) { it == internalName }
+    }
+
     fun ignoreItem(duration: Duration, condition: (NeuInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
 
+    fun ignoreItem(duration: Duration, count: Int, condition: (NeuInternalName) -> Boolean) {
+        ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration, count))
+    }
+
     private val ignoredItemsUntil = mutableListOf<IgnoredItem>()
 
-    class IgnoredItem(val condition: (NeuInternalName) -> Boolean, val blockedUntil: SimpleTimeMark)
+    class IgnoredItem(
+        val condition: (NeuInternalName) -> Boolean,
+        val blockedUntil: SimpleTimeMark,
+        var remainingCount: Int? = null,
+    )
 
     private fun addItem(internalName: NeuInternalName, add: Int) {
         if (SkyBlockUtils.lastWorldSwitch.passedSince() < 3.seconds) return
-
-        ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
-        if (ignoredItemsUntil.any { it.condition(internalName) }) {
-            return
-        }
-
         if (internalName.startsWith("MAP-")) return
 
-        ItemAddInInventoryEvent(internalName, add).post()
+        ignoredItemsUntil.removeIf { it.blockedUntil.isInPast() }
+
+        val matching = ignoredItemsUntil.filter { it.condition(internalName) }
+        if (matching.any { it.remainingCount == null }) return
+
+        val remaining = matching.fold(add) { left, ignored ->
+            val count = ignored.remainingCount!!
+            val consume = minOf(left, count)
+            ignored.remainingCount = count - consume
+            left - consume
+        }
+
+        ignoredItemsUntil.removeIf { it.remainingCount == 0 }
+
+        if (remaining == 0) return
+        ChatUtils.debug("OwnInventory: add $internalName x$remaining")
+        ItemAddInInventoryEvent(internalName, remaining).post()
     }
 }
