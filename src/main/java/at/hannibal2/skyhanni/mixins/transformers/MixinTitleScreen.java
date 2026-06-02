@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
-import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests;
 import at.hannibal2.skyhanni.utils.system.PlatformUtils;
 import kotlin.Unit;
 import net.minecraft.client.gui.components.LogoRenderer;
@@ -20,8 +19,8 @@ public abstract class MixinTitleScreen {
 
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
     private void onCreate(boolean doBackgroundFade, LogoRenderer logoRenderer, CallbackInfo ci) {
-        if (!skyhanni$hasInited && PlatformUtils.INSTANCE.isDevEnvironment()) {
-            SkyHanniDebugsAndTests.loadAllMixinClasses();
+        if (!skyhanni$hasInited && PlatformUtils.isDevEnvironment()) {
+            at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.loadAllMixinClasses();
         }
         skyhanni$hasInited = true;
     }
