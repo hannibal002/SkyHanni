@@ -26,9 +26,7 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
-import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
@@ -50,11 +48,6 @@ object WorldRenderUtils {
 
     //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
-
-    private class DepthPreservingTextBufferSource(private val parent: MultiBufferSource) : MultiBufferSource {
-        override fun getBuffer(renderType: RenderType): VertexConsumer =
-            parent.getBuffer(SkyHanniRenderLayers.getTextNoDepthWrite(renderType))
-    }
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -268,7 +261,6 @@ object WorldRenderUtils {
         val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
-        val textVertexConsumers = if (seeThroughBlocks) vertexConsumers else DepthPreservingTextBufferSource(vertexConsumers)
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -287,7 +279,7 @@ object WorldRenderUtils {
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             shadow,
             matrix,
-            textVertexConsumers,
+            vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
             15728880,
@@ -326,7 +318,6 @@ object WorldRenderUtils {
         val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
-        val textVertexConsumers = if (seeThroughBlocks) vertexConsumers else DepthPreservingTextBufferSource(vertexConsumers)
 
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -345,7 +336,7 @@ object WorldRenderUtils {
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             shadow,
             matrix,
-            textVertexConsumers,
+            vertexConsumers,
             if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
             15728880,
