@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
@@ -16,3 +17,4 @@ public class MixinBlockStateModelSet {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockStateModelSet) (Object) this, state, cir);
     }
 }
+//?}

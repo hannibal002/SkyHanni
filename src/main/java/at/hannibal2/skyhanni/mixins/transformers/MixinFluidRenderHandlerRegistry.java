@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
@@ -29,3 +30,4 @@ public class MixinFluidRenderHandlerRegistry {
         }
     }
 }
+*///?}

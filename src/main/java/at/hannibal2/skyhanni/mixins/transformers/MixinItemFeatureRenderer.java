@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
@@ -39,3 +40,4 @@ public class MixinItemFeatureRenderer {
         return layer;
     }
 }
+//?}

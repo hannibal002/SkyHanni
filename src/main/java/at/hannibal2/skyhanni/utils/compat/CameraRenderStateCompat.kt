@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.utils.compat
 
 import net.minecraft.client.Camera
@@ -14,3 +15,4 @@ fun Camera.getRenderState(): CameraRenderState = CameraRenderState().apply {
     //~ if < 26.1 'extractRenderState' -> 'render'
     this@getRenderState.extractRenderState(this, partialTicks)
 }
+//?}

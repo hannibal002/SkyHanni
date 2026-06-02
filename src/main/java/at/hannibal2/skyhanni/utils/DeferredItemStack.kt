@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 @file:Suppress("VanillaItemStackImport")
 
 package at.hannibal2.skyhanni.utils
@@ -68,3 +69,4 @@ internal class DeferredItemStack private constructor(
         }
     }
 }
+//?}

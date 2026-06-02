@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.world.level.block.state.BlockState;
@@ -16,3 +17,4 @@ public class MixinBlockRendererDispatcher {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockRenderDispatcher) (Object) this, state, cir);
     }
 }
+*///?}

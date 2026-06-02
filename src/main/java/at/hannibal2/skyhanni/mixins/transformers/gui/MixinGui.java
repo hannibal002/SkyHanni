@@ -71,7 +71,7 @@ public class MixinGui {
     }
     //~}
 
-    //~if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
+    //~if < 26.1 '"extractExperienceLevel"' -> '"renderExperienceLevel"' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceLevel(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
@@ -121,7 +121,7 @@ public class MixinGui {
         }
     }
 
-    //~ if < 26.1 'extractSelectedItemName' -> 'renderSelectedItemName' {
+    //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor context, CallbackInfo ci) {
         if (RenderEvents.postHeldItemTooltipLayerEventPre(context)) {
@@ -135,7 +135,7 @@ public class MixinGui {
     }
     //~}
 
-    //~ if < 26.1 'extractOverlayMessage' -> 'renderOverlayMessage' {
+    //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postActionBarLayerEventPre(context)) {
