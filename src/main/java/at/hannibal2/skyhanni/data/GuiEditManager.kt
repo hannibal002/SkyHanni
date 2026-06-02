@@ -43,7 +43,7 @@ object GuiEditManager {
         }
         if (isInGui()) return
 
-        val guiScreen = Minecraft.getInstance().screen
+        val guiScreen = Minecraft.getInstance().gui.screen()
         val openGui = guiScreen?.javaClass?.name ?: "none"
         val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
         if (isInNeuPv) return
@@ -83,7 +83,7 @@ object GuiEditManager {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
-            Minecraft.getInstance().screen as? SkyHanniGuiContainer,
+            Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
@@ -113,7 +113,7 @@ object GuiEditManager {
         DrawContextUtils.clearContext()
     }
 
-    fun isInGui() = Minecraft.getInstance().screen is GuiPositionEditor
+    fun isInGui() = Minecraft.getInstance().gui.screen() is GuiPositionEditor
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)

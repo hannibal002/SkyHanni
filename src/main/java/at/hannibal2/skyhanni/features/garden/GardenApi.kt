@@ -119,7 +119,7 @@ object GardenApi {
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getInstance().screen ?: return
+            Minecraft.getInstance().gui.screen() ?: return
             checkItemInHand()
         }
     }

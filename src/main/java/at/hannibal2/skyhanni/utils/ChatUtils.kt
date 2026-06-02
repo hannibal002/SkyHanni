@@ -351,7 +351,7 @@ object ChatUtils {
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
-    private val chatGui get() = Minecraft.getInstance().gui.chat
+    private val chatGui get() = Minecraft.getInstance().gui.hud.chat
 
     val chatMessages: MutableList<GuiMessage>
         get() = chatGui.allMessages
@@ -499,7 +499,7 @@ object ChatUtils {
         }
 
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
+    fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.hud.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

@@ -23,6 +23,6 @@ public class MixinScreen {
     )
     private void wrapExtractBackground(Screen instance, GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
         original.call(instance, context, mouseX, mouseY, deltaTicks);
-        new ScreenDrawnEvent(context, Minecraft.getInstance().screen).post();
+        new ScreenDrawnEvent(context, Minecraft.getInstance().gui.screen()).post();
     }
 }

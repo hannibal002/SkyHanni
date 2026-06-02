@@ -47,7 +47,7 @@ object UserLuckBreakdown {
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private var fillerItem: SafeItemStack? = null
-    private val fillerID = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
+    private val fillerID = Blocks.STAINED_GLASS_PANE.black().asItem()
 
     private var showAllStats = true
 

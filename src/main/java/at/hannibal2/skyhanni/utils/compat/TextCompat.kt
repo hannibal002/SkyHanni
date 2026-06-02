@@ -264,7 +264,7 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        val chat = Minecraft.getInstance().gui.chat
+        val chat = Minecraft.getInstance().gui.hud.chat
         ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
         DelayedRun.runOrNextTick {
             chat.addMessage(

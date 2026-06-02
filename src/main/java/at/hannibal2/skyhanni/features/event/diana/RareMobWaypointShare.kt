@@ -213,7 +213,7 @@ object RareMobWaypointShare {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
         if (event.keyCode == config.keyBindShare) sendRareMob()
     }
 

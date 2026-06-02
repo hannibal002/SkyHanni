@@ -234,7 +234,7 @@ object BetterContainers {
 
     fun getTextureIdentifier(original: Identifier): Identifier {
         if (!chestOpen) return original
-        val inv = (Minecraft.getInstance().screen as? ContainerScreen)?.container
+        val inv = (Minecraft.getInstance().gui.screen() as? ContainerScreen)?.container
             ?: return original
         if (inv !is ChestMenu) return original
         val invHash = inv.hashCode()

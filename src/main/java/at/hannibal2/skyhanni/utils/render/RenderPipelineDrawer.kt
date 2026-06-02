@@ -13,16 +13,22 @@ import net.minecraft.client.Minecraft
 import org.joml.Matrix3x2f
 
 object RenderPipelineDrawer {
+
     val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.pose())
-    fun getBuffer(
-        pipeline: RenderPipeline,
-    ): BufferBuilder = Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
+
+    fun getBuffer(pipeline: RenderPipeline): BufferBuilder =
+        // TODO 26.2
+        //? if < 26.2 {
+        /*Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
+        *///?}
 
     /**
      * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/main/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
      */
     fun draw(pipeline: RenderPipeline, mesh: MeshData, pass: (RenderPass) -> Unit) {
-        val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
+        // TODO 26.2
+        //? if < 26.2 {
+        /*val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
 
         val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().mode)
         val indexBuffer = sequentialBuffer.getBuffer(mesh.drawState().indexCount)
@@ -44,5 +50,6 @@ object RenderPipelineDrawer {
         }
 
         mesh.close()
+        *///?}
     }
 }

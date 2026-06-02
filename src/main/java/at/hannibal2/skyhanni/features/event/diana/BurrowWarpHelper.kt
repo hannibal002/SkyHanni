@@ -88,7 +88,7 @@ object BurrowWarpHelper {
         warpQueued = false
         if (!DianaApi.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
         val warp = currentWarp ?: return
         if (lastWarpTime.passedSince() < 1.seconds) return
 

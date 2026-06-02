@@ -149,8 +149,8 @@ enum class OreBlock(
 }
 
 private fun isLowTierMithril(state: BlockState): Boolean = when (state.block) {
-    Blocks.GRAY_WOOL -> true
-    Blocks.CYAN_TERRACOTTA -> true
+    Blocks.WOOL.gray() -> true
+    Blocks.DYED_TERRACOTTA.cyan() -> true
     else -> false
 }
 
@@ -159,7 +159,7 @@ private fun isMidTierMithril(state: BlockState): Boolean {
 }
 
 private fun isHighTierMithril(state: BlockState): Boolean {
-    return state.block == Blocks.LIGHT_BLUE_WOOL
+    return state.block == Blocks.WOOL.lightBlue()
 }
 
 fun isTitanium(state: BlockState): Boolean {
@@ -172,17 +172,17 @@ private fun isStone(state: BlockState): Boolean {
 
 private fun isHardStoneHollows(state: BlockState): Boolean {
     return when (state.block) {
-        Blocks.GRAY_WOOL -> true
-        Blocks.GREEN_WOOL -> true
-        Blocks.CYAN_TERRACOTTA -> true
-        Blocks.BROWN_TERRACOTTA -> true
-        Blocks.GRAY_TERRACOTTA -> true
-        Blocks.BLACK_TERRACOTTA -> true
-        Blocks.LIME_TERRACOTTA -> true
-        Blocks.GREEN_TERRACOTTA -> true
-        Blocks.BLUE_TERRACOTTA -> true
-        Blocks.RED_TERRACOTTA -> true
-        Blocks.LIGHT_GRAY_TERRACOTTA -> true
+        Blocks.WOOL.gray() -> true
+        Blocks.WOOL.green() -> true
+        Blocks.DYED_TERRACOTTA.cyan() -> true
+        Blocks.DYED_TERRACOTTA.brown() -> true
+        Blocks.DYED_TERRACOTTA.gray() -> true
+        Blocks.DYED_TERRACOTTA.black() -> true
+        Blocks.DYED_TERRACOTTA.lime() -> true
+        Blocks.DYED_TERRACOTTA.green() -> true
+        Blocks.DYED_TERRACOTTA.blue() -> true
+        Blocks.DYED_TERRACOTTA.red() -> true
+        Blocks.DYED_TERRACOTTA.lightGray() -> true
         Blocks.CLAY -> true
         Blocks.STONE_BRICKS -> true
         Blocks.MOSSY_STONE_BRICKS -> true
@@ -197,10 +197,10 @@ private fun isHardStoneHollows(state: BlockState): Boolean {
 }
 
 private fun isHardstoneTunnels(state: BlockState): Boolean =
-    state.block == Blocks.INFESTED_STONE || state.block == Blocks.LIGHT_GRAY_WOOL
+    state.block == Blocks.INFESTED_STONE || state.block == Blocks.WOOL.lightGray()
 
 private fun isHardstoneMineshaft(state: BlockState): Boolean =
-    state.block == Blocks.STONE || state.block == Blocks.LIGHT_GRAY_WOOL
+    state.block == Blocks.STONE || state.block == Blocks.WOOL.lightGray()
 
 private fun isRedSand(state: BlockState): Boolean =
     state.block == Blocks.RED_SAND
@@ -209,7 +209,7 @@ private fun isLowTierUmber(state: BlockState): Boolean =
     state.block == Blocks.TERRACOTTA
 
 private fun isMidTierUmber(state: BlockState): Boolean =
-    state.block == Blocks.BROWN_TERRACOTTA
+    state.block == Blocks.DYED_TERRACOTTA.brown()
 
 private fun isHighTierUmber(state: BlockState): Boolean =
     state.block == Blocks.SMOOTH_RED_SANDSTONE

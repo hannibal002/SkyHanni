@@ -1,17 +1,21 @@
-package at.hannibal2.skyhanni.utils.render
+// TODO 26.2
+//? if < 26.2 {
+/*package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
-import com.mojang.blaze3d.textures.TextureFormat
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 
-// The idea and implementation for this class was inspired by SkyBlocker.
-// This implementation has been modified from the original SkyBlocker code to work across multiple versions.
+//? if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
+import com.mojang.blaze3d.GpuFormat
+
+// The idea and implementation for this class was inspired by Skyblocker.
+// This implementation has been modified from the original Skyblocker code to work across multiple versions.
 class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
 
     override fun endOutlineBatch() {
@@ -85,7 +89,8 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
                 val depthAttachment = device.createTexture(
                     "SkyHanni Custom Depth",
                     GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
-                    TextureFormat.DEPTH32,
+                    //~ if < 26.2 'GpuFormat.D32_FLOAT_S8_UINT' -> 'TextureFormat.DEPTH32'
+                    GpuFormat.D32_FLOAT_S8_UINT
                     lastWidth, lastHeight, 1, 1,
                 )
                 customDepthAttachment = depthAttachment
@@ -96,3 +101,4 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
         }
     }
 }
+*///?}

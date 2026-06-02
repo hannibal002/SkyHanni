@@ -125,7 +125,7 @@ object CustomWardrobe {
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
-        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
+        val gui = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
         val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
         val posY = gui.topPos + (gui.imageHeight - renderable.height) / 2

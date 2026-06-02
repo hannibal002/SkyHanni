@@ -86,7 +86,7 @@ object VisualWordGui {
     private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
     private val downItemDimmed by lazy { Renderable.item(downSkull, dimmedConfig) }
 
-    fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
+    fun isInGui(): Boolean = Minecraft.getInstance().gui.screen() is VisualWordScreen
 
     fun onCommand() {
         if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {

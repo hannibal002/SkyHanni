@@ -274,7 +274,7 @@ class GuiPositionEditor(
         if (oldScreen == null) {
             super.onClose()
         } else {
-            Minecraft.getInstance().screen = oldScreen
+            Minecraft.getInstance().gui.setScreen(oldScreen)
         }
     }
 }

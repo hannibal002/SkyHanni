@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.ModelPartFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -14,10 +12,18 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+// TODO 26.2
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import net.minecraft.client.renderer.OutlineBufferSource;
+*///?}
+
 @Mixin(ModelPartFeatureRenderer.class)
 public abstract class MixinModelPartFeatureRenderer {
 
-    @WrapOperation(
+    // TODO 26.2
+    //? if < 26.2 {
+    /*@WrapOperation(
         method = "render",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
@@ -53,6 +59,7 @@ public abstract class MixinModelPartFeatureRenderer {
             return original.call(outlineConsumer, layer);
         }
     }
+    *///?}
 
     @Unique
     private boolean skyhanni$usesCustomOutline(SubmitNodeStorage.ModelPartSubmit modelPart) {

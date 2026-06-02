@@ -77,7 +77,7 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        val screen = Minecraft.getInstance().screen ?: return
+        val screen = Minecraft.getInstance().gui.screen() ?: return
         if (screen !is SignEditScreen) return
         lastWindowOpenTime = SimpleTimeMark.now()
     }
@@ -186,7 +186,7 @@ object GardenCustomKeybinds {
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
-    private fun hasGuiOpen() = Minecraft.getInstance().screen != null
+    private fun hasGuiOpen() = Minecraft.getInstance().gui.screen() != null
 
     @JvmStatic
     fun disableAll() {

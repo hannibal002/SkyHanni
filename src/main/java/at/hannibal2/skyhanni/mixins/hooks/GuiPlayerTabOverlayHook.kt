@@ -9,7 +9,7 @@ import kotlin.reflect.KProperty
 fun <T> tabListGuarded(block: (PlayerTabOverlay) -> T): T {
     tabListGuard = true
     try {
-        return block(Minecraft.getInstance().gui.tabList)
+        return block(Minecraft.getInstance().gui.hud.tabList)
     } finally {
         tabListGuard = false
     }

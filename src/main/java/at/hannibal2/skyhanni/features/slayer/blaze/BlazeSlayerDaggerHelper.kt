@@ -245,7 +245,7 @@ object BlazeSlayerDaggerHelper {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.daggers) return
 
-        val currentScreen = Minecraft.getInstance().screen
+        val currentScreen = Minecraft.getInstance().gui.screen()
         if (currentScreen != null && currentScreen !is GuiPositionEditor) return
 
         textTop?.let { config.positionTop.renderRenderable(it, "Blaze Slayer Dagger Top") }

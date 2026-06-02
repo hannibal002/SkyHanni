@@ -191,7 +191,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = Minecraft.getInstance().screen
+        this.guiContext = Minecraft.getInstance().gui.screen()
         return this
     }
 

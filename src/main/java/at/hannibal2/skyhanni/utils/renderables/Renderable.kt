@@ -302,14 +302,14 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getInstance().screen.takeIf { it != null } ?: return false
+            val guiScreen = Minecraft.getInstance().gui.screen().takeIf { it != null } ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = Minecraft.getInstance().screen !is PauseScreen
+            val inMenu = Minecraft.getInstance().gui.screen() !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null

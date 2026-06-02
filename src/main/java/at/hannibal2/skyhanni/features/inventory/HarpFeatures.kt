@@ -107,7 +107,7 @@ object HarpFeatures {
     }
 
     private fun updateScale() {
-        if (Minecraft.getInstance().screen == null) {
+        if (Minecraft.getInstance().gui.screen() == null) {
             DelayedRun.runNextTick {
                 updateScale()
             }

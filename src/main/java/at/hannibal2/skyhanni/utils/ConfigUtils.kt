@@ -70,7 +70,7 @@ object ConfigUtils {
     }
 
     val configScreenCurrentlyOpen: Boolean
-        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
+        get() = Minecraft.getInstance().gui.screen() is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
 }

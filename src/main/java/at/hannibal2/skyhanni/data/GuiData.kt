@@ -58,7 +58,7 @@ object GuiData {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getInstance().screen !is ContainerScreen) {
+            if (Minecraft.getInstance().gui.screen() !is ContainerScreen) {
                 preDrawEventCancelled = false
             }
         }

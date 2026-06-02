@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.LivingEntity
-import net.minecraft.world.entity.monster.Slime
+import net.minecraft.world.entity.monster.cubemob.Slime
 import java.awt.Color
 import kotlin.math.ceil
 

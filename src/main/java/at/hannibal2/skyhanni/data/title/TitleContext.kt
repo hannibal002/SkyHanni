@@ -127,7 +127,7 @@ open class TitleContext(
     }
 
     fun tryRenderInventoryTitle() {
-        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
+        val gui = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return
 
         val stringRenderable = with(Renderable) {
             vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {

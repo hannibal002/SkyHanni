@@ -148,7 +148,7 @@ object VanquisherWaypointShare {
     @HandleEvent
     fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
         if (event.keyCode == config.keybindSharing) sendSpawn()
     }
 

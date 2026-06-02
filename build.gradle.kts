@@ -298,7 +298,7 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == ProjectTarget.MODERN_26100) {
+if (target == ProjectTarget.MODERN_26200) {
     configure<FabricApiExtension> {
         configureTests {
             modId = "skyhanni"
@@ -465,7 +465,7 @@ tasks.withType<Detekt>().configureEach {
     source = source.matching {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
     }
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == ProjectTarget.MODERN_26200
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
 
@@ -481,7 +481,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == ProjectTarget.MODERN_26200
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }

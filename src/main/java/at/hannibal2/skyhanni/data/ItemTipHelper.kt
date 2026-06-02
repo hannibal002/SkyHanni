@@ -40,7 +40,7 @@ object ItemTipHelper {
     fun onRenderInventoryItemOverlayPost(event: DrawScreenAfterEvent) {
         if (GlobalRender.renderDisabled) return
 
-        val gui = Minecraft.getInstance().screen
+        val gui = Minecraft.getInstance().gui.screen()
         if (gui !is ContainerScreen) return
         val inventoryName = InventoryUtils.openInventoryName()
 

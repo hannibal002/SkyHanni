@@ -19,7 +19,7 @@ object RenderData {
     fun postRenderOverlay(context: GuiGraphicsExtractor) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val screen = Minecraft.getInstance().screen
+        val screen = Minecraft.getInstance().gui.screen()
 
         DrawContextUtils.setContext(context)
         renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is ChatScreen)
@@ -30,7 +30,7 @@ object RenderData {
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val currentScreen = Minecraft.getInstance().screen ?: return
+        val currentScreen = Minecraft.getInstance().gui.screen() ?: return
         if (currentScreen !is InventoryScreen && currentScreen !is ContainerScreen) return
 
         DrawContextUtils.pushPop {

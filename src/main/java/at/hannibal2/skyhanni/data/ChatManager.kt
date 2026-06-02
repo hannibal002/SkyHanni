@@ -253,7 +253,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat
+        val chatGui = mc.gui.hud.chat
 
         val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
             predicate(it.value)
@@ -335,7 +335,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat
+        val chatGui = mc.gui.hud.chat
 
         val iterator = chatGui.allMessages.iterator()
         var removed = 0
@@ -408,7 +408,7 @@ object ChatManager {
             description = "Force Minecraft to refresh chat lines"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
+                Minecraft.getInstance().gui.hud.chat.refreshTrimmedMessages()
                 ChatUtils.chat("Refreshed chat.")
             }
         }

@@ -6,7 +6,6 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -17,6 +16,10 @@ import kotlin.math.roundToInt
 
 //? if >= 26.1
 import org.joml.Matrix4f
+
+// TODO 26.2
+//? if < 26.2
+//import net.minecraft.client.renderer.MultiBufferSource
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -46,14 +49,19 @@ internal class SkyHanniItemAtlasRenderer(
         slotX: Int,
         slotY: Int,
         pixelSize: Int,
-        bufferSource: MultiBufferSource.BufferSource,
+        // TODO 26.2
+        //? if < 26.2
+        //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
         RenderSystem.enableScissorForRenderTypeDraws(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
         shState.renderItemToTexture(
-            bufferSource, featureRenderDispatcher,
+            // TODO 26.2
+            //? if < 26.2
+            //bufferSource,
+            featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
             centerY = slotY.toFloat() + pixelSize / 2.0f,
             pixelSize = pixelSize,

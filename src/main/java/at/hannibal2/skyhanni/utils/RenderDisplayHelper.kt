@@ -51,7 +51,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+            val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
                     if (display.outsideInventory && isInOwnInventory) {
@@ -67,7 +67,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+            val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()

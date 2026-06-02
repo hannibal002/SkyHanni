@@ -20,7 +20,7 @@ object ReiCompat {
     @JvmStatic
     fun searchHasFocus(): Boolean {
         if (!isReiLoaded) return false
-        if (Minecraft.getInstance().screen == null) return false
+        if (Minecraft.getInstance().gui.screen() == null) return false
         return try {
             (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
@@ -37,7 +37,7 @@ object ReiCompat {
         }
         var stack = getItemStackFromItemList()
         if (stack == null) {
-            val screen = Minecraft.getInstance().screen
+            val screen = Minecraft.getInstance().gui.screen()
             if (screen !is AbstractContainerScreen<*>) return null
             stack = getItemStackFromRecipe(screen)
         }

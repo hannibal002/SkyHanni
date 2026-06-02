@@ -1,4 +1,6 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+// TODO 26.2
+//? if < 26.2 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
@@ -15,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 //?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource;
+^*import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-*///?}
+*^//?}
 
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
@@ -26,8 +28,8 @@ public abstract class MixinItemFeatureRenderer {
         //? if >= 26.1 {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         //?} else {
-        /*method = "render",
-        *///?}
+        ^*method = "render",
+        *^//?}
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
@@ -55,7 +57,7 @@ public abstract class MixinItemFeatureRenderer {
         return original.call(outlineConsumer, renderType);
     }
     //?} else {
-    /*@ModifyArg(
+    ^*@ModifyArg(
         method = "render",
         at = @At(
             value = "INVOKE",
@@ -71,5 +73,6 @@ public abstract class MixinItemFeatureRenderer {
         }
         return outlineConsumer;
     }
-    *///?}
+    *^//?}
 }
+*///?}

@@ -127,7 +127,7 @@ object BingoCardDisplay {
             }
         }
         if (!config.stepHelper && displayMode == 1) displayMode = 2
-        if (displayMode == 0 && Minecraft.getInstance().screen !is ChatScreen) {
+        if (displayMode == 0 && Minecraft.getInstance().gui.screen() !is ChatScreen) {
             config.bingoCardPos.renderRenderables(displayCache, posLabel = "Bingo Card")
         } else if (displayMode == 1) {
             val helpRenderable = Renderable.vertical(

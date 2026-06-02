@@ -63,7 +63,7 @@ object EstimatedItemValue {
     internal var stackingEnchants: Map<String, Enchant.Stacking> = emptyMap()
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
+    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().gui.screen() != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {

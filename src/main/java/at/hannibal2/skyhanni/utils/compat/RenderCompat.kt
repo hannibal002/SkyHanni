@@ -21,7 +21,14 @@ object RenderCompat {
     }
 
     fun RenderPass.drawIndexed(indices: Int) {
-        drawIndexed(0, 0, indices, 1)
+        drawIndexed(
+            0,
+            0,
+            indices,
+            1,
+            //? if >= 26.2
+            0,
+        )
     }
 
     private fun RenderTarget.findColorAttachment() = this.colorTextureView
@@ -31,11 +38,12 @@ object RenderCompat {
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
         val colorAttachment = framebuffer.findColorAttachment() ?: error("color attachment is null")
         return this.createCommandEncoder().createRenderPass(
-            { name },
-            colorAttachment,
-            OptionalInt.empty(),
-            framebuffer.findDepthAttachment(),
-            OptionalDouble.empty(),
+            { name }, // label
+            colorAttachment, // colorTexture
+            //~ if < 26.2 'Optional.empty<Vector4fc>' -> 'OptionalInt.empty()'
+            Optional.empty()<Vector4fc>,
+            framebuffer.findDepthAttachment(), // depthTexture
+            OptionalDouble.empty(), // clearDepth
         )
     }
 

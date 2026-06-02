@@ -32,8 +32,10 @@ public abstract class MixinChatHud {
     @Final
     private Minecraft minecraft;
 
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;getGuiTicks()I"), require = 0)
-    private int clearChatHead(Gui instance) {
+    //~ if < 26.2 'net/minecraft/client/gui/Hud' -> 'net/minecraft/client/gui/Gui' {
+    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getHudTicks()I"), require = 0)
+    private int clearChatHead(Hud instance) {
+    //~}
         return instance.getGuiTicks() + 90;
     }
 

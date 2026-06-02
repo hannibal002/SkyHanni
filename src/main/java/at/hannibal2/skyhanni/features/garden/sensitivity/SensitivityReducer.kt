@@ -198,5 +198,5 @@ object SensitivityReducer {
     private fun isHoldingMousemat(): Boolean = GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT
     private fun isHoldingTool(): Boolean = GardenApi.toolInHand != null
     private fun isHoldingFishingRod(): Boolean = FishingApi.holdingRod
-    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null
+    private fun isHoldingKey(): Boolean = config.keybind.isKeyHeld() && Minecraft.getInstance().gui.screen() == null
 }

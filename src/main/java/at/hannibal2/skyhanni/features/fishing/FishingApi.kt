@@ -235,7 +235,7 @@ object FishingApi {
     }
 
     private fun hasGuiOpen(): Boolean {
-        val screen = Minecraft.getInstance().screen
+        val screen = Minecraft.getInstance().gui.screen()
         return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
     }
 

@@ -67,7 +67,7 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
+            Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -956,7 +956,7 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
+    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera())
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -1081,5 +1081,5 @@ object WorldRenderUtils {
     }
 
     // returns true if the camera is underwater
-    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera.fluidInCamera == FogType.WATER
+    fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER
 }

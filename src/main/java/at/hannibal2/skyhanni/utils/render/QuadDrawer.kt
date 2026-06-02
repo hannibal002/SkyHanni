@@ -12,7 +12,9 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         sidePoint2: LorenzVec,
         c: Color,
     ) {
-        val layer = SkyHanniRenderLayers.getQuads(false)
+        // TODO 26.2
+        //? if < 26.2 {
+        /*val layer = SkyHanniRenderLayers.getQuads(false)
         val buf = event.vertexConsumers.getBuffer(layer)
         event.matrices.pushPose()
 
@@ -33,6 +35,7 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
             .setColor(c.red, c.green, c.blue, c.alpha)
 
         event.matrices.popPose()
+        *///?}
     }
 
     companion object {

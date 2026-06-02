@@ -144,7 +144,7 @@ object CFCustomReminder {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
-        if (Minecraft.getInstance().screen is ContainerScreen) return
+        if (Minecraft.getInstance().gui.screen() is ContainerScreen) return
         if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")

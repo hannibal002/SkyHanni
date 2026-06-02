@@ -13,13 +13,15 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
     @PublishedApi
     internal fun drawQueuedLines() {
-        if (queuedLines.isEmpty()) return
+        // TODO 26.2
+        //? if < 26.2 {
+        /*if (queuedLines.isEmpty()) return
 
         val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.last()
 
-        // Todo reshape to avoid code duplication
+        // TODO reshape to avoid code duplication
         for (line in queuedLines) {
             buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
@@ -33,6 +35,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         }
 
         queuedLines.clear()
+        *///?}
     }
 
     private fun addQueuedLine(p1: LorenzVec, p2: LorenzVec, color: Color) {

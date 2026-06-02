@@ -133,7 +133,7 @@ object CurrentChatDisplay {
     @HandleEvent(GuiRenderEvent::class)
     fun onGuiRender() {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
+        if (Minecraft.getInstance().gui.screen() !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
         val display = display ?: return
         config.currentChatDisplayPos.renderRenderable(display, posLabel = "Current Chat")
     }

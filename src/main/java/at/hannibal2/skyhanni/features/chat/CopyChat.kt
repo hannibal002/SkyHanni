@@ -53,7 +53,7 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return null
+        val chatGui = mc.gui.hud.chat ?: return null
         val chatLineY = screenToChatY(mouseY.toDouble())
         val chatLineX = screenToChatX(mouseX.toDouble())
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
@@ -83,13 +83,13 @@ object CopyChat {
 
     fun screenToChatX(d: Double): Double {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return 0.0
+        val chatGui = mc.gui.hud.chat ?: return 0.0
         return d / chatGui.scale - 4.0
     }
 
     fun screenToChatY(d: Double): Double {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return 0.0
+        val chatGui = mc.gui.hud.chat ?: return 0.0
         val e = mc.window.guiScaledHeight - d - 40.0
         return e / (chatGui.scale * chatGui.lineHeight)
     }

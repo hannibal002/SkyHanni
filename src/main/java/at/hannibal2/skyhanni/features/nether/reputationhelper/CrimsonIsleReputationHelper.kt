@@ -136,7 +136,7 @@ object CrimsonIsleReputationHelper {
     }
 
     fun isHotkeyHeld(): Boolean {
-        val isAllowedGui = Minecraft.getInstance().screen.let {
+        val isAllowedGui = Minecraft.getInstance().gui.screen().let {
             it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false

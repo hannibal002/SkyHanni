@@ -98,7 +98,7 @@ class DefaultConfigOptionGui(
             }
             button("Apply choices", listOf()) {
                 DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
-                mc.setScreen(null)
+                mc.gui.setScreen(null)
             }
             button("Turn all on", listOf()) {
                 for (entry in resetSuggestionState.entries) {
@@ -125,7 +125,7 @@ class DefaultConfigOptionGui(
                 }
             }
             button("Cancel", listOf()) {
-                mc.setScreen(null)
+                mc.gui.setScreen(null)
             }
         }
 

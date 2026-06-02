@@ -23,7 +23,7 @@ object HideonleafFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
         if (event.keyCode != config.nextHideonleafKeybind) return
         if (!config.hideonleafFinder) return
         if (navigating) return

@@ -34,7 +34,7 @@ object ModifyVisualWords {
         componentCache.clear()
         SkyHanniMod.visualWordsData.modifiedWords =
             userModifiedWords.map { it.toVisualWord() }.toMutableList()
-        Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
+        Minecraft.getInstance().gui.hud.chat.refreshTrimmedMessages()
     }
 
     var changeWords = true

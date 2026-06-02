@@ -16,7 +16,7 @@ object RepoPatternDumpTest : FabricClientGameTest {
     override fun runTest(context: ClientGameTestContext) {
         val dumpDirective = PlatformUtils.getRepoPatternDumpLocation() ?: return
         context.waitFor { mc ->
-            mc.screen is TitleScreen
+            mc.gui.screen() is TitleScreen
         }
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         RepoPatternManager.dump(sourceLabel, File(path))

@@ -23,7 +23,7 @@ object SignUtils {
     private val pasteConfig = CoroutineSettings("sign utils paste config")
 
     fun setTextIntoSign(text: String, line: Int = 0) {
-        val gui = Minecraft.getInstance().screen
+        val gui = Minecraft.getInstance().gui.screen()
         if (gui !is AbstractSignEditScreen) return
         val oldRow = gui.line
         gui.line = line
@@ -32,7 +32,7 @@ object SignUtils {
     }
 
     private fun addTextIntoSign(addedText: String) {
-        val gui = Minecraft.getInstance().screen
+        val gui = Minecraft.getInstance().gui.screen()
         if (gui !is AbstractSignEditScreen) return
         val lines = gui.signText
         val index = gui.line

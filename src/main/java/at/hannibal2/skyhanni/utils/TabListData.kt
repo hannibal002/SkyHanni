@@ -99,7 +99,7 @@ object TabListData {
         tablistCache = newTablistCache
         TabListUpdateEvent(newTablistCache).post()
 
-        val tabListOverlay = Minecraft.getInstance().gui.tabList
+        val tabListOverlay = Minecraft.getInstance().gui.hud.tabList
         header = tabListOverlay.header
         val newFooter = tabListOverlay.footer
         if (newFooter != footer) {

@@ -15,6 +15,7 @@ enum class MinecraftVersion(
 ) {
     MC12111("1.21.11", 21),
     MC26100("26.1", 25, versionNameOverride = "26.1.2"),
+    MC26200("26.2", 25, versionNameOverride = "26.2-pre-3"),
     ;
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)

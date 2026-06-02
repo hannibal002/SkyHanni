@@ -110,7 +110,7 @@ object IslandAreaFeatures {
     fun onGuiRenderOverlay() {
         if (!isAreaListEnabled()) return
         if (!areaListConfig.showAlways) return
-        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+        val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
         if (!isInOwnInventory) {
             doRender()
         }
@@ -119,7 +119,7 @@ object IslandAreaFeatures {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isAreaListEnabled()) return
-        val isInOwnInventory = Minecraft.getInstance().screen is InventoryScreen
+        val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
         if (isInOwnInventory) {
             doRender()
         }

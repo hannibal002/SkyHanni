@@ -141,7 +141,7 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getInstance().screen
+        val guiChest = Minecraft.getInstance().gui.screen()
         if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 

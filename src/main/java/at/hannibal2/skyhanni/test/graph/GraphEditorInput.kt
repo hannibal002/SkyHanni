@@ -162,7 +162,7 @@ object GraphEditorInput {
     }
 
     private fun handleUndoRedo(): Boolean {
-        if (Minecraft.getInstance().screen == null) {
+        if (Minecraft.getInstance().gui.screen() == null) {
             if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
@@ -323,7 +323,7 @@ object GraphEditorInput {
     }
 
     private fun isAnyGuiActive(): Boolean {
-        val gui = Minecraft.getInstance().screen != null
+        val gui = Minecraft.getInstance().gui.screen() != null
         if (gui) {
             lastGuiTime = 3.ticks.fromNow()
         }

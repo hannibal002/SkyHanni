@@ -294,7 +294,7 @@ object MinionFeatures {
     fun onTick() {
         if (display != null) return
 
-        if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
+        if (Minecraft.getInstance().gui.screen() is ContainerScreen && config.hopperProfitDisplay) {
             display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }

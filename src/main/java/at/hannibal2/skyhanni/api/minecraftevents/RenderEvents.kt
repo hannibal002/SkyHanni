@@ -28,13 +28,14 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+        // TODO 26.2
+        //? if < 26.2 {
+        /*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
         PictureInPictureRendererRegistry.register { ctx ->
-            SkyHanniPipCoordinatorRenderer(
-                //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
-                ctx.bufferSource()
-            )
+            //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
+            SkyHanniPipCoordinatorRenderer(ctx.bufferSource())
         }
+        *///?}
     }
 
     @HandleEvent
@@ -44,7 +45,7 @@ object RenderEvents {
     }
 
     private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
-        if (Minecraft.getInstance().options.hideGui) return
+        if (Minecraft.getInstance().gui.hud.isHidden) return
         RenderData.postRenderOverlay(context)
     }
 

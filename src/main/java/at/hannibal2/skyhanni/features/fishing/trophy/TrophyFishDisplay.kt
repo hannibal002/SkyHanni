@@ -282,7 +282,7 @@ object TrophyFishDisplay {
 
     private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
-        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getInstance().screen is InventoryScreen
+        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getInstance().gui.screen() is InventoryScreen
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }

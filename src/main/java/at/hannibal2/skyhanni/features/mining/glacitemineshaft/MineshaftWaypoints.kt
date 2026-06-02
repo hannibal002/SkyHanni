@@ -58,7 +58,7 @@ object MineshaftWaypoints {
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
         if (event.keyCode != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 

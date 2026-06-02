@@ -370,7 +370,7 @@ object ItemAbilityCooldown {
 
         val stack = event.stack
 
-        val guiOpen = Minecraft.getInstance().screen != null
+        val guiOpen = Minecraft.getInstance().gui.screen() != null
         val uuid = stack.getIdentifier() ?: return
         val list = items[uuid] ?: return
 
@@ -391,7 +391,7 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
 
-        val guiOpen = Minecraft.getInstance().screen != null
+        val guiOpen = Minecraft.getInstance().gui.screen() != null
         val stack = event.stack
 
         val uuid = stack?.getIdentifier() ?: return

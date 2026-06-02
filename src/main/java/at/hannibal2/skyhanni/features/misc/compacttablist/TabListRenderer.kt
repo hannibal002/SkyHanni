@@ -48,7 +48,7 @@ object TabListRenderer {
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
-        if (Minecraft.getInstance().screen != null) return
+        if (Minecraft.getInstance().gui.screen() != null) return
 
         val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
         if (playerListKeyActive && !isPressed) {
