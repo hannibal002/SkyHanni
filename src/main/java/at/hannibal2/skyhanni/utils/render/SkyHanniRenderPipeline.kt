@@ -16,7 +16,7 @@ import net.minecraft.resources.Identifier
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.DepthStencilState
-import com.mojang.blaze3d.platform.CompareOp
+import java.util.Optional
 //?} else {
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
@@ -32,8 +32,6 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    //~ if < 26.1 'CompareOp ' -> 'DepthTestFunction '
-    depthTestFunction: CompareOp = CompareOp.LESS_THAN_OR_EQUAL,
     val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
     LINES(
@@ -47,7 +45,6 @@ enum class SkyHanniRenderPipeline(
         vFormat = PosColorNormal,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
-        depthTestFunction = CompareOp.ALWAYS_PASS,
         irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
@@ -58,7 +55,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
         depthWrite = false,
-        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     TRIANGLES(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -68,7 +64,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLES,
         depthWrite = false,
-        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     TRIANGLE_FAN(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -78,7 +73,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
         depthWrite = false,
-        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     QUADS(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -86,7 +80,6 @@ enum class SkyHanniRenderPipeline(
     QUADS_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
-        depthTestFunction = CompareOp.ALWAYS_PASS,
     ),
     ROUNDED_RECT(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -214,12 +207,14 @@ enum class SkyHanniRenderPipeline(
                 }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
-                //? if >= 26.1 {
-                withDepthStencilState(DepthStencilState(depthTestFunction, depthWrite, 0f, 0f))
-                //?} else {
-                /*withDepthWrite(depthWrite)
-                withDepthTestFunction(depthTestFunction)
-                *///?}
+                if (!depthWrite) {
+                    //? if >= 26.1 {
+                    withDepthStencilState(Optional.empty())
+                    //?} else {
+                    /*withDepthWrite(depthWrite)
+                    withDepthTestFunction(CompareOp.ALWAYS_PASS)
+                    *///?}
+                }
             }.build(),
     )
 
