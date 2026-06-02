@@ -79,7 +79,7 @@ object SkyHanniRenderLayers {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
             //?} else {
             /*.withDepthWrite(false)
-            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
             *///?}
             .build(),
     )
@@ -95,7 +95,7 @@ object SkyHanniRenderLayers {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, -1.0f, -10.0f))
             //?} else {
             /*.withDepthWrite(false)
-            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
             .withDepthBias(-1.0f, -10.0f)
             *///?}
             .build(),
@@ -112,7 +112,7 @@ object SkyHanniRenderLayers {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false, -1.0f, -10.0f))
             //} else {
             /*.withDepthWrite(false)
-            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
             *///?}
             .build(),
     )
@@ -128,7 +128,7 @@ object SkyHanniRenderLayers {
             .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
             //} else {
             /*.withDepthWrite(false)
-            .withDepthTestFunction(CompareOp.LESS_THAN_OR_EQUAL)
+            .withDepthTestFunction(DepthTestFunction.LEQUAL_DEPTH_TEST)
             *///?}
             .build(),
     )

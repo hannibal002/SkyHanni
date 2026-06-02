@@ -212,7 +212,7 @@ enum class SkyHanniRenderPipeline(
                     withDepthStencilState(Optional.empty())
                     //?} else {
                     /*withDepthWrite(depthWrite)
-                    withDepthTestFunction(CompareOp.ALWAYS_PASS)
+                    withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
                     *///?}
                 }
             }.build(),

@@ -32,7 +32,7 @@ public class RenderPipelineMixin {
     private DepthTestFunction setGlowDepth(DepthTestFunction original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
         if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
-        return SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive() ? CompareOp.LESS_THAN_OR_EQUAL : original;
+        return SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive() ? DepthTestFunction.LEQUAL_DEPTH_TEST : original;
     }
     *///?}
 }

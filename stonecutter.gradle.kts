@@ -135,8 +135,6 @@ stonecutter parameters {
         string(current.parsed < "26.1") {
             replace(";extractRenderState(", ";render(")
             replace(";text", ";drawString")
-            replace("CompareOp.ALWAYS_PASS", "DepthTestFunction.NO_DEPTH_TEST")
-            replace("CompareOp.LESS_THAN_OR_EQUAL", "DepthTestFunction.LEQUAL_DEPTH_TEST")
             replace("ContainerInput", "ClickType")
             replace("GuiGraphicsExtractor", "GuiGraphics")
             replace("InteractClickType", "InteractClickType") // prevent replacement
