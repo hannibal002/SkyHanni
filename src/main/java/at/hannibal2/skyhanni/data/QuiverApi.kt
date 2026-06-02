@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.BowItem
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.util.regex.Matcher
 
 @SkyHanniModule
@@ -298,7 +298,7 @@ object QuiverApi {
         return null
     }
 
-    private fun ItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
+    private fun SafeItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
         getArrowByNameOrNull(cleanName().trimWhiteSpace())?.let { return it }
         return getLoreComponent().firstNotNullOfOrNull { line ->
             getArrowByNameOrNull(line.string.trimWhiteSpace())
