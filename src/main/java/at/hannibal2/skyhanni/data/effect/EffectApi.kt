@@ -20,13 +20,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -295,7 +295,7 @@ object EffectApi {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
-    private fun ItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
+    private fun SafeItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
         hoverName.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
     }
 

@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.EntityUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 
 // TODO replace all function calls outside the clas with the equivalents inside the class, then remove the function.
@@ -17,19 +18,19 @@ import net.minecraft.world.level.Level
  */
 object EntityCompat {
 
-    fun ArmorStand.getStandHelmet(): ItemStack? =
+    fun ArmorStand.getStandHelmet(): SafeItemStack? =
         this.getItemBySlot(EquipmentSlot.HEAD)
 
-    fun Mob.getEntityHelmet(): ItemStack? =
+    fun Mob.getEntityHelmet(): SafeItemStack? =
         this.getItemBySlot(EquipmentSlot.HEAD)
 
     fun LivingEntity.getAllEquipment() =
         this.equipment.items.values.toTypedArray()
 
-    fun ArmorStand.getHandItem(): ItemStack? =
+    fun ArmorStand.getHandItem(): SafeItemStack? =
         this.getItemBySlot(EquipmentSlot.MAINHAND)
 
-    fun ArmorStand.getInventoryItems(): Array<ItemStack> =
+    fun ArmorStand.getInventoryItems(): Array<SafeItemStack> =
         arrayOf(
             getItemBySlot(EquipmentSlot.MAINHAND),
             getItemBySlot(EquipmentSlot.FEET),
@@ -39,7 +40,7 @@ object EntityCompat {
             getItemBySlot(EquipmentSlot.OFFHAND),
         )
 
-    fun ArmorStand.getEquipmentSlots(): Map<EquipmentSlot, ItemStack?> =
+    fun ArmorStand.getEquipmentSlots(): Map<EquipmentSlot, SafeItemStack?> =
         EquipmentSlot.entries.associateWith { getItemBySlot(it).orNull() }
 
     fun Entity.getEntityLevel(): Level =
@@ -58,24 +59,24 @@ object EntityCompat {
 
 }
 
-@Deprecated("use EntityCompat directly")
-fun ArmorStand.getStandHelmet(): ItemStack? =
+@Legacy("use EntityCompat directly")
+fun ArmorStand.getStandHelmet(): SafeItemStack? =
     this.getItemBySlot(EquipmentSlot.HEAD)
 
-@Deprecated("use EntityCompat directly")
-fun Mob.getEntityHelmet(): ItemStack? =
+@Legacy("use EntityCompat directly")
+fun Mob.getEntityHelmet(): SafeItemStack? =
     this.getItemBySlot(EquipmentSlot.HEAD)
 
-@Deprecated("use EntityCompat directly")
+@Legacy("use EntityCompat directly")
 fun LivingEntity.getAllEquipment() =
     this.equipment.items.values.toTypedArray()
 
-@Deprecated("use EntityCompat directly")
-fun ArmorStand.getHandItem(): ItemStack? =
+@Legacy("use EntityCompat directly")
+fun ArmorStand.getHandItem(): SafeItemStack? =
     this.getItemBySlot(EquipmentSlot.MAINHAND)
 
-@Deprecated("use EntityCompat directly")
-fun ArmorStand.getInventoryItems(): Array<ItemStack> =
+@Legacy("use EntityCompat directly")
+fun ArmorStand.getInventoryItems(): Array<SafeItemStack> =
     arrayOf(
         getItemBySlot(EquipmentSlot.MAINHAND),
         getItemBySlot(EquipmentSlot.FEET),
@@ -85,19 +86,19 @@ fun ArmorStand.getInventoryItems(): Array<ItemStack> =
         getItemBySlot(EquipmentSlot.OFFHAND),
     )
 
-@Deprecated("use EntityCompat directly")
-fun ArmorStand.getEquipmentSlots(): Map<EquipmentSlot, ItemStack?> =
+@Legacy("use EntityCompat directly")
+fun ArmorStand.getEquipmentSlots(): Map<EquipmentSlot, SafeItemStack?> =
     EquipmentSlot.entries.associateWith { getItemBySlot(it).orNull() }
 
-@Deprecated("use EntityCompat directly")
+@Legacy("use EntityCompat directly")
 fun Entity.getEntityLevel(): Level =
     this.level()
 
-@Deprecated("use EntityCompat directly")
+@Legacy("use EntityCompat directly")
 val Entity.deceased: Boolean
     get() = this.isRemoved
 
-@Deprecated("use EntityCompat directly")
+@Legacy("use EntityCompat directly")
 fun LivingEntity.findHealthReal(): Float {
     val entityHealth = health
     if (entityHealth == 1024f) {

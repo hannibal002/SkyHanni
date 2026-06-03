@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -50,7 +51,7 @@ object PageScrolling {
 
     private val scroll = ScrollValue()
 
-    // these checks are to prevent cheat-like behaviour, where the player could scroll through the inventory without any delay
+    // these checks are to prevent cheat-like behavior, where the player could scroll through the inventory without any delay
     // currentlyScrollable is the primary check, to see if the player is currently able to scroll,
     // with cooldown being a fallback to still allow for scrolling if currentlyScrollable is stuck
     private var currentlyScrollable = false

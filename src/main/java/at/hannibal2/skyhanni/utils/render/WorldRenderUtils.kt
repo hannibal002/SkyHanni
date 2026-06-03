@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -25,7 +26,6 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
-import net.minecraft.client.renderer.LightTexture
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -38,10 +38,16 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+//? if >= 26.1 {
+import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
+//?}
+
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    private val beaconBeam = createResourceLocation("textures/entity/beacon_beam.png")
+    //~ if < 26.1 'entity/beacon/' -> 'entity/'
+    private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -64,7 +70,7 @@ object WorldRenderUtils {
             Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage,
             beaconBeam,
             1f,
-            Math.floorMod(MinecraftCompat.localWorld.gameTime, 40) + partialTicks,
+            Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
             0,
             319,
             rgb,
@@ -132,7 +138,7 @@ object WorldRenderUtils {
             seeThroughBlocks = seeThroughBlocks,
         )
 
-        // todo use seeThroughBlocks
+        // TODO use seeThroughBlocks
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(location.x, location.y + 1, location.z, color.rgb)
     }
 
@@ -274,9 +280,9 @@ object WorldRenderUtils {
             shadow,
             matrix,
             vertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
+            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
@@ -331,9 +337,9 @@ object WorldRenderUtils {
             shadow,
             matrix,
             vertexConsumers,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.NORMAL,
+            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
             backGroundColor,
-            LightTexture.FULL_BRIGHT,
+            15728880,
         )
     }
 
@@ -813,7 +819,7 @@ object WorldRenderUtils {
         drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    @Deprecated("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
+    @Legacy("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
         drawLineToCrosshair(location, color, lineWidth, depth)
     }
@@ -950,8 +956,7 @@ object WorldRenderUtils {
         )
     }
 
-    fun getViewerPos() =
-        exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
+    fun getViewerPos() = exactLocation(Minecraft.getInstance().gameRenderer.mainCamera)
 
     fun AABB.expandBlock(n: Int = 1) = expand(LorenzVec.expandVector * n)
     fun AABB.inflateBlock(n: Int = 1) = expand(LorenzVec.expandVector * -n)
@@ -973,13 +978,13 @@ object WorldRenderUtils {
 
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = MinecraftCompat.localPlayer
         val eyeHeight = player.eyeHeight.toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
         exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {

@@ -25,15 +25,16 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -188,7 +189,7 @@ object JacobFarmingContestsInventory {
         }
     }
 
-    fun isClaimableContest(stack: ItemStack): Boolean = stack.getLore().lastOrNull() == "§eClick to claim reward!"
+    fun isClaimableContest(stack: SafeItemStack): Boolean = stack.getLore().lastOrNull() == "§eClick to claim reward!"
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {

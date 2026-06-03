@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,9 +43,11 @@ import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -74,7 +77,7 @@ object FishingApi {
      */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?<tier>BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     /**
@@ -120,7 +123,6 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
-    private const val BAIT_SLOT = 44
     private const val BAIT_HOTBAR_INDEX = 8
 
     var bobber: FishingHook? = null
@@ -191,12 +193,12 @@ object FishingApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
-        if (event.slot != BAIT_SLOT) return
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
         extractAndPostBaitUpdate(event.itemStack)
     }
 
     private fun checkAndUpdateBaitFromInventory() {
+        if (hasGuiOpen()) return
         val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
             postEmptyBaitUpdate()
             return
@@ -204,7 +206,7 @@ object FishingApi {
         extractAndPostBaitUpdate(stack)
     }
 
-    private fun extractAndPostBaitUpdate(stack: ItemStack) {
+    private fun extractAndPostBaitUpdate(stack: SafeItemStack) {
         val category = stack.getItemCategoryOrNull()
         if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
             postEmptyBaitUpdate()
@@ -221,7 +223,7 @@ object FishingApi {
         postBaitUpdate(baitType, baitAmount, stack)
     }
 
-    private fun postBaitUpdate(baitType: BaitType?, amount: Int, itemStack: ItemStack) {
+    private fun postBaitUpdate(baitType: BaitType?, amount: Int, itemStack: SafeItemStack) {
         if (currentBait?.internalName == baitType?.internalName && currentBaitAmount == amount) return
         currentBait = baitType
         currentBaitAmount = amount
@@ -229,7 +231,12 @@ object FishingApi {
     }
 
     private fun postEmptyBaitUpdate() {
-        postBaitUpdate(null, 0, ItemStack.EMPTY)
+        postBaitUpdate(null, 0, SafeItemStack.EMPTY)
+    }
+
+    private fun hasGuiOpen(): Boolean {
+        val screen = Minecraft.getInstance().screen
+        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -240,25 +247,25 @@ object FishingApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClick(event: WorldClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
         if (lastReelTime.passedSince() < .3.seconds) return
         lastReelTime = SimpleTimeMark.now()
     }
 
-    fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
+    fun SafeItemStack.isFishingRod() = getInternalName().isFishingRod()
     fun NeuInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
     fun NeuInternalName.isLavaRod() = this in lavaRods
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+    fun SafeItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
         val rodPartName = getExtraAttributes()?.getCompoundOrDefault(part.tagName)?.getStringOrDefault("part")
         if (rodPartName.isNullOrEmpty()) return null
         return rodPartName.toInternalName()
     }
 
-    fun ItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun SafeItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
@@ -333,9 +340,14 @@ object FishingApi {
     }
 
     private fun isWearingTrophyArmor(): Boolean =
-        InventoryUtils.getArmor().all {
-            trophyArmorNames.matches(it?.getInternalName()?.asString())
-        }
+        InventoryUtils.getArmor()
+            .mapNotNull { stack ->
+                val internalName = stack?.getInternalName()?.asString() ?: return@mapNotNull null
+                trophyArmorNames.matchMatcher(internalName) { group("tier") }
+            }
+            .groupingBy { it }
+            .eachCount()
+            .any { (_, count) -> count >= 2 }
 
     fun isWearingEmberArmor(): Boolean =
         InventoryUtils.getArmor().all {

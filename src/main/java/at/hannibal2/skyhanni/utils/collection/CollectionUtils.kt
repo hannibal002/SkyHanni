@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.Legacy
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -219,10 +220,10 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements.asList())
 
-    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
+    @Legacy("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit): Map<K, V> = toMutableMap().apply(function)
 
-    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
+    @Legacy("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit): List<T> = toMutableList().apply(function)
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
@@ -446,7 +447,7 @@ object CollectionUtils {
         }
     }
 
-    @Deprecated("Use the removeIf function provided by java")
+    @Legacy("Use the removeIf function provided by java")
     fun <T> MutableList<T>.removeIf(predicate: (T) -> Boolean) = removeIf(predicate)
 
     fun <K, V> MutableMap<K, V>.removeIfKey(predicate: (K) -> Boolean) {

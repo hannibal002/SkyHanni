@@ -73,7 +73,8 @@ object WormholeFinder {
     }
 
     private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
-        val quat = renderState()?.transformation()?.get(0f)?.leftRotation ?: return LorenzVec(0, 0, 1)
+        //~ if < 26.1 'leftRotation()' -> 'leftRotation'
+        val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return LorenzVec(0, 0, 1)
         val localY = Vector3f(0f, 1f, 0f)
         quat.transform(localY)
         return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalize()
