@@ -62,16 +62,18 @@ public abstract class MixinGuiGraphicsExtractor {
     )
     private GuiTextRenderState modifyVisualWordsTextState(GuiTextRenderState textState) {
         if (!VisualWordsHook.isCaxtonLoaded()) return textState;
-        FormattedCharSequence text = VisualWordsHook.modifyOrderedText(textState.text);
-        return text == textState.text ? textState : new GuiTextRenderState(
-            textState.font,
+        MixinGuiTextRenderState textStateAccessor = (MixinGuiTextRenderState) (Object) textState;
+        FormattedCharSequence originalText = textStateAccessor.skyhanni$getText();
+        FormattedCharSequence text = VisualWordsHook.modifyOrderedText(originalText);
+        return text == originalText ? textState : new GuiTextRenderState(
+            textStateAccessor.skyhanni$getFont(),
             text,
             textState.pose,
-            textState.x,
-            textState.y,
-            textState.color,
-            textState.backgroundColor,
-            textState.dropShadow,
+            textStateAccessor.skyhanni$getX(),
+            textStateAccessor.skyhanni$getY(),
+            textStateAccessor.skyhanni$getColor(),
+            textStateAccessor.skyhanni$getBackgroundColor(),
+            textStateAccessor.skyhanni$getDropShadow(),
             false,
             textState.scissor
         );

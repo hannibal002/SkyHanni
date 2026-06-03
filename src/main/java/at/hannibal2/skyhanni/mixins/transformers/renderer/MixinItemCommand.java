@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+//? if < 26.2 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import net.minecraft.client.renderer.SubmitNodeStorage;
@@ -26,3 +27,4 @@ public class MixinItemCommand implements GlowingStateStore {
     }
 
 }
+*///?}

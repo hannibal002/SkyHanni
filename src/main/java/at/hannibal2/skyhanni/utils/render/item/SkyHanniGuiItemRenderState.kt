@@ -13,11 +13,12 @@ import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+//? if >= 26.2
+import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
-// TODO 26.2
 //? if < 26.2
 //import net.minecraft.client.renderer.MultiBufferSource
 
@@ -92,7 +93,8 @@ data class SkyHanniGuiItemRenderState(
     private fun setAnimated() = trackingState.setAnimated()
 
     internal fun renderItemToTexture(
-        // TODO 26.2
+        //? if >= 26.2
+        submitNodeStorage: SubmitNodeStorage,
         //? if < 26.2
         //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
@@ -114,9 +116,20 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
-        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
-        featureRenderDispatcher.renderAllFeatures()
-        // TODO 26.2
+        trackingState.submit(
+            ps,
+            //? if >= 26.2
+            submitNodeStorage,
+            //? if < 26.2
+            //featureRenderDispatcher.submitNodeStorage,
+            15728880,
+            OverlayTexture.NO_OVERLAY,
+            0,
+        )
+        //? if >= 26.2
+        featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
+        //? if < 26.2
+        //featureRenderDispatcher.renderAllFeatures()
         //? if < 26.2
         //bufferSource.endBatch()
     }

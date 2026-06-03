@@ -10,7 +10,8 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
+//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.Objective;
@@ -24,8 +25,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if >= 26.1
 import net.minecraft.client.gui.components.ChatComponent;
 
-@Mixin(Gui.class)
-public class MixinGui {
+//~ if < 26.2 'Hud.class' -> 'Gui.class'
+@Mixin(Hud.class)
+public abstract class MixinGui {
 
     @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
     public void renderScoreboard(GuiGraphicsExtractor drawContext, Objective objective, CallbackInfo ci) {
@@ -57,32 +59,34 @@ public class MixinGui {
     }
 
     //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations' {
+    //~ if < 26.2 'net/minecraft/client/gui/contextualbar/ContextualBar;' -> 'net/minecraft/client/gui/contextualbar/ContextualBarRenderer;' {
     //~ if < 26.1 'extractBackground' -> 'renderBackground' {
-    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceBar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postExperienceBarLayerEventPre(context)) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
+    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
     public void renderExperienceBarTail(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postExperienceBarLayerEventPost(context);
     }
     //~}
 
-    //~if < 26.1 ';extractExperienceLevel(' -> ';renderExperienceLevel(' {
-    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
+    //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
+    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceLevel(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
             ci.cancel();
         }
     }
 
-    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.AFTER))
+    @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.AFTER))
     public void renderExperienceLevelTail(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postExperienceNumberLayerEventPost(context);
     }
+    //~}
     //~}
     //~}
 

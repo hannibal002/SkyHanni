@@ -115,13 +115,13 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
 }
 
 private val textColorLUT = ChatFormatting.entries
-    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
+    .mapNotNull { formatting -> TextColor.fromLegacyFormat(formatting)?.let { it.value to formatting } }
     .toMap()
 
 fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.serialize()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")

@@ -13,29 +13,33 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
 
     @PublishedApi
     internal fun drawQueuedLines() {
-        // TODO 26.2
-        //? if < 26.2 {
-        /*if (queuedLines.isEmpty()) return
+        if (queuedLines.isEmpty()) return
 
         val layer = SkyHanniRenderLayers.getLines(!depth)
+        //? if >= 26.2 {
+        event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { matrix, buf ->
+        //?} else {
+        /*
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.last()
+        *///?}
 
-        // TODO reshape to avoid code duplication
-        for (line in queuedLines) {
-            buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-                .setLineWidth(lineWidth.toFloat())
+            // TODO reshape to avoid code duplication
+            for (line in queuedLines) {
+                buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
+                    .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                    .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+                    .setLineWidth(lineWidth.toFloat())
 
-            buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
-                .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
-                .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-                .setLineWidth(lineWidth.toFloat())
+                buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
+                    .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
+                    .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
+                    .setLineWidth(lineWidth.toFloat())
+            }
+        //? if >= 26.2
         }
 
         queuedLines.clear()
-        *///?}
     }
 
     private fun addQueuedLine(p1: LorenzVec, p2: LorenzVec, color: Color) {

@@ -32,6 +32,8 @@ object IrisCompat {
 
     @HandleEvent
     fun onInitFinished(event: InitFinishedEvent) {
+        //? if < 26.2 {
+        /*
         if (!isIrisLoaded) return
         try {
             val irisApiClass = Class.forName(IRIS_API_PATH)
@@ -55,5 +57,6 @@ object IrisCompat {
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception, "Failed to initialize Iris compat!")
         }
+        *///?}
     }
 }

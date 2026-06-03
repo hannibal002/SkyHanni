@@ -1,5 +1,5 @@
-//? if >= 26.1 {
-package at.hannibal2.skyhanni.mixins.transformers;
+//? if >= 26.1 && < 26.2 {
+/*package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ItemFeatureRenderer.class)
-public class MixinItemFeatureRenderer {
+public abstract class MixinItemFeatureRenderer {
 
     @ModifyArg(
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
@@ -40,4 +40,4 @@ public class MixinItemFeatureRenderer {
         return layer;
     }
 }
-//?}
+*///?}

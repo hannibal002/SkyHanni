@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.rendertype.RenderSetup
 import net.minecraft.client.renderer.rendertype.LayeringTransform
@@ -50,9 +49,11 @@ object SkyHanniRenderLayers {
     )
 
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
-        ChromaRenderLayer(
+        RenderType.create(
             "skyhanni_text_chroma",
-            texture = texture,
+            RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT())
+                .withTexture("texture", texture)
+                .createRenderSetup(),
         )
     }
 

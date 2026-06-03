@@ -4,14 +4,12 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 
-// TODO 26.2
 //? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeCollector
 //?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
-// TODO 26.2
 //? if >= 26.2 {
 class SkyHanniPipCoordinatorRenderer : PictureInPictureRenderer<SkyHanniGuiItemRenderState>() {
 //?} else {

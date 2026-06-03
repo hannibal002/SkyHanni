@@ -10,6 +10,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.Gui;
+//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
+import net.minecraft.client.gui.Hud;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,7 +35,8 @@ public abstract class MixinChatHud {
     private Minecraft minecraft;
 
     //~ if < 26.2 'net/minecraft/client/gui/Hud' -> 'net/minecraft/client/gui/Gui' {
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getHudTicks()I"), require = 0)
+    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"), require = 0)
+    //~ if < 26.2 'Hud instance' -> 'Gui instance'
     private int clearChatHead(Hud instance) {
     //~}
         return instance.getGuiTicks() + 90;

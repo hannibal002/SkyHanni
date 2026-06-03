@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 
-// TODO 26.2
 //? if < 26.2
 //import net.minecraft.client.renderer.MultiBufferSource
 
@@ -82,7 +81,6 @@ object GuiRendererHook {
 
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        // TODO 26.2
         //? if < 26.2
         //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
@@ -99,7 +97,6 @@ object GuiRendererHook {
 
         SkyHanniItemRenderCoordinator.preRenderAtlas(
             states,
-            // TODO 26.2
             //? if < 26.2
             //bufferSource,
             featureRenderDispatcher,

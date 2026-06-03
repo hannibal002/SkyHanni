@@ -5,7 +5,10 @@ import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import java.util.OptionalDouble
-import java.util.OptionalInt
+//? if >= 26.2
+import java.util.Optional
+//? if < 26.2
+//import java.util.OptionalInt
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import net.minecraft.client.renderer.RenderPipelines
 
@@ -40,8 +43,10 @@ object RenderCompat {
         return this.createCommandEncoder().createRenderPass(
             { name }, // label
             colorAttachment, // colorTexture
-            //~ if < 26.2 'Optional.empty<Vector4fc>' -> 'OptionalInt.empty()'
-            Optional.empty()<Vector4fc>,
+            //? if >= 26.2
+            Optional.empty(),
+            //? if < 26.2
+            //OptionalInt.empty(),
             framebuffer.findDepthAttachment(), // depthTexture
             OptionalDouble.empty(), // clearDepth
         )

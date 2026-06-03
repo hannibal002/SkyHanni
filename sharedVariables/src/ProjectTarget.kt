@@ -40,7 +40,7 @@ enum class ProjectTarget(
         "official",
         MappingStyle.NONE,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.2",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.150.1+26.2",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.150.2+26.2",
         hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
         hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
         modMenuVersion = "20.0.0-alpha.1",

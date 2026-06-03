@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.atlas
 
+//? if >= 26.2
+import com.mojang.blaze3d.GpuFormat
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -38,7 +40,12 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
 
     protected fun ensureAllocated() {
         if (texture != null) return
-        val size = 512.coerceAtMost(RenderSystem.getDevice().maxTextureSize)
+        val maxTextureSize =
+            //? if >= 26.2
+            RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM)
+            //? if < 26.2
+            //RenderSystem.getDevice().maxTextureSize
+        val size = 512.coerceAtMost(maxTextureSize)
         sizePixels = size
         allocateTextures(size, colorLabel, depthLabel, textureUsage)
         packer = SkyHanniAtlasBinPacker(size)

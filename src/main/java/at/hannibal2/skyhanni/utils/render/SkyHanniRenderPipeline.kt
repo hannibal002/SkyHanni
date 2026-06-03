@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
+import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.MATRICES_PROJECTION_SNIPPET
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
@@ -10,13 +11,14 @@ import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
+//? if >= 26.2
+import net.minecraft.client.renderer.BindGroupLayouts
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 
 //? if >= 26.2 {
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
-import com.mojang.blaze3d.pipeline.BindGroupLayouts
 //?}
 
 //? if >= 26.1 {
@@ -40,7 +42,6 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    // TODO 26.2
     //? if < 26.2
     //val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
@@ -48,7 +49,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.LINES,
     ),
@@ -57,7 +57,6 @@ enum class SkyHanniRenderPipeline(
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
         depthWrite = false,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.LINES,
     ),
@@ -96,26 +95,25 @@ enum class SkyHanniRenderPipeline(
         depthWrite = false,
     ),
     ROUNDED_RECT(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
     ),
     ROUNDED_TEXTURED_RECT(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_TEX,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture",
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_OUTLINE(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline",
@@ -125,7 +123,7 @@ enum class SkyHanniRenderPipeline(
         depthWrite = false,
     ),
     CIRCLE(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle",
@@ -134,7 +132,7 @@ enum class SkyHanniRenderPipeline(
         ),
     ),
     RADIAL_GRADIENT_CIRCLE(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle",
@@ -143,57 +141,55 @@ enum class SkyHanniRenderPipeline(
         ),
     ),
     CHROMA_STANDARD(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "standard_chroma",
         uniforms = commonChromaUniforms,
     ),
     CHROMA_TEXT(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_DEFERRED(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_deferred",
         depthWrite = false,
     ),
     ROUNDED_RECT_OUTLINE_DEFERRED(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_rect_outline_deferred",
         depthWrite = false,
     ),
     CIRCLE_DEFERRED(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "circle_deferred",
         depthWrite = false,
     ),
     ROUNDED_TEXTURED_RECT_DEFERRED(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_TEX_ROUNDED,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "rounded_texture_deferred",
         sampler = "Sampler0",
         depthWrite = false,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     RADIAL_GRADIENT_CIRCLE_DEFERRED(
-        snippet = BindGroupLayouts.MATRICES_PROJECTION,
+        snippet = MATRICES_PROJECTION_SNIPPET,
         vFormat = SkyHanniVertexFormats.POSITION_ROUNDED_GRADIENT,
         blend = BlendFunction.TRANSLUCENT,
         vertexShaderPath = "radial_gradient_circle_deferred",
@@ -206,7 +202,6 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "gui_textured_translucent",
         sampler = "Sampler0",
         depthWrite = false,
-        // TODO 26.2
         //? if < 26.2
         //irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
@@ -216,7 +211,10 @@ enum class SkyHanniRenderPipeline(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
-            .withVertexBinding(0, vFormat).apply {
+            .withVertexBinding(0, vFormat)
+            //? if >= 26.2
+            .withPrimitiveTopology(vDrawMode)
+            .apply {
                 // One or the other, never both
                 //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
@@ -230,13 +228,13 @@ enum class SkyHanniRenderPipeline(
                 }
 
                 //? if >= 26.2 {
-                withBindGroupLayout(
+                if (sampler != null || uniforms.isNotEmpty()) withBindGroupLayout(
                     BindGroupLayout.builder().apply {
                 //?}
                         sampler?.let(this::withSampler)
                         uniforms.forEach(this::withUniform)
                 //? if >= 26.2 {
-                    }
+                    }.build()
                 )
                 //?}
 
@@ -257,6 +255,12 @@ enum class SkyHanniRenderPipeline(
 //~}
 
 private object SkyHanniRenderPipelineUtils {
+    val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
+        //? if >= 26.2
+        RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
+        //? if < 26.2
+        //RenderPipelines.MATRICES_PROJECTION_SNIPPET
+
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
     val PosColorNormal: VertexFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH

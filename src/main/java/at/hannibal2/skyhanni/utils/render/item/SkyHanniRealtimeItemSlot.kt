@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.render.item
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
@@ -37,7 +38,15 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         val depthTextureView = depthTextureView ?: return
 
         // Clear before rendering
-        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
+        RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
+            texture,
+            //? if >= 26.2
+            GuiRenderer.CLEAR_COLOR,
+            //? if < 26.2
+            //0,
+            depthTexture,
+            1.0,
+        )
 
         val size = slotSize.toFloat()
         //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
@@ -48,7 +57,11 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.outputDepthTextureOverride = depthTextureView
 
         state.renderItemToTexture(
-            context.bufferSource, context.featureRenderDispatcher(),
+            //? if >= 26.2
+            context.submitNodeStorage,
+            //? if < 26.2
+            //context.bufferSource,
+            context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,
             pixelSize = slotSize,

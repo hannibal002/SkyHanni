@@ -1,4 +1,3 @@
-// TODO 26.2
 //? if < 26.2 {
 /*package at.hannibal2.skyhanni.utils.render
 
@@ -11,7 +10,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 
-//? if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
+//~ if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
 import com.mojang.blaze3d.GpuFormat
 
 // The idea and implementation for this class was inspired by Skyblocker.
@@ -90,7 +89,7 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
                     "SkyHanni Custom Depth",
                     GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
                     //~ if < 26.2 'GpuFormat.D32_FLOAT_S8_UINT' -> 'TextureFormat.DEPTH32'
-                    GpuFormat.D32_FLOAT_S8_UINT
+                    GpuFormat.D32_FLOAT_S8_UINT,
                     lastWidth, lastHeight, 1, 1,
                 )
                 customDepthAttachment = depthAttachment

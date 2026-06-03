@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+//? if < 26.2 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
@@ -67,3 +68,4 @@ public class MixinSubmitNodeCollection<E> {
         }
     }
 }
+*///?}

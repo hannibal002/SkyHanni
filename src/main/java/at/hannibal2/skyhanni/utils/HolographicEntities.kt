@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
+//? if >= 26.2
+import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
@@ -187,10 +189,19 @@ object HolographicEntities {
         val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
-        //~ if < 26.1 'gameRenderer.gameRenderState().' -> 'gameRenderer.'
-        val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+        val cameraRenderState =
+            //? if >= 26.2
+            gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+            //? if < 26.2 && >= 26.1
+            //gameRenderer.getGameRenderState().levelRenderState.cameraRenderState
+            //? if < 26.1
+            //gameRenderer.getLevelRenderState().cameraRenderState
         val cameraPos = cameraRenderState.pos
-        val submitNodeCollector = gameRenderer.featureRenderDispatcher().submitNodeStorage
+        val submitNodeCollector =
+            //? if >= 26.2
+            SubmitNodeStorage()
+            //? if < 26.2
+            //gameRenderer.featureRenderDispatcher().submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
@@ -212,6 +223,8 @@ object HolographicEntities {
                     matrices,
                     submitNodeCollector,
                 )
+                //? if >= 26.2
+                gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeCollector)
             }
         } finally {
             activeHolographicEntities.remove(entity)
