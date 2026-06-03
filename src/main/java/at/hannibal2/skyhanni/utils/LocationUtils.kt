@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.canSeeFace
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.Direction
@@ -28,7 +29,7 @@ object LocationUtils {
         return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
     }
 
-    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b)?.miss == true
+    private fun canSee0(a: LorenzVec, b: LorenzVec): Boolean = BlockUtils.raycast(a, b).miss
 
     fun playerLocation() = PlayerUtils.getLocation()
 

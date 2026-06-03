@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -109,9 +110,10 @@ object SensitivityReducer {
 
     private fun isOnGround(): Boolean {
         if (PlayerUtils.onGround()) return true
-        val tolerance = config.onGroundTolerance
-        if (tolerance <= 0f || PlayerUtils.isFlying()) return false
-        return PlayerUtils.getLocation().let { BlockUtils.raycast(it, it.down(tolerance))?.miss == false }
+        val tolerance = config.onGroundTolerance.takeUnless { it == 0f } ?: return false
+        if (!PlayerUtils.hasNormalMovement()) return false
+
+        return playerLocation().let { !BlockUtils.raycast(it, it.down(tolerance)).miss }
     }
 
     @HandleEvent

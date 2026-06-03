@@ -47,7 +47,12 @@ object PlayerUtils {
 
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
-    fun isFlying(): Boolean = MinecraftCompat.localPlayer.abilities.flying
+
+    /** the player is not flying, not riding a vehicle, and not using an elytra */
+    fun hasNormalMovement(): Boolean =
+        !MinecraftCompat.localPlayer.abilities.flying
+            && !MinecraftCompat.localPlayer.isPassenger
+            && !MinecraftCompat.localPlayer.isFallFlying
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
 
