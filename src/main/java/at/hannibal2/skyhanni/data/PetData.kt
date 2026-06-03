@@ -12,10 +12,10 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import java.util.UUID
 
 data class PetDataStorage(
@@ -92,7 +92,7 @@ data class PetData(
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
-    fun getItemStackOrNull(frameIndex: Int = 0): ItemStack? =
+    fun getItemStackOrNull(frameIndex: Int = 0): SafeItemStack? =
         getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
 
     fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimatedFrame>? {
@@ -112,7 +112,7 @@ data class PetData(
         }
     }
 
-    private fun String.buildTextureItemStack(): ItemStack {
+    private fun String.buildTextureItemStack(): SafeItemStack {
         val (uuid, texture) = this.split(":")
         return ItemUtils.createSkull("Pet Skin", uuid, texture)
     }
@@ -122,7 +122,7 @@ data class PetData(
         return PetUtils.getAnimatedJsonOrNull(skinInternalName, skinVariantIndex)
     }
 
-    private fun getSkinItemStackOrNull(frameIndex: Int = 0): ItemStack? {
+    private fun getSkinItemStackOrNull(frameIndex: Int = 0): SafeItemStack? {
         val skinInternalName = skinInternalName ?: return null
         val baseItemStack = skinInternalName.getItemStackOrNull() ?: return null
         val animatedSkinJson = getAnimatedJsonOrNull()?.takeIf { it.textures.any() } ?: return baseItemStack

@@ -1,3 +1,5 @@
+@file:Suppress("AnnotationOnSameLine")
+
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.ElectionApi.currentMayor
@@ -6,6 +8,7 @@ import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorPerk
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.Legacy
 
 enum class ElectionCandidate(
     val mayorName: String,
@@ -184,7 +187,7 @@ enum class Perk(val perkName: String) {
     LONG_TERM_INVESTMENT("Long Term Investment"),
 
     // Finnegan
-    @Deprecated("Remove after 9.0.0") PELT_POCALYPSE("Pelt-pocalypse"),
+    @Legacy("Remove after 9.0.0") PELT_POCALYPSE("Pelt-pocalypse"),
     GRAND_FEAST("Grand Feast"),
     GOATED("GOATed"),
     BLOOMING_BUSINESS("Blooming Business"),

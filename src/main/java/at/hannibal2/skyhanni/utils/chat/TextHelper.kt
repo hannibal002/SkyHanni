@@ -207,11 +207,12 @@ object TextHelper {
         var done = false
 
         component.forEachNonEmpty { style, string ->
+            fun String.newText() = asComponent().withStyle(style)
             if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
                     if (currentString.isNotEmpty()) {
-                        newComponent.append(Component.literal(currentString).withStyle(style))
+                        newComponent.append(currentString.newText())
                     }
                     currentString = ""
                     done = true
@@ -227,7 +228,7 @@ object TextHelper {
                 }
             }
             if (currentString.isNotEmpty()) {
-                newComponent.append(Component.literal(currentString).withStyle(style))
+                newComponent.append(currentString.newText())
             }
             currentString = ""
         }
@@ -239,16 +240,17 @@ object TextHelper {
         var currentComponent = Component.empty()
 
         component.forEachNonEmpty { style, string ->
+            fun String.toStyledComponent() = this.asComponent().withStyle(style)
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
-                currentComponent.append(Component.literal(string).withStyle(style))
+                currentComponent.append(string.toStyledComponent())
             } else {
-                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                currentComponent.append(split.first().toStyledComponent())
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
                 for ((index, str) in split.withIndex()) {
                     if (index == 0) continue
-                    currentComponent.append(Component.literal(str).withStyle(style))
+                    currentComponent.append(str.toStyledComponent())
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
                 }
@@ -272,7 +274,7 @@ object TextHelper {
         }
     }
 
-    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit<T>(
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit(
         { style, string ->
             if (string.isEmpty()) Optional.empty()
             else visitor(style, string)

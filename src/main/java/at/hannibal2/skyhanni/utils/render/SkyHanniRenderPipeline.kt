@@ -7,12 +7,19 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChro
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
 import com.mojang.blaze3d.pipeline.RenderPipeline
-import com.mojang.blaze3d.platform.DepthTestFunction
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
+
+//? if >= 26.1 {
+import com.mojang.blaze3d.pipeline.ColorTargetState
+import com.mojang.blaze3d.pipeline.DepthStencilState
+import java.util.Optional
+//?} else {
+/*import com.mojang.blaze3d.platform.DepthTestFunction
+*///?}
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -25,7 +32,6 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    depthTestFunction: DepthTestFunction = DepthTestFunction.LEQUAL_DEPTH_TEST,
     val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
     LINES(
@@ -39,7 +45,6 @@ enum class SkyHanniRenderPipeline(
         vFormat = PosColorNormal,
         vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
         irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
@@ -50,7 +55,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     TRIANGLES(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -60,7 +64,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLES,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     TRIANGLE_FAN(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -70,7 +73,6 @@ enum class SkyHanniRenderPipeline(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     QUADS(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -78,7 +80,6 @@ enum class SkyHanniRenderPipeline(
     QUADS_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
         depthWrite = false,
-        depthTestFunction = DepthTestFunction.NO_DEPTH_TEST,
     ),
     ROUNDED_RECT(
         snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
@@ -155,6 +156,29 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_rect_outline_deferred",
         depthWrite = false,
     ),
+    CIRCLE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_COLOR_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "circle_deferred",
+        depthWrite = false,
+    ),
+    ROUNDED_TEXTURED_RECT_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_TEX_ROUNDED,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "rounded_texture_deferred",
+        sampler = "Sampler0",
+        depthWrite = false,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
+    ),
+    RADIAL_GRADIENT_CIRCLE_DEFERRED(
+        snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET,
+        vFormat = SkyHanniVertexFormats.POSITION_ROUNDED_GRADIENT,
+        blend = BlendFunction.TRANSLUCENT,
+        vertexShaderPath = "radial_gradient_circle_deferred",
+        depthWrite = false,
+    ),
     GUI_TEXTURED_TRANSLUCENT(
         snippet = RenderPipelines.GUI_SNIPPET,
         vFormat = DefaultVertexFormat.POSITION_TEX_COLOR,
@@ -166,12 +190,13 @@ enum class SkyHanniRenderPipeline(
     ),
     ;
 
-    private val _pipe: RenderPipeline = RenderPipelines.register(
+    private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             .withVertexFormat(vFormat, vDrawMode).apply {
                 // One or the other, never both
-                blend?.let(this::withBlend) ?: withCull?.let(this::withCull)
+                //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
+                blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
                     withFragmentShader(
@@ -182,17 +207,22 @@ enum class SkyHanniRenderPipeline(
                 }
                 sampler?.let(this::withSampler)
                 uniforms.forEach(this::withUniform)
-                withDepthWrite(depthWrite)
-                withDepthTestFunction(depthTestFunction)
+                if (!depthWrite) {
+                    //? if >= 26.1 {
+                    withDepthStencilState(Optional.empty())
+                    //?} else {
+                    /*withDepthWrite(depthWrite)
+                    withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
+                    *///?}
+                }
             }.build(),
     )
 
-    operator fun invoke(): RenderPipeline = _pipe
+    operator fun invoke(): RenderPipeline = internalPipeline
 }
 
 private object SkyHanniRenderPipelineUtils {
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)
-    val PosColorNormal: VertexFormat =
-        DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
+    val PosColorNormal: VertexFormat = DefaultVertexFormat.POSITION_COLOR_NORMAL_LINE_WIDTH
 }
