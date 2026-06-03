@@ -175,7 +175,7 @@ object GardenCustomKeybinds {
         return internalName.isFarmingTool() ||
             (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
             (config.fishingRod && internalName.isFishingRod()) ||
-            (config.sunsGrasp && wearingSunsGrasp && heldItem.item == Items.AIR)
+            (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
     } ?: false
 
     private fun isActive(): Boolean =

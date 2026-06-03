@@ -75,7 +75,7 @@ class ChromaRenderLayer(
 
                     renderPass.enableRenderPassScissorStateIfAble()
 
-                    for (entry in this.state.textures) {
+                    for (entry in this.state.getTextures()) {
                         renderPass.bindTexture(entry.key, entry.value.textureView, entry.value.sampler)
                     }
 

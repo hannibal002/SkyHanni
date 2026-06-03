@@ -19,6 +19,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.last()
 
+        // Todo reshape to avoid code duplication
         for (line in queuedLines) {
             buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())

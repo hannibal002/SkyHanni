@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,6 +11,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import net.minecraft.world.inventory.ContainerInput
 
 @SkyHanniModule
 object CFInventory {
@@ -34,7 +35,7 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.item == null) continue
+            if (slot.item.orNull() == null) continue
             val slotIndex = slot.index
 
             if (slotIndex == CFApi.bestPossibleSlot) {
@@ -50,7 +51,7 @@ object CFInventory {
         if (!config.highlightUpgrades) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.item == null) continue
+            if (slot.item.orNull() == null) continue
             val slotIndex = slot.index
 
             val currentUpdates = CFApi.factoryUpgrades
@@ -104,7 +105,7 @@ object CFInventory {
         ) return
 
         // this would break CFKeybinds otherwise
-        if (event.clickType == ClickType.HOTBAR) return
+        if (event.clickType == ContainerInput.SWAP) return
 
         // if the user is holding shift, we don't want to pickblock, handled by hypixel as +10 levels for rabbits
         if (KeyboardManager.isShiftKeyDown() && slotNumber in CFApi.rabbitSlots.keys) return

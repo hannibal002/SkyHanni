@@ -3,16 +3,15 @@ package at.hannibal2.skyhanni.utils.render.states
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.gui.navigation.ScreenRectangle
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.gui.render.state.GuiElementRenderState
 
-abstract class AbstractSkyHanniRoundedRectRenderState(
+abstract class AbstractSkyHanniRoundedShapeRenderState(
     protected val x: Int,
     protected val y: Int,
     protected val width: Int,
     protected val height: Int,
     protected val params: RoundedRenderStateParams,
     private val scissor: ScreenRectangle?,
-) : GuiElementRenderState {
+) : SkyHanniRenderState {
 
     protected abstract val padding: Int
 
@@ -36,5 +35,7 @@ abstract class AbstractSkyHanniRoundedRectRenderState(
         writeVertex(consumer, (x + width + p), (y - p), isTop = true)
     }
 
-    protected abstract fun writeVertex(consumer: VertexConsumer, vx: Float, vy: Float, isTop: Boolean)
+    protected open fun writeVertex(consumer: VertexConsumer, vx: Float, vy: Float, isTop: Boolean) {
+        error("${this::class.simpleName} must override writeVertex or buildVertices")
+    }
 }

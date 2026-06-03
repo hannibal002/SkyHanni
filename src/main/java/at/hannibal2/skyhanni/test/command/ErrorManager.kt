@@ -351,7 +351,7 @@ object ErrorManager {
                     "Probably an JSON error in ChangedChatErrorsJson. Please report this on the discord."
             )
             // can not use error manager inside error manager
-            e.printStackTrace()
+            Error("Failed to format error message", e).printStackTrace()
         }
 
         if (finalMessage.last() !in ".?!") {
