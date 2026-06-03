@@ -193,7 +193,7 @@ object HolographicEntities {
             //? if >= 26.2
             gameRenderer.gameRenderState().levelRenderState.cameraRenderState
             //? if < 26.2 && >= 26.1
-            //gameRenderer.getGameRenderState().levelRenderState.cameraRenderState
+            //gameRenderer.gameRenderState().levelRenderState.cameraRenderState
             //? if < 26.1
             //gameRenderer.getLevelRenderState().cameraRenderState
         val cameraPos = cameraRenderState.pos

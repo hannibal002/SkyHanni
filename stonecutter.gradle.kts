@@ -1,3 +1,5 @@
+import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+
 plugins {
     alias(libs.plugins.loom) apply false
     alias(libs.plugins.kotlin.jvm) apply false
@@ -133,39 +135,60 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.2") {
-            replace(".mainCamera()", ".mainCamera")
-            replace("gui.hud.chat", "gui.chat")
-            replace("gui.hud.guiTicks", "gui.guiTicks")
-            replace("gui.hud.tabList", "gui.tabList")
-            replace(".gui.hud.isHidden", ".options.hideGui")
-            replace(".gui.screen()", ".screen")
-            replace(".gui.setScreen(", ".setScreen(")
             replace(".gameRenderer.featureRenderDispatcher()", ".gameRenderer.getFeatureRenderDispatcher()")
             replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
             replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
+            replace(".gui.hud.isHidden", ".options.hideGui")
+            replace(".gui.setScreen(", ".setScreen(")
+            replace(".mainCamera()", ".mainCamera")
+            replace("Minecraft.getInstance().gui.screen()", "Minecraft.getInstance().screen")
             replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
+            replace("gui.hud.chat", "gui.chat")
+            replace("gui.hud.guiTicks", "gui.guiTicks")
+            replace("gui.hud.tabList", "gui.tabList")
             replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
-            replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
+            replace(
+                "net.minecraft.world.entity.monster.cubemob.MagmaCube",
+                "net.minecraft.world.entity.monster.MagmaCube",
+            )
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
         }
 
+        @OptIn(StonecutterExperimentalAPI::class)
         perl(current.parsed < "26.2") {
+            val DYE_COLORS_LOWER = "black|blue|brown|cyan|gray|green|lime|magenta|orange|pink|purple|red|white|yellow"
+            val DYE_COLORS_UPPER = "BLACK|BLUE|BROWN|CYAN|GRAY|GREEN|LIME|MAGENTA|ORANGE|PINK|PURPLE|RED|WHITE|YELLOW"
+            val LIGHT_DYE_COLORS_LOWER = "light(?<baseColor>Blue|Gray)"
+            val LIGHT_DYE_COLORS_UPPER = "LIGHT_(?<baseColor>BLUE|GRAY)"
+
             replace(
-                "(DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.([a-z]+)\\(\\)" to "\\U$2_$1",
-                "([A-Z]+)_(DYE|WOOL|STAINED_GLASS(?:_PANE)?)" to "$2.\\L$1()",
+                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?<color>$DYE_COLORS_LOWER)\\(\\)",
+                "\\U\${color}_\${itemType}",
+
+                "(?<color>$DYE_COLORS_UPPER)_(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)",
+                "\${itemType}.\\L\${color}()",
             )
             replace(
-                "(DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.([a-z]+)([A-Z][a-z]+)\\(\\)" to "\\U$2_$3_$1",
-                "([A-Z]+)_([A-Z])([A-Z]+)_(DYE|WOOL|STAINED_GLASS(?:_PANE)?)" to "$4.\\L$1\\E$2\\L$3()",
+                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?:$LIGHT_DYE_COLORS_LOWER)\\(\\)",
+                "LIGHT_\\U\${baseColor}_\${itemType}",
+
+                "(?:$LIGHT_DYE_COLORS_UPPER)_(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)",
+                "\${itemType}.light\\L\\u\${baseColor}()",
             )
             replace(
-                "DYED_TERRACOTTA\\.([a-z]+)\\(\\)" to "\\U$2_TERRACOTTA",
-                "([A-Z]+)_TERRACOTTA" to "DYED_TERRACOTTA.\\L$1()",
+                "DYED_TERRACOTTA\\.(?<color>$DYE_COLORS_LOWER)\\(\\)",
+                "\\U\${color}_TERRACOTTA",
+
+                "(?<color>$DYE_COLORS_UPPER)_TERRACOTTA",
+                "DYED_TERRACOTTA.\\L\${color}()",
             )
             replace(
-                "DYED_TERRACOTTA\\.([a-z]+)([A-Z][a-z]+)\\(\\)" to "\\U$1_$2_TERRACOTTA",
-                "([A-Z]+)_([A-Z])([A-Z]+)_TERRACOTTA" to "DYED_TERRACOTTA.\\L$1\\E$2\\L$3()",
+                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?:$LIGHT_DYE_COLORS_LOWER)\\(\\)",
+                "LIGHT_\\U\${baseColor}_\${itemType}",
+
+                "(?:$LIGHT_DYE_COLORS_UPPER)_TERRACOTTA",
+                "DYED_TERRACOTTA.light\\L\\u\${baseColor}()",
             )
         }
 

@@ -11,7 +11,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 //? if < 26.2
-import com.mojang.blaze3d.vertex.VertexFormatElement
+//import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
 //? if < 26.2 {
