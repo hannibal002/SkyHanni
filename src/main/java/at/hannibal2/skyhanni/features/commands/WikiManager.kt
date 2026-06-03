@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
-import net.minecraft.world.item.ItemStack
 import java.net.URLEncoder
 
 @SkyHanniModule
@@ -75,7 +75,7 @@ object WikiManager {
         return "$urlSearchPrefix${URLEncoder.encode(search, "UTF-8")}&scope=internal"
     }
 
-    private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useIndependent: Boolean = config.useIndependent) {
+    private fun wikiTheItem(item: SafeItemStack, autoOpen: Boolean, useIndependent: Boolean = config.useIndependent) {
         val itemDisplayName =
             item.hoverName.formattedTextCompatLeadingWhiteLessResets().replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()

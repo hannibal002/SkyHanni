@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
 @SkyHanniModule
@@ -61,7 +61,7 @@ object AuctionHousePriceComparison {
         inInventory = false
     }
 
-    private fun MutableMap<Int, Long>.add(stack: ItemStack, binPrice: Long, slot: Int) {
+    private fun MutableMap<Int, Long>.add(stack: SafeItemStack, binPrice: Long, slot: Int) {
         val price = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
         val estimatedPrice = price.toLong()
 

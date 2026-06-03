@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import kotlin.math.max
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -62,7 +62,7 @@ object ItemAbilityCooldown {
 
     private var lastAbility = ""
     private var items = mapOf<String, List<ItemText>>()
-    private var abilityItems = mapOf<ItemStack, MutableList<ItemAbility>>()
+    private var abilityItems = mapOf<SafeItemStack, MutableList<ItemAbility>>()
     private val WEIRD_TUBA = "WEIRD_TUBA".toInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".toInternalName()
     private val VOODOO_DOLL = "VOODOO_DOLL".toInternalName()
@@ -241,7 +241,7 @@ object ItemAbilityCooldown {
         handleItemClick(event.itemInHand)
     }
 
-    private fun handleItemClick(itemInHand: ItemStack?) {
+    private fun handleItemClick(itemInHand: SafeItemStack?) {
         if (!SkyBlockUtils.inSkyBlock) return
         itemInHand?.getInternalName()?.run {
             ItemAbility.getByInternalName(this)?.setItemClick()
@@ -411,10 +411,10 @@ object ItemAbilityCooldown {
         }
     }
 
-    private fun ItemStack.getIdentifier(): String? =
+    private fun SafeItemStack.getIdentifier(): String? =
         cachedData.identifier ?: fetchIdentifier().also { cachedData.identifier = it }
 
-    private fun ItemStack.fetchIdentifier() = getItemUuid() ?: getItemId()
+    private fun SafeItemStack.fetchIdentifier() = getItemUuid() ?: getItemId()
 
 
     @HandleEvent
@@ -454,7 +454,7 @@ object ItemAbilityCooldown {
     }
 
     // TODO add item caching
-    private fun hasAbility(stack: ItemStack): MutableList<ItemAbility> {
+    private fun hasAbility(stack: SafeItemStack): MutableList<ItemAbility> {
         val itemName: String = stack.cleanName()
         val internalName = stack.getInternalName()
         val scrolls = ItemAbility.getAllAbilityScrolls(stack)

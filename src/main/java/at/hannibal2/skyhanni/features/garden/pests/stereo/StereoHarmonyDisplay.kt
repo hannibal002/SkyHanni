@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object StereoHarmonyDisplay {
@@ -75,7 +75,7 @@ object StereoHarmonyDisplay {
         add(Renderable.vertical(displayList, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    private fun updateActiveVinyl(stack: ItemStack?) {
+    private fun updateActiveVinyl(stack: SafeItemStack?) {
         PestApi.stereoPlayingPattern.firstMatcher(stack?.getLore() ?: return) {
             gardenStorage?.activeVinyl = VinylType.getByName(group("vinyl").trim()).takeIf { it != VinylType.NONE }
             update()
