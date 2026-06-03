@@ -152,7 +152,7 @@ object SensitivityReducer {
         if (!config.showGui) return
         if (state == SensitivityState.UNCHANGED) return
 
-        config.position.renderRenderable(
+        config.display.renderRenderable(
             Renderable.text("§e" + if (state == SensitivityState.REDUCED) "Sensitivity Lowered" else "Mouse Locked"),
             posLabel = "Sensitivity Reducer",
         )
