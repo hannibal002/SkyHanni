@@ -24,7 +24,9 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.mixins.init.SkyHanniMixinPlugin
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -58,6 +60,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -76,6 +79,11 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.chunk.LevelChunk
+import org.objectweb.asm.ClassReader
+import org.objectweb.asm.Type
+import org.objectweb.asm.tree.AnnotationNode
+import org.objectweb.asm.tree.ClassNode
+import org.spongepowered.asm.mixin.Mixin
 import java.io.File
 import java.util.Locale
 import kotlin.time.Duration.Companion.minutes
@@ -121,6 +129,66 @@ object SkyHanniDebugsAndTests {
     private fun print(text: String) {
         LorenzDebug.log(text)
     }
+
+    // Taken from Firmament
+    @JvmStatic
+    fun loadAllMixinClasses() {
+        val allMixinClasses = mutableSetOf<String>()
+        SkyHanniMixinPlugin.instances.forEach { plugin ->
+            val prefix = "${plugin.mixinPackage}."
+            val classes = plugin.mixins.map { prefix + it }
+            allMixinClasses.addAll(classes)
+            for (mixinClass in classes) {
+                val targets = readMixinTargets(mixinClass)
+                for (target in targets) {
+                    try {
+                        SkyHanniMod.logger.debug("Loading $target to force instantiate $mixinClass")
+                        Class.forName(target, true, javaClass.classLoader)
+                    } catch (exception: Throwable) {
+                        SkyHanniMod.logger.error(
+                            "Could not load class $target that has been mixed into by $mixinClass",
+                            exception,
+                        )
+                    }
+                }
+            }
+        }
+
+        SkyHanniMod.logger.info("Force-loaded all SkyHanni mixins:")
+        val applied = SkyHanniMixinPlugin.instances.flatMap { it.appliedMixins }.toSet()
+        applied.forEach { SkyHanniMod.logger.info(" - $it") }
+
+        val failed = allMixinClasses.size - applied.size
+        if (failed > 0) {
+            ErrorManager.crashInDevEnv("Failed to apply $failed ${"mixin".pluralize(failed)}")
+        }
+    }
+
+    private fun readMixinTargets(mixinClass: String): List<String> {
+        val resource = "${mixinClass.replace(".", "/")}.class"
+        val classNode = ClassNode()
+        javaClass.classLoader.getResourceAsStream(resource).use { input ->
+            requireNotNull(input) { "Could not load mixin class resource $resource" }
+            ClassReader(input).accept(classNode, 0)
+        }
+        val mixinDescriptor = Type.getDescriptor(Mixin::class.java)
+        return (classNode.visibleAnnotations.orEmpty() + classNode.invisibleAnnotations.orEmpty())
+            .filter { it.desc == mixinDescriptor }
+            .flatMap { it.mixinTargets() }
+    }
+
+    private fun AnnotationNode.mixinTargets(): List<String> = buildList {
+        values.orEmpty()
+            .chunked(2)
+            .forEach { (name, value) ->
+                when (name) {
+                    "targets" -> addAll(value.asListOf<String>())
+                    "value" -> addAll(value.asListOf<Type>().map { it.className })
+                }
+            }
+    }
+
+    private inline fun <reified T> Any?.asListOf(): List<T> = (this as? List<*>).orEmpty().filterIsInstance<T>()
 
     private var testLocation: LorenzVec? = null
 
@@ -486,7 +554,7 @@ object SkyHanniDebugsAndTests {
     fun onKeyPressCopyCosmeticsData() {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
-        if (stack.item != Items.PLAYER_HEAD) return
+        if (!stack.`is`(Items.PLAYER_HEAD)) return
         if (skinId == null) return
         if (skinIdTime.passedSince() > 2.minutes) return
 

@@ -23,13 +23,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CropMilestonesApi {
@@ -105,7 +105,7 @@ object CropMilestonesApi {
     private val cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
     private val amountToNextTierCache: MutableMap<CropType, Long> = mutableMapOf()
 
-    fun getCropTypeByLore(itemStack: ItemStack): CropType? {
+    fun getCropTypeByLore(itemStack: SafeItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
             val name = group("name")
             return CropType.getByNameOrNull(name)

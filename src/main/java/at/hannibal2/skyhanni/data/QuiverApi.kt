@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.BowItem
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.util.regex.Matcher
 
 @SkyHanniModule
@@ -298,7 +298,7 @@ object QuiverApi {
         return null
     }
 
-    private fun ItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
+    private fun SafeItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
         getArrowByNameOrNull(cleanName().trimWhiteSpace())?.let { return it }
         return getLoreComponent().firstNotNullOfOrNull { line ->
             getArrowByNameOrNull(line.string.trimWhiteSpace())
@@ -340,7 +340,7 @@ object QuiverApi {
 
     fun isHoldingBow(): Boolean {
         InventoryUtils.getItemInHand()?.let {
-            return it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            return it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         } ?: return false
     }
 
@@ -358,7 +358,7 @@ object QuiverApi {
 
     private fun checkBowInventory() {
         hasBow = InventoryUtils.getItemsInOwnInventory().any {
-            it.item is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+            it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
         }
     }
 

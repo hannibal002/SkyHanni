@@ -212,7 +212,7 @@ object ChangelogViewer {
         return if (!version.isValid()) {
             errorMessage =
                 "'$input' is not a valid mod version. Version Syntax is: 'Major.Beta.Patch' " +
-                    "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
+                "anything not written is assumed 0. Eg: 1.1 = 1.1.0"
             null
         } else {
             version
