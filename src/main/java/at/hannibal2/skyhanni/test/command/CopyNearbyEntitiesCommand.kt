@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
@@ -48,7 +49,6 @@ import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.monster.MagmaCube
 import net.minecraft.world.entity.monster.Shulker
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
@@ -254,10 +254,14 @@ object CopyNearbyEntitiesCommand {
         val transformation = entity.renderState()?.transformation?.get(0f) ?: return
 
         add("-  rotation: $rotation")
-        add("-  transformation scale: ${transformation.scale}")
-        add("-  transformation left rotation: ${transformation.leftRotation}")
-        add("-  transformation right rotation: ${transformation.rightRotation}")
-        add("-  transformation translations: ${transformation.translation}")
+        //~ if < 26.1 '.scale()' -> '.scale'
+        add("-  transformation scale: ${transformation.scale()}")
+        //~ if < 26.1 'leftRotation()' -> 'leftRotation'
+        add("-  transformation left rotation: ${transformation.leftRotation()}")
+        //~ if < 26.1 'rightRotation()' -> 'rightRotation'
+        add("-  transformation right rotation: ${transformation.rightRotation()}")
+        //~ if < 26.1 '.translation()' -> '.translation'
+        add("-  transformation translations: ${transformation.translation()}")
     }
 
     private fun MutableList<String>.addItemDisplayEntity(entity: Display.ItemDisplay) {
@@ -289,7 +293,7 @@ object CopyNearbyEntitiesCommand {
         add("-  Variant: $variant")
     }
 
-    private fun MutableList<String>.printItemStackData(stack: ItemStack?) {
+    private fun MutableList<String>.printItemStackData(stack: SafeItemStack?) {
         if (stack != null) {
             val skullTexture = stack.getSkullTexture()?.trim()?.replace("\n", "")
             if (skullTexture != null) {

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import net.minecraft.client.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
 
@@ -64,7 +64,7 @@ object CopyChat {
         val visibleLine = visibleLines[lineIndex]
 
         val matchingLines = chatGui.allMessages.filter {
-            it.addedTime() == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
+            it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
         }
 
         return when {

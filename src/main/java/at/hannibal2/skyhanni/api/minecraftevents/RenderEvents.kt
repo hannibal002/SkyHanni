@@ -5,15 +5,18 @@ import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
-import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
+
+//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 
 @SkyHanniModule
 object RenderEvents {
@@ -25,29 +28,22 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        SpecialGuiElementRegistry.register { ctx ->
-            SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+        PictureInPictureRendererRegistry.register { ctx ->
+            SkyHanniPipCoordinatorRenderer(
+                //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
+                ctx.bufferSource()
+            )
         }
-
-        // makes the lines render weird idk
-        /*WorldRenderEvents.END_MAIN.register { event ->
-            val immediateVertexConsumers = event.consumers() as? MultiBufferSource.BufferSource ?: return@register
-            val stack = event.matrices()
-            SkyHanniRenderWorldEvent(
-                stack,
-                event.gameRenderer().mainCamera,
-                immediateVertexConsumers,
-                Minecraft.getInstance().deltaTracker.realtimeDeltaTicks
-            ).post()
-        }*/
     }
 
     @HandleEvent
     fun onResourcePackReload() {
         SkyHanniItemRenderCoordinator.invalidateAtlas()
+        SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
-    private fun postGui(context: GuiGraphics, tick: DeltaTracker) {
+    private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
         if (Minecraft.getInstance().options.hideGui) return
         RenderData.postRenderOverlay(context)
     }
@@ -55,59 +51,59 @@ object RenderEvents {
     // GameOverlayRenderPreEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPre(context: GuiGraphics): Boolean {
+    fun postHotbarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
     }
 
     @JvmStatic
-    fun postExperienceBarLayerEventPre(context: GuiGraphics): Boolean {
+    fun postExperienceBarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
     }
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPre(context: GuiGraphics): Boolean {
+    fun postExperienceNumberLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
     @JvmStatic
-    fun postTablistLayerEventPre(context: GuiGraphics): Boolean {
+    fun postTablistLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
     }
 
     // GameOverlayRenderPostEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPost(context: GuiGraphics) {
+    fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
     }
 
     @JvmStatic
-    fun postExperienceBarLayerEventPost(context: GuiGraphics) {
+    fun postExperienceBarLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
     }
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPost(context: GuiGraphics) {
+    fun postExperienceNumberLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
     }
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPre(context: GuiGraphics): Boolean {
+    fun postHeldItemTooltipLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
     }
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPost(context: GuiGraphics) {
+    fun postHeldItemTooltipLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
     }
 
     @JvmStatic
-    fun postActionBarLayerEventPre(context: GuiGraphics): Boolean {
+    fun postActionBarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
     }
 
     @JvmStatic
-    fun postActionBarLayerEventPost(context: GuiGraphics) {
+    fun postActionBarLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
     }
 }

@@ -71,9 +71,10 @@ allprojects {
 
         // moulconfig and a few detekt rules
         exclusiveContent {
-            forRepository {
-                maven("https://maven.notenoughupdates.org/releases")
-            }
+            forRepositories(
+                repositories.mavenLocal(),
+                repositories.maven("https://maven.notenoughupdates.org/releases"),
+            )
             filter {
                 includeGroup("org.notenoughupdates")
                 includeGroup("org.notenoughupdates.moulconfig")
@@ -121,16 +122,34 @@ allprojects {
     }
 }
 
-stonecutter active "1.21.11"
+stonecutter active "26.1"
 
 stonecutter handlers {
-    inherit("accesswidener", "classtweaker")
-
     configure("fsh", "vsh") {
         commenter = line("//")
     }
 }
 
 stonecutter parameters {
+    replacements {
+        string(current.parsed < "26.1") {
+            replace(";extractRenderState(", ";render(")
+            replace(";text", ";drawString")
+            replace("ContainerInput", "ClickType")
+            replace("GuiGraphicsExtractor", "GuiGraphics")
+            replace("InteractClickType", "InteractClickType") // prevent replacement
+            replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
+            replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
+            replace("classTweaker v1 official", "classTweaker v1 named")
+            replace("drawContext.text", "drawContext.drawString")
+            replace("extractContents", "renderContents")
+            replace("extractSlot", "renderSlot")
+            replace("lambda\$addMainPass\$0", "method_62214")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
+            replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
+        }
+    }
+
     filters.include("**/*.fsh", "**/*.vsh")
 }
