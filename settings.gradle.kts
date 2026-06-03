@@ -1,4 +1,5 @@
 import at.skyhanni.sharedvariables.MultiVersionStage
+import at.skyhanni.sharedvariables.ProjectTarget
 
 pluginManagement {
     includeBuild("sharedVariables")
@@ -16,6 +17,7 @@ pluginManagement {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
+        maven("https://maven.kikugie.dev/releases")
         maven("https://maven.kikugie.dev/snapshots") // stone cutter
     }
     resolutionStrategy.eachPlugin {
@@ -33,9 +35,14 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("at.skyhanni.shared-variables")
     id("dev.kikugie.stonecutter") version "0.9"
+    id("dev.kikugie.loom-back-compat") version "0.3"
 }
 
 MultiVersionStage.initFrom(file(".gradle/private.properties"))
+
+loomx {
+    loomVersion = "1.15-SNAPSHOT"
+}
 
 include("annotation-processors")
 include("detekt")

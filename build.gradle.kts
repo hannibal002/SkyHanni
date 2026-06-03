@@ -1,9 +1,9 @@
-import at.skyhanni.sharedvariables.MappingStyle
 import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
+import dev.kikugie.loomx.LoomCompatProjectExtension
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.api.fabricapi.FabricApiExtension
@@ -22,8 +22,7 @@ plugins {
     idea
     java
     alias(libs.plugins.shadow)
-    id("net.fabricmc.fabric-loom-remap") apply false
-    id("net.fabricmc.fabric-loom") apply false
+    id("dev.kikugie.loom-back-compat")
     kotlin("jvm")
     id("com.google.devtools.ksp")
     kotlin("plugin.power-assert")
@@ -32,15 +31,10 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
-val isDeobf = target.mappingStyle == MappingStyle.NONE
+val loomCompat = extensions.getByType(LoomCompatProjectExtension::class.java)
+val isDeobf = loomCompat.isUnobfuscated
 
-if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
-else apply(plugin = "net.fabricmc.fabric-loom-remap")
-
-// Manual accessors for the conditionally-applied loom plugin.
-// These replace the typed accessors that Kotlin DSL would normally generate for
-// plugins applied in the plugins block. Since both loom plugins are declared with
-// apply false, no accessors are auto-generated, so we define them explicitly.
+// String-based accessors for Loom configurations provided by the active compatibility variant.
 val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
 fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
 fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
@@ -97,7 +91,7 @@ val shadowImpl: Configuration by configurations.creating {
 }
 
 val shadowModImpl: Configuration by configurations.creating {
-    if (!isDeobf) configurations.getByName("modImplementation").extendsFrom(this)
+    configurations.getByName("modImplementation").extendsFrom(this)
 }
 
 val shadowOnly: Configuration by configurations.creating
@@ -133,14 +127,7 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
-    @Suppress("UnstableApiUsage")
-    if (!isDeobf) {
-        if (target.mappingDependency == "official") {
-            mappings(loom.officialMojangMappings())
-        } else {
-            mappings(target.mappingDependency)
-        }
-    }
+    loomx.applyMojangMappings()
 
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
@@ -149,33 +136,25 @@ dependencies {
     implementation(libs.autoservice.annotations)
 
     target.fabricLoaderVersion?.let {
-        if (isDeobf) implementation(it) else modImplementation(it)
+        modImplementation(it)
     }
     target.fabricApiVersion?.let {
-        if (isDeobf) implementation(it) else modImplementation(it)
+        modImplementation(it)
     }
-    if (isDeobf) implementation(libs.fabricLanguageKotlin)
-    else modImplementation(libs.fabricLanguageKotlin)
+    modImplementation(libs.fabricLanguageKotlin)
 
     target.modMenuVersion?.let {
-        if (isDeobf) implementation("maven.modrinth:modmenu:$it")
-        else modImplementation("maven.modrinth:modmenu:$it")
+        modImplementation("maven.modrinth:modmenu:$it")
     }
 
-    if (isDeobf) runtimeOnly(libs.devauth)
-    else modRuntimeOnly(libs.devauth)
+    modRuntimeOnly(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    if (isDeobf) {
-        shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-            exclude("org.jetbrains.kotlin")
-            exclude("org.jetbrains.kotlinx")
-        }
-    } else {
-        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-            exclude("org.jetbrains.kotlin")
-            exclude("org.jetbrains.kotlinx")
-        }
+    shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
+    }
+    if (!isDeobf) {
         include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
 
@@ -188,16 +167,10 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.agent)
 
-    if (isDeobf) {
-        implementation(target.hypixelModApiVersion)
-        runtimeOnly(target.hypixelModApiFabricVersion)
-    } else {
-        modImplementation(target.hypixelModApiVersion)
-        modRuntimeOnly(target.hypixelModApiFabricVersion)
-    }
+    modImplementation(target.hypixelModApiVersion)
+    modRuntimeOnly(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
 
     // getting clock offset
     includeImplementation(libs.commons.net)
@@ -216,11 +189,10 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any) {
-    if (isDeobf) {
-        add("shadowImpl", dep)
-    } else {
+    add("shadowOnly", dep)
+    modImplementation(dep)
+    if (!isDeobf) {
         include(dep)
-        modImplementation(dep)
     }
 }
 
@@ -371,7 +343,7 @@ tasks.shadowJar {
     }
     configurations = buildList {
         add(shadowImpl)
-        if (!isDeobf) add(shadowModImpl)
+        add(shadowModImpl)
         if (isDeobf) add(shadowOnly)
     }
     exclude("META-INF/versions/**")
@@ -412,7 +384,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 publishing.publications {
     create<MavenPublication>("maven") {
-        if (!isDeobf) artifact(tasks.named("remapJar"))
+        if (!isDeobf) artifact(loomCompat.modJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")

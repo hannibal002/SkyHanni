@@ -13,7 +13,7 @@ methanol = "1.8.3"
 jgit = "7.6.0.202603022253-r"
 
 shadow = "9.3.1"
-loom = "1.15-SNAPSHOT"
+loomBackCompat = "0.3"
 kotlin = "2.3.20"
 ksp = "2.3.6"
 detekt = "2.0.0-alpha.2"
@@ -60,7 +60,7 @@ ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.re
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
-loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
+loom-back-compat = { id = "dev.kikugie.loom-back-compat", version.ref = "loomBackCompat" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
