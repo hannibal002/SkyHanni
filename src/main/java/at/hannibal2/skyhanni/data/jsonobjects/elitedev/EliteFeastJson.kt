@@ -73,8 +73,8 @@ data class EliteFeastData(
 
     fun getActiveDuration(): Duration {
         if (next.values.all { it == null }) return feastEndTime.timeUntil()
-		return getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
-	}
+        return getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+    }
 
     fun getCurrentCrops(): List<CropType> {
         val fromCurrent = current.toCropTypes()

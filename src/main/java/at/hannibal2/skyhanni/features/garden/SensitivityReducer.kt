@@ -67,9 +67,10 @@ object SensitivityReducer {
         teleportPattern.matchMatchers(event.cleanMessage) {
             if (config.unlockOnTeleport.condition(group("plot"))) DelayedRun.runNextTick {
                 manualState = null
-                ChatUtils.chat(
+                if (config.chatMessage) ChatUtils.notifyOrDisable(
                     if (state == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
                     else "Mouse rotation has been unlocked because you teleported.",
+                    config::unlockOnTeleport,
                     messageId = commandMessageId,
                 )
             }
@@ -97,7 +98,7 @@ object SensitivityReducer {
 
         if (!GardenApi.inGarden()) return false
 
-        if (config.mode.none { it.isActive() }) return false
+        if (config.mode.none { it.condition() }) return false
 
         if (config.onlyPlot && GardenApi.onUnfarmablePlot) return false
 
@@ -187,9 +188,15 @@ object SensitivityReducer {
             }
             newList
         }
+        // migrate from old path
+        event.move(135, "misc.lockMouseLookChatMessage", "$base.chatMessage")
+        event.move(135, "misc.lockedMouseDisplay", "$base.display")
+        // migrate from "new" path
+        event.move(136, "garden.mouseLock.chatMessage", "$base.chatMessage")
+        event.move(136, "garden.mouseLock.display", "$base.display")
         event.move(136, "garden.mouseLock.unlockOnTeleport", "$base.unlockOnTeleport")
-        event.move(136, "$base.reducingFactor", "$base.reducingPercent")
-        event.transform(136, "$base.reducingPercent") {
+        // convert old reducing factor to percent
+        event.move(136, "$base.reducingFactor", "$base.reducingPercent") {
             JsonPrimitive((1f.fractionOf(it.asFloat) * 100f).toFloat().roundTo(2))
         }
     }
@@ -201,7 +208,7 @@ object SensitivityReducer {
         ;
     }
 
-    enum class Mode(private val displayName: String, val isActive: () -> Boolean) {
+    enum class Mode(private val displayName: String, val condition: () -> Boolean) {
         KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
         TOOL("Farming tool", { GardenApi.toolInHand != null }),
         FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),

@@ -46,7 +46,6 @@ object PreventEarlyCommands {
         if (!event.isCommand) return
         if (event.senderIsSkyhanni()) return
         val command = event.message.removePrefix("/").lowercase()
-        if (command == "locraw") return // Ignore locraw commands
         lastCommand = command
 
         commandExecuted = SimpleTimeMark.now()

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -231,7 +230,7 @@ object DebugCommand {
                 add("previousPings: ${CurrentPing.previousPings.map { it.formatTime() }}")
             }
 
-            if (LimboTimeTracker.inLimbo) {
+            if (HypixelData.inLimbo) {
                 add("currently in limbo!")
             }
         }

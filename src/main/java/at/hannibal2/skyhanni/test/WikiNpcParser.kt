@@ -41,13 +41,13 @@ object WikiNpcParser {
             val trimmed = line.trim()
             if (trimmed == "Removed NPCs") break
 
-            sectionToIsland[trimmed]?.let {
-                currentIsland = it
-                continue
-            }
+            val mappedIsland = sectionToIsland[trimmed]
+                ?: if (trimmed.contains("⏣ Dwarven Mines") ||
+                    trimmed.contains("\u23E3 Dwarven Mines")
+                    ) IslandType.DWARVEN_MINES else null
 
-            if (trimmed.contains("⏣ Dwarven Mines") || trimmed.contains("\u23E3 Dwarven Mines")) {
-                currentIsland = IslandType.DWARVEN_MINES
+            if (mappedIsland != null) {
+                currentIsland = mappedIsland
                 continue
             }
 

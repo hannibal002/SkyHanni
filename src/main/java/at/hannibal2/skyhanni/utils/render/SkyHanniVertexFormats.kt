@@ -9,11 +9,12 @@ import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
-private typealias VFEUsage = VertexFormatElement.Usage
+//? if < 26.1
+//private typealias VFEUsage = VertexFormatElement.Usage
 
 object SkyHanniVertexFormats {
 
-    // 1.21.10, Minecraft registers 0-5, on 1.21.11 they register 0-6, so load the last registered ID dynamically.
+    // Different versions of MC use differing counts, so load the last registered ID dynamically.
     val lastRegisteredId by lazy {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
@@ -21,20 +22,30 @@ object SkyHanniVertexFormats {
     internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
-        private val usage: VFEUsage = VFEUsage.GENERIC,
+        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
+        private val normalized: Boolean = false,
         private val count: Int = 4,
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
 
-        // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/0, 0}
+        // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
         ROUNDED_PARAMS_1,
+        // {angle, progress, phaseOffset, reverse(float)}
+        GRADIENT_PARAMS_0,
+        // {startColor R, G, B, A}
+        GRADIENT_PARAMS_1,
+        // {endColor R, G, B, A}
+        GRADIENT_PARAMS_2,
         ;
 
         // The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
-        val element by lazy { safeRegister(registrationId, index, type, usage, count) }
+        val element by lazy {
+            //~ if < 26.1 'false' -> 'usage'
+            safeRegister(registrationId, index, type, false, count)
+        }
     }
 
     /**
@@ -51,7 +62,8 @@ object SkyHanniVertexFormats {
         desiredId: Int,
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
-        usage: VFEUsage = VFEUsage.GENERIC,
+        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
+        normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
         // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
@@ -61,7 +73,8 @@ object SkyHanniVertexFormats {
             "VertexFormatElement ID $desiredId was already taken, using $id instead",
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
-        return VertexFormatElement.register(id, index, type, usage, count)
+        //~ if < 26.1 'normalized' -> 'usage'
+        return VertexFormatElement.register(id, index, type, normalized, count)
     }
 
     val POSITION_COLOR_ROUNDED: VertexFormat by lazy {
@@ -70,6 +83,26 @@ object SkyHanniVertexFormats {
             .add("Color", VertexFormatElement.COLOR)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
+            .build()
+    }
+
+    val POSITION_TEX_ROUNDED: VertexFormat by lazy {
+        VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("UV0", VertexFormatElement.UV0)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
+            .build()
+    }
+
+    val POSITION_ROUNDED_GRADIENT: VertexFormat by lazy {
+        VertexFormat.builder()
+            .add("Position", VertexFormatElement.POSITION)
+            .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
+            .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
+            .add("GradientParams0", VertexElement.GRADIENT_PARAMS_0.element)
+            .add("GradientParams1", VertexElement.GRADIENT_PARAMS_1.element)
+            .add("GradientParams2", VertexElement.GRADIENT_PARAMS_2.element)
             .build()
     }
 

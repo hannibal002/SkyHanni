@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.monster.spider.Spider
 
 @SkyHanniModule
@@ -34,7 +33,7 @@ object SlayerSpiderFeatures {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
-        if (event.action != ServerboundInteractPacket.ActionType.ATTACK) return
+        if (event.action != EntityClickEvent.ActionType.ATTACK) return
         val mob = event.clickedEntity.mob ?: return
         if (mob in allTier) {
             lastClicked = mob

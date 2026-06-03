@@ -134,7 +134,6 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Sensitivity Reducer", desc = "")
-    @SearchTag("/shmouselock /shlockmouse /shsensreduce mouse lock")
     @Accordion
     val sensitivityReducer: SensitivityReducerConfig = SensitivityReducerConfig()
 

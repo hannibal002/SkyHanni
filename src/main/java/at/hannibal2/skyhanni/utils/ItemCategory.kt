@@ -1,7 +1,8 @@
+@file:Suppress("AnnotationOnSameLine")
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import net.minecraft.world.item.ItemStack
 
 /**
  * Deprecated entries should not be removed, they are kept to avoid errors with unupdated items.
@@ -13,11 +14,11 @@ enum class ItemCategory {
     SHORT_BOW,
     WAND,
     FISHING_ROD,
-    @Deprecated("No longer exists") FISHING_WEAPON,
+    @Legacy("No longer exists") FISHING_WEAPON,
     ROD_PART,
     AXE,
     GAUNTLET,
-    @Deprecated("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
+    @Legacy("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
     PICKAXE,
     SHOVEL,
     DRILL,
@@ -47,7 +48,7 @@ enum class ItemCategory {
     ARROW_POISON,
     // TODO This was previously used as a fake category for uncategorized dungeon items.
     //  Remove it after ensuring it doesn't break anything.
-    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE"), level = DeprecationLevel.ERROR) ITEM,
+    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
     FISHING_BAIT,
@@ -80,9 +81,11 @@ enum class ItemCategory {
     NONE,
     ;
 
+    fun isDeprecated(): Boolean = this.javaClass.getField(name).getAnnotation(Deprecated::class.java) != null
+
     companion object {
 
-        fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
+        fun Collection<ItemCategory>.containsItem(stack: SafeItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
@@ -90,8 +93,5 @@ enum class ItemCategory {
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
 
         val equipment = setOf(NECKLACE, BELT, CLOAK, GLOVES, BRACELET)
-
-        fun ItemCategory.isDeprecatedAtErrorLevel(): Boolean =
-            javaClass.getField(name).getAnnotation(Deprecated::class.java)?.level == DeprecationLevel.ERROR
     }
 }

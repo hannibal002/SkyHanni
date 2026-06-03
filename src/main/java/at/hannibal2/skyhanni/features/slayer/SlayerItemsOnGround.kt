@@ -27,7 +27,7 @@ object SlayerItemsOnGround {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNearby<ItemEntity>(15.0)) {
             val itemStack = entityItem.item
-            if (itemStack.item is SpawnEggItem) continue
+            if (itemStack.getItem() is SpawnEggItem) continue
             if (itemStack.getInternalName() == NeuInternalName.NONE) continue
             val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.count)
             if (config.minimumPrice > price) continue
