@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -126,14 +126,14 @@ object GreenhouseLayoutApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onClick(event: EntityClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) {
+        if (event.clickType != InteractClickType.RIGHT_CLICK) {
             updateCropsInGreenhouse()
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val currentLayout = layout ?: return
 
         val matchingEntry = currentLayout.grid.entries.firstOrNull {
@@ -183,7 +183,7 @@ object GreenhouseLayoutApi {
 
         updateLayoutData(clipboard)
 
-        ChatUtils.chat("§aLayout imported!")
+        if (layout?.grid?.isEmpty() == false) ChatUtils.chat("§aLayout imported!")
     }
 
     private fun updateTopLeftOfLayout(plot: GardenPlotApi.Plot?) {
@@ -263,7 +263,16 @@ object GreenhouseLayoutApi {
         worldPos.add(xFix, yFix, zFix)
     }
 
-    fun getWorldPosition(gridPosition: GridPosition) = topLeftOfLayout?.let { topLeft ->
-        topLeft - LorenzVec(gridPosition.x, 0, gridPosition.y)
+    fun getWorldPosition(gridPosition: GridPosition): LorenzVec? {
+        val topLeft = topLeftOfLayout ?: return null
+
+        val (dx, dz) = when (config.layoutRotation.get()) {
+            LayoutRotation.ZERO -> -gridPosition.x to -gridPosition.y
+            LayoutRotation.NINETY -> gridPosition.y to -gridPosition.x
+            LayoutRotation.ONE_HUNDRED_EIGHTY -> gridPosition.x to gridPosition.y
+            LayoutRotation.TWO_HUNDRED_SEVENTY -> -gridPosition.y to gridPosition.x
+        }
+
+        return topLeft.add(x = dx, y = 0, z = dz)
     }
 }

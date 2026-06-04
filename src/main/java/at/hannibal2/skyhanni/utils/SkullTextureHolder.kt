@@ -16,7 +16,6 @@ object SkullTextureHolder {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         skullTextures = event.getConstant<Map<String, String>>("Skulls").toMutableMap()
-        fixLateInits()
     }
 
     @HandleEvent
