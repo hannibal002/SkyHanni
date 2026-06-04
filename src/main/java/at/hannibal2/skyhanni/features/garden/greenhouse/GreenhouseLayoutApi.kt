@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -169,6 +170,7 @@ object GreenhouseLayoutApi {
         try {
             layoutDataPattern.matchMatcher(layoutString) {
                 layout = GreenhouseLayout(group("data")).takeIf { it.grid.isNotEmpty() }
+                config.layout = Property.of(group("data"))
             }
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception)

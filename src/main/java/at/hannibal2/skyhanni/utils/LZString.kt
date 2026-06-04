@@ -1,9 +1,4 @@
-/*
- * Based on lz-string https://github.com/pieroxy/lz-string (MIT License)
- * Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
- */
-
-package at.hannibal2.skyhanni.features.garden.greenhouse
+package at.hannibal2.skyhanni.utils
 
 object LZString {
 

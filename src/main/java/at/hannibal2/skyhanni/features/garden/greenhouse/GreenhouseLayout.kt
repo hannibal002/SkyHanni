@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.GreenhouseCropRole
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.GridPosition
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.SlotInfo
+import at.hannibal2.skyhanni.utils.LZString
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 
 class GreenhouseLayout(val input: String) {
