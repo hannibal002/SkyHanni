@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
@@ -25,9 +26,11 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -76,6 +79,7 @@ object HarvestFeastManager {
     private var lastFetched = SimpleTimeMark.farPast()
     private var lastSubmit: Pair<Int, Int>? = null
     private var display: Renderable? = null
+    private var boostedCrop: CropType? = null
 
     private val fetchingFeastDataMutex = Mutex()
     private val sendingFeastDataMutex = Mutex()
@@ -112,6 +116,14 @@ object HarvestFeastManager {
     private val willBeInSeasonPattern by patternGroup.pattern(
         "crop.willbe",
         "Will be in-season in (?<time>.+)!",
+    )
+
+    /**
+     * REGEX-TEST: [NPC] Feast Chef Ted: ✆ I heard that Moonflower will drop Seasoning more often then the other crops this month...
+     */
+    private val boostedCropPattern by patternGroup.pattern(
+        "crop.boosted",
+        "\\[NPC] Feast Chef Ted: ✆ I heard that (?<crop>.+) will drop Seasoning more often then the other crops this month...",
     )
 
     @HandleEvent
@@ -154,6 +166,13 @@ object HarvestFeastManager {
         lastSubmit = profileStorage.lastHarvestFeastSubmitYear
             .takeIf { it > 0 }
             ?.let { it to profileStorage.lastHarvestFeastSubmitMonth }
+    }
+
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        boostedCropPattern.matchMatcher(event.cleanMessage) {
+            boostedCrop = CropType.getByNameOrNull(group("crop"))
+        }
     }
 
     private fun readAllCrops(items: Map<Int, ItemStack>) {
@@ -349,7 +368,9 @@ object HarvestFeastManager {
         val endStamp = SimpleTimeMark.now() + duration
 
         data.getCurrentCrops().forEach { crop ->
-            val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp")
+            val cropStack = crop.getItemStackCopy("active_feast_crop:$crop-$endStamp").apply {
+                if (crop == boostedCrop) addEnchantGlint()
+            }
             add(
                 Renderable.item(cropStack) {
                     scale = 1.0
