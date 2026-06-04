@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.config.features.event.carnival
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class FruitDiggingConfig {
@@ -16,12 +18,12 @@ class FruitDiggingConfig {
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Show found fruit", desc = "Show uncovered fruit.")
+    @ConfigOption(name = "Show un-diggable fruit", desc = "Show fruit that's destroyed or already dug.")
     @ConfigEditorBoolean
-    var displayFoundFruit: Boolean = true
+    var displayFoundFruit: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Found Color", desc = "Color of the fruit you just dug up.")
+    @ConfigOption(name = "Found Color", desc = "Color of un-diggable fruit.")
     @ConfigEditorColour
     var foundColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 
@@ -31,7 +33,7 @@ class FruitDiggingConfig {
     var displayAdjacentTreasure: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Adjacent Color", desc = "Color of the fruit clue (nearby fruit).")
+    @ConfigOption(name = "Adjacent Color", desc = "Color of the treasure clue (nearby fruit).")
     @ConfigEditorColour
     var adjacentColor: ChromaColour = LorenzColor.GOLD.toChromaColor()
 
@@ -46,12 +48,21 @@ class FruitDiggingConfig {
     var minesColor: ChromaColour = LorenzColor.RED.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Show fruit guesses", desc = "Show guesses for fruits that have not been dug up yet.")
+    @ConfigOption(name = "Show fruit guesses", desc = "Show guesses for fruits that have not been dug up yet. This includes anchor.")
     @ConfigEditorBoolean
     var displayFruitGuesses: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Fruit Guess Color", desc = "Color of the mines clue.")
+    @ConfigOption(name = "Fruit Guess Color", desc = "Color of fruit guesses.")
     @ConfigEditorColour
     var fruitGuessColor: ChromaColour = LorenzColor.AQUA.toChromaColor()
+
+    @Expose
+    @ConfigOption(name = "Remaining Fruit Display", desc = "Show remaining Fruit Digging components.")
+    @ConfigEditorBoolean
+    var remainingFruitDisplay: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = FruitDiggingConfig::class, field = "remainingFruitDisplay")
+    val remainingFruitPosition: Position = Position(200, 20)
 }

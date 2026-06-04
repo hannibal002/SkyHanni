@@ -3,23 +3,24 @@ package at.hannibal2.skyhanni.features.event.carnival
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
@@ -40,6 +41,7 @@ object CarnivalFruitDigging {
 
     private var isPlayingFruitDigging = false
     private var lastSquareDug: GamePos? = null
+    private var remainingFruit = Fruit.entries.associateWith { it.count }.toMutableMap()
 
     private val patternGroup = RepoPattern.group("event.carnival")
 
@@ -131,6 +133,8 @@ object CarnivalFruitDigging {
         var adjacentTreasure: Fruit = Fruit.UNKNOWN
         var anchoredFruit: Fruit = Fruit.UNKNOWN
         var uncoveredFruit: Fruit = Fruit.UNKNOWN
+        var isDiggable: Boolean = true
+        var removedFromRemaining: Boolean = false
     }
 
     private class GameGrid {
@@ -146,6 +150,12 @@ object CarnivalFruitDigging {
 
     private var gameGrid = GameGrid()
 
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
+        if (!isEnabled() || !config.remainingFruitDisplay) return
+        config.remainingFruitPosition.renderRenderables(buildRemainingFruitDisplay(), posLabel = "Remaining Fruit")
+    }
+
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
@@ -156,20 +166,20 @@ object CarnivalFruitDigging {
                 val cell = gameGrid[pos]
 
                 // indicate if not diggable
-                if (pos.toLorenzVec().getBlockAt() != Blocks.SAND) {
+                if (!cell.isDiggable) {
                     val aabb = AABB(pos.toBlockPos()).expandTowards(0.0, 0.1, 0.0)
-                    event.drawFilledBoundingBox(aabb, Color.GRAY, seeThroughBlocks = true)
+                    event.drawFilledBoundingBox(aabb, Color.GRAY, seeThroughBlocks = false)
                 }
 
                 val label = mutableListOf<Pair<String, Color>>()
 
                 // label uncovered fruit
-                if (config.displayFoundFruit && cell.uncoveredFruit != Fruit.UNKNOWN) {
+                if (config.displayFoundFruit && cell.uncoveredFruit != Fruit.UNKNOWN && !cell.isDiggable) {
                     label.add(Pair(cell.uncoveredFruit.inGameName, config.foundColor.toColor()))
                 }
 
-                // label anchor if not dug
-                if (config.displayFruitGuesses && cell.uncoveredFruit == Fruit.UNKNOWN) {
+                // label anchor if not dug or destroyed
+                if (config.displayFruitGuesses && cell.uncoveredFruit == Fruit.UNKNOWN && cell.isDiggable) {
                     if (cell.anchoredFruit != Fruit.UNKNOWN)
                         label.add(Pair(cell.anchoredFruit.inGameName, config.fruitGuessColor.toColor()))
                 }
@@ -198,19 +208,16 @@ object CarnivalFruitDigging {
     fun onBlockChange(event: ServerBlockChangeEvent) {
         val blockOld = event.oldState
         val blockNew = event.newState
-        if (blockOld.block == Blocks.SAND && blockNew.block == Blocks.SANDSTONE) {
-            val pos = GamePos.fromLorenzVec(event.location) ?: return
-            lastSquareDug = pos
-        }
-    }
 
-    @HandleEvent
-    fun onEntitySpawnAny(event: EntityEnterWorldEvent<Entity>) {
-        if (!isEnabled()) return
-        val entity = event.entity
-        if (entity is ItemEntity) {
-            if (handleItemEntity(entity))
-                ChatUtils.chat("fruit detected with onEntitySpawnAny()")
+        if (blockOld.block != Blocks.SAND) return
+        val pos = GamePos.fromLorenzVec(event.location) ?: return
+        val cell = gameGrid[pos]
+        cell.isDiggable = false
+
+        if (blockNew.block == Blocks.SANDSTONE) {
+            lastSquareDug = pos
+        } else if (blockNew.block == Blocks.SANDSTONE_STAIRS) {
+            updateRemainingFruit(cell, cell.anchoredFruit)
         }
     }
 
@@ -219,12 +226,11 @@ object CarnivalFruitDigging {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity is ItemEntity) {
-            if (handleItemEntity(entity))
-                ChatUtils.chat("fruit detected with onDataWatcherUpdate()")
+            handleAnchoredFruit(entity)
         }
     }
 
-    private fun handleItemEntity(entity: ItemEntity) : Boolean {
+    private fun handleAnchoredFruit(entity: ItemEntity) : Boolean {
 
         val gamePos = GamePos.fromLorenzVec(entity.position().toLorenzVec()) ?: return false
         val cell = gameGrid[gamePos]
@@ -240,6 +246,7 @@ object CarnivalFruitDigging {
         val fruit = Fruit.fromTexture(textureHash) ?: return false
 
         cell.anchoredFruit = fruit
+        updateRemainingFruit(cell, fruit)
         return true
     }
 
@@ -252,16 +259,15 @@ object CarnivalFruitDigging {
         val name = event.newName?.removeColor() ?: return
         if (name.isBlank()) return
 
-        // TODO move gamepos resolution up here
-
         val pos = entity.blockPosition().toLorenzVec()
+        val gamePos = GamePos.fromLorenzVec(pos) ?: return
 
         revealFruitPattern.matchMatcher(name) {
             val fruitName = group("name")
             val fruit = Fruit.fromName(fruitName) ?: return
-            GamePos.fromLorenzVec(pos)?.let { gamePos ->
-                gameGrid[gamePos].uncoveredFruit = fruit
-            }
+            val cell = gameGrid[gamePos]
+            updateRemainingFruit(cell, fruit)
+            cell.uncoveredFruit = fruit
         }
     }
 
@@ -272,7 +278,7 @@ object CarnivalFruitDigging {
         val message = event.cleanMessage
 
         if (startPattern.matches(message)) {
-            isPlayingFruitDigging = true
+            startGame()
             return
         }
         if (endPattern.matches(message)) {
@@ -313,6 +319,33 @@ object CarnivalFruitDigging {
     fun resetData() {
         isPlayingFruitDigging = false
         gameGrid = GameGrid()
+        remainingFruit = Fruit.entries.associateWith { it.count }.toMutableMap()
+        lastSquareDug = null
+    }
+
+    private fun startGame() {
+        resetData()
+        isPlayingFruitDigging = true
+    }
+
+    private fun updateRemainingFruit(cell: Cell, fruit: Fruit) {
+        if (fruit == Fruit.UNKNOWN || fruit == Fruit.NO_FRUIT) return
+        if (!cell.removedFromRemaining && !cell.isDiggable) {
+            val count = remainingFruit[fruit] ?: return
+            remainingFruit[fruit] = count - 1
+            cell.removedFromRemaining = true
+        }
+    }
+
+    private fun buildRemainingFruitDisplay(): List<Renderable> {
+        val fruitLines = Fruit.entries.mapNotNull { fruit ->
+            val count = remainingFruit[fruit] ?: return@mapNotNull null
+            if (count <= 0) return@mapNotNull null
+            Renderable.text("${fruit.inGameName}: $count")
+        }
+
+        if (fruitLines.isEmpty()) return emptyList()
+        return listOf(Renderable.text("Fruit Digging")) + fruitLines
     }
 
     private data class GamePos(val row: Int, val col: Int) {
