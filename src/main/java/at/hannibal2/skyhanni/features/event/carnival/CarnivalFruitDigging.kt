@@ -98,7 +98,6 @@ object CarnivalFruitDigging {
         "^(?<name>[A-Za-z ]+)(?: \\(\\+\\d+\\))?$",
     )
 
-    // use Spanish names to prevent text from overflowing the block
     enum class Fruit(val inGameName: String, val points: Int, val count: Int, val textureId: String = "", val isEdible: Boolean = true) {
         UNKNOWN("Unknown", 0, 0, "", false),
         NO_FRUIT("No Fruit", 0, 0, "", false),
@@ -117,12 +116,35 @@ object CarnivalFruitDigging {
 
         fun allFruitsWorthLess(): List<Fruit> = entries.filter { it.isEdible && it.points < this.points }
 
+        fun getAmountDugSoFar(): Int {
+            return count - (remainingFruit[this] ?: 0)
+        }
+
+        fun getPointValue(): Int {
+            val lastDug = gameGrid.getLastDug()
+            var multiplier = 1.0
+            if (lastDug == POMEGRANATE) multiplier = 1.5
+            else if (lastDug == DURIAN) multiplier = 0.5
+
+            if (this == APPLE) {
+                return (multiplier * (points + 100 * getAmountDugSoFar())).toInt()
+            }
+            if (this == CHERRY) {
+                return (multiplier * (points + 300 * getAmountDugSoFar())).toInt()
+            }
+            return (multiplier * points).toInt()
+        }
+
+        fun getNameWithPointValue(): String {
+            return inGameName + " (" + getPointValue() + ")"
+        }
+
         companion object {
-            fun fromTexture(texture: String) : Fruit? {
+            fun fromTexture(texture: String): Fruit? {
                 return Fruit.entries.find { it.textureId.isNotEmpty() && texture.contains(it.textureId) }
             }
 
-            fun fromName(name: String) : Fruit? {
+            fun fromName(name: String): Fruit? {
                 return Fruit.entries.find { it.inGameName.equals(name, ignoreCase = true) }
             }
         }
@@ -130,11 +152,14 @@ object CarnivalFruitDigging {
 
     private class Cell {
         var adjacentMines: Int? = null
-        var adjacentTreasure: Fruit = Fruit.UNKNOWN
+        var treasureFruit: Fruit = Fruit.UNKNOWN
+        var solvedFruit: Fruit = Fruit.UNKNOWN
         var anchoredFruit: Fruit = Fruit.UNKNOWN
         var uncoveredFruit: Fruit = Fruit.UNKNOWN
         var isDiggable: Boolean = true
         var removedFromRemaining: Boolean = false
+
+        fun getFoundFruit(): Fruit = if (uncoveredFruit != Fruit.UNKNOWN) uncoveredFruit else solvedFruit
     }
 
     private class GameGrid {
@@ -145,6 +170,11 @@ object CarnivalFruitDigging {
         operator fun get(vec: LorenzVec): Cell? {
             val pos = GamePos.fromLorenzVec(vec) ?: return null
             return this[pos]
+        }
+
+        fun getLastDug(): Fruit {
+            val lastDugPos = lastSquareDug ?: return Fruit.NO_FRUIT
+            return this[lastDugPos].solvedFruit
         }
     }
 
@@ -174,19 +204,24 @@ object CarnivalFruitDigging {
                 val label = mutableListOf<Pair<String, Color>>()
 
                 // label uncovered fruit
-                if (config.displayFoundFruit && cell.uncoveredFruit != Fruit.UNKNOWN && !cell.isDiggable) {
-                    label.add(Pair(cell.uncoveredFruit.inGameName, config.foundColor.toColor()))
+                if (config.displayFoundFruit && !cell.isDiggable) {
+                    val foundFruit = cell.getFoundFruit()
+                    if (foundFruit != Fruit.UNKNOWN)
+                        label.add(Pair(foundFruit.inGameName, config.foundColor.toColor()))
                 }
 
-                // label anchor if not dug or destroyed
+                // label solved fruit if not dug or destroyed
                 if (config.displayFruitGuesses && cell.uncoveredFruit == Fruit.UNKNOWN && cell.isDiggable) {
-                    if (cell.anchoredFruit != Fruit.UNKNOWN)
-                        label.add(Pair(cell.anchoredFruit.inGameName, config.fruitGuessColor.toColor()))
+                    if (cell.solvedFruit != Fruit.UNKNOWN)
+                        label.add(Pair(cell.solvedFruit.getNameWithPointValue(), config.fruitGuessColor.toColor()))
                 }
 
                 // label treasure
-                if (config.displayAdjacentTreasure && cell.adjacentTreasure != Fruit.UNKNOWN) {
-                    label.add(Pair(cell.adjacentTreasure.inGameName, config.adjacentColor.toColor()))
+                if (config.displayAdjacentTreasure) {
+                    if (cell.treasureFruit != Fruit.UNKNOWN)
+                        label.add(Pair("≤ ${cell.treasureFruit.inGameName}", config.adjacentColor.toColor()))
+                    if (cell.anchoredFruit != Fruit.UNKNOWN && cell.anchoredFruit != cell.treasureFruit)
+                        label.add(Pair("≥ ${cell.anchoredFruit.inGameName}", config.adjacentColor.toColor()))
                 }
 
                 // label num of adjacent mines
@@ -217,7 +252,7 @@ object CarnivalFruitDigging {
         if (blockNew.block == Blocks.SANDSTONE) {
             lastSquareDug = pos
         } else if (blockNew.block == Blocks.SANDSTONE_STAIRS) {
-            updateRemainingFruit(cell, cell.anchoredFruit)
+            updateRemainingFruit(cell, cell.solvedFruit)
         }
     }
 
@@ -226,15 +261,15 @@ object CarnivalFruitDigging {
         if (!isEnabled()) return
         val entity = event.entity
         if (entity is ItemEntity) {
-            handleAnchoredFruit(entity)
+            handleAnchor(entity)
         }
     }
 
-    private fun handleAnchoredFruit(entity: ItemEntity) : Boolean {
+    private fun handleAnchor(entity: ItemEntity): Boolean {
 
-        val gamePos = GamePos.fromLorenzVec(entity.position().toLorenzVec()) ?: return false
-        val cell = gameGrid[gamePos]
-        if (cell.anchoredFruit != Fruit.UNKNOWN) return false
+        val solvedPos = GamePos.fromLorenzVec(entity.position().toLorenzVec()) ?: return false
+        val solvedCell = gameGrid[solvedPos]
+        val dugCell = lastSquareDug?.let { gameGrid[it] } ?: return false
 
         val itemStack = entity.item
         if (itemStack.item == Items.AIR) return false // TODO check if this is even needed
@@ -245,9 +280,17 @@ object CarnivalFruitDigging {
 
         val fruit = Fruit.fromTexture(textureHash) ?: return false
 
-        cell.anchoredFruit = fruit
-        updateRemainingFruit(cell, fruit)
-        return true
+        var updated = false
+        if (solvedCell.solvedFruit == Fruit.UNKNOWN) {
+            solvedCell.solvedFruit = fruit
+            updateRemainingFruit(solvedCell, fruit)
+            updated = true
+        }
+        if (solvedCell.isDiggable && dugCell.anchoredFruit == Fruit.UNKNOWN) {
+            dugCell.anchoredFruit = fruit
+            updated = true
+        }
+        return updated
     }
 
     @HandleEvent
@@ -298,14 +341,16 @@ object CarnivalFruitDigging {
             val fruitName = group("fruit")
             val fruit = Fruit.entries.find { it.inGameName == fruitName } ?: return
             lastSquareDug?.let {
-                gameGrid[it].adjacentTreasure = fruit
+                gameGrid[it].treasureFruit = fruit
             }
             return
         }
 
         if (noFruitsNearbyPattern.matches(message)) {
             lastSquareDug?.let {
-                gameGrid[it].adjacentTreasure = Fruit.NO_FRUIT
+                val cell = gameGrid[it]
+                cell.treasureFruit = Fruit.NO_FRUIT
+                cell.anchoredFruit = Fruit.NO_FRUIT
             }
             return
         }
@@ -338,11 +383,10 @@ object CarnivalFruitDigging {
     }
 
     private fun buildRemainingFruitDisplay(): List<Renderable> {
-        val fruitLines = Fruit.entries.mapNotNull { fruit ->
-            val count = remainingFruit[fruit] ?: return@mapNotNull null
-            if (count <= 0) return@mapNotNull null
-            Renderable.text("${fruit.inGameName}: $count")
-        }
+        val fruitLines = Fruit.entries
+            .filter { (remainingFruit[it] ?: 0) > 0 }
+            .sortedWith(compareByDescending<Fruit> { it.getPointValue() }.thenBy { it.inGameName })
+            .map { fruit -> Renderable.text("${fruit.getNameWithPointValue()}: ${remainingFruit[fruit]}") }
 
         if (fruitLines.isEmpty()) return emptyList()
         return listOf(Renderable.text("Fruit Digging")) + fruitLines

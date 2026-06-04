@@ -28,12 +28,12 @@ class FruitDiggingConfig {
     var foundColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Show treasure", desc = "Show adjacent highest fruit from treasure dousing mode.")
+    @ConfigOption(name = "Show Treasure/Anchor", desc = "Show nearby fruit clues from treasure and anchor dousing modes.")
     @ConfigEditorBoolean
     var displayAdjacentTreasure: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Adjacent Color", desc = "Color of the treasure clue (nearby fruit).")
+    @ConfigOption(name = "Adjacent Color", desc = "Color of treasure and anchor clues (nearby fruit).")
     @ConfigEditorColour
     var adjacentColor: ChromaColour = LorenzColor.GOLD.toChromaColor()
 
