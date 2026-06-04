@@ -167,7 +167,7 @@ object HarvestFeastManager {
         )
 
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
-        
+
         if (config.sharePolicy == SharePolicy.DISABLED) return
 
         if (config.sharePolicy == SharePolicy.ASK) {

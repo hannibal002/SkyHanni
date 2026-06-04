@@ -133,15 +133,16 @@ object ApiInternalUtils {
         crossinline entityGetter: (CloseableHttpResponse) -> HttpEntity? = { it.getEntityOrNull() },
     ): Res = withContext(Dispatchers.IO) {
         ApiIntentionContext(requestFactory(), this@withHttpClient).let { apiIntention ->
+            var responseData: T? = null
             runCatching {
                 httpClient.execute(apiIntention.request).use { resp ->
-                    if (resp.statusLine.statusCode !in 200..299)
-                        throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
                     apiIntention.response = resp
                     val entity = entityGetter(resp)
-                    val data = entityHandler(entity)
+                    responseData = entityHandler(entity)
+                    if (resp.statusLine.statusCode !in 200..299)
+                        throw HttpResponseException(resp.statusLine.statusCode, resp.statusLine.reasonPhrase)
                     val message = resp.statusLine?.reasonPhrase ?: "OK"
-                    dataConsumer(true, message, data)
+                    dataConsumer(true, message, responseData)
                 }
             }.getOrElse { e ->
                 val message = e.message ?: "Request to ${apiIntention.apiName} failed"
@@ -158,7 +159,7 @@ object ApiInternalUtils {
                         },
                     ).toTypedArray()
                 )
-                dataConsumer(false, message, null)
+                dataConsumer(false, message, responseData)
             }
         }
     }
@@ -176,7 +177,12 @@ object ApiInternalUtils {
     internal suspend inline fun <reified T : JsonElement, reified Req : HttpRequestBase> ApiStaticPath.withJsonHttpClient(
         crossinline entityHandler: (HttpEntity?) -> T?,
         crossinline requestFactory: ApiStaticPath.() -> Req = ApiStaticPath::buildRequest,
-    ): JsonApiResponse<T> = withHttpClient(requestFactory, entityHandler, ::JsonApiResponse)
+    ): JsonApiResponse<T> = withHttpClient(
+        requestFactory,
+        entityHandler,
+        ::JsonApiResponse,
+        entityGetter = CloseableHttpResponse::getEntity,
+    )
 
     /**
      * See [withHttpClient] for general field definitions.
