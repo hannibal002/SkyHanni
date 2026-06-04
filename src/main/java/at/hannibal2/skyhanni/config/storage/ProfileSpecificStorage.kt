@@ -503,6 +503,9 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
+        var charmedVisitors: MutableSet<String> = mutableSetOf()
+
+        @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
