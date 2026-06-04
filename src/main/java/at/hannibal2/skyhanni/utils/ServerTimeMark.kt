@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import kotlin.math.abs
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
