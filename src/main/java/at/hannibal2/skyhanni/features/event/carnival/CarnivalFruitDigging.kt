@@ -174,7 +174,7 @@ object CarnivalFruitDigging {
 
         fun getLastDug(): Fruit {
             val lastDugPos = lastSquareDug ?: return Fruit.NO_FRUIT
-            return this[lastDugPos].solvedFruit
+            return this[lastDugPos].uncoveredFruit
         }
     }
 
