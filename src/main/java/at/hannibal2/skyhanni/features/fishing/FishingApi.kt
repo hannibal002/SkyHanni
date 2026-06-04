@@ -109,7 +109,7 @@ object FishingApi {
         "OBFUSCATED_FISH_2_SILVER",
         "OBFUSCATED_FISH_2_GOLD",
         "OBFUSCATED_FISH_2_DIAMOND",
-    ).map { it.toInternalName() }
+    )
 
     const val babySlugName = "Baby Magma Slug"
 
@@ -279,7 +279,7 @@ object FishingApi {
     fun SafeItemStack.isBait(): Boolean {
         val category = getItemCategoryOrNull() ?: return false
         if (category == ItemCategory.BAIT || category == ItemCategory.FISHING_BAIT) return true
-        val internalName = getInternalNameOrNull() ?: return false
+        val internalName = getInternalNameOrNull()?.asString() ?: return false
         return internalName in obfuscatedBaits
     }
 
