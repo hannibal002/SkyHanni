@@ -52,7 +52,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
-    private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
+    private val cooldownOverMessageId = ChatUtils.getUniqueCustomMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"

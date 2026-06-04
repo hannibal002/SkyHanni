@@ -32,7 +32,7 @@ class GraphNode(
 
     private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 
-    // Identity is by id alone — two GraphNode references with the same id are the same node regardless
+    // Identity is by id alone - two GraphNode references with the same id are the same node regardless
     // of mutable state (neighbors, enabled), which must not participate in equality.
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -64,7 +64,7 @@ object CocoonAPI {
         return belt.canCocoon()
     }
 
-    private fun ItemStack.canCocoon() =
+    private fun SafeItemStack.canCocoon() =
         (this.getInternalName() == "THE_PRIMORDIAL".toInternalName() || this.getReforgeModifier() == "blood_shot")
 
     @HandleEvent

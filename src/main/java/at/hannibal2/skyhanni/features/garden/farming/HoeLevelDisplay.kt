@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -159,7 +159,7 @@ object HoeLevelDisplay {
                 Component.empty(),
                 componentBuilder {
                     appendWithColor("Value: ", ChatFormatting.GRAY)
-                    appendWithColor("$luck✴", ChatFormatting.GREEN)
+                    appendWithColor("${luck.addSeparators()}✴", ChatFormatting.GREEN)
                 },
                 Component.empty(),
                 Component.literal("Gain more by leveling up your farming tools!").withColor(ChatFormatting.DARK_GRAY),
@@ -181,7 +181,7 @@ object HoeLevelDisplay {
         ChatUtils.userError("You must hold a specialized farming tool to use this command!")
     }
 
-    private fun errorStorage(item: ItemStack): Nothing {
+    private fun errorStorage(item: SafeItemStack): Nothing {
         ErrorManager.skyHanniError(
             "Error getting overflow hoe level storage",
             "item" to item,

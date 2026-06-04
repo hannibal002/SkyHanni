@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -91,7 +91,7 @@ object ItemPickupLog {
     private val coinConfig get() = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemList = mutableMapOf<Int, Pair<SafeItemStack, Int>>()
     private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
     private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
@@ -154,7 +154,7 @@ object ItemPickupLog {
     @HandleEvent(SkyHanniTickEvent::class)
     fun onTick() {
         if (!isEnabled()) return
-        val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+        val oldItemList = mutableMapOf<Int, Pair<SafeItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
@@ -224,8 +224,8 @@ object ItemPickupLog {
     }
 
     private fun checkForDuplicateItems(
-        list: MutableMap<Int, Pair<ItemStack, Int>>,
-        listToCheckAgainst: MutableMap<Int, Pair<ItemStack, Int>>,
+        list: MutableMap<Int, Pair<SafeItemStack, Int>>,
+        listToCheckAgainst: MutableMap<Int, Pair<SafeItemStack, Int>>,
         add: Boolean,
     ) {
         for ((key, value) in list) {
@@ -243,7 +243,7 @@ object ItemPickupLog {
         }
     }
 
-    private fun ItemStack.dynamicName(): String {
+    private fun SafeItemStack.dynamicName(): String {
         val compact = when (getItemCategoryOrNull()) {
             ItemCategory.ENCHANTED_BOOK -> true
             ItemCategory.PET -> true
@@ -253,12 +253,12 @@ object ItemPickupLog {
         return runCatching {
             if (compact) getInternalName().repoItemName else default
         }.getOrElse {
-            ChatUtils.debug("Could not get dynamic name for $item - error:\n$it")
+            ChatUtils.debug("Could not get dynamic name for ${getItem()} - error:\n$it")
             default
         }
     }
 
-    private fun ItemStack.hash(): Int {
+    private fun SafeItemStack.hash(): Int {
         var displayName = this.hoverName.string.removeColor()
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")

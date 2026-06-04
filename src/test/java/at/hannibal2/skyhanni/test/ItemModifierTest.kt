@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(BootstrapExtension::class)
 class ItemModifierTest {
 
     @Test
@@ -21,6 +23,6 @@ class ItemModifierTest {
         assert(itemStack.getHotPotatoCount() == 15)
         assert(itemStack.getHypixelEnchantments()?.size == 11)
         assert(itemStack.hasArtOfPeace())
-//        assert(itemStack.getDungeonStarCount() == 10)
+        //assert(itemStack.getDungeonStarCount() == 10)
     }
 }

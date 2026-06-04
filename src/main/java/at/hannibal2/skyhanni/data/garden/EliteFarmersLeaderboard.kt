@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
@@ -21,19 +22,31 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.withColor
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
@@ -110,7 +123,30 @@ object EliteFarmersLeaderboard {
             if (list.isEmpty()) return@forEach
             if (list.size < 3) {
                 list.forEach { name ->
-                    farmingChatMessage("You passed §b$name §ein the §6${lbType.key} §eLeaderboard!")
+                    farmingChatMessage(
+                        componentBuilder {
+                            append("You passed ")
+                            append(name) {
+                                withColor(ChatFormatting.AQUA)
+                            }
+                            val contribUUID = ContributorManager.getUUIDFromDisplayName(name)
+                            if (contribUUID != null) {
+                                AchievementManager.completeAchievement(BETTER_THAN_DEV_ACHIEVEMENT)
+                                ContributorManager.getSuffix(contribUUID)?.let {
+                                    append(" ")
+                                    append(it) {
+                                        withColor(ChatFormatting.WHITE)
+                                    }
+                                }
+                            }
+                            append(" in the ")
+                            append("${lbType.key}") {
+                                withColor(ChatFormatting.GOLD)
+                            }
+                            append(" Leaderboard!")
+                            withColor(ChatFormatting.YELLOW)
+                        }
+                    )
                 }
             } else {
                 farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbType.key} §eLeaderboard!")
@@ -477,14 +513,19 @@ object EliteFarmersLeaderboard {
     }
 
     private fun farmingChatMessage(message: String) {
-        ChatUtils.hoverableChat(
-            message,
-            listOf(
-                "§eClick to open your Farming Weight",
-                "§eprofile on §c${EliteDevApi.ELITE_DOMAIN}",
-            ),
-            "/shfarmingprofile ${PlayerUtils.getName()}",
-        )
+        farmingChatMessage(message.asComponent())
+    }
+
+    private fun farmingChatMessage(message: Component) {
+        ChatUtils.chat {
+            append(message)
+            hover = componentBuilder {
+                append("§eClick to open your Farming Weight")
+                append("\n")
+                append("§eprofile on §c${EliteDevApi.ELITE_DOMAIN}")
+            }
+            command = "/shfarmingprofile ${PlayerUtils.getName()}"
+        }
     }
 
     @HandleEvent
@@ -495,5 +536,22 @@ object EliteFarmersLeaderboard {
                 add(it.value.apiData.toString())
             }
         }
+    }
+
+    private const val BETTER_THAN_DEV_ACHIEVEMENT = "Better Than Dev Achievement"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Better than the devs".asComponent(),
+            componentBuilder {
+                append("Pass one of the")
+                append(" SkyHanni ") {
+                    withColor(TextHelper.chromaStyle)
+                }
+                append("contributors in the farming leaderboards")
+            }
+        )
+        event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }
 }

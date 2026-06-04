@@ -23,9 +23,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 object QuestLoader {
 
@@ -146,7 +146,7 @@ object QuestLoader {
     }
 
     // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for mini bosses
-    private fun fixMinibossAmount(quest: Quest, stack: ItemStack) {
+    private fun fixMinibossAmount(quest: Quest, stack: SafeItemStack) {
         if (quest !is MiniBossQuest) return
         val storedAmount = quest.needAmount
         if (storedAmount != 1) return
