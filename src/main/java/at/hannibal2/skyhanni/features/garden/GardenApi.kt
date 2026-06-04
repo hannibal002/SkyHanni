@@ -6,16 +6,16 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.patternGroup
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
@@ -37,6 +38,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -44,6 +46,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
@@ -55,7 +59,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -67,7 +70,7 @@ object GardenApi {
     private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
 
     var toolInHand: String? = null
-    var itemInHand: ItemStack? = null
+    var itemInHand: SafeItemStack? = null
     var cropInHand: CropType? = null
     var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
@@ -87,7 +90,7 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
+    private val cropIconCache = TimeLimitedCache<String, SafeItemStack>(10.minutes)
     val barnArea = AABB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
     private var gardenExpTiers = emptyList<Int>()
     private var extraFarmingTools = emptySet<NeuInternalName>()
@@ -163,7 +166,7 @@ object GardenApi {
         }
     }
 
-    private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
+    private fun getToolInHand(toolItem: SafeItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
@@ -191,12 +194,12 @@ object GardenApi {
         if (this.startsWith("THEORETICAL_HOE_SUNFLOWER")) CropType.getTimeFlower()
         else CropType.entries.firstOrNull { this.startsWith(it.toolName) }
 
-    fun ItemStack.getCropType() = getInternalName().getCropType()
+    fun SafeItemStack.getCropType() = getInternalName().getCropType()
 
-    fun readCounter(itemStack: ItemStack): Long? =
+    fun readCounter(itemStack: SafeItemStack): Long? =
         itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
 
-    fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
+    fun CropType.getItemStackCopy(iconId: String): SafeItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
         AnitaMedalProfit.inInventory ||
@@ -209,8 +212,8 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    @HandleEvent
+    fun onProfileDataReady(event: ProfileDataReadyEvent) {
         GardenBestCropTime.reset()
     }
 
@@ -222,10 +225,19 @@ object GardenApi {
 
     private var lastLocation: LorenzVec? = null
 
+    /**
+     * REGEX-TEST: Farming Toolkit
+     */
+    private val toolkitInventoryPattern by patternGroup.pattern(
+        "toolkit.inventory",
+        "Farming Toolkit"
+    )
+    val toolkitInventory = InventoryDetector { name -> toolkitInventoryPattern.matches(name) }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         // TODO Reevaluate this if Hypixel ever adds right click harvest crops
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
 
         val blockState = event.blockState
         val cropBroken = blockState.getCropType() ?: return
