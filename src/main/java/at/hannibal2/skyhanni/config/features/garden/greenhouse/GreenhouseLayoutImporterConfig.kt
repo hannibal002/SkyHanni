@@ -38,7 +38,7 @@ class GreenhouseLayoutImporterConfig {
     @Expose
     @ConfigOption(name = "Target Color", desc = "Change the color of the text labels above target mutations.")
     @ConfigEditorDropdown
-    var targetColor: LorenzColor = LorenzColor.GOLD
+    var targetColor: LorenzColor = LorenzColor.AQUA
 
     @Expose
     @ConfigOption(name = "Show Text Labels", desc = "Display info above mismatched crops and surfaces.")
