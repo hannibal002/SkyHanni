@@ -50,7 +50,7 @@ value class ServerTimeMark internal constructor(private val ticks: Int) : Compar
     }
 
     companion object {
-        // This is used to ensure no values are close to FAR_PAST_MS (which is 0)
+        // This is used to ensure no values are close to FAR_PAST_TICKS (which is 0)
         // This number is arbitrary, but I believe that 621 days worth of ticks is probably enough to ensure no overflow.
         private const val START_TICKS = Int.MAX_VALUE / 2
 
