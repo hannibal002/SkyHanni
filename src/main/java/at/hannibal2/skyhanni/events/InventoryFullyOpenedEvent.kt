@@ -5,20 +5,20 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import net.minecraft.world.item.ItemStack
 
 sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title
     val inventorySize: Int get() = inventory.slotCount
-    val inventoryItems: Map<Int, ItemStack> get() {
+    val inventoryItems: Map<Int, SafeItemStack> get() {
         val items = inventory.items
         items.entries.removeIf { !it.value.isNotEmpty() }
         return items
     }
-    val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
+    val inventoryItemsWithNull: Map<Int, SafeItemStack?> by lazy {
         (0 until inventorySize).associateWith { inventoryItems[it] }
     }
     val inventoryItemsPrimitive: Map<Int, PrimitiveItemStack> by lazy {

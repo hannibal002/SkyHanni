@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -211,7 +211,7 @@ object MaxwellApi {
         }
     }
 
-    private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, SafeItemStack>) {
         val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
@@ -240,7 +240,7 @@ object MaxwellApi {
         }
     }
 
-    private fun loadThaumaturgyCurrentPower(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyCurrentPower(inventoryItems: Map<Int, SafeItemStack>) {
         val selectedPowerStack =
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
@@ -258,7 +258,7 @@ object MaxwellApi {
         }
     }
 
-    private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyTunings(inventoryItems: Map<Int, SafeItemStack>) {
         val tunings = tunings ?: return
 
         // Only load those rounded values if we don't have any values at all
@@ -281,14 +281,14 @@ object MaxwellApi {
         this.tunings = map
     }
 
-    private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, ItemStack>) {
+    private fun loadThaumaturgyMagicalPower(inventoryItems: Map<Int, SafeItemStack>) {
         val item = inventoryItems[48] ?: return
         thaumaturgyMagicalPowerPattern.firstMatcher(item.getLore()) {
             magicalPower = group("mp").formatInt()
         }
     }
 
-    private fun processStack(stack: ItemStack) {
+    private fun processStack(stack: SafeItemStack) {
         var foundMagicalPower = false
         for (line in stack.getLore()) {
             redstoneCollectionRequirementPattern.matchMatcher(line) {

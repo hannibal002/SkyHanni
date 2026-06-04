@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -46,7 +45,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -118,18 +117,19 @@ object HarvestFeastManager {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Harvest Feast Data")
 
+        val now = SkyBlockTime.now()
+
         if (currentFeastData == null) {
-            val now = SkyBlockTime.now()
             event.addIrrelevant("Harvest Feast data is null for year ${now.year} and month ${now.month}.")
+        } else {
+            event.addIrrelevant("Harvest Feast data was successfully loaded for year ${now.year} and month ${now.month}.")
         }
 
         // TODO: Add more debug
     }
 
-    @HandleEvent(SecondPassedEvent::class)
+    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
-        if (!SkyBlockUtils.inSkyBlock) return
-
         if (displayDirty) updateDisplay()
         fetch()
     }
@@ -156,13 +156,13 @@ object HarvestFeastManager {
             ?.let { it to profileStorage.lastHarvestFeastSubmitMonth }
     }
 
-    private fun readAllCrops(items: Map<Int, ItemStack>) {
+    private fun readAllCrops(items: Map<Int, SafeItemStack>) {
         val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
         val next = readCropTimestamps(items)
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next.map { it.key.cropName to it.value }.toMap(),
+            next = next.filterValues { it != null }.map { it.key.cropName to it.value!! }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
@@ -183,7 +183,9 @@ object HarvestFeastManager {
     private fun trySubmitData(data: EliteFeastJson) {
         if (alreadySubmittedThisSkyBlockMonth()) return
         if (sendingFeastDataMutex.isLocked) {
-            ChatUtils.chat { append("You are already submitting data for this Harvest Feast.").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat {
+                append("You are already submitting data for this Harvest Feast.").withColor(0xFFFF5555.toInt())
+            }
             return
         }
         CoroutineSettings("submit harvest feast data").withIOContext().withMutex(sendingFeastDataMutex).launchCoroutine {
@@ -222,9 +224,9 @@ object HarvestFeastManager {
         return lastSubmit == (now.year to now.month)
     }
 
-    private fun readCurrentActiveCrops(stacks: Map<Int, ItemStack>): List<CropType> {
-        val stacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
-        val current = stacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
+    private fun readCurrentActiveCrops(stacks: Map<Int, SafeItemStack>): List<CropType> {
+        val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
+        val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
 
         if (current.size != 3) {
             ErrorManager.logErrorStateWithData(
@@ -237,7 +239,7 @@ object HarvestFeastManager {
         return current
     }
 
-    private fun readCropTimestamps(items: Map<Int, ItemStack>): Map<CropType, SimpleTimeMark?> {
+    private fun readCropTimestamps(items: Map<Int, SafeItemStack>): Map<CropType, SimpleTimeMark?> {
         val outputMap = CropType.entries.associateWith { null }.toMutableMap<CropType, SimpleTimeMark?>()
 
         items.filterKeys { it in ALL_CROPS_SLOTS }.forEach { (_, stack) ->
@@ -264,15 +266,19 @@ object HarvestFeastManager {
     private fun assumeGrandFeast(): Boolean {
         val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
         val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val timeBasedGrandFeast = currentFeastData?.let { it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty() } ?: false
+        val timeBasedGrandFeast = currentFeastData?.let {
+            it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
+        } ?: false
         return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
         val starting = SkyBlockTime.fromTimeMark(SimpleTimeMark.now() + time)
-        return (SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
-            SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
-            (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))).asTimeMark()
+        return (
+            SkyBlockTime.SKYBLOCK_EPOCH_START_MILLIS +
+                SkyBlockTime.SKYBLOCK_YEAR_MILLIS * starting.year +
+                (SkyBlockTime.SKYBLOCK_MONTH_MILLIS * (starting.month - if (starting.day < MONTH_MIDDLE_DAY) 1 else 0))
+            ).asTimeMark()
     }
 
     private fun fetch() {
@@ -291,8 +297,12 @@ object HarvestFeastManager {
 
     private fun handleFetchedFeastData() {
         if (isCurrentOutdated) {
-            ChatUtils.chat { append("Harvest feast data is not yet available.\n" +
-                "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!").withColor(0xFFFF5555.toInt()) }
+            ChatUtils.chat {
+                append(
+                    "Harvest feast data is not yet available.\n" +
+                        "Talk to the Feast Chef Ted in the Hub or on your Garden to fill it in!"
+                ).withColor(0xFFFF5555.toInt())
+            }
         } else {
             ChatUtils.debug("Loaded Harvest Feast Data for year ${currentFeastData?.year}, month ${currentFeastData?.month}.")
             fetchedFromElite = true
@@ -304,13 +314,13 @@ object HarvestFeastManager {
     }
 
     private fun isOutdated(data: EliteFeastData?): Boolean {
-        val data = data ?: return true
+        val feastData = data ?: return true
         val now = SkyBlockTime.now()
-        return data.year < now.year ||
+        return feastData.year < now.year ||
             // Accept data from previous month as well since the next data is always available for at least the next 2-3 months
             // no reason to invalidate only 1 month outdated data
             data.month < (now.month - 1) ||
-            data.current.isEmpty()
+            feastData.current.isEmpty()
     }
 
     private fun isDataAvailable(): Boolean {
@@ -360,10 +370,9 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
-        if (!SkyBlockUtils.inSkyBlock) return
         if ((!GardenApi.inGarden() && !config.showOutsideGarden) && !isCurrentOutdated) return
         if (!isDataAvailable()) return
         val display = display ?: return

@@ -7,6 +7,7 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.Gui;
 import org.spongepowered.asm.mixin.Final;
@@ -37,7 +38,7 @@ public abstract class MixinChatHud {
     }
 
     @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"), require = 0)
-    private <E> void clearChatTail(ListIterator instance, E e) {
+    private <E> void clearChatTail(ListIterator<E> instance, E e) {
         instance.remove();
     }
 
@@ -48,17 +49,30 @@ public abstract class MixinChatHud {
         }
     }
 
-    @WrapMethod(
-            method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V"
-    )
-    private void wrapRender(ChatComponent.ChatGraphicsAccess chatGraphicsAccess, int i, int j, boolean bl, Operation<Void> original) {
+    //? if >= 26.1 {
+    @WrapMethod(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V")
+    //?} else {
+    /*@WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V")
+    *///?}
+    private void wrapRender(
+        ChatComponent.ChatGraphicsAccess chatGraphicsAccess,
+        int screenHeight,
+        int ticks,
+        //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
+        ChatComponent.DisplayMode displayMode,
+        Operation<Void> original
+    ) {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
-        original.call(chatGraphicsAccess, i, j, bl);
+        original.call(
+            chatGraphicsAccess,
+            screenHeight,
+            ticks,
+            displayMode
+        );
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
-
 }
