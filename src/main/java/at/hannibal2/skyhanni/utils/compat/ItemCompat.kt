@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.core.component.DataComponents
@@ -7,16 +8,15 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 
-fun ItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
+fun SafeItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
     return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType)
 }
 
-fun ItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
+fun SafeItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
     return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }
         .toMutableList()
@@ -35,7 +35,7 @@ fun String.getVanillaItem(): Item? {
     return item
 }
 
-fun ItemStack.setCustomItemName(name: String): ItemStack {
+fun SafeItemStack.setCustomItemName(name: String): SafeItemStack {
     val comp = name.asComponent {
         italic = false
     }
@@ -43,7 +43,7 @@ fun ItemStack.setCustomItemName(name: String): ItemStack {
     return this
 }
 
-fun ItemStack.setCustomItemName(name: Component): ItemStack {
+fun SafeItemStack.setCustomItemName(name: Component): SafeItemStack {
     var comp = name
     if (!comp.style.isItalic) {
         comp = comp.copy().withStyle(comp.style.withItalic(false))
@@ -122,31 +122,31 @@ enum class DyeCompat(
     )
     ;
 
-    fun createStack(size: Int = 1) = ItemStack(stackType, size)
+    fun createStack(size: Int = 1) = SafeItemStack(stackType, size)
 
     companion object {
 
-        fun ItemStack.isDye(dye: DyeCompat): Boolean = isDye(dye.dyeColor)
+        fun SafeItemStack.isDye(dye: DyeCompat): Boolean = isDye(dye.dyeColor)
 
         /**
          * Check if the item is a dye.
          * Enter a metadata to check for a specific dye color.
          */
-        fun ItemStack.isDye(metadata: Int = -1): Boolean {
+        fun SafeItemStack.isDye(metadata: Int = -1): Boolean {
             if (metadata == -1) {
-                return entries.any { this.item == item }
+                return entries.any { this.`is`(it.stackType) }
             }
 
-            return this.item == fromDyeColor(metadata).stackType
+            return this.`is`(fromDyeColor(metadata).stackType)
         }
 
         private fun fromDyeColor(dyeColor: Int): DyeCompat = entries.firstOrNull { it.dyeColor == dyeColor } ?: GRAY
 
-        fun toDamage(stack: ItemStack): Int {
-            return entries.firstOrNull { it.stackType == stack.item }?.dyeColor ?: 0
+        fun toDamage(stack: SafeItemStack): Int {
+            return entries.firstOrNull { stack.`is`(it.stackType) }?.dyeColor ?: 0
         }
 
-        fun createDyeStack(dyeColor: Int, size: Int = 1): ItemStack =
+        fun createDyeStack(dyeColor: Int, size: Int = 1): SafeItemStack =
             fromDyeColor(dyeColor).createStack(size)
     }
 }

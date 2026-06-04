@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -79,7 +79,7 @@ object BestiaryData {
 
     private var display = emptyList<Renderable>()
     private val mobList = mutableListOf<BestiaryMob>()
-    private val stackList = mutableMapOf<Int, ItemStack>()
+    private val stackList = mutableMapOf<Int, SafeItemStack>()
     private val catList = mutableListOf<Category>()
     private var inInventory = false
     private var isCategory = false
@@ -398,8 +398,8 @@ object BestiaryData {
         }
     }
 
-    private fun isOverallProgressEnabled(inventoryItems: Map<Int, ItemStack>): Boolean {
-        if (inventoryItems[52]?.item == Items.ENDER_EYE) {
+    private fun isOverallProgressEnabled(inventoryItems: Map<Int, SafeItemStack>): Boolean {
+        if (inventoryItems[52]?.`is`(Items.ENDER_EYE) == true) {
             return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
         }
 
@@ -413,7 +413,7 @@ object BestiaryData {
         return true
     }
 
-    private fun isBestiaryGui(stack: ItemStack, name: String): Boolean {
+    private fun isBestiaryGui(stack: SafeItemStack, name: String): Boolean {
         val bestiaryGuiTitleMatcher = titlePattern.matcher(name)
         if (bestiaryGuiTitleMatcher.matches()) {
             if ("Bestiary" != bestiaryGuiTitleMatcher.group("title")) {

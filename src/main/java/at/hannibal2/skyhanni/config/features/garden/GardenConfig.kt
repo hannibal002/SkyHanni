@@ -133,6 +133,11 @@ class GardenConfig {
     val yawPitchDisplay: YawPitchDisplayConfig = YawPitchDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Mouse Lock", desc = "")
+    @Accordion
+    val mouseLock: MouseLockConfig = MouseLockConfig()
+
+    @Expose
     @ConfigOption(name = "Sensitivity Reducer", desc = "")
     @Accordion
     val sensitivityReducer: SensitivityReducerConfig = SensitivityReducerConfig()

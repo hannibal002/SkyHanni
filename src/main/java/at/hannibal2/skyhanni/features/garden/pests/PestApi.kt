@@ -75,6 +75,7 @@ object PestApi {
 
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
+    fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
     fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }

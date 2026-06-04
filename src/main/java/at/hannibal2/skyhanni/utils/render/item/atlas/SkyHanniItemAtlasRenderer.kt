@@ -6,15 +6,17 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.gui.render.state.BlitRenderState
-import net.minecraft.client.gui.render.state.GuiRenderState
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+import net.minecraft.client.renderer.state.gui.BlitRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
+import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
 
-import com.mojang.blaze3d.textures.FilterMode
+//? if >= 26.1
+import org.joml.Matrix4f
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -24,8 +26,13 @@ internal class SkyHanniItemAtlasRenderer(
     private val depthTexture: GpuTexture,
 ) {
 
-    fun render(projectionBuffer: CachedOrthoProjectionMatrixBuffer, block: () -> Unit) {
-        val bufferSlice = projectionBuffer.getBuffer(sizePixels.toFloat(), sizePixels.toFloat())
+    fun render(
+        projectionBuffer: ProjectionMatrixBuffer,
+        block: () -> Unit,
+    ) {
+        val size = sizePixels.toFloat()
+        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
+        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
@@ -71,7 +78,7 @@ internal class SkyHanniItemAtlasRenderer(
         val slotF = pixelSize.toFloat()
         val u1 = u + slotF / size
         val v1 = v + (-slotF) / size
-        guiRenderState.submitBlitToCurrentLayer(
+        guiRenderState.addBlitToCurrentLayer(
             BlitRenderState(
                 RenderPipelines.GUI_TEXTURED,
                 TextureSetup.singleTexture(textureView, RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST)),
