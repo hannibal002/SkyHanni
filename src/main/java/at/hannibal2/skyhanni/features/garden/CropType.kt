@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.ServerTime
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
