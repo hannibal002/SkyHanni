@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.greenhouse
 
+import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.GridPosition
 import java.io.ByteArrayOutputStream
 import java.util.Base64
 import java.util.zip.Inflater
@@ -24,6 +25,14 @@ object SkyShardsDecoder {
         "glasscorn", "godseed", "jerryflower", "phantomleaf", "timestalk",
     )
 
+    val sizedMutations = mapOf(
+        "noctilume" to 2,
+        "snoozling" to 3,
+        "plantboy_advance" to 2,
+        "glasscorn" to 2,
+        "godseed" to 3,
+    )
+
     data class Placement(
         val cropId: String,
         val position: GridPosition,
@@ -35,41 +44,52 @@ object SkyShardsDecoder {
     )
 
     fun decodeDesign(input: String): DecodedDesign? {
-        val parts = inflateRaw(fromUrlSafeBase64(input)).split("|")
+        val decodedBytes = fromUrlSafeBase64OrNull(input) ?: return null
+        val decompressedRaw = inflateRawOrNull(decodedBytes) ?: return null
+
+        val parts = decompressedRaw.split("|")
         if (parts.size != 3) return null
 
         val (inputIndexString, targetIndexString, grid) = parts
 
-        val inputCrops = parseCropList(inputIndexString)
-        val targetCrops = parseCropList(targetIndexString)
-
         val useDouble = grid.length == TOTAL_CELLS * 2
         val charWidth = if (useDouble) 2 else 1
+
+        // Prevent StringIndexOutOfBoundsException if the layout string has corrupted size metrics
+        if (grid.length < TOTAL_CELLS * charWidth) return null
+
         val empty = if (useDouble) ".." else "."
+
+        val inputCrops = parseCropList(inputIndexString)
+        val targetCrops = parseCropList(targetIndexString)
 
         val inputs = mutableListOf<Placement>()
         val targets = mutableListOf<Placement>()
 
         repeat(TOTAL_CELLS) { pos ->
             val chars = grid.substring(pos * charWidth, (pos + 1) * charWidth)
-
             if (chars == empty) return@repeat
 
             val index = charsToIndex(chars, useDouble)
             if (index == -1) return@repeat
 
-            val placement = Placement(
-                cropId = when {
-                    chars.isUpperCase() -> targetCrops.getOrNull(index)
-                    else -> inputCrops.getOrNull(index)
-                } ?: return@repeat,
-                position = GridPosition(pos / GRID_SIZE, pos % GRID_SIZE),
-            )
+            val isTarget = chars.isUpperCase()
+            val cropId = if (isTarget) targetCrops.getOrNull(index) else inputCrops.getOrNull(index)
+            if (cropId == null) return@repeat
 
-            if (chars.isUpperCase()) {
-                targets += placement
+            val targetList = if (isTarget) targets else inputs
+            val posX = pos % GRID_SIZE
+            val posY = pos / GRID_SIZE
+
+            val size = sizedMutations[cropId]
+            if (size != null) {
+                for (x in 0 until size) {
+                    for (y in 0 until size) {
+                        targetList.add(Placement(cropId = cropId, position = GridPosition(posX + x, posY + y)))
+                    }
+                }
             } else {
-                inputs += placement
+                targetList.add(Placement(cropId = cropId, position = GridPosition(posX, posY)))
             }
         }
 
@@ -83,7 +103,8 @@ object SkyShardsDecoder {
             .orEmpty()
 
     private fun indexToCrop(indexString: String): String? {
-        val index = indexString.toInt(36)
+        // Safe numerical casting eliminates unexpected format exceptions
+        val index = indexString.toIntOrNull(36) ?: return null
 
         return when {
             index < CROP_IDS.size -> CROP_IDS[index]
@@ -101,37 +122,39 @@ object SkyShardsDecoder {
     private fun String.isUpperCase(): Boolean =
         this == uppercase() && this != lowercase()
 
-    private fun fromUrlSafeBase64(str: String): ByteArray {
-        var base64 = str
-            .replace('-', '+')
-            .replace('_', '/')
-
+    private fun fromUrlSafeBase64OrNull(str: String): ByteArray? = runCatching {
+        // Native URL decoding handles url structures natively and fast
+        Base64.getUrlDecoder().decode(str)
+    }.getOrNull() ?: runCatching {
+        // Safe legacy fallback translation layer
+        var base64 = str.replace('-', '+').replace('_', '/')
         while (base64.length % 4 != 0) {
             base64 += "="
         }
+        Base64.getDecoder().decode(base64)
+    }.getOrNull()
 
-        return Base64.getDecoder().decode(base64)
-    }
-
-    private fun inflateRaw(data: ByteArray): String {
+    private fun inflateRawOrNull(data: ByteArray): String? = runCatching {
         val inflater = Inflater(true)
-        inflater.setInput(data)
-
-        val output = ByteArrayOutputStream()
-        val buffer = ByteArray(1024)
-
-        while (!inflater.finished()) {
-            val count = inflater.inflate(buffer)
-            if (count == 0 && inflater.needsInput()) break
-            output.write(buffer, 0, count)
+        try {
+            inflater.setInput(data)
+            ByteArrayOutputStream().use { output ->
+                val buffer = ByteArray(1024)
+                while (!inflater.finished()) {
+                    val count = inflater.inflate(buffer)
+                    if (count == 0 && inflater.needsInput()) break
+                    output.write(buffer, 0, count)
+                }
+                output.toString(Charsets.UTF_8.name())
+            }
+        } finally {
+            // Releasing the decompression memory context under any status prevents heap leaks
+            inflater.end()
         }
-
-        inflater.end()
-
-        return output.toString(Charsets.UTF_8.name())
-    }
+    }.getOrNull()
 
     private fun doubleToIndex(chars: String): Int {
+        if (chars.length < 2) return -1
         val firstIdx = LETTERS.indexOf(chars[0].lowercaseChar())
         val secondIdx = LETTERS.indexOf(chars[1].lowercaseChar())
 

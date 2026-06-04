@@ -228,7 +228,7 @@ object GardenApi {
         if (event.clickType != ClickType.LEFT_CLICK) return
 
         val blockState = event.blockState
-        val cropBroken = blockState.getCropType(event.position) ?: return
+        val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
