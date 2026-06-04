@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -69,12 +68,20 @@ object GreenhouseLayoutApi {
 
         fun getLayoutBoundingBox(topLeft: LorenzVec): AABB {
             val (dx, dz) = when (this) {
-                ZERO -> -9 to -9
-                NINETY -> 9 to -9
-                ONE_HUNDRED_EIGHTY -> 9 to 9
-                TWO_HUNDRED_SEVENTY -> -9 to 9
+                ZERO -> -10 to -10
+                NINETY -> 10 to -10
+                ONE_HUNDRED_EIGHTY -> 10 to 10
+                TWO_HUNDRED_SEVENTY -> -10 to 10
             }
-            return topLeft.boundingToOffset(dx.toDouble(), 0.0, dz.toDouble()).setMinY(0.0).setMaxY(100.0)
+
+            val (topLeftdx, topLeftdz) = when (this) {
+                ZERO -> 1 to 1
+                NINETY -> 0 to 1
+                ONE_HUNDRED_EIGHTY -> 0 to 0
+                TWO_HUNDRED_SEVENTY -> 1 to 0
+            }
+
+            return topLeft.add(x = topLeftdx, z = topLeftdz).boundingToOffset(dx.toDouble(), 0.0, dz.toDouble()).setMinY(0.0).setMaxY(100.0)
         }
 
         override fun toString(): String = displayName
@@ -83,10 +90,10 @@ object GreenhouseLayoutApi {
     enum class LayoutDisplayType(val displayName: String) {
         ALL("§aAll"),
         INPUTS_AND_TARGETS("§6Inputs §7& §bTargets"),
-        INPUTS("§6Inputs"),
         INPUTS_AND_SURFACES("§6Inputs §7& §dSurfaces"),
-        TARGETS("§bTargets"),
         TARGETS_AND_SURFACES("§bTargets §7& §dSurfaces"),
+        INPUTS("§6Inputs"),
+        TARGETS("§bTargets"),
         SURFACES("§dSurfaces");
 
         fun shouldRenderCrop(slotInfo: SlotInfo) = when (this) {
@@ -101,12 +108,16 @@ object GreenhouseLayoutApi {
         override fun toString(): String = displayName
     }
 
-    enum class GreenhouseCropRole(val color: LorenzColor) {
-        TARGET(LorenzColor.AQUA),
-        INPUT(LorenzColor.GOLD);
+    enum class GreenhouseCropRole {
+        TARGET,
+        INPUT;
 
         companion object {
             fun fromInt(value: Int) = entries.getOrElse(value) { INPUT }
+            fun GreenhouseCropRole.getColor() = when (this) {
+                TARGET -> config.targetColor
+                INPUT -> config.inputColor
+            }
         }
     }
 
@@ -119,21 +130,22 @@ object GreenhouseLayoutApi {
             description = "Import a greenhouse layout from your clipboard."
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                updateLayoutDataCommand()
+                updateLayoutCommand()
             }
         }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onClick(event: EntityClickEvent) {
-        if (event.clickType != InteractClickType.RIGHT_CLICK) {
-            updateCropsInGreenhouse()
-        }
+    fun onEntityClick(event: EntityClickEvent) {
+        updateCropsInGreenhouse()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != InteractClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) {
+            updateCropsInGreenhouse()
+            return
+        }
         val currentLayout = layout ?: return
 
         val matchingEntry = currentLayout.grid.entries.firstOrNull {
@@ -145,43 +157,43 @@ object GreenhouseLayoutApi {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        updateLayoutData(config.layout.get())
-        config.layout.whenChanged { _, new -> updateLayoutData(new) }
-        config.layoutRotation.whenChanged { _, new -> updateTopLeftOfLayout(GardenPlotApi.getCurrentPlot()) }
+        updateLayout(config.layout.get())
+        config.layout.whenChanged { _, new -> updateLayout(new) }
+        config.layoutRotation.whenChanged { _, new -> updateLayoutData() }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onProfileJoin(event: ProfileJoinEvent) {
-        updateTopLeftOfLayout(GardenPlotApi.getCurrentPlot())
+        updateLayoutData()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onIslandJoin(event: IslandJoinEvent) {
-        updateTopLeftOfLayout(GardenPlotApi.getCurrentPlot())
+        updateLayoutData()
     }
 
     @HandleEvent
-    fun onPlotSwitch(event: PlotChangeEvent) {
-        updateTopLeftOfLayout(event.plot)
-        updateCropsInGreenhouse()
+    fun onPlotChange(event: PlotChangeEvent) {
+        updateLayoutData(event.plot)
     }
 
-    fun updateLayoutData(layoutString: String) {
+    fun updateLayout(layoutString: String) {
         try {
             layoutDataPattern.matchMatcher(layoutString) {
                 layout = GreenhouseLayout(group("data")).takeIf { it.grid.isNotEmpty() }
                 config.layout = Property.of(group("data"))
+                updateLayoutData()
             }
         } catch (exception: Exception) {
             ErrorManager.logErrorWithData(exception)
         }
     }
 
-    fun updateLayoutDataCommand() {
+    fun updateLayoutCommand() {
         val clipboard = OSUtils.readFromClipboard()
         if (clipboard.isNullOrEmpty()) return ChatUtils.userError("Your clipboard is empty!")
 
-        updateLayoutData(clipboard)
+        updateLayout(clipboard)
 
         if (layout?.grid?.isEmpty() == false) ChatUtils.chat("§aLayout imported!")
     }
@@ -274,5 +286,10 @@ object GreenhouseLayoutApi {
         }
 
         return topLeft.add(x = dx, y = 0, z = dz)
+    }
+
+    private fun updateLayoutData(plot: GardenPlotApi.Plot? = null) {
+        updateTopLeftOfLayout(plot ?: GardenPlotApi.getCurrentPlot())
+        updateCropsInGreenhouse()
     }
 }

@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.GreenhouseCropRole.Companion.getColor
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.GridPosition
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.LayoutDisplayType
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.SlotInfo
 import at.hannibal2.skyhanni.features.garden.greenhouse.GreenhouseLayoutApi.getWorldPosition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.renderFakeBlock
@@ -35,6 +37,7 @@ object GreenhouseLayoutDisplay {
 
         layout.grid.forEach { (gridPos, slotInfo) ->
             val worldPos = getWorldPosition(gridPos) ?: return@forEach
+            if (config.displayRadius < worldPos.distanceToPlayer()) return@forEach
             val actualBlock = worldPos.getBlockAt()
 
             if (displayType.shouldRenderCrop(slotInfo)) {
@@ -61,7 +64,7 @@ object GreenhouseLayoutDisplay {
         if (config.showTextLabels) {
             drawString(
                 worldPos.add(x = 0.5, y = 2.125, z = 0.5),
-                "${slotInfo.type.color.getChatColor()}${slotInfo.crop}",
+                "${slotInfo.type.getColor().getChatColor()}${slotInfo.crop}",
                 scale = 0.53333333 / 2,
                 yOffset = -9f,
             )
@@ -110,7 +113,7 @@ object GreenhouseLayoutDisplay {
         renderFakeBlock(surface.defaultBlockState(), fakeSurfacePos, OverlayTexture.RED_OVERLAY_V)
 
         if (config.showTextLabels) {
-            val text = when (surface.name) {
+            val text = when (surface) {
                 Blocks.SAND -> "Sand"
                 Blocks.SOUL_SAND -> "Soul Sand"
                 Blocks.MYCELIUM -> "Mycelium"
