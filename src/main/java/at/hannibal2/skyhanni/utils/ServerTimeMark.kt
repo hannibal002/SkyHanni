@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.MinecraftData
-import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import kotlin.math.abs
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant as KInstant
 
 /**
  * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
@@ -13,13 +15,13 @@ import kotlin.time.Duration
  * the server's tps instead of real time, and therefore are affected by server lag.
  */
 @JvmInline
-value class ServerTimeMark internal constructor(private val ticks: Int) : Comparable<ServerTimeMark> {
+value class ServerTimeMark internal constructor(private val millis: Long) : Comparable<ServerTimeMark> {
 
     operator fun minus(other: ServerTimeMark) =
-        (ticks - other.ticks).ticks
+        (millis - other.millis).milliseconds
 
     operator fun plus(other: Duration) =
-        ServerTimeMark(ticks + other.inWholeTicks)
+        ServerTimeMark(millis + other.inWholeMilliseconds)
 
     operator fun minus(other: Duration) = plus(-other)
 
@@ -31,34 +33,35 @@ value class ServerTimeMark internal constructor(private val ticks: Int) : Compar
 
     fun isInFuture(): Boolean = timeUntil().isPositive()
 
-    fun isFarPast() = ticks == FAR_PAST_TICKS
+    fun isFarPast() = millis <= FAR_PAST_MS
 
-    fun isFarFuture() = ticks == FAR_FUTURE_TICKS
+    fun isFarFuture() = millis == FAR_FUTURE_MS
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
-    fun absoluteDifference(other: ServerTimeMark) = abs(ticks - other.ticks).ticks
+    fun absoluteDifference(other: ServerTimeMark) = abs(millis - other.millis).ticks
 
-    override fun compareTo(other: ServerTimeMark): Int = ticks.compareTo(other.ticks)
+    override fun compareTo(other: ServerTimeMark): Int = millis.compareTo(other.millis)
 
-    override fun toString(): String = when (ticks) {
-        FAR_PAST_TICKS -> "The Far Past"
-        FAR_FUTURE_TICKS -> "The Far Future"
-        else -> "ServerTimeMark(ticks=$ticks, now=${MinecraftData.totalServerTicks})"
+    fun toMillis() = millis
+
+    override fun toString(): String = when (millis) {
+        FAR_PAST_MS -> "The Far Past"
+        FAR_FUTURE_MS -> "The Far Future"
+        else -> "ServerTimeMark(millis=$millis})"
     }
 
     companion object {
-        // This is used to ensure no values are close to FAR_PAST_TICKS (which is 0)
-        // This number is arbitrary, but I believe that 621 days worth of ticks is probably enough to ensure no overflow.
-        private const val START_TICKS = Int.MAX_VALUE / 2
+        fun now() = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
 
-        fun now() = ServerTimeMark(START_TICKS + MinecraftData.totalServerTicks)
+        // A sentinel value that is above Long.MIN_VALUE, so we don't worry about underflow
+        // If this causes problems replace with `Long.MIN_VALUE / 2`
+        @OptIn(ExperimentalTime::class)
+        private val FAR_PAST_MS = KInstant.DISTANT_PAST.toEpochMilliseconds()
+        private const val FAR_FUTURE_MS = Long.MAX_VALUE
 
-        private const val FAR_PAST_TICKS = 0
-        private const val FAR_FUTURE_TICKS = Int.MAX_VALUE
-
-        private val FAR_PAST = ServerTimeMark(FAR_PAST_TICKS)
-        private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_TICKS)
+        private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
+        private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
         @JvmStatic
         @JvmName("farPast")
