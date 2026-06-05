@@ -20,7 +20,7 @@ class FruitDiggingConfig {
     @Expose
     @ConfigOption(name = "Show un-diggable fruit", desc = "Show fruit that's destroyed or already dug.")
     @ConfigEditorBoolean
-    var displayFoundFruit: Boolean = false
+    var displayFoundFruit: Boolean = true
 
     @Expose
     @ConfigOption(name = "Found Color", desc = "Color of un-diggable fruit.")
