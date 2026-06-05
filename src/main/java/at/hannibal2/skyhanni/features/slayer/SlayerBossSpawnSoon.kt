@@ -19,8 +19,8 @@ object SlayerBossSpawnSoon {
     private val config get() = SlayerApi.config.slayerBossWarning
 
     /**
-     * REGEX-TEST: (120/500) Atomic Slayer
-     * REGEX-TEST: 12/40 Kills
+     * REGEX-TEST: 38/40 Kills
+     * REGEX-TEST: (0/4.8k) Combat XP
      */
     private val progressPattern by RepoPattern.pattern(
         "slayer.bosswarning.progress",
