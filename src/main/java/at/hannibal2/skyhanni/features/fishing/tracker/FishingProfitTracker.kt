@@ -195,6 +195,7 @@ object FishingProfitTracker {
 
     private var slot9Item: NeuInternalName? = null
 
+    @HandleEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (event.slot == 44) {
             slot9Item = event.itemStack.getInternalNameOrNull()
