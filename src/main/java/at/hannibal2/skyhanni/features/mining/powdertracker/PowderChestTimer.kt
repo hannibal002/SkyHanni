@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -110,7 +110,7 @@ object PowderChestTimer {
         if (HotmData.GREAT_EXPLORER.activeLevel < 20) return
 
         if (location.isOpened()) return
-        if (event.clickType == ClickType.RIGHT_CLICK) {
+        if (event.clickType == InteractClickType.RIGHT_CLICK) {
             chests.remove(location)
             return
         }

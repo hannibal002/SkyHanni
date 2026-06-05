@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.deceased
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
@@ -37,7 +39,7 @@ object RenderLivingEntityHelper {
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
         val livingEntity = entity as? LivingEntity ?: return null
-        if (livingEntity.isInvisible) return null
+        if (livingEntity.isInvisible && !livingEntity.hasVisibleEquipment()) return null
         val color = internalSetColorMultiplier(livingEntity, 0)
         if (color == 0) {
             val eventColor = isEntityInGlowEvent(entity)
@@ -48,6 +50,9 @@ object RenderLivingEntityHelper {
         }
         return color
     }
+
+    private fun LivingEntity.hasVisibleEquipment() =
+        EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
 
     @HandleEvent
     fun onWorldChange() {

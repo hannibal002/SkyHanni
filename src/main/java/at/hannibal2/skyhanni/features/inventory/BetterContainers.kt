@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -28,7 +29,6 @@ import net.minecraft.resources.Identifier
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.BufferedReader
@@ -200,7 +200,7 @@ object BetterContainers {
         bufferedImageButton = readImageResources(buttonStyle.buttonId, dynamic54Button)
     }
 
-    private fun shouldRenderStack(stack: ItemStack): Boolean {
+    private fun shouldRenderStack(stack: SafeItemStack): Boolean {
         return !isBlankStack(stack) && !isToggleOff(stack) && !isToggleOn(stack)
     }
 
@@ -212,11 +212,11 @@ object BetterContainers {
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
     private fun isBlankStack(
-        stack: ItemStack,
+        stack: SafeItemStack,
     ): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK)
 
     private fun isButtonStack(
-        stack: ItemStack?,
+        stack: SafeItemStack?,
     ): Boolean {
         val realStack = stack ?: return false
         val isGlassPane = realStack.isStainedGlassPane()
@@ -225,9 +225,9 @@ object BetterContainers {
         return !isGlassPane && !isUnknownInternalName && !isToggle
     }
 
-    private fun isToggleOn(stack: ItemStack): Boolean = isToggleCommon(stack, "disable")
-    private fun isToggleOff(stack: ItemStack): Boolean = isToggleCommon(stack, "enable")
-    private fun isToggleCommon(stack: ItemStack, verb: String): Boolean {
+    private fun isToggleOn(stack: SafeItemStack): Boolean = isToggleCommon(stack, "disable")
+    private fun isToggleOff(stack: SafeItemStack): Boolean = isToggleCommon(stack, "enable")
+    private fun isToggleCommon(stack: SafeItemStack, verb: String): Boolean {
         val hasText = stack.getLore().takeIfNotEmpty()?.last()?.endsWith("Click to $verb!") ?: false
         return hasText && stack.isDye()
     }
@@ -288,7 +288,7 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: ItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -307,7 +307,7 @@ object BetterContainers {
         }
 
         for (index in 0..<size) {
-            val stack: ItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
             val xi = index % 9
             val yi = index / 9
 

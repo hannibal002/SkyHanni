@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object ReforgeApi {
@@ -79,7 +79,7 @@ object ReforgeApi {
         val isReforgeStone = reforgeStone != null
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
-        fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
+        fun isValid(itemStack: SafeItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
         fun isValid(itemCategory: ItemCategory?, internalName: NeuInternalName) = when (type) {
             ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
             else -> itemCategory in type.itemCategories

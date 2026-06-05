@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
@@ -22,4 +24,10 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) = super.registerCommands(event)
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        ProfileStorageData.repoReady = true
+        if (ProfileStorageData.loaded) ProfileDataReadyEvent().post()
+    }
 }
