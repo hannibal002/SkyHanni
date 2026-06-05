@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -33,6 +34,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GreenhouseLayoutApi {
@@ -73,15 +75,11 @@ object GreenhouseLayoutApi {
                 ONE_HUNDRED_EIGHTY -> 10 to 10
                 TWO_HUNDRED_SEVENTY -> -10 to 10
             }
+            val topLeftChangeX = if (dx == -10) 1 else 0
+            val topLeftChangeZ = if (dx == -10) 1 else 0
 
-            val (topLeftdx, topLeftdz) = when (this) {
-                ZERO -> 1 to 1
-                NINETY -> 0 to 1
-                ONE_HUNDRED_EIGHTY -> 0 to 0
-                TWO_HUNDRED_SEVENTY -> 1 to 0
-            }
-
-            return topLeft.add(x = topLeftdx, z = topLeftdz).boundingToOffset(dx.toDouble(), 0.0, dz.toDouble()).setMinY(0.0).setMaxY(100.0)
+            val topLeftCorner = topLeft.add(x = topLeftChangeX, z = topLeftChangeZ)
+            return topLeftCorner.boundingToOffset(dx.toDouble(), 0.0, dz.toDouble()).setMinY(0.0).setMaxY(100.0)
         }
 
         override fun toString(): String = displayName
@@ -143,7 +141,7 @@ object GreenhouseLayoutApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) {
-            updateCropsInGreenhouse()
+            DelayedRun.runDelayed(1.seconds, { updateCropsInGreenhouse() })
             return
         }
         val currentLayout = layout ?: return
@@ -269,9 +267,23 @@ object GreenhouseLayoutApi {
     }
 
     fun getFakeSurfacePosition(gridPosition: GridPosition, surface: Block) = getWorldPosition(gridPosition)?.let { worldPos ->
-        val xFix = if (gridPosition.x == 0) 0.001 else -0.001
+        val (xFix, zFix) = when (config.layoutRotation.get()) {
+            LayoutRotation.ZERO -> {
+                (if (gridPosition.x == 0) 0.001 else -0.001) to (if (gridPosition.y == 0) 0.001 else -0.001)
+            }
+            LayoutRotation.NINETY -> {
+                (if (gridPosition.y == 0) -0.001 else 0.001) to (if (gridPosition.x == 0) 0.001 else -0.001)
+            }
+            LayoutRotation.ONE_HUNDRED_EIGHTY -> {
+                (if (gridPosition.x == 0) -0.001 else 0.001) to (if (gridPosition.y == 0) -0.001 else 0.001)
+            }
+            LayoutRotation.TWO_HUNDRED_SEVENTY -> {
+                (if (gridPosition.y == 0) 0.001 else -0.001) to (if (gridPosition.x == 0) -0.001 else 0.001)
+            }
+        }
+//         val xFix = if (gridPosition.x == 0) 0.001 else -0.001
         val yFix = if (surface == Blocks.FARMLAND && worldPos.getBlockAt() != Blocks.FARMLAND) 0.0625 + 0.001 else 0.001
-        val zFix = if (gridPosition.y == 0) 0.001 else -0.001
+//         val zFix = if (gridPosition.y == 0) 0.001 else -0.001
         worldPos.add(xFix, yFix, zFix)
     }
 
