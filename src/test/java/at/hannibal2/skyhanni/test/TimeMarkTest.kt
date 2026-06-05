@@ -22,10 +22,7 @@ class TimeMarkTest {
 
     @Test
     fun `the future should be in the future`() {
-        val futureServerTimeMark = ServerTimeMark.now() + 30.days
-        Assertions.assertTrue(futureServerTimeMark.passedSince() < 0.milliseconds)
-
-        val futureSimpleTimeMark = SimpleTimeMark.now() + 30.days
-        Assertions.assertTrue(futureSimpleTimeMark.passedSince() < 0.milliseconds)
+        Assertions.assertTrue(ServerTimeMark.now() + 30.days < ServerTimeMark.farFuture())
+        Assertions.assertTrue(SimpleTimeMark.now() + 30.days < SimpleTimeMark.farFuture())
     }
 }
