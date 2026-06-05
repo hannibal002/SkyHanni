@@ -5,24 +5,32 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
 import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.milliseconds
 
 class TimeMarkTest {
+    // the minimum duration we work with (30 days)
+    private val farThreshold = 30.days
+
     @Test
     fun `far past should not be close to now`() {
-        Assertions.assertTrue(ServerTimeMark.farPast().passedSince() > 30.days)
-        Assertions.assertTrue(SimpleTimeMark.farPast().passedSince() > 30.days)
+        Assertions.assertTrue(ServerTimeMark.farPast().passedSince() > farThreshold)
+        Assertions.assertTrue(SimpleTimeMark.farPast().passedSince() > farThreshold)
     }
 
     @Test
     fun `far future should not be close to now`() {
-        Assertions.assertTrue(ServerTimeMark.farFuture().timeUntil() > 30.days)
-        Assertions.assertTrue(ServerTimeMark.farFuture().timeUntil() > 30.days)
+        Assertions.assertTrue(ServerTimeMark.farFuture().timeUntil() > farThreshold)
+        Assertions.assertTrue(SimpleTimeMark.farFuture().timeUntil() > farThreshold)
     }
 
     @Test
     fun `subtracting duration from far past does not underflow`() {
-        Assertions.assertTrue(ServerTimeMark.farPast() - 30.days <= ServerTimeMark.farPast())
-        Assertions.assertTrue(SimpleTimeMark.farPast() - 30.days <= SimpleTimeMark.farPast())
+        Assertions.assertTrue(ServerTimeMark.farPast() - farThreshold <= ServerTimeMark.farPast())
+        Assertions.assertTrue(SimpleTimeMark.farPast() - farThreshold <= SimpleTimeMark.farPast())
+    }
+
+    @Test
+    fun `subtracting duration from far past is still far past`() {
+        Assertions.assertTrue((SimpleTimeMark.farPast() - farThreshold).isFarPast())
+        Assertions.assertTrue((ServerTimeMark.farPast() - farThreshold).isFarPast())
     }
 }
