@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -84,7 +86,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
      * REGEX-TEST: §6§lRARE DROP! §r§aNot Just a Pest Vinyl §r§6(Cocoaleech)
      * REGEX-FAIL: §6§lRARE CROP! §aCane Knot §e(§e+139.5☀)
      */
-	// TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
+    // TODO consider if we want to add Harvest Feast drops to Pest Profit Tracker - we need a way to distinguish drops
     //  from breaking crops vs. killing pests since they use the same message
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
@@ -104,11 +106,16 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
-    val SUNFLOWER_ITEM = "DOUBLE_PLANT".toInternalName()
+    val ENCHANTED_SUNFLOWER_ITEM = "ENCHANTED_SUNFLOWER".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
+
+    private val noMessageDrops = setOf(
+        "PESTERMINATOR;1",
+        "ULTIMATE_SUNSET;1",
+    ).toInternalNames()
 
     data class BucketData(
         @Expose private var totalPestsKills: Long = 0L,
@@ -163,10 +170,27 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
 
+    fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
+        if (!drop.canDropFromPests) return
+        if (!PestApi.hasVacuumOrLassoInHand()) return
+
+        val internalName = NeuInternalName.fromItemNameOrInternalName(drop.dropName)
+        addItem(drop.pestType ?: PestType.UNKNOWN, internalName, 1, command = false)
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemAdd(event: ItemAddEvent) {
         if (config.enabled && event.source == ItemAddManager.Source.COMMAND) {
             event.addItemFromEvent()
+            return
+        }
+
+        if (event.source == ItemAddManager.Source.ITEM_ADD &&
+            event.internalName in noMessageDrops &&
+            PestApi.hasVacuumOrLassoInHand()
+        ) {
+            val pest = PestType.getByItemInternalNameOrNull(event.internalName) ?: return
+            addItem(pest, event.internalName, event.amount, false)
         }
     }
 
@@ -204,7 +228,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             CropType.getByNameOrNull(rawName)
                 ?.addCollectionCounter(CropCollectionType.PEST_BASE, primitiveStack.amount * amount.toLong())
 
-            if (config.hideChat && config.enabled) blockedReason = "pest_drop"
+            if (config.hideChat) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
 
@@ -212,7 +236,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 // Field Mice drop 6 separate items, but we only want to count the kill once
                 PestType.FIELD_MOUSE -> internalName == DUNG_ITEM
                 // Lunar Moths drop 3 separate crops, but we only want to count the kill once
-                PestType.LUNAR_MOTH -> internalName == SUNFLOWER_ITEM
+                PestType.LUNAR_MOTH -> internalName == ENCHANTED_SUNFLOWER_ITEM
                 // Overclocker drops have the same format as crop drops and causes double counting kills
                 else -> internalName != OVERCLOCKER
             }
@@ -222,7 +246,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
-            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
             val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
 
             addItem(pest, internalName, amount, command = false)
@@ -386,7 +410,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             oldItems.forEach { (neuInternalName, trackedItem) ->
                 val item = neuInternalName.toInternalName()
                 val pest = pestTypeMap.getOrPut(item) {
-                    PestType.getByInternalNameItemOrNull(item) ?: PestType.UNKNOWN
+                    PestType.getByItemInternalNameOrNull(item) ?: PestType.UNKNOWN
                 }
 
                 // If the map for the pest already contains this item, combine the amounts

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.inventory.Slot
@@ -32,7 +33,7 @@ object HighlightMissingRepoItems {
     private fun highlightItems(slots: Iterable<Slot>) {
         if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
-            val internalName = slot.item?.getInternalNameOrNull() ?: continue
+            val internalName = slot.item.getInternalNameOrNull() ?: continue
             val asString = internalName.asString()
             if (asString.startsWith("BUILDER_")) continue // Skip builder items as we filter them out of allInternalNames
 

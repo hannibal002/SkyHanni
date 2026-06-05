@@ -16,15 +16,15 @@ import net.minecraft.network.chat.Component
  * @param userLuckAmount The amount of user luck gained when unlocking the achievement
  * @param secret Secret achievements only show their name once unlocked
  * @param tiers For achievements that require multiple completions (10, 20) would require 10 for tier 1 and 20 to fully unlock
- * @param hidden Hidden achievements are completely hidden until unlocked
+ * @param hidden Hidden achievements are completely hidden until unlocked/found
  */
 data class Achievement(
     private val name: Component? = null,
     private val description: Component = Component.empty(),
     var userLuckAmount: Float = 0f,
-    var secret: Boolean = false, // Secret achievements hide the name
+    var secret: Boolean = false,
     var tiers: List<Int> = listOf(),
-    var hidden: Boolean = false, // Hidden achievements are hidden until found
+    var hidden: Boolean = false,
     @Expose
     var data: AchievementUserData = AchievementUserData(),
 ) {
@@ -58,7 +58,7 @@ data class Achievement(
                 } else {
                     append(
                         "Current Progress: ${getProgressFormatted()} " +
-                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)"
+                            "(you only needed ${tiers.last().addSeparators()} to fully unlock it)",
                     )
                 }
                 withColor(ChatFormatting.YELLOW)

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import net.minecraft.client.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.util.Mth
 
@@ -66,7 +66,7 @@ object CopyChat {
         val visibleLine = visibleLines[lineIndex]
 
         val matchingLines = chatGui.allMessages.filter {
-            it.addedTime() == visibleLine.addedTime && it.content.formattedTextCompat().isNotBlank()
+            it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
         }
 // TODO Fix the bug where it copies the wrong line when SHWords modifies the line count
         return when {
@@ -84,20 +84,13 @@ object CopyChat {
     fun screenToChatX(d: Double): Double {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return 0.0
-        //? if < 1.21.11 {
-        return chatGui.screenToChatX(d)
-        //?} else
-        //return d / chatGui.scale - 4.0
+        return d / chatGui.scale - 4.0
     }
 
     fun screenToChatY(d: Double): Double {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return 0.0
-        //? if < 1.21.11 {
-        return chatGui.screenToChatY(d)
-        //?} else {
-        /*val e = mc.window.guiScaledHeight - d - 40.0
+        val e = mc.window.guiScaledHeight - d - 40.0
         return e / (chatGui.scale * chatGui.lineHeight)
-        *///?}
     }
 }

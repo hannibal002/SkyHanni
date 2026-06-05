@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
@@ -22,7 +22,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
 
     constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, block.asItem(), maxLevel)
 
-    val item: ItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
+    val item: SafeItemStack by lazy { ItemUtils.createItemStack(icon, displayName) }
     val lowercaseName = displayName.lowercase()
     val uppercaseName = displayName.uppercase()
 
