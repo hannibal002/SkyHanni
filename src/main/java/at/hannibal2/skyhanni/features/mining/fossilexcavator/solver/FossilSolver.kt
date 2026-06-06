@@ -34,9 +34,16 @@ object FossilSolver {
         Triple(FossilTile(3, 4), 1.0, 2),
     )
 
-    private data class SolverResult(
-        val possibleClickPositions: Map<FossilTile, Int>,
-        val totalPossibleTiles: Int,
+    // Sequence optimized to avoid hitting fossils
+    private val worstStartingSequence: Set<Triple<FossilTile, Double, Int>> = setOf(
+        Triple(FossilTile(0, 0), 0.023, 174),
+        Triple(FossilTile(0, 1), 0.024, 170),
+        Triple(FossilTile(0, 5), 0.024, 166),
+        Triple(FossilTile(0, 4), 0.025, 162),
+        Triple(FossilTile(0, 2), 0.025, 158),
+        Triple(FossilTile(0, 3), 0.019, 154),
+        Triple(FossilTile(1, 0), 0.026, 151),
+        Triple(FossilTile(1, 1), 0.027, 147),
     )
 
     private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> =
@@ -52,62 +59,19 @@ object FossilSolver {
         fossilLocations: Set<Int>,
         dirtLocations: Set<Int>,
         percentage: String?,
-    ) = solvingMutex.withLock {
-
-        val result = calculatePossibilities(
-            fossilLocations,
-            dirtLocations,
-            percentage,
-        ) ?: return@withLock
-
-        val bestPosition = result.possibleClickPositions.maxByOrNull { it.value } ?: run {
-            return@withLock if (fossilLocations.isNotEmpty()) {
-                FossilSolverDisplay.showCompleted()
-            } else {
-                FossilSolverDisplay.showError()
-            }
-        }
-
-        FossilSolverDisplay.nextData(
-            bestPosition.key,
-            bestPosition.value / result.totalPossibleTiles.toDouble(),
-            result.totalPossibleTiles,
-        )
+    ) {
+        solve(fossilLocations, dirtLocations, percentage, isWorst = false)
     }
 
-    suspend fun findWorstTile(
+    suspend fun findWorstTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) =
+        solve(fossilLocations, dirtLocations, percentage, isWorst = true)
+
+    private suspend fun solve(
         fossilLocations: Set<Int>,
         dirtLocations: Set<Int>,
         percentage: String?,
+        isWorst: Boolean
     ) = solvingMutex.withLock {
-
-        val result = calculatePossibilities(
-            fossilLocations,
-            dirtLocations,
-            percentage,
-        ) ?: return@withLock null
-
-        val worstPosition = result.possibleClickPositions.minByOrNull { it.value } ?: run {
-            return@withLock if (fossilLocations.isNotEmpty()) {
-                FossilSolverDisplay.showCompleted()
-            } else {
-                FossilSolverDisplay.showError()
-            }
-        }
-
-        FossilSolverDisplay.nextData(
-            worstPosition.key,
-            1 - (worstPosition.value / result.totalPossibleTiles.toDouble()),
-            result.totalPossibleTiles,
-        )
-    }
-
-    private fun calculatePossibilities(
-        fossilLocations: Set<Int>,
-        dirtLocations: Set<Int>,
-        percentage: String?,
-    ): SolverResult? {
-
         val invalidPositions: MutableSet<FossilTile> = mutableSetOf()
         for (i in 0..53) {
             if (i !in fossilLocations && i !in dirtLocations) {
@@ -116,18 +80,18 @@ object FossilSolver {
         }
         val foundPositions = fossilLocations.map { FossilTile(it) }.toSet()
 
-        val needsMoveSequence = foundPositions.isEmpty() && invalidPositions.all { isPositionInStartSequence(it) }
+        val currentSeq = if (isWorst) worstStartingSequence else getCurrentSequence()
+        val needsMoveSequence = foundPositions.isEmpty() && invalidPositions.all { pos -> currentSeq.any { it.first == pos } }
 
         if (needsMoveSequence) {
             val movesTaken = invalidPositions.size
-            if (movesTaken >= getCurrentSequence().size) {
-                FossilSolverDisplay.showError()
-                return null
+            if (movesTaken >= currentSeq.size) {
+                return FossilSolverDisplay.showError()
             }
 
-            val nextMove = getCurrentSequence().elementAt(movesTaken)
+            val nextMove = currentSeq.elementAt(movesTaken)
             FossilSolverDisplay.nextData(nextMove.first, nextMove.second, nextMove.third)
-            return null
+            return
         }
 
         val possibleClickPositions: MutableMap<FossilTile, Int> = mutableMapOf()
@@ -157,14 +121,39 @@ object FossilSolver {
             }
         }
 
-        possibleClickPositions
-            .filter { it.key in foundPositions }.keys
-            .forEach { possibleClickPositions.remove(it) }
+        if (!isWorst) {
+            possibleClickPositions
+                .filter { it.key in foundPositions }.keys
+                .forEach { possibleClickPositions.remove(it) }
 
-        return SolverResult(
-            possibleClickPositions = possibleClickPositions,
-            totalPossibleTiles = totalPossibleTiles,
-        )
+            val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
+                return if (fossilLocations.isNotEmpty()) {
+                    FossilSolverDisplay.showCompleted()
+                } else FossilSolverDisplay.showError()
+            }
+
+            val nextMove = bestPosition.key
+            val correctPercentage = bestPosition.value / totalPossibleTiles.toDouble()
+            FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
+        } else {
+            val remainingTiles = (0..53).map { FossilTile(it) }
+                .filter { it !in invalidPositions && it !in foundPositions }
+
+            if (remainingTiles.isEmpty()) {
+                return if (fossilLocations.isNotEmpty()) {
+                    FossilSolverDisplay.showCompleted()
+                } else FossilSolverDisplay.showError()
+            }
+
+            val worstPosition = remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 } ?: run {
+                return FossilSolverDisplay.showError()
+            }
+
+            val nextMove = worstPosition
+            val occurrences = possibleClickPositions[worstPosition] ?: 0
+            val correctPercentage = occurrences / totalPossibleTiles.toDouble()
+            FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
+        }
     }
 
     private fun isValidFossilPosition(
