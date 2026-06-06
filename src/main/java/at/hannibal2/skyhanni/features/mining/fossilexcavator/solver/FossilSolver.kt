@@ -39,7 +39,8 @@ object FossilSolver {
     )
 
     // Sequence optimized to avoid hitting fossils
-    // Only reason this is 26 steps and not 53 is cause 25 is the max chisel charges currently possible.
+    // This could be only 25 steps since that is the max number of possible chisel charges right now
+    // But I put the entire 53 steps for future proofing
     private val worstStartingSequence: Set<Triple<FossilTile, Double, Int>> = setOf(
         Triple(FossilTile(8, 5), 0.002, 404),
         Triple(FossilTile(8, 2), 0.005, 403),
@@ -67,6 +68,33 @@ object FossilSolver {
         Triple(FossilTile(1, 1), 0.044, 226),
         Triple(FossilTile(3, 0), 0.051, 216),
         Triple(FossilTile(4, 0), 0.049, 205),
+        Triple(FossilTile(5, 0), 0.026, 195),
+        Triple(FossilTile(6, 1), 0.053, 190),
+        Triple(FossilTile(1, 2), 0.061, 180),
+        Triple(FossilTile(2, 1), 0.059, 169),
+        Triple(FossilTile(1, 3), 0.063, 159),
+        Triple(FossilTile(1, 4), 0.040, 149),
+        Triple(FossilTile(2, 5), 0.063, 143),
+        Triple(FossilTile(3, 1), 0.082, 134),
+        Triple(FossilTile(2, 2), 0.073, 123),
+        Triple(FossilTile(4, 1), 0.088, 114),
+        Triple(FossilTile(5, 1), 0.048, 104),
+        Triple(FossilTile(6, 2), 0.091, 99),
+        Triple(FossilTile(2, 3), 0.111, 90),
+        Triple(FossilTile(2, 4), 0.075, 80),
+        Triple(FossilTile(3, 5), 0.108, 74),
+        Triple(FossilTile(3, 2), 0.121, 66),
+        Triple(FossilTile(4, 2), 0.172, 58),
+        Triple(FossilTile(5, 2), 0.104, 48),
+        Triple(FossilTile(3, 3), 0.186, 43),
+        Triple(FossilTile(3, 4), 0.171, 35),
+        Triple(FossilTile(6, 3), 0.241, 29),
+        Triple(FossilTile(6, 4), 0.227, 22),
+        Triple(FossilTile(4, 3), 0.412, 17),
+        Triple(FossilTile(5, 3), 0.200, 10),
+        Triple(FossilTile(4, 4), 0.750, 8),
+        Triple(FossilTile(5, 5), 0.500, 2),
+        Triple(FossilTile(5, 4), 1.000, 1)
     )
 
     private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> {
