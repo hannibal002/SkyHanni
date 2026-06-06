@@ -35,15 +35,34 @@ object FossilSolver {
     )
 
     // Sequence optimized to avoid hitting fossils
+    // Only reason this is 26 steps and not 53 is cause 25 is the max chisel charges currently possible.
     private val worstStartingSequence: Set<Triple<FossilTile, Double, Int>> = setOf(
-        Triple(FossilTile(0, 0), 0.023, 174),
-        Triple(FossilTile(0, 1), 0.024, 170),
-        Triple(FossilTile(0, 5), 0.024, 166),
-        Triple(FossilTile(0, 4), 0.025, 162),
-        Triple(FossilTile(0, 2), 0.025, 158),
-        Triple(FossilTile(0, 3), 0.019, 154),
-        Triple(FossilTile(1, 0), 0.026, 151),
-        Triple(FossilTile(1, 1), 0.027, 147),
+        Triple(FossilTile(8, 5), 0.002, 404),
+        Triple(FossilTile(8, 2), 0.005, 403),
+        Triple(FossilTile(8, 3), 0.005, 401),
+        Triple(FossilTile(8, 4), 0.005, 399),
+        Triple(FossilTile(8, 0), 0.013, 397),
+        Triple(FossilTile(8, 1), 0.005, 392),
+        Triple(FossilTile(7, 5), 0.021, 390),
+        Triple(FossilTile(0, 5), 0.024, 382),
+        Triple(FossilTile(0, 0), 0.027, 373),
+        Triple(FossilTile(7, 0), 0.028, 363),
+        Triple(FossilTile(7, 1), 0.031, 353),
+        Triple(FossilTile(6, 0), 0.029, 342),
+        Triple(FossilTile(7, 2), 0.033, 332),
+        Triple(FossilTile(7, 3), 0.031, 321),
+        Triple(FossilTile(7, 4), 0.019, 311),
+        Triple(FossilTile(6, 5), 0.030, 305),
+        Triple(FossilTile(1, 0), 0.041, 296),
+        Triple(FossilTile(0, 1), 0.035, 284),
+        Triple(FossilTile(0, 2), 0.040, 274),
+        Triple(FossilTile(0, 3), 0.038, 263),
+        Triple(FossilTile(0, 4), 0.024, 253),
+        Triple(FossilTile(1, 5), 0.036, 247),
+        Triple(FossilTile(2, 0), 0.050, 238),
+        Triple(FossilTile(1, 1), 0.044, 226),
+        Triple(FossilTile(3, 0), 0.051, 216),
+        Triple(FossilTile(4, 0), 0.049, 205),
     )
 
     private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> =
@@ -121,39 +140,24 @@ object FossilSolver {
             }
         }
 
-        if (!isWorst) {
-            possibleClickPositions
-                .filter { it.key in foundPositions }.keys
-                .forEach { possibleClickPositions.remove(it) }
+        val remainingTiles = (0..53).map { FossilTile(it) }
+            .filter { it !in invalidPositions && it !in foundPositions }
 
-            val bestPosition = possibleClickPositions.maxByOrNull { it.value } ?: run {
-                return if (fossilLocations.isNotEmpty()) {
-                    FossilSolverDisplay.showCompleted()
-                } else FossilSolverDisplay.showError()
-            }
-
-            val nextMove = bestPosition.key
-            val correctPercentage = bestPosition.value / totalPossibleTiles.toDouble()
-            FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
-        } else {
-            val remainingTiles = (0..53).map { FossilTile(it) }
-                .filter { it !in invalidPositions && it !in foundPositions }
-
-            if (remainingTiles.isEmpty()) {
-                return if (fossilLocations.isNotEmpty()) {
-                    FossilSolverDisplay.showCompleted()
-                } else FossilSolverDisplay.showError()
-            }
-
-            val worstPosition = remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 } ?: run {
-                return FossilSolverDisplay.showError()
-            }
-
-            val nextMove = worstPosition
-            val occurrences = possibleClickPositions[worstPosition] ?: 0
-            val correctPercentage = occurrences / totalPossibleTiles.toDouble()
-            FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
+        if (totalPossibleTiles == 0 || remainingTiles.isEmpty()) {
+            return if (fossilLocations.isNotEmpty()) {
+                FossilSolverDisplay.showCompleted()
+            } else FossilSolverDisplay.showError()
         }
+
+        val chosenPosition = if (isWorst) {
+            remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
+        } else {
+            remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
+        } ?: return FossilSolverDisplay.showError()
+
+        val occurrences = possibleClickPositions[chosenPosition] ?: 0
+        val correctPercentage = occurrences / totalPossibleTiles.toDouble()
+        FossilSolverDisplay.nextData(chosenPosition, correctPercentage, totalPossibleTiles)
     }
 
     private fun isValidFossilPosition(
