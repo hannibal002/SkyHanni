@@ -11,14 +11,12 @@ import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.garden.sensitivity.MouseLock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LocationUtils.isInside
-import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
+import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -40,6 +38,20 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GardenPlotApi {
+
+    private const val PLOT_SIZE = 96.0
+    private const val PLOT_GRID_SIZE = 5
+    private const val PLOT_GRID_MIN = -240.0
+    private const val PLOT_GRID_MAX = 240.0
+    private const val PLOT_EDGE_EPSILON = 0.0001
+
+    private val plotMap = listOf(
+        listOf(21, 13, 9, 14, 22),
+        listOf(15, 5, 1, 6, 16),
+        listOf(10, 2, 0, 3, 11),
+        listOf(17, 7, 4, 8, 18),
+        listOf(23, 19, 12, 20, 24),
+    )
 
     private val patternGroup = RepoPattern.group("garden.plot")
     private val config get() = PestApi.config.spray
@@ -122,7 +134,7 @@ object GardenPlotApi {
     var plots = listOf<Plot>()
 
     fun getCurrentPlot(): Plot? {
-        return plots.firstOrNull { it.isPlayerInside() }
+        return getPlot(playerLocation())
     }
 
     fun inGreenhouse(): Boolean {
@@ -288,22 +300,26 @@ object GardenPlotApi {
 
     fun Plot.isBarn() = id == 0
 
-    fun Plot.isPlayerInside() = box.isPlayerInside()
+    fun Plot.isPlayerInside() = getCurrentPlot() == this
 
-    fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
+    fun getPlot(location: LorenzVec): Plot? {
+        if (location.y < 0.0 || location.y >= 256.0) return null
+        val plotX = location.x.toPlotIndex() ?: return null
+        val plotZ = location.z.toPlotIndex() ?: return null
+        return getPlotByID(plotMap[plotZ][plotX])
+    }
+
+    private fun Double.toPlotIndex(): Int? {
+        if (this < PLOT_GRID_MIN - PLOT_EDGE_EPSILON || this > PLOT_GRID_MAX + PLOT_EDGE_EPSILON) return null
+        if (this >= PLOT_GRID_MAX) return PLOT_GRID_SIZE - 1
+        return floor((this - PLOT_GRID_MIN) / PLOT_SIZE).toInt().coerceIn(0, PLOT_GRID_SIZE - 1)
+    }
 
     val Plot.tpName get() = if (isBarn()) "barn" else name
 
     fun Plot.sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
 
     init {
-        val plotMap = listOf(
-            listOf(21, 13, 9, 14, 22),
-            listOf(15, 5, 1, 6, 16),
-            listOf(10, 2, 0, 3, 11),
-            listOf(17, 7, 4, 8, 18),
-            listOf(23, 19, 12, 20, 24),
-        )
         val list = mutableListOf<Plot>()
         var slot = 2
         for ((y, rows) in plotMap.withIndex()) {
