@@ -140,17 +140,12 @@ object FossilSolver {
                 }
             }
         }
-
-        val remainingTiles = (0..53).map { FossilTile(it) }
-            .filter { it !in invalidPositions && it !in foundPositions }
-
-        if (totalPossibleTiles == 0 || remainingTiles.isEmpty()) {
+        val chosenPosition = getChosenPosition(possibleClickPositions) ?: run {
             return if (fossilLocations.isNotEmpty()) {
                 FossilSolverDisplay.showCompleted()
             } else FossilSolverDisplay.showError()
         }
 
-        val chosenPosition = getChosenPosition(possibleClickPositions) ?: return FossilSolverDisplay.showError()
         val nextMove = chosenPosition.key
         val correctPercentage = chosenPosition.value / totalPossibleTiles.toDouble()
         FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
