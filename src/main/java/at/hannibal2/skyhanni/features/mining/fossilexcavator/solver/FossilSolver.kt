@@ -80,12 +80,12 @@ object FossilSolver {
         return getCurrentSequence().any { it.first == position }
     }
 
-    fun getChosenPosition(possibleClickPositions: MutableMap<FossilTile, Int>, remainingTiles: List<FossilTile>): FossilTile? {
+    fun getChosenPosition(possibleClickPositions: MutableMap<FossilTile, Int>): Map.Entry<FossilTile, Int>? {
         return when (config.mode) {
             SolverMode.FOSSIL ->
-                remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
+                possibleClickPositions.maxByOrNull { it.value }
             SolverMode.AVOID ->
-                remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
+                possibleClickPositions.minByOrNull { it.value }
         }
     }
 
@@ -150,10 +150,10 @@ object FossilSolver {
             } else FossilSolverDisplay.showError()
         }
 
-        val chosenPosition = getChosenPosition(possibleClickPositions, remainingTiles) ?: return FossilSolverDisplay.showError()
-        val occurrences = possibleClickPositions[chosenPosition] ?: 0
-        val correctPercentage = occurrences / totalPossibleTiles.toDouble()
-        FossilSolverDisplay.nextData(chosenPosition, correctPercentage, totalPossibleTiles)
+        val chosenPosition = getChosenPosition(possibleClickPositions) ?: return FossilSolverDisplay.showError()
+        val nextMove = chosenPosition.key
+        val correctPercentage = chosenPosition.value / totalPossibleTiles.toDouble()
+        FossilSolverDisplay.nextData(nextMove, correctPercentage, totalPossibleTiles)
     }
 
     private fun isValidFossilPosition(
