@@ -80,6 +80,15 @@ object FossilSolver {
         return getCurrentSequence().any { it.first == position }
     }
 
+    fun getChosenPosition(possibleClickPositions: MutableMap<FossilTile, Int>, remainingTiles: List<FossilTile>): FossilTile? {
+        return when (config.mode) {
+            SolverMode.FOSSIL ->
+                remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
+            SolverMode.AVOID ->
+                remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
+        }
+    }
+
     private val solvingMutex = Mutex()
 
     suspend fun findTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) = solvingMutex.withLock {
@@ -141,13 +150,7 @@ object FossilSolver {
             } else FossilSolverDisplay.showError()
         }
 
-        val chosenPosition = when (config.mode) {
-            SolverMode.FOSSIL ->
-                remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
-            SolverMode.AVOID ->
-                remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
-        } ?: return FossilSolverDisplay.showError()
-
+        val chosenPosition = getChosenPosition(possibleClickPositions, remainingTiles) ?: return FossilSolverDisplay.showError()
         val occurrences = possibleClickPositions[chosenPosition] ?: 0
         val correctPercentage = occurrences / totalPossibleTiles.toDouble()
         FossilSolverDisplay.nextData(chosenPosition, correctPercentage, totalPossibleTiles)
