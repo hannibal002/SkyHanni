@@ -117,6 +117,8 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         "^GONE! Your CROP FEVER has been cured!",
     )
 
+    fun isCropFeverStartMessage(message: String): Boolean = cropFeverStart.matcher(message).matches()
+
     private val config get() = GardenApi.config.cropFeverTracker
     private val blocksBrokenCache: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
     private var isCropFever = false

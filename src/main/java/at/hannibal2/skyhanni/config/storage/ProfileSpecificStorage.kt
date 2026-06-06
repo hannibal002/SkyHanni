@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboard
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
@@ -486,6 +487,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var rareCropTracker: RareCropTracker.Data = RareCropTracker.Data()
+
+        @Expose
+        var farmingProfitTracker: FarmingProfitTracker.Data = FarmingProfitTracker.Data()
 
         @Expose
         var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()

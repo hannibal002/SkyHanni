@@ -231,6 +231,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             if (config.hideChat) blockedReason = "pest_drop"
 
             addItem(pest, internalName, amount, command = false)
+            FarmingProfitTracker.addPestItem(internalName, amount, message = false)
 
             val shouldAddKill = when (pest) {
                 // Field Mice drop 6 separate items, but we only want to count the kill once
@@ -250,6 +251,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
 
             addItem(pest, internalName, amount, command = false)
+            FarmingProfitTracker.addPestItem(internalName, amount)
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
@@ -268,7 +270,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
-            SprayType.getByNameOrNull(it)?.addSprayUsed()
+            SprayType.getByNameOrNull(it)?.let { spray ->
+                spray.addSprayUsed()
+                FarmingProfitTracker.addPestSpray(spray)
+            }
         }
     }
 
@@ -372,7 +377,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
         val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
-        addCoins(pest, coins.roundToInt(), command = false)
+        val roundedCoins = coins.roundToInt()
+        addCoins(pest, roundedCoins, command = false)
+        FarmingProfitTracker.addPestCoins(roundedCoins)
     }
 
     @HandleEvent
