@@ -110,10 +110,8 @@ object FossilSolver {
 
     fun getChosenPosition(possibleClickPositions: MutableMap<FossilTile, Int>): Map.Entry<FossilTile, Int>? {
         return when (config.mode) {
-            SolverMode.FOSSIL ->
-                possibleClickPositions.maxByOrNull { it.value }
-            SolverMode.AVOID ->
-                possibleClickPositions.minByOrNull { it.value }
+            SolverMode.FOSSIL -> possibleClickPositions.maxByOrNull { it.value }
+            SolverMode.AVOID -> possibleClickPositions.minByOrNull { it.value }
         }
     }
 
