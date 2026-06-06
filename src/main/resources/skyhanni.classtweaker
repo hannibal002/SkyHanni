@@ -8,9 +8,11 @@ accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$DelayedMessageDeletion
 accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
 accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
+#? if < 26.1 {
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
+#?}
 
 accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/Vec3;
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
@@ -53,9 +55,11 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/
 accessible field net/minecraft/core/Holder$Reference components Lnet/minecraft/core/component/DataComponentMap;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+#? if < 26.1
+#accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
 accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
+#? if < 26.1
+#accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
 accessible field net/minecraft/world/entity/Avatar POSES Ljava/util/Map;
 accessible field net/minecraft/world/entity/Entity DATA_CUSTOM_NAME Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/EntityEquipment items Ljava/util/EnumMap;
@@ -83,12 +87,14 @@ accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
 accessible method net/minecraft/client/gui/components/ChatComponent getWidth ()I
 accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
 accessible method net/minecraft/client/gui/components/ChatComponent refreshTrimmedMessages ()V
-accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FII)V
+#? if < 26.1
+#accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FII)V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen setMessage (Ljava/lang/String;)V
 accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$Action getType ()Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType;
+#? if < 26.1
+#accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$Action getType ()Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType;
 
 extendable class net/minecraft/world/item/ItemStack
 
