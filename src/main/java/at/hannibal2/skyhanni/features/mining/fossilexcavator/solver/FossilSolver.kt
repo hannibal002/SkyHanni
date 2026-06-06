@@ -140,6 +140,11 @@ object FossilSolver {
                 }
             }
         }
+
+        possibleClickPositions
+            .filter { it.key in foundPositions }.keys
+            .forEach { possibleClickPositions.remove(it) }
+
         val chosenPosition = getChosenPosition(possibleClickPositions) ?: run {
             return if (fossilLocations.isNotEmpty()) {
                 FossilSolverDisplay.showCompleted()
