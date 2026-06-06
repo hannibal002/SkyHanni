@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
+import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
@@ -25,6 +26,7 @@ object GardenUptimeManager {
     private val config get() = GardenApi.config.trackerUptimeSettings
     private val trackerSet: Set<SkyHanniTracker<*, *>> = setOf(
         RareCropTracker.tracker,
+        FarmingProfitTracker,
         CropFeverTracker,
         PestProfitTracker,
         GardenBpsTracker.tracker,
