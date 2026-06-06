@@ -38,7 +38,8 @@ class FossilExcavatorSolverConfig {
 
     enum class SolverMode(val displayName: String) {
         FOSSIL("Find Fossil"),
-        AVOID("Avoid Fossil");
+        AVOID("Avoid Fossil"),
+        ;
 
         override fun toString(): String {
             return displayName
