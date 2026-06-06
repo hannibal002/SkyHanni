@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorSolverConfig.SolverMode
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
 object FossilSolver {
+    private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
+
     /*
     to be used when they have less than 18 clicks
      - solves 361/404 in at most 16 clicks
@@ -65,8 +69,12 @@ object FossilSolver {
         Triple(FossilTile(4, 0), 0.049, 205),
     )
 
-    private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> =
-        if (FossilSolverDisplay.maxCharges < 18) riskyStartingSequence else safeStartingSequence
+    private fun getCurrentSequence(): Set<Triple<FossilTile, Double, Int>> {
+        return when (config.mode) {
+            SolverMode.FOSSIL -> if (FossilSolverDisplay.maxCharges < 18) riskyStartingSequence else safeStartingSequence
+            SolverMode.AVOID -> worstStartingSequence
+        }
+    }
 
     private fun isPositionInStartSequence(position: FossilTile): Boolean {
         return getCurrentSequence().any { it.first == position }
@@ -74,22 +82,10 @@ object FossilSolver {
 
     private val solvingMutex = Mutex()
 
-    suspend fun findBestTile(
+    suspend fun findTile(
         fossilLocations: Set<Int>,
         dirtLocations: Set<Int>,
         percentage: String?,
-    ) {
-        solve(fossilLocations, dirtLocations, percentage, isWorst = false)
-    }
-
-    suspend fun findWorstTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) =
-        solve(fossilLocations, dirtLocations, percentage, isWorst = true)
-
-    private suspend fun solve(
-        fossilLocations: Set<Int>,
-        dirtLocations: Set<Int>,
-        percentage: String?,
-        isWorst: Boolean
     ) = solvingMutex.withLock {
         val invalidPositions: MutableSet<FossilTile> = mutableSetOf()
         for (i in 0..53) {
@@ -99,8 +95,8 @@ object FossilSolver {
         }
         val foundPositions = fossilLocations.map { FossilTile(it) }.toSet()
 
-        val currentSeq = if (isWorst) worstStartingSequence else getCurrentSequence()
-        val needsMoveSequence = foundPositions.isEmpty() && invalidPositions.all { pos -> currentSeq.any { it.first == pos } }
+        val currentSeq = getCurrentSequence()
+        val needsMoveSequence = foundPositions.isEmpty() && invalidPositions.all { isPositionInStartSequence(it) }
 
         if (needsMoveSequence) {
             val movesTaken = invalidPositions.size
@@ -149,10 +145,11 @@ object FossilSolver {
             } else FossilSolverDisplay.showError()
         }
 
-        val chosenPosition = if (isWorst) {
-            remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
-        } else {
-            remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
+        val chosenPosition = when (config.mode) {
+            SolverMode.FOSSIL ->
+                remainingTiles.maxByOrNull { possibleClickPositions[it] ?: 0 }
+            SolverMode.AVOID ->
+                remainingTiles.minByOrNull { possibleClickPositions[it] ?: 0 }
         } ?: return FossilSolverDisplay.showError()
 
         val occurrences = possibleClickPositions[chosenPosition] ?: 0
