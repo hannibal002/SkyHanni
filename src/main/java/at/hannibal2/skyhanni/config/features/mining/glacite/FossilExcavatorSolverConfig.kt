@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -26,6 +27,23 @@ class FossilExcavatorSolverConfig {
     )
     @ConfigEditorBoolean
     var showPercentage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Solver Mode",
+        desc = "Fossil, or avoid fossil mode"
+    )
+    @ConfigEditorDropdown
+    val mode: SolverMode = SolverMode.FOSSIL
+
+    enum class SolverMode(val displayName: String) {
+        FOSSIL("Find Fossil"),
+        AVOID("Avoid Fossil");
+
+        override fun toString(): String {
+            return displayName
+        }
+    }
 
     @Expose
     @ConfigLink(owner = FossilExcavatorSolverConfig::class, field = "enabled")
