@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -20,11 +19,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -89,11 +88,14 @@ object RemainingSlayerKills {
 
         @Expose
         val pets: Map<SlayerType, Map<String, PetData>>,
+
+        @Expose
+        val champion: List<Double>
     )
 
     data class PetData(
         @Expose @SerializedName("alternate_internal_names") val variantNames: List<String>? = null,
-        @Expose val perLevelMultiplier: List<Float>,
+        @Expose @SerializedName("scaling") val perLevelMultiplier: List<Float>,
     )
 
     data class Mob(
@@ -234,6 +236,7 @@ object RemainingSlayerKills {
             multiplier *= 1.5
         }
         // TODO use repo for these in case of rebalance
+
         // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
 
         // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
@@ -242,6 +245,7 @@ object RemainingSlayerKills {
         val currentPet = CurrentPetApi.currentPet ?: return multiplier
         val fauxInternalName = currentPet.fauxInternalName
         val petData = PetUtils.splitInternalName(fauxInternalName) ?: return multiplier
+        var additiveWithMultMultipliers = 0.0
         data?.let { data ->
             val slayerPetData = data.pets[SlayerApi.activeType]
             var levellingData = slayerPetData?.get(petData.first)
@@ -250,10 +254,18 @@ object RemainingSlayerKills {
                     slayerPetData?.entries?.firstOrNull { it.value.variantNames?.contains(petData.first) ?: return multiplier }?.value
                         ?: return multiplier
             }
-            multiplier *= (levellingData.perLevelMultiplier[petData.second.id] * currentPet.level) + 1
+            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petData.second.id] * currentPet.level) + 1
         }
 
-        // TODO add 20% xp boost globally from hypixel event
+        val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) -1
+
+        additiveWithMultMultipliers += if (championLevel != -1) data?.champion[championLevel] ?: 0.0 else 0.0
+
+        multiplier *= additiveWithMultMultipliers
+        /*
+         According to the Independent Wiki Stacking Enchants (Toxo/Champ) Are Additive with the Pet Bonuses but nothing else.
+         https://hypixelskyblock.minecraft.wiki/w/Combat_Wisdom#Notes
+         */
 
         return multiplier
     }
@@ -281,7 +293,7 @@ object RemainingSlayerKills {
 
     private fun Mob.names(xp: Double) = buildString {
         if (config.includeExpectedXP) {
-            append("§3Combat Experience: $xp")
+            append("§3${xp.roundTo(2)}")
         }
         if (config.includeMobLevel) {
             append("§8[§7Lv${level.addSeparators()}§8] ")

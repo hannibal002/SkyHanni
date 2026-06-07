@@ -30,6 +30,6 @@ class SlayerRemainingKillsConfig {
     var includeMobHealth: Boolean = false
 
     @Expose
-    @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
+    @ConfigLink(owner = SlayerRemainingKillsConfig::class, field = "display")
     val remainingKillsPosition: Position = Position(410, 110)
 }
