@@ -146,37 +146,37 @@ object FossilSolverDisplay {
         }
     }
 
+    fun shouldCancelClick(slotIndex: Int): Boolean {
+        val snapshot = FossilSolver.currentSnapshot
+        val totalTiles = snapshot.totalPossibleFossils
+        val guaranteedSlots = if (totalTiles > 0) {
+            snapshot.clickablePositions
+                .filterValues { it == totalTiles }
+                .keys
+                .map { it.toSlotIndex() }
+                .toSet()
+        } else {
+            emptySet()
+        }
+
+        val hasGuaranteedSlot = guaranteedSlots.isNotEmpty()
+        val isClickingGuaranteed: Boolean = slotIndex in guaranteedSlots
+
+        return when (config.mode) {
+            SolverMode.AVOID -> isClickingGuaranteed
+            SolverMode.FOSSIL -> hasGuaranteedSlot && !isClickingGuaranteed
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
 
         val slot = event.slot ?: return
-        if (config.blockClicks) {
-            val snapshot = FossilSolver.currentSnapshot
-            val totalTiles = snapshot.totalPossibleFossils
-            val guaranteedSlots = if (totalTiles > 0) {
-                snapshot.clickablePositions
-                    .filterValues { it == totalTiles }
-                    .keys
-                    .map { it.toSlotIndex() }
-                    .toSet()
-            } else {
-                emptySet()
-            }
-
-            val hasGuaranteedSlot = guaranteedSlots.isNotEmpty()
-            val isClickingGuaranteed: Boolean = slot.containerSlot in guaranteedSlots
-
-            val shouldCancel = when (config.mode) {
-                SolverMode.AVOID -> isClickingGuaranteed
-                SolverMode.FOSSIL -> hasGuaranteedSlot && !isClickingGuaranteed
-            }
-
-            if (shouldCancel) {
-                event.cancel()
-                return
-            }
+        if (config.blockClicks && shouldCancelClick(slot.containerSlot)) {
+            event.cancel()
+            return
         }
 
         event.makePickblock()
