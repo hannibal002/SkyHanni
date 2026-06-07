@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -24,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
@@ -43,17 +46,9 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object RemainingSlayerKills {
 
-    private val config get() = SlayerApi.config
+    private val config get() = SlayerApi.config.slayerRemainingKills
 
     private val patternGroup = RepoPattern.group("slayer.remaining-kills")
-
-    /**
-     * REGEX-TEST:  ☯ Combat Wisdom 2
-     */
-    private val combatWisdomPattern by patternGroup.pattern(
-        "combat-wisdom",
-        " ☯ Combat Wisdom (?<wisdom>\\d+)",
-    )
 
     /**
      * REGEX-TEST: (120/500) Atomic Slayer
@@ -91,6 +86,14 @@ object RemainingSlayerKills {
 
         @Expose
         val equipments: Map<SlayerType, Map<NeuInternalName, Int>>,
+
+        @Expose
+        val pets: Map<SlayerType, Map<String, PetData>>,
+    )
+
+    data class PetData(
+        @Expose @SerializedName("alternate_internal_names") val variantNames: List<String>? = null,
+        @Expose val perLevelMultiplier: List<Float>,
     )
 
     data class Mob(
@@ -103,7 +106,6 @@ object RemainingSlayerKills {
     private var data: SlayerData? = null
     private var display = emptyList<Renderable>()
     private var lastMissing: Double? = null
-    private var baseCombatWisdom: Int? = null
     private var lastReminder = SimpleTimeMark.farPast()
     private var killComboWisdom = 0
 
@@ -115,7 +117,6 @@ object RemainingSlayerKills {
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
         lastMissing = null
-        baseCombatWisdom = null
         lastReminder = SimpleTimeMark.farPast()
         update()
     }
@@ -141,7 +142,7 @@ object RemainingSlayerKills {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
+    fun onSystemMessage(event: SystemMessageEvent.Allow) {
         val message = event.cleanMessage
         if (comboExpiredPattern.matches(message)) {
             killComboWisdom = 0
@@ -165,10 +166,6 @@ object RemainingSlayerKills {
         return buildList {
             add("§e§lRemaining ${slayerType.displayName} ${SlayerApi.tier} kills")
             addAll(getMobNames(missing))
-            if (baseCombatWisdom == null) {
-                remindToUpdateCombatWisdom()
-                add("§cNo base Combat Wisdom information! §e/stats")
-            }
         }
     }
 
@@ -178,9 +175,10 @@ object RemainingSlayerKills {
         val combatWisdomMultiplier = getCombatWisdomMultiplier()
         val multiplicativeMultiplier = getMultiplicativeMultiplier()
         return mobs.map { mob ->
-            val timesNeeded = missing / (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
+            val expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
+            val timesNeeded = missing / expectedXP
             val kills = "§e${ceil(timesNeeded).addSeparators()}x"
-            " §7- $kills ${mob.names()}" to timesNeeded
+            " §7- $kills ${mob.names(expectedXP)}" to timesNeeded
         }.sortedByDescending { it.second }.map { it.first }
     }
 
@@ -199,8 +197,9 @@ object RemainingSlayerKills {
 
     private fun getCombatWisdomMultiplier(): Double {
         var combatWisdom = 1.0
+        val baseCombatWisdom = SkyblockStat.COMBAT_WISDOM.lastKnownValue ?: 0.0
 
-        combatWisdom += (baseCombatWisdom ?: 0)
+        combatWisdom += (baseCombatWisdom)
 
         combatWisdom += killComboWisdom
 
@@ -240,7 +239,19 @@ object RemainingSlayerKills {
         // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
         // They have historically not worked on slayer spawn entirely.
 
-        // TODO add Pet Combat Boosts
+        val currentPet = CurrentPetApi.currentPet ?: return multiplier
+        val fauxInternalName = currentPet.fauxInternalName
+        val petData = PetUtils.splitInternalName(fauxInternalName) ?: return multiplier
+        data?.let { data ->
+            val slayerPetData = data.pets[SlayerApi.activeType]
+            var levellingData = slayerPetData?.get(petData.first)
+            if (levellingData == null) {
+                levellingData =
+                    slayerPetData?.entries?.firstOrNull { it.value.variantNames?.contains(petData.first) ?: return multiplier }?.value
+                        ?: return multiplier
+            }
+            multiplier *= (levellingData.perLevelMultiplier[petData.second.id] * currentPet.level) + 1
+        }
 
         // TODO add 20% xp boost globally from hypixel event
 
@@ -268,12 +279,15 @@ object RemainingSlayerKills {
         return counter * 2.5 // TODO put this wisdom magic number in repo from Habanero
     }
 
-    private fun Mob.names() = buildString {
-        if (config.remainingKillsLevel) {
+    private fun Mob.names(xp: Double) = buildString {
+        if (config.includeExpectedXP) {
+            append("§3Combat Experience: $xp")
+        }
+        if (config.includeMobLevel) {
             append("§8[§7Lv${level.addSeparators()}§8] ")
         }
         append("§c$name")
-        if (config.remainingKillsHealth) {
+        if (config.includeMobHealth) {
             append(" §a${maxHealth.shortFormat()}§c❤")
         }
     }
@@ -284,26 +298,12 @@ object RemainingSlayerKills {
         lastReminder = SimpleTimeMark.now()
         ChatUtils.clickToActionOrDisable(
             "Remaining Slayer Kills feature needs to know your combat wisdom to work.",
-            config::remainingKills,
+            config::display,
             actionName = "open stats menu",
             action = {
                 HypixelCommands.stats()
             },
         )
-    }
-
-    @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventoryName != "Your Equipment and Stats") return
-        val stack = event.inventoryItems[34] ?: return
-
-        for (line in stack.getLore()) {
-            combatWisdomPattern.matchMatcher(line.removeColor()) {
-                baseCombatWisdom = group("wisdom").formatInt()
-                update()
-                return
-            }
-        }
     }
 
     init {
@@ -317,6 +317,6 @@ object RemainingSlayerKills {
         )
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.remainingKills
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.display
 }
 

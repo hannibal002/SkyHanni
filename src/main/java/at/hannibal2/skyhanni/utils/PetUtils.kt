@@ -128,7 +128,7 @@ object PetUtils {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
-    private fun splitInternalName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
+    fun splitInternalName(internalName: NeuInternalName): Pair<String, LorenzRarity>? {
         val parts = internalName.asString().split(";")
         if (parts.size < 2) return null
         val name = parts[0].takeIf { it.isNotBlank() } ?: return null
