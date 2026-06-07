@@ -9,7 +9,7 @@ object FossilSolver {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
     data class SolverSnapshot(
         val clickablePositions: Map<FossilTile, Int> = emptyMap(),
-        val totalPossibleTiles: Int = 0,
+        val totalPossibleFossils: Int = 0,
     )
 
     @Volatile
@@ -182,7 +182,7 @@ object FossilSolver {
 
         currentSnapshot = SolverSnapshot(
             clickablePositions = possibleClickPositions,
-            totalPossibleTiles = totalPossibleTiles
+            totalPossibleFossils = totalPossibleTiles
         )
 
         val chosenPosition = getChosenPosition(possibleClickPositions) ?: run {

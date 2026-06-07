@@ -154,7 +154,7 @@ object FossilSolverDisplay {
         val slot = event.slot ?: return
         if (config.blockClicks) {
             val snapshot = FossilSolver.currentSnapshot
-            val totalTiles = snapshot.totalPossibleTiles
+            val totalTiles = snapshot.totalPossibleFossils
             val guaranteedSlots = if (totalTiles > 0) {
                 snapshot.clickablePositions
                     .filterValues { it == totalTiles }
