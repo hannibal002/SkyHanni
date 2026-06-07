@@ -173,15 +173,15 @@ object FossilSolverDisplay {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
 
-        val slot = event.slot ?: return
-        if (config.blockClicks && shouldCancelClick(slot.containerSlot)) {
+        val slotIndex = event.slot?.containerSlot ?: return
+        if (config.blockClicks && shouldCancelClick(slotIndex)) {
             event.cancel()
             return
         }
 
         event.makePickblock()
 
-        if (slot.containerSlot == slotToClick) {
+        if (slotIndex == slotToClick) {
             slotToClick = null
             correctPercentage = null
         }
