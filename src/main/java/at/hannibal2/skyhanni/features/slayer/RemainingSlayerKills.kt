@@ -91,7 +91,16 @@ object RemainingSlayerKills {
         val pets: Map<SlayerType, Map<String, PetData>>,
 
         @Expose
-        val champion: List<Double>
+        val champion: List<Double>,
+
+        @Expose @SerializedName("habanero_wisdom_per_level")
+        val habaneroMultiplier: Double,
+
+        @Expose @SerializedName("WORK_SMARTER") val auraMultiplier: Double,
+
+        @Expose @SerializedName("WORK_SMARTER") val derpyMultiplier: Double,
+
+        @Expose @SerializedName("arbitrary_multiplier") val arbitraryMultiplier: Double,
     )
 
     data class PetData(
@@ -154,9 +163,9 @@ object RemainingSlayerKills {
             killComboWisdom = 0
         }
         killCombatWisdomPattern.matchMatcher(message) {
-            killComboWisdom = group("wisdom").formatInt()
+            killComboWisdom += group("wisdom").formatInt()
         }
-        // TODO add to repo since Hypixel is planning to add more Wisdom to Grandma Wolf see
+        // This is an attempt to future-proof this due to proposed Magic Find Update changes.
         // https://hypixel.net/threads/design-thread-magic-find.6015417/
     }
 
@@ -186,6 +195,8 @@ object RemainingSlayerKills {
         return mobs.map { mob ->
             var expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
             val maxObtainableAtATime = ( totalQuestXP * 0.75 )
+            // The maximum amount of progress that a kill can contribute towards your Slayer Quest has been raised from 50% to 75%.
+            // https://hypixel.net/threads/hypixel-skyblock-0-20-9-crimson-isle-qol.5809290/
             expectedXP = expectedXP.coerceAtMost(maxObtainableAtATime)
             ChatUtils.debug("Base Mob XP: ${mob.xp}, Post Multiplier XP = $expectedXP")
             val timesNeeded = missing / expectedXP
@@ -241,17 +252,17 @@ object RemainingSlayerKills {
 
     private fun getMultiplicativeMultiplier(): Double {
         var multiplier = 1.0
-        if (Perk.WORK_HARDER.isActive) {
-            multiplier *= 1.5
+        if (Perk.WORK_SMARTER.isActive) {
+            multiplier *= data?.auraMultiplier ?: 1.5
         }
         if (Perk.MOAR_SKILLZ.isActive) {
-            multiplier *= 1.5
+            multiplier *= data?.derpyMultiplier ?: 1.5
         }
-        // TODO use repo for these in case of rebalance
-
+        multiplier *= data?.arbitraryMultiplier ?: 1.0
         // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
 
         // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
+        // They are not implemented but can be added using the "arbitrary_multiplier" field in repo to remote update functionally.
         // They have historically not worked on slayer spawn entirely.
 
         var additiveWithMultMultipliers = 0.0
@@ -309,10 +320,13 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return counter * 2.5 // TODO put this wisdom magic number in repo from Habanero
+        return data?.habaneroMultiplier?.times(counter) ?: 0.0
     }
 
     private fun Mob.names(xp: Double) = buildString {
+        if (config.showOverkill) {
+            append("§4Overkilling XP Needed! ")
+        }
         if (config.includeExpectedXP) {
             append("§3${xp.roundTo(2)} xp ")
         }

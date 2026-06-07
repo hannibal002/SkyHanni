@@ -14,6 +14,12 @@ class SlayerRemainingKillsConfig {
     @FeatureToggle
     var display: Boolean = false
 
+
+    @Expose
+    @ConfigOption(name = "Display Overkill", desc = "Add Text To Display when going over needed XP.")
+    @ConfigEditorBoolean
+    var showOverkill: Boolean = true
+
     @Expose
     @ConfigOption(name = "Show XP", desc = "Show the expected XP from the mob in the display.")
     @ConfigEditorBoolean
