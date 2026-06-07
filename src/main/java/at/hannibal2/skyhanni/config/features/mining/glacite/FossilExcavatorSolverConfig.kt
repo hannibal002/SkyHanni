@@ -47,6 +47,14 @@ class FossilExcavatorSolverConfig {
     }
 
     @Expose
+    @ConfigOption(
+        name = "Block Clicks",
+        desc = "Block clicks when a guaranteed fossil click is available"
+    )
+    @ConfigEditorBoolean
+    val blockClicks: Boolean = false
+
+    @Expose
     @ConfigLink(owner = FossilExcavatorSolverConfig::class, field = "enabled")
     val position: Position = Position(183, 212)
 }

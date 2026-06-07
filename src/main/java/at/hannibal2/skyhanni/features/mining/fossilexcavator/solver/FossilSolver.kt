@@ -7,6 +7,13 @@ import kotlinx.coroutines.sync.withLock
 
 object FossilSolver {
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
+    data class SolverSnapshot(
+        val clickablePositions: Map<FossilTile, Int> = emptyMap(),
+        val totalPossibleTiles: Int = 0,
+    )
+
+    @Volatile
+    var currentSnapshot: SolverSnapshot = SolverSnapshot()
 
     /*
     to be used when they have less than 18 clicks
@@ -108,7 +115,7 @@ object FossilSolver {
         return getCurrentSequence().any { it.first == position }
     }
 
-    fun getChosenPosition(possibleClickPositions: MutableMap<FossilTile, Int>): Map.Entry<FossilTile, Int>? {
+    fun getChosenPosition(possibleClickPositions: Map<FossilTile, Int>): Map.Entry<FossilTile, Int>? {
         return when (config.mode) {
             SolverMode.FOSSIL -> possibleClickPositions.maxByOrNull { it.value }
             SolverMode.AVOID -> possibleClickPositions.minByOrNull { it.value }
@@ -130,6 +137,8 @@ object FossilSolver {
         val needsMoveSequence = foundPositions.isEmpty() && invalidPositions.all { isPositionInStartSequence(it) }
 
         if (needsMoveSequence) {
+            currentSnapshot = SolverSnapshot()
+
             val movesTaken = invalidPositions.size
             if (movesTaken >= currentSeq.size) {
                 return FossilSolverDisplay.showError()
@@ -170,6 +179,11 @@ object FossilSolver {
         possibleClickPositions
             .filter { it.key in foundPositions }.keys
             .forEach { possibleClickPositions.remove(it) }
+
+        currentSnapshot = SolverSnapshot(
+            clickablePositions = possibleClickPositions,
+            totalPossibleTiles = totalPossibleTiles
+        )
 
         val chosenPosition = getChosenPosition(possibleClickPositions) ?: run {
             return if (fossilLocations.isNotEmpty()) {

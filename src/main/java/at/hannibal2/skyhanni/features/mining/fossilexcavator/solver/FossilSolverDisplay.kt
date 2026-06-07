@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.mining.glacite.FossilExcavatorSolverConfig.SolverMode
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -88,6 +89,7 @@ object FossilSolverDisplay {
         isCompleted = false
         inventoryItemNames = emptyList()
         possibleFossilTypes = emptySet()
+        FossilSolver.currentSnapshot = FossilSolver.SolverSnapshot()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
@@ -149,9 +151,36 @@ object FossilSolverDisplay {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
 
+        val slot = event.slot ?: return
+        if (config.blockClicks) {
+            val snapshot = FossilSolver.currentSnapshot
+            val totalTiles = snapshot.totalPossibleTiles
+            val guaranteedSlots = if (totalTiles > 0) {
+                snapshot.clickablePositions
+                    .filterValues { it == totalTiles }
+                    .keys
+                    .map { it.toSlotIndex() }
+                    .toSet()
+            } else {
+                emptySet()
+            }
+
+            val hasGuaranteedSlot = guaranteedSlots.isNotEmpty()
+            val isClickingGuaranteed: Boolean = slot.containerSlot in guaranteedSlots
+
+            val shouldCancel = when (config.mode) {
+                SolverMode.AVOID -> isClickingGuaranteed
+                SolverMode.FOSSIL -> hasGuaranteedSlot && !isClickingGuaranteed
+            }
+
+            if (shouldCancel) {
+                event.cancel()
+                return
+            }
+        }
+
         event.makePickblock()
 
-        val slot = event.slot ?: return
         if (slot.containerSlot == slotToClick) {
             slotToClick = null
             correctPercentage = null
