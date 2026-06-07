@@ -30,8 +30,8 @@ class FossilExcavatorSolverConfig {
 
     @Expose
     @ConfigOption(
-        name = "Solver Mode",
-        desc = "Fossil, or avoid fossil mode"
+        name = "Solver Objective",
+        desc = "Toggle between locating fossils or avoiding them entirely."
     )
     @ConfigEditorDropdown
     val mode: SolverMode = SolverMode.FOSSIL
@@ -48,8 +48,8 @@ class FossilExcavatorSolverConfig {
 
     @Expose
     @ConfigOption(
-        name = "Block Clicks",
-        desc = "Block clicks when a guaranteed fossil click is available"
+        name = "Enforce Guaranteed Hits",
+        desc = "Blocks non-optimal clicks when a 100% certain tile is available."
     )
     @ConfigEditorBoolean
     val blockClicks: Boolean = false
