@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -175,9 +176,12 @@ object RemainingSlayerKills {
         val mobs = getMobs() ?: return listOf()
 
         val combatWisdomMultiplier = getCombatWisdomMultiplier()
+        ChatUtils.debug("$combatWisdomMultiplier multiplier for Combat Wisdom .")
         val multiplicativeMultiplier = getMultiplicativeMultiplier()
+        ChatUtils.debug("$multiplicativeMultiplier multiplier for multiplicatives.")
         return mobs.map { mob ->
             val expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
+            ChatUtils.debug("Base Mob XP: ${mob.xp}, Post Multiplier XP = $expectedXP")
             val timesNeeded = missing / expectedXP
             val kills = "§e${ceil(timesNeeded).addSeparators()}x"
             " §7- $kills ${mob.names(expectedXP)}" to timesNeeded
@@ -202,8 +206,10 @@ object RemainingSlayerKills {
         val baseCombatWisdom = SkyblockStat.COMBAT_WISDOM.lastKnownValue ?: 0.0
 
         combatWisdom += (baseCombatWisdom)
+        ChatUtils.debug("Combat Wisdom in /eq is $baseCombatWisdom")
 
         combatWisdom += killComboWisdom
+        ChatUtils.debug("kill combo wisdom is $killComboWisdom")
 
         data?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
@@ -242,24 +248,33 @@ object RemainingSlayerKills {
         // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
         // They have historically not worked on slayer spawn entirely.
 
-        val currentPet = CurrentPetApi.currentPet ?: return multiplier
-        val fauxInternalName = currentPet.fauxInternalName
-        val petData = PetUtils.splitInternalName(fauxInternalName) ?: return multiplier
         var additiveWithMultMultipliers = 0.0
-        data?.let { data ->
-            val slayerPetData = data.pets[SlayerApi.activeType]
-            var levellingData = slayerPetData?.get(petData.first)
-            if (levellingData == null) {
-                levellingData =
-                    slayerPetData?.entries?.firstOrNull { it.value.variantNames?.contains(petData.first) ?: return multiplier }?.value
-                        ?: return multiplier
-            }
-            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petData.second.id] * currentPet.level) + 1
-        }
 
         val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) -1
 
         additiveWithMultMultipliers += if (championLevel != -1) data?.champion[championLevel] ?: 0.0 else 0.0
+
+        val currentPet = CurrentPetApi.currentPet ?: return multiplier
+        val fauxInternalName = currentPet.fauxInternalName
+        ChatUtils.debug("$fauxInternalName")
+        val petInternalName = PetUtils.getPetProperName(fauxInternalName).orEmpty()
+        val petRarity = PetUtils.getPetRarity(fauxInternalName) ?: LorenzRarity.DIVINE
+        ChatUtils.debug("Split Internal Name, ID = ${petInternalName}, rarity = $petRarity")
+        if (petInternalName.isEmpty() || petRarity == LorenzRarity.DIVINE) {
+            multiplier *= additiveWithMultMultipliers
+            return multiplier
+        }
+        data?.let { data ->
+            val slayerPetData = data.pets[SlayerApi.activeType]
+            var levellingData = slayerPetData?.get(petInternalName)
+            if (levellingData == null) {
+                levellingData =
+                    slayerPetData?.entries?.firstOrNull { it.value.variantNames?.contains(petInternalName) ?: return multiplier }?.value
+                        ?: return multiplier
+            }
+            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level) + 1
+            ChatUtils.debug("$additiveWithMultMultipliers Pet Multiplier, ${currentPet.level} is Pet Level.")
+        }
 
         multiplier *= additiveWithMultMultipliers
         /*
@@ -293,7 +308,7 @@ object RemainingSlayerKills {
 
     private fun Mob.names(xp: Double) = buildString {
         if (config.includeExpectedXP) {
-            append("§3${xp.roundTo(2)}")
+            append("§3${xp.roundTo(2)} xp ")
         }
         if (config.includeMobLevel) {
             append("§8[§7Lv${level.addSeparators()}§8] ")
