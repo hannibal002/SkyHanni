@@ -109,6 +109,7 @@ object RemainingSlayerKills {
     private var data: SlayerData? = null
     private var display = emptyList<Renderable>()
     private var lastMissing: Double? = null
+    private var lastMax: Double? = null
     private var lastReminder = SimpleTimeMark.farPast()
     private var killComboWisdom = 0
 
@@ -120,6 +121,7 @@ object RemainingSlayerKills {
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
         lastMissing = null
+        lastMax = null
         lastReminder = SimpleTimeMark.farPast()
         update()
     }
@@ -132,6 +134,7 @@ object RemainingSlayerKills {
         val newMissing = progressPattern.matchMatcher(progress) {
             val current = group("current").formatDouble()
             val max = group("max").formatDouble()
+            lastMax = max
             max - current
         }
         lastMissing = newMissing
@@ -163,16 +166,17 @@ object RemainingSlayerKills {
 
     private fun createDisplay(): List<String> {
         val missing = lastMissing ?: return emptyList()
+        val maxXP = lastMax ?: return emptyList()
         if (!SlayerApi.isInCorrectArea) return emptyList()
         val slayerType = SlayerApi.currentAreaType ?: return emptyList()
 
         return buildList {
             add("§e§lRemaining ${slayerType.displayName} ${SlayerApi.tier} kills")
-            addAll(getMobNames(missing))
+            addAll(getMobNames(missing, maxXP))
         }
     }
 
-    private fun getMobNames(missing: Double): List<String> {
+    private fun getMobNames(missing: Double, totalQuestXP: Double): List<String> {
         val mobs = getMobs() ?: return listOf()
 
         val combatWisdomMultiplier = getCombatWisdomMultiplier()
@@ -180,7 +184,9 @@ object RemainingSlayerKills {
         val multiplicativeMultiplier = getMultiplicativeMultiplier()
         ChatUtils.debug("$multiplicativeMultiplier multiplier for multiplicatives.")
         return mobs.map { mob ->
-            val expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
+            var expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
+            val maxObtainableAtATime = ( totalQuestXP * 0.75 )
+            expectedXP = expectedXP.coerceAtMost(maxObtainableAtATime)
             ChatUtils.debug("Base Mob XP: ${mob.xp}, Post Multiplier XP = $expectedXP")
             val timesNeeded = missing / expectedXP
             val kills = "§e${ceil(timesNeeded).addSeparators()}x"
