@@ -12,7 +12,7 @@ object SlayerFovChange {
     @HandleEvent
     fun onFov(event: BaseFovEvent) {
         if (!isEnabled()) return
-        event.multiplier *= config.multiplier
+        event.setFov(config.targetFov)
     }
 
     fun isEnabled() = config.enabled && SlayerApi.isInBossFight()

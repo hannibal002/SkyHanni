@@ -5,4 +5,8 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 class BaseFovEvent(val originalFov: Int): SkyHanniEvent() {
     var additive = 0f
     var multiplier = 1f
+
+    fun setFov(targetFov: Float) {
+        additive = targetFov - originalFov
+    }
 }
