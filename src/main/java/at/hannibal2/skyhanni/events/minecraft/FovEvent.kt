@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 @PrimaryFunction("onFov")
-class FovEvent(private var fov: Int): SkyHanniEvent() {
+class FovEvent(private var fov: Int) : SkyHanniEvent() {
     private var additive = 0.0
     private var multiplier = 1.0
     private var currentPriority = 1000
