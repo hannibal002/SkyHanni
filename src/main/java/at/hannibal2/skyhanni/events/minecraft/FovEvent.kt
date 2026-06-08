@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 class FovEvent(private var fov: Int): SkyHanniEvent() {
     private var additive = 0.0
     private var multiplier = 1.0
+    private var currentPriority = 1000
 
     fun add(value: Double) {
         additive += value
@@ -16,8 +17,10 @@ class FovEvent(private var fov: Int): SkyHanniEvent() {
         multiplier *= factor
     }
 
-    fun setFov(targetFov: Int) {
+    fun setFov(targetFov: Int, priority: Int = 1000) {
+        if (currentPriority > priority) return
         fov = targetFov
+        currentPriority = priority
     }
 
     fun getResult(): Int {
