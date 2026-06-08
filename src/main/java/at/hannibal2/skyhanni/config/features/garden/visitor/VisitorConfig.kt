@@ -84,7 +84,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Hide Chat",
-        desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, Tel Kar, and Spaceman)"
+        desc = "Hide chat messages from the visitors in the garden (except those with long dialogues)."
     )
     @ConfigEditorBoolean
     @FeatureToggle
