@@ -102,7 +102,7 @@ object GardenVisitorChat {
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 
         val name = group("name")
-        if (name in setOf("Beth", "Maeve", "Spaceman")) return false
+        if (name in setOf("Beth", "Maeve", "Spaceman", "Tel Kar")) return false
 
         val isInKnownVisitors = VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
 
