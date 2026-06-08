@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
+import at.hannibal2.skyhanni.events.minecraft.BaseFovEvent
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -83,6 +84,12 @@ object ActiveBossTransparency {
         }
 
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)
+    }
+
+    @HandleEvent
+    fun onFov(event: BaseFovEvent) {
+        if (!config.enabled) return
+        event.multiplier = 0.5f
     }
 
     private fun isActive() = config.enabled && (SlayerApi.isInBossFight() || lastHitCarrierBoss)

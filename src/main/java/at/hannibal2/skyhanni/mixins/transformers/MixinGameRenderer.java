@@ -63,7 +63,6 @@ public class MixinGameRenderer {
     private void onRenderTail(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
         GuiEditManager.renderLast(context);
     }
-    *///?}
 
     @ModifyExpressionValue(
         method = "getFov",
@@ -81,4 +80,5 @@ public class MixinGameRenderer {
             (baseFov + event.getAdditive()) * event.getMultiplier();
         return (int) modified;
     }
+    *///?}
 }
