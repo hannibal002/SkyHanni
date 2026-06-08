@@ -21,5 +21,7 @@ data class SeaCreatureInfo(
     @Expose @SerializedName("fishing_experience") val fishingExperience: Int,
     @Expose val rare: Boolean = false,
     @Expose val rarity: LorenzRarity,
-    @Expose val lootshareSphereOverride: Boolean? = null,
+    @Expose
+    @SerializedName(value = "lootshare_sphere_override", alternate = ["lootshareSphereOverride"])
+    val lootshareSphereOverride: Boolean? = null,
 )
