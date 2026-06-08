@@ -66,7 +66,7 @@ object GardenVisitorChat {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         val data = event.getConstantAsync<GardenJson>("Garden")
-        allowedChatMessageVisitors = data.visitors.filterValues { visitorData -> visitorData.showChatMessage == true }.keys
+        allowedChatMessageVisitors = data.visitors.filterValues { visitorData -> visitorData.showChatMessage }.keys
     }
 
     // TODO use event.chatComponent.string instead of event.message here
