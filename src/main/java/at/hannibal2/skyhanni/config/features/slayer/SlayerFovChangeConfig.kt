@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SlayerFovChangeConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Change the FOV while the boss is spawned\"")
+    @ConfigOption(name = "Enabled", desc = "Change the FOV while the boss is spawned")
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = false
