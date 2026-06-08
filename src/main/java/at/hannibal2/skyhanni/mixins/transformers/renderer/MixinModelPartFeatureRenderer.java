@@ -25,8 +25,7 @@ public abstract class MixinModelPartFeatureRenderer {
         OutlineBufferSource outlineConsumer,
         int color,
         Operation<Void> original,
-        //~ if < 26.1 '@Local(argsOnly = true)' -> '@Local'
-        @Local(argsOnly = true) SubmitNodeStorage.ModelPartSubmit modelPart
+        @Local SubmitNodeStorage.ModelPartSubmit modelPart
     ) {
         if (skyhanni$usesCustomOutline(modelPart)) {
             original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), color);
