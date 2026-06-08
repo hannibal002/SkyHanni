@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GuiEditManager;
-import at.hannibal2.skyhanni.events.minecraft.BaseFovEvent;
+import at.hannibal2.skyhanni.events.minecraft.FovEvent;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -74,11 +74,9 @@ public class MixinGameRenderer {
     )
     private Object onBaseFov(Object original) {
         int baseFov = (Integer) original;
-        BaseFovEvent event = new BaseFovEvent(baseFov);
+        FovEvent event = new FovEvent(baseFov);
         event.post();
-        float modified =
-            (baseFov + event.getAdditive()) * event.getMultiplier();
-        return (int) modified;
+        return event.getResult();
     }
     *///?}
 }
