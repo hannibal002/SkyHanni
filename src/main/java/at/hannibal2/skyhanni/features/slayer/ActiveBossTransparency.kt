@@ -86,11 +86,5 @@ object ActiveBossTransparency {
         event.newTransparency = config.transparencyLevel.coerceIn(15, 70)
     }
 
-    @HandleEvent
-    fun onFov(event: BaseFovEvent) {
-        if (!config.enabled) return
-        event.multiplier = 0.5f
-    }
-
     private fun isActive() = config.enabled && (SlayerApi.isInBossFight() || lastHitCarrierBoss)
 }

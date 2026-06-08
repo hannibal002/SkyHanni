@@ -99,6 +99,11 @@ class SlayerConfig {
     val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
+    @ConfigOption(name = "Adjust the FOV", desc = "")
+    @Accordion
+    val fovChange: SlayerFovChangeConfig = SlayerFovChangeConfig()
+
+    @Expose
     @ConfigOption(
         name = "Block Not Spawnable",
         desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
