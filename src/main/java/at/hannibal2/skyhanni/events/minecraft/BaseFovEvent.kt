@@ -8,5 +8,6 @@ class BaseFovEvent(val originalFov: Int): SkyHanniEvent() {
 
     fun setFov(targetFov: Float) {
         additive = targetFov - originalFov
+        multiplier = 1f
     }
 }
