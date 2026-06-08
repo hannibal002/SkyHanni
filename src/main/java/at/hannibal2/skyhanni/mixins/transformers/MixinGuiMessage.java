@@ -47,6 +47,7 @@ public abstract class MixinGuiMessage implements GuiMessageData {
         CallbackInfo ci
     ) {
         Component component = GuiChatHook.getCurrentComponent();
+        GuiChatHook.setCurrentComponent(null);
         skyhanni$fullComponent = component == null ? content : component;
     }
 }
