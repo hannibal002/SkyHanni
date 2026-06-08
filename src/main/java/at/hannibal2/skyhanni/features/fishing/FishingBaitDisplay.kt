@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -25,7 +26,7 @@ object FishingBaitDisplay {
     private var bait: BaitDisplayEntry? = null
 
     private data class BaitDisplayEntry(
-        val itemStack: ItemStack?,
+        val itemStack: SafeItemStack?,
         val displayName: String,
         val amount: Int?,
     )
@@ -86,7 +87,7 @@ object FishingBaitDisplay {
     }
 
     private fun getBaitDisplayEntry(
-        itemStack: ItemStack,
+        itemStack: SafeItemStack,
         baitType: FishingApi.BaitType?,
         amount: Int,
     ): BaitDisplayEntry {
