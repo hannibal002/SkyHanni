@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GuiEditManager;
+import at.hannibal2.skyhanni.events.minecraft.BaseFovEvent;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.GameRenderer;
@@ -62,4 +64,21 @@ public class MixinGameRenderer {
         GuiEditManager.renderLast(context);
     }
     *///?}
+
+    @ModifyExpressionValue(
+        method = "getFov",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/OptionInstance;get()Ljava/lang/Object;",
+            ordinal = 0
+        )
+    )
+    private Object onBaseFov(Object original) {
+        int baseFov = (Integer) original;
+        BaseFovEvent event = new BaseFovEvent(baseFov);
+        event.post();
+        float modified =
+            (baseFov + event.getAdditive()) * event.getMultiplier();
+        return (int) modified;
+    }
 }
