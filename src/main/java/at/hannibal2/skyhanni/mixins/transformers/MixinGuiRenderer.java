@@ -8,20 +8,15 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.buffers.GpuBuffer;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.VertexFormat;
-
-import java.util.Map;
-import java.util.function.Supplier;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
-//? if < 26.2
-//import net.minecraft.client.renderer.MultiBufferSource;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,31 +24,55 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import java.util.Map;
+import java.util.function.Supplier;
+
+//? if < 26.2
+//import net.minecraft.client.renderer.MultiBufferSource;
 
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
 
     //? if >= 26.2 {
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V", at = @At("HEAD"))
+    @Inject(
+        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
+        at = @At("HEAD")
+    )
     public void computeChromaBufferSlice(
         Supplier<String> nameSupplier,
         RenderTarget framebuffer,
         GpuBufferSlice dynamicTransformsBuffer,
-        int from, int _to, CallbackInfo ci) {
+        int from,
+        int _to,
+        CallbackInfo ci
+    ) {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
+    @Inject(
+        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
+            shift = At.Shift.AFTER
+        )
+    )
     public void insertChromaSetUniform(
         Supplier<String> nameSupplier,
         RenderTarget framebuffer,
         GpuBufferSlice dynamicTransformsBuffer,
-        int from, int _to, CallbackInfo ci,
-        @Local RenderPass renderPass) {
+        int from,
+        int _to,
+        CallbackInfo ci,
+        @Local RenderPass renderPass
+    ) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
     //?} else {
-    /*@Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At("HEAD"))
+    /*@Inject(
+        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+        at = @At("HEAD")
+    )
     public void computeChromaBufferSlice(
         Supplier<String> nameSupplier,
         RenderTarget framebuffer,
@@ -61,7 +80,10 @@ public abstract class MixinGuiRenderer {
         GpuBufferSlice dynamicTransformsBuffer,
         GpuBuffer indexBuffer,
         VertexFormat.IndexType indexType,
-        int from, int _to, CallbackInfo ci) {
+        int from,
+        int _to,
+        CallbackInfo ci
+    ) {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 

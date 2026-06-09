@@ -19,7 +19,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         //? if >= 26.2 {
         event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { matrix, buf ->
         //?} else {
-        /*val buf = event.vertexConsumers.getBuffer(layer)
+        /*val buf = event.bufferSource.getBuffer(layer)
         val matrix = event.matrices.last()
         *///?}
 

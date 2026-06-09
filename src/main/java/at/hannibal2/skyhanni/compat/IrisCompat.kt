@@ -32,6 +32,7 @@ object IrisCompat {
 
     @HandleEvent
     fun onInitFinished(event: InitFinishedEvent) {
+        // TODO 26.2
         //? if < 26.2 {
         /*if (!isIrisLoaded) return
         try {

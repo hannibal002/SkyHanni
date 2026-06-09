@@ -1,4 +1,3 @@
-//? if >= 26.2 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
@@ -23,16 +22,16 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//?if >= 26.1 {
+//? if >= 26.2
+import net.minecraft.client.renderer.SubmitNodeStorage;
+
+//? if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
 //?} else {
 /*import net.minecraft.client.Camera;
 import org.joml.Matrix4f;
 *///?}
-
-//? if >= 26.2
-import net.minecraft.client.renderer.SubmitNodeStorage;
 
 // Adapted from Fabric API implementation
 // The Fabric API event makes our lines render strange
@@ -82,24 +81,39 @@ public abstract class MixinReplacementLevelRenderer {
 
     @WrapOperation(
         method = "lambda$addMainPass$0",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
+        slice = @Slice(
+            from = @At(
+                value = "INVOKE_STRING"
+                target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+                args = "ldc=translucent"
+            )
+        ),
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V",
+            ordinal = 0
+        )
     )
-    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
+    private void onTranslucentRender(
+        ChunkSectionsToRender instance,
+        ChunkSectionLayerGroup group,
+        GpuSampler gpuSampler,
+        Operation<Void> original
+    ) {
         original.call(instance, group, gpuSampler);
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             new PoseStack(),
             //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             currentCameraState,
-            //? if >= 26.2
+            //? if >= 26.2 {
             submitNodeStorage,
-            //? if < 26.2
+            //?} else {
             //renderBuffers.bufferSource(),
+            //?}
             currentTickCounter.getGameTimeDeltaPartialTick(true),
             true
         );
         event.post();
     }
 }
-//?}

@@ -28,6 +28,7 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
+        // TODO 26.2
         //? if < 26.2 {
         /*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
         PictureInPictureRendererRegistry.register { ctx ->

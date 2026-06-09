@@ -12,39 +12,72 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+//? if < 26.2
+//import net.minecraft.client.renderer.MultiBufferSource bufferSource;
+
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinInGameOverlayRenderer {
 
     //? if >= 26.2 {
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
-    private static void renderFire(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, TextureAtlasSprite textureAtlasSprite, CallbackInfo ci) {
+    private static void renderFire(
+        PoseStack poseStack,
+        SubmitNodeCollector submitNodeCollector,
+        TextureAtlasSprite textureAtlasSprite,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }
 
     @Inject(method = "submitWater", at = @At("HEAD"), cancellable = true)
-    private static void renderWater(Minecraft client, PoseStack matrices, SubmitNodeCollector submitNodeCollector, CallbackInfo ci) {
+    private static void renderWater(
+        Minecraft client,
+        PoseStack matrices,
+        SubmitNodeCollector submitNodeCollector,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
     }
 
     @Inject(method = "submitBlockSprite", at = @At("HEAD"), cancellable = true)
-    private static void renderBlock(TextureAtlasSprite sprite, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int color, CallbackInfo ci) {
+    private static void renderBlock(
+        TextureAtlasSprite sprite,
+        PoseStack matrices,
+        SubmitNodeCollector submitNodeCollector,
+        int color,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
     }
     //?} else {
     /*@Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
-    private static void renderBlock(TextureAtlasSprite sprite, PoseStack matrices, net.minecraft.client.renderer.MultiBufferSource bufferSource, CallbackInfo ci) {
+    private static void renderBlock(
+        TextureAtlasSprite sprite,
+        PoseStack matrices,
+        MultiBufferSource bufferSource,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
     }
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
-    private static void renderWater(Minecraft client, PoseStack matrices, net.minecraft.client.renderer.MultiBufferSource bufferSource, CallbackInfo ci) {
+    private static void renderWater(
+        Minecraft client,
+        PoseStack matrices,
+        MultiBufferSource bufferSource,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
     }
 
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
-    private static void renderFire(PoseStack poseStack, net.minecraft.client.renderer.MultiBufferSource bufferSource, TextureAtlasSprite textureAtlasSprite, CallbackInfo ci) {
+    private static void renderFire(
+        PoseStack poseStack,
+        MultiBufferSource bufferSource,
+        TextureAtlasSprite textureAtlasSprite,
+        CallbackInfo ci
+    ) {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }
     *///?}
-
 }

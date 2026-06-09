@@ -1,3 +1,4 @@
+// TODO 26.2
 //? if >= 26.1 && < 26.2 {
 /*package at.hannibal2.skyhanni.mixins.transformers;
 
@@ -31,7 +32,11 @@ public abstract class MixinItemFeatureRenderer {
 
     @ModifyExpressionValue(
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;"))
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;"
+        )
+    )
     private RenderType modifyRenderLayer(RenderType layer) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;

@@ -1,3 +1,4 @@
+// TODO 26.2
 //? if < 26.2 {
 /*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
@@ -25,6 +26,5 @@ public class MixinItemCommand implements GlowingStateStore {
     public boolean skyhanni$isUsingCustomOutline() {
         return this.skyhanni$usingCustomOutline;
     }
-
 }
 *///?}

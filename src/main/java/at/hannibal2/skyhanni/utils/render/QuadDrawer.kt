@@ -14,12 +14,12 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     ) {
         event.matrices.pushPose()
         val layer = SkyHanniRenderLayers.getQuads(false)
+
         //? if >= 26.2 {
         event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf ->
         //?} else {
-        /*event.vertexConsumers.getBuffer(layer).let { buf ->
+        /*event.bufferSource.getBuffer(layer).let { buf ->
         *///?}
-
             val viewerPos = WorldRenderUtils.getViewerPos()
             val newMidPoint = middlePoint - viewerPos
             val newSidePoint1 = sidePoint1 - viewerPos

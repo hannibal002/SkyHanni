@@ -8,6 +8,7 @@ import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object BossbarData {
+
     private var bossbar: String? = null
     private var previousServerBossbar = ""
 

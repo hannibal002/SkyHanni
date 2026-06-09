@@ -23,7 +23,9 @@ public class RenderPipelineMixin {
     @ModifyReturnValue(method = "getDepthStencilState", at = @At("RETURN"))
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
-        if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
+        if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) {
+            return original;
+        }
         //? if < 26.2
         //if (!SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive()) return original;
         return original != null

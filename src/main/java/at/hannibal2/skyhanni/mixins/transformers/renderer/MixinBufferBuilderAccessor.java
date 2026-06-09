@@ -9,6 +9,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(BufferBuilder.class)
 public interface MixinBufferBuilderAccessor {
+
     //? if >= 26.2 {
     @Accessor("vertexPointer")
     long getSkyHanniVertexPointer();

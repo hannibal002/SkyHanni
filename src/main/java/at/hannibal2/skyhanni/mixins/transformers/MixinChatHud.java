@@ -10,8 +10,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.Gui;
-//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
-import net.minecraft.client.gui.Hud;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -19,11 +17,13 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import java.util.ListIterator;
 
+//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
+import net.minecraft.client.gui.Hud;
+
 @Mixin(ChatComponent.class)
-public abstract class MixinChatHud {
+public abstract class MixinChatComponent {
 
     @Shadow
     public static int getHeight(double heightOption) {
@@ -34,11 +34,10 @@ public abstract class MixinChatHud {
     @Final
     private Minecraft minecraft;
 
-    //~ if < 26.2 'net/minecraft/client/gui/Hud' -> 'net/minecraft/client/gui/Gui' {
+    //~ if < 26.2 'net/minecraft/client/gui/Hud' -> 'net/minecraft/client/gui/Gui'
     @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"), require = 0)
     //~ if < 26.2 'Hud instance' -> 'Gui instance'
     private int clearChatHead(Hud instance) {
-    //~}
         return instance.getGuiTicks() + 90;
     }
 
