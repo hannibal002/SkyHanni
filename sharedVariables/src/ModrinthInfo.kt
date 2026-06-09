@@ -22,7 +22,7 @@ enum class ModrinthInfo(
         ),
     ),
     FABRIC_26_2(
-        minecraftVersions = listOf("26.2-pre-3"),
+        minecraftVersions = listOf("26.2-pre-5"),
         loader = "fabric",
         dependencies = mapOf(
             ModrinthDependency.FABRIC_API to DependencyType.REQUIRED,

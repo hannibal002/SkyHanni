@@ -20,8 +20,8 @@ enum class MinecraftVersion(
     MC26200(
         "26.2",
         25,
-        versionNameOverride = "26.2-pre-3",
-        fabricModJsonVersionOverride = ">=26.2-pre.3 <26.3-",
+        versionNameOverride = "26.2-pre-5",
+        fabricModJsonVersionOverride = ">=26.2-pre.5 <26.3-",
     ),
     ;
 
