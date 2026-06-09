@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.fetchAndDecrement
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.ClientMannequin
 import net.minecraft.world.entity.player.PlayerModelPart
@@ -12,6 +14,10 @@ class FakePlayer : ClientMannequin(
     MinecraftCompat.localWorld,
     Minecraft.getInstance().playerSkinRenderCache(),
 ) {
+    init {
+        setId(nextFakeEntityId.fetchAndDecrement())
+    }
+
     override fun getSkin(): PlayerSkin = MinecraftCompat.localPlayer.skin
 
     override fun getTeam() = object : PlayerTeam(Scoreboard(), "") {
@@ -20,4 +26,8 @@ class FakePlayer : ClientMannequin(
 
     override fun isModelPartShown(part: PlayerModelPart): Boolean =
         MinecraftCompat.localPlayer.isModelPartShown(part) && part != PlayerModelPart.CAPE
+
+    companion object {
+        private val nextFakeEntityId = AtomicInt(-1)
+    }
 }
