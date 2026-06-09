@@ -18,11 +18,11 @@ class CommonSeaCreatureHiderConfig {
 
     @Expose
     @ConfigOption(
-        name = "Only While Fishing",
+        name = "Only When Holding Rod",
         desc = "Only apply the filter while holding a fishing rod."
     )
     @ConfigEditorBoolean
-    var onlyWhileFishing: Boolean = true
+    var onlyWhileHoldingRod: Boolean = true
 
     @Expose
     @ConfigOption(
