@@ -57,8 +57,7 @@ object WorldRenderUtils {
         //? if >= 26.2 {
         submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
         //?} else {
-        /*
-        render(vertexConsumers.getBuffer(layer))
+        /*render(vertexConsumers.getBuffer(layer))
         *///?}
     }
 
@@ -303,8 +302,7 @@ object WorldRenderUtils {
         )
         matrices.popPose()
         //?} else {
-        /*
-        val matrix = Matrix4f()
+        /*val matrix = Matrix4f()
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
@@ -385,8 +383,7 @@ object WorldRenderUtils {
         )
         matrices.popPose()
         //?} else {
-        /*
-        val matrix = Matrix4f()
+        /*val matrix = Matrix4f()
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),

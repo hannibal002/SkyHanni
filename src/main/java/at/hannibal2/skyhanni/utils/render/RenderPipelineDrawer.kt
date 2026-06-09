@@ -74,8 +74,7 @@ object RenderPipelineDrawer {
         vertexBuffer.close()
         mesh.close()
         //?} else {
-        /*
-        val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
+        /*val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
 
         val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().mode)
         val indexBuffer = sequentialBuffer.getBuffer(mesh.drawState().indexCount)

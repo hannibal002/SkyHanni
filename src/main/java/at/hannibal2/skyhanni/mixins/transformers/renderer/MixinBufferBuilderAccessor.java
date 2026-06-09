@@ -16,8 +16,7 @@ public interface MixinBufferBuilderAccessor {
     @Accessor("format")
     VertexFormat getSkyHanniFormat();
     //?} else {
-    /*
-    @Invoker("beginElement")
+    /*@Invoker("beginElement")
     long invokeBeginElement(VertexFormatElement element);
     *///?}
 }

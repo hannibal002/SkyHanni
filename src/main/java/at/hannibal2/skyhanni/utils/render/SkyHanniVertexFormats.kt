@@ -15,8 +15,8 @@ import com.mojang.blaze3d.vertex.VertexFormat
 import org.lwjgl.system.MemoryUtil
 
 //? if < 26.2 {
-/*
-private typealias VFEType = VertexFormatElement.Type
+
+/*private typealias VFEType = VertexFormatElement.Type
 //? if < 26.1
 //private typealias VFEUsage = VertexFormatElement.Usage
 *///?}
@@ -24,8 +24,7 @@ private typealias VFEType = VertexFormatElement.Type
 object SkyHanniVertexFormats {
 
     //? if < 26.2 {
-    /*
-    // Different versions of MC use differing counts, so load the last registered ID dynamically.
+    /*// Different versions of MC use differing counts, so load the last registered ID dynamically.
     val lastRegisteredId by lazy {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
@@ -35,8 +34,7 @@ object SkyHanniVertexFormats {
         //? if >= 26.2
         val attributeName: String,
         //? if < 26.2 {
-        /*
-        private val index: Int = 0,
+        /*private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
         //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         private val normalized: Boolean = false,
@@ -62,8 +60,7 @@ object SkyHanniVertexFormats {
         ;
 
         //? if < 26.2 {
-        /*
-        // The ID we use to register the format element with Minecraft.
+        /*// The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
         val element by lazy {
@@ -74,8 +71,7 @@ object SkyHanniVertexFormats {
     }
 
     //? if < 26.2 {
-    /*
-    /**
+    /*/**
      * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired one is taken.
      * Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
      * @param desiredId The preferred ID for the VertexFormatElement.
@@ -114,8 +110,7 @@ object SkyHanniVertexFormats {
             .addAttribute(VertexElement.ROUNDED_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
             .build()
         //?} else {
-        /*
-        VertexFormat.builder()
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("Color", VertexFormatElement.COLOR)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
@@ -133,8 +128,7 @@ object SkyHanniVertexFormats {
             .addAttribute(VertexElement.ROUNDED_PARAMS_1.attributeName, GpuFormat.RGBA32_FLOAT)
             .build()
         //?} else {
-        /*
-        VertexFormat.builder()
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("UV0", VertexFormatElement.UV0)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
@@ -154,8 +148,7 @@ object SkyHanniVertexFormats {
             .addAttribute(VertexElement.GRADIENT_PARAMS_2.attributeName, GpuFormat.RGBA32_FLOAT)
             .build()
         //?} else {
-        /*
-        VertexFormat.builder()
+        /*VertexFormat.builder()
             .add("Position", VertexFormatElement.POSITION)
             .add("RoundedParams0", VertexElement.ROUNDED_PARAMS_0.element)
             .add("RoundedParams1", VertexElement.ROUNDED_PARAMS_1.element)
@@ -179,8 +172,7 @@ object SkyHanniVertexFormats {
         val element = accessor.skyHanniFormat.getElement(format.attributeName) ?: return
         val ptr = vertexPointer + element.offset()
         //?} else {
-        /*
-        val element = format.element
+        /*val element = format.element
         val ptr = (this@writeParams as MixinBufferBuilderAccessor).invokeBeginElement(element).takeIf {
             it != -1L
         } ?: return

@@ -33,8 +33,7 @@ object IrisCompat {
     @HandleEvent
     fun onInitFinished(event: InitFinishedEvent) {
         //? if < 26.2 {
-        /*
-        if (!isIrisLoaded) return
+        /*if (!isIrisLoaded) return
         try {
             val irisApiClass = Class.forName(IRIS_API_PATH)
             val irisInstance = irisApiClass.getMethod("getInstance").invoke(null)

@@ -17,8 +17,7 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         //? if >= 26.2 {
         event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf ->
         //?} else {
-        /*
-        val buf = event.vertexConsumers.getBuffer(layer)
+        /*event.vertexConsumers.getBuffer(layer).let { buf ->
         *///?}
 
             val viewerPos = WorldRenderUtils.getViewerPos()
@@ -36,7 +35,6 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
                 .setColor(c.red, c.green, c.blue, c.alpha)
             buf.addVertex(newLastPoint.x.toFloat(), newLastPoint.y.toFloat(), newLastPoint.z.toFloat())
                 .setColor(c.red, c.green, c.blue, c.alpha)
-        //? if >= 26.2
         }
 
         event.matrices.popPose()
