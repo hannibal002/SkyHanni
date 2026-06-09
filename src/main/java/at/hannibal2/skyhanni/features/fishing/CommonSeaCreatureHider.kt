@@ -23,9 +23,9 @@ object CommonSeaCreatureHider {
         if (!isEnabled()) return
 
         val entity = event.entity
-        val seaCreature = entity.mob?.seaCreature ?: return
+        val seaCreature = entity.mob?.seaCreature?.seaCreature ?: return
 
-        if (!seaCreature.seaCreature.rare) {
+        if (!seaCreature.rare) {
             event.newTransparency = config.transparency
         }
     }
