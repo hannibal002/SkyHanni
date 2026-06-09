@@ -150,7 +150,7 @@ stonecutter parameters {
             )
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
 
-            val dyeColors = listOf(
+            val dyeColors = mapOf(
                 "black" to "BLACK",
                 "blue" to "BLUE",
                 "brown" to "BROWN",
@@ -168,7 +168,6 @@ stonecutter parameters {
                 "white" to "WHITE",
                 "yellow" to "YELLOW",
             )
-
             dyeColors.forEach { (lower, upper) ->
                 replace("DYE.$lower()", "${upper}_DYE")
                 replace("WOOL.$lower()", "${upper}_WOOL")
