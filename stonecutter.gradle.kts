@@ -1,5 +1,3 @@
-import dev.kikugie.stonecutter.StonecutterExperimentalAPI
-
 plugins {
     alias(libs.plugins.loom) apply false
     alias(libs.plugins.kotlin.jvm) apply false
@@ -153,43 +151,33 @@ stonecutter parameters {
                 "net.minecraft.world.entity.monster.MagmaCube",
             )
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
-        }
 
-        @OptIn(StonecutterExperimentalAPI::class)
-        perl(current.parsed < "26.2") {
-            val DYE_COLORS_LOWER = "black|blue|brown|cyan|gray|green|lime|magenta|orange|pink|purple|red|white|yellow"
-            val DYE_COLORS_UPPER = "BLACK|BLUE|BROWN|CYAN|GRAY|GREEN|LIME|MAGENTA|ORANGE|PINK|PURPLE|RED|WHITE|YELLOW"
-            val LIGHT_DYE_COLORS_LOWER = "light(?<baseColor>Blue|Gray)"
-            val LIGHT_DYE_COLORS_UPPER = "LIGHT_(?<baseColor>BLUE|GRAY)"
-
-            replace(
-                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?<color>$DYE_COLORS_LOWER)\\(\\)",
-                "\\U\${color}_\${itemType}",
-
-                "(?<color>$DYE_COLORS_UPPER)_(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)",
-                "\${itemType}.\\L\${color}()",
+            val dyeColors = listOf(
+                "black" to "BLACK",
+                "blue" to "BLUE",
+                "brown" to "BROWN",
+                "cyan" to "CYAN",
+                "gray" to "GRAY",
+                "green" to "GREEN",
+                "lightBlue" to "LIGHT_BLUE",
+                "lightGray" to "LIGHT_GRAY",
+                "lime" to "LIME",
+                "magenta" to "MAGENTA",
+                "orange" to "ORANGE",
+                "pink" to "PINK",
+                "purple" to "PURPLE",
+                "red" to "RED",
+                "white" to "WHITE",
+                "yellow" to "YELLOW",
             )
-            replace(
-                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?:$LIGHT_DYE_COLORS_LOWER)\\(\\)",
-                "LIGHT_\\U\${baseColor}_\${itemType}",
 
-                "(?:$LIGHT_DYE_COLORS_UPPER)_(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)",
-                "\${itemType}.light\\L\\u\${baseColor}()",
-            )
-            replace(
-                "DYED_TERRACOTTA\\.(?<color>$DYE_COLORS_LOWER)\\(\\)",
-                "\\U\${color}_TERRACOTTA",
-
-                "(?<color>$DYE_COLORS_UPPER)_TERRACOTTA",
-                "DYED_TERRACOTTA.\\L\${color}()",
-            )
-            replace(
-                "(?<itemType>DYE|WOOL|STAINED_GLASS(?:_PANE)?)\\.(?:$LIGHT_DYE_COLORS_LOWER)\\(\\)",
-                "LIGHT_\\U\${baseColor}_\${itemType}",
-
-                "(?:$LIGHT_DYE_COLORS_UPPER)_TERRACOTTA",
-                "DYED_TERRACOTTA.light\\L\\u\${baseColor}()",
-            )
+            dyeColors.forEach { (lower, upper) ->
+                replace("DYE.$lower()", "${upper}_DYE")
+                replace("WOOL.$lower()", "${upper}_WOOL")
+                replace("STAINED_GLASS.$lower()", "${upper}_STAINED_GLASS")
+                replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
+                replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
+            }
         }
 
         string(current.parsed < "26.1") {
