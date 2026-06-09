@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import net.minecraft.world.entity.player.Inventory
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -274,10 +275,10 @@ object CustomWardrobe {
         containerHeight: Int,
         containerWidth: Int,
     ): Renderable {
-        val fakePlayer = FakePlayer()
+        val fakePlayer = FakePlayer.fromLocalPlayerOrThrow()
         var scale = playerWidth
 
-        for (equipment in net.minecraft.world.entity.player.Inventory.EQUIPMENT_SLOT_MAPPING.values) {
+        for (equipment in Inventory.EQUIPMENT_SLOT_MAPPING.values) {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal !in 0..3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
