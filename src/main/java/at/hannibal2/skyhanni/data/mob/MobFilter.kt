@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeWhileInclusive
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -118,26 +118,33 @@ object MobFilter {
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)] )?... (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)] )?... (?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
         "^\\[\\w+ (?<level>\\d+)\\] (?<name>.*)",
     )
 
-    // TODO fix pattern
+    // TODO fix pattern (is this todo still relevant?)
+    /**
+     * REGEX-TEST: Woke Golem
+     * REGEX-TEST: Sleeping Golem
+     */
     val wokeSleepingGolemPattern by patternGroup.pattern(
-        "pattern.dungeon.woke.golem",
-        "(?:§c§lWoke|§5§lSleeping) Golem§r",
+        "pattern.dungeon.woke.golem.colorless",
+        "(?:Woke|Sleeping) Golem",
     )
+    // TODO add regex tests
+    @Suppress("RepoPatternRegexTestMissing")
     val jerryMagmaCubePattern by patternGroup.pattern(
-        "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
+        "pattern.jerry.magma.cube.colorless",
+        "(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? \\d+\\/\\d+${SkyblockStat.HEALTH.hypixelIcon}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
         ".*Spawned by: (?<name>.*).*",
     )
+
     /**
      * REGEX-TEST: SHINY PIG
      */
@@ -179,7 +186,6 @@ object MobFilter {
         ;
 
         companion object {
-
             val toRegexLine = DungeonAttribute.entries.joinToString("|") { it.name }
         }
     }
@@ -380,13 +386,12 @@ object MobFilter {
             baseEntity.firstPassenger is Player && MobUtils.getArmorStand(baseEntity, 2)
                 ?.wearingSkullTexture(RAT_SKULL_TEXTURE) ?: false -> return MobResult.illegal // Rat Morph
         }
-        val skullTexture = armorStand.getStandHelmet()?.getSkullTexture() ?: return null
-        when (skullTexture) {
+        return when (armorStand.getHelmet()?.getSkullTexture()) {
             HELLWISP_TENTACLE_SKULL_TEXTURE -> return MobResult.illegal // Hellwisp Tentacle
             RIFT_EYE_SKULL1_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
             RIFT_EYE_SKULL2_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
+            else -> null
         }
-        return null
     }
 
     fun LivingEntity.isFarmMob() =

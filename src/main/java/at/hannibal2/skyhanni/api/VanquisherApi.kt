@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -31,7 +31,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object VanquisherApi {
-
     data class VanquisherData(
         val isOwn: Boolean,
         val mob: Mob,
@@ -41,7 +40,7 @@ object VanquisherApi {
         fun postDespawn() {
             if (hasSentDespawn) return
             hasSentDespawn = true
-            VanquisherEvent.DeSpawn(this).post()
+            VanquisherEvent.Despawn(this).post()
         }
     }
 
@@ -92,7 +91,7 @@ object VanquisherApi {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         val entity = event.entity as? ArmorStand ?: return
-        val helmet = entity.getStandHelmet() ?: return
+        val helmet = entity.getHelmet() ?: return
         if (!helmet.`is`(Items.WITHER_SKELETON_SKULL)) return
         lastSpawnEntityPos = entity.getLorenzVec()
         lastPossibleSpawnEntity = entity

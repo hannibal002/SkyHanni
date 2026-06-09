@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -21,9 +20,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -34,7 +33,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SummoningMobManager {
-
     private val config get() = SkyHanniMod.feature.combat.summonings
     private var mobs = mutableSetOf<Mob>()
 
@@ -126,7 +124,7 @@ object SummoningMobManager {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.summoningMobDisplay) return
         if (mobs.isEmpty()) return
 
@@ -134,7 +132,7 @@ object SummoningMobManager {
             add("Summoning mobs: " + mobs.size)
             mobs.forEachIndexed { index, mob ->
                 val entity = mob.baseEntity
-                val health = entity.findHealthReal()
+                val health = entity.realHealth
                 val maxHealth = entity.baseMaxHealth
                 val color = NumberUtil.percentageColor(health.toLong(), maxHealth.toLong()).getChatColor()
                 add("#${index + 1} §a${mob.name} $color${health.shortFormat()}§2/${maxHealth.shortFormat()}§c❤")

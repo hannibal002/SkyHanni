@@ -43,7 +43,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
-import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
@@ -59,7 +58,6 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object FishingApi {
-
     enum class RodPart {
         HOOK,
         LINE,
@@ -190,7 +188,7 @@ object FishingApi {
         }
 
         val bobber = bobber ?: return
-        if (bobber.deceased) {
+        if (bobber.isRemoved) {
             if (lastReelTime.passedSince() < 0.5.seconds && lastCatchSound.passedSince() < 0.5.seconds) FishingCatchEvent.post()
             resetBobber()
             return

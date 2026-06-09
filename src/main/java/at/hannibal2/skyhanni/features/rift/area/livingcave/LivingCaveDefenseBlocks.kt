@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -28,7 +27,6 @@ import net.minecraft.core.particles.ParticleTypes
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
-
     private val config get() = RiftApi.config.area.livingCave.defenseBlock
     private var movingBlocks = mapOf<DefenseBlock, Long>()
     private var staticBlocks = emptyList<DefenseBlock>()
@@ -38,7 +36,7 @@ object LivingCaveDefenseBlocks {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-        staticBlocks = staticBlocks.editCopy { removeIf { it.entity.deceased } }
+        staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isRemoved } }
     }
 
     @HandleEvent(receiveCancelled = true)

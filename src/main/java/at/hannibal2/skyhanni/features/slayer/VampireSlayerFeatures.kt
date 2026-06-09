@@ -36,8 +36,7 @@ import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -59,7 +58,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @OptIn(AllEntitiesGetter::class)
 @SkyHanniModule
 object VampireSlayerFeatures {
-
     private val config get() = SlayerApi.config.vampire
     private val configOwnBoss get() = config.ownBoss
     private val configOtherBoss get() = config.othersBoss
@@ -114,7 +112,7 @@ object VampireSlayerFeatures {
     @HandleEvent(SecondPassedEvent::class)
     fun onSecondPassed() {
         if (!isEnabled()) return
-        entityList.editCopy { removeIf { it.deceased } }
+        entityList.editCopy { removeIf { it.isRemoved } }
     }
 
     private fun List<String>.spawnedByCoop(stand: ArmorStand): Boolean = any {
@@ -172,7 +170,7 @@ object VampireSlayerFeatures {
             if (containUser && taggedEntityList.contains(id)) {
                 taggedEntityList.remove(id)
             }
-            val canUseSteak = findHealthReal() <= neededHealth
+            val canUseSteak = realHealth <= neededHealth
             val ownBoss = configOwnBoss.highlight && containUser && isNpc()
             val otherBoss = configOtherBoss.highlight && taggedEntityList.contains(id) && isNpc()
             val coopBoss = configCoopBoss.highlight && containCoop && isNpc()

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.hasEquipment
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import net.minecraft.client.resources.language.I18n
@@ -18,7 +18,6 @@ import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object MobUtils {
-
     private val defaultArmorStandName get() = I18n.get("entity.minecraft.armor_stand")
 
     // The corresponding ArmorStand for a mob has always the ID + 1 (with some exceptions)
@@ -39,9 +38,7 @@ object MobUtils {
 
     fun ArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 
-    fun ArmorStand.hasEmptyInventory() = getInventoryItems().none { it.isNotEmpty() }
-
-    fun ArmorStand.isCompletelyDefault() = isDefaultValue() && hasEmptyInventory()
+    fun ArmorStand.isCompletelyDefault() = isDefaultValue() && !hasEquipment()
 
     class Ownership(val ownerName: String) {
         val ownerPlayer = MobData.players.firstOrNull { it.name == ownerName }
@@ -93,5 +90,4 @@ object MobUtils {
     val LivingEntity.mob: Mob? get() = MobData.entityToMob[this]
 
     val Entity.mob: Mob? get() = (this as? LivingEntity)?.mob
-
 }

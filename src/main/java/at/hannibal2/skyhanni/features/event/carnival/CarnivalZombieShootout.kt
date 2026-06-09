@@ -16,8 +16,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.itemType
@@ -43,7 +43,6 @@ import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object CarnivalZombieShootout {
-
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
     private data class ShootoutLamp(var pos: LorenzVec, var time: SimpleTimeMark)
@@ -235,9 +234,10 @@ object CarnivalZombieShootout {
 
     private fun getZombies() =
         EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
-            if (zombie.findHealthReal() <= 0) return@mapNotNull null
-            val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
+            if (zombie.realHealth <= 0) return@mapNotNull null
+            val helmet = zombie.getHelmet() ?: return@mapNotNull null
             if (helmet.isEmpty) return@mapNotNull null
+
             val type = toType(helmet) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not identify Zombie Shootout type",

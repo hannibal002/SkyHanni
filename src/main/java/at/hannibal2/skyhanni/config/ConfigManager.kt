@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
-import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -72,7 +71,6 @@ class ConfigManager {
             logger.log("Loading config despite config being already loaded?")
         }
         configDirectory.mkdirs()
-
 
         for (fileType in ConfigFileType.entries) {
             val clazzInstance = fileType.clazz.getDeclaredConstructor().newInstance()
@@ -290,8 +288,6 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
-    val isDev by lazy { ContributorManager.isSelfDeveloper() }
-
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
@@ -313,10 +309,10 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
             return GuiOptionEditorBlocked(default, extraMessage)
         }
 
-        if (!isDev) {
-            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
-                return GuiOptionEditorHidden(default)
-            }
+        if (field.isAnnotationPresent(OnlyDevEnv::class.java) &&
+            !PlatformUtils.isDevEnvironment
+        ) {
+            return GuiOptionEditorHidden(default)
         }
 
         return default

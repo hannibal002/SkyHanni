@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
@@ -22,7 +21,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EntityMovementData {
-
     /**
      * REGEX-TEST: §7Sending a visit request...
      * REGEX-TEST: §7Finding player...
@@ -92,7 +90,7 @@ object EntityMovementData {
         addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         for (entity in entityLocation.keys) {
-            if (entity.deceased) continue
+            if (entity.isRemoved) continue
 
             val newLocation = entity.getLorenzVec()
             val oldLocation = entityLocation[entity]!!

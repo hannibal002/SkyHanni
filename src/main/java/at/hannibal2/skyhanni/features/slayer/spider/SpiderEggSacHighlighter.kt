@@ -12,14 +12,12 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
 object SpiderEggSacHighlighter {
-
     private val config get() = SlayerApi.config.spider
     private val highlightedEggSacs = mutableSetOf<ArmorStand>()
 
@@ -56,7 +54,7 @@ object SpiderEggSacHighlighter {
             .toSet()
 
         highlightedEggSacs.removeAll {
-            val shouldRemove = it.deceased || it !in currentEggSacs
+            val shouldRemove = it.isRemoved || it !in currentEggSacs
             if (shouldRemove) RenderLivingEntityHelper.removeEntityColor(it)
             shouldRemove
         }

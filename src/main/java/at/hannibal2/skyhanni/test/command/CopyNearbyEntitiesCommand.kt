@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.realHealth
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -52,98 +52,101 @@ import net.minecraft.world.entity.player.Player
 
 @SkyHanniModule
 object CopyNearbyEntitiesCommand {
-
-    private var entityCounter = 0
-
     // Only runs on the command, so performance impact is minimal
+    // TODO refactor instead of suppressing
     @OptIn(AllEntitiesGetter::class)
-    private fun buildCommandResult(searchRadius: Int): List<String> = buildList {
-        val start = LocationUtils.playerLocation()
-        for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
-            val position = entity.blockPosition()
-            val vec = position.toLorenzVec()
-            val distance = start.distance(vec)
-            val mob = MobData.entityToMob[entity]
-            if (distance >= searchRadius) continue
+    @Suppress("CyclomaticComplexMethod")
+    private fun buildCommandResult(searchRadius: Int): Pair<List<String>, Int> {
+        var count = 0
+        val list = buildList {
+            val start = LocationUtils.playerLocation()
+            for (entity in EntityUtils.getAllEntities().sortedBy { it.id }) {
+                val position = entity.blockPosition()
+                val vec = position.toLorenzVec()
+                val distance = start.distance(vec)
+                val mob = MobData.entityToMob[entity]
+                if (distance >= searchRadius) continue
 
-            val simpleName = entity.javaClass.simpleName
-            add("entity: $simpleName")
-            val displayName = entity.displayName
-            add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
-            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName + "'")
-            add("displayName: '${displayName.formattedTextCompat()}'")
-            add("entityId: ${entity.id}")
-            add("Category of Mob: ${getCategory(entity, mob)}")
-            add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
-            add("location data:")
-            add("-  vec: $vec")
-            add("-  distance: $distance")
+                count++
+                val simpleName = entity.javaClass.simpleName
+                add("entity: $simpleName")
+                val displayName = entity.displayName
+                add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
+                if (entity is ArmorStand) add("cleanName: '" + entity.cleanName + "'")
+                add("displayName: '${displayName.formattedTextCompat()}'")
+                add("entityId: ${entity.id}")
+                add("Category of Mob: ${getCategory(entity, mob)}")
+                add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
+                add("location data:")
+                add("-  vec: $vec")
+                add("-  distance: $distance")
 
-            val rotationYaw = entity.yRot
-            val rotationPitch = entity.xRot
-            add("-  rotationYaw: $rotationYaw")
-            add("-  rotationPitch: $rotationPitch")
+                val rotationYaw = entity.yRot
+                val rotationPitch = entity.xRot
+                add("-  rotationYaw: $rotationYaw")
+                add("-  rotationPitch: $rotationPitch")
 
-            val firstPassenger = entity.firstPassenger
-            add("firstPassenger: $firstPassenger")
-            val ridingEntity = entity.vehicle
-            add("ridingEntity: $ridingEntity")
+                val firstPassenger = entity.firstPassenger
+                add("firstPassenger: $firstPassenger")
+                val ridingEntity = entity.vehicle
+                add("ridingEntity: $ridingEntity")
 
-            if (entity.isInvisible) {
-                add("Invisible: true")
-            }
-            if (entity.isCurrentlyGlowing) {
-                add("Glowing: true")
-            }
+                if (entity.isInvisible) {
+                    add("Invisible: true")
+                }
+                if (entity.isCurrentlyGlowing) {
+                    add("Glowing: true")
+                }
 
-            if (entity is LivingEntity) {
-                add("EntityLivingBase:")
-                val baseMaxHealth = entity.baseMaxHealth
-                val health = entity.findHealthReal().toInt()
-                add("-  baseMaxHealth: $baseMaxHealth")
-                add("-  health: $health")
-            }
+                if (entity is LivingEntity) {
+                    add("EntityLivingBase:")
+                    val baseMaxHealth = entity.baseMaxHealth
+                    val health = entity.realHealth.toInt()
+                    add("-  baseMaxHealth: $baseMaxHealth")
+                    add("-  health: $health")
+                }
 
-            if (entity is Player) {
-                val armor = entity.getArmorInventory()
-                if (armor != null) {
-                    add("armor:")
-                    for ((i, itemStack) in armor.withIndex()) {
-                        val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
-                        add("-  at: $i: $name")
+                if (entity is Player) {
+                    val armor = entity.getArmorInventory()
+                    if (armor != null) {
+                        add("armor:")
+                        for ((i, itemStack) in armor.withIndex()) {
+                            val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                            add("-  at: $i: $name")
+                        }
                     }
                 }
-            }
 
-            if (entity is Display) {
-                // separate because the when also needs to trigger
-                addDisplayEntity(entity)
-            }
+                if (entity is Display) {
+                    // separate because the when also needs to trigger
+                    addDisplayEntity(entity)
+                }
 
-            when (entity) {
-                is ArmorStand -> addArmorStand(entity)
-                is EnderMan -> addEnderman(entity)
-                is MagmaCube -> addMagmaCube(entity)
-                is ItemEntity -> addItem(entity)
-                is RemotePlayer -> addOtherPlayer(entity)
-                is Creeper -> addCreeper(entity)
-                is WitherBoss -> addWither(entity)
-                is TropicalFish -> addTropicalFish(entity)
-                is Shulker -> addShulker(entity)
-                is Panda -> addPanda(entity)
-                is Display.ItemDisplay -> addItemDisplayEntity(entity)
-                is Display.BlockDisplay -> addBlockDisplayEntity(entity)
-                is Display.TextDisplay -> addTextDisplayEntity(entity)
-                is Frog -> addFrogEntity(entity)
+                when (entity) {
+                    is ArmorStand -> addArmorStand(entity)
+                    is EnderMan -> addEnderman(entity)
+                    is MagmaCube -> addMagmaCube(entity)
+                    is ItemEntity -> addItem(entity)
+                    is RemotePlayer -> addOtherPlayer(entity)
+                    is Creeper -> addCreeper(entity)
+                    is WitherBoss -> addWither(entity)
+                    is TropicalFish -> addTropicalFish(entity)
+                    is Shulker -> addShulker(entity)
+                    is Panda -> addPanda(entity)
+                    is Display.ItemDisplay -> addItemDisplayEntity(entity)
+                    is Display.BlockDisplay -> addBlockDisplayEntity(entity)
+                    is Display.TextDisplay -> addTextDisplayEntity(entity)
+                    is Frog -> addFrogEntity(entity)
+                }
+                if (mob != null && mob.category != MobCategory.PLAYER) {
+                    add("MobInfo: ")
+                    addAll(getMobInfo(mob).map { "-  $it" })
+                }
+                add("")
+                add("")
             }
-            if (mob != null && mob.category != MobCategory.PLAYER) {
-                add("MobInfo: ")
-                addAll(getMobInfo(mob).map { "-  $it" })
-            }
-            add("")
-            add("")
-            entityCounter++
         }
+        return list to count
     }
 
     private fun MutableList<String>.addArmorStand(entity: ArmorStand) {
@@ -247,7 +250,6 @@ object CopyNearbyEntitiesCommand {
         add("-  hiddenGene: $hiddenGene")
     }
 
-
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
         val lookAngle = entity.lookAngle
@@ -333,7 +335,7 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    fun getMobInfo(mob: Mob) = buildList<String> {
+    fun getMobInfo(mob: Mob) = buildList {
         add("Name: ${mob.name}")
         add("Category: ${mob.category}")
         add("Base Entity: ${mob.baseEntity.asString()}")
@@ -366,26 +368,25 @@ object CopyNearbyEntitiesCommand {
         event.registerBrigadier("shcopyentities") {
             description = "Copies the entities in the specified radius around the player into the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG
-            argCallback("radius", BrigadierArguments.integer()) { radius ->
+            argCallback("radius", BrigadierArguments.integer(min = 1)) { radius ->
                 command(radius)
             }
             simpleCallback {
-                command()
+                command(10)
             }
         }
     }
 
-    private fun command(searchRadius: Int = 10) {
-        val resultList = buildCommandResult(searchRadius)
+    private fun command(searchRadius: Int) {
+        val (resultList, resultCount) = buildCommandResult(searchRadius)
 
-        if (entityCounter != 0) {
+        if (resultCount > 0) {
             val string = resultList.joinToString("\n")
             OSUtils.copyToClipboard(string)
-            ChatUtils.chat("$entityCounter entities copied into the clipboard!")
+            ChatUtils.chat("$resultCount entities copied into the clipboard!")
         } else {
             ChatUtils.chat("No entities found in a search radius of $searchRadius!")
         }
-        entityCounter = 0
     }
 
     private fun LivingEntity.asString() =
