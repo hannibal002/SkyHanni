@@ -631,6 +631,7 @@ object WorldRenderUtils {
         seeThroughBlocks: Boolean = true,
         ignoreY: Boolean = false,
         maxDistance: Int? = null,
+        color: Color? = null,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos()
 
@@ -666,7 +667,8 @@ object WorldRenderUtils {
 
         val renderLocation = LorenzVec(resultX, resultY, resultZ)
 
-        drawString(renderLocation, "§f$text", seeThroughBlocks, null, scale, true, yOff, 0)
+        val formattedText = if (color == null) "§f$text" else text
+        drawString(renderLocation, formattedText, seeThroughBlocks, color, scale, true, yOff, 0)
     }
 
     fun SkyHanniRenderWorldEvent.drawDynamicText(
