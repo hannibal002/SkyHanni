@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.input.MouseButtonEvent;
 
 @Mixin(ChatScreen.class)
-public class MixinGuiChat {
+public class MixinChatScreen {
 
     @Inject(method = "mouseClicked", at = @At("HEAD"))
     public void mouseClicked(MouseButtonEvent click, boolean doubled, CallbackInfoReturnable<Boolean> cir) {

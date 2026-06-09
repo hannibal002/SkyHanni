@@ -33,7 +33,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.Vec3
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.cos
@@ -1117,48 +1116,37 @@ object WorldRenderUtils {
         o: Float,
     ) {
         val matrix4f = matrices.last().pose()
-        vertexConsumer.addVertices(
-            matrix4f,
-            Vec3(f, g, h),
-            Vec3(f, g, h),
-            Vec3(f, g, h),
-            Vec3(f, g, k),
-            Vec3(f, j, h),
-            Vec3(f, j, k),
-            Vec3(f, j, k),
-            Vec3(f, g, k),
-            Vec3(i, j, k),
-            Vec3(i, g, k),
-            Vec3(i, g, k),
-            Vec3(i, g, h),
-            Vec3(i, j, k),
-            Vec3(i, j, h),
-            Vec3(i, j, h),
-            Vec3(i, g, h),
-            Vec3(f, j, h),
-            Vec3(f, g, h),
-            Vec3(f, g, h),
-            Vec3(i, g, h),
-            Vec3(f, g, k),
-            Vec3(i, g, k),
-            Vec3(i, g, k),
-            Vec3(f, j, h),
-            Vec3(f, j, h),
-            Vec3(f, j, k),
-            Vec3(i, j, h),
-            Vec3(i, j, k),
-            Vec3(i, j, k),
-            Vec3(i, j, k),
-            color = Color(l, m, n, o),
-        )
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, g, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, f, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, h).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+        vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
-
-    private fun VertexConsumer.addVertices(matrix4f: Matrix4f, vararg vertex: Vec3, color: Color? = null) =
-        vertices.forEach { 
-            addVertex(matrix4f, vertex.x, vertex.y, vertex.y).let {
-                color?.let { setColor(color.red, color.green, color.blue, color.alpha)
-            }
-        }
 
     // returns true if the camera is underwater
     fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER

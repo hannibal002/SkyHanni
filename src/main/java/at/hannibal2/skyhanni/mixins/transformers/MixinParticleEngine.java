@@ -11,14 +11,23 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ParticleEngine.class)
-public class MixinEffectRenderer {
+public class MixinParticleEngine {
 
     @Inject(
         method = "createParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)Lnet/minecraft/client/particle/Particle;",
         at = @At("HEAD"),
         cancellable = true
     )
-    private void onCreateParticle(ParticleOptions particleOptions, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, CallbackInfoReturnable<Particle> cir) {
+    private void onCreateParticle(
+        ParticleOptions particleOptions,
+        double x,
+        double y,
+        double z,
+        double xSpeed,
+        double ySpeed,
+        double zSpeed,
+        CallbackInfoReturnable<@Nullable Particle> cir
+    ) {
         if (particleOptions.getType() == ParticleTypes.BLOCK && ParticleHider.shouldHideBlockParticles()) {
             cir.cancel();
         }

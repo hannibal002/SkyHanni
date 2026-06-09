@@ -17,7 +17,7 @@ import java.util.Map;
 
 @SuppressWarnings("UnstableApiUsage")
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
-public class MixinFluidRenderHandlerRegistry {
+public class MixinFluidRenderHandlerRegistryImpl {
 
     @Shadow @Final
     private Map<Fluid, FluidRenderHandler> handlers;

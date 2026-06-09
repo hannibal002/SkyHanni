@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.minecraft.world.level.entity.TransientEntitySectionManager$Callback")
-public class MixinClientEntityManager<T extends EntityAccess> {
+public class MixinTransientEntitySectionManagerCallback<T extends EntityAccess> {
 
     @Shadow
     @Final

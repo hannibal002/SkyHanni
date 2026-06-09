@@ -12,23 +12,26 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
 import java.util.List;
 
 @Mixin(SplashManager.class)
-public class MixinSplashTextResourceSupplier {
-
-    @Shadow
-    private List<Component> splashes;
+public class MixinSplashManager {
 
     @Shadow
     @Final
     private static RandomSource RANDOM;
 
+    @Shadow
+    private List<Component> splashes;
+
     @Inject(method = "getSplash", at = @At("HEAD"), cancellable = true)
-    public void addSkyhanniSplash(CallbackInfoReturnable<SplashRenderer> cir) {
+    public void addSkyHanniSplash(CallbackInfoReturnable<SplashRenderer> cir) {
         if (RANDOM.nextInt(this.splashes.size() + 1) == this.splashes.size()) {
-            cir.setReturnValue(new SplashRenderer(TextHelper.INSTANCE.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, "SkyHanni!")));
+            cir.setReturnValue(
+                new SplashRenderer(
+                    TextHelper.INSTANCE.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, "SkyHanni!")
+                )
+            );
         }
     }
 }

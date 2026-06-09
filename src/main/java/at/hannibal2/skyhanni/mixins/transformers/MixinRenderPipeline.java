@@ -17,7 +17,7 @@ import com.mojang.blaze3d.platform.CompareOp;
 *///?}
 
 @Mixin(value = RenderPipeline.class, remap = false)
-public class RenderPipelineMixin {
+public class MixinRenderPipeline {
 
     //? if >= 26.1 {
     @ModifyReturnValue(method = "getDepthStencilState", at = @At("RETURN"))

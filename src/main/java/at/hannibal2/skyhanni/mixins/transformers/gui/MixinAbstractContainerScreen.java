@@ -20,20 +20,28 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.client.input.KeyEvent;
 
 @Mixin(AbstractContainerScreen.class)
-public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends Screen {
+public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen {
+
+    protected MixinAbstractContainerScreen(Component title) {
+        super(title);
+    }
 
     @Shadow
     @Nullable
     protected Slot hoveredSlot;
 
-    protected MixinGuiContainer(Component title) {
-        super(title);
-    }
-
     @Unique
     private final GuiContainerHook skyhanni$hook = new GuiContainerHook(this);
 
-    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(
+        method = "keyPressed",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V",
+            shift = At.Shift.BEFORE
+        ),
+        cancellable = true
+    )
     private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
         skyhanni$hook.closeWindowPressed(cir);
     }
@@ -83,7 +91,11 @@ public abstract class MixinGuiContainer<T extends AbstractContainerMenu> extends
         skyhanni$hook.onDrawSlotPost(slot);
     }
 
-    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(
+        method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V",
+        at = @At("HEAD"),
+        cancellable = true
+    )
     private void onMouseClick(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo cir) {
         skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
     }

@@ -19,7 +19,7 @@ import net.minecraft.client.input.KeyEvent;
 //import at.hannibal2.skyhanni.compat.ReiCompat;
 
 @Mixin(KeyboardHandler.class)
-public class MixinKeyboard {
+public class MixinKeyboardHandler {
 
     @Inject(method = "keyPress", at = @At("HEAD"))
     private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
@@ -45,10 +45,11 @@ public class MixinKeyboard {
          * modifiers = 4: Alt
          */
         // TODO on 1.8 it first checks TextInput.isActive() before posting, however im not sure if this is needed
-        // and as of now that file would need to be recoded to work with 1.21 so it hasn't been put here
-        // there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive() with that somehow
-        // the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
-        // this only replaces the posting of events
+        //  and as of now that file would need to be recoded to work with 1.21 so it hasn't been put here
+        //  there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive()
+        //  with that somehow
+        //  the extension functions such as isActive() and isKeyHeld() still work from keyboard manager
+        //  this only replaces the posting of events
         if (action == 0) new KeyUpEvent(key).post();
         if (action == 1) {
             new KeyDownEvent(key).post();

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.input.MouseButtonInfo;
 
 @Mixin(MouseHandler.class)
-public class MixinMouse {
+public class MixinMouseHandler {
 
     @Shadow
     private double accumulatedDX;

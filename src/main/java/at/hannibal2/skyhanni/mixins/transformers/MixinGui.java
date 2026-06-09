@@ -10,11 +10,79 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public abstract class MixinMinecraftClient {
+public abstract class MixinGui {
 
-    @Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/Gui;screen:Lnet/minecraft/client/gui/screens/Screen;"))
+    @Unique
+    private GuiGraphicsExtractor skyhanni$graphics;
+
+    @Inject(
+        method = "setScreen",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/gui/Gui;screen:Lnet/minecraft/client/gui/screens/Screen;"
+        )
+    )
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         new GuiScreenOpenEvent(screen).post();
+    }
+
+    @ModifyVariable(
+        method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        at = @At("STORE"),
+        name = "graphics"
+    )
+    private GuiGraphicsExtractor captureGuiGraphicsExtractor(GuiGraphicsExtractor graphics) {
+        skyhanni$graphics = graphics;
+        return graphics;
+    }
+
+    @Inject(
+        method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+        )
+    )
+    private void onRenderStartPhase(
+        DeltaTracker deltaTracker,
+        boolean shouldRenderLevel, 
+        boolean resourcesLoaded,
+        CallbackInfo ci
+    ) {
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$graphics, true).post();
+    }
+
+    @Inject(
+        method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Hud;extractSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+        )
+    )
+    private void onRenderEndPhase(
+        DeltaTracker deltaTracker,
+        boolean shouldRenderLevel,
+        boolean resourcesLoaded,
+        CallbackInfo ci
+    ) {
+        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$graphics, false).post();
+    }
+
+    @Inject(
+        method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void onRenderTail(
+        DeltaTracker deltaTracker,
+        boolean shouldRenderLevel,
+        boolean resourcesLoaded,
+        CallbackInfo ci
+    ) {
+        GuiEditManager.renderLast(skyhanni$graphics);
     }
 }
 //?}

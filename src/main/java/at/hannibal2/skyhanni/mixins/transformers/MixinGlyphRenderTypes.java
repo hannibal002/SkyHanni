@@ -14,14 +14,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GlyphRenderTypes.class)
-public class MixinTextRenderLayerSet {
+public class MixinGlyphRenderTypes {
 
     @Unique
     private Identifier skyhanni$identifier;
 
     @ModifyReturnValue(method = {"createForColorTexture", "createForIntensityTexture"}, at = @At("RETURN"))
-    private static GlyphRenderTypes ofMethods(GlyphRenderTypes original, @Local(argsOnly = true) Identifier identifier) {
-        ((MixinTextRenderLayerSet) (Object) original).skyhanni$identifier = identifier;
+    private static GlyphRenderTypes ofMethods(
+        GlyphRenderTypes original,
+        @Local(argsOnly = true) Identifier identifier
+    ) {
+        ((MixinGlyphRenderTypes) (Object) original).skyhanni$identifier = identifier;
         return original;
     }
 
@@ -31,5 +34,4 @@ public class MixinTextRenderLayerSet {
             cir.setReturnValue(SkyHanniRenderLayers.INSTANCE.getChromaTexturedWithIdentifier(skyhanni$identifier));
         }
     }
-
 }

@@ -15,21 +15,39 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 
 @Mixin(CustomHeadLayer.class)
-public class MixinHeadFeatureRenderer {
+public class MixinCustomHeadLayer {
 
     @WrapWithCondition(
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V",
-        //~ if < 26.1 'submitSkull(FLcom/mojang' -> 'submitSkull(Lnet/minecraft/core/Direction;FFLcom/mojang'
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V")
+        at = @At(
+            value = "INVOKE",
+            //~ if < 26.1 'submitSkull(' -> 'submitSkull(Lnet/minecraft/core/Direction;F'
+            target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V
+        )
     )
-    //~ if < 26.1 'float animationPos' -> 'Direction direction, float f, float g'
-    private boolean onRenderArmor(float animationPos, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int i, SkullModelBase skullModelBase, RenderType renderType, int j, ModelFeatureRenderer.CrumblingOverlay crumblingOverlay) {
+    private boolean onRenderArmor(
+        //? if < 26.1 {
+        /*Direction direction,
+        float rot,
+        *///?}
+        float animationValue,
+        PoseStack matrices,
+        SubmitNodeCollector submitNodeCollector,
+        int i,
+        SkullModelBase skullModelBase,
+        RenderType renderType,
+        int j,
+        ModelFeatureRenderer.CrumblingOverlay crumblingOverlayo
+    ) {
         return !HideArmorHookKt.shouldHideArmor();
     }
 
     @WrapWithCondition(
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;III)V")
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/item/ItemStackRenderState;submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;III)V"
+        )
     )
     private boolean onRenderItemstackOnHead(ItemStackRenderState instance, PoseStack matrices, SubmitNodeCollector submitNodeCollector, int i, int j, int k) {
         return !HideArmorHookKt.shouldHideArmor();

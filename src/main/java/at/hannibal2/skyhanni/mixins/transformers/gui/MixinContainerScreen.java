@@ -13,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ContainerScreen.class)
-abstract class MixinGenericContainerScreen {
+public abstract class MixinContainerScreen {
+
     @Unique
     private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();
 
@@ -32,8 +33,16 @@ abstract class MixinGenericContainerScreen {
 
     //~ if < 26.1 'extractBackground' -> 'renderBg'
     @Inject(method = "extractBackground", at = @At(value = "HEAD"), cancellable = true)
-    //~ if < 26.1 'int mouseX, int mouseY, float a' -> 'float f, int i, int j'
-    private void cancelWardrobeBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
+    private void cancelWardrobeBackground(
+        GuiGraphicsExtractor graphics,
+        //? if < 26.1
+        //float a,
+        int mouseX,
+        int mouseY,
+        //? if >= 26.1
+        float a,
+        CallbackInfo ci
+    ) {
         if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
             ci.cancel();
         }
