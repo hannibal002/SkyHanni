@@ -16,5 +16,5 @@ class SlayerFovChangeConfig {
     @Expose
     @ConfigOption(name = "Target FOV", desc = "")
     @ConfigEditorSlider(minValue = 30f, maxValue = 110f, minStep = 1f)
-    var targetFov: Float = 75f
+    var targetFov: Int = 75
 }
