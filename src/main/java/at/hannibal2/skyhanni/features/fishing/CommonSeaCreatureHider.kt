@@ -26,7 +26,7 @@ object CommonSeaCreatureHider {
         val seaCreature = entity.mob?.seaCreature ?: return
 
         if (!seaCreature.seaCreature.rare) {
-            event.newTransparency = config.transparency;
+            event.newTransparency = config.transparency
         }
     }
 
