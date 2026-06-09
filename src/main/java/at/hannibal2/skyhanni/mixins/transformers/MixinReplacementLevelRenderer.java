@@ -95,9 +95,7 @@ public abstract class MixinReplacementLevelRenderer {
             //? if >= 26.2
             submitNodeStorage,
             //? if < 26.2
-            /*
-            renderBuffers.bufferSource(),
-            */
+            //renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
             true
         );
