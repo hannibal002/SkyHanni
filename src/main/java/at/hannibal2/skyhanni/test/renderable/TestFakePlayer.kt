@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -57,7 +58,7 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
 
     private fun createRandomArmorPiece(armorPieces: Collection<Item>): SafeItemStack =
         SafeItemStack(armorPieces.random()).also {
-            if (Random.nextBoolean()) it.enchant(EnchantmentsCompat.PROTECTION.enchantment, 1)
+            if (Random.nextBoolean()) it.addEnchantGlint()
         }
 
     private fun createFakePlayer(): FakePlayer {
