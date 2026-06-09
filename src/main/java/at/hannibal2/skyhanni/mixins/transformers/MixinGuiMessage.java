@@ -47,6 +47,8 @@ public abstract class MixinGuiMessage implements GuiMessageData {
         CallbackInfo ci
     ) {
         Component component = GuiChatHook.getCurrentComponent();
+        // Clear current component for compatibility with mods that inject messages into the chat
+        // history, such as Chat Patches' persistent history feature
         GuiChatHook.setCurrentComponent(null);
         skyhanni$fullComponent = component == null ? content : component;
     }
