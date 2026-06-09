@@ -11,17 +11,21 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
-//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
-import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
+import net.minecraft.client.gui.Hud;
+//~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
+import net.minecraft.client.gui.contextualbar.ContextualBar;
 
 //? if >= 26.1
 import net.minecraft.client.gui.components.ChatComponent;
@@ -63,11 +67,17 @@ public abstract class MixinGui {
             target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V"
         )
     )
-    public void renderPlayerList(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
+    public void renderPlayerList(
+        PlayerTabOverlay tabList,
+        GuiGraphicsExtractor graphics,
+        int screenWidth,
+        Scoreboard scoreboard,
+        Objective displayObjective,
+        Operation<Void> original
+    ) {
         if (RenderEvents.postTablistLayerEventPre(graphics)) return;
-        original.call(graphics, deltaTracker);
+        original.call(tabList, graphics, screenWidth, scoreboard, displayObjective);
     }
-
 
     @WrapOperation(
         //~ if < 26.1 'extract' -> 'render'
@@ -78,9 +88,15 @@ public abstract class MixinGui {
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
         )
     )
-    public void renderExperienceBar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
+    public void renderExperienceBar(
+        //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
+        ContextualBar contextualBar,
+        GuiGraphicsExtractor graphics,
+        DeltaTracker deltaTracker,
+        Operation<Void> original
+    ) {
         if (RenderEvents.postExperienceBarLayerEventPre(graphics)) return;
-        original.call(graphics, deltaTracker);
+        original.call(contextualBar, graphics, deltaTracker);
         RenderEvents.postExperienceBarLayerEventPost(graphics);
     }
 
@@ -90,11 +106,18 @@ public abstract class MixinGui {
         at = @At(
             value = "INVOKE",
             //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-            //~ if < 26.1 'extractBackground' -> 'renderBackground'
-            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
-    public void renderExperienceLevel(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
+            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel'
+            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
+        )
+    )
+    public void renderExperienceLevel(
+        GuiGraphicsExtractor graphics,
+        Font font,
+        int experienceLevel,
+        Operation<Void> original
+    ) {
         if (RenderEvents.postExperienceNumberLayerEventPre(graphics)) return;
-        original.call(graphics, deltaTracker);
+        original.call(graphics, font, experienceLevel);
         RenderEvents.postExperienceNumberLayerEventPost(graphics);
     }
 
