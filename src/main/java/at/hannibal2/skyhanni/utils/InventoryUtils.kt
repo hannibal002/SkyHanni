@@ -66,7 +66,7 @@ object InventoryUtils {
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
-        val guiChest = Minecraft.getInstance().gui.screen() as? ContainerScreen ?: return emptyList()
+        val guiChest = MinecraftCompat.screen as? ContainerScreen ?: return emptyList()
         return guiChest.slots()
             .filter { it.container !is Inventory }
     }
@@ -77,20 +77,20 @@ object InventoryUtils {
 
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return emptyList()
+        val guiInventory = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
             .filter { it.container is Inventory && it.item.isNotEmpty() }
     }
 
     fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
-    fun inInventory() = Minecraft.getInstance().gui.screen() is ContainerScreen
+    fun inInventory() = MinecraftCompat.screen is ContainerScreen
 
-    fun inOwnInventory() = Minecraft.getInstance().gui.screen() is InventoryScreen
+    fun inOwnInventory() = MinecraftCompat.screen is InventoryScreen
 
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
-    fun inContainer() = Minecraft.getInstance().gui.screen() is SkyHanniGuiContainer
+    fun inContainer() = MinecraftCompat.screen is SkyHanniGuiContainer
 
     fun getItemsInOwnInventory(): List<SafeItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
@@ -184,7 +184,7 @@ object InventoryUtils {
     fun Container.isTopInventory() = this is SimpleContainer
 
     fun closeInventory() {
-        Minecraft.getInstance().gui.setScreen(null)
+        MinecraftCompat.screen = null
     }
 
     fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }

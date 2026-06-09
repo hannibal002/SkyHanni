@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -302,14 +303,14 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getInstance().gui.screen().takeIf { it != null } ?: return false
+            val guiScreen = MinecraftCompat.screen.takeIf { it != null } ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = Minecraft.getInstance().gui.screen() !is PauseScreen
+            val inMenu = MinecraftCompat.screen !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null

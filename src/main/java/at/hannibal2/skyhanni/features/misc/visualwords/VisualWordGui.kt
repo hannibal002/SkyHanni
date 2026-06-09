@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -86,7 +87,7 @@ object VisualWordGui {
     private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
     private val downItemDimmed by lazy { Renderable.item(downSkull, dimmedConfig) }
 
-    fun isInGui(): Boolean = Minecraft.getInstance().gui.screen() is VisualWordScreen
+    fun isInGui(): Boolean = MinecraftCompat.screen is VisualWordScreen
 
     fun onCommand() {
         if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {

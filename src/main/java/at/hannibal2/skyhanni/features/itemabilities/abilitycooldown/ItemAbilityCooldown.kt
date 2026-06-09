@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapKeysNotNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import kotlin.math.max
@@ -370,7 +371,7 @@ object ItemAbilityCooldown {
 
         val stack = event.stack
 
-        val guiOpen = Minecraft.getInstance().gui.screen() != null
+        val guiOpen = MinecraftCompat.screen != null
         val uuid = stack.getIdentifier() ?: return
         val list = items[uuid] ?: return
 
@@ -391,7 +392,7 @@ object ItemAbilityCooldown {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
 
-        val guiOpen = Minecraft.getInstance().gui.screen() != null
+        val guiOpen = MinecraftCompat.screen != null
         val stack = event.stack
 
         val uuid = stack?.getIdentifier() ?: return

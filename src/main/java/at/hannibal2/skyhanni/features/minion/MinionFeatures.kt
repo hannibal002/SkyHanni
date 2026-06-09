@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -294,7 +295,7 @@ object MinionFeatures {
     fun onTick() {
         if (display != null) return
 
-        if (Minecraft.getInstance().gui.screen() is ContainerScreen && config.hopperProfitDisplay) {
+        if (MinecraftCompat.screen is ContainerScreen && config.hopperProfitDisplay) {
             display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }

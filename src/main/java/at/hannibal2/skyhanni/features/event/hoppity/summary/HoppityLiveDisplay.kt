@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
@@ -132,7 +133,7 @@ object HoppityLiveDisplay {
         if (!config.enabled) return
         if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getInstance().gui.screen() != null && !CFApi.inChocolateFactory) return
+        if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -182,7 +183,7 @@ object HoppityLiveDisplay {
 
     private fun inMatchingInventory(): Boolean {
         val setting = config.specificInventories
-        val currentScreen = Minecraft.getInstance().gui.screen()
+        val currentScreen = MinecraftCompat.screen
             ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
         // Get the inventory name and check if it matches any of the specific inventories
@@ -202,7 +203,7 @@ object HoppityLiveDisplay {
     }
 
     private fun isInInventory(): Boolean =
-        Minecraft.getInstance().gui.screen() is InventoryScreen || Minecraft.getInstance().gui.screen() is ContainerScreen
+        MinecraftCompat.screen is InventoryScreen || MinecraftCompat.screen is ContainerScreen
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCountsWithInfPossible(statYear).takeIfNotEmpty() ?: return@buildList

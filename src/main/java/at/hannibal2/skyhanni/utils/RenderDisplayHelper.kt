@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 
@@ -51,7 +52,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
+            val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.renderIn(isInOwnInventory)) {
                     if (display.outsideInventory && isInOwnInventory) {
@@ -67,7 +68,7 @@ class RenderDisplayHelper(
 
         @HandleEvent
         fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
+            val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
             for (display in currentlyVisibleDisplays) {
                 if (display.outsideInventory && !display.renderIn(isInOwnInventory)) {
                     display.render()

@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -190,7 +191,7 @@ object CityProjectFeatures {
     private fun materialLink(name: String, amount: Int): Renderable = Renderable.optionalLink(
         "$name §ex${amount.addSeparators()}",
         {
-            if (Minecraft.getInstance().gui.screen() is SignEditScreen) {
+            if (MinecraftCompat.screen is SignEditScreen) {
                 SignUtils.setTextIntoSign("$amount")
             } else {
                 BazaarApi.searchForBazaarItemOrRecipe(name, amount)

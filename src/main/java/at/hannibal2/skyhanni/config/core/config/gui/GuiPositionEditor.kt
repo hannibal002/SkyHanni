@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
@@ -274,7 +275,7 @@ class GuiPositionEditor(
         if (oldScreen == null) {
             super.onClose()
         } else {
-            Minecraft.getInstance().gui.setScreen(oldScreen)
+            MinecraftCompat.screen = oldScreen
         }
     }
 }

@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -110,7 +111,7 @@ object IslandAreaFeatures {
     fun onGuiRenderOverlay() {
         if (!isAreaListEnabled()) return
         if (!areaListConfig.showAlways) return
-        val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
+        val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
         if (!isInOwnInventory) {
             doRender()
         }
@@ -119,7 +120,7 @@ object IslandAreaFeatures {
     @HandleEvent
     fun onChestGuiRender() {
         if (!isAreaListEnabled()) return
-        val isInOwnInventory = Minecraft.getInstance().gui.screen() is InventoryScreen
+        val isInOwnInventory = MinecraftCompat.screen is InventoryScreen
         if (isInOwnInventory) {
             doRender()
         }

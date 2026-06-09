@@ -99,7 +99,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
-        Minecraft.getInstance().gui.setScreen(screenToOpen)
+        MinecraftCompat.screen = screenToOpen
         screenTicks = 0
         this.screenToOpen = null
     }

@@ -3,6 +3,7 @@
 /*package at.hannibal2.skyhanni.compat
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import me.shedaniel.math.impl.PointHelper
 import me.shedaniel.rei.api.client.REIRuntime
@@ -20,7 +21,7 @@ object ReiCompat {
     @JvmStatic
     fun searchHasFocus(): Boolean {
         if (!isReiLoaded) return false
-        if (Minecraft.getInstance().gui.screen() == null) return false
+        if (MinecraftCompat.screen == null) return false
         return try {
             (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
@@ -37,7 +38,7 @@ object ReiCompat {
         }
         var stack = getItemStackFromItemList()
         if (stack == null) {
-            val screen = Minecraft.getInstance().gui.screen()
+            val screen = MinecraftCompat.screen
             if (screen !is AbstractContainerScreen<*>) return null
             stack = getItemStackFromRecipe(screen)
         }

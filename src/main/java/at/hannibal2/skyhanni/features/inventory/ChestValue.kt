@@ -75,7 +75,7 @@ object ChestValue {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        val inInv = Minecraft.getInstance().gui.screen() is InventoryScreen
+        val inInv = MinecraftCompat.screen is InventoryScreen
         inOwnInventory = inInv && config.enableInOwnInventory
         if (!inInventory) return
         update()
@@ -232,7 +232,7 @@ object ChestValue {
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
-        if (Minecraft.getInstance().gui.screen() !is ContainerScreen) return false
+        if (MinecraftCompat.screen !is ContainerScreen) return false
         if (BazaarApi.inBazaarInventory) return false
         if (MinionFeatures.minionInventoryOpen) return false
         if (MinionFeatures.minionStorageInventoryOpen) return false

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
@@ -41,6 +42,15 @@ object MinecraftCompat {
     @JvmStatic
     var serverTime: Long = 0L
         private set
+
+    @JvmStatic
+    var screen: Screen?
+        //~ if < 26.2 'gui.screen()' -> 'screen'
+        get() = Minecraft.getInstance().gui.screen()
+        set(value) {
+            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
+            Minecraft.getInstance().gui.setScreen(value)
+        }
 
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {

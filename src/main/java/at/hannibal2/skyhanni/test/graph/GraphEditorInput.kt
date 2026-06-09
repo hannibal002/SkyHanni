@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -162,7 +163,7 @@ object GraphEditorInput {
     }
 
     private fun handleUndoRedo(): Boolean {
-        if (Minecraft.getInstance().gui.screen() == null) {
+        if (MinecraftCompat.screen == null) {
             if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
@@ -323,7 +324,7 @@ object GraphEditorInput {
     }
 
     private fun isAnyGuiActive(): Boolean {
-        val gui = Minecraft.getInstance().gui.screen() != null
+        val gui = MinecraftCompat.screen != null
         if (gui) {
             lastGuiTime = 3.ticks.fromNow()
         }

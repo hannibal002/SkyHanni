@@ -18,7 +18,7 @@ object ChatPeek {
 
         if (!MinecraftCompat.localPlayerExists) return false
         if (key <= GLFW.GLFW_KEY_UNKNOWN) return false
-        if (Minecraft.getInstance().gui.screen() is SignEditScreen) return false
+        if (MinecraftCompat.screen is SignEditScreen) return false
         if (ConfigUtils.configScreenCurrentlyOpen) return false
 
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return false

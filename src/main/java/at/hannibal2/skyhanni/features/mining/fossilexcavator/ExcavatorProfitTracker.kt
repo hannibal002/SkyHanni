@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -202,7 +203,7 @@ object ExcavatorProfitTracker {
     private fun shouldShowDisplay(): Boolean {
         if (!config.enabled) return false
         if (!isEnabled()) return false
-        if (Minecraft.getInstance().gui.screen() !is ContainerScreen) return true
+        if (MinecraftCompat.screen !is ContainerScreen) return true
         // Only show in excavation menu
         return FossilExcavatorApi.inExcavatorMenu
     }

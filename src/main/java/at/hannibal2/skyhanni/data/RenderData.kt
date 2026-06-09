@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
@@ -19,7 +20,7 @@ object RenderData {
     fun postRenderOverlay(context: GuiGraphicsExtractor) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val screen = Minecraft.getInstance().gui.screen()
+        val screen = MinecraftCompat.screen
 
         DrawContextUtils.setContext(context)
         renderOverlay(DrawContextUtils.drawContext, screen != null && screen !is ChatScreen)
@@ -30,7 +31,7 @@ object RenderData {
     fun onBackgroundDraw(event: DrawBackgroundEvent) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
-        val currentScreen = Minecraft.getInstance().gui.screen() ?: return
+        val currentScreen = MinecraftCompat.screen ?: return
         if (currentScreen !is InventoryScreen && currentScreen !is ContainerScreen) return
 
         DrawContextUtils.pushPop {

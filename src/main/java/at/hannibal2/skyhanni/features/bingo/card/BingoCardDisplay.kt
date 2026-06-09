@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -127,7 +128,7 @@ object BingoCardDisplay {
             }
         }
         if (!config.stepHelper && displayMode == 1) displayMode = 2
-        if (displayMode == 0 && Minecraft.getInstance().gui.screen() !is ChatScreen) {
+        if (displayMode == 0 && MinecraftCompat.screen !is ChatScreen) {
             config.bingoCardPos.renderRenderables(displayCache, posLabel = "Bingo Card")
         } else if (displayMode == 1) {
             val helpRenderable = Renderable.vertical(

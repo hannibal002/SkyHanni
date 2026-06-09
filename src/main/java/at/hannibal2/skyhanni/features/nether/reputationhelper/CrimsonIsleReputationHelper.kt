@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -136,7 +137,7 @@ object CrimsonIsleReputationHelper {
     }
 
     fun isHotkeyHeld(): Boolean {
-        val isAllowedGui = Minecraft.getInstance().gui.screen().let {
+        val isAllowedGui = MinecraftCompat.screen.let {
             it == null || it is InventoryScreen
         }
         if (!isAllowedGui) return false

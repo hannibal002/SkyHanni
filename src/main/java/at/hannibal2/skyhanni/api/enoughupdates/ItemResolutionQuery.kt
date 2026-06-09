@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
@@ -191,7 +192,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = Minecraft.getInstance().gui.screen()
+        this.guiContext = MinecraftCompat.screen
         return this
     }
 

@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -127,7 +128,7 @@ open class TitleContext(
     }
 
     fun tryRenderInventoryTitle() {
-        val gui = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return
+        val gui = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return
 
         val stringRenderable = with(Renderable) {
             vertical(horizontalAlign = RenderUtils.HorizontalAlignment.CENTER) {

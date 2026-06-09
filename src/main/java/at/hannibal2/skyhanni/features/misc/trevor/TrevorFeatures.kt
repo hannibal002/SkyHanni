@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -312,7 +313,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().gui.screen() != null) return
+        if (MinecraftCompat.screen != null) return
 
         if (event.keyCode != config.keyBind) return
 

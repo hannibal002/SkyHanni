@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -144,7 +145,7 @@ object CFCustomReminder {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
-        if (Minecraft.getInstance().gui.screen() is ContainerScreen) return
+        if (MinecraftCompat.screen is ContainerScreen) return
         if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")

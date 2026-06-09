@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent;
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
@@ -23,6 +24,6 @@ public class MixinScreen {
     )
     private void wrapExtractBackground(Screen instance, GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, Operation<Void> original) {
         original.call(instance, context, mouseX, mouseY, deltaTicks);
-        new ScreenDrawnEvent(context, Minecraft.getInstance().gui.screen()).post();
+        new ScreenDrawnEvent(context, MinecraftCompat.getScreen()).post();
     }
 }

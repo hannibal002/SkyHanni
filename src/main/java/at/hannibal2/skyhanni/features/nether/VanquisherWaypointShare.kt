@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -148,7 +149,7 @@ object VanquisherWaypointShare {
     @HandleEvent
     fun onKeyPressEvent(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().gui.screen() != null) return
+        if (MinecraftCompat.screen != null) return
         if (event.keyCode == config.keybindSharing) sendSpawn()
     }
 

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import net.minecraft.client.Minecraft
 
@@ -23,7 +24,7 @@ object HideonleafFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().gui.screen() != null) return
+        if (MinecraftCompat.screen != null) return
         if (event.keyCode != config.nextHideonleafKeybind) return
         if (!config.hideonleafFinder) return
         if (navigating) return

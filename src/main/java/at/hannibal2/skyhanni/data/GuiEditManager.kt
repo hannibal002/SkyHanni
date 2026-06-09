@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
@@ -43,7 +44,7 @@ object GuiEditManager {
         }
         if (isInGui()) return
 
-        val guiScreen = Minecraft.getInstance().gui.screen()
+        val guiScreen = MinecraftCompat.screen
         val openGui = guiScreen?.javaClass?.name ?: "none"
         val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
         if (isInNeuPv) return
@@ -83,7 +84,7 @@ object GuiEditManager {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values.toList(),
             2,
-            Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer,
+            MinecraftCompat.screen as? SkyHanniGuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
@@ -113,7 +114,7 @@ object GuiEditManager {
         DrawContextUtils.clearContext()
     }
 
-    fun isInGui() = Minecraft.getInstance().gui.screen() is GuiPositionEditor
+    fun isInGui() = MinecraftCompat.screen is GuiPositionEditor
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)

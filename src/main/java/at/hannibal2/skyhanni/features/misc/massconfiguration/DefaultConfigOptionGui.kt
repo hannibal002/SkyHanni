@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
@@ -98,7 +99,7 @@ class DefaultConfigOptionGui(
             }
             button("Apply choices", listOf()) {
                 DefaultConfigFeatures.applyCategorySelections(resetSuggestionState, orderedOptions)
-                mc.gui.setScreen(null)
+                MinecraftCompat.screen = null
             }
             button("Turn all on", listOf()) {
                 for (entry in resetSuggestionState.entries) {
@@ -125,7 +126,7 @@ class DefaultConfigOptionGui(
                 }
             }
             button("Cancel", listOf()) {
-                mc.gui.setScreen(null)
+                MinecraftCompat.screen = null
             }
         }
 

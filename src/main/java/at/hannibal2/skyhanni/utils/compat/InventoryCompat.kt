@@ -24,7 +24,7 @@ fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
 }
 
 fun stackUnderCursor(): SafeItemStack? {
-    val screen = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return null
+    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
@@ -34,7 +34,7 @@ fun stackUnderCursor(): SafeItemStack? {
 }
 
 fun slotUnderCursor(): Slot? {
-    val screen = Minecraft.getInstance().gui.screen() as? SkyHanniGuiContainer ?: return null
+    val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
     return screen.hoveredSlot
 }
 
@@ -58,7 +58,7 @@ object InventoryCompat {
      */
     internal fun mouseClickInventorySlot(slot: Int, mouseButton: Int, mode: ContainerInput) {
         if (slot < 0) return
-        val gui = Minecraft.getInstance().gui.screen()
+        val gui = MinecraftCompat.screen
         if (gui is AbstractContainerScreen<*>) {
             val slotObj = gui.menu.getSlot(slot)
             gui.slotClicked(slotObj, slot, mouseButton, mode)
@@ -69,7 +69,7 @@ object InventoryCompat {
         container.menu.slots
 
     fun getWindowIdOrNull(): Int? =
-        (Minecraft.getInstance().gui.screen() as? ContainerScreen)?.menu?.containerId
+        (MinecraftCompat.screen as? ContainerScreen)?.menu?.containerId
 
     fun getWindowId(): Int =
         getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")

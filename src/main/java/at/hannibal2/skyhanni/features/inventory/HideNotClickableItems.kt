@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
@@ -141,7 +142,7 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getInstance().gui.screen()
+        val guiChest = MinecraftCompat.screen
         if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 

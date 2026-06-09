@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
@@ -119,7 +120,7 @@ object GardenApi {
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getInstance().gui.screen() ?: return
+            MinecraftCompat.screen ?: return
             checkItemInHand()
         }
     }

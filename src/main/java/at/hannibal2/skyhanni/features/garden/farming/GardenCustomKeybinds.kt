@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
@@ -77,7 +78,7 @@ object GardenCustomKeybinds {
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        val screen = Minecraft.getInstance().gui.screen() ?: return
+        val screen = MinecraftCompat.screen ?: return
         if (screen !is SignEditScreen) return
         lastWindowOpenTime = SimpleTimeMark.now()
     }
@@ -186,7 +187,7 @@ object GardenCustomKeybinds {
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
-    private fun hasGuiOpen() = Minecraft.getInstance().gui.screen() != null
+    private fun hasGuiOpen() = MinecraftCompat.screen != null
 
     @JvmStatic
     fun disableAll() {

@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSingleString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.table.TableRenderable.Companion.table
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -282,7 +283,7 @@ object TrophyFishDisplay {
 
     private fun canRender(): Boolean = when (config.whenToShow.get()!!) {
         WhenToShow.ALWAYS -> true
-        WhenToShow.ONLY_IN_INVENTORY -> Minecraft.getInstance().gui.screen() is InventoryScreen
+        WhenToShow.ONLY_IN_INVENTORY -> MinecraftCompat.screen is InventoryScreen
         WhenToShow.ONLY_WITH_ROD_IN_HAND -> FishingApi.holdingLavaRod
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }

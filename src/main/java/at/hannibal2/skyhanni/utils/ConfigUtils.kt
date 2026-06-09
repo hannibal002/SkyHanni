@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
@@ -70,7 +71,7 @@ object ConfigUtils {
     }
 
     val configScreenCurrentlyOpen: Boolean
-        get() = Minecraft.getInstance().gui.screen() is MoulConfigScreenComponent
+        get() = MinecraftCompat.screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
 }
