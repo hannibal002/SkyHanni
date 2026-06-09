@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
+import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
-import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -30,7 +30,11 @@ import net.minecraft.client.gui.components.ChatComponent;
 @Mixin(Hud.class)
 public abstract class MixinGui {
 
-    @Inject(method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V", at = @At("HEAD"), cancellable = true)
+    @Inject(
+        method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V",
+        at = @At("HEAD"),
+        cancellable = true
+    )
     public void renderScoreboard(GuiGraphicsExtractor graphics, Objective objective, CallbackInfo ci) {
         if (CustomScoreboard.isHideVanillaScoreboardEnabled()) {
             ci.cancel();
@@ -51,57 +55,86 @@ public abstract class MixinGui {
     }
     //~}
 
-    //~ if < 26.1 'extractTabList' -> 'renderTabList'
-    @WrapOperation(method = "extractTabList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V"))
+    @WrapOperation(
+        //~ if < 26.1 'extractTabList' -> 'renderTabList'
+        method = "extractTabList",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V"
+        )
+    )
     public void renderPlayerList(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
         if (RenderEvents.postTablistLayerEventPre(graphics)) return;
         original.call(graphics, deltaTracker);
     }
 
-    //? if >= 26.2 {
-    @WrapOperation(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    //?} else if >= 26.1 {
-    /*@WrapOperation(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    *///?} else {
-    //@WrapOperation(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    //?}
+
+    @WrapOperation(
+        //~ if < 26.1 'extract' -> 'render'
+        method = "extractHotbarAndDecorations",
+        at = @At(value = "INVOKE",
+            //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
+            //~ if < 26.1 'extractBackground' -> 'renderBackground'
+            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+        )
+    )
     public void renderExperienceBar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
         if (RenderEvents.postExperienceBarLayerEventPre(graphics)) return;
         original.call(graphics, deltaTracker);
         RenderEvents.postExperienceBarLayerEventPost(graphics);
     }
 
-    //? if >= 26.2 {
-    @WrapOperation(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
-    //?} else if >= 26.1 {
-    /*@WrapOperation(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
-    *///?} else {
-    //@WrapOperation(method = "renderHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
-    //?}
+    @WrapOperation(
+        //~ if < 26.1 'extract' -> 'render'
+        method = "extractHotbarAndDecorations",
+        at = @At(
+            value = "INVOKE",
+            //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
+            //~ if < 26.1 'extractBackground' -> 'renderBackground'
+            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"))
     public void renderExperienceLevel(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, Operation<Void> original) {
         if (RenderEvents.postExperienceNumberLayerEventPre(graphics)) return;
         original.call(graphics, deltaTracker);
         RenderEvents.postExperienceNumberLayerEventPost(graphics);
     }
 
-    @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
-    private void renderItemOverlayPost(GuiGraphicsExtractor graphics, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
-        GuiIngameHook.drawString(textRenderer, graphics, text, x, y, color, bl);
+    @WrapOperation(
+        method = "displayScoreboardSidebar",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
+        )
+    )
+    private void renderItemOverlayPost(
+        GuiGraphicsExtractor graphics,
+        Font font,
+        Component str,
+        int x,
+        int y,
+        int color,
+        boolean dropShadow,
+        Operation<Void> original
+    ) {
+        Component modifiedStr = ScoreboardData.tryToReplaceScoreboardLine(str);
+        original.call(graphics, font, modifiedStr, x, y, color, dropShadow);
     }
 
-    //? if >= 26.1 {
-    @ModifyArg(method = "extractChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"), index = 5)
+    @ModifyArg(
+        //~ if < 26.1 'extractChat' -> 'renderChat'
+        method = "extractChat",
+        at = @At(
+            value = "INVOKE",
+            //~ if < 26.1 'IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;' -> 'IIIZ'
+            target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"
+        ),
+        index = 5
+    )
+    //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
     private ChatComponent.DisplayMode modifyRenderText(ChatComponent.DisplayMode mode) {
+        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
         return mode;
     }
-    //?} else {
-    /*@ModifyArg(method = "renderChat", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"), index = 5)
-    private boolean modifyRenderText(boolean isChatting) {
-        if (ChatPeek.peek()) return true;
-        return isChatting;
-    }
-    *///?}
 
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
