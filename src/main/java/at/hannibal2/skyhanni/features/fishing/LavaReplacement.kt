@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
@@ -23,10 +24,8 @@ object LavaReplacement {
         private set
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) {
-            update()
-        }
+    fun onIslandJoin() {
+        update()
     }
 
     @HandleEvent
@@ -40,7 +39,7 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        Minecraft.getInstance().levelRenderer.allChanged()
+        DelayedRun.runOrNextTick { Minecraft.getInstance().levelRenderer.allChanged() }
     }
 
     private fun shouldReplace(): Boolean {
