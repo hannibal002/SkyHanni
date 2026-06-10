@@ -126,7 +126,7 @@ object HarvestFeastManager {
         // TODO: Add more debug
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         if (displayDirty) updateDisplay()
         fetch()
@@ -368,7 +368,7 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return
