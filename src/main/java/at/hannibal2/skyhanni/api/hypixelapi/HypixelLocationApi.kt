@@ -144,7 +144,6 @@ object HypixelLocationApi {
     }
 
     private fun changeIsland() {
-        if (internalIsland == island) return
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")

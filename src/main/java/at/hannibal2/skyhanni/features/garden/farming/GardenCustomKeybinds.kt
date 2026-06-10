@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -174,6 +175,7 @@ object GardenCustomKeybinds {
 
         return internalName.isFarmingTool() ||
             (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+            (config.vacuum && PestApi.hasVacuumInHand()) ||
             (config.fishingRod && internalName.isFishingRod()) ||
             (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
     } ?: false
