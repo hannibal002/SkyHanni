@@ -44,7 +44,7 @@ object WikiNpcParser {
             val mappedIsland = sectionToIsland[trimmed]
                 ?: if (trimmed.contains("⏣ Dwarven Mines") ||
                     trimmed.contains("\u23E3 Dwarven Mines")
-                    ) IslandType.DWARVEN_MINES else null
+                ) IslandType.DWARVEN_MINES else null
 
             if (mappedIsland != null) {
                 currentIsland = mappedIsland

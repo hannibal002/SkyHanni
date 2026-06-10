@@ -563,7 +563,7 @@ object SkyHanniDebugsAndTests {
         val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
         val skullOwner = stack.getSkullOwner() ?: "unknown"
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
-        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
+        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"$skullOwner:$skullTexture\"]},"
 
         OSUtils.copyToClipboard(formatted)
         ChatUtils.chat("§eCopied cosmetic data to the clipboard!")
