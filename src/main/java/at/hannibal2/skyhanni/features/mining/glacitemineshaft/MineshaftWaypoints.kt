@@ -7,16 +7,20 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.core.Direction
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
+import net.minecraft.world.entity.Relative
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 // TODO rename to something else to reduce confusion
 @SkyHanniModule
@@ -27,6 +31,7 @@ object MineshaftWaypoints {
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
+    private var timeEnteredMinecraft = SimpleTimeMark.farPast()
 
     @HandleEvent
     fun onWorldChange() {
@@ -37,22 +42,34 @@ object MineshaftWaypoints {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        val playerLocation = LocationUtils.getBlockBelowPlayer()
+        timeEnteredMinecraft = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onPacketReceived(event: PacketReceivedEvent) {
+        if (timeEnteredMinecraft.passedSince() >= 1.seconds) return
+        if (event.packet !is ClientboundPlayerPositionPacket) return
+        if (event.packet.relatives.contains(Relative.Y_ROT)) return
+
+        waypoints.clear()
+
+        val location = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
+        val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
 
         if (config.mineshaftWaypoints.entranceLocation) {
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = location))
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.direction.unitVec3i
-            val location = playerLocation
+            val ladderLocation = location
                 // Move 7 blocks in front of the player to be in the ladder shaft
-                .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
+                .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)
                 // Adjust 2 blocks to the right to be in the center of the ladder shaft
-                .add(x = vec.z * -2, z = vec.x * 2)
+                .add(x = direction.z * -2, z = direction.x * 2)
                 // Move 15 blocks down to be at the bottom of the ladder shaft
                 .add(y = -15)
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = location))
+
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
         }
     }
 
