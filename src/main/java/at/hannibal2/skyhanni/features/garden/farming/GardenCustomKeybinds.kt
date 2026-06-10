@@ -133,7 +133,7 @@ object GardenCustomKeybinds {
     }
 
     private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+        this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
         key.value != override
@@ -158,7 +158,7 @@ object GardenCustomKeybinds {
         if (pressedToggleKeys[this] == override) return false
 
         pressedToggleKeys[this] = override
-        setDown(true)
+        isDown = true
         return true
     }
 

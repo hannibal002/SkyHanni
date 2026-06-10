@@ -41,7 +41,7 @@ object CompactSplashPotionMessage {
                 message,
                 listOf("§eClick to view your potion effects."),
                 "/effects",
-                prefix = false
+                prefix = false,
             )
         } else {
             ChatUtils.chat(message, prefix = false)

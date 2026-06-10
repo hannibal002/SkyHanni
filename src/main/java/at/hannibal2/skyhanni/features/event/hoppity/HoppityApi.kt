@@ -293,7 +293,10 @@ object HoppityApi {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
 
-        if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(SIDE_DISH, event.slotId).post()
+        if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(
+            SIDE_DISH,
+            event.slotId,
+        ).post()
 
         milestoneNamePattern.matchMatcher(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val lore = slot.item.getLore()

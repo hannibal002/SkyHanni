@@ -279,7 +279,8 @@ object HoppityCollectionStats {
         this.getLore().any { milestoneRabbitLorePattern.matches(it) }
 
     private fun missingRabbitStackNeedsFix(stack: SafeItemStack): Boolean =
-        stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
+        stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            .isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
 
     private val replacementCache: MutableMap<String, SafeItemStack> = mutableMapOf()
 
@@ -453,7 +454,10 @@ object HoppityCollectionStats {
 
         if (highlightMap.containsKey(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
 
-        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAbi" && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.ABI)) {
+        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAbi" && collectionConfig.highlightRabbits.contains(
+                HighlightRabbitTypes.ABI,
+            )
+        ) {
             highlightMap[stack.hoverName.formattedTextCompatLeadingWhiteLessResets()] = HighlightRabbitTypes.ABI.color
             return
         }
