@@ -126,8 +126,8 @@ tasks.named<JavaExec>("runClient") {
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as? String ?: ""
-    this.prBody = project.findProperty("prBody") as? String ?: ""
+    this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
+    this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
 }
 
 dependencies {
