@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Hud;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
@@ -20,10 +22,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
 import java.util.ListIterator;
 
 //? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 //?} else {
 /*import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
@@ -42,8 +44,13 @@ public abstract class MixinChatComponent {
     @Final
     private Minecraft minecraft;
 
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;getGuiTicks()I"), require = 0)
-    private int clearChatHead(Gui instance) {
+    @WrapOperation(
+        method = "deleteMessageOrDelay",
+        //~ if < 26.2 'net/minecraft/client/gui/Hud' -> 'net/minecraft/client/gui/Gui'
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"),
+        require = 0
+    )
+    private int clearChatHead(Hud instance, Operation<Integer> original) {
         return instance.getGuiTicks() + 90;
     }
 

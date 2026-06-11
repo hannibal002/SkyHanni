@@ -12,13 +12,14 @@ public abstract class MixinClientIntentionPacket {
 
     @ModifyVariable(
         method = "<init>(ILjava/lang/String;ILnet/minecraft/network/protocol/handshake/ClientIntent;)V",
-        index = 1,
         at = @At("HEAD"),
-        argsOnly = true
+        argsOnly = true,
+        name = "protocolVersion"
     )
-    private static int modifyProtocolVersion(int original) {
-        if (!PlatformUtils.isDevEnvironment) return original;
-        if (!System.hasProperty("skyhanni.snapshotProtocolDebug")) return original;
+    private static int modifyProtocolVersion(int protocolVersion) {
+        if (!PlatformUtils.isDevEnvironment()) return protocolVersion;
+        if (!Boolean.parseBoolean(System.getProperty("skyhanni.snapshotProtocolDebug"))) return protocolVersion;
+        //noinspection deprecation
         return SharedConstants.RELEASE_NETWORK_PROTOCOL_VERSION;
     }
 }
