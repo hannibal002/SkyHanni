@@ -120,14 +120,11 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
+val skyHanniSystemProperties = providers.systemPropertiesPrefixedBy("skyhanni.")
+
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    systemProperties(
-        System.getProperties()
-            .stringPropertyNames()
-            .filter { it.startsWith("skyhanni.") }
-            .associateWith { System.getProperty(it) },
-    )
+    systemProperties(skyHanniSystemProperties.get())
 }
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
