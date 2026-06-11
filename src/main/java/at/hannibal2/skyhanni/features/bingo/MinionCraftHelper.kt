@@ -35,13 +35,13 @@ import com.google.gson.JsonObject
 object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
-
+    private val recipeGroup = RepoPattern.group("bingo.minion")
     /**
      * REGEX-TEST: Sheep Minion X
      * REGEX-TEST: Wheat Minion IV
      */
-    private val minionNamePattern by RepoPattern.pattern(
-        "bingo.minion.name",
+    private val minionNamePattern by recipeGroup.pattern(
+        "name",
         "(?<name>.*) Minion (?<number>.*)",
     )
 
@@ -49,8 +49,8 @@ object MinionCraftHelper {
      * REGEX-TEST: (1/3) Crafted Minions
      * REGEX-TEST: (2/3) Crafted Minions
      */
-    private val minionCraftNamePattern by RepoPattern.pattern(
-        "minion.collection.title",
+    private val minionCraftNamePattern by recipeGroup.pattern(
+        "collection.title",
         "\\(\\d+/\\d+\\) Crafted Minions",
     )
 
