@@ -18,7 +18,7 @@ public abstract class MixinClientIntentionPacket {
     )
     private static int modifyProtocolVersion(int protocolVersion) {
         if (!PlatformUtils.isDevEnvironment()) return protocolVersion;
-        if (!Boolean.parseBoolean(System.getProperty("skyhanni.snapshotProtocolDebug"))) return protocolVersion;
+        if (!Boolean.getBoolean("skyhanni.snapshotProtocolDebug")) return protocolVersion;
         //noinspection deprecation
         return SharedConstants.RELEASE_NETWORK_PROTOCOL_VERSION;
     }
