@@ -1,0 +1,52 @@
+name: "PR Changelog Verification"
+
+on:
+    pull_request:
+        types: [ opened, edited, ready_for_review ]
+
+permissions:
+    contents: read
+
+jobs:
+    verify-changelog:
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
+        runs-on: ubuntu-latest
+        concurrency:
+            group: verify-changelog-${{ github.event.pull_request.number }}
+            cancel-in-progress: true
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
+
+            -   name: Run ChangeLog verification w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                with:
+                    gradle-command: checkPrDescription
+            -   name: Run ChangeLog verification w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: checkPrDescription
