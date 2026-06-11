@@ -60,7 +60,7 @@ public abstract class MixinLevelExtractor {
 
     //? if < 26.1 {
     /*@Unique
-    PoseStack contextPoseStack;
+    PoseStack skyhanni$contextPoseStack;
     *///?}
 
     @Unique
@@ -90,8 +90,8 @@ public abstract class MixinLevelExtractor {
         boolean shouldRenderSky,
         CallbackInfo ci
     ) {
-        currentCameraState = cameraState;
-        currentDeltaTracker = deltaTracker;
+        skyhanni$currentCameraState = cameraState;
+        skyhanni$currentDeltaTracker = deltaTracker;
     }
 
     @WrapOperation(
@@ -118,21 +118,21 @@ public abstract class MixinLevelExtractor {
         original.call(instance, group, gpuSampler);
 
         //? if < 26.1
-        //if (contextPoseStack == null) return;
+        //if (skyhanni$contextPoseStack == null) return;
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             new PoseStack(),
-            currentCameraState,
+            skyhanni$currentCameraState,
             //? if >= 26.2 {
             submitNodeStorage,
             //?} else {
             //renderBuffers.bufferSource(),
             //?}
-            currentDeltaTracker.getGameTimeDeltaPartialTick(true),
+            skyhanni$currentDeltaTracker.getGameTimeDeltaPartialTick(true),
             true
         );
         event.post();
-         //? if < 26.1
-        //contextPoseStack = null;
+        //? if < 26.1
+        //skyhanni$contextPoseStack = null;
     }
 
     //? if < 26.1 {
@@ -140,8 +140,8 @@ public abstract class MixinLevelExtractor {
         method = "lambda$addMainPass$0",
         at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;")
     )
-    private PoseStack onCreatePoseStack(PoseStack poseStack) {
-        contextPoseStack = poseStack;
+    private void onCreatePoseStack(PoseStack poseStack) {
+        skyhanni$contextPoseStack = poseStack;
     }
     *///?}
 

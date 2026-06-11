@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 26.2 'net.minecraft.client.gui.Hud' -> 'net.minecraft.client.gui.Gui'
+//~ if < 26.2 'Hud' -> 'Gui'
 import net.minecraft.client.gui.Hud;
 //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
 import net.minecraft.client.gui.contextualbar.ContextualBar;
@@ -32,7 +32,7 @@ import net.minecraft.client.gui.components.ChatComponent;
 
 //~ if < 26.2 'Hud.class' -> 'Gui.class'
 @Mixin(Hud.class)
-public abstract class MixinGui {
+public abstract class MixinHud {
 
     @Inject(
         method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V",

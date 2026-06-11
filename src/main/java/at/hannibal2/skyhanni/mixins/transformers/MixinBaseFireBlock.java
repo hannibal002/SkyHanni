@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.BaseFireBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BaseFireBlock.class)
 public class MixinBaseFireBlock {
@@ -27,7 +28,8 @@ public class MixinBaseFireBlock {
         double z,
         double xOffset,
         double yOffset,
-        double zOffset
+        double zOffset,
+        CallbackInfo ci
     ) {
         if (ParticleHider.shouldHideFireParticles()) ci.cancel();
     }

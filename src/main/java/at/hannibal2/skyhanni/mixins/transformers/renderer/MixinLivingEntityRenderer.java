@@ -29,12 +29,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(LivingEntityRenderer.class)
-public abstract class MixinLivingEntitryRenderer<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
+public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>
     extends EntityRenderer<T, S>
     implements RenderLayerParent<S, M> {
 
-    protected MixinRendererLivingEntity(EntityRendererProvider.Context dontCare) {
-        super(dontCare);
+    protected MixinLivingEntityRenderer(EntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Shadow
