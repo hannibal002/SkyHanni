@@ -102,6 +102,12 @@ Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 2
 
 Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
+### Accessibility
+Minecraft's accessibility onboarding is disabled by default in SkyHanni's development environment
+because it's generally a nuisance. If you need it, append `-Dskyhanni.accessibilityOnboarding=true`
+to the run configuration's JVM arguments (or to the Gradle task invocation if you're not using
+IntelliJ).
+
 ## Pull Requests
 
 General infos about Pull Request can be found on

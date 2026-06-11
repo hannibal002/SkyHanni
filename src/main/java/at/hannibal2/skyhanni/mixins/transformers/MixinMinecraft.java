@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
+import at.hannibal2.skyhanni.utils.system.PlatformUtils;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
@@ -30,6 +32,15 @@ public abstract class MixinMinecraft {
     @Shadow
     @Nullable
     public MultiPlayerGameMode gameMode;
+
+    @ModifyExpressionValue(
+        method = "addInitialScreens*",
+        at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;onboardAccessibility:Z")
+    )
+    public boolean onboardAccessibility(boolean original) {
+        if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
+        return original;
+    }
 
     @Inject(
         at = @At("HEAD"),
