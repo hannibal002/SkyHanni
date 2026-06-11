@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -22,10 +21,10 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.world.entity.Relative
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 // TODO rename to something else to reduce confusion
 @SkyHanniModule
@@ -36,42 +35,39 @@ object MineshaftWaypoints {
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
-    private var timeEnteredMinecraft = SimpleTimeMark.farPast()
+    private var isWorldLoaded = false
 
     @HandleEvent
     fun onWorldChange() {
         waypoints.clear()
+        isWorldLoaded = false
     }
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        timeEnteredMinecraft = SimpleTimeMark.now()
-
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
         val direction = MinecraftCompat.localPlayer.direction.unitVec3i
-
-        ChatUtils.debug("Island change event fired, type is now mineshaft (${spawnLocation.toChatFormat()})")
 
         addEntranceWaypoints(spawnLocation, direction)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onPacketReceived(event: PacketReceivedEvent) {
-        if (timeEnteredMinecraft.passedSince() >= 1.seconds) return
-        if (event.packet !is ClientboundPlayerPositionPacket) return
-        if (event.packet.relatives.contains(Relative.Y_ROT)) return
+        if (isWorldLoaded) return
 
-        val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
-        val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
+        when (event.packet) {
+            is ClientboundLevelChunkWithLightPacket -> isWorldLoaded = true
+            is ClientboundPlayerPositionPacket -> {
+                if (event.packet.relatives.contains(Relative.Y_ROT)) return
 
-        ChatUtils.debug(
-            "Received player position packet ${timeEnteredMinecraft.passedSince()} after entering mineshaft" +
-                "(${spawnLocation.toChatFormat()})"
-        )
+                val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
+                val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
 
-        addEntranceWaypoints(spawnLocation, direction)
+                addEntranceWaypoints(spawnLocation, direction)
+            }
+        }
     }
 
     @HandleEvent
