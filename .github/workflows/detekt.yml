@@ -1,0 +1,75 @@
+name: Detekt
+
+on:
+    pull_request:
+        types: [opened, synchronize, reopened]
+        branches:
+            - "**"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    detekt:
+        name: Run detekt
+        runs-on: ubuntu-latest
+        concurrency:
+            group: detekt-${{ github.event.pull_request.number }}
+            cancel-in-progress: true
+        permissions:
+            contents: read
+        steps:
+            -   name: Checkout PR code
+                uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
+            -   name: Disable preprocessor
+                run: |
+                    mkdir -p .gradle
+                    echo skyhanni.multi-version=off > .gradle/private.properties
+            -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                id: run_detekt
+                if: github.repository == 'hannibal002/SkyHanni'
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                continue-on-error: true
+                with:
+                    gradle-command: detektMain --stacktrace
+            -   name: Run detekt main (w/ typing analysis) w/gradle retry
+                id: run_detekt_fork
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                continue-on-error: true
+                with:
+                    gradle-command: detektMain --stacktrace
+
+            -   name: Check if SARIF file exists
+                if: always()
+                id: check_sarif
+                run: |
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
+                        echo "exists=true" >> $GITHUB_OUTPUT
+                    else
+                        echo "exists=false" >> $GITHUB_OUTPUT
+                    fi
+
+            -   name: Annotate detekt failures
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                run: |
+                    chmod +x .github/scripts/process_detekt_sarif.sh
+                    ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif | tee detekt_output.txt
+            -   name: Upload detekt artifact
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                uses: actions/upload-artifact@v7
+                with:
+                    name: detekt-output
+                    path: detekt-artifact/
+            -   name: Fail job if detekt found issues
+                if: steps.run_detekt.outcome == 'failure' || steps.run_detekt_fork.outcome == 'failure'
+                run: exit 1
