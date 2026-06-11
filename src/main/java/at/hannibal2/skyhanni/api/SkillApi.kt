@@ -148,7 +148,11 @@ object SkillApi {
                 skillMultiplierPattern -> handleSkillPatternMultiplier(matcher, skillType, skillInfo)
             }
 
-            SkillExpGainEvent(skillType, matcher.group("gained").formatDouble()).post()
+            SkillExpGainEvent(
+                skillType,
+                matcher.group("gained").formatDouble(),
+                totalXp = skillInfo.totalXp.toDouble(),
+            ).post()
 
             showDisplay = true
             lastUpdate = SimpleTimeMark.now()
@@ -315,7 +319,7 @@ object SkillApi {
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
         val level = tablistLevel ?: return
         if (isPercentPatternFound) {
-            val levelXP = calculateLevelXP(existingLevel.level - 1)
+            val levelXP = calculateLevelXP(level - 1)
             val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
             val nextLevelProgress = nextLevelDiff * xpPercentage / 100
             val totalXP = levelXP + nextLevelProgress
@@ -328,9 +332,8 @@ object SkillApi {
                 matcher.group("gained"),
             )
         } else {
-            val exactLevel = getLevelExact(needed)
-            val levelXP = calculateLevelXP(existingLevel.level - 1).toLong() + current
-            updateSkillInfo(existingLevel, exactLevel, current, needed, levelXP, matcher.group("gained"))
+            val levelXP = calculateLevelXP(level - 1).toLong() + current
+            updateSkillInfo(existingLevel, level, current, needed, levelXP, matcher.group("gained"))
         }
         storage?.set(skillType, existingLevel)
     }
@@ -367,7 +370,7 @@ object SkillApi {
         val minus = if (maxXP == 0L) 0 else 1
         val level = getLevelExact(maxXP) - minus
 
-        val levelXP = calculateLevelXP(level - 1).toLong() + currentXP
+        val levelXP = if (maxXP == 0L) currentXP else calculateLevelXP(level - 1).toLong() + currentXP
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXP, skillType.maxLevel)
 
