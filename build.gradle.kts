@@ -122,6 +122,12 @@ val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    systemProperties(
+        System.getProperties()
+            .stringPropertyNames()
+            .filter { it.startsWith("skyhanni.") }
+            .associateWith { System.getProperty(it) },
+    )
 }
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
