@@ -5,18 +5,14 @@ import at.hannibal2.skyhanni.events.render.OverlayType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//? if >= 26.2 {
+//~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
 import net.minecraft.client.renderer.SubmitNodeCollector;
-//?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource;
-*///?}
 
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
@@ -53,6 +49,7 @@ abstract class MixinScreenEffectRenderer {
         PoseStack poseStack,
         //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         SubmitNodeCollector submitNodeCollector,
+        int color,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
