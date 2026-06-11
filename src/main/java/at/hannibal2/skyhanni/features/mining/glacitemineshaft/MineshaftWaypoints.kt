@@ -9,14 +9,19 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Direction
+import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import net.minecraft.world.entity.Relative
 import kotlin.time.Duration.Companion.milliseconds
@@ -43,6 +48,13 @@ object MineshaftWaypoints {
         if (event.newIsland != IslandType.MINESHAFT) return
 
         timeEnteredMinecraft = SimpleTimeMark.now()
+
+        val spawnLocation = LocationUtils.getBlockBelowPlayer()
+        val direction = MinecraftCompat.localPlayer.direction.unitVec3i
+
+        ChatUtils.debug("Island change event fired, type is now mineshaft (${spawnLocation.toChatFormat()})")
+
+        addEntranceWaypoints(spawnLocation, direction)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
@@ -51,26 +63,15 @@ object MineshaftWaypoints {
         if (event.packet !is ClientboundPlayerPositionPacket) return
         if (event.packet.relatives.contains(Relative.Y_ROT)) return
 
-        waypoints.clear()
-
-        val location = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
+        val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
         val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
 
-        if (config.mineshaftWaypoints.entranceLocation) {
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = location))
-        }
+        ChatUtils.debug(
+            "Received player position packet ${timeEnteredMinecraft.passedSince()} after entering mineshaft" +
+                "(${spawnLocation.toChatFormat()})"
+        )
 
-        if (config.mineshaftWaypoints.ladderLocation) {
-            val ladderLocation = location
-                // Move 7 blocks in front of the player to be in the ladder shaft
-                .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)
-                // Adjust 2 blocks to the right to be in the center of the ladder shaft
-                .add(x = direction.z * -2, z = direction.x * 2)
-                // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = -15)
-
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
-        }
+        addEntranceWaypoints(spawnLocation, direction)
     }
 
     @HandleEvent
@@ -106,6 +107,26 @@ object MineshaftWaypoints {
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
                 event.drawDynamicText(it.location, "§e${it.waypointType.displayText}", 1.0)
             }
+    }
+
+    private fun addEntranceWaypoints(spawnLocation: LorenzVec, direction: Vec3i) {
+        if (config.mineshaftWaypoints.entranceLocation) {
+            waypoints.removeIf { it.waypointType == MineshaftWaypointType.ENTRANCE }
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = spawnLocation))
+        }
+
+        if (config.mineshaftWaypoints.ladderLocation) {
+            val ladderLocation = spawnLocation
+                // Move 7 blocks in front of the player to be in the ladder shaft
+                .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)
+                // Adjust 2 blocks to the right to be in the center of the ladder shaft
+                .add(x = direction.z * -2, z = direction.x * 2)
+                // Move 15 blocks down to be at the bottom of the ladder shaft
+                .add(y = -15)
+
+            waypoints.removeIf { it.waypointType == MineshaftWaypointType.LADDER }
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
+        }
     }
 
     fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
