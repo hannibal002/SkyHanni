@@ -17,19 +17,9 @@ public class MixinBlaze {
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
-        )
-    )
-    private void onLivingUpdate(
-        Level level,
-        ParticleOptions particleType,
-        double x,
-        double y,
-        double z,
-        double xOffset,
-        double yOffset,
-        double zOffset,
-        CallbackInfo ci
-    ) {
+        ),
+        cancellable = true)
+    private void onAddParticle(CallbackInfo ci) {
         if (ParticleHider.shouldHideBlazeParticles()) ci.cancel();
     }
 }

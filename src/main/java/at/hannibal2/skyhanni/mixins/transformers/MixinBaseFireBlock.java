@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.misc.ParticleHider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -20,15 +23,11 @@ public class MixinBaseFireBlock {
         ),
         cancellable = true
     )
-    private void onRandomDisplayTick(
+    private void onAddParticle(
+        BlockState state,
         Level level,
-        ParticleOptions particleType,
-        double x,
-        double y,
-        double z,
-        double xOffset,
-        double yOffset,
-        double zOffset,
+        BlockPos pos,
+        RandomSource random,
         CallbackInfo ci
     ) {
         if (ParticleHider.shouldHideFireParticles()) ci.cancel();
