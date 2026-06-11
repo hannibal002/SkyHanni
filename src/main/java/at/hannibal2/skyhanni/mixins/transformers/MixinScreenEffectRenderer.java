@@ -49,6 +49,7 @@ abstract class MixinScreenEffectRenderer {
         PoseStack poseStack,
         //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         SubmitNodeCollector submitNodeCollector,
+        //? if >= 26.2
         int color,
         CallbackInfo ci
     ) {
