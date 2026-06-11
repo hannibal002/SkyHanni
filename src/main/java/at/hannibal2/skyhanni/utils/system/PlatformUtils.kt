@@ -104,12 +104,7 @@ object PlatformUtils {
         return version < MCVersion.currentMcVersion
     }
 
-    fun getRepoPatternDumpLocation(): String? {
-        if (System.getProperty("SkyHanniDumpRegex.enabled") != "true") return null
-        val dumpDirective = System.getProperty("SkyHanniDumpRegex")
-        if (dumpDirective.isNullOrBlank()) return null
-        return dumpDirective
-    }
+    fun getRepoPatternDumpLocation(): String? = System.getProperty("skyhanni.dumpRegex")
 }
 
 data class ModInstance(val id: String, val name: String, val version: String, val sourceJar: String)

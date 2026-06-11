@@ -312,8 +312,7 @@ if (target == ProjectTarget.MODERN_26200) {
         dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
 
-        jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
-        jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        jvmArgs.add("-Dskyhanni.dumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
         useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
     }
