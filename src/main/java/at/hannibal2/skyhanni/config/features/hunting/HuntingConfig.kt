@@ -25,6 +25,11 @@ class HuntingConfig {
     val huntingProfitTracker: HuntingProfitTrackerConfig = HuntingProfitTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Lotum Helper", desc = "")
+    @Accordion
+    val lotumHelperConfig: LotumHelperConfig = LotumHelperConfig()
+
+    @Expose
     @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights")
     var mobHighlight = GalateaMobHighlightConfig()
 
