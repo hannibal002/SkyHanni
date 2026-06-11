@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.test.command.ErrorManager;
 import at.hannibal2.skyhanni.utils.system.PlatformUtils;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.protocol.handshake.ClientIntentionPacket;
@@ -19,12 +18,6 @@ public abstract class MixinClientIntentionPacket {
     )
     private static int modifyProtocolVersion(int protocolVersion) {
         if (!PlatformUtils.isDevEnvironment()) return protocolVersion;
-
-        // Temporary code for testing purposes
-        if (!Boolean.getBoolean("skyhanni.snapshotProtocolDebug")) {
-            ErrorManager.crashInDevEnv("snapshotProtocolDebug was not set");
-        }
-
         if (!Boolean.getBoolean("skyhanni.snapshotProtocolDebug")) return protocolVersion;
         //noinspection deprecation
         return SharedConstants.RELEASE_NETWORK_PROTOCOL_VERSION;

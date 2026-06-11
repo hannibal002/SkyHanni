@@ -149,8 +149,6 @@ object ErrorManager {
         )
     }
 
-    @JvmStatic
-    @JvmOverloads
     inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
         if (!PlatformUtils.isDevEnvironment) return
         Minecraft.getInstance().delayCrash(CrashReport("SkyHanni - $reason", t(reason)))
