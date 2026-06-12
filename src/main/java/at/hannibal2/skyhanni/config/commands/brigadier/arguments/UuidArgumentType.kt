@@ -34,10 +34,7 @@ class UuidArgumentType : ArgumentType<UUID> {
 
     companion object {
         private val invalidUuid = SimpleCommandExceptionType(
-            LiteralMessage(
-                "Invalid UUID format\n" +
-                    "Please provide a valid UUID in the format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            )
+            LiteralMessage("Please provide a valid UUID in the format xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx")
         )
 
         fun uuid(): UuidArgumentType = UuidArgumentType()
