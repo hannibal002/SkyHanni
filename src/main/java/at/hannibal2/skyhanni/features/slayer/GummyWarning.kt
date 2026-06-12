@@ -19,7 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GummyWarning {
 
-    private val config get() = SkyHanniMod.feature.slayer.GummyWarning
+    private val config get() = SkyHanniMod.feature.slayer.gummyWarning
 
     private var lastWarned = SimpleTimeMark.farPast()
 

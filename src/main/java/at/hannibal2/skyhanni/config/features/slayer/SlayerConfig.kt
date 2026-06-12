@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig
-import at.hannibal2.skyhanni.features.slayer.GummyWarning
 import at.hannibal2.skyhanni.features.slayer.HideSlayerSpawnParticles.SpawnParticles
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
@@ -139,8 +138,7 @@ class SlayerConfig {
     @Expose
     @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
     @FeatureToggle
-    var GummyWarning: GummyWarningConfig = GummyWarningConfig()
-
+    var gummyWarning: GummyWarningConfig = GummyWarningConfig()
 
     @Expose
     @ConfigOption(
