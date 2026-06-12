@@ -58,6 +58,11 @@ class FishingConfig {
     val fishingBaitWarnings: FishingBaitWarningsConfig = FishingBaitWarningsConfig()
 
     @Expose
+    @ConfigOption(name = "Bait Display", desc = "")
+    @Accordion
+    var baitDisplay: BaitDisplayConfig = BaitDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Rare Sea Creatures", desc = "")
     @Accordion
     val rareCatches: RareCatchesConfig = RareCatchesConfig()
