@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerCategory
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -51,16 +52,7 @@ class PlayerSuggestions private constructor(
     }
 
     fun toBrigadier(): SuggestionProvider<FabricClientCommandSource> {
-        return SuggestionProvider { _, builder ->
-
-            val remaining = builder.remainingLowerCase
-
-            cached
-                .filter { it.lowercase().startsWith(remaining) }
-                .forEach { builder.suggest(it) }
-
-            builder.buildFuture()
-        }
+        return cached.toSuggestionProvider()
     }
 
     companion object {
