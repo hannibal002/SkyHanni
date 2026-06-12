@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object CarryTracker {
     private val config get() = SkyHanniMod.feature.misc
 
-    val customers = mutableListOf<Customer>()
+    private val customers = mutableListOf<Customer>()
     private val carryTypes = mutableMapOf<String, CarryType>()
     private var slayerNames = emptyMap<SlayerType, List<String>>()
 
@@ -199,6 +199,8 @@ object CarryTracker {
     }
 
     fun isCustomer(customerName: String): Boolean = getCustomerOrNull(customerName) != null
+
+    fun getCustomers(): List<Customer> = customers.toList()
 
     private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)

@@ -80,7 +80,7 @@ object PlayerTabComplete {
             PlayerCategory.ISLAND_PLAYERS -> config.islandPlayers
             PlayerCategory.PARTY -> config.party
             PlayerCategory.GUILD -> config.guild
-            PlayerCategory.SELF -> true
+            else -> true
         }
 
         val excludedSet = excluded.toSet()

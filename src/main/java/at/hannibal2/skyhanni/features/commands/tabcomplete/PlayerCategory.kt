@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 
@@ -12,6 +13,7 @@ enum class PlayerCategory(private val usernamesGetter: () -> Sequence<String>) {
     PARTY({ PartyApi.partyMembers.asSequence() }),
     GUILD({ GuildApi.getAllMembers().asSequence() }),
     FRIENDS({ FriendApi.getAllFriends().asSequence().map { it.name } }),
+    CARRY_CUSTOMER({ CarryTracker.getCustomers().asSequence().map { it.name } }),
     ;
 
     fun usernames(): Sequence<String> = usernamesGetter()
