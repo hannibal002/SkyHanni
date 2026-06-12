@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -11,6 +13,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayerGroup;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,8 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeStorage;
 //?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+/*import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -168,26 +170,35 @@ public abstract class MixinLevelRenderer {
     }
 
     @Inject(
-        method = "lambda$addMainPass$0",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
-            ordinal = 0,
-            shift = At.Shift.AFTER
-        )
+    method = "lambda$addMainPass$0",
+    at = @At(
+        value = "INVOKE",
+        target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
+        ordinal = 0,
+        shift = At.Shift.AFTER
     )
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
-
-    @Inject(
-        method = "lambda$addMainPass$0",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V")
-    )
-    private void renderSkyHanniGlow(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
-        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
-    }
     *///?}
+
+    @WrapOperation(
+        method = "lambda$addMainPass$0",
+        at = @At(
+            value = "INVOKE",
+            //? if >= 26.2 {
+            target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeOutline()V"
+            //?} else
+            //target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"
+        )
+    )
+    //~ if < 26.2 'FeatureRenderDispatcher.PreparedFrame' -> 'OutlineBufferSource'
+    private void renderSkyHanniGlow(FeatureRenderDispatcher.PreparedFrame instance, Operation<Void> original) {
+        boolean areMobsHighlighted = RenderLivingEntityHelper.getAreMobsHighlighted();
+
+        if (areMobsHighlighted) SkyHanniOutlineVertexConsumerProvider.beginRendering();
+        original.call(instance);
+        if (areMobsHighlighted) SkyHanniOutlineVertexConsumerProvider.finishRendering();
+    }
 }

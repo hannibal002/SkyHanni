@@ -184,11 +184,12 @@ stonecutter parameters {
             replace("GuiGraphicsExtractor", "GuiGraphics")
             replace("InteractClickType", "InteractClickType") // prevent replacement
             replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
+            replace("\"extractSlot\"", "\"renderSlot\"")
             replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
             replace("classTweaker v1 official", "classTweaker v1 named")
             replace("drawContext.text", "drawContext.drawString")
             replace("extractContents", "renderContents")
-            replace("extractSlot", "renderSlot")
+            replace("extractSlotHighlight", "renderSlotHighlight")
             replace("lambda\$addMainPass\$0", "method_62214")
             replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
