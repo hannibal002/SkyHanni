@@ -60,6 +60,7 @@ class PlayerSuggestions private constructor(
         }
     }
 }
+
 enum class PlayerSource {
     WORLD {
         override fun usernames(): Sequence<String> =
