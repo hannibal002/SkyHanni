@@ -67,7 +67,7 @@ enum class PlayerSource(private val usernamesGetter: () -> Sequence<String>) {
     SELF({ sequenceOf(PlayerUtils.getName()) }),
     PARTY({ PartyApi.partyMembers.asSequence() }),
     GUILD({ GuildApi.getAllMembers().asSequence() }),
-    CARRY_COSTUMER({ CarryTracker.customers.asSequence().map { it.name } }),
+    CARRY_CUSTOMER({ CarryTracker.customers.asSequence().map { it.name } }),
     ;
 
     fun usernames(): Sequence<String> = usernamesGetter()
