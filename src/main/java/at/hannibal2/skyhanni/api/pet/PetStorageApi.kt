@@ -22,6 +22,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -29,19 +31,24 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.PetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.firstUniqueByOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
+import java.util.UUID
 import java.util.regex.Matcher
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
@@ -58,17 +65,31 @@ object PetStorageApi {
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
     private var jsonNeedsSave: Boolean = false
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
 
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Pets
      * REGEX-TEST: Pets (1/3)
+     * REGEX-TEST: (6/6) Pets
      * REGEX-TEST: Pets: "a"
      * REGEX-TEST: Pets: "e" (1/2)
+     * REGEX-TEST: (6/6) Pets: "e"
      */
-    val mainPetMenuNamePattern by patternGroup.pattern(
-        "menu.gui.name",
-        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?",
+    private val mainPetMenuNamePattern by patternGroup.pattern(
+        "menu.gui.title",
+        "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
+    )
+
+    /**
+     * REGEX-TEST: §7[Lvl 8] §6Squid
+     * REGEX-TEST: §7[Lvl 100] §dHermit Crab
+     * REGEX-TEST: §7[Lvl 200] §8[§6122§4✦§8] §6Golden Dragon
+     */
+    @Suppress("MaxLineLength")
+    private val petMenuPetStackNamePattern by patternGroup.pattern(
+        "menu.petstack.name",
+        "(?:§.)*\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+?)(?<skin>§. ✦)?",
     )
 
     /**
@@ -149,11 +170,22 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST: §aHeld Item: §9Farming Exp Boost
+     * REGEX-TEST: Held Item: Poignant Lucky Clover
+     * REGEX-TEST: Equip: [Lvl 200] Rose Dragon Held Item: Poignant Lucky Clover
      */
     private val autoPetHoverHeldItemPattern by patternGroup.pattern(
-        "autopet.hover.helditem",
-        "§aHeld Item: (?<item>.*)",
+        "autopet.hover.helditem.clean",
+        ".*Held Item: (?<item>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §aYour pet is now holding §r§6Burnt Texts§r§a.
+     * REGEX-TEST: §aYour pet is now holding §r§9Combat Exp Boost§r§a.
+     * REGEX-TEST: Your pet is now holding Burnt Texts.
+     */
+    private val petItemHeldMessagePattern by patternGroup.pattern(
+        "chat.helditem",
+        "(?:§a)?Your pet is now holding (?<item>.+?)(?:§r)?(?:§a)?\\.",
     )
     // </editor-fold>
 
@@ -166,6 +198,91 @@ object PetStorageApi {
     }
 
     private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
+
+    private val PetInfo.ownedUuid: UUID? get() = uniqueId ?: uuid
+
+    private fun MutableList<PetData>.addOrReplace(petData: PetData) {
+        indexOfFirstOrNull { it.uuid == petData.uuid }?.let {
+            this[it] = petData
+        } ?: add(petData)
+    }
+
+    private fun PetData.applyKnownData(
+        exp: Double? = null,
+        skinInternalName: NeuInternalName? = null,
+        heldItemInternalName: NeuInternalName? = null,
+    ) {
+        this.exp = exp ?: this.exp
+        this.skinInternalName = skinInternalName ?: this.skinInternalName
+        this.heldItemInternalName = heldItemInternalName ?: this.heldItemInternalName
+    }
+
+    private val PetExpRead?.exactValue get() = this?.takeIf { it.exact }?.value
+
+    private fun PetData.reconcileDisplayedExp(readExp: Double): Double {
+        val storedExp = exp ?: return readExp
+        if (readExp % 1.0 != 0.0) return readExp
+        return storedExp.coerceIn(readExp, readExp + 0.999)
+    }
+
+    private fun String.isExactPetExpText() =
+        !contains('k', ignoreCase = true) && !contains('m', ignoreCase = true)
+
+    fun isMainPetMenuName(inventoryName: String?) = mainPetMenuNamePattern.matches(inventoryName)
+
+    private data class PetExpRead(
+        val value: Double,
+        val exact: Boolean,
+    )
+
+    private fun SafeItemStack.toVisiblePetDataOrNull(petInfo: PetInfo? = getPetInfo()): PetData? =
+        petMenuPetStackNamePattern.matchMatcher(hoverName.formattedTextCompat()) {
+            val level = group("level").formatInt()
+            val petName = groupOrNull("pet")?.trim() ?: return@matchMatcher null
+            val itemInternalName = getInternalNameOrNull()?.takeIf { PetUtils.getPetRarity(it) != null }
+            val petInternalName = itemInternalName ?: run {
+                val rarity = getRarityOrNull() ?: return@matchMatcher null
+                PetUtils.petWithRarityToInternalName(petName, rarity)
+            }
+            val petSkin = getPetSkinOrNull(petInternalName)
+            val lore = getLore()
+            val petExp = petMenuSelectedPetXpPattern.firstMatcher(lore) {
+                val currentValue = group("current").formatDouble()
+                when (groupOrNull("next")) {
+                    null -> currentValue
+                    else -> {
+                        val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: 0.0
+                        currentLevelXp + currentValue
+                    }
+                }
+            }
+            val petInfoExp = petInfo?.exp?.takeIf { it > 0.0 || level <= 1 }
+            PetData(
+                petInternalName = petInternalName,
+                skinInternalName = petInfo?.properSkinItem ?: petSkin?.internalName,
+                heldItemInternalName = petInfo?.heldItem,
+                exp = petInfoExp ?: petExp ?: PetUtils.levelToXp(level, petInternalName) ?: 0.0,
+                uuid = petInfo?.ownedUuid,
+                skinVariantIndex = petInfo?.getSkinVariantIndex(),
+            )
+        }
+
+    private fun SafeItemStack.toClickedPetDataOrNull(petInfo: PetInfo? = getPetInfo()): PetData? =
+        petInfo?.let(::PetData) ?: toVisiblePetDataOrNull(null)
+
+    private fun SafeItemStack.toExactPetDataOrNull(): PetData? =
+        getPetInfo()?.let { petInfo ->
+            PetData(
+                petInternalName = getInternalName(),
+                skinInternalName = petInfo.properSkinItem,
+                heldItemInternalName = petInfo.heldItem,
+                exp = petInfo.exp,
+                uuid = petInfo.ownedUuid,
+                skinVariantIndex = petInfo.getSkinVariantIndex(),
+            )
+        }
+
+    private fun SafeItemStack.isCurrentPetStack() = getLore().any { it.contains("Click to despawn") }
 
     @HandleEvent
     fun onSecondPassed() {
@@ -182,9 +299,12 @@ object PetStorageApi {
             petTabWidgetNamePattern.matchMatcher(component.string) {
                 val petName = groupOrNull("pet") ?: return@matchMatcher false
                 val level = group("level").toInt()
-                // let's hope they don't add a multicolored pet
                 val rarity: LorenzRarity =
                     LorenzRarity.getByComponent(component, group("pet")) ?: return@matchMatcher false
+                val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
+                val petSkin = getPetSkinOrNull(petInternalName)
+                val petSkinTag = (groupOrNull("skin") ?: groupOrNull("altskin"))?.replace(" ", "")
+                val petSkinTagKnown = petSkinTag == null
                 val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                     val trimmedLine =
                         line.formattedTextCompat().trim().removeResets().takeIf { it.isNotBlank() }
@@ -195,10 +315,10 @@ object PetStorageApi {
                 val petExp = petTabWidgetXpPattern.firstMatcher(event.lines.map { it.string }) expFirstMatcher@{
                     // We don't know XP if it's just "MAX LEVEL"
                     if (groupOrNull("max") != null) return@expFirstMatcher null
-                    val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
                     val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@expFirstMatcher null
-                    val readXpGroup = groupOrNull("current")?.formatDoubleOrNull() ?: 0.0
-                    currentLevelXp + readXpGroup
+                    val current = groupOrNull("current") ?: "0"
+                    val readXpGroup = current.formatDoubleOrNull() ?: 0.0
+                    PetExpRead(currentLevelXp + readXpGroup, current.isExactPetExpText())
                 }
 
                 val resolvedPet = resolvePetDataOrNull(
@@ -206,17 +326,29 @@ object PetStorageApi {
                     rarity = rarity,
                     level = level,
                     heldItem = petHeldItem,
-                    exp = petExp,
-                ) ?: return@matchMatcher false
-
-                // Apply all the data we know for sure to the pet
-                resolvedPet.apply {
-                    exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
-                    skinInternalName = getPetSkinOrNull(fauxInternalName)?.internalName ?: skinInternalName
-                    heldItemInternalName = petHeldItem ?: heldItemInternalName
+                    skinTagKnown = petSkinTagKnown,
+                    exp = petExp?.value,
+                )
+                val matchingCurrentPet = CurrentPetApi.currentPet?.takeIf { currentPet ->
+                    currentPet.cleanName == petName &&
+                        currentPet.rarity == rarity &&
+                        currentPet.level == level &&
+                        (petSkinTag == null || currentPet.skinTag == petSkinTag)
                 }
+                val currentPetData = resolvedPet ?: matchingCurrentPet ?: PetData(
+                    petInternalName = petInternalName,
+                    skinInternalName = petSkin?.internalName,
+                    heldItemInternalName = petHeldItem,
+                    exp = petExp?.value ?: PetUtils.levelToXp(level, petInternalName) ?: 0.0,
+                )
 
-                CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.TAB)
+                currentPetData.applyKnownData(
+                    exp = petExp.exactValue?.let { currentPetData.reconcileDisplayedExp(it) },
+                    skinInternalName = petSkin?.internalName,
+                    heldItemInternalName = petHeldItem,
+                )
+
+                CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.TAB)
                 jsonNeedsSave = true
             }
         }
@@ -224,6 +356,11 @@ object PetStorageApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent.Allow) {
+        petItemHeldMessagePattern.matchMatcher(event.message) {
+            val petHeldItem = resolveAppliedPetItemOrNull(group("item").removeResets().trim()) ?: return
+            updateCurrentPetHeldItem(petHeldItem)
+        }
+
         autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
@@ -232,54 +369,139 @@ object PetStorageApi {
             val rarity = getRarityOrNull() ?: return
             val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petInternalName)
-            val petSkinTag = groupOrNull("skin")
+            val petSkinTag = (groupOrNull("skin") ?: groupOrNull("altskin"))?.replace(" ", "")
 
-            val hoverInfo = event.chatComponent.hover?.siblings?.joinToString {
-                it.formattedTextCompat()
-            }?.split("\n") ?: return
+            val hoverInfo = event.chatComponent.hoverTextLines()
+            val petHeldItemName = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo.map { it.removeResets() }) {
+                group("item")
+            }?.trim()
+            val petHeldItem = petHeldItemName?.let(PetUtils::resolvePetItemOrNull)
 
-            val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {
-                PetUtils.resolvePetItemOrNull(group("item").removeResets())
-            }
-
-            val resolvedPet = resolvePetDataOrNull(
+            val resolvedPet = resolveAutopetPetDataOrNull(
                 name = petName,
                 rarity = rarity,
-                heldItem = petHeldItem,
+                heldItemName = petHeldItemName,
+                heldItemKnown = hoverInfo.isNotEmpty(),
                 skinTag = petSkinTag,
                 level = level,
-            ) ?: return
+            ) ?: PetData(
+                petInternalName = petInternalName,
+                exp = PetUtils.levelToXp(level, petInternalName),
+            )
 
-            // Apply all the data we know for sure to the pet
-            resolvedPet.apply {
-                skinInternalName = petSkin?.internalName ?: skinInternalName
-                heldItemInternalName = petHeldItem ?: heldItemInternalName
+            resolvedPet.applyKnownData(skinInternalName = petSkin?.internalName)
+            when {
+                petHeldItem != null -> resolvedPet.heldItemInternalName = petHeldItem
+                hoverInfo.isNotEmpty() && petHeldItemName == null -> resolvedPet.heldItemInternalName = null
+            }
+            PetUtils.levelToXp(level, resolvedPet.fauxInternalName)?.let { minimumExp ->
+                if ((resolvedPet.exp ?: 0.0) < minimumExp) resolvedPet.exp = minimumExp
             }
 
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
+            PetXpEstimateApi.recordAutopetSwap(resolvedPet.uuid, hoverInfo.autopetTriggerOrNull())
             jsonNeedsSave = true
         }
     }
 
+    private fun resolveAppliedPetItemOrNull(itemName: String): NeuInternalName? {
+        val heldItemName = InventoryUtils.getItemInHand()?.displayName?.formattedTextCompat()
+            ?.removeResets()
+            ?.trim()
+        if (heldItemName?.removeColor() == itemName.removeColor()) {
+            PetUtils.resolvePetItemOrNull(heldItemName)?.let { return it }
+        }
+        return PetUtils.resolvePetItemOrNull(itemName)
+    }
+
+    private fun updateCurrentPetHeldItem(heldItem: NeuInternalName) {
+        val currentPet = CurrentPetApi.currentPet ?: return
+        if (currentPet.heldItemInternalName == heldItem) return
+        currentPet.heldItemInternalName = heldItem
+        if (currentPet.uuid != null) petStorage?.pets?.addOrReplace(currentPet)
+        CurrentPetApi.assertFoundCurrentData(currentPet, CurrentPetApi.PetDataAssertionSource.CHAT)
+        markDirty()
+    }
+
+    private fun List<String>.autopetTriggerOrNull(): String? =
+        map { it.removeColor().removeResets().trim() }
+            .zipWithNext()
+            .firstOrNull { (line, trigger) -> line == "When:" && trigger.isNotBlank() }
+            ?.second
+
+    private fun resolveAutopetPetDataOrNull(
+        name: String,
+        rarity: LorenzRarity,
+        heldItemName: String?,
+        heldItemKnown: Boolean,
+        skinTag: String?,
+        level: Int,
+    ): PetData? {
+        val candidates = petStorage?.pets
+            ?.asSequence()
+            ?.filter { it.uuid != null }
+            ?.filter { it.cleanName == name }
+            ?.filter { it.rarity == rarity }
+            ?.filter { it.skinTag == skinTag }
+            ?.toList()
+            ?.takeIfNotEmpty()
+            ?: return null
+
+        val levelCandidates = candidates.filter { it.level == level }.takeIfNotEmpty()
+            ?: candidates.filter { it.level <= level }
+
+        val heldItemCandidates = when {
+            !heldItemKnown -> levelCandidates
+            heldItemName == null -> levelCandidates.filter { it.heldItemInternalName == null }
+            else -> levelCandidates.filter { it.heldItemInternalName?.matchesItemName(heldItemName) == true }
+        }
+        return heldItemCandidates.singleOrNull()
+            ?: levelCandidates.singleOrNull()
+            ?: candidates.singleOrNull()
+    }
+
+    private fun Component.hoverTextLines(): List<String> = buildList {
+        addHoverTextLines(this@hoverTextLines)
+    }
+
+    private fun MutableList<String>.addHoverTextLines(component: Component) {
+        component.hover?.formattedTextCompat()?.split("\n")?.let(::addAll)
+        component.siblings.forEach { addHoverTextLines(it) }
+    }
+
+    private fun NeuInternalName.matchesItemName(itemName: String): Boolean = when {
+        itemName.contains('§') -> repoItemName == itemName
+        else ->
+            itemNameWithoutColor == itemName ||
+                asString().replace("_", " ").equals(itemName, ignoreCase = true)
+    }
+
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!mainPetMenuNamePattern.matches(InventoryUtils.openInventoryName())) return
-        val clickedItem = event.item ?: return
-        val petInfo = clickedItem.getPetInfo() ?: return
+        val inventoryName = InventoryUtils.openInventoryName()
+        if (!isMainPetMenuName(inventoryName)) return
+        if (!event.slotId.isPetStackLocation()) return
+        val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
+        val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
+        val clickedPetUuid = clickedPetData.uuid
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         when (event.clickedButton) {
             1 -> { // Right click - remove pet from menu
-                petStorage?.pets?.removeIf { it.uuid == petInfo.uniqueId }
-                if (currentPetUuid == petInfo.uniqueId) {
-                    ProfileStorageData.profileSpecific?.currentPetUuid = null
+                clickedPetUuid ?: return
+                petStorage?.pets?.removeIf { it.uuid == clickedPetUuid }
+                if (currentPetUuid == clickedPetUuid) {
+                    CurrentPetApi.clearCurrentPet()
                 }
             }
 
             0 -> { // Left click - if not a shift click, summon/un-summon pet
                 if (KeyboardManager.isShiftKeyDown()) return
-                ProfileStorageData.profileSpecific?.currentPetUuid = when (currentPetUuid) {
-                    petInfo.uniqueId -> null // Un-summon
-                    else -> petInfo.uniqueId // Summon
+                lastExactPetMenuClick = SimpleTimeMark.now()
+                if (clickedItem.isCurrentPetStack() || currentPetUuid == clickedPetUuid) {
+                    CurrentPetApi.clearCurrentPet()
+                } else {
+                    if (clickedPetUuid != null) petStorage?.pets?.addOrReplace(clickedPetData)
+                    CurrentPetApi.assertFoundCurrentData(clickedPetData, CurrentPetApi.PetDataAssertionSource.MENU)
                 }
             }
 
@@ -290,36 +512,38 @@ object PetStorageApi {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        event.readPetsMenuItems()
+        val exactPetMenuUuids = event.readPetsMenuItems()
         event.readEquipmentPetData()
-        event.readSelectedPetData()
+        event.readSelectedPetData(exactPetMenuUuids)
         event.readExpSharePets()
     }
 
-    private fun InventoryFullyOpenedEvent.readPetsMenuItems() {
-        if (!mainPetMenuNamePattern.matches(inventoryName)) return
-        val petStorage = petStorage ?: return
+    private fun InventoryFullyOpenedEvent.readPetsMenuItems(): Set<UUID> {
+        if (!isMainPetMenuName(inventoryName)) return emptySet()
+        val petStorage = petStorage ?: return emptySet()
+        val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
+        val exactPetUuids = mutableSetOf<UUID>()
 
         inventoryItems.filter { (slotNumber, stack) ->
             slotNumber.isPetStackLocation() && stack.getInternalNameOrNull() != null
         }.mapNotNull { (_, item) ->
-            val petInfo = item.getPetInfo() ?: return@mapNotNull null
-            PetData(
-                petInternalName = item.getInternalName(),
-                skinInternalName = petInfo.properSkinItem,
-                heldItemInternalName = petInfo.heldItem,
-                exp = petInfo.exp,
-                uuid = petInfo.uniqueId,
-                skinVariantIndex = petInfo.getSkinVariantIndex(),
-            )
-        }.forEach { data ->
-            // Because this inventory is the "source of truth", if we come across the same UUID
-            // we should always replace the data in-place
-            petStorage.pets.indexOfFirstOrNull { it.uuid == data.uuid }?.let {
-                petStorage.pets[it] = data
-            } ?: petStorage.pets.add(data)
+            item.toExactPetDataOrNull()
+        }.forEach {
+            val previousExp = petStorage.pets.firstOrNull { petData -> petData.uuid == it.uuid }?.exp
+            it.uuid?.let(exactPetUuids::add)
+            if (it.uuid == currentPetUuid || PetXpEstimateApi.shouldRecordPetMenuRead(it.uuid)) {
+                PetXpEstimateApi.recordPetDataRead(
+                    "pet-menu-grid",
+                    it,
+                    exact = true,
+                    previousExp = previousExp,
+                    appliedExp = it.exp,
+                )
+            }
+            petStorage.pets.addOrReplace(it)
         }
         jsonNeedsSave = true
+        return exactPetUuids
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
@@ -328,54 +552,50 @@ object PetStorageApi {
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
             it.hoverName.string != "Empty Pet Slot"
         } ?: return
-        val petInfo = currentPetItem.getPetInfo() ?: return
+        val data = currentPetItem.toExactPetDataOrNull() ?: return
 
-        val data = PetData(
-            petInternalName = currentPetItem.getInternalName(),
-            skinInternalName = petInfo.properSkinItem,
-            heldItemInternalName = petInfo.heldItem,
-            exp = petInfo.exp,
-            uuid = petInfo.uniqueId,
-            skinVariantIndex = petInfo.getSkinVariantIndex(),
-        )
-
-        petStorage.pets.indexOfFirstOrNull { it.uuid == petInfo.uniqueId }?.let {
-            petStorage.pets[it] = data
-        } ?: petStorage.pets.add(data)
+        petStorage.pets.addOrReplace(data)
 
         CurrentPetApi.assertFoundCurrentData(data, CurrentPetApi.PetDataAssertionSource.MENU)
         jsonNeedsSave = true
     }
 
-    private fun InventoryFullyOpenedEvent.readSelectedPetData() {
+    private fun InventoryFullyOpenedEvent.readSelectedPetData(exactPetMenuUuids: Set<UUID>) {
+        val isPetMenu = isMainPetMenuName(inventoryName)
+        if (isPetMenu && lastExactPetMenuClick.passedSince() < 5.seconds) return
+
         val petItemSlot = when {
-            mainPetMenuNamePattern.matches(inventoryName) -> PET_MENU_CURRENT_PET_SLOT
+            isPetMenu -> PET_MENU_CURRENT_PET_SLOT
             inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
             else -> return
         }
-        val currentPetItemLore = inventoryItems[petItemSlot]?.getLore()?.takeIfNotEmpty() ?: return
+        val currentPetItem = inventoryItems[petItemSlot] ?: return
+        if (currentPetItem.readExactSelectedPetData()) return
+        val currentPetItemLore = currentPetItem.getLore().takeIfNotEmpty() ?: return
 
         petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
             val rarity = getRarityOrNull() ?: return@firstMatcher false
-            val petInternalname = PetUtils.petWithRarityToInternalName(petName, rarity)
-            val petSkin = getPetSkinOrNull(petInternalname)
-            val petSkinTag = groupOrNull("skin")
+            val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
+            val petSkin = getPetSkinOrNull(petInternalName)
+            val petSkinTag = groupOrNull("skin")?.replace(" ", "")
 
             val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
-                    null -> PetUtils.getMaxLevel(petInternalname)
+                    null -> PetUtils.getMaxLevel(petInternalName)
                     else -> (group("next").formatInt() - 1)
                 }
             } ?: return@firstMatcher false
 
             val petExp = petMenuSelectedPetXpPattern.firstMatcher(currentPetItemLore) {
-                val currentValue = group("current").formatDouble()
+                val current = group("current")
+                val currentValue = current.formatDouble()
+                val exact = current.isExactPetExpText()
                 when (groupOrNull("next")) {
-                    null -> currentValue
+                    null -> PetExpRead(currentValue, exact)
                     else -> {
-                        val currentLevelXp = PetUtils.levelToXp(level, petInternalname) ?: 0.0
-                        currentLevelXp + currentValue
+                        val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: 0.0
+                        PetExpRead(currentLevelXp + currentValue, exact)
                     }
                 }
             }
@@ -383,21 +603,65 @@ object PetStorageApi {
             val resolvedPet = resolvePetDataOrNull(
                 name = petName,
                 skinTag = petSkinTag,
+                skinTagKnown = true,
                 rarity = rarity,
                 level = level,
-                exp = petExp,
-            ) ?: return
-
-            // Apply all the data we know for sure to the pet
-            resolvedPet.apply {
-                exp = petExp?.takeIf { it > (exp ?: 0.0) } ?: exp
-                skinInternalName = petSkin?.internalName ?: skinInternalName
+                exp = petExp?.value,
+            )
+            val matchingCurrentPet = CurrentPetApi.currentPet?.takeIf { currentPet ->
+                currentPet.matchesSelectedPet(petName, rarity, level, petSkinTag)
             }
+            val currentPetData = resolvedPet ?: matchingCurrentPet ?: PetData(
+                petInternalName = petInternalName,
+                skinInternalName = petSkin?.internalName,
+                exp = petExp?.value ?: PetUtils.levelToXp(level, petInternalName) ?: 0.0,
+            )
 
-            CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.MENU)
+            val hasExactPetMenuRead = currentPetData.uuid?.let { it in exactPetMenuUuids } == true
+            val previousExp = currentPetData.exp
+            val exactPetExp = petExp.exactValue.takeUnless { hasExactPetMenuRead }
+                ?.let { currentPetData.reconcileDisplayedExp(it) }
+            currentPetData.applyKnownData(exp = exactPetExp, skinInternalName = petSkin?.internalName)
+
+            PetXpEstimateApi.recordPetDataRead(
+                "selected-pet-lore",
+                currentPetData,
+                exact = exactPetExp != null,
+                previousExp = previousExp,
+                appliedExp = exactPetExp,
+            )
+            CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.MENU)
             jsonNeedsSave = true
         }
     }
+
+    private fun SafeItemStack.readExactSelectedPetData(): Boolean {
+        val currentPetData = getPetInfo()?.let(::PetData) ?: return false
+        val previousExp = currentPetData.uuid?.let { uuid ->
+            petStorage?.pets?.firstOrNull { it.uuid == uuid }?.exp
+        }
+        if (currentPetData.uuid != null) petStorage?.pets?.addOrReplace(currentPetData)
+        PetXpEstimateApi.recordPetDataRead(
+            "selected-pet-nbt",
+            currentPetData,
+            exact = true,
+            previousExp = previousExp,
+            appliedExp = currentPetData.exp,
+        )
+        CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.MENU)
+        jsonNeedsSave = true
+        return true
+    }
+
+    private fun PetData.matchesSelectedPet(
+        petName: String,
+        rarity: LorenzRarity,
+        level: Int,
+        skinTag: String?,
+    ) = cleanName == petName &&
+        this.rarity == rarity &&
+        this.level <= level &&
+        this.skinTag == skinTag
 
     private fun InventoryFullyOpenedEvent.readExpSharePets() {
         if (inventoryName != "Exp Sharing") return
@@ -408,31 +672,45 @@ object PetStorageApi {
                 val slotItem = inventoryItems[expShareSlot]?.takeIf {
                     it.hoverName.string != "No pet in slot"
                 } ?: return@map null
-                slotItem.getPetInfo()?.uniqueId
+                slotItem.getPetInfo()?.ownedUuid
             },
         )
     }
 
     fun isAutopetMessage(message: String): Boolean = autoPetMessagePattern.matches(message)
 
+    fun markDirty() {
+        jsonNeedsSave = true
+    }
+
+    fun getExpSharePets(): List<PetData> = petStorage?.let { petStorage ->
+        petStorage.expSharePets.mapNotNull { uuid ->
+            uuid?.let { petUuid -> petStorage.pets.firstOrNull { it.uuid == petUuid } }
+        }
+    } ?: emptyList()
+
     fun resolvePetDataOrNull(
         name: String,
         rarity: LorenzRarity? = null,
         heldItem: NeuInternalName? = null,
         skinTag: String? = null,
+        skinTagKnown: Boolean = false,
         level: Int? = null,
         exp: Double? = null,
         expErrorFactor: Double = 0.01,
-    ): PetData? = petStorage?.pets?.filter {
-        it.uuid != null
-    }?.takeIfNotEmpty()?.firstUniqueByOrNull(
-        { it.cleanName == name },
-        { rarity == null || it.rarity == rarity },
-        { heldItem == null || it.heldItemInternalName == heldItem },
-        { skinTag == null || it.skinTag == skinTag },
-        { level == null || it.level == level },
-        { exp == null || abs((it.exp ?: 0.0) - exp) < (exp * expErrorFactor) },
-    )
+    ): PetData? = petStorage?.pets
+        ?.filter { it.uuid != null }
+        ?.filter { it.cleanName == name }
+        ?.filter { rarity == null || it.rarity == rarity }
+        ?.filter { heldItem == null || it.heldItemInternalName == heldItem }
+        ?.filter { if (skinTagKnown || skinTag != null) it.skinTag == skinTag else true }
+        ?.filter { level == null || it.level == level }
+        ?.singleOrNull { it.hasMatchingExp(exp, expErrorFactor) }
+
+    private fun PetData.hasMatchingExp(exp: Double?, expErrorFactor: Double): Boolean = exp?.let { readExp ->
+        val allowedError = (readExp * expErrorFactor).coerceAtLeast(1.0)
+        abs((this.exp ?: 0.0) - readExp) <= allowedError
+    } ?: true
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -452,16 +730,32 @@ object PetStorageApi {
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl$level>:" + uuid.toString()
+        fun PetData.formatForDebug(currentPetUuid: UUID?) = buildString {
+            append(if (uuid == currentPetUuid) "* " else "- ")
+            append(fauxInternalName.asString())
+            append(" lvl=$level")
+            append(" rarity=$rarity")
+            append(" uuid=$uuid")
+            append(" exp=${exp?.toLong() ?: 0L}")
+            append(" held=${heldItemInternalName?.asString() ?: "<none>"}")
+            append(" skin=${skinInternalName?.asString() ?: "<none>"}")
+            append(" skinTag=${skinTag ?: "<none>"}")
+            append(" variant=${skinVariantIndex ?: "<none>"}")
+        }
         event.title("Pet Storage API")
         event.addIrrelevant {
             val petStorage = petStorage ?: run {
                 add("petStorage is null")
                 return@addIrrelevant
             }
+            val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
+            add("currentPetUuid: $currentPetUuid")
+            add("recentExactPetMenuClick: ${lastExactPetMenuClick.passedSince() < 5.seconds}")
+            add("petCount: ${petStorage.pets.size}")
             LorenzRarity.entries.reversed().forEach { rarity ->
                 val pets = petStorage.pets.filter { it.rarity == rarity }.takeIfNotEmpty() ?: return@forEach
-                add("pets (${rarity.name}):\n" + pets.joinToString(", ", transform = PetData::formatForDebug))
+                add("pets (${rarity.name}):")
+                pets.forEach { add(it.formatForDebug(currentPetUuid)) }
                 add("")
             }
             add("expSharePets: " + petStorage.expSharePets.joinToString(", ") { it?.toString() ?: "<empty>" })
