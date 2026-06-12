@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+import at.hannibal2.skyhanni.utils.system.PlatformUtils;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,6 +24,19 @@ public abstract class MixinGui {
 
     @Unique
     private GuiGraphicsExtractor skyhanni$graphics;
+
+    @ModifyExpressionValue(
+        method = "addInitialScreens",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/Options;onboardAccessibility:Z",
+            opcode = Opcodes.GETFIELD
+        )
+    )
+    public boolean onboardAccessibility(boolean original) {
+        if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
+        return original;
+    }
 
     @Inject(
         method = "setScreen",

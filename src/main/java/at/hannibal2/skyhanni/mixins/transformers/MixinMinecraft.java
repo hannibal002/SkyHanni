@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
-import at.hannibal2.skyhanni.utils.system.PlatformUtils;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
@@ -17,7 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //? if < 26.2 {
 /*import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
+import at.hannibal2.skyhanni.utils.system.PlatformUtils;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.screens.Screen;
+import org.objectweb.asm.Opcodes;
 *///?}
 
 @Mixin(Minecraft.class)
@@ -27,20 +28,26 @@ public abstract class MixinMinecraft {
     public HitResult hitResult;
 
     @Shadow
-    private int missTime;
+    public int missTime;
 
     @Shadow
     @Nullable
     public MultiPlayerGameMode gameMode;
 
-    @ModifyExpressionValue(
-        method = "addInitialScreens*",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/client/Options;onboardAccessibility:Z")
+    //? if < 26.2 {
+    /*@ModifyExpressionValue(
+        method = "addInitialScreens",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/Options;onboardAccessibility:Z",
+            opcode = Opcodes.GETFIELD
+        )
     )
     public boolean onboardAccessibility(boolean original) {
         if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
         return original;
     }
+    *///?}
 
     @Inject(
         at = @At("HEAD"),
@@ -48,6 +55,7 @@ public abstract class MixinMinecraft {
         cancellable = true
     )
     public void handleRightClickMouse(CallbackInfo ci) {
+        if (this.gameMode == null) return;
         if (this.gameMode.isDestroying()) return;
 
         if (MinecraftInputHook.shouldCancelMouseRightClick(this.hitResult)) ci.cancel();
@@ -67,7 +75,8 @@ public abstract class MixinMinecraft {
     @ModifyVariable(
         at = @At(value = "HEAD"),
         method = "continueAttack",
-        argsOnly = true
+        argsOnly = true,
+        name = "down"
     )
     public boolean handleBlockClick(boolean isLeftClick) {
         if (isLeftClick && this.missTime <= 0) {
@@ -80,7 +89,14 @@ public abstract class MixinMinecraft {
     }
 
     //? if < 26.2 {
-    /*@Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;"))
+    /*@Inject(
+        method = "setScreen",
+        at = @At(
+            value = "FIELD",
+            target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;",
+            opcode = Opcodes.PUTFIELD
+        )
+    )
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         new GuiScreenOpenEvent(screen).post();
     }

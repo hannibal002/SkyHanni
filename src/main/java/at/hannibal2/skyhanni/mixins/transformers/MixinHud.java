@@ -147,8 +147,10 @@ public abstract class MixinHud {
         method = "extractChat",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;' -> 'IIIZ'
+            //? if >= 26.1 {
             target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"
+            //?} else
+            //target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"
         ),
         index = 5
     )
