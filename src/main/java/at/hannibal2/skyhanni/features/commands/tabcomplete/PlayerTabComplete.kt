@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.commands.brigadier.PlayerCategory
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -87,7 +86,6 @@ object PlayerTabComplete {
         val excludedSet = excluded.toSet()
 
         PlayerCategory.entries
-            .asSequence()
             .filter { it !in excludedSet }
             .filter { allowed(it) }
             .flatMap { it.usernames() }

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.commands.brigadier
+package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GuildApi
@@ -16,4 +16,3 @@ enum class PlayerCategory(private val usernamesGetter: () -> Sequence<String>) {
 
     fun usernames(): Sequence<String> = usernamesGetter()
 }
-
