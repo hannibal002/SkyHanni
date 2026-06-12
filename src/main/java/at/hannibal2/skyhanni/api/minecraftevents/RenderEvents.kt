@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
-import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
@@ -15,8 +14,10 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
-//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+//? if < 26.2 {
+/*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
+*///?}
 
 @SkyHanniModule
 object RenderEvents {
@@ -25,16 +26,19 @@ object RenderEvents {
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
             Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
-            RenderEvents::postGui
+            RenderEvents::postGui,
         )
 
         // TODO 26.2
         //? if < 26.2 {
-        /*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
-        PictureInPictureRendererRegistry.register { ctx ->
-            //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
-            SkyHanniPipCoordinatorRenderer(ctx.bufferSource())
-        }
+        /*try {
+            //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+            PictureInPictureRendererRegistry.register { ctx ->
+                //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
+                SkyHanniPipCoordinatorRenderer(ctx.bufferSource())
+            } catch (e: Exception) {
+                throw e
+            }
         *///?}
     }
 
@@ -50,7 +54,7 @@ object RenderEvents {
     }
 
     // GameOverlayRenderPreEvent
-    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
         return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
@@ -72,7 +76,7 @@ object RenderEvents {
     }
 
     // GameOverlayRenderPostEvent
-    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) {
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
@@ -109,6 +113,7 @@ object RenderEvents {
     }
 }
 
+@Suppress("unused")
 enum class RenderLayer {
     ALL,
     HELMET,
@@ -129,7 +134,5 @@ enum class RenderLayer {
     DEBUG,
     HELD_ITEM_TOOLTIP,
     ACTION_BAR,
-
-    // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
 }
