@@ -151,24 +151,6 @@ public abstract class MixinLevelRenderer {
     }
     *///?}
 
-    //? if < 26.2 {
-    /*@WrapOperation(
-        method = "extractVisibleEntities",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"
-        )
-    )
-    public boolean shouldAlsoGlow(
-        EntityRenderState instance,
-        Operation<Boolean> original,
-        @Local(name = "entity") Entity entity
-    ) {
-        Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-        if (glowColor == null) return original.call(instance);
-        return true;
-    }
-
     @Inject(
         method = "lambda$addMainPass$0",
         at = @At(
@@ -182,7 +164,6 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
-    *///?}
 
     @WrapOperation(
         method = "lambda$addMainPass$0",
