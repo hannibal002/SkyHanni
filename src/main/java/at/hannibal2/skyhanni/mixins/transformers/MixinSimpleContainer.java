@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;

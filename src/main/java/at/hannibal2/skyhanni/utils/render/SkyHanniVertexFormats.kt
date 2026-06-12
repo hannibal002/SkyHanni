@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.mixins.transformers.renderer.MixinBufferBuilderAccessor
+import at.hannibal2.skyhanni.mixins.transformers.MixinBufferBuilderAccessor
 //? if < 26.2 {
 /*import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils

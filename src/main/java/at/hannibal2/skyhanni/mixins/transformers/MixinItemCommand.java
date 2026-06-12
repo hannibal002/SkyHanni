@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 // TODO 26.2
 //? if < 26.2 {

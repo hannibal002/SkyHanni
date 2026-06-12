@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if < 26.2 {
 /*import com.llamalad7.mixinextras.sugar.Local;

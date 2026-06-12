@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers.gui;
+package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.GlobalRender;
 import at.hannibal2.skyhanni.data.GuiData;
