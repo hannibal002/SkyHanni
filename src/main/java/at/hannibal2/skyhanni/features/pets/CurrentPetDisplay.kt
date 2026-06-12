@@ -96,7 +96,6 @@ object CurrentPetDisplay {
     private var expShareOrbitLastRenderTime = SimpleTimeMark.now()
     private val currentRotation: Property<Vec3> = Property.of(Vec3.ZERO)
     private val EXP_SHARE = "PET_ITEM_EXP_SHARE".toInternalName()
-    private const val DISABLED_EXP_SHARE_OPACITY = 0.5f
     private val previewPet: PetData by lazy {
         PetData(
             petInternalName = "BEE;4".toInternalName(),
@@ -212,7 +211,11 @@ object CurrentPetDisplay {
         val textRenderable = if (
             textConfig.enabled.get() &&
             textConfig.textMode.get() == ESTextMode.ATTACHED_TO_ICONS
-        ) petData.buildTextRenderableOrNull(textConfig, opacity) else null
+        ) petData.buildTextRenderableOrNull(
+            textConfig = textConfig,
+            opacity = opacity,
+            textScale = textConfig.textScale.get().toDouble(),
+        ) else null
         return combineVisualAndTextRenderables(itemRenderable, textRenderable, textConfig.textLocation.get())
     }
 
@@ -544,7 +547,11 @@ object CurrentPetDisplay {
         }
     }
 
-    private fun PetData.buildTextRenderableOrNull(textConfig: PetTextDisplaySettings, opacity: Float = 1.0f): Renderable? {
+    private fun PetData.buildTextRenderableOrNull(
+        textConfig: PetTextDisplaySettings,
+        opacity: Float = 1.0f,
+        textScale: Double = 1.0,
+    ): Renderable? {
         val enabledTexts = textConfig.enabledTexts.get().takeIfNotEmpty() ?: return null
         val textColor = Color(255, 255, 255, (255 * opacity).roundToInt().coerceIn(0, 255))
         val xpFormat = textConfig.xpFormat.get()
@@ -579,6 +586,7 @@ object CurrentPetDisplay {
             val labelFormat = textElement.getFormattedLabel().takeIf { textConfig.textLabels.get() }.orEmpty()
             StringRenderable(
                 "$labelFormat$textElementFormat",
+                scale = textScale,
                 color = textColor,
                 horizontalAlign = textConfig.horizontalAlign.get()
             )
@@ -594,7 +602,14 @@ object CurrentPetDisplay {
         val textConfig = config.text.expSharePets
         if (!textConfig.enabled.get()) return emptyList()
         if (textConfig.textMode.get() != ESTextMode.BUNDLED_WITH_MAIN) return emptyList()
-        return mapNotNull { it.petData.buildTextRenderableOrNull(textConfig, it.opacity) }
+        val textScale = textConfig.textScale.get().toDouble()
+        return mapNotNull {
+            it.petData.buildTextRenderableOrNull(
+                textConfig = textConfig,
+                opacity = it.opacity,
+                textScale = textScale,
+            )
+        }
     }
 
     private fun Double.formatExpByConfigOption(xpFormat: NFE) = when (xpFormat) {
@@ -804,6 +819,7 @@ object CurrentPetDisplay {
         petItem.renderHash(),
         rarityBackground.renderHash(),
         activeSlotsOnly.get(),
+        disabledOpacity.get(),
     ).hashCode()
 
     private fun PetTextDisplaySettings.settingsRenderHash(): Int = listOf(
@@ -823,6 +839,7 @@ object CurrentPetDisplay {
         textMode.get(),
         bundledLocation.get(),
         bundledSpacing.get(),
+        textScale.get(),
         settingsRenderHash(),
     ).hashCode()
 
@@ -917,7 +934,7 @@ object CurrentPetDisplay {
     private data class RenderCache(val key: Int, val renderable: Renderable?)
     private data class VisualIconLayer(val renderable: Renderable, val backgroundEnabled: Boolean)
     private data class ExpSharePetState(val petData: PetData, val disabled: Boolean) {
-        val opacity get() = if (disabled) DISABLED_EXP_SHARE_OPACITY else 1.0f
+        val opacity get() = if (disabled) expShareConfig.disabledOpacity.get() else 1.0f
     }
 
     private data class XpAnimation(

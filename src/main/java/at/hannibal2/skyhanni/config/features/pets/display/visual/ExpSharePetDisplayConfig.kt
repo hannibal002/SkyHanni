@@ -96,9 +96,18 @@ class ExpSharePetDisplayConfig(
     @ConfigOption(
         name = "Hide Disabled Slots",
         desc = "Hide disabled Exp Share slots from the display.\n" +
-            "Disabled slots are shown at 50% opacity when this is off."
+            "Disabled slots are shown with reduced opacity when this is off."
     )
     @ConfigEditorBoolean
     @ConfigOrder(60)
     val activeSlotsOnly: Property<Boolean> = Property.of(false)
+
+    @Expose
+    @ConfigOption(
+        name = "Disabled Opacity",
+        desc = "Opacity for disabled Exp Share pets."
+    )
+    @ConfigEditorSlider(minValue = 0.1f, maxValue = 1f, minStep = 0.05f)
+    @ConfigOrder(65)
+    val disabledOpacity: Property<Float> = Property.of(0.5f)
 }

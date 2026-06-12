@@ -188,6 +188,14 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
         @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
         val bundledSpacing: Property<Int> = Property.of(9)
 
+        @Expose
+        @ConfigOption(
+            name = "Text Scale",
+            desc = "How large Exp-Share pet text should be."
+        )
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.05f)
+        val textScale: Property<Float> = Property.of(1.0f)
+
         enum class BundledTextLocation(private val displayName: String) {
             ABOVE("Above Main Text"),
             BELOW("Below Main Text"),
