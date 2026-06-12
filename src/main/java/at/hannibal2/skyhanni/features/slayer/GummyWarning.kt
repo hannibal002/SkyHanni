@@ -85,7 +85,7 @@ object GummyWarning {
         TitleManager.sendTitle("§4§lNo Gummy Warning", duration = 2.seconds)
         Minecraft.getInstance().player?.playSound(
             SoundEvents.BLAZE_HURT,
-            0.3f, 0.5f
+            1f, 0.5f
         )
     }
 }
