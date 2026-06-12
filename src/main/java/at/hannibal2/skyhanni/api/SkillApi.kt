@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -24,21 +25,27 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
 import java.util.LinkedList
 import java.util.regex.Matcher
+import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -59,6 +66,48 @@ object SkillApi {
     private val skillMultiplierPattern by patternGroup.pattern(
         "skill.multiplier",
         "\\+(?<gained>[\\d.,]+) (?<skillName>.+) \\((?<current>[\\d.,]+)\\/(?<needed>[\\d,.]+[kmb]?)\\)",
+    )
+
+    /**
+     * REGEX-TEST: ☺ You claimed 2,500 Foraging XP from the Jerry Box!
+     */
+    private val jerryBoxSkillXpPattern by patternGroup.pattern(
+        "chat.jerry-box.skillxp",
+        ".*You claimed (?<gained>[\\d,]+) (?<skillName>\\w+) XP from the Jerry Box!",
+    )
+
+    /**
+     * REGEX-TEST: COMMON! +500 Combat XP gift with [VIP] sn0wfxll!
+     */
+    private val giftSkillXpPattern by patternGroup.pattern(
+        "chat.gift.skillxp",
+        "(?:COMMON|RARE|SWEET|SANTA(?: TIER)?|PARTY(?: TIER)?)! \\+(?<gained>[\\d,]+) (?<skillName>[\\w ]+) XP gift with .*!?",
+    )
+
+    /**
+     * REGEX-TEST: Accessory Bag
+     * REGEX-TEST: Accessory Bag (1/2)
+     */
+    private val accessoryBagNamePattern by patternGroup.pattern(
+        "inventory.accessory-bag",
+        "Accessory Bag(?: \\(\\d+\\/\\d+\\))?",
+    )
+
+    /**
+     * REGEX-TEST: LILY-SPLOSION!
+     * REGEX-TEST: LILI-SPLOSION!
+     */
+    private val lilySplosionStartPattern by patternGroup.pattern(
+        "chat.lily-splosion.start",
+        "LIL[YI]-SPLOSION!",
+    )
+
+    /**
+     * REGEX-TEST: +120 Fishing Experience
+     */
+    private val lilySplosionSkillXpPattern by patternGroup.pattern(
+        "chat.lily-splosion.skillxp",
+        "\\+(?<gained>[\\d,]+) (?<skillName>\\w+) Experience",
     )
 
     // TODO find out whats going on here
@@ -100,6 +149,31 @@ object SkillApi {
     var lastUpdate = SimpleTimeMark.farPast()
 
     private var lastTabComponents: List<Component> = emptyList()
+    private var lastLilySplosion = SimpleTimeMark.farPast()
+
+    private const val JERRY_BOX_SOURCE = "chat-jerry-box"
+    private const val GIFT_SOURCE = "chat-gift"
+    private const val LILY_SPLOSION_SOURCE = "chat-lily-splosion"
+    private const val SEASON_OF_JERRY_SHOP = "Season of Jerry"
+    private const val PROFESSIONAL_GIFTER = "Professional Gifter"
+    private const val PROFESSIONAL_GIFTER_TIER_ONE_BONUS = 0.05
+    private const val PROFESSIONAL_GIFTER_TIER_TWO_BONUS = 0.10
+    private const val SNOWMAN_MASK_BONUS = 0.10
+
+    private val SNOWMAN_MASK = "SNOWMAN_MASK".toInternalName()
+    private val GIFT_TALISMAN_BONUSES = mapOf(
+        "WHITE_GIFT_TALISMAN".toInternalName() to 0.05,
+        "GREEN_GIFT_TALISMAN".toInternalName() to 0.10,
+        "BLUE_GIFT_TALISMAN".toInternalName() to 0.15,
+        "PURPLE_GIFT_TALISMAN".toInternalName() to 0.20,
+        "GOLD_GIFT_TALISMAN".toInternalName() to 0.25,
+    )
+
+    private var giftTalismanBonus: Double
+        get() = ProfileStorageData.profileSpecific?.giftTalismanSkillXpBonus ?: 0.0
+        set(value) {
+            ProfileStorageData.profileSpecific?.giftTalismanSkillXpBonus = value
+        }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTabListUpdate(event: TabListUpdateEvent) {
@@ -108,6 +182,7 @@ object SkillApi {
 
     @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
+        updateGiftTalismanBonus(InventoryUtils.getItemsInOwnInventory())
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -164,6 +239,67 @@ object SkillApi {
         }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        for (message in event.message.removeColor().removeResets().lineSequence().map { it.trim() }) {
+            if (lilySplosionStartPattern.matcher(message).matches()) {
+                lastLilySplosion = SimpleTimeMark.now()
+                continue
+            }
+
+            jerryBoxSkillXpPattern.matchMatcher(message) {
+                postChatSkillXp(group("skillName"), group("gained").formatLong(), JERRY_BOX_SOURCE)
+                return
+            }
+
+            giftSkillXpPattern.matchMatcher(message) {
+                postChatSkillXp(group("skillName"), group("gained").formatLong(), GIFT_SOURCE)
+                return
+            }
+
+            lilySplosionSkillXpPattern.matchMatcher(message) {
+                if (lastLilySplosion.passedSince() > 5.seconds) return
+                postChatSkillXp(group("skillName"), group("gained").formatLong(), LILY_SPLOSION_SOURCE)
+            }
+        }
+    }
+
+    private fun postChatSkillXp(skillName: String, gained: Long, source: String) {
+        val skillType = SkillType.getByNameOrNull(skillName) ?: return
+        val effectiveGain = gained * giftXpMultiplier(source)
+        val totalXp = addChatSkillXp(skillType, effectiveGain)
+        SkillExpGainEvent(skillType, effectiveGain, totalXp, source).post()
+
+        val skillXP = skillXPInfoMap.getOrPut(skillType, ::SkillXPInfo)
+        activeSkill = skillType
+        showDisplay = true
+        lastUpdate = SimpleTimeMark.now()
+        skillXP.lastUpdate = SimpleTimeMark.now()
+        skillXP.sessionTimerActive = true
+        SkillProgress.updateDisplay()
+    }
+
+    private fun addChatSkillXp(skillType: SkillType, gained: Double): Double? {
+        val skillInfo = storage?.getOrPut(skillType, ::SkillInfo) ?: return null
+        if (skillInfo.totalXp <= 0L) return null
+
+        val totalXp = skillInfo.totalXp + gained
+        val roundedTotalXp = totalXp.roundToLong()
+        val skillLevel = calculateSkillLevel(roundedTotalXp, skillType.maxLevel)
+        skillInfo.apply {
+            this.totalXp = roundedTotalXp
+            currentXp = skillLevel.xpCurrent
+            currentXpMax = skillLevel.xpForNext
+            level = skillLevel.level.coerceAtMost(skillType.maxLevel)
+            overflowLevel = skillLevel.level
+            overflowCurrentXp = skillLevel.xpCurrent
+            overflowCurrentXpMax = skillLevel.xpForNext
+            overflowTotalXp = skillLevel.overflowXP
+            lastGain = gained.addSeparators()
+        }
+        return totalXp
+    }
+
     @HandleEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NeuSkillLevelJson>("leveling")
@@ -175,6 +311,11 @@ object SkillApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (accessoryBagNamePattern.matcher(event.inventoryName).matches()) {
+            updateGiftTalismanBonus(event.inventoryItems.values)
+            return
+        }
+
         if (event.inventoryName != "Your Skills") return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
@@ -197,6 +338,38 @@ object SkillApi {
                     onUpdateNotMax(progress, skillLevel, skillInfo)
                 }
             }
+        }
+    }
+
+    private fun updateGiftTalismanBonus(items: Collection<SafeItemStack>) {
+        val bestBonus = items.maxOfOrNull { GIFT_TALISMAN_BONUSES[it.getInternalName()] ?: 0.0 } ?: return
+        if (bestBonus > giftTalismanBonus) giftTalismanBonus = bestBonus
+    }
+
+    private fun giftXpMultiplier(source: String): Double {
+        if (source != GIFT_SOURCE) return 1.0
+
+        // Gift chat says the base XP. These bonuses are applied by Hypixel after that.
+        return 1.0 + giftTalismanBonus + snowmanMaskBonus() + professionalGifterBonus()
+    }
+
+    private fun snowmanMaskBonus(): Double =
+        if (InventoryUtils.getHelmet()?.getInternalName() == SNOWMAN_MASK) SNOWMAN_MASK_BONUS else 0.0
+
+    private fun professionalGifterBonus(): Double {
+        val tier = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress
+            ?.entries
+            ?.firstOrNull { it.key.equals(SEASON_OF_JERRY_SHOP, ignoreCase = true) }
+            ?.value
+            ?.entries
+            ?.firstOrNull { it.key.equals(PROFESSIONAL_GIFTER, ignoreCase = true) }
+            ?.value
+            ?: return 0.0
+
+        return when {
+            tier <= 0 -> 0.0
+            tier == 1 -> PROFESSIONAL_GIFTER_TIER_ONE_BONUS
+            else -> PROFESSIONAL_GIFTER_TIER_TWO_BONUS
         }
     }
 

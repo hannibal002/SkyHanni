@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.pets.display.visual
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
@@ -84,13 +83,6 @@ class ExpSharePetDisplayConfig(
             @ConfigOverride
             override val separator: SeparatorRingConfig = SeparatorRingConfig(scalar)
 
-            @ConfigOption(
-                name = "Static Borders",
-                desc = "Due to limitations in information, exp share pet XP rings are always shown as full."
-            )
-            @ConfigEditorInfoText
-            @ConfigOrder(35)
-            val staticNote: Unit = Unit
         }
 
         @Expose
@@ -102,10 +94,11 @@ class ExpSharePetDisplayConfig(
 
     @Expose
     @ConfigOption(
-        name = "Active Slots Only",
-        desc = "Only show pets from Exp Share slots if that slot is unlocked by Diana's §dSharing is Caring §7Perk."
+        name = "Hide Disabled Slots",
+        desc = "Hide disabled Exp Share slots from the display.\n" +
+            "Disabled slots are shown at 50% opacity when this is off."
     )
     @ConfigEditorBoolean
     @ConfigOrder(60)
-    val activeSlotsOnly: Property<Boolean> = Property.of(true)
+    val activeSlotsOnly: Property<Boolean> = Property.of(false)
 }

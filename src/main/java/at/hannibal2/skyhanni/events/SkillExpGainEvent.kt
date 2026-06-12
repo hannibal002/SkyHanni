@@ -6,5 +6,6 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 class SkillExpGainEvent(
     val skill: SkillType,
     val gained: Double,
-    val totalXp: Double,
+    val totalXp: Double?,
+    val source: String = "actionbar",
 ) : SkyHanniEvent()

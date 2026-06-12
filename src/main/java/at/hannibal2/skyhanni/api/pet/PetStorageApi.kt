@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -63,6 +64,7 @@ object PetStorageApi {
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
+    private const val EXP_SHARING_INVENTORY_NAME = "Exp Sharing"
     private var jsonNeedsSave: Boolean = false
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -664,7 +666,7 @@ object PetStorageApi {
         this.skinTag == skinTag
 
     private fun InventoryFullyOpenedEvent.readExpSharePets() {
-        if (inventoryName != "Exp Sharing") return
+        if (inventoryName != EXP_SHARING_INVENTORY_NAME) return
         val petStorage = petStorage ?: return
         petStorage.expSharePets.clear()
         petStorage.expSharePets.addAll(
@@ -688,6 +690,27 @@ object PetStorageApi {
             uuid?.let { petUuid -> petStorage.pets.firstOrNull { it.uuid == petUuid } }
         }
     } ?: emptyList()
+
+    fun getActiveExpSharePets(): List<PetData> = petStorage?.let { petStorage ->
+        petStorage.expSharePets.take(activeExpShareSlotCount()).mapNotNull { uuid ->
+            uuid?.let { petUuid -> petStorage.pets.firstOrNull { it.uuid == petUuid } }
+        }
+    } ?: emptyList()
+
+    fun getActiveExpSharePetUuids(): Set<UUID> =
+        petStorage?.expSharePets?.take(activeExpShareSlotCount())?.filterNotNull()?.toSet().orEmpty()
+
+    fun getDisabledExpSharePetUuids(): Set<UUID> =
+        petStorage?.expSharePets?.drop(activeExpShareSlotCount())?.filterNotNull()?.toSet().orEmpty()
+
+    fun isExpShareSlotDisabled(slot: Int) =
+        slot in EXP_SHARE_SLOTS.drop(activeExpShareSlotCount())
+
+    fun isExpSharingInventory(inventoryName: String?) =
+        inventoryName == EXP_SHARING_INVENTORY_NAME
+
+    private fun activeExpShareSlotCount() =
+        if (Perk.SHARING_IS_CARING.isActive) EXP_SHARE_SLOTS.size else 1
 
     fun resolvePetDataOrNull(
         name: String,

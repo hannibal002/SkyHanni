@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import com.google.gson.annotations.Expose
 import java.util.UUID
@@ -31,12 +29,6 @@ data class PetDataStorage(
         @Expose val pets: MutableList<PetData> = mutableListOf(),
         @Expose val expSharePets: MutableList<UUID?> = mutableListOf(),
         @Expose var beastmasterPetXpMultiplier: Double? = null,
-        @Expose val xpEstimatorSamples: MutableMap<SkillType, PetXpEstimatorSample> = enumMapOf(),
-    )
-    data class PetXpEstimatorSample(
-        @Expose var totalXp: Double? = null,
-        @Expose var preciseTotalXp: Double? = null,
-        @Expose var petUuid: UUID? = null,
     )
 }
 
