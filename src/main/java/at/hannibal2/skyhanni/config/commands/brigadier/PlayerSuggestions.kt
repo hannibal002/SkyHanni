@@ -1,11 +1,5 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
-import at.hannibal2.skyhanni.data.FriendApi
-import at.hannibal2.skyhanni.data.GuildApi
-import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.features.misc.CarryTracker
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.suggestion.Suggestions
@@ -14,29 +8,38 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 import java.util.concurrent.CompletableFuture
 
 class PlayerSuggestions private constructor(
-    private val include: Set<PlayerSource>,
-    private val exclude: Set<PlayerSource>,
+    private val include: Set<PlayerCategory>,
+    private val exclude: Set<PlayerCategory>,
+    private val customFilter: (String) -> Boolean,
 ) : SuggestionProvider<FabricClientCommandSource> {
 
-    fun usernames(): Set<String> {
-        val excluded = exclude
+    private val cached: List<String> by lazy {
+        val excludedNames = exclude
             .asSequence()
             .flatMap { it.usernames() }
             .toSet()
 
-        return include
+        var result = include
             .asSequence()
             .flatMap { it.usernames() }
-            .filterNot { it in excluded }
-            .toSet()
+            .filterNot { it in excludedNames }
+            .filter(customFilter)
+
+        result = result.distinct()
+
+        result.toList()
     }
 
-    fun listSuggestions(
+    fun usernames(): List<String> = cached
+
+    override fun getSuggestions(
+        context: CommandContext<FabricClientCommandSource>,
         builder: SuggestionsBuilder,
     ): CompletableFuture<Suggestions> {
+
         val remaining = builder.remainingLowerCase
 
-        usernames()
+        cached
             .asSequence()
             .filter { it.lowercase().startsWith(remaining) }
             .forEach(builder::suggest)
@@ -44,31 +47,53 @@ class PlayerSuggestions private constructor(
         return builder.buildFuture()
     }
 
-    override fun getSuggestions(
-        context: CommandContext<FabricClientCommandSource>,
-        builder: SuggestionsBuilder,
-    ): CompletableFuture<Suggestions> {
-        return listSuggestions(builder)
+    class Builder {
+        private val include = mutableSetOf<PlayerCategory>()
+        private val exclude = mutableSetOf<PlayerCategory>()
+
+        private var filter: (String) -> Boolean = { true }
+
+        fun include(vararg categories: PlayerCategory) = apply {
+            include.addAll(categories)
+        }
+
+        fun exclude(vararg categories: PlayerCategory) = apply {
+            exclude.addAll(categories)
+        }
+
+        fun filter(predicate: (String) -> Boolean) = apply {
+            val old = this.filter
+            this.filter = { old(it) && predicate(it) }
+        }
+
+        fun filterNot(vararg categories: PlayerCategory) = apply {
+            val excludedNames = categories
+                .asSequence()
+                .flatMap { it.usernames() }
+                .toSet()
+
+            filter { it !in excludedNames }
+        }
+
+        fun build(): PlayerSuggestions {
+            return PlayerSuggestions(
+                include = include,
+                exclude = exclude,
+                customFilter = filter,
+            )
+        }
     }
 
     companion object {
-        fun create(
-            include: Set<PlayerSource> = setOf(PlayerSource.WORLD),
-            exclude: Set<PlayerSource> = emptySet(),
-        ): PlayerSuggestions {
-            return PlayerSuggestions(include, exclude)
+        fun builder(): Builder = Builder()
+
+        fun all(): PlayerSuggestions =
+            builder()
+                .include(*PlayerCategory.entries.toTypedArray())
+                .build()
+
+        fun builder(block: Builder.() -> Unit): PlayerSuggestions {
+            return Builder().apply(block).build()
         }
     }
-}
-
-enum class PlayerSource(private val usernamesGetter: () -> Sequence<String>) {
-    WORLD({ EntityUtils.getPlayerEntities().asSequence().map { it.gameProfile.name } }),
-    SELF({ sequenceOf(PlayerUtils.getName()) }),
-    PARTY({ PartyApi.partyMembers.asSequence() }),
-    GUILD({ GuildApi.getAllMembers().asSequence() }),
-    FRIEND({ FriendApi.getAllFriends().map { it.name }.asSequence() }),
-    CARRY_CUSTOMER({ CarryTracker.customers.asSequence().map { it.name } }),
-    ;
-
-    fun usernames(): Sequence<String> = usernamesGetter()
 }
