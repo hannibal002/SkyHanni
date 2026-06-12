@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.misc.CarryTracker
@@ -65,6 +66,7 @@ enum class PlayerSource(private val usernamesGetter: () -> Sequence<String>) {
     SELF({ sequenceOf(PlayerUtils.getName()) }),
     PARTY({ PartyApi.partyMembers.asSequence() }),
     GUILD({ GuildApi.getAllMembers().asSequence() }),
+    FRIEND({ FriendApi.getAllFriends().map { it.name }.asSequence() }),
     CARRY_CUSTOMER({ CarryTracker.customers.asSequence().map { it.name } }),
     ;
 
