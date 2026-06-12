@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object CarryTracker {
     private val config get() = SkyHanniMod.feature.misc
 
-    private val customers = mutableListOf<Customer>()
+    val customers = mutableListOf<Customer>()
     private val carryTypes = mutableMapOf<String, CarryType>()
     private var slayerNames = emptyMap<SlayerType, List<String>>()
 
