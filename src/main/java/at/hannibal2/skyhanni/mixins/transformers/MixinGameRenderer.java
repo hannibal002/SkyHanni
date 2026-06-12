@@ -28,7 +28,6 @@ public abstract class MixinGameRenderer {
         GuiRendererHook.INSTANCE.getChromaUniform().clear();
         RoundedShapeDrawer.INSTANCE.clearUniforms();
     }
-    // TODO 26.2
     //?} else {
     /*@Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;

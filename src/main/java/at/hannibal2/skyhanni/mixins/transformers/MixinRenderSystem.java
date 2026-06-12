@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-// TODO 26.2
 //? if < 26.2 {
 /*import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
 import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer;
