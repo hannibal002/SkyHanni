@@ -10,6 +10,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
+import net.minecraft.world.entity.player.Player
 import java.util.concurrent.CompletableFuture
 
 class PlayerSuggestions private constructor(
@@ -18,10 +19,17 @@ class PlayerSuggestions private constructor(
 ) : SuggestionProvider<FabricClientCommandSource> {
 
     fun usernames(): Set<String> {
-        val included = include.flatMapTo(linkedSetOf()) { it.usernames() }
-        val excluded = exclude.flatMapTo(linkedSetOf()) { it.usernames() }
+        val excluded = exclude
+            .asSequence()
+            .flatMap { it.usernames() }
+            .map { it.lowercase() }
+            .toSet()
 
-        return included - excluded
+        return include
+            .asSequence()
+            .flatMap { it.usernames() }
+            .filterNot { it.lowercase() in excluded }
+            .toSet()
     }
 
     fun listSuggestions(
@@ -53,25 +61,35 @@ class PlayerSuggestions private constructor(
         }
     }
 }
-
 enum class PlayerSource {
-    WORLD,
-    SELF,
-    PARTY,
-    GUILD,
-    CARRY_CUSTOMER,
-    ;
-
-    fun usernames(): Set<String> = when (this) {
-        WORLD ->
+    WORLD {
+        override fun usernames(): Sequence<String> =
             EntityUtils.getPlayerEntities()
-                .mapTo(linkedSetOf()) { it.gameProfile.name }
-        SELF ->
-            setOfNotNull(
-                MinecraftCompat.localPlayerOrNull?.gameProfile?.name,
-            )
-        PARTY -> PartyApi.partyMembers.toSet()
-        GUILD -> GuildApi.getAllMembers().toSet()
-        CARRY_CUSTOMER -> CarryTracker.customers.map { it.name }.toSet()
-    }
+                .asSequence()
+                .map { it.gameProfile.name }
+    },
+
+    SELF {
+        override fun usernames(): Sequence<String> {
+            val username = MinecraftCompat.localPlayerOrNull?.gameProfile?.name ?: return emptySequence()
+            return sequenceOf(username)
+        }
+    },
+
+    PARTY {
+        override fun usernames(): Sequence<String> =
+            PartyApi.partyMembers.asSequence()
+    },
+
+    GUILD {
+        override fun usernames(): Sequence<String> =
+            GuildApi.getAllMembers().asSequence()
+    },
+
+    CARRY_CUSTOMER {
+        override fun usernames(): Sequence<String> =
+            CarryTracker.customers.asSequence().map { it.name }
+    };
+
+    abstract fun usernames(): Sequence<String>
 }

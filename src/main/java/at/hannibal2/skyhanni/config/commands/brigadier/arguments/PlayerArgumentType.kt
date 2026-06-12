@@ -27,6 +27,9 @@ class PlayerArgumentType private constructor(val suggestions: PlayerSuggestions)
             ?: throw PLAYER_NOT_FOUND.create(username)
     }
 
+    fun getAllPlayers(): List<Player> =
+        EntityUtils.getPlayerEntities() + listOfNotNull(MinecraftCompat.localPlayerOrNull)
+
     override fun <S> listSuggestions(
         context: CommandContext<S>,
         builder: SuggestionsBuilder,
@@ -40,10 +43,6 @@ class PlayerArgumentType private constructor(val suggestions: PlayerSuggestions)
     companion object {
         private val PLAYER_NOT_FOUND = DynamicCommandExceptionType {
             Component.literal("Could not find player with username: $it")
-        }
-
-        private fun getAllPlayers(): List<Player> {
-            return EntityUtils.getPlayerEntities() + listOfNotNull(MinecraftCompat.localPlayerOrNull)
         }
 
         fun player(
