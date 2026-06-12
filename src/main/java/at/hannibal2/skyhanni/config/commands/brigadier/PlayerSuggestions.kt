@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -57,6 +58,7 @@ enum class PlayerSource {
     WORLD,
     SELF,
     PARTY,
+    GUILD,
     CARRY_CUSTOMER,
     ;
 
@@ -69,6 +71,7 @@ enum class PlayerSource {
                 MinecraftCompat.localPlayerOrNull?.gameProfile?.name,
             )
         PARTY -> PartyApi.partyMembers.toSet()
+        GUILD -> GuildApi.getAllMembers().toSet()
         CARRY_CUSTOMER -> CarryTracker.customers.map { it.name }.toSet()
     }
 }
