@@ -1,7 +1,7 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
+//? if < 26.1 {
+/*import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BlockStateModel;

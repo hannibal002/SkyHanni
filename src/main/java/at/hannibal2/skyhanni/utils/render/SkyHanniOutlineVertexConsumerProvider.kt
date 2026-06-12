@@ -1,8 +1,8 @@
+package at.hannibal2.skyhanni.utils.render
+
 // TODO 26.2
 //? if < 26.2 {
-/*package at.hannibal2.skyhanni.utils.render
-
-import at.hannibal2.skyhanni.test.command.ErrorManager
+/*import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView

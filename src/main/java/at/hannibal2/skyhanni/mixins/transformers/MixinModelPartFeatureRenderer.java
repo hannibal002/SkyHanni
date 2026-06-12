@@ -1,7 +1,7 @@
-//? if < 26.2 {
-/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

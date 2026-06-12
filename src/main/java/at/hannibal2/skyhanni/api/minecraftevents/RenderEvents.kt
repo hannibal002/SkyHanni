@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
@@ -14,10 +15,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
-//? if < 26.2 {
-/*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
-*///?}
 
 @SkyHanniModule
 object RenderEvents {
@@ -29,17 +28,15 @@ object RenderEvents {
             RenderEvents::postGui,
         )
 
-        // TODO 26.2
-        //? if < 26.2 {
-        /*try {
-            //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
-            PictureInPictureRendererRegistry.register { ctx ->
+        //~ if < 26.2 '_' -> 'ctx'
+        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+        PictureInPictureRendererRegistry.register { _ ->
+            SkyHanniPipCoordinatorRenderer(
                 //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
-                SkyHanniPipCoordinatorRenderer(ctx.bufferSource())
-            } catch (e: Exception) {
-                throw e
-            }
-        *///?}
+                //? if < 26.2
+                //ctx.bufferSource(),
+            )
+        }
     }
 
     @HandleEvent
@@ -48,7 +45,9 @@ object RenderEvents {
         SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
-    private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
+    // IntelliJ is wrong, the unused parameter is required to confirm to the HudElement interface
+    @Suppress("unused")
+    private fun postGui(context: GuiGraphicsExtractor, deltaTracker: DeltaTracker) {
         if (Minecraft.getInstance().gui.hud.isHidden) return
         RenderData.postRenderOverlay(context)
     }
@@ -113,6 +112,7 @@ object RenderEvents {
     }
 }
 
+// We intentionally define render layers that may be used in the future
 @Suppress("unused")
 enum class RenderLayer {
     ALL,

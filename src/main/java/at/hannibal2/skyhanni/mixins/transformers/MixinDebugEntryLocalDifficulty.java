@@ -1,7 +1,7 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+//? if < 26.1 {
+/*import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugEntryLocalDifficulty;

@@ -1,7 +1,7 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
+//? if < 26.1 {
+/*import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;

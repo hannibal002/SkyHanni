@@ -1,7 +1,7 @@
-//? if < 26.2 {
-/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
+package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
-import com.llamalad7.mixinextras.sugar.Local;
+//? if < 26.2 {
+/*import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
