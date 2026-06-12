@@ -894,7 +894,7 @@ object CurrentPetDisplay {
         if (RiftApi.inRift() || !config.general.enabled.get()) return
         val currentPet = CurrentPetApi.currentPet ?: return invalidateRenderable()
         currentPet.withAnimatedExp().buildRenderable()?.also {
-            config.general.position.renderRenderable(it, posLabel = "Current Pet")
+            config.general.position.renderRenderable(it, posLabel = "Pet Display")
         }
     }
 

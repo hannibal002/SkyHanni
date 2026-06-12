@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
+import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -13,6 +14,7 @@ import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
+import java.lang.reflect.Field
 import kotlin.jvm.internal.CallableReference
 import kotlin.reflect.KProperty0
 
@@ -59,9 +61,27 @@ object ConfigUtils {
 
     private fun KProperty0<*>.tryJumpToEditor(editor: MoulConfigEditor<*>): Boolean {
         val option = tryFindEditor(editor) ?: return false
-        editor.search("")
-        if (!editor.goToOption(option)) return false
-        openEditor(editor)
+        return editor.jumpToOption(option)
+    }
+
+    fun canJumpToEditor(field: Field): Boolean =
+        editorInstances().any { it.getOptionFromField(field) != null }
+
+    fun jumpToEditor(field: Field): Boolean =
+        editorInstances().any { editor ->
+            val option = editor.getOptionFromField(field) ?: return@any false
+            editor.jumpToOption(option)
+        }
+
+    private fun editorInstances() = sequence {
+        yield(ConfigGuiManager.getEditorInstance())
+        yield(PetDisplayConfigGuiManager.getEditorInstance())
+    }
+
+    private fun MoulConfigEditor<*>.jumpToOption(option: ProcessedOption): Boolean {
+        search("")
+        if (!goToOption(option)) return false
+        openEditor(this)
         return true
     }
 
