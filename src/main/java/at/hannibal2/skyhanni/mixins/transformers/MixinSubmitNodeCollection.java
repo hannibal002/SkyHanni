@@ -36,7 +36,7 @@ public class MixinSubmitNodeCollection<E> {
     private void onSubmitModel(
         ModelFeatureRenderer.Storage storage,
         RenderType renderType,
-        SubmitNodeStorage.ModelSubmit<?> modelSubmit,
+        ModelFeatureRenderer.Submit<?> modelSubmit,
         Operation<Void> original
     ) {
         skyhanni$markCustomOutline(modelSubmit);

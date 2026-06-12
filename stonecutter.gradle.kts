@@ -138,6 +138,8 @@ stonecutter parameters {
             replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
             replace(".gui.hud.isHidden", ".options.hideGui")
             replace(".mainCamera()", ".mainCamera")
+            replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
+            replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
             replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
             replace("gui.hud.chat", "gui.chat")

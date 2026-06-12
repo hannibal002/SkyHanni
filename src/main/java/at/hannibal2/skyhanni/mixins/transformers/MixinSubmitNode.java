@@ -15,8 +15,8 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
     ItemFeatureRenderer.Submit.class,
     ModelFeatureRenderer.Submit.class,
     //?} else {
-    /*SubmitNodeStorage.ItemSubmit.class,
-    SubmitNodeStorage.ModelSubmit.class,
+    /*ItemFeatureRenderer.Submit.class,
+    ModelFeatureRenderer.Submit.class,
     SubmitNodeStorage.ModelPartSubmit.class,
     *///?}
 })

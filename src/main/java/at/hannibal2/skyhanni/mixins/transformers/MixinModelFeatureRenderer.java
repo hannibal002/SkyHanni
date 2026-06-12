@@ -1,47 +1,61 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+// TODO 26.2
 //? if < 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+/*import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
 
-    @WrapOperation(method = "renderModel(Lnet/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit;Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
-    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
-        if (skyhanni$usesCustomOutline(model)) {
-            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), color);
-        } else {
-            original.call(outlineConsumer, color);
-        }
+    @WrapOperation(
+        method = "renderModel",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
+    )
+    private <S> void setSkyHanniOutlineColor(
+        OutlineBufferSource instance,
+        int color,
+        Operation<Void> original,
+        //~ if < 26.1 '"submit"' -> '"modelSubmit"'
+        @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
+    ) {
+        boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
+
+        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
+        original.call(instance, color);
+        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
     }
 
-    @WrapOperation(method = "renderModel(Lnet/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit;Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
-    private VertexConsumer getSkyHanniOutlineBuffer(OutlineBufferSource outlineConsumer, RenderType layer, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
-        if (skyhanni$usesCustomOutline(model)) {
-            return original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), layer);
-        } else {
-            return original.call(outlineConsumer, layer);
-        }
-    }
+    @WrapOperation(
+        method = "renderModel",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
+        )
+    )
+    private <S> VertexConsumer wrapOutlineVertexConsumer(
+        OutlineBufferSource instance,
+        RenderType renderType,
+        Operation<VertexConsumer> original,
+        //~ if < 26.1 '"submit"' -> '"modelSubmit"'
+        @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
+    ) {
+        boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-    @Unique
-    private boolean skyhanni$usesCustomOutline(SubmitNodeStorage.ModelSubmit<?> model) {
-        Object obj = model;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;
-        return model.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
+        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
+        VertexConsumer orig = original.call(instance, renderType);
+        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
+
+        return orig;
     }
 }
 *///?}
