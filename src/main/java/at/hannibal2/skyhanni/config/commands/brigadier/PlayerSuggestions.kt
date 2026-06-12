@@ -22,13 +22,12 @@ class PlayerSuggestions private constructor(
         val excluded = exclude
             .asSequence()
             .flatMap { it.usernames() }
-            .map { it.lowercase() }
             .toSet()
 
         return include
             .asSequence()
             .flatMap { it.usernames() }
-            .filterNot { it.lowercase() in excluded }
+            .filterNot { it in excluded }
             .toSet()
     }
 
