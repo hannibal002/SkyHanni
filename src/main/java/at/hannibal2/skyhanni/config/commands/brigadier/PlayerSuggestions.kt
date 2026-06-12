@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.mojang.brigadier.context.CommandContext
 import com.mojang.brigadier.suggestion.SuggestionProvider
@@ -61,35 +62,13 @@ class PlayerSuggestions private constructor(
     }
 }
 
-enum class PlayerSource {
-    WORLD {
-        override fun usernames(): Sequence<String> =
-            EntityUtils.getPlayerEntities()
-                .asSequence()
-                .map { it.gameProfile.name }
-    },
+enum class PlayerSource(private val usernamesGetter: () -> Sequence<String>) {
+    WORLD({ EntityUtils.getPlayerEntities().asSequence().map { it.gameProfile.name } }),
+    SELF({ sequenceOf(PlayerUtils.getName()) }),
+    PARTY({ PartyApi.partyMembers.asSequence() }),
+    GUILD({ GuildApi.getAllMembers().asSequence() }),
+    CARRY_COSTUMER({ CarryTracker.customers.asSequence().map { it.name } }),
+    ;
 
-    SELF {
-        override fun usernames(): Sequence<String> {
-            val username = MinecraftCompat.localPlayerOrNull?.gameProfile?.name ?: return emptySequence()
-            return sequenceOf(username)
-        }
-    },
-
-    PARTY {
-        override fun usernames(): Sequence<String> =
-            PartyApi.partyMembers.asSequence()
-    },
-
-    GUILD {
-        override fun usernames(): Sequence<String> =
-            GuildApi.getAllMembers().asSequence()
-    },
-
-    CARRY_CUSTOMER {
-        override fun usernames(): Sequence<String> =
-            CarryTracker.customers.asSequence().map { it.name }
-    };
-
-    abstract fun usernames(): Sequence<String>
+    fun usernames(): Sequence<String> = usernamesGetter()
 }
