@@ -116,10 +116,10 @@ public abstract class MixinLevelRenderer {
     private void onTranslucentRender(
         ChunkSectionsToRender instance,
         ChunkSectionLayerGroup group,
-        GpuSampler gpuSampler,
+        GpuSampler sampler,
         Operation<Void> original
     ) {
-        original.call(instance, group, gpuSampler);
+        original.call(instance, group, sampler);
 
         //? if < 26.1
         //if (skyhanni$contextPoseStack == null) return;
@@ -170,12 +170,13 @@ public abstract class MixinLevelRenderer {
     }
 
     @Inject(
-    method = "lambda$addMainPass$0",
-    at = @At(
-        value = "INVOKE",
-        target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
-        ordinal = 0,
-        shift = At.Shift.AFTER
+        method = "lambda$addMainPass$0",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
+            ordinal = 0,
+            shift = At.Shift.AFTER
+        )
     )
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;

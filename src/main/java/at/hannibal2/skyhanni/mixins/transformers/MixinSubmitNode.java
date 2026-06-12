@@ -1,18 +1,26 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-// TODO 26.2
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import net.minecraft.client.renderer.SubmitNodeStorage;
+import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
+//? if >= 26.2 {
+import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+//?} else
+//import net.minecraft.client.renderer.SubmitNodeStorage;
+
 @Mixin({
-    SubmitNodeStorage.ItemSubmit.class,
+    //? if >= 26.2 {
+    ItemFeatureRenderer.Submit.class,
+    ModelFeatureRenderer.Submit.class,
+    //?} else {
+    /*SubmitNodeStorage.ItemSubmit.class,
     SubmitNodeStorage.ModelSubmit.class,
     SubmitNodeStorage.ModelPartSubmit.class,
+    *///?}
 })
-public class MixinItemCommand implements GlowingStateStore {
+public class MixinSubmitNode implements GlowingStateStore {
 
     @Unique
     private boolean skyhanni$usingCustomOutline = false;
@@ -27,4 +35,3 @@ public class MixinItemCommand implements GlowingStateStore {
         return this.skyhanni$usingCustomOutline;
     }
 }
-*///?}
