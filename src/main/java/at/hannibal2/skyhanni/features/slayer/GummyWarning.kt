@@ -67,7 +67,7 @@ object GummyWarning {
 
         val hasSmoldering = NonGodPotEffectDisplay.isActive(NonGodPotEffect.SMOLDERING)
 
-        if (!hasHabanero) return
+        if (config.onlyWithHabanero && !hasHabanero) return
         if (hasSmoldering) return
 
         if (lastWarned.passedSince() < 10.seconds) return

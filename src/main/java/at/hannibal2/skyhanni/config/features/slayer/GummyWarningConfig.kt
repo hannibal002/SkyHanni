@@ -17,4 +17,9 @@ class GummyWarningConfig {
     @ConfigOption(name = "Only When Slayer Active", desc = "Only warn when you have an active slayer quest.")
     @ConfigEditorBoolean
     var onlyWhenSlayerActive: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Only With Habanero Tactics", desc = "Only warn if you're wearing armor with Habanero Tactics.")
+    @ConfigEditorBoolean
+    var onlyWithHabanero: Boolean = true
 }
