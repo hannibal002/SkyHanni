@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import net.minecraft.client.Minecraft
@@ -28,11 +28,11 @@ object GummyWarning {
         "REVENANT_SWORD",
         "REAPER_SWORD",
         "AXE_OF_THE_SHREDDED",
-        // Spider
+        // Tara
         "TARANTULA_FANG",
         "SCORPION_FOIL",
         "STING",
-        // Wolf
+        // Sven
         "SHAMAN_SWORD",
         "POOCH_SWORD",
         // Enderman
@@ -53,12 +53,10 @@ object GummyWarning {
         if (event.action != EntityClickEvent.ActionType.ATTACK) return
         if (!config.enabled) return
 
-        val player = Minecraft.getInstance().player ?: return
-        val heldItem = player.mainHandItem
-        if (!isSlayerWeapon(heldItem)) return
+        val id = event.itemInHand?.getInternalNameOrNull()?.asString() ?: return
+        if (!SLAYER_WEAPONS.contains(id)) return
 
         val armor = InventoryUtils.getArmor()
-
         val hasHabanero = armor.any { piece ->
             if (piece == null) return@any false
             val enchants = piece.getHypixelEnchantments() ?: return@any false
@@ -73,19 +71,12 @@ object GummyWarning {
         if (lastWarned.passedSince() < 10.seconds) return
         lastWarned = SimpleTimeMark.now()
 
-        sendWarning()
-    }
-
-    private fun isSlayerWeapon(stack: SafeItemStack): Boolean {
-        val id = stack.getInternalNameOrNull()?.asString() ?: return false
-        return id in SLAYER_WEAPONS
-    }
-
-    private fun sendWarning() {
-        TitleManager.sendTitle("§4§lNo Gummy Warning", duration = 2.seconds)
-        Minecraft.getInstance().player?.playSound(
-            SoundEvents.BLAZE_HURT,
-            1f, 0.5f
-        )
+        DelayedRun.runDelayed(0.5.seconds) {
+            TitleManager.sendTitle("§4§lNo Gummy Warning", duration = 2.seconds)
+            Minecraft.getInstance().player?.playSound(
+                SoundEvents.BLAZE_HURT,
+                1f, 0.5f
+            )
+        }
     }
 }
