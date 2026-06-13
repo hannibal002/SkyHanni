@@ -206,9 +206,8 @@ object MineshaftPityDisplay {
     private var tablistPity = MAX_COUNTER
     private var everFoundPityWidget = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
