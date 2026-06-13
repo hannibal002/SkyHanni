@@ -66,7 +66,7 @@ class RewardWarningConfig {
     @Expose
     @ConfigOption(
         name = "Block Refusing Copper",
-        desc = "Prevent refusing visitors with a coin per copper lower than the set value."
+        desc = "Prevent refusing visitors with a coins per copper lower than the set value."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -75,7 +75,7 @@ class RewardWarningConfig {
     @Expose
     @ConfigOption(
         name = "Block Accepting Copper",
-        desc = "Prevent accepting visitors with a coin per copper higher than the set value."
+        desc = "Prevent accepting visitors with a coins per copper higher than the set value."
     )
     @ConfigEditorBoolean
     @FeatureToggle
