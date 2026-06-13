@@ -12,8 +12,10 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
 import io.github.notenoughupdates.moulconfig.observer.Property
 
@@ -50,14 +52,38 @@ class PetDisplayConfig : Config() {
     @Category(name = "Visual Elements", desc = "Visual element settings for the pet display.")
     val visual: MainVisualPetDisplayConfig = MainVisualPetDisplayConfig()
 
-    class MainVisualPetDisplayConfig : VisualPetDisplayConfig() {
+    class MainVisualPetDisplayConfig {
         @Expose
-        @ConfigOption(name = "Exp-Share Pets Customization", desc = "")
+        @ConfigOption(name = "Equipped Pet Visuals", desc = "")
         @Accordion
+        @ConfigOrder(10)
+        val equippedPet: EquippedPetVisualConfig = EquippedPetVisualConfig()
+
+        @Expose
+        @ConfigOption(name = "Exp-Share Pets Visuals", desc = "")
+        @Accordion
+        @ConfigOrder(20)
         val expSharePets: ExpSharePetDisplayConfig = ExpSharePetDisplayConfig(scalar = 0.6f)
     }
+
+    class EquippedPetVisualConfig : VisualPetDisplayConfig()
 
     @Expose
     @Category(name = "Text Elements", desc = "Text element settings for the pet display.")
     val text: TextPetDisplayConfig = TextPetDisplayConfig()
+
+    @Expose
+    @Category(name = "Preview", desc = "Preview settings for the pet display.")
+    val preview: PreviewPetDisplayConfig = PreviewPetDisplayConfig()
+
+    class PreviewPetDisplayConfig {
+        @Expose
+        @ConfigOption(
+            name = "Preview Scale",
+            desc = "How large the pet display preview should be."
+        )
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 3.0f, minStep = 0.05f)
+        @ConfigOrder(10)
+        val scale: Property<Float> = Property.of(1.0f)
+    }
 }

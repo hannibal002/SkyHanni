@@ -8,6 +8,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 interface PetTextDisplaySettings {
@@ -17,27 +18,13 @@ interface PetTextDisplaySettings {
     val nameSkinSymbol: Property<Boolean>
     val nextLevelPercent: Property<Boolean>
     val xpFormat: Property<TextPetDisplayConfig.NumberFormatEntry>
+    val textScale: Property<Float>
     val textLocation: Property<TextPetDisplayConfig.TextLocationOption>
     val verticalAlign: Property<RenderUtils.VerticalAlignment>
     val horizontalAlign: Property<RenderUtils.HorizontalAlignment>
 }
 
-class TextPetDisplayConfig : PetTextDisplaySettings {
-    @Expose
-    @ConfigOption(
-        name = "Enabled Text",
-        desc = "Show text relating to your pet in the GUI element.\n" +
-            "§eItems that are gray are dependent on the items in red."
-    )
-    @ConfigEditorDraggableList
-    override val enabledTexts: Property<MutableList<TextElement>> = Property.of(
-        mutableListOf(
-            TextElement.PET_NAME,
-            TextElement.NEXT_LEVEL,
-            TextElement.HELD_ITEM,
-        )
-    )
-
+class TextPetDisplayConfig {
     enum class TextElement(private val displayName: String, private val label: String = "") {
         PET_NAME("§7[Lvl 100] §6Mithril Golem §5✦"),
         NEXT_LEVEL("§b2,000§9/§b4,000 §7- §e50%", "Next Level"),
@@ -50,52 +37,6 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
         override fun toString() = getFormattedLabel() + displayName
     }
 
-    @Expose
-    @ConfigOption(
-        name = "Text Labels",
-        desc = "Show labels before each text line explaining what data it is."
-    )
-    @ConfigEditorBoolean
-    override val textLabels: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Pet Level",
-        desc = "Show pet level in the pet name text.\n" +
-            "§ePet Name must be enabled above."
-    )
-    @ConfigEditorBoolean
-    override val nameLevel: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Skin Symbol",
-        desc = "Show a symbol for pet skin in the pet name text.\n" +
-            "§ePet Name must be enabled above."
-    )
-    @ConfigEditorBoolean
-    override val nameSkinSymbol: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "Next Level %",
-        desc = "Show a percentage after your exp progress.\n" +
-            "§eNext Level must be enabled above."
-    )
-    @ConfigEditorBoolean
-    override val nextLevelPercent: Property<Boolean> = Property.of(true)
-
-    @Expose
-    @ConfigOption(
-        name = "XP Format",
-        desc = "Either show default, formatted, or unformatted numbers.\n" +
-            "§eDefault: §72,240/2.2k\n" +
-            "§eFormatted: §72.2k/2.2k\n" +
-            "§eUnformatted: §72,240/2,200"
-    )
-    @ConfigEditorDropdown
-    override val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
-
     enum class NumberFormatEntry(
         private val displayName: String,
     ) {
@@ -106,15 +47,6 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
 
         override fun toString() = displayName
     }
-
-    @Expose
-    @ConfigOption(
-        name = "Text Location",
-        desc = "Where the text will be placed, relative to the Visual Elements above.\n" +
-            "§eOnly has any effect if one or more Visual Elements are enabled."
-    )
-    @ConfigEditorDropdown
-    override val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
 
     enum class TextLocationOption(private val displayName: String) {
         TOP("Top"),
@@ -127,24 +59,138 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
     }
 
     @Expose
-    @ConfigOption(
-        name = "Vertical Alignment",
-        desc = "How text elements will align vertically.",
-    )
-    @ConfigEditorDropdown
-    override val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
+    @ConfigOption(name = "Equipped Pet Text", desc = "")
+    @Accordion
+    @ConfigOrder(10)
+    val equippedPet: EquippedPetTextConfig = EquippedPetTextConfig()
 
-    @Expose
-    @ConfigOption(
-        name = "Horizontal Alignment",
-        desc = "How text elements will align horizontally.",
-    )
-    @ConfigEditorDropdown
-    override val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+    class EquippedPetTextConfig : PetTextDisplaySettings {
+        @Expose
+        @ConfigOption(
+            name = "Enabled Text",
+            desc = "Show text relating to your pet in the GUI element.\n" +
+                "§eItems that are gray are dependent on the items in red."
+        )
+        @ConfigEditorDraggableList
+        @ConfigOrder(10)
+        override val enabledTexts: Property<MutableList<TextElement>> = Property.of(
+            mutableListOf(
+                TextElement.PET_NAME,
+                TextElement.NEXT_LEVEL,
+                TextElement.HELD_ITEM,
+            )
+        )
+
+        @Expose
+        @ConfigOption(
+            name = "Text Labels",
+            desc = "Show labels before each text line explaining what data it is."
+        )
+        @ConfigEditorBoolean
+        @ConfigOrder(20)
+        override val textLabels: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "Pet Level",
+            desc = "Show pet level in the pet name text.\n" +
+                "§ePet Name must be enabled above."
+        )
+        @ConfigEditorBoolean
+        @ConfigOrder(30)
+        override val nameLevel: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "Skin Symbol",
+            desc = "Show a symbol for pet skin in the pet name text.\n" +
+                "§ePet Name must be enabled above."
+        )
+        @ConfigEditorBoolean
+        @ConfigOrder(40)
+        override val nameSkinSymbol: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "Next Level %",
+            desc = "Show a percentage after your exp progress.\n" +
+                "§eNext Level must be enabled above."
+        )
+        @ConfigEditorBoolean
+        @ConfigOrder(50)
+        override val nextLevelPercent: Property<Boolean> = Property.of(true)
+
+        @Expose
+        @ConfigOption(
+            name = "XP Format",
+            desc = "Either show default, formatted, or unformatted numbers.\n" +
+                "§eDefault: §72,240/2.2k\n" +
+                "§eFormatted: §72.2k/2.2k\n" +
+                "§eUnformatted: §72,240/2,200"
+        )
+        @ConfigEditorDropdown
+        @ConfigOrder(60)
+        override val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
+
+        @Expose
+        @ConfigOption(
+            name = "Text Scale",
+            desc = "How large equipped pet text should be."
+        )
+        @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.05f)
+        @ConfigOrder(70)
+        override val textScale: Property<Float> = Property.of(1.0f)
+
+        @Expose
+        @ConfigOption(
+            name = "Text Location",
+            desc = "Where the text will be placed, relative to the Visual Elements above.\n" +
+                "§eOnly has any effect if one or more Visual Elements are enabled."
+        )
+        @ConfigEditorDropdown
+        @ConfigOrder(80)
+        override val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
+
+        @Expose
+        @ConfigOption(
+            name = "Center Target",
+            desc = "What equipped pet text should center around."
+        )
+        @ConfigEditorDropdown
+        @ConfigOrder(90)
+        val centerTarget: Property<CenterTarget> = Property.of(CenterTarget.EQUIPPED_PET_VISUALS)
+
+        enum class CenterTarget(private val displayName: String) {
+            EQUIPPED_PET_VISUALS("Equipped Pet Visuals"),
+            ALL_PET_VISUALS("All Pet Visuals"),
+            ;
+
+            override fun toString() = displayName
+        }
+
+        @Expose
+        @ConfigOption(
+            name = "Vertical Alignment",
+            desc = "How text elements will align vertically.",
+        )
+        @ConfigEditorDropdown
+        @ConfigOrder(100)
+        override val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
+
+        @Expose
+        @ConfigOption(
+            name = "Horizontal Alignment",
+            desc = "How text elements will align horizontally.",
+        )
+        @ConfigEditorDropdown
+        @ConfigOrder(110)
+        override val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+    }
 
     @Expose
     @ConfigOption(name = "Exp-Share Pet Text", desc = "")
     @Accordion
+    @ConfigOrder(20)
     val expSharePets: ExpSharePetTextConfig = ExpSharePetTextConfig()
 
     class ExpSharePetTextConfig : PetTextDisplaySettings {
@@ -154,6 +200,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Show text next to your Exp-Share pet icons."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(10)
         val enabled: Property<Boolean> = Property.of(false)
 
         @Expose
@@ -162,6 +209,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Where Exp-Share pet text should be displayed."
         )
         @ConfigEditorDropdown
+        @ConfigOrder(20)
         val textMode: Property<TextMode> = Property.of(TextMode.BUNDLED_WITH_MAIN)
 
         enum class TextMode(private val displayName: String) {
@@ -178,6 +226,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Where bundled Exp-Share pet text should be placed around the main pet text."
         )
         @ConfigEditorDropdown
+        @ConfigOrder(30)
         val bundledLocation: Property<BundledTextLocation> = Property.of(BundledTextLocation.BELOW)
 
         @Expose
@@ -186,6 +235,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Space between bundled Exp-Share pet text and the main pet text."
         )
         @ConfigEditorSlider(minValue = 0f, maxValue = 20f, minStep = 1f)
+        @ConfigOrder(40)
         val bundledSpacing: Property<Int> = Property.of(9)
 
         @Expose
@@ -194,7 +244,8 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "How large Exp-Share pet text should be."
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.05f)
-        val textScale: Property<Float> = Property.of(1.0f)
+        @ConfigOrder(50)
+        override val textScale: Property<Float> = Property.of(1.0f)
 
         enum class BundledTextLocation(private val displayName: String) {
             ABOVE("Above Main Text"),
@@ -212,6 +263,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
                 "§eItems that are gray are dependent on the items in red."
         )
         @ConfigEditorDraggableList
+        @ConfigOrder(60)
         override val enabledTexts: Property<MutableList<TextElement>> = Property.of(
             mutableListOf(
                 TextElement.PET_NAME,
@@ -225,6 +277,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Show labels before each text line explaining what data it is."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(70)
         override val textLabels: Property<Boolean> = Property.of(true)
 
         @Expose
@@ -234,6 +287,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
                 "§ePet Name must be enabled above."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(80)
         override val nameLevel: Property<Boolean> = Property.of(true)
 
         @Expose
@@ -243,6 +297,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
                 "§ePet Name must be enabled above."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(90)
         override val nameSkinSymbol: Property<Boolean> = Property.of(true)
 
         @Expose
@@ -252,6 +307,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
                 "§eNext Level must be enabled above."
         )
         @ConfigEditorBoolean
+        @ConfigOrder(100)
         override val nextLevelPercent: Property<Boolean> = Property.of(true)
 
         @Expose
@@ -263,6 +319,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
                 "§eUnformatted: §72,240/2,200"
         )
         @ConfigEditorDropdown
+        @ConfigOrder(110)
         override val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
 
         @Expose
@@ -271,6 +328,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "Where attached text will be placed, relative to each Exp-Share pet icon."
         )
         @ConfigEditorDropdown
+        @ConfigOrder(120)
         override val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
 
         @Expose
@@ -279,6 +337,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "How text elements will align vertically.",
         )
         @ConfigEditorDropdown
+        @ConfigOrder(130)
         override val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
 
         @Expose
@@ -287,6 +346,7 @@ class TextPetDisplayConfig : PetTextDisplaySettings {
             desc = "How text elements will align horizontally.",
         )
         @ConfigEditorDropdown
+        @ConfigOrder(140)
         override val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
     }
 }

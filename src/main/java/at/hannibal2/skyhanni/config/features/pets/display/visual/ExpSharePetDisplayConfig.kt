@@ -50,18 +50,18 @@ class ExpSharePetDisplayConfig(
     }
 
     @Expose
-    @ConfigOption(name = "Pet Item", desc = "")
+    @ConfigOption(name = "Background Color", desc = "")
     @Accordion
     @ConfigOverride(overrideOrder = 40)
     @ConfigOrder(40)
-    override val petItem: PetItemConfig = PetItemConfig(scalar)
+    override val rarityBackground: ExpShareBackgroundColorConfig = ExpShareBackgroundColorConfig(scalar)
 
     @Expose
-    @ConfigOption(name = "Background Color", desc = "")
+    @ConfigOption(name = "Pet Item", desc = "")
     @Accordion
     @ConfigOverride(overrideOrder = 50)
     @ConfigOrder(50)
-    override val rarityBackground: ExpShareBackgroundColorConfig = ExpShareBackgroundColorConfig(scalar)
+    override val petItem: PetItemConfig = PetItemConfig(scalar)
 
     class ExpShareBackgroundColorConfig(
         scalar: Float = 1.0f,

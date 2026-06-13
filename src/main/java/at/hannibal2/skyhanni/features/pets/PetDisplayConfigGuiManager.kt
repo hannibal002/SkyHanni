@@ -19,11 +19,13 @@ import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import net.minecraft.client.Minecraft
+import kotlin.math.roundToInt
 
 @SkyHanniModule
 object PetDisplayConfigGuiManager {
 
     private var editor: MoulConfigEditor<PetDisplayConfig>? = null
+    private val config get() = SkyHanniMod.feature.misc.pets.display
     private val widenConfig get() = SkyHanniMod.feature.gui.widenConfig
 
     private var previewPosition: PreviewPosition? = null
@@ -34,7 +36,6 @@ object PetDisplayConfigGuiManager {
 
     fun getEditorInstance(): MoulConfigEditor<PetDisplayConfig> {
         editor?.let { return it }
-        val config = SkyHanniMod.feature.misc.pets.display
         val processor = MoulConfigProcessor(config)
         BuiltinMoulConfigGuis.addProcessors(processor)
         val driver = ConfigProcessorDriver(processor)
@@ -64,9 +65,12 @@ object PetDisplayConfigGuiManager {
         val margin = 100 / window.guiScale.coerceAtLeast(1)
         val ySize = (screenHeight - margin).coerceAtMost(400)
         val editorBottom = (screenHeight + ySize) / 2
+        val previewScale = config.preview.scale.get()
+        val previewWidth = (renderable.width * previewScale).roundToInt()
+        val previewHeight = (renderable.height * previewScale).roundToInt()
 
-        val paneWidth = renderable.width + INNER_PAD * 2
-        val paneHeight = renderable.height + INNER_PAD * 2 + LABEL_HEIGHT + LABEL_GAP
+        val paneWidth = previewWidth + INNER_PAD * 2
+        val paneHeight = previewHeight + INNER_PAD * 2 + LABEL_HEIGHT + LABEL_GAP
         val defaultLeft = (screenWidth - paneWidth) / 2
         val defaultTop = editorBottom
         val position = updatePreviewPosition(
@@ -100,6 +104,7 @@ object PetDisplayConfigGuiManager {
         val renderY = paneTop + INNER_PAD + LABEL_HEIGHT + LABEL_GAP
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(renderX.toFloat(), renderY.toFloat())
+            DrawContextUtils.scale(previewScale, previewScale)
             Renderable.withMousePosition(renderX, renderY) { renderable.render(0, 0) }
         }
     }
