@@ -15,23 +15,32 @@ object MoveInsertIntoSackButton {
 
     private var inSackMenu = false
     private var insertIntoSackItem: SafeItemStack? = null
-    private var originalSlot48Item: SafeItemStack? = null
+    private var originalSlotItem: SafeItemStack? = null
 
-    private const val CHEST_SLOT = 51
-    private const val SWAP_TARGET_SLOT = 48
+    private var chestSlot = -1
+    private var swapTargetSlot = -1
 
     @HandleEvent
     fun onSackOpen(event: SackOpenEvent) {
-        if (config) return
-        val openEvent = event.inventoryOpenEvent
+        if (!config) return
+        val openEvent = event.inventoryOpenEvent ?: return
         val items = openEvent.inventoryItems
+        val size = openEvent.inventorySize
 
-        val item = items[CHEST_SLOT]
+        // Dynamically compute positions based on rows of 9 columns
+        val computedChestSlot = size - 3
+        val computedTargetSlot = computedChestSlot - 3
+
+        if (computedTargetSlot < 0) return
+
+        val item = items[computedChestSlot]
         if (item == null || item.getItem() != Items.CHEST) return
 
         inSackMenu = true
+        chestSlot = computedChestSlot
+        swapTargetSlot = computedTargetSlot
         insertIntoSackItem = item
-        originalSlot48Item = items[SWAP_TARGET_SLOT]
+        originalSlotItem = items[swapTargetSlot]
     }
 
     @HandleEvent
@@ -39,13 +48,12 @@ object MoveInsertIntoSackButton {
         if (!isEnabled()) return
 
         val newSlotItem = when (event.slot) {
-            SWAP_TARGET_SLOT -> insertIntoSackItem
-            CHEST_SLOT -> originalSlot48Item
+            swapTargetSlot -> insertIntoSackItem
+            chestSlot -> originalSlotItem
             else -> return
         } ?: return
 
         event.replace(newSlotItem)
-
     }
 
     @HandleEvent
@@ -53,8 +61,8 @@ object MoveInsertIntoSackButton {
         if (!isEnabled()) return
 
         val newSlotId = when (event.slotId) {
-            SWAP_TARGET_SLOT -> CHEST_SLOT
-            CHEST_SLOT -> SWAP_TARGET_SLOT
+            swapTargetSlot -> chestSlot
+            chestSlot -> swapTargetSlot
             else -> return
         }
         event.redirectClick(newSlotId)
@@ -64,7 +72,9 @@ object MoveInsertIntoSackButton {
     fun onInventoryClose() {
         inSackMenu = false
         insertIntoSackItem = null
-        originalSlot48Item = null
+        originalSlotItem = null
+        chestSlot = -1
+        swapTargetSlot = -1
     }
 
     fun isEnabled() = config && inSackMenu
