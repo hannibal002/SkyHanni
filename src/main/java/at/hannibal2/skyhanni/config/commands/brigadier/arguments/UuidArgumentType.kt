@@ -9,12 +9,7 @@ import java.util.UUID
 
 class UuidArgumentType : ArgumentType<UUID> {
     override fun parse(reader: StringReader): UUID {
-        val input =
-            if (reader.canRead() && reader.peek() == '"')
-                reader.readQuotedString()
-            else
-                readUnquoted(reader)
-
+        val input = reader.readString()
         return StringUtils.parseUUIDOrNull(input)
             ?: throw invalidUuid.createWithContext(reader)
     }

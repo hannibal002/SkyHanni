@@ -10,14 +10,9 @@ import net.minecraft.world.entity.player.Player
 
 class PlayerArgumentType private constructor() : ArgumentType<Player> {
     override fun parse(reader: StringReader): Player {
-        val username = if (reader.canRead() && reader.peek() == '"') {
-            reader.readQuotedString()
-        } else {
-            reader.readUnquotedString()
-        }
-
+        val username = reader.readString()
         return getAllPlayers()
-            .firstOrNull { it.gameProfile.name.equals(username, ignoreCase = true) }
+            .firstOrNull { it.name.string.equals(username, ignoreCase = true) }
             ?: throw PLAYER_NOT_FOUND.create(username)
     }
 
