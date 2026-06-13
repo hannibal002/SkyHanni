@@ -142,7 +142,7 @@ class ChangeLogViewerScreen : SkyHanniBaseScreen() {
                         )
                     } else {
                         ErrorManager.skyHanniError(
-                            "Idk how you ended up here",
+                            "how did you reach this place?",
                             "changelog" to changelogList,
                             "transformed" to this,
                             "show beta" to ChangelogViewer.shouldShowBeta,

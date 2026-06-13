@@ -363,7 +363,7 @@ object EnoughUpdatesManager {
         val directorySize = itemsFolder.listFiles()?.size ?: 0
 
         val status = when {
-            directorySize == 0 -> "§cNo items directory found!"
+            directorySize == 0 -> "§cNo directory items found!"
             loadedItems == 0 -> "§cNo items loaded!"
             loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
             loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
