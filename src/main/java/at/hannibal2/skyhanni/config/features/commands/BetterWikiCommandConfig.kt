@@ -13,7 +13,7 @@ class BetterWikiCommandConfig {
     @ConfigOption(
         name = "Enabled",
         desc = "Improve the functionality of the /wiki command. " +
-            "This is required for all the below features.",
+            "This is required for all of the below features.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
