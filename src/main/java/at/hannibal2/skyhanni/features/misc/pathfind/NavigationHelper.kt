@@ -126,7 +126,7 @@ object NavigationHelper {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shnavigate") {
-            description = "Using pathfinder to go to locations"
+            description = "Using path finder to go to locations"
             aliases = listOf("shnav")
             argCallback("coords", LorenzVecArgumentType.double()) { location ->
                 pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
