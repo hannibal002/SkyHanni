@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
@@ -10,6 +11,8 @@ import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object MoveInsertIntoSackButton {
+    private val config get() = SkyHanniMod.feature.misc.moveInsertIntoSackButton
+
     private var inSackMenu = false
     private var insertIntoSackItem: SafeItemStack? = null
     private var originalSlot48Item: SafeItemStack? = null
@@ -19,6 +22,7 @@ object MoveInsertIntoSackButton {
 
     @HandleEvent
     fun onSackOpen(event: SackOpenEvent) {
+        if (config) return
         val openEvent = event.inventoryOpenEvent
         val items = openEvent.inventoryItems
 
@@ -63,5 +67,5 @@ object MoveInsertIntoSackButton {
         originalSlot48Item = null
     }
 
-    fun isEnabled() = inSackMenu
+    fun isEnabled() = config && inSackMenu
 }

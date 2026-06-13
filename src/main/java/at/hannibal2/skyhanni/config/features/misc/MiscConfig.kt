@@ -418,6 +418,15 @@ class MiscConfig {
     var gfsPiggyBank: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Move Insert Into Sack Button",
+        desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var moveInsertIntoSackButton: Boolean = false
+
+    @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
