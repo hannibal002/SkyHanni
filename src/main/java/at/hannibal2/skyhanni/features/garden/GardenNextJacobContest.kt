@@ -355,7 +355,7 @@ object GardenNextJacobContest {
         }
 
         display = if (fetchingContestsMutex.isLocked) {
-            Renderable.text("§cFetching this year's jacob contests...")
+            Renderable.text("§cFetching this year's Jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
