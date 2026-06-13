@@ -76,16 +76,17 @@ public abstract class MixinMinecraft {
         at = @At(value = "HEAD"),
         method = "continueAttack",
         argsOnly = true,
+        //~ if < 26.1 'down' -> 'bl'
         name = "down"
     )
-    public boolean handleBlockClick(boolean isLeftClick) {
-        if (isLeftClick && this.missTime <= 0) {
+    public boolean handleBlockClick(boolean down) {
+        if (down && this.missTime <= 0) {
             if (this.gameMode != null && MinecraftInputHook.shouldCancelContinuedBlockBreak(
                 this.hitResult,
                 this.gameMode.destroyBlockPos
             )) return false;
         }
-        return isLeftClick;
+        return down;
     }
 
     //? if < 26.2 {
