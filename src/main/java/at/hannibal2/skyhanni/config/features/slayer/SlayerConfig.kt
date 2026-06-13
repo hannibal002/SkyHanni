@@ -67,6 +67,11 @@ class SlayerConfig {
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
 
     @Expose
+    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
+    @Accordion
+    var gummyWarning: GummyWarningConfig = GummyWarningConfig()
+
+    @Expose
     @ConfigOption(name = "Slayer Time Messages", desc = "")
     @Accordion
     val slayerTimeMessages: SlayerTimeMessagesConfig = SlayerTimeMessagesConfig()
@@ -134,11 +139,6 @@ class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var questWarningTitle: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
-    @Accordion
-    var gummyWarning: GummyWarningConfig = GummyWarningConfig()
 
     @Expose
     @ConfigOption(

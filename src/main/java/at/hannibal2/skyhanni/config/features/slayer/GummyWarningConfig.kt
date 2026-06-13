@@ -12,4 +12,9 @@ class GummyWarningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var enabled: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Only When Slayer Active", desc = "Only warn when you have an active slayer quest.")
+    @ConfigEditorBoolean
+    var onlyWhenSlayerActive: Boolean = true
 }

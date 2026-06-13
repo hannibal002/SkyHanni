@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.SlayerApi
 import net.minecraft.sounds.SoundEvents
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -52,6 +53,7 @@ object GummyWarning {
     fun onEntityClick(event: EntityClickEvent) {
         if (event.action != EntityClickEvent.ActionType.ATTACK) return
         if (!config.enabled) return
+        if (config.onlyWhenSlayerActive && SlayerApi.activeType == null) return
 
         val id = event.itemInHand?.getInternalNameOrNull()?.asString() ?: return
         if (!SLAYER_WEAPONS.contains(id)) return
