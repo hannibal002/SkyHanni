@@ -9,8 +9,7 @@ class CleanEndConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "After the last Dungeon boss has died, all entities and " +
-            "particles are no longer displayed and the music stops playing, but the loot chests are still displayed."
+        desc = "After the last dungeon boss had died, stop the music and hide all entities and particles except the loot chests."
     )
     @ConfigEditorBoolean
     @FeatureToggle
