@@ -25,10 +25,10 @@ object MoveInsertIntoSackButton {
         if (!config) return
         val openEvent = event.inventoryOpenEvent
         val items = openEvent.inventoryItems
-        val size = openEvent.inventorySize
+        val lastSlotIndex = openEvent.inventorySize - 1
 
-        val computedChestSlot = size - 3
-        val computedTargetSlot = computedChestSlot - 3
+        val computedChestSlot = lastSlotIndex - 2
+        val computedTargetSlot = lastSlotIndex - 5
 
         if (computedTargetSlot < 0) return
 
