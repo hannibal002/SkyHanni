@@ -137,7 +137,7 @@ class SlayerConfig {
 
     @Expose
     @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
-    @FeatureToggle
+    @Accordion
     var gummyWarning: GummyWarningConfig = GummyWarningConfig()
 
     @Expose
