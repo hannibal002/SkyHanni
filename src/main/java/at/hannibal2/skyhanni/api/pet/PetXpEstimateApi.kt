@@ -385,7 +385,8 @@ object PetXpEstimateApi {
                         previousPreciseTotalXp + (decomposedGain ?: if (useVisibleGain) event.gained else displayedGain)
                     val preciseTotalXp = unclampedTotalXp.coerceIn(totalXp, totalXp + MAX_TOTAL_FRACTION)
                     val preciseGain = preciseTotalXp - previousPreciseTotalXp
-                    val totalGain = preciseGain - consumeUnsurfacedXp(event.skill, preciseGain)
+                    val hiddenGain = (preciseGain - event.gained).takeIf { it > VISIBLE_GAIN_EPSILON } ?: 0.0
+                    val totalGain = preciseGain - consumeUnsurfacedXp(event.skill, hiddenGain)
                     val previousPetUuid = previous.petUuid
                     val swappedPet = previousPetUuid != null && previousPetUuid != currentPetUuid
                     val autopetSwap = lastAutopetSwap?.takeIf {
