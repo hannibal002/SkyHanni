@@ -151,7 +151,7 @@ object ArrowGuessBurrow {
         }
 
         if (candidates.isEmpty()) {
-            GriffinBurrowHelper.addDebug("candidates are empty")
+            GriffinBurrowHelper.addDebug("candidates list is empty")
             return null
         }
         val minValue = candidates.values.minOf { it.first }
