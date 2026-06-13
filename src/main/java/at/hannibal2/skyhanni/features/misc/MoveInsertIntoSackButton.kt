@@ -23,11 +23,10 @@ object MoveInsertIntoSackButton {
     @HandleEvent
     fun onSackOpen(event: SackOpenEvent) {
         if (!config) return
-        val openEvent = event.inventoryOpenEvent ?: return
+        val openEvent = event.inventoryOpenEvent
         val items = openEvent.inventoryItems
         val size = openEvent.inventorySize
 
-        // Dynamically compute positions based on rows of 9 columns
         val computedChestSlot = size - 3
         val computedTargetSlot = computedChestSlot - 3
 
