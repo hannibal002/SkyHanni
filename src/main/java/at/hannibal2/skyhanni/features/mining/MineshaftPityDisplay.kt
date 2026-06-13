@@ -208,12 +208,13 @@ object MineshaftPityDisplay {
 
     @HandleEvent
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!MiningApi.inGlacialTunnels() && !MiningApi.inDwarvenBaseCamp()) return
+        if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true
                 tablistPity = MAX_COUNTER - group("pity").formatInt()
+                update()
             }
         }
     }
