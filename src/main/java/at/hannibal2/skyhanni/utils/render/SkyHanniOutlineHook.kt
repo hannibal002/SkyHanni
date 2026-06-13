@@ -69,7 +69,10 @@ object SkyHanniOutlineHook {
                 GpuTexture.USAGE_RENDER_ATTACHMENT or GpuTexture.USAGE_COPY_DST or GpuTexture.USAGE_TEXTURE_BINDING,
                 //~ if < 26.2 'GpuFormat.D32_FLOAT_S8_UINT' -> 'TextureFormat.DEPTH32'
                 GpuFormat.D32_FLOAT_S8_UINT,
-                lastWidth, lastHeight, 1, 1,
+                lastWidth,
+                lastHeight,
+                1,
+                1,
             )
             customDepthAttachment = depthAttachment
             customDepthAttachmentView = device.createTextureView(depthAttachment)
