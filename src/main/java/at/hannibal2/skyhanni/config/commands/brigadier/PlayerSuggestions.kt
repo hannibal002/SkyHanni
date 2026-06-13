@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.dynamicSuggestionProvider
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerCategory
 import com.mojang.brigadier.suggestion.SuggestionProvider
@@ -39,12 +40,12 @@ class PlayerSuggestions private constructor(
         }
     }
 
-    private val cached: List<String> by lazy {
+    private fun getPlayers(): List<String>{
         val excludedNames = exclude
             .flatMap(PlayerCategory::usernames)
             .toSet()
 
-        include
+        return include
             .flatMap(PlayerCategory::usernames)
             .filterNot(excludedNames::contains)
             .filter(filter)
@@ -52,7 +53,7 @@ class PlayerSuggestions private constructor(
     }
 
     fun toBrigadier(): SuggestionProvider<FabricClientCommandSource> {
-        return cached.toSuggestionProvider()
+        return dynamicSuggestionProvider { getPlayers() }
     }
 
     companion object {
