@@ -158,7 +158,9 @@ object PestSpawnTimer {
         if (shouldRepeatWarning) {
             countdownTitleContext?.stop()
             countdownTitleContext = null
-            if (!pestCooldownEndTime.isInPast()) {
+            if (pestCooldownEndTime.isInPast()) {
+                shouldRepeatWarning = false
+            } else {
                 countdownWarn(pestCooldownEndTime.timeUntil())
             }
         }
@@ -286,6 +288,7 @@ object PestSpawnTimer {
             option = config::cooldownOverWarning,
             messageId = cooldownOverMessageId,
         )
+        hasWarned = true
         hasReminderShown = true
 
         if (config.repeatWarning) {
