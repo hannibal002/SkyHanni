@@ -423,8 +423,7 @@ class MiscConfig {
         desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
     )
     @ConfigEditorBoolean
-    @FeatureToggle
-    var moveInsertIntoSackButton: Boolean = true
+    var moveInsertIntoSackButton: Boolean = false
 
     @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
