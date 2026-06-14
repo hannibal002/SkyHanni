@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.commands.brigadier
 
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.dynamicSuggestionProvider
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.toSuggestionProvider
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerCategory
 import com.mojang.brigadier.suggestion.SuggestionProvider
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
@@ -9,7 +8,7 @@ import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 class PlayerSuggestions private constructor(
     private val include: Set<PlayerCategory>,
     private val exclude: Set<PlayerCategory>,
-    private val filter: (String) -> Boolean
+    private val filter: (String) -> Boolean,
 ) {
 
     class Builder {
@@ -40,7 +39,7 @@ class PlayerSuggestions private constructor(
         }
     }
 
-    private fun getPlayers(): List<String>{
+    private fun getPlayers(): List<String> {
         val excludedNames = exclude
             .flatMap(PlayerCategory::usernames)
             .toSet()

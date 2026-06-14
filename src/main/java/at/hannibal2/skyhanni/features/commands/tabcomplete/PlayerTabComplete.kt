@@ -18,7 +18,7 @@ object PlayerTabComplete {
 
     private val friendsEntry = lazyEntry { PlayerCategory.FRIENDS.usernames().toList() }
     private val partyMembersEntry = lazyEntry { PlayerCategory.PARTY.usernames().toList() }
-    private val guildMembersEntry = lazyEntry { PlayerCategory.GUILD.usernames().toList()}
+    private val guildMembersEntry = lazyEntry { PlayerCategory.GUILD.usernames().toList() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
     private val islandPlayersEntry = lazyEntry { PlayerCategory.ISLAND_PLAYERS.usernames().toList() }
 
