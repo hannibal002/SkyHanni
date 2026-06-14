@@ -424,7 +424,7 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var moveInsertIntoSackButton: Boolean = false
+    var moveInsertIntoSackButton: Boolean = true
 
     @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
