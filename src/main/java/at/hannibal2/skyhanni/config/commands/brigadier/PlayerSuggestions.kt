@@ -28,11 +28,13 @@ class PlayerSuggestions private constructor(
         }
 
         fun exclude(vararg categories: PlayerCategory) = apply {
-            val excluded = categories.asSequence()
+            val excludedSeq = categories
+                .asSequence()
                 .flatMap { it.usernames() }
-                .toSet()
 
-            seq = seq.filterNot { it in excluded }
+            seq = seq.filterNot { name ->
+                excludedSeq.any { it == name }
+            }
         }
 
         fun exclude(vararg players: String) = apply {
@@ -48,13 +50,11 @@ class PlayerSuggestions private constructor(
             seq = seq.filterNot(predicate)
         }
 
-        fun build(): PlayerSuggestions {
-            return PlayerSuggestions(seq)
-        }
+        fun build(): PlayerSuggestions = PlayerSuggestions(seq)
     }
 
     companion object {
-        fun build(block: Builder.() -> Unit): SuggestionProvider<FabricClientCommandSource> {
+        fun builder(block: Builder.() -> Unit): SuggestionProvider<FabricClientCommandSource> {
             return Builder()
                 .apply(block)
                 .build()
