@@ -14,14 +14,6 @@ class UuidArgumentType : ArgumentType<UUID> {
             ?: throw invalidUuid.createWithContext(reader)
     }
 
-    private fun readUnquoted(reader: StringReader): String {
-        val start = reader.cursor
-        while (reader.canRead() && reader.peek() != ' ') {
-            reader.skip()
-        }
-        return reader.string.substring(start, reader.cursor)
-    }
-
     override fun getExamples(): Collection<String> = listOf(
         "123e4567-e89b-12d3-a456-426614174000",
         "\"123e4567-e89b-12d3-a456-426614174000\""
