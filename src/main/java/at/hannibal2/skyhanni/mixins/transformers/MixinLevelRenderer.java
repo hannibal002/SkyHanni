@@ -168,22 +168,17 @@ public abstract class MixinLevelRenderer {
         SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
 
-    @WrapOperation(
+    //? if < 26.2 {
+    /*@Inject(
         method = "lambda$addMainPass$0",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.2 {
-            target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;executeOutline()V"
-            //?} else
-            //target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"
+            target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"
         )
     )
-    //~ if < 26.2 'FeatureRenderDispatcher.PreparedFrame' -> 'OutlineBufferSource'
-    private void renderSkyHanniGlow(FeatureRenderDispatcher.PreparedFrame instance, Operation<Void> original) {
-        boolean areMobsHighlighted = RenderLivingEntityHelper.getAreMobsHighlighted();
-
-        if (areMobsHighlighted) SkyHanniOutlineHook.beginRendering();
-        original.call(instance);
-        if (areMobsHighlighted) SkyHanniOutlineHook.finishRendering();
+    private void renderSkyHanniGlow(CallbackInfo ci) {
+        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
+        SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
     }
+    *///?}
 }

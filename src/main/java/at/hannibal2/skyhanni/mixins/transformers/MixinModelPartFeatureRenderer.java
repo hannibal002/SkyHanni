@@ -28,9 +28,11 @@ public abstract class MixinModelPartFeatureRenderer {
     ) {
         boolean hasCustomOutline = modelPartSubmit.skyhanni$isUsingCustomOutline();
 
-        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
+        if (hasCustomOutline) {
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
+            return;
+        }
         original.call(outlineBufferSource, color);
-        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
     }
 
     @WrapOperation(
@@ -48,11 +50,10 @@ public abstract class MixinModelPartFeatureRenderer {
     ) {
         boolean hasCustomOutline = modelPartSubmit.skyhanni$isUsingCustomOutline();
 
-        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
-        VertexConsumer orig = original.call(outlineBufferSource, renderType);
-        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
-
-        return orig;
+        if (hasCustomOutline) {
+            return original.call(SkyHanniOutlineHook.getVertexConsumers(), renderType);
+        }
+        return original.call(outlineBufferSource, renderType);
     }
 }
 *///?}

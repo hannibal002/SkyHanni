@@ -62,9 +62,13 @@ public abstract class MixinItemFeatureRenderer {
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
+        //? if < 26.2 {
+        /*if (hasCustomOutline) {
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
+            return;
+        }
+        *///?}
         original.call(instance, color);
-        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
     }
 
     //? if >= 26.1 {
@@ -90,11 +94,22 @@ public abstract class MixinItemFeatureRenderer {
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
-        VertexConsumer orig = original.call(instance, renderType);
-        if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
-
-        return orig;
+        //? if < 26.2 {
+        /*if (hasCustomOutline) {
+            return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
+        }
+        *///?}
+        //? if >= 26.2 {
+        if (hasCustomOutline) {
+            SkyHanniOutlineHook.beginCustomOutlineBuild();
+            try {
+                return original.call(instance, renderType);
+            } finally {
+                SkyHanniOutlineHook.finishCustomOutlineBuild();
+            }
+        }
+        //?}
+        return original.call(instance, renderType);
     }
     //?} else {
     /*@WrapOperation(
