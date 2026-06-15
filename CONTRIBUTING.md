@@ -91,7 +91,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
+Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -296,14 +296,7 @@ debugging in IntelliJ. This is very useful for coding live on Hypixel without th
 - SkyHanni will automatically set up DevAuth.
 - Start Minecraft inside IntelliJ normally.
     - Click on the link in the console and verify with a Microsoft account.
-    - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
+    - The verification process will reappear every few days (after the session token [expires).
 
 ### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
 
