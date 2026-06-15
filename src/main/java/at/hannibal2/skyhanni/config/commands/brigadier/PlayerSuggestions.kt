@@ -6,53 +6,51 @@ import com.mojang.brigadier.suggestion.SuggestionProvider
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource
 
 class PlayerSuggestions private constructor(
-    private val include: Set<PlayerCategory>,
-    private val exclude: Set<PlayerCategory>,
-    private val filter: (String) -> Boolean,
+    private val sequence: Sequence<String>,
 ) {
 
-    class Builder {
-        private val include = mutableSetOf<PlayerCategory>()
-        private val exclude = mutableSetOf<PlayerCategory>()
-        private var filter: (String) -> Boolean = { true }
-
-        fun include(vararg categories: PlayerCategory) = apply {
-            include.addAll(categories)
-        }
-
-        fun exclude(vararg categories: PlayerCategory) = apply {
-            exclude.addAll(categories)
-        }
-
-        fun filter(predicate: (String) -> Boolean) = apply {
-            val old = filter
-            filter = { old(it) && predicate(it) }
-        }
-
-        fun filterNot(predicate: (String) -> Boolean) = apply {
-            val old = filter
-            filter = { old(it) && !predicate(it) }
-        }
-
-        fun build(): PlayerSuggestions {
-            return PlayerSuggestions(include, exclude, filter)
-        }
-    }
-
-    private fun getPlayers(): List<String> {
-        val excludedNames = exclude
-            .flatMap(PlayerCategory::usernames)
-            .toSet()
-
-        return include
-            .flatMap(PlayerCategory::usernames)
-            .filterNot(excludedNames::contains)
-            .filter(filter)
-            .toList()
-    }
+    fun getPlayers(): List<String> =
+        sequence.distinct().toList()
 
     fun toBrigadier(): SuggestionProvider<FabricClientCommandSource> {
         return dynamicSuggestionProvider { getPlayers() }
+    }
+
+    class Builder {
+        private var seq: Sequence<String> = emptySequence()
+
+        fun include(vararg categories: PlayerCategory) = apply {
+            seq += categories.asSequence().flatMap { it.usernames() }
+        }
+
+        fun include(vararg players: String) = apply {
+            seq += players.asSequence()
+        }
+
+        fun exclude(vararg categories: PlayerCategory) = apply {
+            val excluded = categories.asSequence()
+                .flatMap { it.usernames() }
+                .toSet()
+
+            seq = seq.filterNot { it in excluded }
+        }
+
+        fun exclude(vararg players: String) = apply {
+            val excluded = players.toSet()
+            seq = seq.filterNot { it in excluded }
+        }
+
+        fun filter(predicate: (String) -> Boolean) = apply {
+            seq = seq.filter(predicate)
+        }
+
+        fun filterNot(predicate: (String) -> Boolean) = apply {
+            seq = seq.filterNot(predicate)
+        }
+
+        fun build(): PlayerSuggestions {
+            return PlayerSuggestions(seq)
+        }
     }
 
     companion object {
