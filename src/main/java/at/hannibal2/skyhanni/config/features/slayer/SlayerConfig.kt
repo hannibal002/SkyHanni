@@ -74,7 +74,7 @@ class SlayerConfig {
 
     @Expose
     @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
-    var gummyWarningPosition: Position = Position(10, 10)
+    var gummyWarningPosition: Position = Position(2, 100)
 
     @Expose
     @ConfigOption(name = "Slayer Time Messages", desc = "")

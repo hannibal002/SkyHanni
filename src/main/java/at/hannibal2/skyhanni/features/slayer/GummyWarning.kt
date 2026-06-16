@@ -71,7 +71,7 @@ object GummyWarning {
             enchants.containsKey("ultimate_habanero_tactics")
         }
 
-        val inSmolderingTomb = SkyBlockUtils.scoreboardArea == "Smoldering Tomb"
+        val inSmolderingTomb = SkyBlockUtils.scoreboardArea == "Smoldering Tomb" || SkyBlockUtils.scoreboardArea == "The Wasteland"
 
         if (!hasHabanero && !inSmolderingTomb) return
 
@@ -91,7 +91,7 @@ object GummyWarning {
             if (!config.gummyWarning) return
             if (warningActive.passedSince() > 3.seconds) return
 
-            val display = Renderable.text("§4§lNo Gummy Warning")
+            val display = Renderable.text("§4§lNo Gummy Warning", scale = 2.0)
             config.gummyWarningPosition.renderRenderable(display, posLabel = "Gummy Warning")
         }
     }
