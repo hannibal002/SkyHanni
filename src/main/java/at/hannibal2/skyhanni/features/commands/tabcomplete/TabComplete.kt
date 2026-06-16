@@ -27,6 +27,7 @@ object TabComplete {
         PlayerTabComplete.handleTabComplete(fullCommand)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
+        CropTimeTabComplete.handleTabComplete(command)?.let { return it }
 
         return null
     }
