@@ -1,6 +1,6 @@
-//? >= 26.1 {
 package at.hannibal2.skyhanni.compat
 
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
