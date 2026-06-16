@@ -204,8 +204,13 @@ dependencies {
     }
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    if (isDeobf) {
+        compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+        compileOnly(libs.skyblockitemlist)
+    } else {
+        modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+        modCompileOnly(libs.skyblockitemlist)
+    }
 
     // getting clock offset
     includeImplementation(libs.commons.net)
@@ -507,4 +512,10 @@ tasks.withType<ValidateAccessWidenerTask>().configureEach {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven("https://maven.operationpotato.com/releases") {
+        content { includeGroup("com.operationpotato") }
+    }
+    maven("https://maven.operationpotato.com/snapshots") {
+        content { includeGroup("com.operationpotato") }
+    }
 }
