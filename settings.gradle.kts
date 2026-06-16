@@ -44,7 +44,7 @@ rootProject.buildFileName = "root.gradle.kts"
 
 stonecutter {
     create(rootProject) {
-        versions("26.2", "26.1", "1.21.11")
+        versions("1.21.11", "26.1", "26.2")
         vcsVersion = "26.2"
     }
 }
