@@ -68,8 +68,13 @@ class SlayerConfig {
 
     @Expose
     @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
-    @Accordion
-    var gummyWarning: GummyWarningConfig = GummyWarningConfig()
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var gummyWarning: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
+    var gummyWarningPosition: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(name = "Slayer Time Messages", desc = "")
