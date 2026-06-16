@@ -296,7 +296,7 @@ debugging in IntelliJ. This is very useful for coding live on Hypixel without th
 - SkyHanni will automatically set up DevAuth.
 - Start Minecraft inside IntelliJ normally.
     - Click on the link in the console and verify with a Microsoft account.
-    - The verification process will reappear every few days (after the session token [expires).
+    - The verification process will reappear every few days (after the session token expires).
 
 ### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
 
