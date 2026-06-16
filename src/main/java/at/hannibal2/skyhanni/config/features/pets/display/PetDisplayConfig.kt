@@ -37,8 +37,8 @@ class PetDisplayConfig : Config() {
 
         @ConfigOption(
             name = "§cXP Accuracy",
-            desc = "For accurate live pet XP, enable the Pet display in Hypixel's /widget menu. " +
-                "Without it, SkyHanni estimates pet XP and may be slightly off."
+            desc = "Pet Display requires the Pet display in Hypixel's /widget menu. " +
+                "SkyHanni estimates live XP between widget updates. For maxed pets, enable Pet widget overflow XP too."
         )
         @ConfigEditorInfoText
         val xpAccuracyWarning: Unit = Unit

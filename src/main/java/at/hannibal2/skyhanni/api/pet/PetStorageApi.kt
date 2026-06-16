@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.PetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -65,9 +66,33 @@ object PetStorageApi {
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
     private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
     private const val EXP_SHARING_INVENTORY_NAME = "Exp Sharing"
+    private val WIDGET_LOAD_GRACE = 3.seconds
     private var jsonNeedsSave: Boolean = false
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
+
+    val isPetWidgetReadyForDisplay: Boolean
+        get() = petWidgetState == PetWidgetState.READY
+
+    val petWidgetDisplayMessage: List<String>?
+        get() = when {
+            !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> listOf(
+                "§cPet Tab Widget Missing",
+                "§cDo /widget and enable the pet widget",
+            )
+            petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> listOf(
+                "§cPet Widget Overflow XP Missing",
+                "§cEnable overflow XP in the pet widget",
+            )
+            else -> null
+        }
+
+    private enum class PetWidgetState {
+        NOT_READY,
+        READY,
+        MAXED_WITHOUT_OVERFLOW_XP,
+    }
 
     // <editor-fold desc="Patterns">
     /**
@@ -297,6 +322,12 @@ object PetStorageApi {
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
+        if (event.isClear()) {
+            if (SkyBlockUtils.lastWorldSwitch.passedSince() < WIDGET_LOAD_GRACE) return
+            petWidgetState = PetWidgetState.NOT_READY
+            return
+        }
+        var foundUsableWidgetPet = false
         for (component in event.lines) {
             petTabWidgetNamePattern.matchMatcher(component.string) {
                 val petName = groupOrNull("pet") ?: return@matchMatcher false
@@ -314,9 +345,13 @@ object PetStorageApi {
                     PetUtils.resolvePetItemOrNull(trimmedLine)
                 }
 
+                var maxedWithoutOverflowXp = false
                 val petExp = petTabWidgetXpPattern.firstMatcher(event.lines.map { it.string }) expFirstMatcher@{
                     // We don't know XP if it's just "MAX LEVEL"
-                    if (groupOrNull("max") != null) return@expFirstMatcher null
+                    if (groupOrNull("max") != null) {
+                        maxedWithoutOverflowXp = true
+                        return@expFirstMatcher null
+                    }
                     val currentLevelXp = PetUtils.levelToXp(level, petInternalName) ?: return@expFirstMatcher null
                     val current = groupOrNull("current") ?: "0"
                     val readXpGroup = current.formatDoubleOrNull() ?: 0.0
@@ -344,15 +379,33 @@ object PetStorageApi {
                     exp = petExp?.value ?: PetUtils.levelToXp(level, petInternalName) ?: 0.0,
                 )
 
+                val previousExp = currentPetData.exp
+                val exactPetExp = petExp.exactValue?.let { currentPetData.reconcileDisplayedExp(it) }
                 currentPetData.applyKnownData(
-                    exp = petExp.exactValue?.let { currentPetData.reconcileDisplayedExp(it) },
+                    exp = exactPetExp,
                     skinInternalName = petSkin?.internalName,
                     heldItemInternalName = petHeldItem,
                 )
 
+                PetXpEstimateApi.recordPetDataRead(
+                    currentPetData,
+                    exact = exactPetExp != null,
+                    previousExp = previousExp,
+                    appliedExp = exactPetExp,
+                )
                 CurrentPetApi.assertFoundCurrentData(currentPetData, CurrentPetApi.PetDataAssertionSource.TAB)
+                if (maxedWithoutOverflowXp) {
+                    petWidgetState = PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP
+                    foundUsableWidgetPet = true
+                } else if (exactPetExp != null) {
+                    petWidgetState = PetWidgetState.READY
+                    foundUsableWidgetPet = true
+                }
                 jsonNeedsSave = true
             }
+        }
+        if (!foundUsableWidgetPet) {
+            petWidgetState = PetWidgetState.NOT_READY
         }
     }
 
@@ -400,8 +453,9 @@ object PetStorageApi {
                 if ((resolvedPet.exp ?: 0.0) < minimumExp) resolvedPet.exp = minimumExp
             }
 
+            val previousPet = CurrentPetApi.currentPet
             CurrentPetApi.assertFoundCurrentData(resolvedPet, CurrentPetApi.PetDataAssertionSource.AUTOPET)
-            PetXpEstimateApi.recordAutopetSwap(resolvedPet.uuid, hoverInfo.autopetTriggerOrNull())
+            PetXpEstimateApi.recordAutopetSwap(resolvedPet, previousPet, hoverInfo.autopetTriggerOrNull())
             jsonNeedsSave = true
         }
     }
@@ -535,7 +589,6 @@ object PetStorageApi {
             it.uuid?.let(exactPetUuids::add)
             if (it.uuid == currentPetUuid || PetXpEstimateApi.shouldRecordPetMenuRead(it.uuid)) {
                 PetXpEstimateApi.recordPetDataRead(
-                    "pet-menu-grid",
                     it,
                     exact = true,
                     previousExp = previousExp,
@@ -626,7 +679,6 @@ object PetStorageApi {
             currentPetData.applyKnownData(exp = exactPetExp, skinInternalName = petSkin?.internalName)
 
             PetXpEstimateApi.recordPetDataRead(
-                "selected-pet-lore",
                 currentPetData,
                 exact = exactPetExp != null,
                 previousExp = previousExp,
@@ -644,7 +696,6 @@ object PetStorageApi {
         }
         if (currentPetData.uuid != null) petStorage?.pets?.addOrReplace(currentPetData)
         PetXpEstimateApi.recordPetDataRead(
-            "selected-pet-nbt",
             currentPetData,
             exact = true,
             previousExp = previousExp,
@@ -684,12 +735,6 @@ object PetStorageApi {
     fun markDirty() {
         jsonNeedsSave = true
     }
-
-    fun getExpSharePets(): List<PetData> = petStorage?.let { petStorage ->
-        petStorage.expSharePets.mapNotNull { uuid ->
-            uuid?.let { petUuid -> petStorage.pets.firstOrNull { it.uuid == petUuid } }
-        }
-    } ?: emptyList()
 
     fun getActiveExpSharePets(): List<PetData> = petStorage?.let { petStorage ->
         petStorage.expSharePets.take(activeExpShareSlotCount()).mapNotNull { uuid ->
@@ -773,6 +818,7 @@ object PetStorageApi {
             }
             val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
             add("currentPetUuid: $currentPetUuid")
+            add("petWidgetState: $petWidgetState")
             add("recentExactPetMenuClick: ${lastExactPetMenuClick.passedSince() < 5.seconds}")
             add("petCount: ${petStorage.pets.size}")
             LorenzRarity.entries.reversed().forEach { rarity ->

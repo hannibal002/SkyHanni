@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.api.pet
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -22,8 +19,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -33,11 +28,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.Locale
 import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.roundToLong
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -78,28 +71,22 @@ object PetXpEstimateApi {
     private const val BATTLE_EXPERIENCE_ATTRIBUTE = "Battle Experience"
     private const val WHY_NOT_MORE_ATTRIBUTE = "Why Not More"
     private const val ACTIONBAR_SKILL_SOURCE = "actionbar"
-    private const val MAX_DEBUG_ENTRIES = 500
     private const val VISIBLE_GAIN_EPSILON = 1.0000001
     private const val UNKNOWN_TOTAL_FRACTION = 0.5
     private const val MAX_TOTAL_FRACTION = 0.999
 
-    private const val UNSURFACED_PET_XP_THRESHOLD = 5.0
-
     private const val MAX_GAIN_QUANTA = 12
     private const val MAX_QUANTA_PARTS = 12
     private val GAIN_QUANTA_MAX_AGE = 10.minutes
+    private val SPAWN_AUTOPET_MAX_AGE = 5.seconds
     private val NON_SKILL_PET_TYPES = setOf("GABAGOOL", "FRACTURED_SOUL")
 
     private val skillSamples = mutableMapOf<SkillType, SkillProgressSample>()
     private val recentSkillEstimates = mutableMapOf<SkillType, RecentSkillEstimate>()
     private val recentEstimatePetUuids = mutableMapOf<UUID, SimpleTimeMark>()
-    private val unsurfacedPetXp = mutableMapOf<UUID, PendingPetXp>()
-    private val exactReadDeficits = mutableMapOf<UUID, PendingPetXp>()
     private val recentGainQuanta = mutableMapOf<SkillType, MutableMap<Double, SimpleTimeMark>>()
-    private val debugEntries = ArrayDeque<String>()
     private var pendingLevelUp: PendingPetLevelUp? = null
-    private var lastAutopetSwap: AutopetSwapContext? = null
-    private var debugEntryCounter = 0
+    private var pendingSpawnAutopetSwap: SpawnAutopetContext? = null
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSkillExpGain(event: SkillExpGainEvent) {
@@ -115,27 +102,14 @@ object PetXpEstimateApi {
         val targetPetExp = targetPet.exp ?: return
         val skillGain = skillRead.gain.takeIf { it > 0.0 } ?: return
 
-        val estimate = estimatePetXp(targetPet, event.skill, skillGain)
-        if (estimate == null) {
-            recordSkillDebug(event, skillRead, "skip=pet-not-eligible target=${targetPet.debugPet()}")
-            return
-        }
-        val petXp = estimate.exp
+        val petXp = estimatePetXp(targetPet, event.skill, skillGain) ?: return
 
         targetPet.uuid?.let { recentEstimatePetUuids[it] = SimpleTimeMark.now() }
         rememberRecentSkillEstimate(event, targetPet, skillRead)
         val targetExp = targetPet.targetExpAfterGain(targetPetExp, petXp)
         val updatedPet = updateTargetPetExp(targetPet, targetExp)
-        val expShareUpdates = updateExpSharePets(event.skill, petXp, targetPet.uuid)
-        recordSkillDebug(
-            event,
-            skillRead,
-            "petXp=${petXp.debugFormat()} before=${targetPetExp.debugFormat()} " +
-                "target=${targetExp.debugFormat()} updated=${updatedPet != null} " +
-                "expShareUpdated=${expShareUpdates.size}${expShareUpdates.debugString()} " +
-                "${estimate.debugString()} targetPet=${targetPet.debugPet()}",
-        )
-        if (updatedPet != null || expShareUpdates.isNotEmpty()) PetStorageApi.markDirty()
+        val expShareUpdated = updateExpSharePets(event.skill, petXp, targetPet.uuid)
+        if (updatedPet != null || expShareUpdated) PetStorageApi.markDirty()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -163,13 +137,7 @@ object PetXpEstimateApi {
                 )
             }
 
-            val updatedPet = CurrentPetApi.updateCurrentPetExp(levelExp)
-            recordDebug(
-                "level-up pet='$petName' level=$level before=${currentExp.debugFormat()} " +
-                    "levelExp=${levelExp.debugFormat()} pending=$storedPending updated=${updatedPet != null} " +
-                    currentPet.debugPet(),
-            )
-            if (updatedPet != null) PetStorageApi.markDirty()
+            if (CurrentPetApi.updateCurrentPetExp(levelExp) != null) PetStorageApi.markDirty()
         }
     }
 
@@ -190,95 +158,35 @@ object PetXpEstimateApi {
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
-        resetSessionState()
+        resetProfileState()
     }
 
     @HandleEvent
     fun onWorldChange() {
-        resetSessionState()
+        resetWorldState()
     }
 
-    private fun resetSessionState() {
+    private fun resetProfileState() {
         skillSamples.clear()
+        recentGainQuanta.clear()
+        resetWorldState()
+    }
+
+    private fun resetWorldState() {
         recentSkillEstimates.clear()
         recentEstimatePetUuids.clear()
-        unsurfacedPetXp.clear()
-        exactReadDeficits.clear()
-        recentGainQuanta.clear()
         pendingLevelUp = null
+        pendingSpawnAutopetSwap = null
     }
 
     fun recordPetDataRead(
-        source: String,
         petData: PetData,
         exact: Boolean,
         previousExp: Double? = null,
         appliedExp: Double? = null,
     ) {
         val appliedDelta = appliedExp?.let { applied -> previousExp?.let { applied - it } }
-        val resynced = exact && petData.resyncSkillFractionFromExactRead(appliedDelta)
-        if (exact && !resynced) {
-            petData.reconcileExactReadDelta(appliedDelta)
-        }
-        recordDebug(
-            "pet-read source=$source exact=$exact previous=${previousExp.debugFormat()} " +
-                "applied=${appliedExp.debugFormat()} delta=${appliedDelta.debugFormat()} " +
-                "resynced=$resynced ${petData.debugPet()}",
-        )
-    }
-
-    private fun PetData.reconcileExactReadDelta(appliedDelta: Double?) {
-        val petUuid = uuid ?: return
-        if (appliedDelta == null) return
-        if (recentEstimatePetUuids[petUuid]?.let { it.passedSince() <= 10.minutes } != true) return
-        unsurfacedPetXp.prune(10.minutes)
-        exactReadDeficits.prune(60.seconds)
-        when {
-            appliedDelta > UNSURFACED_PET_XP_THRESHOLD -> {
-                val surplus = cancelPendingPetXp(exactReadDeficits, this, appliedDelta)
-                if (surplus <= UNSURFACED_PET_XP_THRESHOLD) return
-                val pendingPetXp = (unsurfacedPetXp[petUuid]?.petXp ?: 0.0) + surplus
-                unsurfacedPetXp[petUuid] = PendingPetXp(pendingPetXp)
-                recordDebug("unsurfaced-record petXp=${surplus.debugFormat()} pending=${pendingPetXp.debugFormat()} ${debugPet()}")
-            }
-            appliedDelta < -UNSURFACED_PET_XP_THRESHOLD -> {
-                val deficit = cancelPendingPetXp(unsurfacedPetXp, this, -appliedDelta)
-                if (deficit <= UNSURFACED_PET_XP_THRESHOLD) return
-                val pendingPetXp = (exactReadDeficits[petUuid]?.petXp ?: 0.0) + deficit
-                exactReadDeficits[petUuid] = PendingPetXp(pendingPetXp)
-                recordDebug("deficit-record petXp=${deficit.debugFormat()} pending=${pendingPetXp.debugFormat()} ${debugPet()}")
-            }
-        }
-    }
-
-    private fun cancelPendingPetXp(
-        pendingMap: MutableMap<UUID, PendingPetXp>,
-        sourcePet: PetData,
-        sourcePetXp: Double,
-    ): Double {
-        if (pendingMap.isEmpty()) return sourcePetXp
-        val skill = recentSkillEstimates.maxByOrNull { it.value.createdAt }?.key ?: return sourcePetXp
-        val sourceMultiplier = estimatePetXp(sourcePet, skill, 1.0)?.exp?.takeIf { it > 0.0 } ?: return sourcePetXp
-        var remainingSkillXp = sourcePetXp / sourceMultiplier
-        val iterator = pendingMap.iterator()
-        while (iterator.hasNext() && remainingSkillXp > 0.0) {
-            val (petUuid, pending) = iterator.next()
-            val petData = getPetByUuid(petUuid) ?: continue
-            val multiplier = estimatePetXp(petData, skill, 1.0)?.exp?.takeIf { it > 0.0 } ?: continue
-            val cancelledSkillXp = (pending.petXp / multiplier).coerceAtMost(remainingSkillXp)
-            remainingSkillXp -= cancelledSkillXp
-            pending.petXp -= cancelledSkillXp * multiplier
-            recordDebug(
-                "pending-cancel skill=${skill.displayName} skillXp=${cancelledSkillXp.debugFormat()} " +
-                    "remainingPetXp=${pending.petXp.debugFormat()} ${petData.debugPet()}",
-            )
-            if (pending.petXp <= UNSURFACED_PET_XP_THRESHOLD) iterator.remove()
-        }
-        return remainingSkillXp * sourceMultiplier
-    }
-
-    private fun MutableMap<UUID, PendingPetXp>.prune(maxAge: Duration) {
-        values.removeIf { it.createdAt.passedSince() > maxAge }
+        if (exact) petData.resyncSkillFractionFromExactRead(appliedDelta)
     }
 
     private fun rememberGainQuantum(skill: SkillType, gained: Double) {
@@ -311,49 +219,23 @@ object PetXpEstimateApi {
         return candidateTenths.singleOrNull()?.div(10.0)
     }
 
-    private fun consumeUnsurfacedXp(skill: SkillType, availableGain: Double): Double {
-        var remaining = availableGain
-        var discarded = 0.0
-        val iterator = unsurfacedPetXp.iterator()
-        while (iterator.hasNext() && remaining > 0.0) {
-            val (petUuid, surplus) = iterator.next()
-            if (surplus.createdAt.passedSince() > 10.minutes) {
-                iterator.remove()
-                continue
-            }
-            val petData = getPetByUuid(petUuid) ?: continue
-            val multiplier = estimatePetXp(petData, skill, 1.0)?.exp?.takeIf { it > 0.0 } ?: continue
-            val skillXp = (surplus.petXp / multiplier).coerceAtMost(remaining)
-            remaining -= skillXp
-            discarded += skillXp
-            surplus.petXp -= skillXp * multiplier
-            recordDebug(
-                "unsurfaced-discard skill=${skill.displayName} skillXp=${skillXp.debugFormat()} " +
-                    "remainingPetXp=${surplus.petXp.debugFormat()} ${petData.debugPet()}",
-            )
-            if (surplus.petXp <= UNSURFACED_PET_XP_THRESHOLD) iterator.remove()
-        }
-        return discarded
-    }
-
     fun shouldRecordPetMenuRead(uuid: UUID?): Boolean {
         val lastEstimate = recentEstimatePetUuids[uuid] ?: return false
         return lastEstimate.passedSince() <= 60.seconds
     }
 
-    fun recordAutopetSwap(petUuid: UUID?, trigger: String?) {
-        lastAutopetSwap = AutopetSwapContext(petUuid, trigger)
-        recordDebug("autopet-swap petUuid=$petUuid trigger='${trigger ?: "<unknown>"}'")
+    fun recordAutopetSwap(petData: PetData, previousPet: PetData?, trigger: String?) {
+        pendingSpawnAutopetSwap = if (trigger?.contains("spawn", ignoreCase = true) == true) {
+            SpawnAutopetContext(petData.uuid, previousPet?.uuid)
+        } else null
     }
 
     private fun readSkillGains(event: SkillExpGainEvent, currentPetUuid: UUID?): List<SkillGainRead> {
         val totalXp = event.totalXp?.takeIf { it > 0.0 }
         if (event.source == ACTIONBAR_SKILL_SOURCE && event.gained > 0.0) rememberGainQuantum(event.skill, event.gained)
         val previous = skillSamples[event.skill]
-        val previousTotalXp = previous?.totalXp
-        fun read(gain: Double, petUuid: UUID?, source: String) =
-            SkillGainRead(gain, totalXp, previousTotalXp, petUuid, source)
-        fun singleRead(gain: Double, petUuid: UUID?, source: String) = listOf(read(gain, petUuid, source))
+        val seededPreviousTotalXp = event.previousTotalXp?.takeIf { previous == null && totalXp != null && it < totalXp }
+        val previousTotalXp = previous?.totalXp ?: seededPreviousTotalXp
 
         if (event.source != ACTIONBAR_SKILL_SOURCE) {
             val expectedTotalXp = previousTotalXp?.plus(event.gained)
@@ -370,66 +252,32 @@ object PetXpEstimateApi {
                 inferredTotalXp,
                 inferredPreciseTotalXp,
                 currentPetUuid,
-                listOf(SkillGainRead(event.gained, inferredTotalXp, previousTotalXp, currentPetUuid, event.source)),
+                singleSkillGainRead(
+                    event.gained,
+                    inferredTotalXp,
+                    previousTotalXp,
+                    currentPetUuid,
+                ),
             )
         }
 
         when {
             totalXp != null && previousTotalXp != null -> when {
                 totalXp > previousTotalXp -> {
-                    val previousPreciseTotalXp = previous.preciseTotalXp ?: previousTotalXp
+                    val previousPreciseTotalXp = previous?.preciseTotalXp ?: previousTotalXp
                     val displayedGain = totalXp - previousTotalXp
                     val useVisibleGain = displayedGain.isRoundedVisibleGain(event.gained)
                     val decomposedGain = if (useVisibleGain) null else decomposeDisplayedGain(event.skill, displayedGain)
                     val unclampedTotalXp =
                         previousPreciseTotalXp + (decomposedGain ?: if (useVisibleGain) event.gained else displayedGain)
                     val preciseTotalXp = unclampedTotalXp.coerceIn(totalXp, totalXp + MAX_TOTAL_FRACTION)
-                    val preciseGain = preciseTotalXp - previousPreciseTotalXp
-                    val hiddenGain = (preciseGain - event.gained).takeIf { it > VISIBLE_GAIN_EPSILON } ?: 0.0
-                    val totalGain = preciseGain - consumeUnsurfacedXp(event.skill, hiddenGain)
-                    val previousPetUuid = previous.petUuid
-                    val swappedPet = previousPetUuid != null && previousPetUuid != currentPetUuid
-                    val autopetSwap = lastAutopetSwap?.takeIf {
-                        it.petUuid == currentPetUuid && it.createdAt.passedSince() <= 5.seconds
-                    }
-                    val reads = if (swappedPet && autopetSwap != null) {
-                        val visibleGain = event.gained.coerceIn(0.0, totalGain)
-                        val hiddenGain = totalGain - visibleGain
-                        when {
-                            !autopetSwap.isSpawnTrigger -> singleRead(
-                                totalGain,
-                                currentPetUuid,
-                                "autopet-boundary-current",
-                            )
-
-                            hiddenGain > visibleGain + VISIBLE_GAIN_EPSILON -> listOf(
-                                read(
-                                    hiddenGain,
-                                    previousPetUuid,
-                                    "autopet-boundary-hidden-previous",
-                                ),
-                                read(
-                                    visibleGain,
-                                    currentPetUuid,
-                                    "autopet-boundary-visible-current",
-                                ),
-                            )
-
-                            else -> singleRead(
-                                totalGain,
-                                previousPetUuid,
-                                "autopet-boundary-previous",
-                            )
-                        }
-                    } else singleRead(
-                        totalGain,
+                    val reads = readIncreasingActionbarSkillGains(
+                        event,
+                        preciseTotalXp - previousPreciseTotalXp,
+                        totalXp,
+                        previousTotalXp,
+                        previous,
                         currentPetUuid,
-                        when {
-                            useVisibleGain -> "visible-gain"
-                            swappedPet -> "pet-swap-current-gain"
-                            decomposedGain != null -> "total-diff-quanta"
-                            else -> "total-diff"
-                        },
                     )
                     return rememberSkillSampleAndReturn(event.skill, totalXp, preciseTotalXp, currentPetUuid, reads)
                 }
@@ -437,9 +285,9 @@ object PetXpEstimateApi {
                 totalXp == previousTotalXp -> return rememberSkillSampleAndReturn(
                     event.skill,
                     totalXp,
-                    previous.preciseTotalXp ?: totalXp,
+                    previous?.preciseTotalXp ?: totalXp,
                     currentPetUuid,
-                    singleRead(0.0, currentPetUuid, "same-total"),
+                    singleSkillGainRead(0.0, totalXp, previousTotalXp, currentPetUuid),
                 )
 
                 else -> return rememberSkillSampleAndReturn(
@@ -447,7 +295,12 @@ object PetXpEstimateApi {
                     totalXp,
                     totalXp + UNKNOWN_TOTAL_FRACTION,
                     currentPetUuid,
-                    singleRead(event.gained, currentPetUuid, "backwards-event-gain"),
+                    singleSkillGainRead(
+                        event.gained,
+                        totalXp,
+                        previousTotalXp,
+                        currentPetUuid,
+                    ),
                 )
             }
 
@@ -456,10 +309,49 @@ object PetXpEstimateApi {
                 totalXp,
                 totalXp?.plus(UNKNOWN_TOTAL_FRACTION),
                 currentPetUuid,
-                singleRead(event.gained, currentPetUuid, "event-gain"),
+                singleSkillGainRead(event.gained, totalXp, previousTotalXp, currentPetUuid),
             )
         }
     }
+
+    private fun readIncreasingActionbarSkillGains(
+        event: SkillExpGainEvent,
+        totalGain: Double,
+        totalXp: Double,
+        previousTotalXp: Double,
+        previous: SkillProgressSample?,
+        currentPetUuid: UUID?,
+    ): List<SkillGainRead> {
+        val previousPetUuid = previous?.petUuid ?: currentPetUuid
+        val swappedPet = previousPetUuid != null && previousPetUuid != currentPetUuid
+        val pendingSpawn = pendingSpawnAutopetSwap
+        val spawnAutopetSwap = pendingSpawn?.takeIf {
+            event.skill == SkillType.COMBAT &&
+                swappedPet &&
+                it.petUuid == currentPetUuid &&
+                it.matchesPreviousPet(previousPetUuid) &&
+                it.createdAt.passedSince() <= SPAWN_AUTOPET_MAX_AGE
+        }
+        if (pendingSpawn != null && spawnAutopetSwap == null) {
+            if (pendingSpawn.createdAt.passedSince() > SPAWN_AUTOPET_MAX_AGE) pendingSpawnAutopetSwap = null
+        }
+        return spawnAutopetSwap?.let {
+            pendingSpawnAutopetSwap = null
+            singleSkillGainRead(totalGain, totalXp, previousTotalXp, previousPetUuid)
+        } ?: singleSkillGainRead(
+            totalGain,
+            totalXp,
+            previousTotalXp,
+            currentPetUuid,
+        )
+    }
+
+    private fun singleSkillGainRead(
+        gain: Double,
+        totalXp: Double?,
+        previousTotalXp: Double?,
+        petUuid: UUID?,
+    ) = listOf(SkillGainRead(gain, totalXp, previousTotalXp, petUuid))
 
     private fun rememberSkillSampleAndReturn(
         skill: SkillType,
@@ -482,6 +374,9 @@ object PetXpEstimateApi {
         recentSkillEstimates[event.skill] = RecentSkillEstimate(targetPet.uuid)
     }
 
+    private fun SpawnAutopetContext.matchesPreviousPet(samplePreviousPetUuid: UUID?) =
+        previousPetUuid == null || previousPetUuid == samplePreviousPetUuid
+
     private fun PetData.resyncSkillFractionFromExactRead(appliedDelta: Double?): Boolean {
         val petUuid = uuid ?: return false
 
@@ -492,7 +387,7 @@ object PetXpEstimateApi {
         val sample = skillSamples[skill] ?: return false
         val totalXp = sample.totalXp ?: return false
         val precise = sample.preciseTotalXp ?: return false
-        val multiplier = estimatePetXp(this, skill, 1.0)?.exp?.takeIf { it > 0.0 } ?: return false
+        val multiplier = estimatePetXp(this, skill, 1.0)?.takeIf { it > 0.0 } ?: return false
         val skillDelta = appliedDelta?.takeIf { it != 0.0 }?.let { it / multiplier } ?: return false
         if (abs(skillDelta) >= 1.0) return false
 
@@ -503,7 +398,7 @@ object PetXpEstimateApi {
         return true
     }
 
-    private fun estimatePetXp(petData: PetData, skill: SkillType, skillXp: Double): PetXpEstimate? {
+    private fun estimatePetXp(petData: PetData, skill: SkillType, skillXp: Double): Double? {
         val petType = PetUtils.getPetType(petData.fauxInternalName) ?: return null
         val baseMultiplier = skillBaseMultiplier(petType, skill) ?: return null
         val tamingLevel = getSkillInfo(SkillType.TAMING)?.level?.coerceIn(0, SkillType.TAMING.maxLevel) ?: 0
@@ -516,19 +411,7 @@ object PetXpEstimateApi {
         val totalMultiplier = baseMultiplier * tamingMultiplier * dianaMultiplier *
             beastmasterMultiplier * itemMultiplier * battleExperienceMultiplier * customMultiplier
 
-        return PetXpEstimate(
-            exp = skillXp * totalMultiplier,
-            multiplier = totalMultiplier,
-            petType = petType,
-            baseMultiplier = baseMultiplier,
-            tamingLevel = tamingLevel,
-            tamingMultiplier = tamingMultiplier,
-            dianaMultiplier = dianaMultiplier,
-            beastmasterMultiplier = beastmasterMultiplier,
-            itemMultiplier = itemMultiplier,
-            battleExperienceMultiplier = battleExperienceMultiplier,
-            customMultiplier = customMultiplier,
-        )
+        return skillXp * totalMultiplier
     }
 
     private fun skillBaseMultiplier(petType: String, skill: SkillType): Double? = when (skill) {
@@ -598,41 +481,29 @@ object PetXpEstimateApi {
         return 1.0 + amount / 100.0
     }
 
-    private fun updateExpSharePets(skill: SkillType, sourcePetXp: Double, currentPetUuid: UUID?): List<ExpShareUpdate> {
+    private fun updateExpSharePets(skill: SkillType, sourcePetXp: Double, currentPetUuid: UUID?): Boolean {
         val baseRate = expShareBaseRate()
         val whyNotMoreRate = whyNotMoreExpShareRate()
-        return PetStorageApi.getActiveExpSharePets().mapNotNull { petData ->
-            val currentExp = petData.exp ?: return@mapNotNull null
-            if (petData.uuid == currentPetUuid) return@mapNotNull null
+        var updated = false
+        PetStorageApi.getActiveExpSharePets().forEach { petData ->
+            val currentExp = petData.exp ?: return@forEach
+            if (petData.uuid == currentPetUuid) return@forEach
 
             val itemRate = if (petData.heldItemInternalName == EXP_SHARE) 0.15 else 0.0
             // Server quirk: Why Not More is extra share rate, not a final multiplier.
             val rate = baseRate + whyNotMoreRate + itemRate
-            if (rate <= 0.0) return@mapNotNull null
+            if (rate <= 0.0) return@forEach
 
-            val petType = PetUtils.getPetType(petData.fauxInternalName) ?: return@mapNotNull null
+            val petType = PetUtils.getPetType(petData.fauxInternalName) ?: return@forEach
             // EXP Share uses the equipped pet XP, then only the shared pet's base skill type.
-            val sharedPetBaseMultiplier = skillBaseMultiplier(petType, skill) ?: return@mapNotNull null
+            val sharedPetBaseMultiplier = skillBaseMultiplier(petType, skill) ?: return@forEach
             val effectiveRate = rate * sharedPetBaseMultiplier
             val gain = sourcePetXp * effectiveRate
-            val targetExp = currentExp + gain
-            petData.exp = targetExp
+            petData.exp = currentExp + gain
             petData.uuid?.let { recentEstimatePetUuids[it] = SimpleTimeMark.now() }
-            ExpShareUpdate(
-                petName = petData.getUserFriendlyName().removeColor().removeResets(),
-                uuid = petData.uuid,
-                sourcePetXp = sourcePetXp,
-                rate = rate,
-                petType = petType,
-                sharedPetBaseMultiplier = sharedPetBaseMultiplier,
-                effectiveRate = effectiveRate,
-                whyNotMoreRate = whyNotMoreRate,
-                itemRate = itemRate,
-                gain = gain,
-                before = currentExp,
-                target = targetExp,
-            )
+            updated = true
         }
+        return updated
     }
 
     private fun getPetByUuid(uuid: UUID): PetData? =
@@ -663,66 +534,6 @@ object PetXpEstimateApi {
             1.0 + AttributeShardsData.getActiveLevelByAbilityName(BATTLE_EXPERIENCE_ATTRIBUTE) / 100.0
         } else 1.0
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shpetxpdebug") {
-            description = "Copies pet XP estimator debug data to the clipboard"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { copyDebugEntries() }
-        }
-        event.registerBrigadier("shclearpetxpdebug") {
-            description = "Clears pet XP estimator debug data"
-            category = CommandCategory.DEVELOPER_DEBUG
-            simpleCallback { clearDebugEntries() }
-        }
-    }
-
-    private fun recordSkillDebug(event: SkillExpGainEvent, skillRead: SkillGainRead, message: String) {
-        if (skillRead.gain <= 0.0) return
-        val actionBar = ActionBarData.getActionBar().removeColor().removeResets()
-        val totalGain = skillRead.totalXp?.let { total ->
-            skillRead.previousTotalXp?.let { total - it }
-        }
-        val visibleDelta = totalGain?.minus(event.gained)
-        recordDebug(
-            "skill=${event.skill.displayName} source=${skillRead.source} " +
-                "eventGain=${event.gained.debugFormat()} readGain=${skillRead.gain.debugFormat()} " +
-                "total=${skillRead.totalXp.debugFormat()} previous=${skillRead.previousTotalXp.debugFormat()} " +
-                "preciseTotal=${skillSamples[event.skill]?.preciseTotalXp.debugFormat()} " +
-                "totalGain=${totalGain.debugFormat()} visibleDelta=${visibleDelta.debugFormat()} " +
-                "actionbar='$actionBar' $message",
-        )
-    }
-
-    private fun recordDebug(message: String) {
-        debugEntries.addLast("#${++debugEntryCounter} $message")
-        while (debugEntries.size > MAX_DEBUG_ENTRIES) debugEntries.removeFirst()
-    }
-
-    private fun copyDebugEntries() {
-        val output = buildString {
-            appendLine("Pet XP Estimator Debug entries=${debugEntries.size}")
-            debugEntries.forEach { appendLine(it) }
-        }
-        OSUtils.copyToClipboard(output)
-        ChatUtils.chat("Copied ${debugEntries.size} pet XP estimator debug entries to clipboard.")
-    }
-
-    private fun clearDebugEntries() {
-        debugEntries.clear()
-        debugEntryCounter = 0
-        resetSessionState()
-        ChatUtils.chat("Cleared pet XP estimator debug entries and reset estimator state.")
-    }
-
-    private fun PetData.debugPet() =
-        "pet='${getUserFriendlyName().removeColor().removeResets()}' uuid=$uuid level=$level " +
-            "exp=${exp.debugFormat()} held=${heldItemInternalName?.asString() ?: "<none>"}"
-
-    private fun Double?.debugFormat() = this?.let { String.format(Locale.US, "%.3f", it) } ?: "null"
-
-    private fun Double.preciseDebugFormat() = String.format(Locale.US, "%.6f", this)
-
     private fun PetData.targetExpAfterGain(currentExp: Double, petXp: Double): Double {
         val pending = pendingLevelUp ?: return currentExp + petXp
         if (!pending.matches(this) || pending.createdAt.passedSince() > 5.seconds) {
@@ -746,67 +557,12 @@ object PetXpEstimateApi {
         val createdAt: SimpleTimeMark = SimpleTimeMark.now(),
     )
 
-    private data class PendingPetXp(
-        var petXp: Double,
-        val createdAt: SimpleTimeMark = SimpleTimeMark.now(),
-    )
-
     private data class SkillGainRead(
         val gain: Double,
         val totalXp: Double?,
         val previousTotalXp: Double?,
         val petUuid: UUID?,
-        val source: String,
     )
-
-    private data class PetXpEstimate(
-        val exp: Double,
-        val multiplier: Double,
-        val petType: String,
-        val baseMultiplier: Double,
-        val tamingLevel: Int,
-        val tamingMultiplier: Double,
-        val dianaMultiplier: Double,
-        val beastmasterMultiplier: Double,
-        val itemMultiplier: Double,
-        val battleExperienceMultiplier: Double,
-        val customMultiplier: Double,
-    ) {
-        fun debugString() =
-            "multiplier=${multiplier.preciseDebugFormat()} petType='$petType' " +
-                "base=${baseMultiplier.preciseDebugFormat()} tamingLevel=$tamingLevel " +
-                "taming=${tamingMultiplier.preciseDebugFormat()} diana=${dianaMultiplier.preciseDebugFormat()} " +
-                "beastmaster=${beastmasterMultiplier.preciseDebugFormat()} item=${itemMultiplier.preciseDebugFormat()} " +
-                "battle=${battleExperienceMultiplier.preciseDebugFormat()} custom=${customMultiplier.preciseDebugFormat()}"
-    }
-
-    private fun List<ExpShareUpdate>.debugString() =
-        takeIf { it.isNotEmpty() }
-            ?.joinToString(prefix = " expShare=[", postfix = "]", separator = "; ") { it.debugString() }
-            .orEmpty()
-
-    private data class ExpShareUpdate(
-        val petName: String,
-        val uuid: UUID?,
-        val sourcePetXp: Double,
-        val rate: Double,
-        val petType: String,
-        val sharedPetBaseMultiplier: Double,
-        val effectiveRate: Double,
-        val whyNotMoreRate: Double,
-        val itemRate: Double,
-        val gain: Double,
-        val before: Double,
-        val target: Double,
-    ) {
-        fun debugString() =
-            "pet='$petName' uuid=$uuid sourcePetXp=${sourcePetXp.debugFormat()} " +
-                "rate=${rate.preciseDebugFormat()} petType='$petType' " +
-                "base=${sharedPetBaseMultiplier.preciseDebugFormat()} effectiveRate=${effectiveRate.preciseDebugFormat()} " +
-                "whyNotMoreRate=${whyNotMoreRate.preciseDebugFormat()} " +
-                "itemRate=${itemRate.preciseDebugFormat()} gain=${gain.debugFormat()} " +
-                "before=${before.debugFormat()} target=${target.debugFormat()}"
-    }
 
     private data class PendingPetLevelUp(
         val uuid: UUID?,
@@ -819,11 +575,10 @@ object PetXpEstimateApi {
             uuid?.let { petData.uuid == it } ?: (petData.fauxInternalName == internalName)
     }
 
-    private data class AutopetSwapContext(
+    private data class SpawnAutopetContext(
         val petUuid: UUID?,
-        val trigger: String?,
+        val previousPetUuid: UUID?,
         val createdAt: SimpleTimeMark = SimpleTimeMark.now(),
-    ) {
-        val isSpawnTrigger get() = trigger?.contains("spawn", ignoreCase = true) == true
-    }
+    )
+
 }

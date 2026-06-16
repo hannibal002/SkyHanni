@@ -166,8 +166,8 @@ object CurrentPetDisplay {
         val placement: EXPSharePlace = organization.placement.get()
         return if (placement == EXPSharePlace.ORBIT) {
             val subBodySpacing = subOrbit.orbitDistance.get().roundToInt()
-            val subBodyWidth = expShareRenderables.maxOfOrNull { it.width } ?: 0
-            val subBodyHeight = expShareRenderables.maxOfOrNull { it.height } ?: 0
+            val subBodyWidth = expShareRenderables.maxOf { it.width }
+            val subBodyHeight = expShareRenderables.maxOf { it.height }
             val renderable = Renderable.orbitalSystem(
                 this,
                 subBodySpacing = subBodySpacing,
@@ -204,17 +204,14 @@ object CurrentPetDisplay {
                 )
             }
 
-            val orderedList = when (placement) {
-                EXPSharePlace.TOP, EXPSharePlace.LEFT -> listOf(expShareContainer, this)
-                EXPSharePlace.BOTTOM, EXPSharePlace.RIGHT -> listOf(this, expShareContainer)
-                else -> return anchorToSelf()
-            }
-
             val iconGroupSpacing = 2
-            val renderable = when (placement) {
-                EXPSharePlace.TOP, EXPSharePlace.BOTTOM -> Renderable.vertical(orderedList, spacing = iconGroupSpacing)
-                EXPSharePlace.LEFT, EXPSharePlace.RIGHT -> Renderable.horizontal(orderedList, spacing = iconGroupSpacing)
-                else -> return anchorToSelf()
+            val orderedList = if (placement == EXPSharePlace.TOP || placement == EXPSharePlace.LEFT) {
+                listOf(expShareContainer, this)
+            } else listOf(this, expShareContainer)
+            val renderable = if (placement == EXPSharePlace.TOP || placement == EXPSharePlace.BOTTOM) {
+                Renderable.vertical(orderedList, spacing = iconGroupSpacing)
+            } else {
+                Renderable.horizontal(orderedList, spacing = iconGroupSpacing)
             }
             val anchorX = when (placement) {
                 EXPSharePlace.LEFT -> expShareContainer.width + iconGroupSpacing
@@ -694,12 +691,10 @@ object CurrentPetDisplay {
         textRenderable: Renderable?,
         textLocation: TLO,
         centerTarget: ETextCenter,
-    ): Renderable? {
-        return if (itemRenderable != null && textRenderable != null) {
-            if (centerTarget == ETextCenter.EQUIPPED_PET_VISUALS) {
-                return combineAnchoredVisualAndTextRenderables(itemRenderable, textRenderable, textLocation)
-            }
-
+    ): Renderable? = if (itemRenderable != null && textRenderable != null) {
+        if (centerTarget == ETextCenter.EQUIPPED_PET_VISUALS) {
+            combineAnchoredVisualAndTextRenderables(itemRenderable, textRenderable, textLocation)
+        } else {
             val visualRenderable = itemRenderable.renderable
             val orderedList = when (textLocation) {
                 TLO.TOP, TLO.LEFT -> listOf(textRenderable, visualRenderable)
@@ -709,8 +704,8 @@ object CurrentPetDisplay {
                 TLO.TOP, TLO.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
                 TLO.LEFT, TLO.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
             }
-        } else textRenderable ?: itemRenderable?.renderable
-    }
+        }
+    } else textRenderable ?: itemRenderable?.renderable
 
     private fun combineAnchoredVisualAndTextRenderables(
         itemRenderable: AnchoredRenderable,
@@ -786,6 +781,23 @@ object CurrentPetDisplay {
         )
     }
 
+    private fun buildWidgetMessageRenderable(lines: List<String>): Renderable {
+        val textConfig = config.text.equippedPet
+        val textScale = textConfig.textScale.get().toDouble()
+        val horizontalAlign = textConfig.horizontalAlign.get()
+        return Renderable.vertical(
+            lines.map {
+                StringRenderable(
+                    it,
+                    scale = textScale,
+                    horizontalAlign = horizontalAlign,
+                )
+            },
+            horizontalAlign = horizontalAlign,
+            verticalAlign = textConfig.verticalAlign.get(),
+        )
+    }
+
     private fun PetData.buildRenderable(preview: Boolean = false): Renderable? {
         val storage = ProfileStorageData.petProfiles
         val currentPetUuid = uuid
@@ -795,8 +807,7 @@ object CurrentPetDisplay {
             ProfileStorageData.profileSpecific?.currentPetUuid,
             config.renderHash(),
             storage?.expSharePets,
-            storage?.pets,
-            expSharePets.map { it.petData.uuid to it.petData.exp to it.disabled },
+            expSharePets.map { it.petData to it.disabled },
         ).hashCode()
         val cache = if (preview) previewRenderCache else liveRenderCache
         if (cache?.key == displayHash) return cache.renderable
@@ -1010,6 +1021,12 @@ object CurrentPetDisplay {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.general.enabled.get()) return
+        PetStorageApi.petWidgetDisplayMessage?.let { lines ->
+            invalidateRenderable()
+            config.general.position.renderRenderable(buildWidgetMessageRenderable(lines), posLabel = "Pet Display")
+            return
+        }
+        if (!PetStorageApi.isPetWidgetReadyForDisplay) return invalidateRenderable()
         val currentPet = CurrentPetApi.currentPet ?: return invalidateRenderable()
         currentPet.withAnimatedExp().buildRenderable()?.also {
             config.general.position.renderRenderable(it, posLabel = "Pet Display")

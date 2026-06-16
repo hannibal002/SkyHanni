@@ -217,6 +217,7 @@ object SkillApi {
             val skillType = SkillType.getByNameOrNull(skillName) ?: return
             val skillInfo = storage?.get(skillType) ?: SkillInfo()
             val skillXP = skillXPInfoMap[skillType] ?: SkillXPInfo()
+            val previousTotalXp = skillInfo.totalXp.takeIf { it > 0 }?.toDouble()
             activeSkill = skillType
             when (matcher.pattern()) {
                 skillPercentPattern -> handleSkillPatternPercent(matcher, skillType)
@@ -227,6 +228,7 @@ object SkillApi {
                 skillType,
                 matcher.group("gained").formatDouble(),
                 totalXp = skillInfo.totalXp.toDouble(),
+                previousTotalXp = previousTotalXp,
             ).post()
 
             showDisplay = true
@@ -268,7 +270,7 @@ object SkillApi {
         val skillType = SkillType.getByNameOrNull(skillName) ?: return
         val effectiveGain = gained * giftXpMultiplier(source)
         val totalXp = addChatSkillXp(skillType, effectiveGain)
-        SkillExpGainEvent(skillType, effectiveGain, totalXp, source).post()
+        SkillExpGainEvent(skillType, effectiveGain, totalXp, source = source).post()
 
         val skillXP = skillXPInfoMap.getOrPut(skillType, ::SkillXPInfo)
         activeSkill = skillType

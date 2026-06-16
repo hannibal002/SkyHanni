@@ -7,5 +7,6 @@ class SkillExpGainEvent(
     val skill: SkillType,
     val gained: Double,
     val totalXp: Double?,
+    val previousTotalXp: Double? = null,
     val source: String = "actionbar",
 ) : SkyHanniEvent()
