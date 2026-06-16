@@ -78,8 +78,14 @@ class TabCompleteConfig {
     var call: Boolean = true
 
     @Expose
-    @ConfigOption( name = "Crop Time", desc = "Tab-complete crops in the SkyHanni command §e/shcroptime§7.",)
+    @ConfigOption(name = "Crop Time", desc = "Tab-complete crops in the SkyHanni command §e/shcroptime§7.",)
     @ConfigEditorBoolean
     @FeatureToggle
     var shCropTime: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "SkyHanni Categories", desc = "Tab-complete command categories in the main SkyHanni command §e/sh§7.",)
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var shCategories: Boolean = true
 }
