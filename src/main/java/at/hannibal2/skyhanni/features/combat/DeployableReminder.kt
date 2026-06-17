@@ -26,6 +26,9 @@ object DeployableReminder {
     private var warningActiveTime = SimpleTimeMark.farPast()
     private var display: Renderable? = null
 
+    // To prevent multiple warnings from being scheduled at the same time
+    private var scheduledWarningGeneration = 0
+
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         if (!isEnabled()) return
@@ -87,7 +90,9 @@ object DeployableReminder {
         type: DeployableType,
         condition: () -> Boolean = { true },
     ) {
+        val currentGeneration = ++scheduledWarningGeneration
         DelayedRun.runDelayed(warningDelay) {
+            if (currentGeneration != scheduledWarningGeneration) return@runDelayed
             if (!isEnabled()) return@runDelayed
             if (!condition()) return@runDelayed
             showWarning(message, type)
