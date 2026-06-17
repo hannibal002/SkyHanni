@@ -63,7 +63,7 @@ class DeployableConfig {
 
     @Expose
     @ConfigOption(name = "Warning Delay", desc = "Delay before warning to place deployable.")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
+    @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 1f)
     var warningDelay: Int = 5
 
     @ConfigOption(

@@ -20,7 +20,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object DeployableReminder {
     private val config get() = SkyHanniMod.feature.combat.deployable
+    private val warningDelay get() = config.warningDelay.seconds
 
+    private var lastWorldChangeTime = SimpleTimeMark.farPast()
     private var warningActiveTime = SimpleTimeMark.farPast()
     private var display: Renderable? = null
 
@@ -29,7 +31,7 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
         val deployableType = getActiveDeployableType(WarningType.SLAYER) ?: return
-        DelayedRun.runDelayed(config.warningDelay.seconds) {
+        DelayedRun.runDelayed(warningDelay) {
             showWarning("Place Down Power Orb!", deployableType)
         }
     }
@@ -39,7 +41,7 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.newIsland != IslandType.MINESHAFT) return
         val deployableType = getActiveDeployableType(WarningType.MINESHAFT) ?: return
-        DelayedRun.runDelayed(config.warningDelay.seconds) {
+        DelayedRun.runDelayed(warningDelay) {
             if (!IslandType.MINESHAFT.isInIsland()) return@runDelayed
             showWarning("Place Down Power Orb!", deployableType)
         }
@@ -63,8 +65,17 @@ object DeployableReminder {
         config.warningPosition.renderRenderable(activeDisplay, posLabel = "Gummy Warning")
     }
 
+    @HandleEvent
+    fun onWorldChange() {
+        warningActiveTime = SimpleTimeMark.farPast()
+        lastWorldChangeTime = SimpleTimeMark.now()
+        display = null
+    }
+
     private fun showWarning(message: String, type: DeployableType) {
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
+        // Don't show warning if the world just changed, to avoid false positives
+        if (lastWorldChangeTime.passedSince() < warningDelay) return
         SoundUtils.playErrorSound()
         display = Renderable.text("§4§l$message", scale = 2.0)
         warningActiveTime = SimpleTimeMark.now()
