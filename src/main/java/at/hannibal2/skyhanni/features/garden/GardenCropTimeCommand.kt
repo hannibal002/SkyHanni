@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -83,7 +84,32 @@ object GardenCropTimeCommand {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
-            legacyCallbackArgs { onCommand(it) }
+
+            // First argument: <amount>
+            arg("amount", BrigadierArguments.string()) { amountArg ->
+
+                // Second argument: <item> with a live suggestion lambda
+                arg(
+                    name = "item",
+                    argument = BrigadierArguments.greedyString(),
+                    suggestions = com.mojang.brigadier.suggestion.SuggestionProvider { _, builder ->
+
+                        // This runs LIVE every time the player tabs in chat
+                        CropMoneyDisplay.multipliers.keys.forEach { internalName ->
+                            val cleanName = internalName.repoItemName.removeColor().lowercase()
+                            builder.suggest(cleanName)
+                        }
+                         builder.buildFuture()
+                    }
+                ) { itemArg ->
+                    callback {
+                        val amount = getArg(amountArg)
+                        val item = getArg(itemArg)
+
+                        onCommand(arrayOf(amount, item))
+                    }
+                }
+            }
         }
     }
 }
