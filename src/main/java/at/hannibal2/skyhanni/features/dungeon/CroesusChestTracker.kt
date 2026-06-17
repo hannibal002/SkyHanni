@@ -289,6 +289,7 @@ object CroesusChestTracker {
             val next = iterator.next()
             if (next.floor == null) {
                 iterator.remove()
+                continue
             }
             if (next.runTime == null) {
                 next.runTime = SimpleTimeMark.now()
@@ -296,6 +297,7 @@ object CroesusChestTracker {
             val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
             if (sinceRun > 3.days) {
                 iterator.remove()
+                continue
             }
             if (next.openState == OpenedState.UNOPENED) unopenedChests++
         }
