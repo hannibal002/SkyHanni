@@ -22,7 +22,6 @@ object DeployableReminder {
     private val config get() = SkyHanniMod.feature.combat.deployable
     private val warningDelay get() = config.warningDelay.seconds
 
-    private var lastWorldChangeTime = SimpleTimeMark.farPast()
     private var warningActiveTime = SimpleTimeMark.farPast()
     private var display: Renderable? = null
 
@@ -31,10 +30,11 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
         val deployableType = getActiveDeployableType(WarningType.SLAYER) ?: return
-        DelayedRun.runDelayed(warningDelay) {
-            if (lastWorldChangeTime.passedSince() < warningDelay) return@runDelayed
-            showWarning("Place Down Power Orb!", deployableType)
-        }
+        scheduleWarning(
+            message = "Place Down Power Orb!",
+            type = deployableType,
+            condition = { SlayerApi.isInBossFight() }
+        )
     }
 
     @HandleEvent
@@ -42,10 +42,11 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.newIsland != IslandType.MINESHAFT) return
         val deployableType = getActiveDeployableType(WarningType.MINESHAFT) ?: return
-        DelayedRun.runDelayed(warningDelay) {
-            if (!IslandType.MINESHAFT.isInIsland()) return@runDelayed
-            showWarning("Place Down Power Orb!", deployableType)
-        }
+        scheduleWarning(
+            message = "Place Down Lantern!",
+            type = deployableType,
+            condition = { IslandType.MINESHAFT.isInIsland() }
+        )
     }
 
     @HandleEvent
@@ -69,7 +70,6 @@ object DeployableReminder {
     @HandleEvent
     fun onWorldChange() {
         warningActiveTime = SimpleTimeMark.farPast()
-        lastWorldChangeTime = SimpleTimeMark.now()
         display = null
     }
 
@@ -83,6 +83,18 @@ object DeployableReminder {
     private fun getActiveDeployableType(type: WarningType): DeployableType? {
         if (!config.warningTypes.contains(type)) return null
         return type.deployableType
+    }
+
+    private fun scheduleWarning(
+        message: String,
+        type: DeployableType,
+        condition: () -> Boolean = { true },
+    ) {
+        DelayedRun.runDelayed(warningDelay) {
+            if (!isEnabled()) return@runDelayed
+            if (!condition()) return@runDelayed
+            showWarning(message, type)
+        }
     }
 
     private fun isEnabled() = config.warnMissingDeployable
