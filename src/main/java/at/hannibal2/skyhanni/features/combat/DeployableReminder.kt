@@ -94,10 +94,8 @@ object DeployableReminder {
         }
     }
 
-    private fun getActiveDeployableType(type: WarningType): DeployableType? {
-        if (!config.warningTypes.contains(type)) return null
-        return type.deployableType
-    }
+    private fun getActiveDeployableType(type: WarningType): DeployableType? =
+        type.deployableType.takeIf { config.warningTypes.contains(type) }
 
     private fun isEnabled() = config.warnMissingDeployable
 }
