@@ -198,15 +198,15 @@ object CroesusChestTracker {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.showUsedKismets) return
         if (inCroesusInventory && !croesusEmpty) {
-            val slot = event.slot ?: return
+            if (event.slot == null) return
             when (event.slotId) {
-                FRONT_ARROW_SLOT -> if (pageSwitchable && slot.item.isArrow()) {
+                FRONT_ARROW_SLOT -> if (pageSwitchable && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage++
                 }
 
                 // People are getting Index out of range errors presumably due to negative pages.
-                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && slot.item.isArrow()) {
+                BACK_ARROW_SLOT -> if (pageSwitchable && currentPage != 0 && event.slot.item.isArrow()) {
                     pageSwitchable = false
                     currentPage--
                 }
