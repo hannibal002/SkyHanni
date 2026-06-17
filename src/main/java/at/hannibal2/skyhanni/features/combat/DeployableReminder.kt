@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -53,6 +54,7 @@ object DeployableReminder {
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
         val deployableType = getActiveDeployableType(WarningType.TROPHY_FISHING) ?: return
+        if (!FishingApi.isTrophyFishing()) return
         showWarning("Place Down Umbrella!", deployableType)
     }
 
