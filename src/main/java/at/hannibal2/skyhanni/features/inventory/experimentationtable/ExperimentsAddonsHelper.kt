@@ -266,7 +266,8 @@ object ExperimentsAddonsHelper {
         val hypixelSizeNow = hypixelChronomatronData.size
         val userSizeNow = userChronomatronProgress.size
 
-        val activeColors = inventoryItems.values.filter {
+        val inventorySnapshot = inventoryItems.values.toList() // Avoid concurrent modification issues
+        val activeColors = inventorySnapshot.filter {
             nextChronomatronItemPattern.matches(it.itemType.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
@@ -305,7 +306,8 @@ object ExperimentsAddonsHelper {
     )
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
-        val orderedUltrasequencerSlots = inventoryItems.filter {
+        val inventorySnapshot = inventoryItems.toMap() // Avoid concurrent modification issues
+        val orderedUltrasequencerSlots = inventorySnapshot.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
             val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
