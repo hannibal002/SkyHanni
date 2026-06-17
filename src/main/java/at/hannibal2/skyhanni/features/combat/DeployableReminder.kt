@@ -29,7 +29,9 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
         val deployableType = getActiveDeployableType(WarningType.SLAYER) ?: return
-        scheduleWarning("Place Down Power Orb!", deployableType)
+        DelayedRun.runDelayed(config.warningDelay.seconds) {
+            showWarning("Place Down Power Orb!", deployableType)
+        }
     }
 
     @HandleEvent
@@ -37,7 +39,10 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.newIsland != IslandType.MINESHAFT) return
         val deployableType = getActiveDeployableType(WarningType.MINESHAFT) ?: return
-        scheduleWarning("Place Down Lantern!", deployableType)
+        DelayedRun.runDelayed(config.warningDelay.seconds) {
+            if (!IslandType.MINESHAFT.isInIsland()) return@runDelayed
+            showWarning("Place Down Power Orb!", deployableType)
+        }
     }
 
     @HandleEvent
@@ -58,12 +63,6 @@ object DeployableReminder {
         config.warningPosition.renderRenderable(activeDisplay, posLabel = "Gummy Warning")
     }
 
-    private fun scheduleWarning(message: String, type: DeployableType) {
-        DelayedRun.runDelayed(config.warningDelay.seconds) {
-            showWarning(message, type)
-        }
-    }
-
     private fun showWarning(message: String, type: DeployableType) {
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
         SoundUtils.playErrorSound()
@@ -76,5 +75,5 @@ object DeployableReminder {
         return type.deployableType
     }
 
-    fun isEnabled() = config.warnMissingDeployable
+    private fun isEnabled() = config.warnMissingDeployable
 }
