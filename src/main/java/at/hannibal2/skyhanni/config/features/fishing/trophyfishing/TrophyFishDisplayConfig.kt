@@ -41,11 +41,6 @@ class TrophyFishDisplayConfig {
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing 2+ Hunter Armor pieces or full Ember Armor.")
-    @ConfigEditorBoolean
-    val requireArmor: Property<Boolean> = Property.of(false)
-
-    @Expose
     @ConfigOption(name = "Highlight New", desc = "Highlight new trophies green for couple seconds.")
     @ConfigEditorBoolean
     val highlightNew: Property<Boolean> = Property.of(true)
