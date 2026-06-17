@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.combat.DeployableDisplay
+import at.hannibal2.skyhanni.features.combat.DeployableType
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -32,10 +33,10 @@ class DeployableConfig {
     @Expose
     @ConfigOption(name = "Deployable Types", desc = "Which types of Deployables to display.")
     @ConfigEditorDraggableList
-    val displayTypes: MutableList<DeployableDisplay.DeployableType> = mutableListOf(
-        DeployableDisplay.DeployableType.FLUX,
-        DeployableDisplay.DeployableType.LANTERN,
-        DeployableDisplay.DeployableType.UMBERELLA,
+    val displayTypes: MutableList<DeployableType> = mutableListOf(
+        DeployableType.FLUX,
+        DeployableType.LANTERN,
+        DeployableType.UMBERELLA,
     )
 
     @ConfigOption(
