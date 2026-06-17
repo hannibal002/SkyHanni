@@ -80,11 +80,6 @@ object DeployableReminder {
         warningActiveTime = SimpleTimeMark.now()
     }
 
-    private fun getActiveDeployableType(type: WarningType): DeployableType? {
-        if (!config.warningTypes.contains(type)) return null
-        return type.deployableType
-    }
-
     private fun scheduleWarning(
         message: String,
         type: DeployableType,
@@ -95,6 +90,11 @@ object DeployableReminder {
             if (!condition()) return@runDelayed
             showWarning(message, type)
         }
+    }
+
+    private fun getActiveDeployableType(type: WarningType): DeployableType? {
+        if (!config.warningTypes.contains(type)) return null
+        return type.deployableType
     }
 
     private fun isEnabled() = config.warnMissingDeployable
