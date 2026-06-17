@@ -9,15 +9,15 @@ import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
 
 class FakePlayer : ClientMannequin(
-    MinecraftCompat.localWorld,
+    MinecraftCompat.localWorldOrThrow,
     Minecraft.getInstance().playerSkinRenderCache(),
 ) {
-    override fun getSkin(): PlayerSkin = MinecraftCompat.localPlayer.skin
+    override fun getSkin(): PlayerSkin = MinecraftCompat.localPlayerOrThrow.skin
 
     override fun getTeam() = object : PlayerTeam(Scoreboard(), "") {
         override fun getNameTagVisibility() = Visibility.NEVER
     }
 
     override fun isModelPartShown(part: PlayerModelPart): Boolean =
-        MinecraftCompat.localPlayer.isModelPartShown(part) && part != PlayerModelPart.CAPE
+        MinecraftCompat.localPlayerOrThrow.isModelPartShown(part) && part != PlayerModelPart.CAPE
 }

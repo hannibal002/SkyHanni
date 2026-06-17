@@ -163,7 +163,7 @@ object ItemPickupLog {
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
                 ?.filterNotNull().orEmpty().toMutableList()
-            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
+            val cursorItem = MinecraftCompat.localPlayerOrThrow.getItemOnCursor()
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()

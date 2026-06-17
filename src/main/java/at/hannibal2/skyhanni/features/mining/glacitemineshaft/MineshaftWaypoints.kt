@@ -44,7 +44,7 @@ object MineshaftWaypoints {
         }
 
         if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.direction.unitVec3i
+            val vec = MinecraftCompat.localPlayerOrThrow.direction.unitVec3i
             val location = playerLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)

@@ -392,7 +392,7 @@ object ChatUtils {
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             val message = sendQueue.poll() ?: return
-            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
+            MinecraftCompat.localPlayerOrThrow.connection.dispatchMessage(message)
         }
     }
 

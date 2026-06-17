@@ -29,7 +29,7 @@ object XpAchievement {
     fun onSecondPassed() {
         if (AchievementManager.isCompleted(XP_ACHIEVEMENT)) return
         if (ignoredAreas.isInAnyIsland()) return
-        if (MinecraftCompat.localPlayer.experienceLevel == 1000) {
+        if (MinecraftCompat.localPlayerOrThrow.experienceLevel == 1000) {
             AchievementManager.completeAchievement(XP_ACHIEVEMENT)
         }
     }

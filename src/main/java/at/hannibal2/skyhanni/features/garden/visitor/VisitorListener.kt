@@ -65,7 +65,7 @@ object VisitorListener {
             else -> return
         }
 
-        val entity = MinecraftCompat.localWorld.getEntity(packetEntityId) ?: return
+        val entity = MinecraftCompat.localWorldOrThrow.getEntity(packetEntityId) ?: return
         val entityId = entity.id
 
         lastClickedNpc = entityId
