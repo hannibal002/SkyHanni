@@ -81,4 +81,8 @@ object DeployableDisplay {
             display.add(Renderable.text("$deployable §e${deployable.expiryTime.timeUntil().format()}"))
         }
     }
+
+    fun getActiveDeployables(): List<Deployable> {
+        return activeDeployables.toList()
+    }
 }

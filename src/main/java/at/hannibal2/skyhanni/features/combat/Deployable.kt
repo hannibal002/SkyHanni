@@ -30,6 +30,7 @@ enum class Deployable(
     BLACK_HOLE("Black Hole", "§5Black Hole", 20, DeployableType.BLACK_HOLE),
     UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA),
     ;
+
     private val group = RepoPattern.group("deployable")
 
     val pattern by group.pattern(
