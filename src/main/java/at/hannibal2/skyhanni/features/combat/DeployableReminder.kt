@@ -56,8 +56,8 @@ object DeployableReminder {
     @HandleEvent
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
-        val deployableType = getActiveDeployableType(WarningType.TROPHY_FISHING) ?: return
         if (!FishingApi.isTrophyFishing()) return
+        val deployableType = getActiveDeployableType(WarningType.TROPHY_FISHING) ?: return
         showWarning("Place Down Umbrella!", deployableType)
     }
 
