@@ -32,6 +32,7 @@ object DeployableReminder {
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
         val deployableType = getActiveDeployableType(WarningType.SLAYER) ?: return
         DelayedRun.runDelayed(warningDelay) {
+            if (lastWorldChangeTime.passedSince() < warningDelay) return@runDelayed
             showWarning("Place Down Power Orb!", deployableType)
         }
     }
@@ -74,8 +75,6 @@ object DeployableReminder {
 
     private fun showWarning(message: String, type: DeployableType) {
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
-        // Don't show warning if the world just changed, to avoid false positives
-        if (lastWorldChangeTime.passedSince() < warningDelay) return
         SoundUtils.playErrorSound()
         display = Renderable.text("§4§l$message", scale = 2.0)
         warningActiveTime = SimpleTimeMark.now()
