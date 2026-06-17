@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object OdgerTotalCaught {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
+
     private val patternGroup = RepoPattern.group("fishing.trophy.odger")
 
     /**
@@ -35,11 +36,10 @@ object OdgerTotalCaught {
         "^Bronze.*",
     )
 
-    private val odgerInventory = InventoryDetector { name -> name == "Trophy Fishing" }
-
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    // Not island-gated because Odger has an Abiphone contact
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTipEvent(event: ToolTipTextEvent) {
-        if (!odgerInventory.isInside()) return
+        if (!TrophyFishManager.odgerInventory.isInside()) return
         if (!config.totalFishCaught) return
 
         if (event.toolTip.none { discoveredPattern.matcher(it.string).find() }) return

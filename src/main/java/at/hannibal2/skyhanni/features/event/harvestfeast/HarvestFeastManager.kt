@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
@@ -167,6 +168,7 @@ object HarvestFeastManager {
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
 
         if (config.sharePolicy == SharePolicy.DISABLED) return
+        if (HypixelData.hypixelAlpha) return
 
         if (config.sharePolicy == SharePolicy.ASK) {
             ChatUtils.clickableChat(
