@@ -66,7 +66,7 @@ object DeployableReminder {
             display = null
             return
         }
-        config.warningPosition.renderRenderable(activeDisplay, posLabel = "Gummy Warning")
+        config.warningPosition.renderRenderable(activeDisplay, posLabel = "Deployable Warning")
     }
 
     @HandleEvent
