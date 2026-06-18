@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -14,13 +13,15 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -42,7 +44,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.world.entity.LivingEntity
+import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -105,23 +107,24 @@ object TrevorFeatures {
     )
     // </editor-fold>
 
+    private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
+
     // TODO form to data class, use Resettable
     private var timeUntilNextReady = 0
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
     private var currentLabel = "§2Ready"
-    private const val TRAPPER_ID: Int = 56
-    private const val BACKUP_TRAPPER_ID: Int = 17
     private var timeLastWarped = SimpleTimeMark.farPast()
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
+
+    private var trevorTexture: String? = null
+    private var trevorEntity: RemotePlayer? = null
 
     var questActive = false
     var inBetweenQuests = false
     var inTrapperDen = false
     var lastTitle: TitleContext? = null
-
-    private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onSecondPassed() {
@@ -267,20 +270,33 @@ object TrevorFeatures {
         }
     }
 
+    fun loadTrevorTexture() {
+        trevorTexture = SkullTextureHolder.getTextureOrNull("TREVOR")
+    }
+
+    @HandleEvent
+    fun onRepoReload() = loadTrevorTexture()
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+        if (trevorTexture != null &&
+            event.entity.getSkinTexture() == trevorTexture
+        ) {
+            trevorEntity = event.entity
+        }
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        var entityTrapper = EntityUtils.getEntityByID(TRAPPER_ID)
-        if (entityTrapper !is LivingEntity) entityTrapper = EntityUtils.getEntityByID(BACKUP_TRAPPER_ID)
-        if (entityTrapper is LivingEntity && config.cooldown) {
-            // Solve for the fact that Moby also has the same ID as the Trapper
-            val entityMob = MobData.entityToMob[entityTrapper] ?: return
-            if (entityMob.name == "Moby") return
-            RenderLivingEntityHelper.setEntityColor(entityTrapper, currentStatus.color) {
-                config.cooldown
-            }
-            entityTrapper.getLorenzVec().let {
-                if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.up(2.23), currentLabel)
+        if (config.cooldown) {
+            trevorEntity?.let { entity ->
+                RenderLivingEntityHelper.setEntityColor(entity, currentStatus.color) {
+                    config.cooldown
+                }
+                entity.getLorenzVec().let {
+                    if (it.distanceToPlayer() < 15) {
+                        event.drawString(it.up(2.23), currentLabel)
+                    }
                 }
             }
         }
