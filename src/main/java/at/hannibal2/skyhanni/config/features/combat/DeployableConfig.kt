@@ -51,7 +51,7 @@ class DeployableConfig {
     @ConfigEditorDraggableList
     val warningTypes: MutableList<WarningType> = mutableListOf(
         WarningType.SLAYER,
-        WarningType.TROPHY_FISHING
+        WarningType.TROPHY_FISHING,
         WarningType.MINESHAFT,
     )
 
