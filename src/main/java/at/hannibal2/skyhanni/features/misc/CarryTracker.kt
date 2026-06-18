@@ -492,7 +492,7 @@ object CarryTracker {
             "Carry Tracker Prices",
             carryTypes.filter { it.pricePer != 0.0 },
             PRICE_LIST_MESSAGE_ID,
-            "No carry prices set! Use /shcarry price set <type> <price> to set a price",
+            "No carry prices set.",
             page,
         ) { type ->
             val name = type.displayName
@@ -502,7 +502,7 @@ object CarryTracker {
                     hover = "§eClick to delete price!".asComponent()
                     onClick {
                         deletePrice(type.id)
-                        listPrices(page)
+                        listPrices()
                     }
                 },
                 " ",
