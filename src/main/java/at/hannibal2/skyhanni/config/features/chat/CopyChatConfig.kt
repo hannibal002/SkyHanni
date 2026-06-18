@@ -31,7 +31,7 @@ class CopyChatConfig {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(134, "chat.copyChat") { element ->
+        event.transform(136, "chat.copyChat") { element ->
             JsonObject().apply {
                 add("copyChat", element)
                 addProperty("copyFormattedMessage", false)
