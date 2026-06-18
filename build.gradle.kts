@@ -10,6 +10,7 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -126,8 +127,8 @@ tasks.named<JavaExec>("runClient") {
 
 tasks.register("checkPrDescription", ChangelogVerification::class) {
     this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as? String ?: ""
-    this.prBody = project.findProperty("prBody") as? String ?: ""
+    this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
+    this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
 }
 
 dependencies {
@@ -150,12 +151,15 @@ dependencies {
 
     target.fabricLoaderVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
+        "productionRuntimeMods"(it)
     }
     target.fabricApiVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
+        "productionRuntimeMods"(it)
     }
     if (isDeobf) implementation(libs.fabricLanguageKotlin)
     else modImplementation(libs.fabricLanguageKotlin)
+    "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
     target.modMenuVersion?.let {
         if (isDeobf) implementation("maven.modrinth:modmenu:$it")
@@ -178,10 +182,14 @@ dependencies {
         }
         include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
+    "minecraftTestClientRuntimeLibraries"(
+        "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}"
+    )
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
+    "minecraftTestClientRuntimeLibraries"(libs.libautoupdate)
 
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.launcher)
@@ -195,6 +203,7 @@ dependencies {
         modImplementation(target.hypixelModApiVersion)
         modRuntimeOnly(target.hypixelModApiFabricVersion)
     }
+    "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
     if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
     else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
@@ -203,7 +212,10 @@ dependencies {
     includeImplementation(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval)
+    includeImplementation(libs.keval) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
+    "minecraftTestClientRuntimeLibraries"(libs.keval)
 
     // Repo mgmt
     includeImplementation(libs.jgit)
@@ -213,14 +225,17 @@ dependencies {
     detektPlugins(libs.detektrules.ktlint)
 
     shadowImpl(libs.httpclient)
+    "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 }
 
-fun DependencyHandler.includeImplementation(dep: Any) {
+fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
+    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
+
     if (isDeobf) {
-        add("shadowImpl", dep)
+        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     } else {
-        include(dep)
-        modImplementation(dep)
+        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     }
 }
 
@@ -301,7 +316,6 @@ if (target == ProjectTarget.MODERN_26100) {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
-        mods.from(project.configurations.getByName("modImplementation"))
 
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
