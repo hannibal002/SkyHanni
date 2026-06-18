@@ -24,7 +24,7 @@ class ChromaRenderLayer(
     if (texture == null) {
         RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_STANDARD())
     } else {
-        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("texture", texture)
+        RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("Sampler0", texture)
     }.createRenderSetup(),
 ) {
 
