@@ -25,7 +25,7 @@ public abstract class MixinGameRenderer {
     //? if >= 26.2 {
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V", shift = At.Shift.AFTER))
     private void skyhanni$clearChromaUniforms(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
-        GuiRendererHook.INSTANCE.getChromaUniform().clear();
+        GuiRendererHook.INSTANCE.clearChromaUniforms();
         RoundedShapeDrawer.INSTANCE.clearUniforms();
     }
     //?} else {

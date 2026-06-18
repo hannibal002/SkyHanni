@@ -50,6 +50,11 @@ object GuiRendererHook {
         chromaBufferSlice = chromaUniform.writeWith(chromaSize, timeOffset, saturation, forwardDirection)
     }
 
+    fun clearChromaUniforms() {
+        chromaUniform.clear()
+        chromaBufferSlice = null
+    }
+
     // This 'should' be fine being injected into GuiRenderer's render pass since if the bound pipeline's shader doesn't
     // have a uniform with the given name, then the buffer slice will never be bound
     fun insertChromaSetUniform(renderPass: RenderPass) {
@@ -58,6 +63,15 @@ object GuiRendererHook {
         // A very explicit name is given since the uniform will show up in RenderPassImpl's simpleUniforms
         // map, and so it is made clear where this uniform is from
         chromaBufferSlice?.let { renderPass.setUniform("SkyHanniChromaUniforms", it) } ?: return
+    }
+
+    fun insertChromaSetUniform(renderPass: RenderPass, pipeline: RenderPipeline) {
+        if (pipeline != SkyHanniRenderPipeline.CHROMA_TEXT.invoke() &&
+            pipeline != SkyHanniRenderPipeline.CHROMA_STANDARD.invoke()
+        ) return
+
+        if (chromaBufferSlice == null) computeChromaBufferSlice()
+        insertChromaSetUniform(renderPass)
     }
 
     fun replacePipeline(state: GuiElementRenderState, original: Operation<RenderPipeline>): RenderPipeline {
