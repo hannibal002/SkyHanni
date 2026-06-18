@@ -43,12 +43,17 @@ class DeployableConfig {
     @Expose
     @ConfigOption(name = "Missing Deployable Warning", desc = "Warn when a deployable is missing.")
     @ConfigEditorBoolean
-    var warnMissingDeployable: Boolean = true
+    @FeatureToggle
+    var warnMissingDeployable: Boolean = false
 
     @Expose
     @ConfigOption(name = "Deployable Warnings", desc = "Which deployables to warn for.")
     @ConfigEditorDraggableList
-    val warningTypes: MutableList<WarningType> = mutableListOf()
+    val warningTypes: MutableList<WarningType> = mutableListOf(
+        WarningType.SLAYER,
+        WarningType.TROPHY_FISHING
+        WarningType.MINESHAFT,
+    )
 
     enum class WarningType(val displayName: String, val deployableType: DeployableType) {
         SLAYER("Slayer Boss Fight", DeployableType.FLUX),
