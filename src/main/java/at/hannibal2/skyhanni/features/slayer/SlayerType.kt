@@ -46,10 +46,10 @@ enum class SlayerType(
         SlayerMiniBossType.INFERNAL,
     ),
     VAMPIRE(
-        "Bloodfiend",
+        "Riftstalker Bloodfiend",
         "vampire",
         Zombie::class.java,
-    ) // previously called "Riftstalker Bloodfiend"
+    )
     ;
 
     companion object {

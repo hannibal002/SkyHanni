@@ -2,59 +2,77 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CarryTrackerJson
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
+import at.hannibal2.skyhanni.events.combat.CrimsonMinibossKilledEvent
+import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
+import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
-import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
+import at.hannibal2.skyhanni.utils.StringUtils.width
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.width
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.suggest
+import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-
-/**
- * TODO more carry features
- * save on restart
- * support for Dungeon, Kuudra, crimson minibosses
- * average spawn time per slayer customer
- * change customer name color if offline, online, on your island
- * show time since last boss died next to slayer customer name
- * highlight slayer bosses for slayer customers
- * automatically mark customers with /shmarkplayers
- * show a line behind them
- */
+import net.minecraft.client.Minecraft
+import kotlin.math.roundToInt
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
+import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss as CrimsonMiniBoss
 
 @SkyHanniModule
 object CarryTracker {
+    private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueCustomMessageId()
+
+    private val storage get() = SkyHanniMod.feature.storage.carryPrices
     private val config get() = SkyHanniMod.feature.misc
 
-    private val customers = mutableListOf<Customer>()
-    private val carryTypes = mutableMapOf<String, CarryType>()
-    private var slayerNames = emptyMap<SlayerType, List<String>>()
+    private var display: List<Renderable> = emptyList()
 
-    private var display = emptyList<Renderable>()
+    private val customers: MutableList<Customer> = mutableListOf()
 
-    private val patternGroup = RepoPattern.group("carry")
+    // TODO create trade event with player name, coins and items
+    private var lastTradedPlayer: String? = null
+    private val recentTrades: MutableMap<String, Double> = mutableMapOf()
 
     /**
      * REGEX-TEST:
      * §6Trade completed with §r§b[MVP§r§c+§r§b] ClachersHD§r§f§r§6!
      */
-    private val tradeCompletedPattern by patternGroup.pattern(
-        "trade.completed",
+    private val tradeCompletedPattern by RepoPattern.pattern(
+        "carry.trade.completed",
         "§6Trade completed with (?<name>.*)§r§6!",
     )
 
@@ -62,277 +80,755 @@ object CarryTracker {
      * REGEX-TEST:
      *  §r§a§l+ §r§6500k coins
      */
-    private val rawNamePattern by patternGroup.pattern(
-        "trade.coins.gained",
+    private val tradeCoinsGainedPattern by RepoPattern.pattern(
+        "carry.trade.coins.gained",
         " §r§a§l\\+ §r§6(?<coins>.*) coins",
     )
 
-    @HandleEvent
-    fun onSlayerDeath(event: SlayerDeathEvent) {
-        val slayerType = event.slayerType
-        val tier = event.tier
-        val owner = event.owner
-        val customer = customers.find { it.name.equals(owner, true) } ?: return
-        val carry = customer.carries.find {
-            it.type is SlayerCarryType && it.type.slayerType == slayerType && it.type.tier == tier
-        } ?: return
-        carry.done++
-        if (carry.done == carry.requested) {
-            ChatUtils.chat("Carry done for ${customer.name}!")
-            TitleManager.sendTitle("§eCarry done!")
-        }
-        update()
-    }
-
-    // TODO create trade event with player name, coins and items
-    private var lastTradedPlayer: String? = null
+    /**
+     * REGEX-TEST:
+     *  §r§c§l- §r§6500k coins
+     */
+    private val tradeCoinsLostPattern by RepoPattern.pattern(
+        "carry.trade.coins.lost",
+        " §r§c§l- §r§6(?<coins>.*) coins",
+    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         tradeCompletedPattern.matchMatcher(event.message) {
-            lastTradedPlayer = group("name").cleanPlayerName()
+            val name = group("name").cleanPlayerName()
+
+            recentTrades.remove(name) // clear old trades with player
+            lastTradedPlayer = name
+
+            DelayedRun.runNextTick {
+                val coins = recentTrades[name] ?: return@runNextTick
+                if (coins <= 0.0) return@runNextTick
+
+                findCustomer(name)?.let { customer ->
+                    customer.coinsPaid += coins
+                    update()
+                }
+
+                val types = carryTypes.filter { it.pricePer != 0.0 && (coins % it.pricePer) == 0.0 }
+
+                if (types.isNotEmpty()) ChatUtils.chat {
+                    append("Click to add carries for:")
+
+                    val chatWidth = Minecraft.getInstance().gui.chat.width
+                    val prefixWidth = "[SkyHanni] ".width()
+                    val spaceWidth = " ".width()
+
+                    for (type in types) {
+                        val amount = (coins / type.pricePer).toInt()
+                        val component = " ".asComponent().append(
+                            "§b[${amount}x ${type.shortName}]".asComponent {
+                                hover = "§eClick to add ${amount}x §d${type.displayName}§e!".asComponent()
+                                onClick { addCarry(name, type.id, amount) }
+                            },
+                        )
+
+                        // dont break component into 2 lines
+                        val remainingWidth = chatWidth - ((prefixWidth + this.width()) % chatWidth)
+                        // this is (remainingWidth < component.width() < chatWidth) but kotlin doesnt support it
+                        if (component.width() in (remainingWidth + 1)..<chatWidth)
+                            repeat(remainingWidth / spaceWidth) { append(" ") }
+
+                        append(component)
+                    }
+                }
+            }
         }
 
-        rawNamePattern.matchMatcher(event.message) {
-            val player = lastTradedPlayer ?: return
-            val coinsGained = group("coins").formatDouble()
-            getCustomerOrNull(player)?.let {
-                it.alreadyPaid += coinsGained
-                update()
-            }
+        tradeCoinsGainedPattern.matchMatcher(event.message) {
+            val name = lastTradedPlayer ?: return
+            val coins = group("coins").formatDouble()
+
+            recentTrades.addOrPut(name, coins)
+        }
+
+        tradeCoinsLostPattern.matchMatcher(event.message) {
+            val name = lastTradedPlayer ?: return
+            val coins = group("coins").formatDouble()
+
+            recentTrades.addOrPut(name, -coins)
         }
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<CarryTrackerJson>("CarryTracker")
-        slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
-    }
-
-    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender() {
         config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
     }
 
     @HandleEvent
-    fun onCommandRegister(event: CommandRegistrationEvent) {
+    fun onSecondPassed() {
+        update()
+    }
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Carry Tracker")
+        event.addIrrelevant {
+            add("customers: $customers")
+            add("carryTypes: $carryTypes")
+            add("carryPrices: $storage")
+            add("lastTradedPlayer: $lastTradedPlayer")
+            add("recentTrades: $recentTrades")
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcarry") {
             description = "Keep track of carries you do."
-            legacyCallbackArgs { onCommand(it) }
+            category = CommandCategory.USERS_ACTIVE
+            literal("add") {
+                arg(
+                    "player",
+                    BrigadierArguments.word(),
+                    BrigadierUtils.dynamicSuggestionProvider {
+                        (customers.map { it.name } + PartyApi.partyMembers + EntityUtils.getPlayerEntities()
+                            .map { it.plainTextName }).distinct()
+                    },
+                ) { player ->
+                    arg(
+                        "type",
+                        BrigadierArguments.word(),
+                        carryTypes.map { it.id },
+                    ) { type ->
+                        arg(
+                            "amount",
+                            BrigadierArguments.integer(),
+                            listOf("1", "10", "30", "160", "200"),
+                        ) { amount ->
+                            callback {
+                                addCarry(getArg(player), getArg(type), getArg(amount))
+                            }
+                        }
+                        callback {
+                            addCarry(getArg(player), getArg(type))
+                        }
+                    }
+                    callback {
+                        addCustomer(getArg(player))
+                    }
+                }
+                callback { showHelpUserError() }
+            }
+            literal("remove") {
+                arg(
+                    "player",
+                    BrigadierArguments.word(),
+                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                ) { player ->
+                    arg(
+                        "type",
+                        BrigadierArguments.word(),
+                        carryTypes.map { it.id },
+                    ) { type ->
+                        arg(
+                            "amount",
+                            BrigadierArguments.integer(),
+                            listOf("1", "10", "30", "160", "200"),
+                        ) { amount ->
+                            callback {
+                                removeCarry(getArg(player), getArg(type), getArg(amount))
+                            }
+                        }
+                        callback {
+                            removeCarry(getArg(player), getArg(type))
+                        }
+                    }
+                    callback {
+                        removeCustomer(getArg(player))
+                    }
+                }
+                callback { showHelpUserError() }
+            }
+            literal("updateDone") {
+                arg(
+                    "player",
+                    BrigadierArguments.word(),
+                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                ) { player ->
+                    arg(
+                        "type",
+                        BrigadierArguments.word(),
+                        carryTypes.map { it.id },
+                    ) { type ->
+                        arg(
+                            "amount",
+                            BrigadierArguments.integer(),
+                            listOf("1", "5", "10", "-1", "-5", "-10"),
+                        ) { amount ->
+                            callback {
+                                updateDone(getArg(player), getArg(type), getArg(amount))
+                            }
+                        }
+                        callback { showHelpUserError() }
+                    }
+                    callback { showHelpUserError() }
+                }
+                callback { showHelpUserError() }
+            }
+            literal("updatePaid") {
+                arg(
+                    "player",
+                    BrigadierArguments.word(),
+                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                ) { player ->
+                    arg(
+                        "coins",
+                        BrigadierArguments.word(),
+                        listOf("1m", "5m", "10m", "-1m", "-5m", "-10m"),
+                    ) { coins ->
+                        callback {
+                            updatePaid(getArg(player), getArg(coins))
+                        }
+                    }
+                    callback { showHelpUserError() }
+                }
+                callback { showHelpUserError() }
+            }
+            literal("price") {
+                literal("list") {
+                    arg(
+                        "page",
+                        BrigadierArguments.integer(),
+                    ) { page ->
+                        callback {
+                            listPrices(getArg(page))
+                        }
+                    }
+                    callback {
+                        listPrices()
+                    }
+                }
+                literal("set") {
+                    arg(
+                        "type",
+                        BrigadierArguments.word(),
+                        carryTypes.map { it.id },
+                    ) { type ->
+                        arg(
+                            "price",
+                            BrigadierArguments.word(),
+                            listOf("1m", "2m", "3m", "4m", "5m"),
+                        ) { price ->
+                            callback {
+                                setPrice(getArg(type), getArg(price))
+                            }
+                        }
+                        callback { showHelpUserError() }
+                    }
+                }
+                literal("delete") {
+                    arg(
+                        "type",
+                        BrigadierArguments.word(),
+                        carryTypes.map { it.id },
+                    ) { type ->
+                        callback {
+                            deletePrice(getArg(type))
+                        }
+                    }
+                    callback { showHelpUserError() }
+                }
+                literal("deleteAll") {
+                    callback {
+                        deleteAllPrices()
+                    }
+                }
+                callback { showHelpUserError() }
+            }
+            literal("clearAll") {
+                callback {
+                    clearAll()
+                }
+            }
+            simpleCallback {
+                showHelpUserError()
+            }
         }
     }
 
-    private fun onCommand(args: Array<String>) {
-        if (args.size !in 2..3) {
-            ChatUtils.userError(
-                "Usage:\n" +
-                    "§c/shcarry <customer name> <type> <amount requested>\n" +
-                    "§c/shcarry <type> <price per>\n" +
-                    "§c/shcarry remove <customer name>",
-            )
-            return
-        }
-        if (args.size == 3) {
-            addCarry(args[0], args[1], args[2])
-            return
-        }
-        if (args[0] == "remove") {
-            val customerName = args[1]
-            val customer = getCustomerOrNull(customerName) ?: run {
-                ChatUtils.userError("Customer not found: §b$customerName")
-                return
-            }
-            customers.remove(customer)
-            update()
-            ChatUtils.chat("Removed customer: §b$customerName")
-            return
-        }
-        setPrice(args[0], args[1])
+    private fun showHelpUserError() {
+        ChatUtils.userError(
+            "Usage:\n" +
+                "  §c/shcarry add <player> [type] [amount]\n" +
+                "  §c/shcarry remove <player> [type] [amount]\n" +
+                "  §c/shcarry updateDone <player> <type> <amount>\n" +
+                "  §c/shcarry updatePaid <player> <coins>\n" +
+                "  §c/shcarry price list\n" +
+                "  §c/shcarry price set <type> <price>\n" +
+                "  §c/shcarry price delete <type>\n" +
+                "  §c/shcarry price deleteAll\n" +
+                "  §c/shcarry clearAll",
+            true,
+        )
     }
 
-    private fun addCarry(customerName: String, rawType: String, amount: String) {
-        val carryType = getCarryType(rawType) ?: return
-        val amountRequested = amount.formatIntOrUserError() ?: return
-        val newCarry = Carry(carryType, amountRequested)
+    private fun addCustomer(customerName: String) {
+        findCustomer(customerName)?.let { customer ->
+            ChatUtils.userError("Customer already exists: §b${customer.name}")
+            return
+        }
 
-        val customer = getCustomer(customerName)
-        val carries = customer.carries
-        for (carry in carries.toList()) {
-            if (newCarry.type != carry.type) continue
-            val newAmountRequested = carry.requested + amountRequested
-            if (newAmountRequested < 1) {
-                ChatUtils.userError("New carry amount requested must be positive!")
-                return
+        val customer = addCustomerInternal(customerName)
+        ChatUtils.chat("Customer added: §b${customer.name}")
+    }
+
+    private fun addCustomerInternal(name: String): Customer {
+        val customer = Customer(name)
+        customers.add(customer)
+        recentTrades.entries.firstOrNull { it.key.equals(name, true) }?.let {
+            customer.coinsPaid += it.value
+        }
+
+        return customer
+    }
+
+    private fun addCarry(customerName: String, rawType: String, amount: Int = 0) {
+        findCarryType(rawType)?.let { type ->
+            val customer = findCustomer(customerName) ?: addCustomerInternal(customerName)
+
+            customer.findCarry(type)?.let { carry ->
+                updateTotal(customer, carry, amount)
+            } ?: run {
+                if (amount < 0) {
+                    ChatUtils.userError("Carry amount cannot be negative!")
+                    return
+                }
+
+                val carry = Carry(type, amount)
+                customer.carries.add(carry)
+
+                update()
+                ChatUtils.chat("Carry added: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
             }
-            carries.remove(carry)
-            val updatedCarry = Carry(carryType, newAmountRequested)
-            updatedCarry.done = carry.done
-            carries.add(updatedCarry)
-            update()
-            ChatUtils.chat("Updated carry: §b$customerName §8x$newAmountRequested ${newCarry.type}")
-            return
-        }
+        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+    }
 
-        if (amountRequested < 1) {
-            ChatUtils.userError("Carry amount requested must be positive!")
-            return
-        }
-        customer.carries.add(newCarry)
+    private fun removeCustomer(customerName: String) {
+        findCustomer(customerName)?.let { customer ->
+            removeCustomerInternal(customer)
+        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+    }
+
+    private fun removeCustomerInternal(customer: Customer) {
+        customers.remove(customer)
         update()
-        ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
+        ChatUtils.chat("Customer removed: §b${customer.name}")
     }
 
-    private fun getCarryType(rawType: String): CarryType? = carryTypes.getOrPut(rawType) {
-        createCarryType(rawType) ?: run {
-            ChatUtils.userError("Unknown carry type: '$rawType'! Use e.g. rev5, sven4, eman3, blaze2..")
-            return null
+    private fun removeCarry(customerName: String, rawType: String, amount: Int? = null) {
+        findCustomer(customerName)?.let { customer ->
+            findCarryType(rawType)?.let { type ->
+                customer.findCarry(type)?.let { carry ->
+                    if (amount != null) updateTotal(customer, carry, -amount)
+                    else removeCarryInternal(customer, carry)
+                } ?: ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
+            } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+    }
+
+    private fun removeCarryInternal(customer: Customer, carry: Carry) {
+        customer.carries.remove(carry)
+        update()
+        ChatUtils.chat("Carry removed: §b${customer.name} §d${carry.type.displayName}")
+    }
+
+    private fun updateTotal(customer: Customer, carry: Carry, amount: Int) {
+        val newTotal = carry.total + amount
+        if (newTotal < 0) {
+            ChatUtils.userError("New carry amount cannot be negative!")
+            return
+        }
+        carry.total = newTotal
+
+        update()
+        ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
+    }
+
+    private fun updateDone(customerName: String, rawType: String, amount: Int) {
+        findCustomer(customerName)?.let { customer ->
+            findCarryType(rawType)?.let { type ->
+                customer.findCarry(type)?.let { carry ->
+                    updateDoneInternal(customer, carry, amount)
+                } ?: ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
+            } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+    }
+
+    private fun updateDoneInternal(customer: Customer, carry: Carry, amount: Int) {
+        val newDone = carry.done + amount
+        if (newDone < 0) {
+            ChatUtils.userError("New carries done cannot be negative!")
+            return
+        }
+        carry.done = newDone
+
+        update()
+        ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
+    }
+
+    private fun updatePaid(customerName: String, rawCoins: String) {
+        findCustomer(customerName)?.let { customer ->
+            rawCoins.formatDoubleOrUserError()?.let { coins ->
+                customer.coinsPaid += coins
+                update()
+                ChatUtils.chat(
+                    "Customer updated: §b${customer.name} " +
+                        "§6${customer.coinsPaid.shortFormat()}§8/§6${customer.getTotalCost().shortFormat()}" +
+                        " coins §epaid",
+                )
+            }
+        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+    }
+
+    private fun listPrices(page: Int = 1) {
+        TextHelper.displayPaginatedList(
+            "Carry Tracker Prices",
+            carryTypes.filter { it.pricePer != 0.0 },
+            PRICE_LIST_MESSAGE_ID,
+            "No carry prices set! Use /shcarry price set <type> <price> to set a price",
+            page,
+        ) { type ->
+            val name = type.displayName
+            val price = type.pricePer.shortFormat()
+            TextHelper.join(
+                "§8[§c✖§8]".asComponent {
+                    hover = "§eClick to delete price!".asComponent()
+                    onClick {
+                        deletePrice(type.id)
+                        listPrices(page)
+                    }
+                },
+                " ",
+                "§8[§e✎§8]".asComponent {
+                    hover = "§eClick to edit price!".asComponent()
+                    suggest = "/shcarry price set ${type.id} ${price.lowercase()}"
+                },
+                " §d$name§8: §6$price coins",
+            )
         }
     }
 
     private fun setPrice(rawType: String, rawPrice: String) {
-        val carryType = getCarryType(rawType) ?: return
-
-        val price = rawPrice.formatDoubleOrUserError() ?: return
-        carryType.pricePer = price
-        update()
-        ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
-    }
-
-    fun isCustomer(customerName: String): Boolean = getCustomerOrNull(customerName) != null
-
-    private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
-        it.name.equals(customerName, ignoreCase = true)
-    }
-
-    private fun getCustomer(customerName: String): Customer =
-        getCustomerOrNull(customerName) ?: Customer(customerName).also { customers.add(it) }
-
-    private fun createDisplay(
-        carry: Carry,
-        customer: Customer,
-        carries: MutableList<Carry>,
-    ): Renderable {
-        val (type, requested, done) = carry
-        val missing = requested - done
-
-        val color = when {
-            done > requested -> "§c"
-            done == requested -> "§a"
-            else -> "§e"
-        }
-        val cost = formatCost(type.pricePer?.let { it * requested })
-        val text = "$color$done§8/$color$requested $cost"
-        return Renderable.clickable(
-            "  $type $text",
-            tips = buildList<String> {
-                add("§b${customer.name}' $type §cCarry")
-                add("")
-                add("§7Requested: §e$requested")
-                add("§7Done: §e$done")
-                add("§7Missing: §e$missing")
-                add("")
-                if (cost != "") {
-                    add("§7Total cost: §e$cost")
-                    add("§7Cost per carry: §e${formatCost(type.pricePer)}")
-                } else {
-                    add("§cNo price set for this carry!")
-                    add("§7Set a price with §e/shcarry <type> <price>")
-                }
-                add("")
-                add("§7Run §e/shcarry remove ${customer.name} §7to remove the whole customer!")
-                add("§eClick to send current progress in the party chat!")
-                add("§eControl-click to remove this carry!")
-            },
-            onLeftClick = {
-                if (KeyboardManager.isModifierKeyDown()) {
-                    carries.remove(carry)
+        findCarryType(rawType)?.let { type ->
+            rawPrice.formatDoubleOrUserError()?.let { price ->
+                if (price < 0.0) ChatUtils.userError("Carry price cannot be negative!")
+                else if (price == 0.0) ChatUtils.userError("Carry price cannot be 0! Use /shcarry price delete $rawType instead")
+                else {
+                    type.pricePer = price
                     update()
-                } else {
-                    HypixelCommands.partyChat(
-                        "${customer.name} ${type.toString().removeColor()} carry: $done/$requested",
-                    )
+                    ChatUtils.chat("Set carry price for §d${type.displayName} §eto §6${price.shortFormat()} coins")
                 }
-            },
-        )
+            }
+        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+    }
+
+    private fun deletePrice(rawType: String) {
+        findCarryType(rawType)?.let { type ->
+            type.pricePer = 0.0
+            update()
+            ChatUtils.chat("Deleted carry price for §d${type.displayName}")
+        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+    }
+
+    private fun deleteAllPrices() {
+        for (type in carryTypes) type.pricePer = 0.0
+        update()
+        ChatUtils.chat("Deleted all carry prices")
+    }
+
+    private fun clearAll() {
+        val customerSize = customers.size
+        val carrySize = customers.sumOf { it.carries.size }
+        customers.clear()
+        update()
+        ChatUtils.chat("Removed §b$customerSize §ecustomers including §b$carrySize §ecarries")
+    }
+
+    private fun countCarry(customer: Customer, carry: Carry) {
+        carry.done++
+        customer.stats.done()
+        update()
+
+        HypixelCommands.partyChat("${customer.name}: ${carry.done}/${carry.total}")
+        if (carry.done >= carry.total) {
+            ChatUtils.chat(
+                TextHelper.join(
+                    "Carry finished: §b${customer.name} ${carry.formatProgress()} §b${carry.type.displayName}\n",
+                    if (customer.carries.size > 1) "§e[CLICK to remove this carry]".asComponent {
+                        hover = "§eClick to remove this carry!".asComponent()
+                        onClick { removeCarryInternal(customer, carry) }
+                    } else "§e[CLICK to remove this customer]".asComponent {
+                        hover = "§eClick to remove this customer!".asComponent()
+                        onClick { removeCustomerInternal(customer) }
+                    },
+                ),
+            )
+            TitleManager.sendTitle("§eCarry finished for §b${customer.name}§e!", duration = 3.seconds)
+            SoundUtils.playBeepSound()
+        }
     }
 
     private fun update() {
         display = buildList {
-            if (customers.none { it.carries.isNotEmpty() }) return@buildList
+            if (customers.isEmpty()) return@buildList
             addString("§c§lCarries")
-            for (customer in customers) {
-                val carries = customer.carries
-                if (carries.isEmpty()) continue
-                addCustomerName(customer)
 
-                carries.forEach { add(createDisplay(it, customer, carries)) }
+            for (customer in customers) {
+                val totalCost = customer.getTotalCost()
+                val totalCostFormat = totalCost.shortFormat()
+                val paidFormat = customer.coinsPaid.shortFormat()
+                val missingFormat = (totalCost - customer.coinsPaid).shortFormat()
+
+                val totalDone = customer.stats.totalDone
+                val sinceStart = customer.stats.sinceStart().format(showMilliSeconds = false)
+                val sinceLast = customer.stats.sinceLast().format(showMilliSeconds = false)
+                val perHour = customer.stats.perHour()
+                val averageTime = customer.stats.averageTime().format(showMilliSeconds = false)
+                add(
+                    Renderable.clickable(
+                        "§b${customer.name} §6$paidFormat§8/§6$totalCostFormat §8(§7$sinceLast §8| " +
+                            (if (totalDone == 0) "§7N/A §8| §7N/A" else "§7${perHour.roundToInt()}/h §8| §7$averageTime avg") + "§8)",
+                        tips = buildList {
+                            add("§7Carries for §b${customer.name}")
+                            add("")
+                            add("§7Total cost: §6$totalCostFormat")
+                            add("§7Already paid: §6$paidFormat")
+                            add("§7Still missing: §6$missingFormat")
+                            add("")
+                            add("§7Total carries done: §e$totalDone")
+                            add("§7Total elapsed time: §e$sinceStart")
+                            add("§7Carries per hour: §e${perHour.roundTo(1).removeUnusedDecimal()}")
+                            add("§7Average time per carry: §e$averageTime")
+                            add("§7Elapsed time since last carry: §e$sinceLast")
+                            add("")
+                            add("§eClick to send missing coins in party chat!")
+                            add("§e${KeyboardManager.getModifierKeyName()}-click to remove this customer!")
+                        },
+                        onLeftClick = {
+                            if (KeyboardManager.isModifierKeyDown()) removeCustomerInternal(customer)
+                            else HypixelCommands.partyChat("${customer.name}: ${paidFormat}/${totalCostFormat} coins paid")
+                        },
+                    ),
+                )
+
+                for (carry in customer.carries) {
+                    val carryTotalCostFormat = carry.getCost().shortFormat()
+                    add(
+                        Renderable.clickable(
+                            "  §d${carry.type.displayName} ${carry.formatProgress()} §6$carryTotalCostFormat",
+                            tips = buildList {
+                                add("§b${customer.name} §d${carry.type.displayName} §cCarry")
+                                add("")
+                                add("§7Total: §e${carry.total}")
+                                add("§7Done: §e${carry.done}")
+                                add("§7Missing: §e${carry.total - carry.done}")
+                                add("")
+                                add("§7Total cost: §6$carryTotalCostFormat")
+                                add("§7Cost per carry: §6${carry.type.pricePer.shortFormat()}")
+                                if (carry.type.pricePer == 0.0) {
+                                    add("")
+                                    add("§cNo price set for this carry!")
+                                    add("§cSet a price with /shcarry price set ${carry.type.id} <price>")
+                                }
+                                add("")
+                                add("§eClick to send current progress in the party chat!")
+                                add("§e${KeyboardManager.getModifierKeyName()}-click to remove this carry!")
+                            },
+                            onLeftClick = {
+                                if (KeyboardManager.isModifierKeyDown()) removeCarryInternal(customer, carry)
+                                else HypixelCommands.partyChat("${customer.name} ${carry.type.displayName}: ${carry.done}/${carry.total}")
+                            },
+                        ),
+                    )
+                }
             }
         }
     }
 
-    private fun MutableList<Renderable>.addCustomerName(customer: Customer) {
-        val customerName = customer.name
-        val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
-        val totalCostFormat = formatCost(totalCost)
-        if (totalCostFormat.isEmpty()) {
-            addString("§b$customerName")
-            return
+    private fun findCustomer(name: String): Customer? = customers.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    private fun findCarryType(id: String): CarryType? = carryTypes.firstOrNull { it.id.equals(id, ignoreCase = true) }
+    private fun findCarryType(predicate: (CarryType) -> Boolean): CarryType? = carryTypes.firstOrNull(predicate)
+
+    private data class Customer(
+        val name: String,
+        var coinsPaid: Double = 0.0,
+        val carries: MutableList<Carry> = mutableListOf(),
+        val stats: CustomerStats = CustomerStats(),
+    ) {
+        fun findCarry(type: CarryType): Carry? = carries.firstOrNull { it.type == type }
+        fun getTotalCost(): Double = carries.sumOf { it.getCost() }
+    }
+
+    private data class Carry(val type: CarryType, var total: Int, var done: Int = 0) {
+        fun getCost(): Double = type.pricePer * total
+        fun formatProgress(): String = when {
+            done > total -> 'c'
+            done == total -> 'a'
+            else -> 'e'
+        }.let { "§$it$done§8/§$it$total" }
+    }
+
+    private data class CustomerStats(
+        private val stopwatch: Stopwatch = Stopwatch(paused = false),
+        var totalDone: Int = 0,
+    ) {
+        fun done() {
+            totalDone++
+            stopwatch.lap()
         }
 
-        val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
-        val missingFormat = formatCost(totalCost - customer.alreadyPaid)
+        fun sinceStart(): Duration = stopwatch.getDuration()
+        fun sinceLast(): Duration = stopwatch.getLapTime()!! // never null as long as stopwatch is not paused
+        fun elapsed(): Duration = sinceStart() - sinceLast()
+
+        fun perHour(): Double = (totalDone / ((elapsed().inPartialHours).takeUnless { it == 0.0 } ?: 1.0))
+        fun averageTime(): Duration = (elapsed().inWholeMilliseconds / (totalDone.takeUnless { it == 0 } ?: 1)).milliseconds
+    }
+
+    private abstract class CarryType {
+        abstract val id: String
+        abstract val displayName: String
+        abstract val shortName: String
+
+        var pricePer: Double = 0.0
+            get() = storage.getOrDefault(id, field)
+            set(value) {
+                field = value
+                if (value == 0.0) storage.remove(id)
+                else storage.put(id, value)
+            }
+    }
+
+    private data class SlayerCarryType(
+        override val id: String,
+        override val displayName: String,
+        override val shortName: String,
+        val slayerType: SlayerType,
+        val slayerTier: Int,
+    ) : CarryType()
+
+    private data class DungeonCarryType(
+        override val id: String,
+        override val displayName: String,
+        val dungeonFloor: String,
+        override val shortName: String = dungeonFloor,
+    ) : CarryType()
+
+    private data class KuudraCarryType(
+        override val id: String,
+        override val displayName: String,
+        override val shortName: String,
+        val kuudraTier: KuudraTier,
+    ) : CarryType()
+
+    private data class CrimsonMinibossCarryType(
+        override val id: String,
+        override val displayName: String,
+        override val shortName: String,
+        val crimsonMiniboss: CrimsonMiniBoss,
+    ) : CarryType()
+
+    private val carryTypes: List<CarryType> = buildList {
+        for (i in 1..5) add(SlayerCarryType("rev$i", "${SlayerType.REVENANT.displayName} $i", "Rev $i", SlayerType.REVENANT, i))
+        for (i in 1..5) add(SlayerCarryType("tara$i", "${SlayerType.TARANTULA.displayName} $i", "Tara $i", SlayerType.TARANTULA, i))
+        for (i in 1..4) add(SlayerCarryType("sven$i", "${SlayerType.SVEN.displayName} $i", "Sven $i", SlayerType.SVEN, i))
+        for (i in 1..4) add(SlayerCarryType("eman$i", "${SlayerType.VOID.displayName} $i", "Eman $i", SlayerType.VOID, i))
+        for (i in 1..4) add(SlayerCarryType("blaze$i", "${SlayerType.INFERNO.displayName} $i", "Blaze $i", SlayerType.INFERNO, i))
+        for (i in 1..5) add(SlayerCarryType("vamp$i", "${SlayerType.VAMPIRE.displayName} $i", "Vamp $i", SlayerType.VAMPIRE, i))
+
+        add(DungeonCarryType("f0", "Entrance Floor", "E"))
+        for (i in 1..7) add(DungeonCarryType("f$i", "Floor $i", "F$i"))
+        for (i in 1..7) add(DungeonCarryType("m$i", "Master Mode $i", "M$i"))
+
+        for (i in 1..5) add(KuudraCarryType("k$i", "${KuudraTier.entries[i - 1].displayName} Kuudra", "", KuudraTier.entries[i - 1]))
+
+        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL.displayName, "Bladesoul", CrimsonMiniBoss.BLADESOUL))
+        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW.displayName, "Mage Outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
         add(
-            Renderable.clickable(
-                "§b$customerName $paidFormat§8/$totalCostFormat",
-                tips = listOf(
-                    "§7Carries for §b$customerName",
-                    "",
-                    "§7Total cost: $totalCostFormat",
-                    "§7Already paid: $paidFormat",
-                    "§7Still missing: $missingFormat",
-                    "",
-                    "§eClick to send missing coins in party chat!",
-                ),
-                onLeftClick = {
-                    HypixelCommands.partyChat(
-                        "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
-                    )
-                },
+            CrimsonMinibossCarryType(
+                "barb_duke",
+                CrimsonMiniBoss.BARBARIAN_DUKE_X.displayName,
+                "Barb Duke",
+                CrimsonMiniBoss.BARBARIAN_DUKE_X,
             ),
         )
+        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG.displayName, "Ashfang", CrimsonMiniBoss.ASHFANG))
+        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_BOSS.displayName, "Magma Boss", CrimsonMiniBoss.MAGMA_BOSS))
     }
 
-    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.shortFormat()}"
-
-    private fun createCarryType(input: String): CarryType? {
-        if (input.length == 1) return null
-        val rawName = input.dropLast(1).lowercase()
-        val tier = input.last().digitToIntOrNull() ?: return null
-
-        return getSlayerType(rawName)?.let {
-            SlayerCarryType(it, tier)
+    @HandleEvent
+    fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
+        findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier }?.let { type ->
+            findCustomer(event.owner)?.let { customer ->
+                customer.findCarry(type)?.let { carry ->
+                    ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
+                    TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
+                    SoundUtils.playPlingSound()
+                }
+            }
         }
     }
 
-    private fun getSlayerType(name: String): SlayerType? = slayerNames.entries.find { name in it.value }?.key
-
-    data class Customer(
-        val name: String,
-        var alreadyPaid: Double = 0.0,
-        val carries: MutableList<Carry> = mutableListOf(),
-    )
-
-    data class Carry(val type: CarryType, val requested: Int, var done: Int = 0) {
-        fun getCost(): Double? = type.pricePer?.let {
-            requested * it
-        }?.takeIf { it != 0.0 }
+    @HandleEvent
+    fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
+        findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier }?.let { type ->
+            findCustomer(event.owner)?.let { customer ->
+                customer.findCarry(type)?.let { carry ->
+                    // MobEvent.Death already triggers late, no need to wait
+                    countCarry(customer, carry)
+                }
+            }
+        }
     }
 
-    abstract class CarryType(val name: String, val tier: Int) {
-        var pricePer: Double? = null
-        override fun toString(): String = "§d$name $tier"
+    @HandleEvent
+    fun onDungeonComplete(event: DungeonCompleteEvent) {
+        findCarryType { it is DungeonCarryType && it.dungeonFloor == event.floor }?.let { type ->
+            for (partyMember in PartyApi.partyMembers) {
+                findCustomer(partyMember)?.let { customer ->
+                    customer.findCarry(type)?.let { carry ->
+                        // wait for other server messages first
+                        DelayedRun.runNextTick { countCarry(customer, carry) }
+                    }
+                }
+            }
+        }
     }
 
-    class SlayerCarryType(val slayerType: SlayerType, tier: Int) : CarryType(slayerType.displayName, tier)
-//     class DungeonCarryType(val floor: DungeonFloor, masterMode: Boolean) : CarryType(floor.name, tier)
+    @HandleEvent
+    fun onKuudraComplete(event: KuudraCompleteEvent) {
+        findCarryType { it is KuudraCarryType && it.kuudraTier.tierNumber == event.kuudraTier }?.let { type ->
+            for (partyMember in PartyApi.partyMembers) {
+                findCustomer(partyMember)?.let { customer ->
+                    customer.findCarry(type)?.let { carry ->
+                        // wait for other server messages first
+                        DelayedRun.runNextTick { countCarry(customer, carry) }
+                    }
+                }
+            }
+        }
+    }
+
+    @HandleEvent
+    fun onCrimsonMinibossKilled(event: CrimsonMinibossKilledEvent) {
+        findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniboss }?.let { type ->
+            for (partyMember in PartyApi.partyMembers) {
+                findCustomer(partyMember)?.let { customer ->
+                    customer.findCarry(type)?.let { carry ->
+                        // wait for other server messages first
+                        DelayedRun.runNextTick { countCarry(customer, carry) }
+                    }
+                }
+            }
+        }
+    }
+
+    fun isCustomer(customerName: String): Boolean = findCustomer(customerName) != null
 }

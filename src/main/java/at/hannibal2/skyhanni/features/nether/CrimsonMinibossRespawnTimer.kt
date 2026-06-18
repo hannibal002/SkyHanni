@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.combat.CrimsonMinibossKilledEvent
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawningSoon
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
@@ -47,20 +48,19 @@ object CrimsonMinibossRespawnTimer {
     )
 
     /**
-     * REGEX-TEST: §f                            §r§6§lBLADESOUL DOWN!
+     * REGEX-TEST:                             §r§6§lBLADESOUL DOWN!
      */
     private val downPattern by patternGroup.pattern(
         "down",
-        "§f\\s*§r§6§l(?<name>.+) DOWN!",
+        "\\s*§r§6§l(?<name>.+) DOWN!",
     )
 
     private var currentAreaBoss: MiniBoss? = null
 
     private var display: Renderable? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {
             val miniBoss = MiniBoss.fromName(group("name")) ?: return
@@ -69,6 +69,7 @@ object CrimsonMinibossRespawnTimer {
             miniBoss.possibleSpawnTime = null
             miniBoss.foundBeacon = null
             update()
+            CrimsonMinibossKilledEvent(miniBoss).post()
             return
         }
         spawnPattern.matchMatcher(message) {
