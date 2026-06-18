@@ -70,7 +70,7 @@ object EnchantParser {
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?<=^|, )(?:§d§l|§9|§7|§r)+(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?<=^|, )(?:§7§l|§d§l|§9|§7)+(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: SafeItemStack? = null
