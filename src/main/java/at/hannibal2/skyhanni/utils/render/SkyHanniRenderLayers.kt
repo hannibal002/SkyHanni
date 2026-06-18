@@ -52,7 +52,7 @@ object SkyHanniRenderLayers {
         RenderType.create(
             "skyhanni_text_chroma",
             RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT())
-                .withTexture("texture", texture)
+                .withTexture("Sampler0", texture)
                 .createRenderSetup(),
         )
     }

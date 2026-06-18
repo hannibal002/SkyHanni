@@ -111,7 +111,7 @@ object GraphEditorBugFinder {
             if (pathToNearestArea == null) {
                 continue
             }
-            val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
+            val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to the nearest area")
             nearestArea[node] = areaNode
         }
         for (node in graph) {

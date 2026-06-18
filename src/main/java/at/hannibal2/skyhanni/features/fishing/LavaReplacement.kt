@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
@@ -40,7 +41,10 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        Minecraft.getInstance().levelExtractor.allChanged()
+
+        DelayedRun.runNextTick {
+            Minecraft.getInstance().levelExtractor.allChanged()
+        }
     }
 
     private fun shouldReplace(): Boolean {
