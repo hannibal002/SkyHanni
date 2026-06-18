@@ -47,7 +47,7 @@ class SensitivityReducerConfig {
     var chatMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Reducing percent", desc = "Change how much the sensitivity is lowered by.")
+    @ConfigOption(name = "Reducing percent", desc = "Set sensitivity to this percentage of your normal sensitivity")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 99.9f, minStep = 0.1f)
     var reducingPercent: Float = 10f
 
@@ -81,7 +81,7 @@ class SensitivityReducerConfig {
 
     @Expose
     @ConfigLink(owner = SensitivityReducerConfig::class, field = "showGui")
-    val display: Position = Position(400, 200)
+    val position: Position = Position(400, 200)
 
     enum class UnlockOnTeleport(private val displayName: String, val condition: (String) -> Boolean) {
         ALWAYS("Always", { true }),

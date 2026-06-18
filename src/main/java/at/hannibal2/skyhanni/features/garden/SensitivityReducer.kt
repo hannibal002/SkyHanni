@@ -63,17 +63,17 @@ object SensitivityReducer {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.unlockOnTeleport == SensitivityReducerConfig.UnlockOnTeleport.NEVER) return
-        val state = manualState ?: return
+        if (manualState == null) return
 
         teleportPattern.matchMatchers(event.cleanMessage) {
             if (config.unlockOnTeleport.condition(group("plot"))) DelayedRun.runNextTick {
-                manualState = null
                 if (config.chatMessage) ChatUtils.notifyOrDisable(
-                    if (state == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
+                    if (manualState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
                     else "Mouse rotation has been unlocked because you teleported.",
                     config::unlockOnTeleport,
                     messageId = commandMessageId,
                 )
+                manualState = null
             }
         }
     }
@@ -155,7 +155,7 @@ object SensitivityReducer {
         if (!config.showGui) return
         if (state == SensitivityState.UNCHANGED) return
 
-        config.display.renderRenderable(
+        config.position.renderRenderable(
             Renderable.text("§e" + if (state == SensitivityState.REDUCED) "Sensitivity Lowered" else "Mouse Locked"),
             posLabel = "Sensitivity Reducer",
         )
@@ -192,10 +192,8 @@ object SensitivityReducer {
         }
         // migrate from old path
         event.move(135, "misc.lockMouseLookChatMessage", "$base.chatMessage")
-        event.move(135, "misc.lockedMouseDisplay", "$base.display")
         // migrate from "new" path
         event.move(136, "garden.mouseLock.chatMessage", "$base.chatMessage")
-        event.move(136, "garden.mouseLock.display", "$base.display")
         event.move(136, "garden.mouseLock.unlockOnTeleport", "$base.unlockOnTeleport")
         // convert old reducing factor to percent
         event.move(136, "$base.reducingFactor", "$base.reducingPercent") {
