@@ -97,6 +97,7 @@ object PetStorageApi {
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Pets
+     * REGEX-TEST: (1/3) Pets
      * REGEX-TEST: Pets (1/3)
      * REGEX-TEST: (6/6) Pets
      * REGEX-TEST: Pets: "a"
@@ -104,7 +105,7 @@ object PetStorageApi {
      * REGEX-TEST: (6/6) Pets: "e"
      */
     private val mainPetMenuNamePattern by patternGroup.pattern(
-        "menu.gui.title",
+        "menu.gui.name",
         "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
     )
 
