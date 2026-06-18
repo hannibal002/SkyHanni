@@ -10,6 +10,7 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -211,7 +212,9 @@ dependencies {
     includeImplementation(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval)
+    includeImplementation(libs.keval) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
     "minecraftTestClientRuntimeLibraries"(libs.keval)
 
     // Repo mgmt
@@ -225,12 +228,14 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 }
 
-fun DependencyHandler.includeImplementation(dep: Any) {
+fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
+    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
+
     if (isDeobf) {
-        add("shadowImpl", dep)
+        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     } else {
-        include(dep)
-        modImplementation(dep)
+        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     }
 }
 

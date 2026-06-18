@@ -99,7 +99,9 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        DelayedRun.runOrNextTick(Minecraft.getInstance().levelRenderer::allChanged)
+        DelayedRun.runNextTick {
+            Minecraft.getInstance().levelRenderer.allChanged()
+        }
     }
 
     private fun shouldReplace(): Boolean {
