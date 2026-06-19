@@ -161,8 +161,9 @@ object ErrorManager {
                 if (copied) {
                     AchievementManager.completeAchievement(COPY_ERROR_ACHIEVEMENT)
                     "$name copied into the clipboard, please report it on the SkyHanni discord!"
+                } else {
+                    "$name could not be copied to clipboard!"
                 }
-                else "$name could not be copied to clipboard!"
             } ?: "Error id not found!",
         )
     }
