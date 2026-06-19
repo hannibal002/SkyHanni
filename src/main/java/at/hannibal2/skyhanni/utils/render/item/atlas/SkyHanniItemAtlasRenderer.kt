@@ -9,18 +9,16 @@ import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
-//? if >= 26.2
-import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import com.mojang.blaze3d.textures.FilterMode
+import org.joml.Matrix4f
 import kotlin.math.roundToInt
 
-//? if >= 26.1
-import org.joml.Matrix4f
-
-//? if < 26.2
+//? if >= 26.2 {
+import net.minecraft.client.renderer.SubmitNodeStorage
+//?} else
 //import net.minecraft.client.renderer.MultiBufferSource
 
 internal class SkyHanniItemAtlasRenderer(
@@ -36,7 +34,6 @@ internal class SkyHanniItemAtlasRenderer(
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
         val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
@@ -51,9 +48,9 @@ internal class SkyHanniItemAtlasRenderer(
         slotX: Int,
         slotY: Int,
         pixelSize: Int,
-        //? if >= 26.2
+        //? if >= 26.2 {
         submitNodeStorage: SubmitNodeStorage,
-        //? if < 26.2
+        //?} else
         //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
@@ -61,9 +58,9 @@ internal class SkyHanniItemAtlasRenderer(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
         shState.renderItemToTexture(
-            //? if >= 26.2
+            //? if >= 26.2 {
             submitNodeStorage,
-            //? if < 26.2
+            //?} else
             //bufferSource,
             featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
@@ -106,9 +103,9 @@ internal class SkyHanniItemAtlasRenderer(
     fun clearSlot(x: Int, y: Int, size: Int) {
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture,
-            //? if >= 26.2
+            //? if >= 26.2 {
             GuiRenderer.CLEAR_COLOR,
-            //? if < 26.2
+            //?} else
             //0,
             depthTexture,
             1.0,

@@ -6,15 +6,15 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
-//? if >= 26.2
-import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 
-//? if < 26.2
-//import net.minecraft.client.renderer.MultiBufferSource.BufferSource
+//? if >= 26.2 {
+import net.minecraft.client.renderer.SubmitNodeStorage
+//?} else
+//import net.minecraft.client.renderer.MultiBufferSource
 
 @SkyHanniModule
 internal object SkyHanniItemRenderCoordinator {
@@ -28,10 +28,10 @@ internal object SkyHanniItemRenderCoordinator {
     }
 
     private data class FrameRenderResources(
-        //? if >= 26.2
+        //? if >= 26.2 {
         val submitNodeStorage: SubmitNodeStorage,
-        //? if < 26.2
-        //val bufferSource: BufferSource,
+        //?} else
+        //val bufferSource: MultiBufferSource.BufferSource,
         val featureRenderDispatcher: FeatureRenderDispatcher,
         val guiScale: Int,
     )
@@ -40,16 +40,7 @@ internal object SkyHanniItemRenderCoordinator {
     // items actively spinning re-render every frame, same as Mojang's isAnimated path.
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
-    private val projectionBuffer by lazy {
-        ProjectionMatrixBuffer(
-            "SkyHanni items",
-            //? if < 26.1 {
-            /*-1000.0f,
-            1000.0f,
-            true,
-            *///?}
-        )
-    }
+    private val projectionBuffer by lazy { ProjectionMatrixBuffer("SkyHanni items") }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber
     private val settleTracker = HashMap<Int, SettleEntry>() // keyed by stableId, NOT atlasKey
@@ -75,7 +66,7 @@ internal object SkyHanniItemRenderCoordinator {
     fun preRenderAtlas(
         pipStates: List<SkyHanniGuiItemRenderState>,
         //? if < 26.2
-        //bufferSource: BufferSource,
+        //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
@@ -84,9 +75,9 @@ internal object SkyHanniItemRenderCoordinator {
 
         val guiScale = Minecraft.getInstance().window.guiScale
         frameResources = FrameRenderResources(
-            //? if >= 26.2
+            //? if >= 26.2 {
             SubmitNodeStorage(),
-            //? if < 26.2
+            //?} else
             //bufferSource,
             featureRenderDispatcher,
             guiScale,
@@ -113,9 +104,9 @@ internal object SkyHanniItemRenderCoordinator {
 
         val renderContext = SkyHanniItemRenderContext(
             atlasStates,
-            //? if >= 26.2
+            //? if >= 26.2 {
             SubmitNodeStorage(),
-            //? if < 26.2
+            //?} else
             //bufferSource,
             featureRenderDispatcher,
             frameNumber,
@@ -154,9 +145,9 @@ internal object SkyHanniItemRenderCoordinator {
         }
         val renderContext = SkyHanniItemRenderContext(
             atlasStates = emptyList(),
-            //? if >= 26.2
+            //? if >= 26.2 {
             resources.submitNodeStorage,
-            //? if < 26.2
+            //?} else
             //resources.bufferSource,
             resources.featureRenderDispatcher,
             frameNumber,

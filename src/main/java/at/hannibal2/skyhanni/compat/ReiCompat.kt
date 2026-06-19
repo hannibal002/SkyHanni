@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.compat
 
-// TODO 26.1 rei compat needed
-//? if < 26.1 {
+// TODO 26.1 REI compat needed
 /*import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -63,4 +62,4 @@ object ReiCompat {
         }
     }
 }
-*///?}
+*/

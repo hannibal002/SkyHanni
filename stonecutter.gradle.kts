@@ -133,17 +133,16 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.2") {
-            replace(".gameRenderer.featureRenderDispatcher()", ".gameRenderer.getFeatureRenderDispatcher()")
-            replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
-            replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
-            replace(".gui.hud.isHidden", ".options.hideGui")
             replace(".mainCamera()", ".mainCamera")
             replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
             replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
             replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
+            replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
+            replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
             replace("gui.hud.chat", "gui.chat")
             replace("gui.hud.guiTicks", "gui.guiTicks")
+            replace("gui.hud.isHidden", "options.hideGui")
             replace("gui.hud.tabList", "gui.tabList")
             replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
             replace(
@@ -180,7 +179,6 @@ stonecutter parameters {
         }
 
         string(current.parsed < "26.1") {
-            replace(";extractRenderState(", ";render(")
             replace(";text(", ";drawString(")
             replace("ContainerInput", "ClickType")
             replace("GuiGraphicsExtractor", "GuiGraphics")

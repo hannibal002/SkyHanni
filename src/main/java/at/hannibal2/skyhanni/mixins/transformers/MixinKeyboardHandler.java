@@ -14,8 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 
-// TODO 26.1 rei compat needed
-//? if < 26.1
+// TODO 26.1 REI compat needed
 //import at.hannibal2.skyhanni.compat.ReiCompat;
 
 @Mixin(KeyboardHandler.class)
@@ -28,9 +27,8 @@ public class MixinKeyboardHandler {
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
-        // don't send key events if Rei search bar is selected
-        // TODO 26.1 rei compat needed
-        //? if < 26.1
+        // don't send key events if REI search bar is selected
+        // TODO 26.1 REI compat needed
         //if (ReiCompat.searchHasFocus()) return;
 
         /*

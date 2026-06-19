@@ -34,10 +34,8 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
-val isDeobf = target.mappingStyle == MappingStyle.NONE
 
-if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
-else apply(plugin = "net.fabricmc.fabric-loom-remap")
+apply(plugin = "net.fabricmc.fabric-loom")
 
 // Manual accessors for the conditionally-applied loom plugin.
 // These replace the typed accessors that Kotlin DSL would normally generate for
@@ -98,10 +96,6 @@ val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowModImpl: Configuration by configurations.creating {
-    if (!isDeobf) configurations.getByName("modImplementation").extendsFrom(this)
-}
-
 val shadowOnly: Configuration by configurations.creating
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
@@ -153,14 +147,6 @@ tasks.register("checkPrDescription", ChangelogVerification::class) {
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
-    @Suppress("UnstableApiUsage")
-    if (!isDeobf) {
-        if (target.mappingDependency == "official") {
-            mappings(loom.officialMojangMappings())
-        } else {
-            mappings(target.mappingDependency)
-        }
-    }
 
     compileOnly(libs.jbAnnotations)
     ksp(project(":annotation-processors"))?.let { compileOnly(it) }
@@ -169,37 +155,26 @@ dependencies {
     implementation(libs.autoservice.annotations)
 
     target.fabricLoaderVersion?.let {
-        if (isDeobf) implementation(it) else modImplementation(it)
+        implementation(it)
         "productionRuntimeMods"(it)
     }
     target.fabricApiVersion?.let {
-        if (isDeobf) implementation(it) else modImplementation(it)
+        implementation(it)
         "productionRuntimeMods"(it)
     }
-    if (isDeobf) implementation(libs.fabricLanguageKotlin)
-    else modImplementation(libs.fabricLanguageKotlin)
+    implementation(libs.fabricLanguageKotlin)
     "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
     target.modMenuVersion?.let {
-        if (isDeobf) implementation("maven.modrinth:modmenu:$it")
-        else modImplementation("maven.modrinth:modmenu:$it")
+        implementation("maven.modrinth:modmenu:$it")
     }
 
-    if (isDeobf) runtimeOnly(libs.devauth)
-    else modRuntimeOnly(libs.devauth)
+    runtimeOnly(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    if (isDeobf) {
-        shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-            exclude("org.jetbrains.kotlin")
-            exclude("org.jetbrains.kotlinx")
-        }
-    } else {
-        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-            exclude("org.jetbrains.kotlin")
-            exclude("org.jetbrains.kotlinx")
-        }
-        include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
+    shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+        exclude("org.jetbrains.kotlin")
+        exclude("org.jetbrains.kotlinx")
     }
     "minecraftTestClientRuntimeLibraries"(
         "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}"
@@ -215,17 +190,11 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mockk.agent)
 
-    if (isDeobf) {
-        implementation(target.hypixelModApiVersion)
-        runtimeOnly(target.hypixelModApiFabricVersion)
-    } else {
-        modImplementation(target.hypixelModApiVersion)
-        modRuntimeOnly(target.hypixelModApiFabricVersion)
-    }
+    implementation(target.hypixelModApiVersion)
+    runtimeOnly(target.hypixelModApiFabricVersion)
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
 
     // getting clock offset
     includeImplementation(libs.commons.net)
@@ -250,12 +219,7 @@ dependencies {
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
     fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
 
-    if (isDeobf) {
-        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
-    } else {
-        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
-        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
-    }
+    add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
 }
 
 afterEvaluate {
@@ -266,11 +230,8 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        if (!isDeobf) {
-            arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
-        } else {
-            arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
-        }
+        //arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
     }
 }
 
@@ -356,15 +317,12 @@ fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-if (isDeobf) {
-    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
-    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
-}
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
-                           else target.minecraftVersion.formattedJavaLanguageVersion
+        val jvmTargetStr = target.minecraftVersion.formattedKotlinJvmTarget
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
         optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
         // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
@@ -384,28 +342,12 @@ tasks.withType<GradleJar> {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
 }
 
-if (!isDeobf) {
-    val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-        archiveClassifier.set("")
-        dependsOn(tasks.shadowJar)
-        inputFile.set(tasks.shadowJar.get().archiveFile)
-        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
-    }
-    tasks.assemble.get().dependsOn(remapJar)
-}
-
 tasks.shadowJar {
-    if (isDeobf) {
-        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
-        archiveClassifier.set("")
-    } else {
-        destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-        archiveClassifier.set("all-dev")
-    }
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    archiveClassifier.set("")
     configurations = buildList {
         add(shadowImpl)
-        if (!isDeobf) add(shadowModImpl)
-        if (isDeobf) add(shadowOnly)
+        add(shadowOnly)
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
@@ -420,9 +362,7 @@ tasks.jar {
     dependsOn(setProductionMixinConfig)
 }
 
-if (isDeobf) {
-    tasks.assemble.get().dependsOn(tasks.shadowJar)
-}
+tasks.assemble.get().dependsOn(tasks.shadowJar)
 
 if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
@@ -447,7 +387,6 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 publishing.publications {
     create<MavenPublication>("maven") {
-        if (!isDeobf) artifact(tasks.named("remapJar"))
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
@@ -526,8 +465,7 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    if (isDeobf) enabled = false
-    else dependsOn("stonecutterPrepare")
+    enabled = false
 }
 
 repositories {

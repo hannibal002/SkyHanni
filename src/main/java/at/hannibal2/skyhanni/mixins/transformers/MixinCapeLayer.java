@@ -28,7 +28,6 @@ public class MixinCapeLayer {
                 && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return original;
-            //~ if < 26.1 'entityTranslucentCullItemTarget' -> 'itemEntityTranslucentCull'
             return RenderTypes.entityTranslucentCullItemTarget(skinTextures.cape().texturePath());
         }
         return original;

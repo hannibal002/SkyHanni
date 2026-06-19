@@ -1,25 +1,21 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.mixins.transformers.MixinBufferBuilderAccessor
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
-*///?}
-//? if >= 26.2
-import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
-//? if < 26.2
-//import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
-//? if < 26.2 {
-
-/*private typealias VFEType = VertexFormatElement.Type
-//? if < 26.1
-//private typealias VFEUsage = VertexFormatElement.Usage
+//? if >= 26.2 {
+import com.mojang.blaze3d.GpuFormat
+//?} else {
+/*import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.blaze3d.vertex.VertexFormatElement
 *///?}
+
+//? if < 26.2
+//private typealias VFEType = VertexFormatElement.Type
 
 object SkyHanniVertexFormats {
 
@@ -31,49 +27,41 @@ object SkyHanniVertexFormats {
     *///?}
 
     internal enum class VertexElement(
-        //? if >= 26.2
-        val attributeName: String,
         //? if < 26.2 {
         /*private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         private val normalized: Boolean = false,
         private val count: Int = 4,
         *///?}
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
-        //~ if < 26.2 'ROUNDED_PARAMS_0("RoundedParams0")' -> 'ROUNDED_PARAMS_0'
-        ROUNDED_PARAMS_0("RoundedParams0"),
-
+        ROUNDED_PARAMS_0,
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
-        //~ if < 26.2 'ROUNDED_PARAMS_1("RoundedParams1")' -> 'ROUNDED_PARAMS_1'
-        ROUNDED_PARAMS_1("RoundedParams1"),
+        ROUNDED_PARAMS_1,
         // {angle, progress, phaseOffset, reverse(float)}
-        //~ if < 26.2 'GRADIENT_PARAMS_0("GradientParams0")' -> 'GRADIENT_PARAMS_0'
-        GRADIENT_PARAMS_0("GradientParams0"),
+        GRADIENT_PARAMS_0,
         // {startColor R, G, B, A}
-        //~ if < 26.2 'GRADIENT_PARAMS_1("GradientParams1")' -> 'GRADIENT_PARAMS_1'
-        GRADIENT_PARAMS_1("GradientParams1"),
+        GRADIENT_PARAMS_1,
         // {endColor R, G, B, A}
-        //~ if < 26.2 'GRADIENT_PARAMS_2("GradientParams2")' -> 'GRADIENT_PARAMS_2'
-        GRADIENT_PARAMS_2("GradientParams2"),
+        GRADIENT_PARAMS_2,
         ;
+        
+        val attributeName: String =
+            name.lowercase().split("_").joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 
         //? if < 26.2 {
         /*// The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
-        val element by lazy {
-            //~ if < 26.1 'false' -> 'usage'
-            safeRegister(registrationId, index, type, false, count)
-        }
+        val element by lazy { safeRegister(registrationId, index, type, false, count) }
         *///?}
     }
 
     //? if < 26.2 {
     /*/**
-     * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired one is taken.
-     * Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
+     * Registers a VertexFormatElement with the given parameters, automatically finding an available ID if the desired
+     * one is taken. Logs an error if the desired ID was already taken, but still registers the element with a valid ID.
+     *
      * @param desiredId The preferred ID for the VertexFormatElement.
      * @param index The index of the element in the vertex format (default is 0).
      * @param type The data type of the element (default is FLOAT).
@@ -85,18 +73,16 @@ object SkyHanniVertexFormats {
         desiredId: Int,
         index: Int = 0,
         type: VFEType = VFEType.FLOAT,
-        //~ if < 26.1 'normalized: Boolean = false' -> 'usage: VFEUsage = VFEUsage.GENERIC'
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
-        // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
-        //  but, technically possible, and something we should account for eventually.
+        // TODO it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format
+        // elements, but technically possible, and something we should account for eventually.
         val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
         if (id != desiredId && PlatformUtils.isDevEnvironment) ErrorManager.logErrorStateWithData(
             "VertexFormatElement ID $desiredId was already taken, using $id instead",
             "SkyHanni vertex format element ID conflict. Desired ID $desiredId was already registered",
         )
-        //~ if < 26.1 'normalized' -> 'usage'
         return VertexFormatElement.register(id, index, type, normalized, count)
     }
     *///?}

@@ -38,15 +38,9 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.compat.position
-import at.hannibal2.skyhanni.utils.compat.rotation
-//?}
-
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     private inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
@@ -75,13 +69,10 @@ object WorldRenderUtils {
         rgb: Int,
     ) {
         matrices.pushPose()
-        matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
+        matrices.translate(x - cameraState.pos.x, y - cameraState.pos.y, z - cameraState.pos.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //? if >= 26.2
-            submitNodeStorage,
-            //? if < 26.2
-            //Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
+            /*? if < 26.2 {*//*Minecraft.getInstance().gameRenderer.featureRenderDispatcher().*//*?}*/submitNodeStorage,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -272,7 +263,7 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = camera.position
+        val cameraPos = cameraState.pos
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -284,7 +275,7 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
-        matrices.mulPose(camera.rotation())
+        matrices.mulPose(cameraState.orientation)
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
         submitNodeStorage.submitText(
@@ -306,7 +297,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
+        ).rotate(cameraState.orientation)
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -353,7 +344,7 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = camera.position
+        val cameraPos = cameraState.pos
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -365,7 +356,7 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
-        matrices.mulPose(camera.rotation())
+        matrices.mulPose(cameraState.orientation)
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
         submitNodeStorage.submitText(
@@ -387,7 +378,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
+        ).rotate(cameraState.orientation)
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 

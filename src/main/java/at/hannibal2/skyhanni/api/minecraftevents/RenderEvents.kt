@@ -8,15 +8,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
+import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
-
-//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
-import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
 
 @SkyHanniModule
 object RenderEvents {
@@ -29,10 +27,8 @@ object RenderEvents {
         )
 
         //~ if < 26.2 '_' -> 'ctx'
-        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
         PictureInPictureRendererRegistry.register { _ ->
             SkyHanniPipCoordinatorRenderer(
-                //~ if < 26.1 'bufferSource' -> 'vertexConsumers'
                 //? if < 26.2
                 //ctx.bufferSource(),
             )

@@ -12,7 +12,7 @@ import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
 
 /**
- * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
  * This class should be used in utils/data/api classes and not in feature classes.
  */
 @SkyHanniModule
@@ -36,7 +36,6 @@ object MinecraftCompat {
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 
-    //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
 
     @JvmStatic
@@ -55,11 +54,8 @@ object MinecraftCompat {
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
-        //? if >= 26.1 {
+
         val defaultClock = localWorldOrNull?.dimensionType()?.defaultClock()?.orElse(null) ?: return
         serverTime = packet.clockUpdates[defaultClock]?.totalTicks() ?: serverTime
-        //?} else {
-        /*serverTime = packet.dayTime
-        *///?}
     }
 }

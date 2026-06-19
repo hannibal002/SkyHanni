@@ -12,6 +12,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.PlayerTabOverlay;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.scores.Objective;
@@ -26,9 +27,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.gui.Hud;
 //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
 import net.minecraft.client.gui.contextualbar.ContextualBar;
-
-//? if >= 26.1
-import net.minecraft.client.gui.components.ChatComponent;
 
 //~ if < 26.2 'Hud.class' -> 'Gui.class'
 @Mixin(Hud.class)
@@ -45,7 +43,6 @@ public abstract class MixinHud {
         }
     }
 
-    //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postHotbarLayerEventPre(graphics)) {
@@ -57,10 +54,8 @@ public abstract class MixinHud {
     public void renderHotbarTail(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postHotbarLayerEventPost(graphics);
     }
-    //~}
 
     @WrapOperation(
-        //~ if < 26.1 'extractTabList' -> 'renderTabList'
         method = "extractTabList",
         at = @At(
             value = "INVOKE",
@@ -80,11 +75,9 @@ public abstract class MixinHud {
     }
 
     @WrapOperation(
-        //~ if < 26.1 'extract' -> 'render'
         method = "extractHotbarAndDecorations",
         at = @At(value = "INVOKE",
             //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-            //~ if < 26.1 'extractBackground' -> 'renderBackground'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
         )
     )
@@ -101,12 +94,10 @@ public abstract class MixinHud {
     }
 
     @WrapOperation(
-        //~ if < 26.1 'extract' -> 'render'
         method = "extractHotbarAndDecorations",
         at = @At(
             value = "INVOKE",
             //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
         )
     )
@@ -143,20 +134,14 @@ public abstract class MixinHud {
     }
 
     @ModifyArg(
-        //~ if < 26.1 'extractChat' -> 'renderChat'
         method = "extractChat",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.1 {
             target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"
-            //?} else
-            //target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"
         ),
         index = 5
     )
-    //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
     private ChatComponent.DisplayMode modifyRenderText(ChatComponent.DisplayMode mode) {
-        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
         return mode;
     }
@@ -177,7 +162,6 @@ public abstract class MixinHud {
         }
     }
 
-    //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (RenderEvents.postHeldItemTooltipLayerEventPre(graphics)) {
@@ -189,9 +173,7 @@ public abstract class MixinHud {
     public void renderSelectedItemNamePost(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         RenderEvents.postHeldItemTooltipLayerEventPost(graphics);
     }
-    //~}
 
-    //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postActionBarLayerEventPre(graphics)) {
@@ -203,5 +185,4 @@ public abstract class MixinHud {
     public void renderOverlayMessagePost(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(graphics);
     }
-    //~}
 }

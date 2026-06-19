@@ -1,6 +1,5 @@
 classTweaker v1 official
 
-#~ if < 26.1 'net/minecraft/client/multiplayer/chat/GuiMessage' -> 'net/minecraft/client/GuiMessage' {
 accessible class net/minecraft/client/StringSplitter$FlatComponents
 accessible class net/minecraft/client/StringSplitter$LineComponent
 accessible class net/minecraft/client/gui/Font$PreparedTextBuilder
@@ -16,7 +15,6 @@ accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
 accessible field net/minecraft/client/Minecraft deltaTracker Lnet/minecraft/client/DeltaTracker$Timer;
 accessible field net/minecraft/client/ToggleKeyMapping needsToggle Ljava/util/function/BooleanSupplier;
-#~ if < 26.1 'renderer/state/gui' -> 'gui/render/state'
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor scissorStack Lnet/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack;
 accessible field net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack stack Ljava/util/Deque;
@@ -34,8 +32,6 @@ accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScr
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen line I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen text Lnet/minecraft/world/level/block/entity/SignText;
 accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyBlockPos Lnet/minecraft/core/BlockPos;
-#? if < 26.1
-#accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
 accessible field net/minecraft/client/renderer/RenderPipelines DEBUG_FILLED_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines GUI_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
@@ -49,7 +45,6 @@ accessible field net/minecraft/client/renderer/rendertype/RenderSetup textures L
 accessible field net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding location Lnet/minecraft/resources/Identifier;
 accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/lang/String;
 accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/minecraft/client/renderer/rendertype/RenderSetup;
-#? if >= 26.1
 accessible field net/minecraft/core/Holder$Reference components Lnet/minecraft/core/component/DataComponentMap;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
@@ -64,19 +59,14 @@ accessible field net/minecraft/world/entity/LivingEntity equipment Lnet/minecraf
 accessible field net/minecraft/world/entity/player/Inventory equipment Lnet/minecraft/world/entity/EntityEquipment;
 accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
 accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
-#? if >= 26.1
 accessible field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
 accessible field net/minecraft/world/phys/BlockHitResult miss Z
 
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor fill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V
-#? if >= 26.1 {
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerBlit (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lcom/mojang/blaze3d/textures/GpuTextureView;Lcom/mojang/blaze3d/textures/GpuSampler;IIIIFFFFI)V
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerFill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/client/gui/render/TextureSetup;IIIIILjava/lang/Integer;)V
 accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V
-#?} else {
-#accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V
-#?}
 accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
 accessible method net/minecraft/client/gui/components/ChatComponent getLineHeight ()I
 accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
@@ -96,7 +86,6 @@ mutable field net/minecraft/client/gui/components/ChatComponent allMessages Ljav
 mutable field net/minecraft/client/gui/components/ChatComponent trimmedMessages Ljava/util/List;
 mutable field net/minecraft/core/particles/ColorParticleOption color I
 mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
-#? if >= 26.1
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 
 inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
@@ -112,4 +101,3 @@ inject-interface net/minecraft/client/renderer/feature/ModelFeatureRenderer$Subm
 #?}
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
-#~}

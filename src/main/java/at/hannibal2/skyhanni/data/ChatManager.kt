@@ -25,17 +25,15 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
-import net.minecraft.client.multiplayer.chat.GuiMessage
-import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
-
-//? if >= 26.1
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
 
 @SkyHanniModule
 object ChatManager {
@@ -277,7 +275,6 @@ object ChatManager {
             counter,
             newComponent,
             id,
-            //? if >= 26.1
             GuiMessageSource.SYSTEM_CLIENT,
             GuiMessageTag.system(),
         )
@@ -308,12 +305,7 @@ object ChatManager {
         val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
-            //? if >= 26.1 {
             val newLine = GuiMessage.Line(message, line, endOfEntry)
-            //?} else {
-            /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
-            *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
         }
     }

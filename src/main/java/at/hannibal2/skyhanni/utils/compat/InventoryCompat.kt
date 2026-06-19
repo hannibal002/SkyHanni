@@ -14,7 +14,6 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
 // TODO 26.1 REI compat needed
-//? if < 26.1
 //import at.hannibal2.skyhanni.compat.ReiCompat
 
 fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
@@ -28,7 +27,6 @@ fun stackUnderCursor(): SafeItemStack? {
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
-    //? if < 26.1
     //stack = ReiCompat.getHoveredStackFromRei()
     return stack
 }
@@ -49,7 +47,6 @@ object InventoryCompat {
     internal fun clickInventorySlot(windowId: Int, slotId: Int, mouseButton: Int, mode: ContainerInput) {
         val controller = Minecraft.getInstance().gameMode ?: return
         val player = Minecraft.getInstance().player ?: return
-        //~ if < 26.1 'handleContainerInput' -> 'handleInventoryMouseClick'
         controller.handleContainerInput(windowId, slotId, mouseButton, mode, player)
     }
 
