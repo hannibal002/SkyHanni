@@ -15,9 +15,9 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
     ItemFeatureRenderer.Submit.class,
     ModelFeatureRenderer.Submit.class,
     //?} else {
-    /*ItemFeatureRenderer.Submit.class,
-    ModelFeatureRenderer.Submit.class,
+    /*SubmitNodeStorage.ItemSubmit.class,
     SubmitNodeStorage.ModelPartSubmit.class,
+    SubmitNodeStorage.ModelSubmit.class,
     *///?}
 })
 public class MixinSubmitNode implements GlowingStateStore {
@@ -26,12 +26,12 @@ public class MixinSubmitNode implements GlowingStateStore {
     private boolean skyhanni$usingCustomOutline = false;
 
     @Override
-    public void skyhanni$setUsingCustomOutline() {
-        this.skyhanni$usingCustomOutline = true;
+    public boolean skyhanni$isUsingCustomOutline() {
+        return this.skyhanni$usingCustomOutline;
     }
 
     @Override
-    public boolean skyhanni$isUsingCustomOutline() {
-        return this.skyhanni$usingCustomOutline;
+    public void skyhanni$setUsingCustomOutline() {
+        this.skyhanni$usingCustomOutline = true;
     }
 }
