@@ -16,7 +16,7 @@ object SeaCreatureLootshareSphere {
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
 
-    private val existingCircle = mutableSetOf<LorenzVec>()
+    private val existingCircles = mutableSetOf<LorenzVec>()
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
