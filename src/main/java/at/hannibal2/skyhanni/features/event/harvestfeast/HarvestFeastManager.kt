@@ -161,7 +161,11 @@ object HarvestFeastManager {
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next.filterValues { it != null }.map { it.key.cropName to it.value!! }.toMap(),
+            next = next
+                .mapNotNull { (crop, value) ->
+                    value?.let { crop.cropName to it }
+                }
+                .toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 

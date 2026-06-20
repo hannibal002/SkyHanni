@@ -74,6 +74,7 @@ object WormholeFinder {
         lastPlayerPos = playerPos
     }
 
+    @Suppress("UnnecessarySafeCall")
     private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
         //~ if < 26.1 'leftRotation()' -> 'leftRotation'
         val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return LorenzVec(0, 0, 1)
