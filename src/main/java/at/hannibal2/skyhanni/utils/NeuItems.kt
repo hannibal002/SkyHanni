@@ -16,12 +16,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
@@ -29,7 +31,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonPrimitive
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import java.util.NavigableMap
@@ -40,7 +41,7 @@ import kotlin.time.Duration.Companion.minutes
 object NeuItems {
     private val multiplierCache = mutableMapOf<NeuInternalName, PrimitiveItemStack>()
     private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
-    private val stackResolutionCache: TimeLimitedCache<NeuInternalName, ItemStack> = TimeLimitedCache(2.minutes)
+    private val stackResolutionCache: TimeLimitedCache<NeuInternalName, SafeItemStack> = TimeLimitedCache(2.minutes)
     private val patternGroup = RepoPattern.group("data.neu.items")
 
     /**
@@ -66,9 +67,11 @@ object NeuItems {
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
         private set
 
+    private var waitingOnComponents = false
+
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
-            ItemStack(Blocks.BARRIER).item,
+            SafeItemStack(Blocks.BARRIER).itemType,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
         )
@@ -83,11 +86,24 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        DelayedRun.runOrNextTick {
-            readAllNeuItems()
-            multiplierCache.clear()
-            itemIdCache.clear()
+        multiplierCache.clear()
+        itemIdCache.clear()
+        rebuildItemNameCachesWhenReady()
+    }
+
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onComponentsLoaded() {
+        if (!waitingOnComponents) return
+        rebuildItemNameCachesWhenReady()
+    }
+
+    private fun rebuildItemNameCachesWhenReady() {
+        if (!SafeItemStackUtils.componentsLoaded) {
+            waitingOnComponents = true
+            return
         }
+        waitingOnComponents = false
+        DelayedRun.runOrNextTick(::readAllNeuItems)
     }
 
     private fun readAllNeuItems() {
@@ -100,7 +116,7 @@ object NeuItems {
             // because builder blocks can have the same display name as normal items.
             if (internalName.startsWith("BUILDER_")) return@forEach
 
-            val stack = internalName.getItemStackOrNull() ?: run {
+            val stack = internalName.getItemStackOrNull()?.takeIf { it.isNotEmpty() } ?: run {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
@@ -125,7 +141,7 @@ object NeuItems {
         ChatUtils.debug("Cleared the NEUItems stack resolution cache")
     }
 
-    fun getInternalName(itemStack: ItemStack): NeuInternalName? = ItemResolutionQuery()
+    fun getInternalName(itemStack: SafeItemStack): NeuInternalName? = ItemResolutionQuery()
         .withCurrentGuiContext()
         .withItemStack(itemStack)
         .resolveInternalName()
@@ -142,12 +158,12 @@ object NeuItems {
     fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
-    fun NeuInternalName.getItemStackOrNull(): ItemStack? = stackResolutionCache.getOrPut(this) {
+    fun NeuInternalName.getItemStackOrNull(): SafeItemStack? = stackResolutionCache.getOrPut(this) {
         ItemResolutionQuery().withKnownInternalName(this).resolveToItemStack()
             ?: return null
     }.copy()
 
-    fun NeuInternalName.getItemStack(): ItemStack =
+    fun NeuInternalName.getItemStack(): SafeItemStack =
         getItemStackOrNull() ?: run {
             getPriceOrNull() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
@@ -157,7 +173,7 @@ object NeuItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
+    fun isVanillaItem(item: SafeItemStack): Boolean = item.getInternalName().isVanillaItem()
 
     // todo repo
     private val hardcodedVanillaItems = listOf(
@@ -265,7 +281,7 @@ object NeuItems {
 
     fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
-    fun saveNBTData(item: ItemStack, removeLore: Boolean = true): String {
+    fun saveNBTData(item: SafeItemStack, removeLore: Boolean = true): String {
         val jsonObject = EnoughUpdatesManager.stackToJson(item)
         if (!jsonObject.has("internalname")) {
             jsonObject.add("internalname", JsonPrimitive("_"))
@@ -275,7 +291,7 @@ object NeuItems {
         return StringUtils.encodeBase64(jsonString)
     }
 
-    fun loadNBTData(encoded: String): ItemStack {
+    fun loadNBTData(encoded: String): SafeItemStack {
         val jsonString = StringUtils.decodeBase64(encoded)
         val neuItem = ConfigManager.gson.fromJsonOrNull<NeuItemJson>(jsonString) ?: run {
             ErrorManager.logErrorStateWithData(

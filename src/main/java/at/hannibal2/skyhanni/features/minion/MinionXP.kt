@@ -20,11 +20,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.itemType
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.ChestBlock
 import java.util.EnumMap
 
@@ -48,14 +49,14 @@ object MinionXP {
         val timestamp: SimpleTimeMark = SimpleTimeMark.now()
     }
 
-    private fun toPrimitiveItemStack(itemStack: ItemStack) =
+    private fun toPrimitiveItemStack(itemStack: SafeItemStack) =
         PrimitiveItemStack(itemStack.getInternalName(), itemStack.count)
 
     @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.xpDisplay) return
 
-        collectItem = event.inventoryItems[48]?.item
+        collectItem = event.inventoryItems[48]?.itemType
         collectItemXPList.clear()
 
         val xpTotal = handleItems(event.inventoryItems, true)
@@ -95,7 +96,7 @@ object MinionXP {
     // TODO find the correct name of the list
     private val listWithMissingName = listOf(21..26, 30..35, 39..44)
 
-    private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
+    private fun handleItems(inventoryItems: Map<Int, SafeItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = enumMapOf<SkillType, Double>()
         val list = inventoryItems.filter {
             it.value.getLore().isNotEmpty() &&
@@ -151,7 +152,8 @@ object MinionXP {
         when {
             MinionFeatures.minionInventoryOpen -> {
                 addXPInfoToTooltip(event)
-                if (collectItem == event.itemStack.item) {
+                val item = collectItem ?: return
+                if (event.itemStack.`is`(item)) {
                     collectItemXPList.forEachIndexed { i, item ->
                         event.toolTip.add(i + 1, item)
                     }

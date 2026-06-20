@@ -10,18 +10,23 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlasKey
 import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniCircleRenderState
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniRadialGradientCircleRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectOutlineRenderState
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedRectRenderState
+import at.hannibal2.skyhanni.utils.render.states.SkyHanniRoundedTexturedRectRenderState
 import io.github.notenoughupdates.moulconfig.ChromaColour
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
+import org.joml.Matrix3x2f
 import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
-import org.joml.Matrix3x2f
+import kotlin.math.roundToInt
 
-private typealias GuiRenderState = net.minecraft.client.gui.render.state.GuiRenderState
-
+@Suppress("TooManyFunctions")
 object ShaderRenderUtils {
 
     /**
@@ -83,12 +88,14 @@ object ShaderRenderUtils {
         texture: Identifier,
         alpha: Float = 1f,
     ) {
-        // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
 
-        RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
-
+        //? if >= 26.1 {
+        drawRoundTexturedRectDeferred(x, y, width, height, radius, smoothness, texture, alpha)
+        //?} else {
+        /*RoundedTextureShader.applyBaseSettings(radius, width, height, x, y, smoothness)
         RoundedShapeDrawer.drawRoundedTexturedRect(x, y, width, height, texture)
+        *///?}
     }
 
     /**
@@ -105,9 +112,12 @@ object ShaderRenderUtils {
      * It is best kept at its default.
      */
     fun drawRoundRect(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
-        RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
-
+        //? if >= 26.1 {
+        drawRoundRectDeferred(x, y, width, height, color, radius, smoothness)
+        //?} else {
+        /*RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
         RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
+        *///?}
     }
 
     /**
@@ -135,7 +145,10 @@ object ShaderRenderUtils {
         radius: Int = 10,
         blur: Float = 0.7f,
     ) {
-        RoundedRectangleOutlineShader.applyBaseSettings(radius, width, height, x, y) {
+        //? if >= 26.1 {
+        drawRoundRectOutlineDeferred(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
+        //?} else {
+        /*RoundedRectangleOutlineShader.applyBaseSettings(radius, width, height, x, y) {
             this.borderThickness = borderThickness.toFloat()
             // The blur argument is a bit misleading, the greater the value the more sharp the edges of the
             // outline will be and the smaller the value the blurrier. So we take the difference from 1
@@ -143,18 +156,17 @@ object ShaderRenderUtils {
             // to users than a 'sharpness' option in this context
             this.borderBlur = max(1 - blur, 0f)
         }
-
         val borderAdjustment = borderThickness / 2
-        val left = x - borderAdjustment
-        val top = y - borderAdjustment
-        val right = x + width + borderAdjustment
-        val bottom = y + height + borderAdjustment
-
-        RoundedShapeDrawer.drawRoundedRectOutline(left, top, right, bottom, topColor, bottomColor)
+        RoundedShapeDrawer.drawRoundedRectOutline(
+            x - borderAdjustment, y - borderAdjustment,
+            x + width + borderAdjustment, y + height + borderAdjustment,
+            topColor, bottomColor,
+        )
+        *///?}
     }
 
     /**
-     * Method to draw a rounded rectangle.
+     * Method to draw a rounded rectangle with a vertical color gradient.
      *
      * **NOTE:** If you are using [DrawContextUtils.translate] or [DrawContextUtils.scale]
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
@@ -177,14 +189,12 @@ object ShaderRenderUtils {
         radius: Int = 10,
         smoothness: Float = 1f,
     ) {
-        RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
-
-        val left = x - 5
-        val top = y - 5
-        val right = x + width + 5
-        val bottom = y + height + 5
-
-        RoundedShapeDrawer.drawRoundedRect(left, top, right, bottom, topColor, bottomColor)
+        //? if >= 26.1 {
+        drawRoundGradientRectDeferred(x, y, width, height, topColor, bottomColor, radius, smoothness)
+        //?} else {
+        /*RoundedRectangleShader.applyBaseSettings(radius, width, height, x, y, smoothness)
+        RoundedShapeDrawer.drawRoundedRect(x - 5, y - 5, x + width + 5, y + height + 5, topColor, bottomColor)
+        *///?}
     }
 
     /**
@@ -194,8 +204,8 @@ object ShaderRenderUtils {
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
      * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
      *
-     * @param x The x-coordinate of the circle's center.
-     * @param y The y-coordinate of the circle's center.
+     * @param x The x-coordinate of the circle's top-left bounding box corner.
+     * @param y The y-coordinate of the circle's top-left bounding box corner.
      * @param radius The circle's radius.
      * @param color The fill color.
      * @param angle1 defines the start of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
@@ -211,21 +221,17 @@ object ShaderRenderUtils {
         angle1: Float = 7.0f,
         angle2: Float = 7.0f,
     ) {
-        // todo all of these diameters might need to be calced from radiusIn instead of radius?
-        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        //? if >= 26.1 {
+        drawFilledCircleDeferred(x, y, color, radius, smoothness, angle1, angle2)
+        //?} else {
+        /*val radiusIn = radius * GuiScreenUtils.scaleFactor
         val diameter = radius * 2
-
         CircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
             this.angle1 = angle1 - Math.PI.toFloat()
             this.angle2 = angle2 - Math.PI.toFloat()
         }
-
-        val left = x - 5
-        val top = y - 5
-        val right = x + (radius * 2) + 5
-        val bottom = y + (radius * 2) + 5
-
-        RoundedShapeDrawer.drawCircle(left, top, right, bottom, color.rgb)
+        RoundedShapeDrawer.drawCircle(x - 5, y - 5, x + diameter + 5, y + diameter + 5, color.rgb)
+        *///?}
     }
 
     /**
@@ -235,8 +241,8 @@ object ShaderRenderUtils {
      * with this method, ensure they are invoked in the correct order if you use both. That is, [DrawContextUtils.translate]
      * is called **BEFORE** [DrawContextUtils.scale], otherwise the rectangle will not be rendered correctly
      *
-     * @param x The x-coordinate of the circle's center.
-     * @param y The y-coordinate of the circle's center.
+     * @param x The x-coordinate of the circle's top-left bounding box corner.
+     * @param y The y-coordinate of the circle's top-left bounding box corner.
      * @param radius The circle's radius.
      * @param startColor The start color of the gradient.
      * @param endColor The end color of the gradient.
@@ -258,9 +264,11 @@ object ShaderRenderUtils {
         smoothness: Float = 1.5f,
         reverse: Boolean = false,
     ) {
-        val radiusIn = radius * GuiScreenUtils.scaleFactor
+        //? if >= 26.1 {
+        drawRadialGradientFilledCircleDeferred(x, y, radius, startColor, endColor, angle, progress, phaseOffset, smoothness, reverse)
+        //?} else {
+        /*val radiusIn = radius * GuiScreenUtils.scaleFactor
         val diameter = radius * 2
-
         RadialGradientCircleShader.applyBaseSettings(radiusIn, diameter, diameter, x, y, smoothness) {
             this.angle = angle - Math.PI.toFloat()
             this.reverse = if (reverse) 1 else 0
@@ -269,14 +277,8 @@ object ShaderRenderUtils {
             this.startColor = startColor.destructToFloatArray()
             this.endColor = endColor.destructToFloatArray()
         }
-
-        val left = x - 5
-        val top = y - 5
-        val right = x + (radius * 2) + 5
-        val bottom = y + (radius * 2) + 5
-
-        RoundedShapeDrawer.drawGradientCircle(left, top, right, bottom, startColor, endColor)
-
+        RoundedShapeDrawer.drawGradientCircle(x - 5, y - 5, x + diameter + 5, y + diameter + 5, startColor, endColor)
+        *///?}
     }
 
     private fun buildRoundedStateParams(x: Int, y: Int, width: Int, height: Int, radius: Int): RoundedRenderStateParams {
@@ -311,8 +313,61 @@ object ShaderRenderUtils {
      * [GuiRenderState] queue, ensuring correct ordering over all other GUI elements.
      */
     fun drawRoundRectDeferred(x: Int, y: Int, width: Int, height: Int, color: Int, radius: Int = 10, smoothness: Float = 1f) {
-        val state = buildRoundedRectState(x, y, width, height, color, radius, smoothness)
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+        if (!tryBlitRoundedRect(x, y, width, height, color, radius, smoothness)) {
+            DrawContextUtils.addGuiElement(buildRoundedRectState(x, y, width, height, color, radius, smoothness))
+        }
+    }
+
+    /**
+     * Deferred equivalent of [drawRoundGradientRect]. Captures all shader parameters from the
+     * current pose matrix and submits a [SkyHanniRoundedRectRenderState] to the
+     * [GuiRenderState] queue.
+     *
+     * @param topColor the color of the top of the rectangle
+     * @param bottomColor the color of the bottom of the rectangle
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1)
+     */
+    fun drawRoundGradientRectDeferred(
+        x: Int, y: Int, width: Int, height: Int,
+        topColor: Int,
+        bottomColor: Int,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+    ) {
+        if (topColor == bottomColor && tryBlitRoundedRect(x, y, width, height, topColor, radius, smoothness)) return
+        DrawContextUtils.addGuiElement(
+            buildRoundedRectGradientState(x, y, width, height, topColor, bottomColor, radius, smoothness)
+        )
+    }
+
+    /**
+     * Attempts to blit a solid rounded rect from the atlas. Returns true if the shape was already
+     * cached and the blit was submitted; returns false on a cache miss, leaving the caller to fall
+     * back to a deferred render state submission.
+     *
+     * @param x left edge in logical GUI pixels
+     * @param y top edge in logical GUI pixels
+     * @param width width in logical GUI pixels
+     * @param height height in logical GUI pixels
+     * @param color ARGB packed fill color
+     * @param radius corner radius in logical GUI pixels
+     * @param smoothness edge smoothness in physical pixels
+     */
+    private fun tryBlitRoundedRect(
+        x: Int, y: Int, width: Int, height: Int,
+        color: Int, radius: Int, smoothness: Float,
+    ): Boolean {
+        val scaleFactor = GuiScreenUtils.scaleFactor
+        val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
+        val pixelWidth = (width * scaleFactor * matrix.m00()).roundToInt()
+        val pixelHeight = (height * scaleFactor * matrix.m11()).roundToInt()
+        val radiusPixels = (radius * scaleFactor * matrix.m00()).roundToInt()
+        val atlasKey = SkyHanniRoundedShapeAtlasKey.RoundedRect(pixelWidth, pixelHeight, color, radiusPixels, smoothness)
+        val scissor = DrawContextUtils.drawContext.scissorStack.peek()
+        return SkyHanniRoundedShapeRenderManager.submitBlit(
+            atlasKey, DrawContextUtils.drawContext.guiRenderState, matrix, x, y, x + width, y + height, -1, scissor,
+        )
     }
 
     /**
@@ -329,14 +384,107 @@ object ShaderRenderUtils {
         blur: Float = 0.7f,
     ) {
         val state = buildRoundedRectOutlineState(x, y, width, height, topColor, bottomColor, borderThickness, radius, blur)
-        DrawContextUtils.drawContext.guiRenderState.submitGuiElement(state)
+        DrawContextUtils.addGuiElement(state)
+    }
+
+    /**
+     * Deferred equivalent of [drawRoundTexturedRect]. Captures all shader parameters from the
+     * current pose matrix and submits a [SkyHanniRoundedTexturedRectRenderState] to the
+     * [GuiRenderState] queue.
+     *
+     * @param radius the radius of the corners (default 10)
+     * @param smoothness how smooth the corners will appear (default 1)
+     * @param texture the texture identifier to render
+     * @param alpha the alpha multiplier (default 1.0)
+     */
+    fun drawRoundTexturedRectDeferred(
+        x: Int, y: Int, width: Int, height: Int,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+        texture: Identifier,
+        alpha: Float = 1f,
+    ) {
+        if (radius <= 0) return GuiRenderUtils.drawTexturedRect(x, y, width, height, texture = texture, alpha = alpha)
+        val state = buildRoundedTexturedRectState(x, y, width, height, radius, smoothness, texture, alpha)
+        DrawContextUtils.addGuiElement(state)
+    }
+
+    /**
+     * Deferred equivalent of [drawFilledCircle]. Captures all shader parameters from the
+     * current pose matrix and submits a [SkyHanniCircleRenderState] to the [GuiRenderState] queue.
+     *
+     * @param x The x-coordinate of the circle's top-left bounding box corner.
+     * @param y The y-coordinate of the circle's top-left bounding box corner.
+     * @param color The fill color.
+     * @param radius The circle's radius.
+     * @param smoothness smooths out the edge (in amount of blurred pixels).
+     * @param angle1 defines the start of the arc, must be in range [0, 2*pi].
+     * @param angle2 defines the end of the arc, must be in range [0, 2*pi].
+     */
+    fun drawFilledCircleDeferred(
+        x: Int,
+        y: Int,
+        color: Color,
+        radius: Int = 10,
+        smoothness: Float = 1f,
+        angle1: Float = 7.0f,
+        angle2: Float = 7.0f,
+    ) {
+        val guiRenderState = DrawContextUtils.drawContext.guiRenderState
+        // Only full circles (default angles) are atlased; arcs change per-frame and would overflow the atlas.
+        if (angle1 == 7.0f && angle2 == 7.0f) {
+            val scaleFactor = GuiScreenUtils.scaleFactor
+            val matrix = Matrix3x2f(DrawContextUtils.drawContext.pose())
+            val radiusPixels = (radius * scaleFactor * matrix.m00()).roundToInt()
+            val atlasKey = SkyHanniRoundedShapeAtlasKey.Circle(radiusPixels, color.rgb, smoothness, angle1, angle2)
+            val scissor = DrawContextUtils.drawContext.scissorStack.peek()
+            val diameter = radius * 2
+            val blitted = SkyHanniRoundedShapeRenderManager.submitBlit(
+                atlasKey, guiRenderState, matrix, x, y, x + diameter, y + diameter, -1, scissor,
+            )
+            if (blitted) return
+        }
+        //~ if < 26.1 'addGuiElement' -> 'submitGuiElement'
+        guiRenderState.addGuiElement(buildCircleState(x, y, radius, color.rgb, smoothness, angle1, angle2))
+    }
+
+    /**
+     * Deferred equivalent of [drawRadialGradientFilledCircle]. Captures all shader parameters from the
+     * current pose matrix and submits a [SkyHanniRadialGradientCircleRenderState] to the [GuiRenderState] queue.
+     *
+     * @param x The x-coordinate of the circle's top-left bounding box corner.
+     * @param y The y-coordinate of the circle's top-left bounding box corner.
+     * @param radius The circle's radius.
+     * @param startColor The start color of the gradient.
+     * @param endColor The end color of the gradient.
+     * @param angle defines the start angle of the gradient sweep.
+     * @param progress the arc length of the gradient as a fraction of the full circle (0.0 to 1.0).
+     * @param phaseOffset the phase offset applied to the color interpolation factor.
+     * @param smoothness smooths out the edge (in amount of blurred pixels).
+     * @param reverse if true, the gradient color direction will be reversed.
+     */
+    fun drawRadialGradientFilledCircleDeferred(
+        x: Int,
+        y: Int,
+        radius: Int = 10,
+        startColor: ChromaColour,
+        endColor: ChromaColour,
+        angle: Float = 180f,
+        progress: Float,
+        phaseOffset: Float,
+        smoothness: Float = 1.5f,
+        reverse: Boolean = false,
+    ) {
+        val state = buildGradientCircleState(
+            x, y, radius, startColor.destructToFloatArray(), endColor.destructToFloatArray(),
+            angle - Math.PI.toFloat(), progress, phaseOffset, smoothness, reverse,
+        )
+        DrawContextUtils.addGuiElement(state)
     }
 
     private fun buildRoundedRectState(
         x: Int, y: Int, width: Int, height: Int,
-        color: Int,
-        radius: Int,
-        smoothness: Float,
+        color: Int, radius: Int, smoothness: Float,
     ): SkyHanniRoundedRectRenderState {
         val params = buildRoundedStateParams(x, y, width, height, radius)
         return SkyHanniRoundedRectRenderState(
@@ -345,17 +493,66 @@ object ShaderRenderUtils {
         )
     }
 
+    private fun buildRoundedRectGradientState(
+        x: Int, y: Int, width: Int, height: Int,
+        topColor: Int, bottomColor: Int, radius: Int, smoothness: Float,
+    ): SkyHanniRoundedRectRenderState {
+        val params = buildRoundedStateParams(x, y, width, height, radius)
+        return SkyHanniRoundedRectRenderState(
+            x, y, width, height, topColor, smoothness, params,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+            bottomColor,
+        )
+    }
+
     private fun buildRoundedRectOutlineState(
         x: Int, y: Int, width: Int, height: Int,
-        topColor: Int, bottomColor: Int,
-        borderThickness: Int,
-        radius: Int,
-        blur: Float,
+        topColor: Int, bottomColor: Int, borderThickness: Int, radius: Int, blur: Float,
     ): SkyHanniRoundedRectOutlineRenderState {
         val params = buildRoundedStateParams(x, y, width, height, radius)
         return SkyHanniRoundedRectOutlineRenderState(
             x, y, width, height, topColor, bottomColor,
             borderThickness.toFloat(), max(1 - blur, 0f), params,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+        )
+    }
+
+    private fun buildRoundedTexturedRectState(
+        x: Int, y: Int, width: Int, height: Int,
+        radius: Int, smoothness: Float, texture: Identifier, alpha: Float,
+    ): SkyHanniRoundedTexturedRectRenderState {
+        val params = buildRoundedStateParams(x, y, width, height, radius)
+        return SkyHanniRoundedTexturedRectRenderState(
+            x, y, width, height, params, smoothness, texture, alpha,
+            DrawContextUtils.drawContext.scissorStack.peek(),
+        )
+    }
+
+    private fun buildCircleState(
+        x: Int, y: Int, radius: Int,
+        color: Int, smoothness: Float, angle1: Float, angle2: Float,
+    ): SkyHanniCircleRenderState {
+        val diameter = radius * 2
+        val params = buildRoundedStateParams(x, y, diameter, diameter, radius)
+        return SkyHanniCircleRenderState(
+            x, y, diameter, diameter,
+            color, smoothness,
+            angle1 - Math.PI.toFloat(), angle2 - Math.PI.toFloat(),
+            params, DrawContextUtils.drawContext.scissorStack.peek(),
+        )
+    }
+
+    private fun buildGradientCircleState(
+        x: Int, y: Int, radius: Int,
+        startColor: FloatArray, endColor: FloatArray,
+        angle: Float, progress: Float, phaseOffset: Float, smoothness: Float, reverse: Boolean,
+    ): SkyHanniRadialGradientCircleRenderState {
+        val diameter = radius * 2
+        val params = buildRoundedStateParams(x, y, diameter, diameter, radius)
+        return SkyHanniRadialGradientCircleRenderState(
+            x, y, diameter, diameter, params,
+            smoothness, angle, progress, phaseOffset, reverse,
+            startColor, endColor,
             DrawContextUtils.drawContext.scissorStack.peek(),
         )
     }

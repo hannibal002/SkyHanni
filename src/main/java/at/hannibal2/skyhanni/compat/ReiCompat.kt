@@ -1,5 +1,8 @@
-package at.hannibal2.skyhanni.compat
+// TODO 26.1 rei compat needed
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.compat
 
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import me.shedaniel.math.impl.PointHelper
 import me.shedaniel.rei.api.client.REIRuntime
@@ -9,7 +12,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.events.ContainerEventHandler
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
-import net.minecraft.world.item.ItemStack
 
 object ReiCompat {
 
@@ -26,7 +28,7 @@ object ReiCompat {
         }
     }
 
-    fun getHoveredStackFromRei(): ItemStack? {
+    fun getHoveredStackFromRei(): SafeItemStack? {
         if (!isReiLoaded) return null
         try {
             REIRuntime.getInstance()
@@ -43,13 +45,13 @@ object ReiCompat {
     }
 
 
-    private fun getItemStackFromRecipe(screen: AbstractContainerScreen<*>): ItemStack? {
+    private fun getItemStackFromRecipe(screen: AbstractContainerScreen<*>): SafeItemStack? {
         val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, PointHelper.ofMouse())
             ?: return null
-        return entryStack.value as? ItemStack ?: entryStack.cheatsAs().value
+        return entryStack.value as? SafeItemStack ?: entryStack.cheatsAs().value
     }
 
-    private fun getItemStackFromItemList(): ItemStack? {
+    private fun getItemStackFromItemList(): SafeItemStack? {
         var baseElement: GuiEventListener? = REIRuntime.getInstance().overlay.orElse(null)
         val mx = PointHelper.getMouseFloatingX()
         val my = PointHelper.getMouseFloatingY()
@@ -60,3 +62,4 @@ object ReiCompat {
         }
     }
 }
+*///?}

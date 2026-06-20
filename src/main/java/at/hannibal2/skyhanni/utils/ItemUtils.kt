@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.ge
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
-import at.hannibal2.skyhanni.utils.ItemCategory.Companion.isDeprecatedAtErrorLevel
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -34,6 +33,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -81,7 +81,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.ItemLore
@@ -172,12 +171,12 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = hoverName.string.removeColor()
+    fun SafeItemStack.cleanName() = hoverName.string.removeColor()
 
-    fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
+    fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
-    fun ItemStack.getLore(): List<String> {
+    @Legacy("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
+    fun SafeItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
@@ -188,12 +187,12 @@ object ItemUtils {
         return lore
     }
 
-    fun ItemStack.getLoreComponent(): List<Component> {
+    fun SafeItemStack.getLoreComponent(): List<Component> {
         val lore = this.get(DataComponents.LORE)?.lines
         return lore ?: emptyList()
     }
 
-    fun ItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
+    fun SafeItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
 
     fun DataComponentMap?.getLore(): List<String> {
         this ?: return emptyList()
@@ -225,17 +224,17 @@ object ItemUtils {
         return name
     }
 
-    fun ItemStack.setLoreString(lore: List<String>): ItemStack {
+    fun SafeItemStack.setLoreString(lore: List<String>): SafeItemStack {
         this.set(DataComponents.LORE, ItemLore(lore.map { Component.literal(it) }))
         return this
     }
 
-    fun ItemStack.setLore(lore: List<Component>): ItemStack {
+    fun SafeItemStack.setLore(lore: List<Component>): SafeItemStack {
         this.set(DataComponents.LORE, ItemLore(lore, lore))
         return this
     }
 
-    var ItemStack.extraAttributes: CompoundTag
+    var SafeItemStack.extraAttributes: CompoundTag
         get() = this.getExtraAttributes() ?: CompoundTag()
         set(value) {
             set(DataComponents.CUSTOM_DATA, CustomData.of(value))
@@ -243,25 +242,25 @@ object ItemUtils {
 
     val DataComponentMap.extraAttributes: CompoundTag get() = this.get(DataComponents.CUSTOM_DATA)?.copyTag() ?: CompoundTag()
 
-    fun ItemStack.overrideId(id: String): ItemStack {
+    fun SafeItemStack.overrideId(id: String): SafeItemStack {
         extraAttributes = extraAttributes.apply { putString("id", id) }
         return this
     }
 
-    fun ItemStack.isAnySoulbound(): Boolean = isCoopSoulbound() || isSoulbound()
+    fun SafeItemStack.isAnySoulbound(): Boolean = isCoopSoulbound() || isSoulbound()
 
-    fun ItemStack.isCoopSoulbound(): Boolean = getLoreComponent().any {
+    fun SafeItemStack.isCoopSoulbound(): Boolean = getLoreComponent().any {
         it.string == "* Co-op Soulbound *"
     }
 
-    fun ItemStack.isSoulbound(): Boolean = getLoreComponent().any {
+    fun SafeItemStack.isSoulbound(): Boolean = getLoreComponent().any {
         it.string == "* Soulbound *"
     }
 
-    fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
+    fun isRecombobulated(stack: SafeItemStack) = stack.isRecombobulated()
 
-    fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
-        val list: LinkedList<ItemStack> = LinkedList()
+    fun getItemsInInventory(withCursorItem: Boolean = false): List<SafeItemStack> {
+        val list: LinkedList<SafeItemStack> = LinkedList()
         val player = MinecraftCompat.localPlayer
 
         for (slot in player.containerMenu.slots) {
@@ -277,9 +276,9 @@ object ItemUtils {
         return list
     }
 
-    fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NeuInternalName.NONE
+    fun SafeItemStack.getInternalName() = getInternalNameOrNull() ?: NeuInternalName.NONE
 
-    fun ItemStack.getInternalNameOrNull(): NeuInternalName? {
+    fun SafeItemStack.getInternalNameOrNull(): NeuInternalName? {
         val data = cachedData
         if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
             return data.lastInternalName
@@ -294,9 +293,9 @@ object ItemUtils {
     This will cause errors if used with basically anything EXCEPT getPrice
     since PENGUIN;4+100 or GOLDEN_DRAGON;4+200 aren't real internal names.
      */
-    fun ItemStack.getPetInternalNameWithLevel(): NeuInternalName = getPetInternalNameWithLevelOrNull() ?: NeuInternalName.NONE
+    fun SafeItemStack.getPetInternalNameWithLevel(): NeuInternalName = getPetInternalNameWithLevelOrNull() ?: NeuInternalName.NONE
 
-    fun ItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
+    fun SafeItemStack.getPetInternalNameWithLevelOrNull(): NeuInternalName? {
         var internalName = getInternalNameOrNull()
         if (internalName != null) {
             val maxLevel = getMaxLevel(internalName)
@@ -312,7 +311,9 @@ object ItemUtils {
         return internalName
     }
 
-    private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
+    private fun SafeItemStack.grabInternalNameOrNull(): NeuInternalName? {
+        if (!SafeItemStackUtils.componentsLoaded) return null
+        if (isEmpty) return null
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
         }
@@ -327,31 +328,31 @@ object ItemUtils {
         return rawInternalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
-    fun ItemStack.isVanilla() = NeuItems.isVanillaItem(this)
+    fun SafeItemStack.isVanilla() = NeuItems.isVanillaItem(this)
 
     // Checks for the enchantment glint as part of the Minecraft enchantments
-    fun ItemStack.hasEnchantGlint(): Boolean = hasFoil()
+    fun SafeItemStack.hasEnchantGlint(): Boolean = hasFoil()
 
     // Checks for Hypixel enchantments in the attributes
-    fun ItemStack.hasHypixelEnchantments(): Boolean =
+    fun SafeItemStack.hasHypixelEnchantments(): Boolean =
         getHypixelEnchantments()?.isNotEmpty() ?: false
 
-    fun ItemStack.addEnchantGlint(): ItemStack = apply {
+    fun SafeItemStack.addEnchantGlint(): SafeItemStack = apply {
         set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
     }
 
-    fun ItemStack.removeEnchants(): ItemStack = apply {
+    fun SafeItemStack.removeEnchants(): SafeItemStack = apply {
         this.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
     }
 
-    fun ItemStack.getSkullTexture(): String? {
-        if (item != Items.PLAYER_HEAD) return null
+    fun SafeItemStack.getSkullTexture(): String? {
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
 
     }
 
-    fun ItemStack.getSkullOwner(): String? {
-        if (item != Items.PLAYER_HEAD) return null
+    fun SafeItemStack.getSkullOwner(): String? {
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.id.toString()
     }
 
@@ -360,8 +361,8 @@ object ItemUtils {
         createSkull(displayName, uuid, value, *loreColl.toTypedArray())
 
     // Taken from NEU
-    fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): ItemStack {
-        val stack = ItemStack(Items.PLAYER_HEAD)
+    fun createSkull(displayName: String, uuid: String, value: String, vararg lore: String): SafeItemStack {
+        val stack = SafeItemStack(Items.PLAYER_HEAD)
         val builder = ImmutableMultimap.builder<String, Property>()
         builder.put("textures", Property("textures", value))
         val profile = GameProfile(UUID.fromString(uuid), "Throwpo", PropertyMap(builder.build()))
@@ -371,32 +372,32 @@ object ItemUtils {
         return stack
     }
 
-    fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
+    fun createItemStack(item: Item, displayName: String, vararg lore: String): SafeItemStack {
         return createItemStack(item, displayName, lore.toList())
     }
 
     // Overload to avoid spread operators
-    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1): ItemStack =
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1): SafeItemStack =
         createItemStack(item, displayName, loreArray.toList(), amount)
 
     // Taken from NEU
-    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): ItemStack {
-        val stack = ItemStack(item, amount)
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1): SafeItemStack {
+        val stack = SafeItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLoreString(lore)
         setDefaultHiddenComponents(stack)
         return stack
     }
 
-    fun createItemStack(item: Item, displayName: Component, lore: List<Component>, amount: Int = 1): ItemStack {
-        val stack = ItemStack(item, amount)
+    fun createItemStack(item: Item, displayName: Component, lore: List<Component>, amount: Int = 1): SafeItemStack {
+        val stack = SafeItemStack(item, amount)
         stack.setCustomItemName(displayName)
         stack.setLore(lore)
         setDefaultHiddenComponents(stack)
         return stack
     }
 
-    fun setDefaultHiddenComponents(stack: ItemStack) {
+    fun setDefaultHiddenComponents(stack: SafeItemStack) {
         var tooltipDisplay = TooltipDisplay.DEFAULT.withHidden(DataComponents.DAMAGE, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.ATTRIBUTE_MODIFIERS, true)
         tooltipDisplay = tooltipDisplay.withHidden(DataComponents.UNBREAKABLE, true)
@@ -406,7 +407,7 @@ object ItemUtils {
         stack.set(DataComponents.TOOLTIP_DISPLAY, tooltipDisplay)
     }
 
-    fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
+    fun SafeItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
     private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
         "itemcategory.repocheck",
@@ -417,7 +418,7 @@ object ItemUtils {
         LorenzRarity.entries.joinToString(separator = "|") { it.name },
     )
 
-    private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
+    private fun SafeItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
         val cleanName = this.cleanName()
@@ -425,7 +426,7 @@ object ItemUtils {
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                val category = (groupOrNull("itemCategory") ?: "").replace(" ", "_")
+                val category = (groupOrNull("itemCategory").orEmpty()).replace(" ", "_")
                 val rarity = group("rarity").replace(" ", "_")
                 category to rarity
             } ?: continue
@@ -449,7 +450,7 @@ object ItemUtils {
                     condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             } else {
-                if (itemCategory.isDeprecatedAtErrorLevel()) {
+                if (itemCategory.isDeprecated()) {
                     ErrorManager.logErrorStateWithData(
                         "Item category $itemCategory for item $name is outdated",
                         "ItemCategory $itemCategory is deprecated at error level",
@@ -496,7 +497,7 @@ object ItemUtils {
             EnumUtils.enumValueOfOrNull<ItemCategory>(itemCategory)
         }
 
-    private fun ItemStack.updateCategoryAndRarity() {
+    private fun SafeItemStack.updateCategoryAndRarity() {
         val data = cachedData
         if (data.itemRarityLastCheck.passedSince() < 10.seconds) return
         data.itemRarityLastCheck = SimpleTimeMark.now()
@@ -511,30 +512,30 @@ object ItemUtils {
         data.itemCategory = pair.second
     }
 
-    fun ItemStack.getItemCategoryOrNull(): ItemCategory? {
+    fun SafeItemStack.getItemCategoryOrNull(): ItemCategory? {
         this.updateCategoryAndRarity()
         return cachedData.itemCategory
     }
 
-    fun ItemStack.getItemRarityOrNull(): LorenzRarity? {
+    fun SafeItemStack.getItemRarityOrNull(): LorenzRarity? {
         this.updateCategoryAndRarity()
         return cachedData.itemRarity
     }
 
     // Taken from NEU
-    fun ItemStack.editItemInfo(displayName: String, lore: List<String>): ItemStack {
+    fun SafeItemStack.editItemInfo(displayName: String, lore: List<String>): SafeItemStack {
         this.setCustomItemName(displayName)
         this.setLoreString(lore)
         return this
     }
 
-    fun ItemStack.editItemInfo(displayName: Component, lore: List<Component>): ItemStack {
+    fun SafeItemStack.editItemInfo(displayName: Component, lore: List<Component>): SafeItemStack {
         this.setCustomItemName(displayName)
         this.setLore(lore)
         return this
     }
 
-    fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName() == SKYBLOCK_MENU
+    fun isSkyBlockMenuItem(stack: SafeItemStack?): Boolean = stack?.getInternalName() == SKYBLOCK_MENU
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
@@ -590,7 +591,7 @@ object ItemUtils {
         return pair
     }
 
-    private fun getPetRarity(pet: ItemStack): LorenzRarity? {
+    private fun getPetRarity(pet: SafeItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
         val name = pet.hoverName.formattedTextCompatLeadingWhiteLessResets()
@@ -610,7 +611,7 @@ object ItemUtils {
     fun NeuInternalName.isRune(): Boolean = contains("_RUNE;")
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.repoItemName: String
+    val SafeItemStack.repoItemName: String
         get() {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
@@ -619,7 +620,7 @@ object ItemUtils {
         }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.repoItemNameCompact: String
+    val SafeItemStack.repoItemNameCompact: String
         get() {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
@@ -627,20 +628,25 @@ object ItemUtils {
             return getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
         }
 
-    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+    fun SafeItemStack.getAttributeFromShard(): Pair<String, Int>? {
         if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
         val attributes = getAttributes() ?: return null
         return attributes.firstOrNull()
     }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val ItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
+    val SafeItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.repoItemName: String
-        get() = itemNameCache.getOrPut(this) { grabItemName() }
+        get() = if (SafeItemStackUtils.componentsLoaded) {
+            itemNameCache.getOrPut(this) { grabItemName() }
+        } else grabItemName()
 
-    val NeuInternalName.repoItemNameCompact get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+    val NeuInternalName.repoItemNameCompact
+        get() = if (SafeItemStackUtils.componentsLoaded) {
+            compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+        } else getRepoCompactName()
 
     private fun NeuInternalName.getRepoCompactName(): String {
         var name = repoItemName
@@ -678,6 +684,13 @@ object ItemUtils {
         missingRepoItems.clear()
     }
 
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onComponentsLoaded() {
+        itemNameCache.clear()
+        compactItemNameCache.clear()
+        missingRepoItems.clear()
+    }
+
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
@@ -686,6 +699,7 @@ object ItemUtils {
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
+        if (!SafeItemStackUtils.componentsLoaded) return "§c$this"
         if (this.isPet) {
             return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
@@ -739,7 +753,7 @@ object ItemUtils {
         return name
     }
 
-    fun ItemStack.loreCosts(): MutableList<NeuInternalName> {
+    fun SafeItemStack.loreCosts(): MutableList<NeuInternalName> {
         var found = false
         val list = mutableListOf<NeuInternalName>()
         for (lines in getLore()) {
@@ -958,10 +972,10 @@ object ItemUtils {
         }.toMap()
     }
 
-    private val coinSkullCache = TimeLimitedCache<Number, ItemStack>(2.minutes)
+    private val coinSkullCache = TimeLimitedCache<Number, SafeItemStack>(2.minutes)
 
     // Taken from NEU
-    fun getCoinItemStack(coinAmount: Number): ItemStack = coinSkullCache.getOrPut(coinAmount) {
+    fun getCoinItemStack(coinAmount: Number): SafeItemStack = coinSkullCache.getOrPut(coinAmount) {
         ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
         val amount = coinAmount.toDouble()
         val skull = when {
@@ -976,19 +990,19 @@ object ItemUtils {
         }
     }
 
-    fun ItemStack.isSkull(): Boolean {
+    fun SafeItemStack.isSkull(): Boolean {
         val hasItemModel = this.getItemModel() != null
-        return item == Items.PLAYER_HEAD && !hasItemModel
+        return this.`is`(Items.PLAYER_HEAD) && !hasItemModel
     }
 
-    fun ItemStack.getItemModel(): Item? {
+    fun SafeItemStack.getItemModel(): Item? {
         val identifier = this.get(DataComponents.ITEM_MODEL)
         val itemModel = BuiltInRegistries.ITEM.getValue(identifier)
-        return if (itemModel == Items.AIR || itemModel == this.item) null else itemModel
+        return itemModel.takeUnless { it == Items.AIR || this.`is`(it) }
     }
 
-    fun ItemStack.asTextComponent(): Component? {
-        if (item != Items.PLAYER_HEAD) return null
+    fun SafeItemStack.asTextComponent(): Component? {
+        if (!this.`is`(Items.PLAYER_HEAD)) return null
         val profile = get(DataComponents.PROFILE) ?: return null
         return componentBuilder {
             append(Component.`object`(PlayerSprite(profile, true))) {

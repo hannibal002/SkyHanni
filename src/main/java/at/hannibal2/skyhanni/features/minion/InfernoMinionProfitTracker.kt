@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -176,7 +176,7 @@ object InfernoMinionProfitTracker {
         }
     }
 
-    private fun getFuelFromInventory(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
+    private fun getFuelFromInventory(inventoryItems: Map<Int, SafeItemStack>): NeuInternalName? {
         val fuelStack = inventoryItems[MINION_FUEL_SLOT] ?: return null
         val name = fuelStack.getInternalNameOrNull() ?: return null
         return if (name in InfernoMinionFeatures.fuelItemIds) name else null
