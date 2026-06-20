@@ -67,6 +67,7 @@ import kotlin.time.Duration.Companion.seconds
 private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object HoppityCollectionStats {
     private val collectionConfig get() = CFApi.config.hoppityCollectionStats
     private val patternGroup = CFApi.patternGroup.group("collection")
