@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -163,7 +164,7 @@ object HarvestFeastManager {
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next.filterValues { it != null }.map { it.key.cropName to it.value!! }.toMap(),
+            next = next.filterNotNullValues().map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
