@@ -107,7 +107,7 @@ object EssenceUtils {
 
         operator fun plus(other: EssenceUpgradePrice): EssenceUpgradePrice {
             if (other.essencePrice.essenceType != essencePrice.essenceType) ErrorManager.skyHanniError(
-                "Trying to add non compatible EssenceUpgradePrices!",
+                "Trying to add incompatible EssenceUpgradePrices!",
                 "essencePrice.essenceType" to essencePrice.essenceType,
                 "other.essencePrice.essenceType" to other.essencePrice.essenceType,
             )
@@ -128,7 +128,7 @@ object EssenceUtils {
 
         operator fun plus(other: EssencePrice): EssencePrice {
             if (other.essenceType != essenceType) ErrorManager.skyHanniError(
-                "Trying to add non compatible essence prices!",
+                "Trying to add incompatible essence prices!",
                 "essenceType" to essenceType,
                 "other.essenceType" to other.essenceType,
             )
