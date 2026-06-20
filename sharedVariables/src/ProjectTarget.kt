@@ -39,8 +39,6 @@ enum class ProjectTarget(
     val projectPath get() = ":$projectName"
 
     companion object {
-        fun activeVersions() = entries.filter { MultiVersionStage.activeState.shouldCreateProject(it) }
-
         fun findByMcVersion(mcVersion: String): ProjectTarget? {
             return entries.find { it.minecraftVersion.versionName == mcVersion }
         }
