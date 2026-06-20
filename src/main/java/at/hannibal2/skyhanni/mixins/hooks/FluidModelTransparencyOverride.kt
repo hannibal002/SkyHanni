@@ -9,9 +9,14 @@ interface FluidModelTransparencyOverride {
 
     fun `skyhanni$getTransparency`(): Transparency? = throw UnsupportedOperationException("Implemented via mixin")
 
-    fun `skyhanni$setTransparency`(value: Transparency?) { throw UnsupportedOperationException("Implemented via mixin") }
+    fun `skyhanni$setTransparency`(value: Transparency?) {
+        throw UnsupportedOperationException("Implemented via mixin")
+    }
 
-    var `skyhanni$transparency`: Transparency?
+    // Kotlin-only accessor
+    @get:JvmSynthetic
+    @set:JvmSynthetic
+    var transparency: Transparency?
         get() = `skyhanni$getTransparency`()
         set(value) { `skyhanni$setTransparency`(value) }
 }
