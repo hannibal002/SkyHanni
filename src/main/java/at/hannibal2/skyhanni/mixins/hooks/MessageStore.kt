@@ -1,17 +1,20 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.client.multiplayer.chat.GuiMessage
+//? if < 26.1 {
+/*import net.minecraft.client.multiplayer.chat.GuiMessage
 
 interface MessageStore {
 
     fun `skyhanni$getParent`(): GuiMessage? = throw UnsupportedOperationException("Implemented via mixin")
 
-    fun `skyhanni$setParent`(parent: GuiMessage?): Unit {
+    fun `skyhanni$setParent`(parent: GuiMessage?) {
         throw UnsupportedOperationException("Implemented via mixin")
     }
 
-    var `skyhanni$parent`: GuiMessage?
+    // Kotlin-only accessor
+    @get:JvmSynthetic
+    @set:JvmSynthetic
+    var parent: GuiMessage?
         get() = `skyhanni$getParent`()
         set(parent) { `skyhanni$setParent`(parent) }
 }

@@ -288,7 +288,6 @@ object ChatManager {
         while (iterator.hasNext()) {
             val lineIndex = iterator.nextIndex()
             val line = iterator.next()
-            //~ if < 26.1 'parent' -> '`skyhanni$parent`'
             if (line.parent == message) {
                 if (targetIndex == null) targetIndex = lineIndex
                 iterator.remove()
@@ -313,7 +312,7 @@ object ChatManager {
             val newLine = GuiMessage.Line(message, line, endOfEntry)
             //?} else {
             /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.`skyhanni$parent` = newMessage
+            newLine.parent = newMessage
             *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
         }
@@ -350,7 +349,6 @@ object ChatManager {
             if (predicate(message)) {
                 iterator.remove()
 
-                //~ if < 26.1 'parent' -> '`skyhanni$parent`'
                 val found = chatGui.trimmedMessages.removeIf { it.parent == message }
                 if (!found) {
                     ErrorManager.logErrorWithData(
