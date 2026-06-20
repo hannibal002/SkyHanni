@@ -155,7 +155,7 @@ object RenderUtils {
         return x to y
     }
 
-    @Deprecated("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
+    @Legacy("Use renderRenderable instead", ReplaceWith("renderRenderable(renderable, posLabel)"))
     private fun Position.renderString0(string: String, offsetX: Int = 0, offsetY: Int = 0, centered: Boolean): Int =
         DrawContextUtils.pushPopResult {
             val display = "§f$string"
@@ -172,7 +172,7 @@ object RenderUtils {
             return fr.width(display)
         }
 
-    @Deprecated("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
+    @Legacy("Use renderRenderables instead", ReplaceWith("renderRenderables(renderables)"))
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 

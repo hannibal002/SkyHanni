@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.chat.StashCompact.StashType.Companion.fromGroup
@@ -117,7 +118,7 @@ object StashCompact {
             val currentType = currentType ?: return@matchMatcher
             currentMessages[currentType] = StashMessage(group("count").formatInt(), group("type"))
             event.blockedReason = REASON
-            ChatUtils.deleteMessage(REASON, 2) {
+            ChatManager.deleteMessages(2, REASON) {
                 StringUtils.isEmpty(it.chatMessage) && it.passedSinceSent() < 500.milliseconds
             }
         }

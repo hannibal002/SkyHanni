@@ -231,7 +231,7 @@ object FastFairySoulsPathfinder {
     }
 
     private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
-    private val calculatingMessageId = ChatUtils.getUniqueMessageId()
+    private val calculatingMessageId = ChatUtils.getUniqueCustomMessageId()
 
     private var calculating = false
     private var calculatingStart = SimpleTimeMark.farPast()
@@ -298,7 +298,7 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
+        if (duplicatePattern.matches(event.cleanMessage) || newPattern.matches(event.cleanMessage)) {
             data?.foundNearby()
         }
     }

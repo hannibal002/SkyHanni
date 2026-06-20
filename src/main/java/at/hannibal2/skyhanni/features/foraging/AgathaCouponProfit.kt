@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
@@ -29,7 +30,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AgathaCouponProfit {
@@ -76,7 +76,7 @@ object AgathaCouponProfit {
         }
     }
 
-    private fun readItem(slot: Int, item: ItemStack): DisplayTableEntry? {
+    private fun readItem(slot: Int, item: SafeItemStack): DisplayTableEntry? {
         if (!isValidSlotNumber(slot)) return null
         val (internalName, itemName) = workOutInternalNameOrNull(item) ?: return null
         val requiredItems = getRequiredItems(item)
@@ -119,7 +119,7 @@ object AgathaCouponProfit {
     }
 
     // TODO merge logic into core item utils logic, I think
-    private fun workOutInternalNameOrNull(item: ItemStack): Pair<NeuInternalName, Component>? {
+    private fun workOutInternalNameOrNull(item: SafeItemStack): Pair<NeuInternalName, Component>? {
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             val internalName = item.getInternalNameOrNull() ?: return null
@@ -130,7 +130,7 @@ object AgathaCouponProfit {
         }
     }
 
-    private fun getRequiredItems(item: ItemStack): MutableMap<NeuInternalName, Int> {
+    private fun getRequiredItems(item: SafeItemStack): MutableMap<NeuInternalName, Int> {
         val items = mutableMapOf<NeuInternalName, Int>()
 
         val lore = item.getLore()

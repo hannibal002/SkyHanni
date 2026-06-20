@@ -91,7 +91,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
+Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -191,6 +191,14 @@ Make sure such pull requests have a good explanation in the **What** section.
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
+- **Do not submit AI-generated content.**
+    - This includes code, pull requests, issues, and review comments generated
+      by tools such as GitHub Copilot, ChatGPT, Claude, or similar systems.
+    - All contributions must be written and understood by the person submitting them. Using AI tools to help you
+      *learn* something is fine, but the code and text you submit must be your own work.
+    - AI-generated content often introduces subtle bugs, hallucinated APIs, or misleading context that costs
+      reviewers significant time to identify. Contributors who repeatedly submit AI-generated content may be
+      blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - **My build is failing due to `detekt`, what do I do?**
@@ -198,7 +206,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline-main.xml` file,
+        - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
@@ -275,7 +283,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more informations why the title just showed up, as the title should not be too long.
+    - Also we can include more information on why the title just showed up, as the title should not be too long.
 
 ## Additional Useful Development Tools
 
@@ -289,13 +297,6 @@ debugging in IntelliJ. This is very useful for coding live on Hypixel without th
 - Start Minecraft inside IntelliJ normally.
     - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
 
 ### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
 

@@ -2,13 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.network.protocol.common.ClientboundPingPacket
@@ -20,8 +17,8 @@ object MinecraftData {
     var hasLeftMainScreen: Boolean = false
         private set
 
-    @HandleEvent(ClientConnectEvent::class, priority = HandleEvent.LOW)
-    fun onClientConnect() {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onConnect() {
         hasLeftMainScreen = true
     }
 
@@ -41,24 +38,20 @@ object MinecraftData {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
-        val hand = InventoryUtils.getItemInHand()
-        val newItem = hand?.getInternalName() ?: NeuInternalName.NONE
-        val oldItem = InventoryUtils.itemInHandId
-        if (newItem != oldItem) {
-            if (newItem != NeuInternalName.NONE) {
-                InventoryUtils.recentItemsInHand.add(newItem)
-                InventoryUtils.pastItemsInHand.add(Pair(SimpleTimeMark.now(), newItem))
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (event.newItem != event.oldItem) {
+            if (event.newItem != NeuInternalName.NONE) {
+                InventoryUtils.recentItemsInHand.add(event.newItem)
+                InventoryUtils.pastItemsInHand.add(SimpleTimeMark.now() to event.newItem)
             }
-            InventoryUtils.itemInHandId = newItem
-            InventoryUtils.latestItemInHand = hand
+            InventoryUtils.itemInHandId = event.newItem
+            InventoryUtils.latestItemInHand = event.newStack
             InventoryUtils.lastItemChangeTime = SimpleTimeMark.now()
-            ItemInHandChangeEvent(newItem, oldItem).post()
         }
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val cutoff = SimpleTimeMark.now() - 50.seconds
         InventoryUtils.pastItemsInHand.removeAll { it.first < cutoff }
     }

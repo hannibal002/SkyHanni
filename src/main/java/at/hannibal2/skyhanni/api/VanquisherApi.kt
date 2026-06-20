@@ -92,7 +92,7 @@ object VanquisherApi {
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         val entity = event.entity as? ArmorStand ?: return
         val helmet = entity.getStandHelmet() ?: return
-        if (helmet.item != Items.WITHER_SKELETON_SKULL) return
+        if (!helmet.`is`(Items.WITHER_SKELETON_SKULL)) return
         lastSpawnEntityPos = entity.getLorenzVec()
         lastPossibleSpawnEntity = entity
         lastSpawnEntityTime = SimpleTimeMark.now()

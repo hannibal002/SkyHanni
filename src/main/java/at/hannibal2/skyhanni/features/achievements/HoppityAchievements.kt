@@ -31,12 +31,12 @@ object HoppityAchievements {
         val rabbitAchievement = Achievement(
             "Hoppity's Assistant".asComponent(),
             "Bring home all of Hoppity's Rabbits".asComponent(),
-            200f,
-            false,
-            listOf(80, 90, 100),
+            userLuckAmount = 200f,
+            secret = false,
+            tiers = listOf(80, 90, 99),
         )
         val chocolateAchievement = Achievement(
-            "Waste of chooclate".asComponent(),
+            "Waste of chocolate".asComponent(),
             "Have 60 Billion Chocolate sitting in your Chocolate Factory".asComponent(),
             5f,
         )
