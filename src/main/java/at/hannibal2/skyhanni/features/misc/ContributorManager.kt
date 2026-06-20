@@ -167,10 +167,10 @@ object ContributorManager {
         }
 
         event.registerBrigadier("shaddcontributormention") {
-            description = "Add a contributor mention to the counter."
+            description = "Add/Remove a contributor mention."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback { addContributorMention() }
-            argCallback("amount", BrigadierArguments.integer(1)) { amount ->
+            argCallback("amount", BrigadierArguments.integer()) { amount ->
                 addContributorMention(amount)
             }
         }
@@ -276,10 +276,27 @@ object ContributorManager {
             ChatUtils.userError("Only contributors can add contributor mentions to the counter.")
             return
         }
-        val ts = SimpleTimeMark.now()
-        repeat(amount) {
-            contributorMentions.addLast(ts)
+
+        when {
+            amount > 0 -> {
+                val ts = SimpleTimeMark.now()
+                repeat(amount) {
+                    contributorMentions.addLast(ts)
+                }
+            }
+
+            amount < 0 -> {
+                repeat(-amount) {
+                    contributorMentions.removeLastOrNull()
+                }
+            }
+
+            else -> {
+                ChatUtils.userError("Amount cannot be 0.")
+                return
+            }
         }
+
         ChatUtils.chat("Total contributor mentions: ${contributorMentions.size}")
         saveConfig("added contributor mention record")
     }
