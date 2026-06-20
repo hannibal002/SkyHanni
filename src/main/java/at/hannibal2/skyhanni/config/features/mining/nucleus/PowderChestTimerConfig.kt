@@ -70,6 +70,11 @@ class PowderChestTimerConfig {
     var drawLineToChestAmount: Int = 5
 
     @Expose
+    @ConfigOption(name = "Mute Chest Sounds", desc = "Mute the sound from opening treasure chests.")
+    @ConfigEditorBoolean
+    var muteChestSounds: Boolean = false
+
+    @Expose
     @ConfigLink(owner = PowderChestTimerConfig::class, field = "enabled")
     val position: Position = Position(100, 100)
 }
