@@ -62,9 +62,9 @@ object PowderChestTimer {
     fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
-            if (config.muteChestSounds) event.cancel()
+            if (config.muteChestDiscover) event.cancel()
         }
-        if (config.muteChestSounds && event.soundName == "block.chest.open"
+        if (config.muteChestOpen && event.soundName == "block.chest.open"
             && event.pitch == 1f && event.volume == 1.0f
         ) {
             event.cancel()

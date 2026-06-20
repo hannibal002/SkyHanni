@@ -70,9 +70,14 @@ class PowderChestTimerConfig {
     var drawLineToChestAmount: Int = 5
 
     @Expose
-    @ConfigOption(name = "Mute Chest Sounds", desc = "Mute the sound from opening treasure chests.")
+    @ConfigOption(name = "Mute Chest Discovery Sound", desc = "Mute the sound from discovering treasure chests.")
     @ConfigEditorBoolean
-    var muteChestSounds: Boolean = false
+    var muteChestDiscover: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mute Chest Opening Sound", desc = "Mute the sound from opening treasure chests.")
+    @ConfigEditorBoolean
+    var muteChestOpen: Boolean = false
 
     @Expose
     @ConfigLink(owner = PowderChestTimerConfig::class, field = "enabled")
