@@ -16,6 +16,7 @@ object SeaCreatureLootshareSphere {
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
 
+    private val existingCircle = mutableSetOf<LorenzVec>()
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -26,12 +27,17 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
+        existingCircles.clear()
+        var circleCount = 0
         for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
             val color = if (seaCreature.isOwn || isInLootshareRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
-
-            LootshareUtils.queuePositionToCircle(pos, color.toColor(), event)
+            existingCircles.forEach {
+                if (it.distance(pos) < 10) circleCount++
+            }
+            if (circleCount > 2) continueevent.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
+            existingCircles.add(pos)
         }
     }
 
