@@ -1,3 +1,5 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.compat
 // TODO 26.1 rei compat needed
 //? if < 26.1 {
