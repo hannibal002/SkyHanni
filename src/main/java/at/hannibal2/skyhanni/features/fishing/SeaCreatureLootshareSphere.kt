@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LootshareUtils
 import at.hannibal2.skyhanni.utils.LootshareUtils.isInLootshareRange
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 
 @SkyHanniModule
 object SeaCreatureLootshareSphere {
@@ -36,7 +38,8 @@ object SeaCreatureLootshareSphere {
             existingCircles.forEach {
                 if (it.distance(pos) < 10) circleCount++
             }
-            if (circleCount > 2) continueevent.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
+            if (circleCount > 2) continue
+            event.drawSphereWireframeInWorld(color.toColor(), pos, LootshareUtils.RANGE)
             existingCircles.add(pos)
         }
     }
