@@ -24,7 +24,7 @@ fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
 
 fun stackUnderCursor(): SafeItemStack? {
     val screen = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return null
-    var stack = screen.hoveredSlot?.item
+    val stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
     //return ReiCompat.getHoveredStackFromRei()

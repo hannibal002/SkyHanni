@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 

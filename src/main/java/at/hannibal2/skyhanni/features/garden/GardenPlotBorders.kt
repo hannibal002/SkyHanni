@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule

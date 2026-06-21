@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object HideonleafFinder {

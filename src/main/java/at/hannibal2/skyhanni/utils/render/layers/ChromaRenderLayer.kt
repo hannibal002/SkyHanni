@@ -1,3 +1,5 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.utils.render.layers
 
 //? if < 26.2 {

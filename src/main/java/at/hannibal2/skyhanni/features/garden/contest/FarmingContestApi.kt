@@ -181,6 +181,6 @@ object FarmingContestApi {
             }
             if (amount == 10) break
         }
-        return Pair(amount, crops.mapValues { (bracket, counter) -> counter / contests[bracket]!! })
+        return amount to crops.mapValues { (bracket, counter) -> counter / (contests[bracket] ?: 1) }
     }
 }

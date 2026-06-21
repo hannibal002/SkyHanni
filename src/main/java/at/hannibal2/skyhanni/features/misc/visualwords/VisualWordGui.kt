@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.Minecraft
 import java.awt.Color
 import java.io.File
 import java.io.FileInputStream

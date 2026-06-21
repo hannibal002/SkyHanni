@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object QuickModMenuSwitch {

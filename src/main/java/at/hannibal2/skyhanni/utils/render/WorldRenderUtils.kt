@@ -32,11 +32,13 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
-import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
+
+//? if < 26.2
+//import org.joml.Matrix4f
 
 @Suppress("LargeClass")
 object WorldRenderUtils {

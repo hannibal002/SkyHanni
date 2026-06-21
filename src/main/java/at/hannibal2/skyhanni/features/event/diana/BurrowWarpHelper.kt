@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
-import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds

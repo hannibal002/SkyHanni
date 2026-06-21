@@ -143,7 +143,7 @@ class DefaultConfigOptionGui(
             )
 
             for ((cat) in orderedOptions.entries) {
-                val suggestionState = resetSuggestionState[cat]!!
+                val suggestionState = resetSuggestionState[cat] ?: continue
 
                 GuiRenderUtils.drawRect(0, 0, xSize - padding * 2, 1, 0xFF808080.toInt())
                 GuiRenderUtils.drawRect(0, 30, xSize - padding * 2, cardHeight + 1, 0xFF808080.toInt())

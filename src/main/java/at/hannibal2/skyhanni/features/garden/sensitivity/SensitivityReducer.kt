@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object SensitivityReducer {

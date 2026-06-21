@@ -100,7 +100,7 @@ object DefaultConfigFeatures {
     ) {
         for ((cat, options) in orderedOptions) {
             for (option in options) {
-                val resetState = option.toggleOverride ?: resetSuggestionState[cat]!!
+                val resetState = option.toggleOverride ?: resetSuggestionState[cat] ?: continue
                 if (resetState == ResetSuggestionState.LEAVE_DEFAULTS) continue
                 val onState = option.isTrueEnabled
                 val setTo = if (resetState == ResetSuggestionState.TURN_ALL_ON) {

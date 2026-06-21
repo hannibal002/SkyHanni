@@ -59,7 +59,7 @@ object JacobContestTimeNeeded {
             )
             addString("")
             for (crop in sorted.sorted().keys) {
-                val text = map[crop]!!
+                val text = map[crop] ?: continue
                 addLine {
                     addItemStack(crop.icon)
                     add(text)

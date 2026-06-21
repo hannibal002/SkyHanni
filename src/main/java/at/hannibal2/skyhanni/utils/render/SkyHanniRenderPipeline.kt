@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.MATRICES_PROJECTION_SNIPPET
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
@@ -20,7 +19,8 @@ import java.util.Optional
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
-//?}
+//?} else
+//import at.hannibal2.skyhanni.compat.IrisCompat
 
 //~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
 //~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {

@@ -21,7 +21,6 @@ import com.google.gson.Gson
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.future.await
 import moe.nea.libautoupdate.GithubReleaseUpdateSource.GithubRelease
-import net.minecraft.client.Minecraft
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds

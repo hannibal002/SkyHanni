@@ -545,9 +545,7 @@ object ItemUtils {
         // This workaround fixes 'Turbo Cacti I Book'
         val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
-        if (itemAmountCache.containsKey(input)) {
-            return itemAmountCache[input]!!
-        }
+        itemAmountCache[input]?.let { return it }
 
         UtilsPatterns.readAmountBeforePattern.matchMatcher(input) {
             val itemName = group("name")
@@ -669,7 +667,7 @@ object ItemUtils {
     fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION", "MapGetWithNotNullAssertionOperator")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }
 

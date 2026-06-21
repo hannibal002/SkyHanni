@@ -1,3 +1,5 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.compat
 
 // TODO 26.1 REI compat needed
@@ -8,7 +10,6 @@ import me.shedaniel.math.impl.PointHelper
 import me.shedaniel.rei.api.client.REIRuntime
 import me.shedaniel.rei.api.client.gui.widgets.Slot
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.events.ContainerEventHandler
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen

@@ -26,7 +26,7 @@ object SkyHanniVertexFormats {
     }
     *///?}
 
-    @Suppress("UnusedPrivateProperty")
+    @Suppress("EmptyDefaultConstructor")
     internal enum class VertexElement(
         //? if < 26.2 {
         /*private val index: Int = 0,
@@ -46,7 +46,7 @@ object SkyHanniVertexFormats {
         // {endColor R, G, B, A}
         GRADIENT_PARAMS_2,
         ;
-        
+
         val attributeName: String =
             name.lowercase().split("_").joinToString("") { it.replaceFirstChar(Char::uppercaseChar) }
 

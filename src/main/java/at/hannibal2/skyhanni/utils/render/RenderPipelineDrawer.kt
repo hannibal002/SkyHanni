@@ -49,11 +49,13 @@ object RenderPipelineDrawer {
         val indexBuffer = mesh.indexBuffer()?.let {
             device.createBuffer({ "SkyHanni immediate pipeline index buffer" }, GpuBuffer.USAGE_INDEX, it)
         }
-        val sequentialBuffer = if (indexBuffer == null) {
-            RenderSystem.getSequentialBuffer(mesh.drawState().primitiveTopology())
-        } else null
-        val indices = indexBuffer ?: sequentialBuffer!!.getBuffer(mesh.drawState().indexCount())
-        val indexType = indexBuffer?.let { mesh.drawState().indexType() } ?: sequentialBuffer!!.type()
+
+        val (indices, indexType) = indexBuffer?.let {
+            it to mesh.drawState().indexType()
+        } ?: run {
+            val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().primitiveTopology())
+            sequentialBuffer.getBuffer(mesh.drawState().indexCount()) to sequentialBuffer.type()
+        }
 
         val framebuffer = Minecraft.getInstance().gameRenderer.mainRenderTarget()
 

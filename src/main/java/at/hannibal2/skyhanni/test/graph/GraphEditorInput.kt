@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.client.KeyMapping
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import org.lwjgl.glfw.GLFW
 

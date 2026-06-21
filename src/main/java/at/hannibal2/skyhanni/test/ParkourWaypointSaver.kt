@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
