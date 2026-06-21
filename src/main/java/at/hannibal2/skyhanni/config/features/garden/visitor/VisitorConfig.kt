@@ -37,11 +37,6 @@ class VisitorConfig {
     val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
-    @ConfigOption(name = "Charmed Visitors", desc = "")
-    @Accordion
-    val charmedVisitors: CharmedVisitorsConfig = CharmedVisitorsConfig()
-
-    @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @FeatureToggle
