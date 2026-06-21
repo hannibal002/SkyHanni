@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.nether.kuudra
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +18,7 @@ object KuudraProfileViewerBlocker {
     fun onClickEntity(event: EntityClickEvent) {
         if (!config.disableProfileViewerInKuudra) return
 
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         if (event.clickedEntity !is Player) return
         if (event.clickedEntity.isNpc()) return
 

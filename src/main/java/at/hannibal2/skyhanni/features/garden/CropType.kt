@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.ServerTime
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -14,7 +14,7 @@ enum class CropType(
     val toolName: String,
     val specialDropType: String,
     val baseDrops: Double,
-    iconSupplier: () -> ItemStack,
+    iconSupplier: () -> SafeItemStack,
     val simpleName: String,
     val replenish: Boolean = false,
     val enchantName: String = cropName.lowercase(),
@@ -25,17 +25,17 @@ enum class CropType(
 
     WHEAT(
         "Wheat", "THEORETICAL_HOE_WHEAT", "CROPIE", 1.0,
-        { ItemStack(Items.WHEAT).overrideId("WHEAT") }, "wheat",
+        { SafeItemStack(Items.WHEAT).overrideId("WHEAT") }, "wheat",
         cropColor = LorenzColor.GOLD,
     ),
     CARROT(
         "Carrot", "THEORETICAL_HOE_CARROT", "CROPIE", 3.0,
-        { ItemStack(Items.CARROT).overrideId("CARROT_ITEM") }, "carrot", replenish = true,
+        { SafeItemStack(Items.CARROT).overrideId("CARROT_ITEM") }, "carrot", replenish = true,
         cropColor = LorenzColor.GOLD,
     ),
     POTATO(
         "Potato", "THEORETICAL_HOE_POTATO", "CROPIE", 3.0,
-        { ItemStack(Items.POTATO).overrideId("POTATO_ITEM") }, "potato", replenish = true,
+        { SafeItemStack(Items.POTATO).overrideId("POTATO_ITEM") }, "potato", replenish = true,
         cropColor = LorenzColor.GOLD,
     ),
     NETHER_WART(
@@ -43,7 +43,7 @@ enum class CropType(
         "THEORETICAL_HOE_WARTS",
         "FERMENTO",
         2.5,
-        { ItemStack(Items.NETHER_WART).overrideId("NETHER_STALK") },
+        { SafeItemStack(Items.NETHER_WART).overrideId("NETHER_STALK") },
         "wart",
         replenish = true,
         enchantName = "warts",
@@ -52,17 +52,17 @@ enum class CropType(
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
-        { ItemStack(Items.CARVED_PUMPKIN).overrideId("PUMPKIN") }, "pumpkin",
+        { SafeItemStack(Items.CARVED_PUMPKIN).overrideId("PUMPKIN") }, "pumpkin",
         cropColor = LorenzColor.GOLD,
     ),
     MELON(
         "Melon Slice", "MELON_DICER", "SQUASH", 5.0,
-        { ItemStack(Items.MELON_SLICE).overrideId("MELON") }, "melon",
+        { SafeItemStack(Items.MELON_SLICE).overrideId("MELON") }, "melon",
         cropColor = LorenzColor.GREEN,
     ),
     COCOA_BEANS(
         "Cocoa Beans", "COCO_CHOPPER", "SQUASH", 3.0,
-        { ItemStack(Items.COCOA_BEANS).overrideId("INK_SACK:3") }, "cocoa",
+        { SafeItemStack(Items.COCOA_BEANS).overrideId("INK_SACK:3") }, "cocoa",
         replenish = true, enchantName = "coco",
         cropColor = LorenzColor.GOLD,
     ),
@@ -71,7 +71,7 @@ enum class CropType(
         "THEORETICAL_HOE_CANE",
         "FERMENTO",
         2.0,
-        { ItemStack(Items.SUGAR_CANE).overrideId("SUGAR_CANE") },
+        { SafeItemStack(Items.SUGAR_CANE).overrideId("SUGAR_CANE") },
         "cane",
         enchantName = "cane",
         eliteLbName = "sugarcane",
@@ -79,12 +79,12 @@ enum class CropType(
     ),
     CACTUS(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
-        { ItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus",
+        { SafeItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus",
         cropColor = LorenzColor.GREEN,
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
-        { ItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom",
+        { SafeItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom",
         enchantName = "mushrooms",
         cropColor = LorenzColor.RED,
     ),
@@ -93,7 +93,7 @@ enum class CropType(
         "THEORETICAL_HOE_SUNFLOWER",
         "HELIANTHUS",
         2.0,
-        { ItemStack(Items.SUNFLOWER).overrideId("DOUBLE_PLANT") },
+        { SafeItemStack(Items.SUNFLOWER).overrideId("DOUBLE_PLANT") },
         "sunflower",
         replenish = true,
         cropColor = LorenzColor.GOLD,
@@ -104,7 +104,7 @@ enum class CropType(
         "THEORETICAL_HOE_SUNFLOWER",
         "HELIANTHUS",
         2.0,
-        { ItemStack(Items.BLUE_ORCHID).overrideId("MOONFLOWER") },
+        { SafeItemStack(Items.BLUE_ORCHID).overrideId("MOONFLOWER") },
         "moonflower",
         replenish = true,
         cropColor = LorenzColor.AQUA,
@@ -115,7 +115,7 @@ enum class CropType(
         "THEORETICAL_HOE_WILD_ROSE",
         "HELIANTHUS",
         2.0,
-        { ItemStack(Items.ROSE_BUSH).overrideId("WILD_ROSE") },
+        { SafeItemStack(Items.ROSE_BUSH).overrideId("WILD_ROSE") },
         "rose",
         replenish = true,
         eliteLbName = "wildrose",
@@ -167,7 +167,7 @@ enum class CropType(
         }
 
         fun getTimeFlower(): CropType {
-            val time = ServerTime.dayTime % 24000
+            val time = MinecraftCompat.serverTime % 24000
             // pretty sure great spook will break this
             return if (time >= 12000) MOONFLOWER else SUNFLOWER
         }
