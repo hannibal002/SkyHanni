@@ -1,5 +1,4 @@
 import at.skyhanni.sharedvariables.MappingStyle
-import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
@@ -10,6 +9,7 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -32,6 +32,7 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
+val primaryTarget = ProjectTarget.MODERN_26100
 val isDeobf = target.mappingStyle == MappingStyle.NONE
 
 if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
@@ -124,10 +125,12 @@ tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
-tasks.register("checkPrDescription", ChangelogVerification::class) {
-    this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
-    this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+if (target == primaryTarget) {
+    tasks.register("checkPrDescription", ChangelogVerification::class) {
+        this.outputDirectory.set(layout.buildDirectory)
+        this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
+        this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+    }
 }
 
 dependencies {
@@ -211,7 +214,9 @@ dependencies {
     includeImplementation(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval)
+    includeImplementation(libs.keval) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
     "minecraftTestClientRuntimeLibraries"(libs.keval)
 
     // Repo mgmt
@@ -225,12 +230,14 @@ dependencies {
     "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 }
 
-fun DependencyHandler.includeImplementation(dep: Any) {
+fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
+    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
+
     if (isDeobf) {
-        add("shadowImpl", dep)
+        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     } else {
-        include(dep)
-        modImplementation(dep)
+        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
     }
 }
 
@@ -298,7 +305,7 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == ProjectTarget.MODERN_26100) {
+if (target == primaryTarget) {
     configure<FabricApiExtension> {
         configureTests {
             modId = "skyhanni"
@@ -398,21 +405,6 @@ if (isDeobf) {
     tasks.assemble.get().dependsOn(tasks.shadowJar)
 }
 
-if (!MultiVersionStage.activeState.shouldCompile(target)) {
-    tasks.withType<JavaCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<KotlinCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<AbstractArchiveTask> {
-        onlyIf { false }
-    }
-    tasks.withType<ProcessResources> {
-        onlyIf { false }
-    }
-}
-
 val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
@@ -465,7 +457,7 @@ tasks.withType<Detekt>().configureEach {
     source = source.matching {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
     }
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == primaryTarget
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
 
@@ -481,7 +473,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == primaryTarget
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }
