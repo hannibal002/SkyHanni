@@ -136,6 +136,8 @@ ktlint:
         active: false
     TrailingCommaOnCallSite:
         active: false
+    Indentation: # False positives with Stonecutter - TODO: reenable
+        active: false
 
 complexity:
     CyclomaticComplexMethod: # default allowedComplexity of 14, caught almost every complex method
