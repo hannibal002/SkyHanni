@@ -59,13 +59,23 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
 
+            -   name: Save PR metadata
+                if: ${{ !cancelled() }}
+                run: |
+                    mkdir -p detekt-artifact
+                    echo "${{ github.event.pull_request.number }}" > detekt-artifact/pr_number.txt
+                    printf '%s' "$GITHUB_WORKSPACE" > detekt-artifact/workspace.txt
+                    if [ -f "build/reports/detekt/main.sarif" ]; then
+                        cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
+                    fi
+
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
                     chmod +x .github/scripts/process_detekt_sarif.sh
                     ./.github/scripts/process_detekt_sarif.sh build/reports/detekt/main.sarif | tee detekt_output.txt
             -   name: Upload detekt artifact
-                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ !cancelled() }}
                 uses: actions/upload-artifact@v7
                 with:
                     name: detekt-output
