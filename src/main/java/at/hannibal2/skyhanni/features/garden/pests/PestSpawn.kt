@@ -31,8 +31,8 @@ object PestSpawn {
      */
     private val onePestPattern by patternGroup.list(
         "one.colorless",
-        "\\w+! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
-        "\\w+! A ൠ Pest has appeared in (?<plot>The Barn)!",
+        "^\\w+! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
+        "^\\w+! A ൠ Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
@@ -42,8 +42,8 @@ object PestSpawn {
      */
     private val multiplePestsPattern by patternGroup.list(
         "multiple.colorless",
-        "\\w+! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
-        "\\w+! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
+        "^\\w+! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
+        "^\\w+! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
@@ -52,7 +52,7 @@ object PestSpawn {
      */
     private val offlinePestsPattern by patternGroup.pattern(
         "offline.colorless",
-        "\\w+! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
+        "^\\w+! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
     )
 
     /**
