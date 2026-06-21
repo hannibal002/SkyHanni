@@ -50,7 +50,7 @@ object BetterWikiFromMenus {
             }
         }
 
-        if (inSBGuideInventory && config.sbGuide) {
+        if (inSBGuideInventory && config.skyblockGuide) {
             val wikiSearch = itemClickedName.removeColor().replace("✔ ", "").replace("✖ ", "")
             WikiManager.sendWikiMessage(wikiSearch, autoOpen = config.menuOpenWiki)
             event.cancel()
