@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils.compat
 
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 
@@ -17,8 +17,8 @@ object BlockCompat {
         return logs
     }
 
-    fun createSmoothDiorite(): ItemStack {
-        return ItemStack(Blocks.POLISHED_DIORITE)
+    fun createSmoothDiorite(): SafeItemStack {
+        return SafeItemStack(Blocks.POLISHED_DIORITE)
     }
 
     fun getAllLeaves(): List<Block> = buildList { addLeaves() }

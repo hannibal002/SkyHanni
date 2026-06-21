@@ -4,19 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
-import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.hypixel.SkyBlockLocationData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
@@ -24,8 +20,6 @@ import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatchesComponent
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -38,9 +32,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * This class handles "am I on hypixel", and similar states.
@@ -50,34 +41,6 @@ import kotlin.time.Duration.Companion.seconds
 object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
-
-    // TODO add regex tests
-    private val serverNameConnectionPattern by patternGroup.pattern(
-        "servername.connection",
-        "(?<prefix>.+\\.)?hypixel\\.net",
-    )
-
-    /**
-     * REGEX-TEST: §ewww.hypixel.net
-     * REGEX-TEST: §ealpha.hypixel.net
-     */
-    private val serverNameScoreboardPattern by patternGroup.pattern(
-        "servername.scoreboard",
-        "§e(?<prefix>.+\\.)?hypixel\\.net",
-    )
-
-    /**
-     * REGEX-TEST: §711/15/24 §8m19CJ
-     * REGEX-TEST: §711/15/24 §8m1F
-     */
-    private val serverIdScoreboardPattern by patternGroup.pattern(
-        "serverid.scoreboard",
-        "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
-    )
-    private val lobbyTypePattern by patternGroup.pattern(
-        "lobbytype",
-        "(?<lobbyType>.*lobby)\\d+",
-    )
 
     /**
      * REGEX-TEST: [441] Throwpo ♲
@@ -105,23 +68,18 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
-    var lastLocRaw = SimpleTimeMark.farPast()
-    private var hasScoreboardUpdated = false
-    val connectedToHypixel get() = hypixelLive || hypixelAlpha
+    val connectedToHypixel get() = HypixelLocationApi.inHypixel
 
-    var hypixelLive = false
-    var hypixelAlpha = false
-    var inLobby = false
-    var inLimbo = false
+    val hypixelLive get() = connectedToHypixel && !HypixelLocationApi.inAlpha
+    val hypixelAlpha get() = connectedToHypixel && HypixelLocationApi.inAlpha
+    val inLobby get() = HypixelLocationApi.inLobby
+    val inLimbo get() = HypixelLocationApi.inLimbo
 
     // TODO remove eventually
     val skyBlock get() = SkyBlockLocationData.inSkyBlock
     val skyBlockIsland get() = SkyBlockLocationData.currentIsland
 
-    var serverId: String? = null
-    private var lastSuccessfulServerIdFetchTime = SimpleTimeMark.farPast()
-    private var lastSuccessfulServerIdFetchType: String? = null
-    private var failedServerIdFetchCounter = 0
+    val serverId get() = HypixelLocationApi.serverId
 
     // Ironman, Stranded and Bingo
     var noTrade = false
@@ -140,87 +98,12 @@ object HypixelData {
 
     private val progressCategory = ChatProgressUpdates.category("Hypixel Data")
 
-    // Data from locraw
-    var locrawData: JsonObject? = null
-    private val locraw: MutableMap<String, String> = listOf(
-        "server",
-        "gametype",
-        "lobbyname",
-        "lobbytype",
-        "mode",
-        "map",
-    ).associateWith { "" }.toMutableMap()
-
-    val server get() = locraw["server"].orEmpty()
-    val gameType get() = locraw["gametype"].orEmpty()
-    val lobbyName get() = locraw["lobbyname"].orEmpty()
-    val lobbyType get() = locraw["lobbytype"].orEmpty()
-    val mode get() = locraw["mode"].orEmpty()
-    val map get() = locraw["map"].orEmpty()
-
-    fun checkCurrentServerId() {
-        if (!SkyBlockUtils.inSkyBlock) return
-        if (serverId != null) return
-        if (SkyBlockUtils.lastWorldSwitch.passedSince() < 1.seconds) return
-        if (!TabListData.fullyLoaded) return
-
-        TabWidget.SERVER.matchMatcherFirstLine {
-            serverId = group("serverid")
-            HypixelLocationApi.checkEquals()
-            lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
-            lastSuccessfulServerIdFetchType = "tab list"
-            failedServerIdFetchCounter = 0
-            return
-        }
-
-        serverIdScoreboardPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
-            val serverType = if (group("servertype") == "M") "mega" else "mini"
-            serverId = "$serverType${group("serverid")}"
-            HypixelLocationApi.checkEquals()
-            lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
-            lastSuccessfulServerIdFetchType = "scoreboard"
-            failedServerIdFetchCounter = 0
-            return
-        }
-
-        failedServerIdFetchCounter++
-        if (failedServerIdFetchCounter < 3) return
-        ErrorManager.logErrorWithData(
-            Exception("NoServerId"),
-            "Could not find server id",
-            "failedServerIdFetchCounter" to failedServerIdFetchCounter,
-            "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
-            "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
-            "islandType" to SkyBlockUtils.currentIsland,
-            "scoreboard" to ScoreboardData.sidebarLinesFormatted,
-        )
-    }
-
-    @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Server ID")
-        if (!SkyBlockUtils.inSkyBlock) {
-            event.addIrrelevant("not in sb")
-            return
-        }
-
-        val id = serverId
-        if (id == null) {
-            event.addData {
-                add("server id is null!")
-                add("failedServerIdFetchCounter: $failedServerIdFetchCounter")
-                add("")
-                add("last successful fetch time: $lastSuccessfulServerIdFetchTime")
-                add("last successful fetch type: $lastSuccessfulServerIdFetchType")
-            }
-        } else {
-            event.addIrrelevant {
-                add("Server id: '$id'")
-                add("fetch time: $lastSuccessfulServerIdFetchTime")
-                add("fetch type: $lastSuccessfulServerIdFetchType")
-            }
-        }
-    }
+    val server get() = HypixelLocationApi.serverName
+    val gameType get() = HypixelLocationApi.serverType?.name().orEmpty()
+    val lobbyName get() = HypixelLocationApi.lobbyName.orEmpty()
+    val lobbyType get() = HypixelLocationApi.lobbyType.orEmpty()
+    val mode get() = HypixelLocationApi.mode.orEmpty()
+    val map get() = HypixelLocationApi.map.orEmpty()
 
     fun getPlayersOnCurrentServer(): Int {
         var amount = 0
@@ -259,64 +142,17 @@ object HypixelData {
         return SkyBlockLocationData.currentIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
-    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-    private val jsonBracketPattern = "^\\{.+}".toPattern()
-
-    // todo convert to proper json object
-    fun checkForLocraw(message: String) {
-        jsonBracketPattern.matchMatcher(message.removeColor()) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    for (key in locraw.keys) {
-                        locraw[key] = obj[key]?.asString.orEmpty()
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-                return
-            }
-        }
-    }
-
     @HandleEvent
     fun onWorldChange() {
-        locrawData = null
-        inLimbo = false
-        inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
-        serverId = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
     }
 
     @HandleEvent(ClientDisconnectEvent::class)
     fun onDisconnect() {
-        hypixelLive = false
-        hypixelAlpha = false
-        inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
-        locrawData = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
-        hasScoreboardUpdated = false
-    }
-
-    @HandleEvent(ScoreboardUpdateEvent::class)
-    fun onScoreboardUpdate() {
-        hasScoreboardUpdated = true
     }
 
     @HandleEvent
@@ -353,10 +189,6 @@ object HypixelData {
     // TODO rewrite everything in here
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!SkyBlockUtils.inSkyBlock) {
-            sendLocraw()
-        }
-
         if (SkyBlockUtils.onHypixel && SkyBlockUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
@@ -375,39 +207,12 @@ object HypixelData {
             checkProfileName()
         }
 
-        val wasOnHypixel = SkyBlockUtils.onHypixel
-        checkHypixel()
-        val nowOnHypixel = SkyBlockUtils.onHypixel
-        when {
-            !wasOnHypixel && nowOnHypixel -> {
-                HypixelJoinEvent.post()
-                CoroutineSettings("hypixel join repo update").launchCoroutine {
-                    val progress = progressCategory.start("hypixel join repo update check")
-                    SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
-                    EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
-                    progress.end("done with checking both repos")
-                }
-            }
-
-            wasOnHypixel && !nowOnHypixel -> {
-                HypixelLeaveEvent.post()
-            }
-        }
-
         if (!SkyBlockUtils.onHypixel) return
 
         if (!event.isMod(5)) return
 
         if (SkyBlockLocationData.inSkyBlock) {
             checkSpecialModes()
-            checkCurrentServerId()
-        }
-    }
-
-    private fun sendLocraw() {
-        if (SkyBlockUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
-            lastLocRaw = SimpleTimeMark.now()
-            HypixelCommands.locraw()
         }
     }
 
@@ -429,40 +234,6 @@ object HypixelData {
             profileName = group("profile").lowercase().trim()
             ProfileJoinEvent(profileName).post()
         }
-    }
-
-    private fun checkHypixel() {
-        if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getInstance()
-        MinecraftCompat.localPlayerOrNull ?: return
-
-        var hypixel = false
-
-        val clientBrand = mc.connection?.serverBrand()
-        clientBrand?.let {
-            if (it.contains("hypixel", ignoreCase = true)) {
-                hypixel = true
-            }
-        }
-
-        serverNameConnectionPattern.matchMatcher(mc.currentServer?.ip.orEmpty()) {
-            hypixel = true
-            if (group("prefix") == "alpha.") {
-                hypixelAlpha = true
-            }
-        }
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            serverNameScoreboardPattern.matchMatcher(line) {
-                hypixel = true
-                if (group("prefix") == "alpha.") {
-                    hypixelAlpha = true
-                }
-            }
-        }
-
-        hypixelLive = hypixel && !hypixelAlpha
-        HypixelLocationApi.checkEquals()
     }
 
     private fun checkSpecialModes() {
@@ -526,5 +297,15 @@ object HypixelData {
     private fun countPlayersOnIsland(event: WidgetUpdateEvent) {
         if (event.isClear()) return
         playerAmountOnIsland = playerAmountOnIslandPattern.allMatchesComponent(event.lines).size
+    }
+
+    @HandleEvent(HypixelJoinEvent::class)
+    fun onHypixelJoin() {
+        CoroutineSettings("hypixel join repo update").launchCoroutine {
+            val progress = progressCategory.start("hypixel join repo update check")
+            SkyHanniRepoManager.displayRepoStatus(progress, joinEvent = true)
+            EnoughUpdatesRepoManager.displayRepoStatus(progress, joinEvent = true)
+            progress.end("done with checking both repos")
+        }
     }
 }

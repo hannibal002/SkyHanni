@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.utils.guide
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 
 abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniBaseScreen() {
     companion object {
@@ -39,10 +39,10 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniB
         override var tab: GuideTab? = null
     }
 
-    fun hTab(item: ItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
+    fun hTab(item: SafeItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
         GuideTab(item, tip, false, lastHorizontalTabWrapper, onClick)
 
-    fun vTab(item: ItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
+    fun vTab(item: SafeItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
         GuideTab(item, tip, true, lastVerticalTabWrapper, onClick)
 
     interface TabWrapper {

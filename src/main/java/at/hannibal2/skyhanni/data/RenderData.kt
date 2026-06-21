@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.ChatScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -16,7 +16,7 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen
 object RenderData {
 
     @JvmStatic
-    fun postRenderOverlay(context: GuiGraphics) {
+    fun postRenderOverlay(context: GuiGraphicsExtractor) {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val screen = Minecraft.getInstance().screen
@@ -45,7 +45,7 @@ object RenderData {
 
     var outsideInventory = false
 
-    fun renderOverlay(context: GuiGraphics, inventoryPresent: Boolean = false) {
+    fun renderOverlay(context: GuiGraphicsExtractor, inventoryPresent: Boolean = false) {
         outsideInventory = true
         GuiRenderEvent.GuiOverlayRenderEvent(context).post()
         if (!inventoryPresent) GuiRenderEvent.GuiOnTopRenderEvent(context).post()

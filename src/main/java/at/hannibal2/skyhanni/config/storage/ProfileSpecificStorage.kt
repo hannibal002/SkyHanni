@@ -70,13 +70,13 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
@@ -717,10 +717,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var slots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var riftSlots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
     }
 
     // - foraging
