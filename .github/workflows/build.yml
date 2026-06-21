@@ -1,0 +1,86 @@
+name: Build
+
+on:
+    push:
+        branches:
+            - "**"
+        paths-ignore:
+            - ".gitignore"
+    pull_request:
+        branches:
+            - "**"
+        paths-ignore:
+            - ".gitignore"
+    workflow_dispatch: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Build and test
+        strategy:
+            fail-fast: false
+            matrix:
+                minecraft_version:
+                    - "1.21.11"
+                    - "26.1"
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
+            -   name: Build with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace -PskipDetekt=true
+            -   name: Build with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace -PskipDetekt=true
+            -   name: Upload development build
+                uses: actions/upload-artifact@v7
+                with:
+                    path: build/libs/SkyHanni-*-mc${{ matrix.minecraft_version }}.jar
+                    archive: false
+            -   name: Test with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Test with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Upload test report
+                uses: actions/upload-artifact@v7
+                if: ${{ !cancelled() }}
+                with:
+                    name: Test Results (${{ matrix.minecraft_version }})
+                    path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
+                    if-no-files-found: warn
+
+    verify:
+        runs-on: ubuntu-latest
+        name: Verify build results
+        needs: build
+        if: always()
+        steps:
+            -   name: Check matrix result
+                uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # release/v1
+                with:
+                    jobs: ${{ toJSON(needs) }}

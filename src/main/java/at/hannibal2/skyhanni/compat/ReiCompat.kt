@@ -1,8 +1,9 @@
+@file:Suppress("NoEmptyFile")
+
+package at.hannibal2.skyhanni.compat
 // TODO 26.1 rei compat needed
 //? if < 26.1 {
-/*package at.hannibal2.skyhanni.compat
-
-import at.hannibal2.skyhanni.utils.SafeItemStack
+/*import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import me.shedaniel.math.impl.PointHelper
 import me.shedaniel.rei.api.client.REIRuntime
