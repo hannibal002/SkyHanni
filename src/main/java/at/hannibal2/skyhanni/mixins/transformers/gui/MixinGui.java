@@ -73,7 +73,7 @@ public class MixinGui {
 
     //~if < 26.1 'extractExperienceLevel(' -> 'renderExperienceLevel(' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
-    public void renderExperienceLevel(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
+    public void renderExperienceLevelHead(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
             ci.cancel();
         }

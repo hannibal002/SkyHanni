@@ -1,5 +1,4 @@
 import at.skyhanni.sharedvariables.MappingStyle
-import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
@@ -33,6 +32,7 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
+val primaryTarget = ProjectTarget.MODERN_26100
 val isDeobf = target.mappingStyle == MappingStyle.NONE
 
 if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
@@ -125,10 +125,12 @@ tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
-tasks.register("checkPrDescription", ChangelogVerification::class) {
-    this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
-    this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+if (target == primaryTarget) {
+    tasks.register("checkPrDescription", ChangelogVerification::class) {
+        this.outputDirectory.set(layout.buildDirectory)
+        this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
+        this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+    }
 }
 
 dependencies {
@@ -303,7 +305,7 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == ProjectTarget.MODERN_26100) {
+if (target == primaryTarget) {
     configure<FabricApiExtension> {
         configureTests {
             modId = "skyhanni"
@@ -403,21 +405,6 @@ if (isDeobf) {
     tasks.assemble.get().dependsOn(tasks.shadowJar)
 }
 
-if (!MultiVersionStage.activeState.shouldCompile(target)) {
-    tasks.withType<JavaCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<KotlinCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<AbstractArchiveTask> {
-        onlyIf { false }
-    }
-    tasks.withType<ProcessResources> {
-        onlyIf { false }
-    }
-}
-
 val sourcesJar by tasks.registering(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
@@ -470,7 +457,7 @@ tasks.withType<Detekt>().configureEach {
     source = source.matching {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
     }
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == primaryTarget
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
 
@@ -486,7 +473,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_26100
+    val isTargetVersion = target == primaryTarget
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }
