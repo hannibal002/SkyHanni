@@ -65,6 +65,7 @@ object ForagingTrackerLegacy {
                 "§7You got §6$mobKillCoinsFormat coins §7that way.",
             )
         }
+
         override fun TreeType.isBucketSelectable() = true
         override fun bucketName(): String = "tree"
 
