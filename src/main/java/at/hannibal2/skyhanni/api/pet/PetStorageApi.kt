@@ -62,13 +62,11 @@ object PetStorageApi {
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Pets
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: Pets: "a"
-     * REGEX-TEST: Pets: "e" (1/2)
+     * REGEX-TEST: (1/3) Pets
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
-        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?",
+        "(?:\\(\\d+/\\d+\\) )?Pets",
     )
 
     /**
@@ -451,7 +449,7 @@ object PetStorageApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl$level>:" + uuid.toString()
         event.title("Pet Storage API")
         event.addIrrelevant {

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.time.Duration
@@ -53,13 +53,13 @@ class ResettableValue<T>(private val calculation: () -> T) : ReadOnlyProperty<An
     }
 }
 
-class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, ItemStack> {
+class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, SafeItemStack> {
 
-    private val value: ResettableValue<ItemStack> = ResettableValue {
+    private val value: ResettableValue<SafeItemStack> = ResettableValue {
         internalName.getItemStack()
     }.also { list.add(it) }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack = value.getValue(thisRef, property)
+    override fun getValue(thisRef: Any?, property: KProperty<*>): SafeItemStack = value.getValue(thisRef, property)
 
     @SkyHanniModule
     companion object {
@@ -68,7 +68,7 @@ class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<An
         fun of(internalName: String) = AutoUpdatingItemStack(internalName.toInternalName())
         operator fun invoke(internalName: String) = of(internalName)
 
-        val list = mutableListOf<ResettableValue<ItemStack>>()
+        val list = mutableListOf<ResettableValue<SafeItemStack>>()
 
         @HandleEvent(RepositoryReloadEvent::class)
         fun onRepoReload() {
