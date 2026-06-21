@@ -1,3 +1,5 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.mixins.hooks
 
 //? if < 26.1 {
