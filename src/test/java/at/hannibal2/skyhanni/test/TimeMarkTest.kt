@@ -33,4 +33,16 @@ class TimeMarkTest {
         Assertions.assertTrue((SimpleTimeMark.farPast() - farThreshold).isFarPast())
         Assertions.assertTrue((ServerTimeMark.farPast() - farThreshold).isFarPast())
     }
+
+    @Test
+    fun `adding duration to far future does not overflow`() {
+        Assertions.assertTrue(ServerTimeMark.farFuture() + farThreshold >= ServerTimeMark.farFuture())
+        Assertions.assertTrue(SimpleTimeMark.farFuture() + farThreshold >= SimpleTimeMark.farFuture())
+    }
+
+    @Test
+    fun `adding duration to far future is still far future`() {
+        Assertions.assertTrue((SimpleTimeMark.farFuture() + farThreshold).isFarFuture())
+        Assertions.assertTrue((ServerTimeMark.farFuture() + farThreshold).isFarFuture())
+    }
 }

@@ -34,7 +34,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun isFarPast() = millis <= FAR_PAST_MS
 
-    fun isFarFuture() = millis == FAR_FUTURE_MS
+    fun isFarFuture() = millis >= FAR_FUTURE_MS
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
@@ -50,14 +50,12 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         else -> "ServerTimeMark(millis=$millis})"
     }
 
+    @OptIn(ExperimentalTime::class)
     companion object {
         fun now() = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
 
-        // A sentinel value that is above Long.MIN_VALUE, so we don't worry about underflow
-        // If this causes problems replace with `Long.MIN_VALUE / 2`
-        @OptIn(ExperimentalTime::class)
         private val FAR_PAST_MS = KInstant.DISTANT_PAST.toEpochMilliseconds()
-        private const val FAR_FUTURE_MS = Long.MAX_VALUE
+        private val FAR_FUTURE_MS = KInstant.DISTANT_FUTURE.toEpochMilliseconds()
 
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
