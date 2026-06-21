@@ -189,7 +189,8 @@ object BestiaryData {
             if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
             if (!indexes.contains(index)) continue
             val name = " [IVX0-9]+$".toPattern().matcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()).replaceFirst("")
-            val level = " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())?.groupValues?.get(1) ?: "0"
+            val level =
+                " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0
