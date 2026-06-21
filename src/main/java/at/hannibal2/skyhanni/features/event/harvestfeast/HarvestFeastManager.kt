@@ -16,9 +16,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -130,7 +128,7 @@ object HarvestFeastManager {
         // TODO: Add more debug
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         if (displayDirty) updateDisplay()
         fetch()
@@ -169,7 +167,7 @@ object HarvestFeastManager {
         )
 
         currentFeastData = sendData.createData().takeIf { it.complete } ?: return
-        
+
         if (config.sharePolicy == SharePolicy.DISABLED) return
         if (HypixelData.hypixelAlpha) return
 
@@ -373,7 +371,7 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return

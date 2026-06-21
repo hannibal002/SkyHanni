@@ -53,6 +53,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
      * Pre-renders any new static [shapes] into atlas slots before the GUI render pass.
      * No-op on 26.1+, where all shapes use the deferred rendering path.
      */
+    @Suppress("UnusedParameter")
     fun preRenderShapes(shapes: List<SkyHanniRoundedShapeAtlasKey>) {
         //? if < 26.1 {
         /*if (shapes.isEmpty()) return
