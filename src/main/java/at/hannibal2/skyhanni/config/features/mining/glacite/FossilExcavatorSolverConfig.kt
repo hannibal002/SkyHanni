@@ -34,7 +34,7 @@ class FossilExcavatorSolverConfig {
         desc = "Toggle between locating fossils or avoiding them entirely."
     )
     @ConfigEditorDropdown
-    val mode: SolverMode = SolverMode.FOSSIL
+    var mode: SolverMode = SolverMode.FOSSIL
 
     enum class SolverMode(val displayName: String) {
         FOSSIL("Find Fossil"),
@@ -52,7 +52,7 @@ class FossilExcavatorSolverConfig {
         desc = "Blocks non-optimal clicks when a 100% certain tile is available."
     )
     @ConfigEditorBoolean
-    val blockClicks: Boolean = false
+    var blockClicks: Boolean = false
 
     @Expose
     @ConfigLink(owner = FossilExcavatorSolverConfig::class, field = "enabled")
