@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -34,7 +36,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 // Code taken from NotEnoughUpdates
@@ -178,8 +179,8 @@ class ItemResolutionQuery {
         }
     }
 
-    fun withItemStack(stack: ItemStack): ItemResolutionQuery {
-        this.itemType = stack.item
+    fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
+        this.itemType = stack.itemType
         this.compound = stack.components
         return this
     }
@@ -207,6 +208,7 @@ class ItemResolutionQuery {
             "POTION" -> resolvePotionName()
             "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
             "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
+            "CAKE_HAT_2026" -> resolveCakeHatName()
             else -> resolvedName
         }
     }
@@ -292,6 +294,12 @@ class ItemResolutionQuery {
         val attributeName = attributes.keySet().singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
         val rawInternalName = "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getIntOrDefault(attributeName)
+        return rawInternalName.toInternalName()
+    }
+
+    private fun resolveCakeHatName(): NeuInternalName {
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
+        val rawInternalName = "CAKE_HAT_2026_" + color.uppercase()
         return rawInternalName.toInternalName()
     }
 
@@ -389,7 +397,7 @@ class ItemResolutionQuery {
         return EnoughUpdatesManager.getItemById(internalName)
     }
 
-    fun resolveToItemStack(): ItemStack? {
+    fun resolveToItemStack(): SafeItemStack? {
         val neuItem = resolveToItemJson() ?: return null
         return EnoughUpdatesManager.neuItemToStack(neuItem)
     }
