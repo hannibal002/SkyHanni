@@ -113,26 +113,18 @@ fun postReview(prNumber: String, body: String, comments: List<Map<String, Any>>?
     return ghRequest("POST", "/repos/$repo/pulls/$prNumber/reviews", payload)
 }
 
+val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
+    ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+
 val artifactDir = Path("detekt-artifact")
-val prFile = artifactDir / "pr_number.txt"
 val sarifFile = artifactDir / "main.sarif"
-val workspaceFile = artifactDir / "workspace.txt"
-
-if (!prFile.exists()) {
-    println("Artifact missing, skipping"); exitProcess(0)
-}
-
-val prNumber = prFile.readText().trim()
-if (prNumber.isEmpty()) {
-    println("Empty PR number, skipping"); exitProcess(0)
-}
 
 if (!sarifFile.exists()) {
     println("No SARIF found, skipping")
     exitProcess(0)
 }
 
-val workspace = if (workspaceFile.exists()) workspaceFile.readText().trim() else ""
+val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
 val sarif: JsonObject = runCatching { JsonParser.parseString(sarifFile.readText()).asJsonObject }.getOrElse {
     System.err.println("Failed to parse SARIF: ${it.message}")
     exitProcess(1)

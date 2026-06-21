@@ -29,6 +29,19 @@ jobs:
                     path: detekt-artifact/
                 continue-on-error: true
 
+            -   name: Resolve PR number
+                id: pr
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+                    HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+                    TARGET_REPO: ${{ github.repository }}
+                run: |
+                    PR_NUMBER=$(gh api "repos/$TARGET_REPO/pulls?state=open" \
+                      --jq --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
+                      '[.[] | select(.head.repo.full_name == $repo and .head.ref == $branch)] | .[0].number // empty')
+                    echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
             -   name: Cache Kotlin compiler
                 uses: actions/cache@v4
                 with:
@@ -44,8 +57,9 @@ jobs:
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
             -   name: Post review and manage label
-                if: steps.download.outcome == 'success'
+                if: steps.download.outcome == 'success' && steps.pr.outputs.number != ''
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
+                    PR_NUMBER: ${{ steps.pr.outputs.number }}
                 run: kotlinc -script .github/scripts/post_detekt_review.main.kts

@@ -2,10 +2,10 @@ name: Detekt
 
 on:
     pull_request:
-        types: [opened, synchronize, reopened]
+        types: [ opened, synchronize, reopened ]
         branches:
             - "**"
-    workflow_dispatch: {}
+    workflow_dispatch: { }
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -59,12 +59,10 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
 
-            -   name: Save PR metadata
+            -   name: Save detekt artifact
                 if: ${{ !cancelled() }}
                 run: |
                     mkdir -p detekt-artifact
-                    echo "${{ github.event.pull_request.number }}" > detekt-artifact/pr_number.txt
-                    printf '%s' "$GITHUB_WORKSPACE" > detekt-artifact/workspace.txt
                     if [ -f "build/reports/detekt/main.sarif" ]; then
                         cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
                     fi
