@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 
 // Abstraction for Heart of the Mountain/Forest
@@ -37,7 +37,7 @@ interface HotxData<Reward> {
     val guiNamePattern: Pattern
 
     var slot: Slot?
-    var item: ItemStack?
+    var item: SafeItemStack?
 
     /**
      * Level for which the effect that is present (considers [enabled] and [effectiveLevel])

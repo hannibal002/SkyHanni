@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.render.PoseStackUtils.mulPose
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAnimatedAtlasKey
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniAtlasKey
@@ -9,17 +10,16 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.gui.render.state.GuiItemRenderState
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState
+import net.minecraft.client.renderer.state.gui.GuiItemRenderState
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
 data class SkyHanniGuiItemRenderState(
-    val itemStack: ItemStack,
+    val itemStack: SafeItemStack,
     val guiItemRenderState: GuiItemRenderState,
     val x: Float,
     val y: Float,
@@ -50,7 +50,7 @@ data class SkyHanniGuiItemRenderState(
     }
     val atlasKey by lazy {
         val baseKey = SkyHanniAtlasKey(
-            item = itemStack.item.toString(),
+            item = itemStack.getItem().toString(),
             modelIdentity = trackingState.modelIdentity,
             rotationVector = rotationVector,
         )
