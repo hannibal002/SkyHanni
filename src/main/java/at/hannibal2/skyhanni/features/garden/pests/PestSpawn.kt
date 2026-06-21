@@ -51,6 +51,7 @@ object PestSpawn {
         "offline.colorless",
         ".*! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
     )
+
     /**
      * WRAPPED-REGEX-TEST: "  CLICK HERE to teleport to the plot!"
      */

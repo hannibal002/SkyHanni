@@ -24,7 +24,7 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    fun getBezierFitterCount(): Int { return bezierFitter.count() }
+    fun getBezierFitterCount() = bezierFitter.count()
 
     private var lastGuess: GuessEntry? = null
 
