@@ -1,7 +1,7 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.hooks
+package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.client.multiplayer.chat.GuiMessage
+//? if < 26.1 {
+/*import net.minecraft.client.multiplayer.chat.GuiMessage
 
 interface MessageStore {
 
@@ -13,6 +13,8 @@ interface MessageStore {
 
     var `skyhanni$parent`: GuiMessage?
         get() = `skyhanni$getParent`()
-        set(parent) { `skyhanni$setParent`(parent) }
+        set(parent) {
+            `skyhanni$setParent`(parent)
+        }
 }
 *///?}
