@@ -35,7 +35,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Use Static Color",
-        desc = "Use a single color for the chest highlight instead of changing it depending of the time.",
+        desc = "Use a single color for the chest highlight instead of changing it depending on the time.",
     )
     @ConfigEditorBoolean
     var useStaticColor: Boolean = false

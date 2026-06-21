@@ -14,13 +14,12 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMax
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMilestoneCounter
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.isMaxMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percentToNextMilestone
-import at.hannibal2.skyhanni.data.jsonobjects.repo.StackingEnchantData
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
-import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -80,7 +79,6 @@ private fun getPetDisplay(): String = CurrentPetApi.currentPet?.getUserFriendlyN
     ?: "No pet equipped"
 
 enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() -> String?) {
-
     NONE({ null }),
 
     LOCATION(
@@ -270,16 +268,16 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
             if (extraAttributes != null) {
                 val enchantments = extraAttributes.getCompoundOrDefault("enchantments")
                 var stackingEnchant = ""
-                for (enchant in EstimatedItemValue.stackingEnchants) {
-                    if (extraAttributes.contains(enchant.value.statName)) {
-                        stackingEnchant = enchant.key
+                for ((name, enchant) in DiscordRPCManager.stackingEnchants) {
+                    if (enchant.nbtNum in extraAttributes) {
+                        stackingEnchant = name
                         break
                     }
                 }
-                val stackingData = EstimatedItemValue.stackingEnchants[stackingEnchant] ?: StackingEnchantData()
-                val levels = stackingData.levels
+                val stackingData = DiscordRPCManager.stackingEnchants[stackingEnchant] ?: Enchant.Stacking()
+                val levels = stackingData.stackLevel
                 val level = enchantments.getIntOrDefault(stackingEnchant)
-                val amount = extraAttributes.getIntOrDefault(stackingData.statName)
+                val amount = extraAttributes.getIntOrDefault(stackingData.nbtNum)
                 val stackingPercent = getProgressPercent(amount, levels)
 
                 stackingReturn =

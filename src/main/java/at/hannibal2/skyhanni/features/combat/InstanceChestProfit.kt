@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -49,7 +50,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 @Suppress("UnusedPrivateProperty")
@@ -224,7 +224,7 @@ object InstanceChestProfit {
         croesusDisplay = null
     }
 
-    private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
+    private fun parseCroesusChest(itemStack: SafeItemStack?, chestType: CroesusChestType, slot: Int) {
         val chestList = mutableListOf<NeuInternalName>()
         val chestTips = mutableListOf<String>()
         chestTips.add("${chestType.stackChestName}:")
@@ -322,7 +322,7 @@ object InstanceChestProfit {
         count * getPrice(NeuInternalName.fromItemName(name))
     } ?: 0.0
 
-    private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
+    private fun createDisplay(inventoryName: String, items: Map<Int, SafeItemStack>) {
         /**
          * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
          */

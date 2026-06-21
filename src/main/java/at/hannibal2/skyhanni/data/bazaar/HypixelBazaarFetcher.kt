@@ -172,7 +172,7 @@ object HypixelBazaarFetcher {
                 failedAttempts = 0
                 nextFetchIsManual = true
                 nextFetchTime = SimpleTimeMark.now()
-                ChatUtils.chat("Manually updating the bazaar prices right now..")
+                ChatUtils.chat("Manually updating the bazaar prices right now...")
             }
         }
     }
