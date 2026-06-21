@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.SackOpenEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -71,7 +72,9 @@ object SackDisplay {
 
     @HandleEvent
     fun onSackOpen(event: SackOpenEvent) {
-        update(event.isNewInventory)
+        DelayedRun.runOrNextTick {
+            update(event.isNewInventory)
+        }
     }
 
     fun update(savingSacks: Boolean) {

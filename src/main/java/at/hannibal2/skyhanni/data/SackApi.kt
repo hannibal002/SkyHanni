@@ -184,10 +184,7 @@ object SackApi {
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
         sackRarity = inventoryName.getTrophyRarity()
         stackList.putAll(stacks)
-        // Switch from network thread to render/main thread
-        DelayedRun.runOrNextTick {
-            SackOpenEvent(isNewInventory, event).post()
-        }
+        SackOpenEvent(isNewInventory, event).post()
     }
 
     private fun String.getTrophyRarity(): TrophyRarity? = when {
