@@ -23,7 +23,7 @@ object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
 
-    private fun onCommand(amount: Int, item: String) {
+    private fun onCommand(amount: Long, item: String) {
         if (!config.display) {
             ChatUtils.userError("Command /shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
@@ -36,22 +36,21 @@ object GardenCropTimeCommand {
         }
 
         val searchName = item.lowercase()
-        val amountLong = amount.toLong()
 
         val map = mutableMapOf<String, Long>()
         for (entry in multipliers) {
             val internalName = entry.key
-            val itemName = internalName.repoItemName
+            val itemName = internalName.repoItemName.removeColor()
             if (itemName.lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
-                val baseName = baseId.repoItemName
+                val baseName = baseId.repoItemName.removeColor()
                 val crop = CropType.getByName(baseName)
 
-                val fullAmount = baseAmount.toLong() * amountLong
+                val fullAmount = baseAmount.toLong() * amount
                 val text = if (baseAmount == 1) {
-                    "§e${amountLong.addSeparators()}x $itemName"
+                    "§e${amount.addSeparators()}x $itemName"
                 } else {
-                    "§e${amountLong.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
+                    "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
                 }
 
                 val speed = crop.getSpeed()
@@ -66,7 +65,7 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
+            ChatUtils.userError("No crop item found for '$item'.")
             return
         }
 
@@ -80,7 +79,7 @@ object GardenCropTimeCommand {
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
 
-            arg("amount", BrigadierArguments.integer(1)) { amountArg ->
+            arg("amount", BrigadierArguments.long(1)) { amountArg ->
                 argCallback(
                     "item",
                     BrigadierArguments.greedyString(),
