@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -14,13 +15,12 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun createPlayerHead(): ItemStack = ItemStack(Items.PLAYER_HEAD)
+private fun createPlayerHead(): SafeItemStack = SafeItemStack(Items.PLAYER_HEAD)
 
 // Todo de-duplicate with MiningEventType in data
 enum class MiningEventType(
@@ -30,7 +30,7 @@ enum class MiningEventType(
     color: LorenzColor,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
-    var itemStack: ItemStack? = null,
+    var itemStack: SafeItemStack? = null,
 ) {
     GONE_WITH_THE_WIND(
         "GONE WITH THE WIND", "Wind", 18.minutes, LorenzColor.BLUE, false,
@@ -40,7 +40,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.item(ItemStack(Items.COMPASS)) { scale = 0.45 }
+            val compass by lazy {
+                Renderable.item(SafeItemStack(Items.COMPASS)) { scale = 0.45 }
+            }
             val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -60,8 +62,12 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
-            val dyePink = Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            val dyeGreen by lazy {
+                Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
+            }
+            val dyePink by lazy {
+                Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f)
@@ -87,7 +93,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.item(createPlayerHead()) { scale = 0.36 }
+            val steveHead by lazy {
+                Renderable.item(createPlayerHead()) { scale = 0.36 }
+            }
             val alexHead by lazy {
                 Renderable.item(
                     ItemUtils.createSkull(
@@ -114,7 +122,7 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = ItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = SafeItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
@@ -131,7 +139,7 @@ enum class MiningEventType(
         defaultLength: Duration,
         color: LorenzColor,
         dwarvenSpecific: Boolean,
-        iconInput: ItemStack,
+        iconInput: SafeItemStack,
     ) : this(
         eventName, shortName, defaultLength, color, dwarvenSpecific,
         Renderable.item(iconInput) { xSpacing = 0 },
@@ -145,7 +153,7 @@ enum class MiningEventType(
     private var compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
     private var normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
 
-    private fun rebuildIcons(iconInput: ItemStack) {
+    private fun rebuildIcons(iconInput: SafeItemStack) {
         icon = Renderable.hoverTips(iconInput, listOf(eventName))
         compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
         normalTextWithIcon = Renderable.horizontal(listOf(icon, normalText), 0)

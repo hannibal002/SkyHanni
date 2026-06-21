@@ -12,12 +12,12 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object QuickCraftFeatures {
@@ -84,7 +84,7 @@ object QuickCraftFeatures {
         }
     }
 
-    private fun needsQuickCraftConfirmation(item: ItemStack): Boolean {
+    private fun needsQuickCraftConfirmation(item: SafeItemStack): Boolean {
         return !quickCraftableItems.contains(item.cleanName())
     }
 

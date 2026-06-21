@@ -49,7 +49,7 @@ class CustomScoreboardConfig {
     @ConfigOption(
         name = "Unknown Lines warning",
         desc = "Give a chat warning when unknown lines are found in the scoreboard.\n" +
-            "§cReporting these in the Discord Server are very important, so we can know what lines are missing."
+            "§cReporting these in the Discord Server is very important, so we can know what lines are missing."
     )
     @ConfigEditorBoolean
     var unknownLinesWarning: Boolean = true

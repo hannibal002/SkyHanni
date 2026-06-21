@@ -1,5 +1,7 @@
-package at.hannibal2.skyhanni.mixins.transformers;
-//? > 1.21.9 < 26.1 {
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers;
+
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugEntryLocalDifficulty;
@@ -19,10 +21,10 @@ public class MixinDebugEntryLocalDifficulty {
         Minecraft minecraftClient = Minecraft.getInstance();
         Entity entity = minecraftClient.getCameraEntity();
         if (entity != null && minecraftClient.level != null && (chunk == null || world == null)) {
-            long time = minecraftClient.level.getDayTime();
+            long time = MinecraftCompat.getServerTime();
             lines.addLine("Local Difficulty: ?? (Day " + time / 24000L + ")");
         }
     }
 
 }
-//?}
+*///?}

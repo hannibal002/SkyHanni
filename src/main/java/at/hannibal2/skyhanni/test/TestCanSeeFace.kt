@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -208,7 +208,7 @@ object TestCanSeeFace {
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!enabled || event.clickType != ClickType.LEFT_CLICK) return
+        if (!enabled || event.clickType != InteractClickType.LEFT_CLICK) return
         if (!faceCheckContext.waitingForPunch) return
         faceCheckContext.resetFromClickedBlock(event)
         ChatUtils.chat("Starting face check for block at ${event.position}.", replaceSameMessage = true)
