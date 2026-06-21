@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -28,6 +29,7 @@ object ProfileStorageData {
     var playerSpecific: PlayerSpecificStorage? = null
     var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
+    var repoReady = false
     private var firstLoad = true
     private var noTabListTime = SimpleTimeMark.farPast()
 
@@ -126,6 +128,11 @@ object ProfileStorageData {
         noTabListTime = SimpleTimeMark.now()
         val foundSkyBlockTabList = TabWidget.AREA.isActive
         if (foundSkyBlockTabList) {
+            if (HypixelData.profileName.isNotEmpty()) {
+                ChatUtils.debug("Profile widget missing but we already got profile name, skipping warning")
+                noTabListTime = SimpleTimeMark.farPast()
+                return
+            }
             ChatUtils.clickableChat(
                 "§cCannot read profile name from tab list! Open /widget and make sure the Profile Widget " +
                     "is enabled and visible.",
@@ -163,6 +170,7 @@ object ProfileStorageData {
         petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
         postConfigLoadEvent()
+        if (repoReady) ProfileDataReadyEvent().post()
     }
 
     @HandleEvent

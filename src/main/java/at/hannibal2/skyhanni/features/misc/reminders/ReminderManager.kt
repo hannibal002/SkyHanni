@@ -29,9 +29,9 @@ object ReminderManager {
     private const val REMINDERS_PER_PAGE = 10
 
     // Random numbers chosen, this will be used to delete the old list and action messages
-    private val REMINDERS_LIST_ID = ChatUtils.getUniqueMessageId()
-    private val REMINDERS_ACTION_ID = ChatUtils.getUniqueMessageId()
-    private val REMINDERS_MESSAGE_ID = ChatUtils.getUniqueMessageId()
+    private val REMINDERS_LIST_ID = ChatUtils.getUniqueCustomMessageId()
+    private val REMINDERS_ACTION_ID = ChatUtils.getUniqueCustomMessageId()
+    private val REMINDERS_MESSAGE_ID = ChatUtils.getUniqueCustomMessageId()
 
     private val storage get() = SkyHanniMod.feature.storage.reminders
     private val config get() = SkyHanniMod.feature.misc.reminders

@@ -10,10 +10,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object AttributeOverlay {
         val rollType: RollType,
     )
 
-    private val cachedData = TimeLimitedCache<ItemStack, CachedData>(5.seconds)
+    private val cachedData = TimeLimitedCache<SafeItemStack, CachedData>(5.seconds)
 
     @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
