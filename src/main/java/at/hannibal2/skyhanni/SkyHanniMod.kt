@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
+import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -111,6 +112,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     @HandleEvent
     fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
+        SkyHanniRoundedShapeRenderManager.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
@@ -121,7 +123,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
 
-    val userAgent: String = "SkyHanni/${VERSION}-${PlatformUtils.MC_VERSION}"
+    val userAgent: String = "SkyHanni/$VERSION-${PlatformUtils.MC_VERSION}"
 
     // TODO rename to config. whoever does this, have fun with 644 lines changed
     @JvmField

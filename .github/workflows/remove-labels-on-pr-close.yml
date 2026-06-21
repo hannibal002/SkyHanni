@@ -1,0 +1,20 @@
+# https://github.com/marketplace/actions/label-remover
+
+name: "Remove All Labels"
+
+on:
+    pull_request_target:
+        types: [closed]
+
+permissions:
+    contents: read
+    pull-requests: write
+    issues: write
+
+jobs:
+    remove_very_soon:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: rogerluan/label-remover@92abf197094ff354b296a1629c0452bd79462710 # v1.0.1
+              with:
+                  github_token: ${{ secrets.github_token }}

@@ -9,14 +9,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object ToolkitCropReplacer {
 
     private val config get() = GardenApi.config.farmingToolkit
 
-    private val iconCache: MutableMap<Int, ItemStack> = mutableMapOf()
+    private val iconCache: MutableMap<Int, SafeItemStack> = mutableMapOf()
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {

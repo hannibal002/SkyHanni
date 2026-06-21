@@ -14,11 +14,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -31,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.monster.zombie.Zombie
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.properties.BlockStateProperties
@@ -220,7 +221,7 @@ object CarnivalZombieShootout {
     }
 
     private fun updateContent(time: SimpleTimeMark): Renderable {
-        val lamp = ItemStack(Blocks.REDSTONE_LAMP)
+        val lamp = SafeItemStack(Blocks.REDSTONE_LAMP)
         val timer = 6.seconds - time.passedSince()
         val prefix = determinePrefix(timer, 6.seconds, 4.seconds, 2.seconds)
 
@@ -236,15 +237,15 @@ object CarnivalZombieShootout {
         EntityUtils.getEntitiesNearby<Zombie>(50.0).mapNotNull { zombie ->
             if (zombie.findHealthReal() <= 0) return@mapNotNull null
             val helmet = zombie.getEntityHelmet() ?: return@mapNotNull null
-            if (helmet.item == Items.AIR) return@mapNotNull null
+            if (helmet.isEmpty) return@mapNotNull null
             val type = toType(helmet) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Could not identify Zombie Shootout type",
                     "zombie type for zombie entity helmet is null",
                     "helmet" to helmet,
                     "helmet.displayName" to helmet.hoverName.formattedTextCompatLeadingWhiteLessResets(),
-                    "helmet.item" to helmet.item,
-                    "helmet.unlocalizedName" to helmet.item.descriptionId,
+                    "helmet.item" to helmet.itemType,
+                    "helmet.unlocalizedName" to helmet.itemType.descriptionId,
                 )
                 return@mapNotNull null
             }
@@ -258,7 +259,7 @@ object CarnivalZombieShootout {
             else -> "§c"
         }
 
-    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.item }
+    private fun toType(item: SafeItemStack) = ZombieType.entries.find { item.`is`(it.helmet) }
 
     private fun isEnabled() = config.enabled && CarnivalAPI.inCarnivalArea && started
 }
