@@ -44,12 +44,13 @@ object EquipmentApi {
 
     private val equipment get() = if (RiftApi.inRift()) storage?.riftSlots else storage?.slots
 
-    fun getEquipment(slot: EquipmentSlot): SafeItemStack? = equipment?.get(slot.ordinal)
+    fun getEquipment(slot: EquipmentSlot): SafeItemStack? =
+        equipment?.getOrNull(slot.ordinal)?.takeUnless { it.isEmpty }
 
     fun getSlots(): Map<EquipmentSlot, SafeItemStack?> =
-        EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
+        EquipmentSlot.entries.associateWith(::getEquipment)
 
-    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
+    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull().orEmpty()
 
     private fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
