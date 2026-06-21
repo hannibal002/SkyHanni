@@ -285,7 +285,7 @@ object ChatManager {
         while (iterator.hasNext()) {
             val lineIndex = iterator.nextIndex()
             val line = iterator.next()
-            if (line.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()) {
+            if (line.parent == message) {
                 if (targetIndex == null) targetIndex = lineIndex
                 iterator.remove()
             }
@@ -341,9 +341,7 @@ object ChatManager {
             if (predicate(message)) {
                 iterator.remove()
 
-                val found = chatGui.trimmedMessages.removeIf {
-                    it.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()
-                }
+                val found = chatGui.trimmedMessages.removeIf { it.parent == message }
                 if (!found) {
                     ErrorManager.logErrorWithData(
                         IllegalStateException("Failed to find associated chat lines"),

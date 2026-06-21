@@ -23,9 +23,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
 
-//~ if < 26.2 'Hud' -> 'Gui'
+//? if >= 26.2 {
 import net.minecraft.client.gui.Hud;
-
+//?} else
+//import net.minecraft.client.gui.Gui;
 
 @Mixin(ChatComponent.class)
 public abstract class MixinChatComponent {

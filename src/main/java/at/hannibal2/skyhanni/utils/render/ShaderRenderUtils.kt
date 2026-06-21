@@ -26,13 +26,8 @@ import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.roundToInt
-//? if < 26.1 {
-/*import at.hannibal2.skyhanni.shader.RoundedTextureShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
-import at.hannibal2.skyhanni.shader.CircleShader
-*///?}
+
+// TODO refactor
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {
 

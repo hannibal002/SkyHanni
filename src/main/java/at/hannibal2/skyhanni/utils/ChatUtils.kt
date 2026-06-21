@@ -141,7 +141,7 @@ object ChatUtils {
         val text = message.asComponent()
         if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            text.send(messageId ?: message.getCustomMessageIdForString())
+            text.send(messageId ?: message.getMessageIdForString())
             logAndSendMessage(text, false)
         } else logAndSendMessage(text)
     }
@@ -154,7 +154,7 @@ object ChatUtils {
     ): Boolean {
         if (onlySendOnce && !messagesThatAreOnlySentOnceComponent.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            message.send(messageId ?: message.getCustomMessageIdForString())
+            message.send(messageId ?: message.getMessageIdForString())
             logAndSendMessage(message, false)
         } else logAndSendMessage(message)
     }
@@ -213,7 +213,7 @@ object ChatUtils {
         messageId?.let {
             text.send(it)
         } ?: run {
-            if (replaceSameMessage) text.send(text.getCustomMessageIdForString())
+            if (replaceSameMessage) text.send(text.getMessageIdForString())
             else logAndSendMessage(text)
         }
     }
@@ -235,38 +235,23 @@ object ChatUtils {
         )
     }
 
-
-    // <editor-fold desc="GUI Message IDs">
-    private val lastGuiMessageId = AtomicInt(0)
-
-    /**
-     * Atomically returns a unique message ID, to be used to associate [GuiMessage]s with
-     * [GuiMessage.Line]s to be able to delete past messages without causing lag with large chat
-     * history sizes.
-     */
-    @JvmStatic
-    fun getUniqueGuiMessageId() = lastGuiMessageId.fetchAndIncrement()
-    // </editor-fold>
-
-
-    // <editor-fold desc="Custom Message IDs">
-    private val lastCustomMessageId = AtomicInt(0)
+    // <editor-fold desc="Message IDs">
+    private val lastMessageId = AtomicInt(0)
 
     /**
      * Atomically returns a unique message ID, to be used for custom messages sent by SkyHanni to be
      * able to easily reference and delete them later.
      */
-    fun getUniqueCustomMessageId() = lastCustomMessageId.fetchAndIncrement()
+    fun getUniqueMessageId() = lastMessageId.fetchAndIncrement()
 
-    private val stringToCustomMessageId = mutableMapOf<String, Int>()
+    private val stringToMessageId = mutableMapOf<String, Int>()
 
-    private fun String.getCustomMessageIdForString() =
-        stringToCustomMessageId.getOrPut(this) { getUniqueCustomMessageId() }
+    private fun String.getMessageIdForString() =
+        stringToMessageId.getOrPut(this) { getUniqueMessageId() }
 
-    private fun Component.getCustomMessageIdForString() =
-        stringToCustomMessageId.getOrPut(string) { getUniqueCustomMessageId() }
+    private fun Component.getMessageIdForString() =
+        stringToMessageId.getOrPut(string) { getUniqueMessageId() }
     // </editor-fold>
-
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -344,7 +329,7 @@ object ChatUtils {
             }
         }
 
-        if (replaceSameMessage) text.send(message.getCustomMessageIdForString())
+        if (replaceSameMessage) text.send(message.getMessageIdForString())
         else logAndSendMessage(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
