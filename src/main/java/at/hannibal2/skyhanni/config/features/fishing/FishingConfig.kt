@@ -20,7 +20,7 @@ class FishingConfig {
     @Expose
     @ConfigOption(name = "Wormhole Finder", desc = "Settings for the Wormhole Finder on Lotus Atoll and Crimson Isle.")
     @Accordion
-    var wormholeFinder: WormholeFinderConfig = WormholeFinderConfig()
+    val wormholeFinder: WormholeFinderConfig = WormholeFinderConfig()
 
     @Expose
     @ConfigOption(name = "Thunder Spark", desc = "")

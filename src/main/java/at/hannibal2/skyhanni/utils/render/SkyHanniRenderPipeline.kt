@@ -15,7 +15,6 @@ import net.minecraft.resources.Identifier
 
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
-import com.mojang.blaze3d.pipeline.DepthStencilState
 import java.util.Optional
 //?} else {
 /*import com.mojang.blaze3d.platform.DepthTestFunction

@@ -5,12 +5,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class WestVillageConfig {
-    @ConfigOption(name = "Vermin Tracker", desc = "Track all vermins collected.")
+    @ConfigOption(name = "Vermin Tracker", desc = "Track all vermin collected.")
     @Accordion
     @Expose
     val verminTracker: VerminTrackerConfig = VerminTrackerConfig()
 
-    @ConfigOption(name = "Vermin Highlighter", desc = "Highlight vermins.")
+    @ConfigOption(name = "Vermin Highlighter", desc = "Highlight vermin.")
     @Accordion
     @Expose
     val verminHighlight: VerminHighlightConfig = VerminHighlightConfig()

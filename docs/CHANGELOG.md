@@ -170,6 +170,7 @@
 + Added options to use custom keybinds in the Garden while holding a Squeaky Mousemat or a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
 + Added Harvest Feast rare drops and other missing rare crops to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
 + Refactored Armor Drop Tracker to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
++ Added Include Vacuum to Custom Keybinds. - LukV (https://github.com/hannibal002/SkyHanni/pull/5752)
 
 #### Combat
 
@@ -226,6 +227,9 @@
 + Fixed Pest Repellent 1 being added when Pest Repellent 2 is active. - Alex (https://github.com/hannibal002/SkyHanni/pull/5734)
 + Fixed Locust Larva and Pesterminator & Sunset books not being tracked on Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5818)
 + Fixed pest spawns on the barn plot not being properly detected. - Luna (https://github.com/hannibal002/SkyHanni/pull/5795)
++ Fixed Lunar Moth kills not counting towards Pest Profit Tracker and Mantid Kill Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/5837)
++ Fixed Pets menu no longer being detected after a recent Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/5857)
++ Fixed SkyHanni incorrectly submitting Harvest Feast, Jacob Contest, and Mining Event data on the alpha server. - Luna (https://github.com/hannibal002/SkyHanni/pull/5860)
 
 #### Combat
 
@@ -301,6 +305,8 @@
 + Fixed false fishing bait change warnings when opening a GUI while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5806)
 + Fixed fishing profit tracker falsely reporting gaining bait when using it. - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Updated trophy fishing detection to only require 2 pieces of Trophy Hunter Armor. - Luna (https://github.com/hannibal002/SkyHanni/pull/5810)
++ Fixed Trophy Fish Display not updating when talking to Odger. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
++ Fixed Trophy Fish Total Caught Tooltip feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
 
 #### Item
 
@@ -422,6 +428,12 @@
 + Fixed profit trackers falsely reporting gaining an item when equipping it in your wardrobe (e.g. Tiki Mask) (hopefully). - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Fixed the mod sometimes not correctly detecting the island you're on. - Luna (https://github.com/hannibal002/SkyHanni/pull/5762)
   + The "Hypixel Mod API" mod (https://modrinth.com/mod/hypixel-mod-api) is now required to use SkyHanni. You might already have this installed because of other mods.
++ Fixed a potential issue with glowing entities on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5826)
++ Fixed features that check for Current Island not working when swapping from equivalent islands (HUB --> HUB). - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5836)
+    + This includes any feature that relied on the Graph system to check current area such as Slayer/Carnival features.
++ Fixed in-world chroma text not rendering properly (especially with Everything Chroma). - Luna (https://github.com/hannibal002/SkyHanni/pull/5863)
++ Fixed Kotlin being bundled in the 26.1 JAR which may have caused compatibility issues with some mods. - Luna (https://github.com/hannibal002/SkyHanni/pull/5828)
++ Fixed minor spelling mistakes. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5875)
 
 #### Commands
 
@@ -435,6 +447,8 @@
 + Fixed custom Mineshaft type names not displaying correctly. - Rain (https://github.com/hannibal002/SkyHanni/pull/5613)
 + Fixed Mineshaft Pity Message Modification requiring the Pity Display to be enabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 + Fixed Quick Shafter Achievement not being granted properly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Fixed Glacite Mineshaft pity display falsely reporting pity tab widget as missing. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5873)
++ Fixed Mining Event Tracker sometimes failing to load with an error. - Luna (https://github.com/hannibal002/SkyHanni/pull/5888)
 
 ### Technical Details
 
@@ -667,6 +681,9 @@
 + Migrated to Hypixel Mod API for server and location detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5762)
 + OwnInventoryItemUpdateEvent is now only posted for actual inventory slots, excluding armor slots and the last hotbar slot (SkyBlock Menu). - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Updated MoulConfig to 4.7.0. - Luna (https://github.com/hannibal002/SkyHanni/pull/5813)
++ Added incremental cache for primary functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5642)
++ Added support for the 2026 Cake Hat colors to the Item Resolution Query. - jani (https://github.com/hannibal002/SkyHanni/pull/5865)
++ Fixed generateRepoPatterns Gradle task not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5840)
 
 ### Removed Features
 
