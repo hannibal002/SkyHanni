@@ -46,7 +46,7 @@ jobs:
         needs: regexes
         name: Publish regexes
         # 511310721 is the Repository ID for SkyHanni
-        if: ${{ github.event.name == 'push' && github.ref.name == 'beta' && github.repository_id == '511310721' }}
+        if: ${{ github.event_name == 'push' && github.ref_name == 'beta' && github.repository_id == '511310721' }}
         steps:
             -   uses: actions/checkout@v6
                 with:
