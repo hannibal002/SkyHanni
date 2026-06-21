@@ -23,7 +23,6 @@ import net.minecraft.core.Direction
 import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
-import net.minecraft.world.entity.Relative
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO rename to something else to reduce confusion
@@ -60,7 +59,7 @@ object MineshaftWaypoints {
         when (event.packet) {
             is ClientboundLevelChunkWithLightPacket -> isWorldLoaded = true
             is ClientboundPlayerPositionPacket -> {
-                if (event.packet.relatives.contains(Relative.Y_ROT)) return
+                if (!event.packet.relatives.isEmpty()) return
 
                 val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
                 val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
