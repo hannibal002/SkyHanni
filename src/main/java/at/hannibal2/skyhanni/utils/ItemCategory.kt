@@ -1,4 +1,4 @@
-@file:Suppress("AnnotationOnSameLine")
+@file:Suppress("AnnotationOnSameLine", "AnnotationOnSeparateLine")
 
 package at.hannibal2.skyhanni.utils
 
