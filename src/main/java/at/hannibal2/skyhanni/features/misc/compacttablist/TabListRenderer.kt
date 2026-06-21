@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
+//~ if < 26.1 'PlayerFaceExtractor' -> 'PlayerFaceRenderer' {
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.components.PlayerFaceRenderer
+import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -160,8 +161,10 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
                     val playerInfo = tabLine.getInfo()
                     if (playerInfo != null) {
-                        val texture = playerInfo.skin.body().id()
-                        PlayerFaceRenderer.draw(
+                        //~ if < 26.1 'texturePath' -> 'id'
+                        val texture = playerInfo.skin.body().texturePath()
+                        //~ if < 26.1 'extractRenderState' -> 'draw'
+                        PlayerFaceExtractor.extractRenderState(
                             DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
                         )
                     }
@@ -200,3 +203,4 @@ object TabListRenderer {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }
 }
+//~}

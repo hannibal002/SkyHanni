@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -116,7 +116,7 @@ object DungeonSecretTrackerLocator {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onUseAbility(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (item.getInternalNameOrNull() != SECRET_COMPASS) return
         if (lastParticle.passedSince() < 0.2.seconds) {

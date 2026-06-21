@@ -134,6 +134,11 @@ class GardenConfig {
     val yawPitchDisplay: YawPitchDisplayConfig = YawPitchDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Mouse Lock", desc = "")
+    @Accordion
+    val mouseLock: MouseLockConfig = MouseLockConfig()
+
+    @Expose
     @ConfigOption(name = "Sensitivity Reducer", desc = "")
     @Accordion
     val sensitivityReducer: SensitivityReducerConfig = SensitivityReducerConfig()
@@ -187,6 +192,11 @@ class GardenConfig {
     @ConfigOption(name = "See Through Farming", desc = "")
     @Accordion
     val seeThroughWindow: SeeThroughWindowConfig = SeeThroughWindowConfig()
+
+    @Expose
+    @ConfigOption(name = "Farming Toolkit", desc = "")
+    @Accordion
+    val farmingToolkit: FarmingToolkitIconConfig = FarmingToolkitIconConfig()
 
     @Expose
     @ConfigOption(

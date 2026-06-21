@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
@@ -24,7 +24,7 @@ object NoBreak {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         // TODO make this work with CropClickEvent
         if (event.getCropType() == null) return
 
@@ -36,7 +36,7 @@ object NoBreak {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(134, "garden.noRodBreak", "garden.noBreakItems") { element ->
+        event.move(136, "garden.noRodBreak", "garden.noBreakItems") { element ->
             if (element.asBoolean) {
                 ConfigManager.gson.toJsonTree(NoBreakItem.entries)
             } else {

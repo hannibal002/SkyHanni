@@ -18,6 +18,11 @@ class FishingConfig {
     val trophyFishing: TrophyFishingConfig = TrophyFishingConfig()
 
     @Expose
+    @ConfigOption(name = "Wormhole Finder", desc = "Settings for the Wormhole Finder on Lotus Atoll and Crimson Isle.")
+    @Accordion
+    val wormholeFinder: WormholeFinderConfig = WormholeFinderConfig()
+
+    @Expose
     @ConfigOption(name = "Thunder Spark", desc = "")
     @Accordion
     val thunderSpark: ThunderSparkConfig = ThunderSparkConfig()
@@ -26,6 +31,11 @@ class FishingConfig {
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
     val barnTimer: BarnTimerConfig = BarnTimerConfig()
+
+    @Expose
+    @ConfigOption(name = "Fishing Bobber Timer", desc = "")
+    @Accordion
+    val bobberTimer: FishingBobberTimerConfig = FishingBobberTimerConfig()
 
     @Expose
     @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
