@@ -15,7 +15,7 @@ class MouseLockConfig {
         desc = "You can use the §e/shmouselock §rcommand to lock and unlock your mouse rotation.",
     )
     @ConfigEditorInfoText
-    val notice: String = ""
+    var notice: String = ""
 
     @Expose
     @ConfigOption(name = "Chat Message", desc = "Show a message in chat when toggling mouse lock.")
@@ -28,7 +28,7 @@ class MouseLockConfig {
         desc = "Choose whether teleporting to a plot should unlock your mouse rotation.",
     )
     @ConfigEditorDropdown
-    val unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
+    var unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
 
     @Expose
     @NoConfigLink
