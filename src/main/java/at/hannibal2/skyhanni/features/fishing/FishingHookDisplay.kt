@@ -22,6 +22,7 @@ object FishingHookDisplay {
     private val config get() = SkyHanniMod.feature.fishing.fishingHookDisplay
     private var armorStand: ArmorStand? = null
     private val potentialArmorStands = mutableListOf<ArmorStand>()
+
     // Todo repo pattern?
     private val pattern = "§e§l(\\d+(\\.\\d+)?)".toPattern()
     private var isRendering = false

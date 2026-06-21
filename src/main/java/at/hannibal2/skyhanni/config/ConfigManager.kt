@@ -166,7 +166,10 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             logger.log(e.stackTraceToString())
-                            PlatformUtils.shutdownMinecraft("Config is corrupt inside development environment. Maybe you forgot to implement a config migration, or the migration failed.")
+                            PlatformUtils.shutdownMinecraft(
+                                "Config is corrupt inside development environment. " +
+                                    "Maybe you forgot to implement a config migration, or the migration failed."
+                            )
                         }
                     } else {
                         run()
