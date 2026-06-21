@@ -14,7 +14,7 @@ object ClipboardUtils {
         withIOContext = true,
     )
 
-    @Deprecated("Use copyToClipboardAsync instead", ReplaceWith("copyToClipboardAsync(text).await()"))
+    @Legacy("Use copyToClipboardAsync instead", ReplaceWith("copyToClipboardAsync(text).await()"))
     fun copyToClipboard(text: String, step: Int = 0) = copyToClipboardInternal(text, step)
 
     fun copyToClipboardAsync(text: String, step: Int = 0): Deferred<Boolean?> = clipboardCoroutineSettings.async {

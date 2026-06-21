@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.item.DyeColor
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
@@ -154,16 +154,16 @@ enum class ColoredBlockCompat(
         Blocks.BLACK_TERRACOTTA,
     );
 
-    fun createGlassStack(amount: Int = 1): ItemStack {
-        return ItemStack(glassBlock, amount)
+    fun createGlassStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(glassBlock, amount)
     }
 
-    fun createGlassPaneStack(amount: Int = 1): ItemStack {
-        return ItemStack(glassPaneBlock, amount)
+    fun createGlassPaneStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(glassPaneBlock, amount)
     }
 
-    fun createWoolStack(amount: Int = 1): ItemStack {
-        return ItemStack(woolBlock, amount)
+    fun createWoolStack(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(woolBlock, amount)
     }
 
     fun createWoolBlockState(): BlockState {
@@ -178,8 +178,8 @@ enum class ColoredBlockCompat(
         return this.glassBlock.withPropertiesOf(state)
     }
 
-    fun createStainedClay(amount: Int = 1): ItemStack {
-        return ItemStack(clayBlock, amount)
+    fun createStainedClay(amount: Int = 1): SafeItemStack {
+        return SafeItemStack(clayBlock, amount)
     }
 
     fun getDyeColor(): DyeColor {
@@ -190,37 +190,37 @@ enum class ColoredBlockCompat(
     }
 
     companion object {
-        fun ItemStack.isStainedGlass(color: ColoredBlockCompat): Boolean = this.isStainedGlass(color.metaColor)
-        fun ItemStack.isStainedGlassPane(color: ColoredBlockCompat): Boolean = this.isStainedGlassPane(color.metaColor)
-        fun ItemStack.isWool(color: ColoredBlockCompat): Boolean = this.isWool(color.metaColor)
-        fun ItemStack.isStainedClay(color: ColoredBlockCompat): Boolean = this.isStainedClay(color.metaColor)
+        fun SafeItemStack.isStainedGlass(color: ColoredBlockCompat): Boolean = this.isStainedGlass(color.metaColor)
+        fun SafeItemStack.isStainedGlassPane(color: ColoredBlockCompat): Boolean = this.isStainedGlassPane(color.metaColor)
+        fun SafeItemStack.isWool(color: ColoredBlockCompat): Boolean = this.isWool(color.metaColor)
+        fun SafeItemStack.isStainedClay(color: ColoredBlockCompat): Boolean = this.isStainedClay(color.metaColor)
 
         /**
          * No metadata means any stained-glass
          */
-        fun ItemStack.isStainedGlass(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassBlock.asItem() }
+        fun SafeItemStack.isStainedGlass(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained-glass pane
          */
-        fun ItemStack.isStainedGlassPane(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.glassPaneBlock.asItem() }
+        fun SafeItemStack.isStainedGlassPane(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.glassPaneBlock.asItem()) }
         }
 
         /**
          * No metadata means any wool
          */
-        fun ItemStack.isWool(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.woolBlock.asItem() }
+        fun SafeItemStack.isWool(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.woolBlock.asItem()) }
         }
 
         /**
          * No metadata means any stained clay
          */
-        fun ItemStack.isStainedClay(meta: Int? = null): Boolean {
-            return entries.any { (meta == null || it.metaColor == meta) && this.item == it.clayBlock.asItem() }
+        fun SafeItemStack.isStainedClay(meta: Int? = null): Boolean {
+            return entries.any { (meta == null || it.metaColor == meta) && this.`is`(it.clayBlock.asItem()) }
         }
 
         fun BlockState.isStainedGlass(color: ColoredBlockCompat): Boolean = isStainedGlass(color.metaColor)

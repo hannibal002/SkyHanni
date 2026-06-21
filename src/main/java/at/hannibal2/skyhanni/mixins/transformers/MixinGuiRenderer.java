@@ -16,9 +16,9 @@ import java.util.function.Supplier;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.GuiElementRenderState;
-import net.minecraft.client.gui.render.state.GuiRenderState;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.renderer.state.gui.GuiRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import org.spongepowered.asm.mixin.Final;
@@ -57,14 +57,26 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
 
-    @WrapOperation(method = "addElementToMesh", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/state/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;"))
+    @WrapOperation(
+        method = "addElementToMesh",
+        //~ if < 26.1 'renderer/state/gui/' -> 'gui/render/state/'
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
+    )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    // Here and below is to construct our own render pipeline for atlas-ed item rendering.
-    @Shadow
-    private int frameNumber;
+    //~ if < 26.1 'Unique' -> 'Shadow'
+    @Unique
+    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
+    private int skyhanni$frameNumber;
+
+    //? if >= 26.1 {
+    @Inject(method = "render", at = @At("HEAD"))
+    private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
+        skyhanni$frameNumber++;
+    }
+    //?}
 
     @Shadow
     @Final
@@ -96,7 +108,8 @@ public class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
-            frameNumber
+            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
+            skyhanni$frameNumber
         );
     }
 
@@ -113,7 +126,8 @@ public class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
-            frameNumber
+            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
+            skyhanni$frameNumber
         );
     }
 

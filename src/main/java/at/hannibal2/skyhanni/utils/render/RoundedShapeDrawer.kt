@@ -13,13 +13,13 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.resources.Identifier
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
 import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
 import com.mojang.blaze3d.buffers.GpuBufferSlice
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
 import org.joml.Vector4f
@@ -28,7 +28,14 @@ import com.mojang.blaze3d.textures.FilterMode
 
 object RoundedShapeDrawer {
 
-    val projectionMatrix = CachedOrthoProjectionMatrixBuffer("SkyHanni Rounded Shapes", 1000.0f, 11000.0f, true)
+    val projectionMatrix = ProjectionMatrixBuffer(
+        "SkyHanni Rounded Shapes",
+        //? if < 26.1 {
+        /*1000.0f,
+        11000.0f,
+        true,
+        *///?}
+    )
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     var circleUniform = SkyHanniCircleUniform()
@@ -71,11 +78,11 @@ object RoundedShapeDrawer {
             // so we just set the correct matrix here are restore the perspective one afterwards
             val window = Minecraft.getInstance().window
             RenderSystem.backupProjectionMatrix()
+            val w = window.width.toFloat() / window.guiScale.toFloat()
+            val h = window.height.toFloat() / window.guiScale.toFloat()
             RenderSystem.setProjectionMatrix(
-                projectionMatrix.getBuffer(
-                    window.width.toFloat() / window.guiScale.toFloat(),
-                    window.height.toFloat() / window.guiScale.toFloat(),
-                ),
+                //~ if < 26.1 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)' -> 'w, h'
+                projectionMatrix.getBuffer(Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)),
                 ProjectionType.ORTHOGRAPHIC,
             )
             val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(

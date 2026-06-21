@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -60,13 +61,13 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
 private typealias RabbitData = ProfileSpecificStorage.HoppityEventStats.Companion.RabbitData
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object HoppityCollectionStats {
     private val collectionConfig get() = CFApi.config.hoppityCollectionStats
     private val patternGroup = CFApi.patternGroup.group("collection")
@@ -275,13 +276,14 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
-    private fun ItemStack.isMilestoneRabbit(): Boolean =
+    private fun SafeItemStack.isMilestoneRabbit(): Boolean =
         this.getLore().any { milestoneRabbitLorePattern.matches(it) }
 
-    private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean =
-        stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
+    private fun missingRabbitStackNeedsFix(stack: SafeItemStack): Boolean =
+        stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            .isNotEmpty() && stack.isDye() && (stack.isDye(8) || stack.isMilestoneRabbit())
 
-    private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
+    private val replacementCache: MutableMap<String, SafeItemStack> = mutableMapOf()
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
@@ -382,7 +384,7 @@ object HoppityCollectionStats {
         }
     }
 
-    private fun buildDescriptiveMilestoneLore(itemStack: ItemStack): List<String> {
+    private fun buildDescriptiveMilestoneLore(itemStack: SafeItemStack): List<String> {
         val existingLore = itemStack.getLore().toMutableList()
         var replaceIndex: Int? = null
         var milestoneType: HoppityEggType = HoppityEggType.BREAKFAST
@@ -416,7 +418,7 @@ object HoppityCollectionStats {
 
     private fun String.takeIfKnownRabbit(): String? = takeIf { HoppityCollectionData.isKnownRabbit(it) }
 
-    private fun setResidentDataFromStack(stack: ItemStack) {
+    private fun setResidentDataFromStack(stack: SafeItemStack) {
         val lore = stack.getLore()
         if (lore.isEmpty()) return
 
@@ -430,7 +432,7 @@ object HoppityCollectionStats {
         }
     }
 
-    private fun setHotspotDataFromStack(stack: ItemStack) {
+    private fun setHotspotDataFromStack(stack: SafeItemStack) {
         val lore = stack.getLore()
         if (lore.isEmpty()) return
 
@@ -445,7 +447,7 @@ object HoppityCollectionStats {
         }
     }
 
-    private fun filterRabbitToHighlight(stack: ItemStack) {
+    private fun filterRabbitToHighlight(stack: SafeItemStack) {
         val lore = stack.getLore()
 
         if (lore.isEmpty()) return
@@ -453,7 +455,10 @@ object HoppityCollectionStats {
 
         if (highlightMap.containsKey(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
 
-        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAbi" && collectionConfig.highlightRabbits.contains(HighlightRabbitTypes.ABI)) {
+        if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == "§aAbi" && collectionConfig.highlightRabbits.contains(
+                HighlightRabbitTypes.ABI,
+            )
+        ) {
             highlightMap[stack.hoverName.formattedTextCompatLeadingWhiteLessResets()] = HighlightRabbitTypes.ABI.color
             return
         }

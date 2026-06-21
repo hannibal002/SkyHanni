@@ -24,11 +24,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CommunityFix {
@@ -58,13 +58,13 @@ object CommunityFix {
         }
     }
 
-    fun openInventory(inventoryItems: Map<Int, ItemStack>) {
+    fun openInventory(inventoryItems: Map<Int, SafeItemStack>) {
         if (!showWrongData) return
         if (!GardenApi.config.copyMilestoneData) return
         fixForWrongData(inventoryItems)
     }
 
-    private fun fixForWrongData(inventoryItems: Map<Int, ItemStack>) {
+    private fun fixForWrongData(inventoryItems: Map<Int, SafeItemStack>) {
         val data = mutableListOf<String>()
         for ((_, stack) in inventoryItems) {
             val crop = getCropTypeByLore(stack) ?: continue
@@ -86,7 +86,7 @@ object CommunityFix {
     }
 
     private fun checkForWrongData(
-        stack: ItemStack,
+        stack: SafeItemStack,
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
