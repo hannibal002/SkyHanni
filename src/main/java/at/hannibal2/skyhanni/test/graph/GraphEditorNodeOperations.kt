@@ -14,7 +14,9 @@ object GraphEditorNodeOperations {
     fun addNode() {
         val closestNode = state.closestNode
         if (closestNode != null && closestNode.distanceSqToPlayer() < 9.0 && closestNode == state.activeNode) {
-            GraphEditor.feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
+            GraphEditor.feedBackInTutorial(
+                "Removed node since you were closer than 3 blocks from the active node."
+            )
             GraphEditorHistory.save("removed node")
             nodes.remove(closestNode)
             edges.removeIf { it.isInEdge(closestNode) }
