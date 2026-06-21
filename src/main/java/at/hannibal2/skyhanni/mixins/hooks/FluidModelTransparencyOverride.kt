@@ -18,6 +18,8 @@ interface FluidModelTransparencyOverride {
     @set:JvmSynthetic
     var transparency: Transparency?
         get() = `skyhanni$getTransparency`()
-        set(value) { `skyhanni$setTransparency`(value) }
+        set(value) {
+            `skyhanni$setTransparency`(value)
+        }
 }
 //?}
