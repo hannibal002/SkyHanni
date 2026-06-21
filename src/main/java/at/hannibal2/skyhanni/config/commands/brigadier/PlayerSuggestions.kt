@@ -27,19 +27,22 @@ class PlayerSuggestions private constructor(
     class Builder {
         private var seq: Sequence<String> = emptySequence()
 
-        fun includeAllSources() {
-            seq = PlayerNameSource.entries.asSequence().flatMap { it.usernames }
+        fun includeAllSources(): Builder {
+            seq += PlayerNameSource.entries.asSequence().flatMap { it.usernames }
+            return this
         }
 
-        fun include(vararg categories: PlayerNameSource) = apply {
+        fun include(vararg categories: PlayerNameSource): Builder {
             seq += categories.asSequence().flatMap { it.usernames }
+            return this
         }
 
-        fun include(categories: Collection<PlayerNameSource>) = apply {
+        fun include(categories: Collection<PlayerNameSource>): Builder {
             seq += categories.asSequence().flatMap { it.usernames }
+            return this
         }
 
-        fun exclude(vararg categories: PlayerNameSource) = apply {
+        fun exclude(vararg categories: PlayerNameSource): Builder {
             val oldSeq = seq
             seq = sequence {
                 val excluded = categories
@@ -49,27 +52,33 @@ class PlayerSuggestions private constructor(
 
                 yieldAll(oldSeq.filterNot { it in excluded })
             }
+            return this
         }
 
-        fun includePlayers(vararg players: String) = apply {
+        fun includePlayers(vararg players: String): Builder {
             seq += players.asSequence()
+            return this
         }
 
-        fun includePlayers(players: Collection<String>) = apply {
+        fun includePlayers(players: Collection<String>): Builder {
             seq += players.asSequence()
+            return this
         }
 
-        fun excludePlayers(vararg players: String) = apply {
+        fun excludePlayers(vararg players: String): Builder {
             val excluded = players.toSet()
             seq = seq.filterNot { it in excluded }
+            return this
         }
 
-        fun filter(predicate: (String) -> Boolean) = apply {
+        fun filter(predicate: (String) -> Boolean): Builder {
             seq = seq.filter(predicate)
+            return this
         }
 
-        fun filterNot(predicate: (String) -> Boolean) = apply {
+        fun filterNot(predicate: (String) -> Boolean): Builder {
             seq = seq.filterNot(predicate)
+            return this
         }
 
         fun build(): PlayerSuggestions = PlayerSuggestions(seq)

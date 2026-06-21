@@ -16,7 +16,7 @@ class PlayerArgumentType private constructor() : ArgumentType<Player> {
             ?: throw PLAYER_NOT_FOUND.create(username)
     }
 
-    fun getAllPlayers(): List<Player> =
+    private fun getAllPlayers(): List<Player> =
         EntityUtils.getPlayerEntities() + listOfNotNull(MinecraftCompat.localPlayerOrNull)
 
     override fun getExamples(): Collection<String> =

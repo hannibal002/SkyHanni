@@ -74,7 +74,7 @@ object ContributorManager {
      */
     private val contribMentionPattern by patternGroup.pattern(
         "mention",
-        """\b(?:skyhanni|skyhani|sh).*\b(?:dev\w*|contrib\w*)\b"""
+        """\b(?:skyhanni|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*)\b"""
     )
 
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
@@ -259,7 +259,7 @@ object ContributorManager {
         val msg = event.messageComponent.getText()
         if (!isContributorMentionMessage(msg)) return
         val author = event.author
-        // This also counts the current player themselves
+        // contributorNames includes the current player
         if (author in contributorNames) return
         if (!contributorMentionersThisSession.add(author)) return
 

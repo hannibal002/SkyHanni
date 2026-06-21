@@ -7,7 +7,7 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType
 import com.mojang.brigadier.LiteralMessage
 import java.util.UUID
 
-class UuidArgumentType : ArgumentType<UUID> {
+class UuidArgumentType private constructor() : ArgumentType<UUID> {
     override fun parse(reader: StringReader): UUID {
         val input = reader.readString()
         return StringUtils.parseUUIDOrNull(input)

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.FriendAddEvent
 import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
 import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
-import at.hannibal2.skyhanni.features.misc.ContributorManager.contributorNames
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -74,28 +74,28 @@ object ContributorAchievement {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onProfileJoin() {
         val friends = FriendApi.getAllFriends()
-        if (friends.any { it.name in contributorNames }) {
+        if (friends.any { it.name in ContributorManager.contributorNames }) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     fun onFriendAdd(event: FriendAddEvent) {
-        if (event.playerName in contributorNames) {
+        if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
-        if (event.playerName in contributorNames) {
+        if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_NOBODY_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
     fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
-        if (event.playerName in contributorNames) {
+        if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_REJECTED_ACHIEVEMENT)
         }
     }

@@ -42,7 +42,7 @@ class TabCompleteConfig {
     var guild: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Carry Customers", desc = "Tab-complete Carry Customers")
+    @ConfigOption(name = "Carry Customers", desc = "Tab-complete Carry Customers.")
     @ConfigEditorBoolean
     var carryCustomer: Boolean = false
 
