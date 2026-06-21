@@ -266,7 +266,7 @@ object ContributorManager {
             "Hey people seem to be talking about you, want to increment the popularity counter?",
             oneTimeClick = true,
             onClick = { addContributorMention() },
-            hover = "§eClick to add this EEEEKK occurrence!",
+            hover = "§eClick to add this contributor mention",
         )
     }
 
