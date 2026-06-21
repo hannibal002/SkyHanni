@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderContext
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
-import org.joml.Matrix4f
 
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
 

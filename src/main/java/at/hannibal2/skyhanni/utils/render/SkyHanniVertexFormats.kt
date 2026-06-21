@@ -26,6 +26,7 @@ object SkyHanniVertexFormats {
     }
     *///?}
 
+    @Suppress("UnusedPrivateProperty")
     internal enum class VertexElement(
         //? if < 26.2 {
         /*private val index: Int = 0,
@@ -69,6 +70,7 @@ object SkyHanniVertexFormats {
      * @param count The number of components in the element (default is 4).
      * @return The registered VertexFormatElement, guaranteed to have a unique ID.
      */
+    @Suppress("UnusedParameter")
     private fun safeRegister(
         desiredId: Int,
         index: Int = 0,

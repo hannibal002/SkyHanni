@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.shader.CircleShader
-import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
-import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
-import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawFilledCircle
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRadialGradientFilledCircle
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundGradientRect
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRect
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundRectOutline
+import at.hannibal2.skyhanni.utils.render.ShaderRenderUtils.drawRoundTexturedRect
 import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniRoundedShapeAtlasKey
 import at.hannibal2.skyhanni.utils.render.states.RoundedRenderStateParams
 import at.hannibal2.skyhanni.utils.render.states.SkyHanniCircleRenderState
@@ -25,7 +26,13 @@ import org.joml.Matrix4f
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.roundToInt
-
+//? if < 26.1 {
+/*import at.hannibal2.skyhanni.shader.RoundedTextureShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleShader
+import at.hannibal2.skyhanni.shader.RoundedRectangleOutlineShader
+import at.hannibal2.skyhanni.shader.RadialGradientCircleShader
+import at.hannibal2.skyhanni.shader.CircleShader
+*///?}
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {
 

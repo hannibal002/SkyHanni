@@ -27,8 +27,8 @@ fun stackUnderCursor(): SafeItemStack? {
     var stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
-    //stack = ReiCompat.getHoveredStackFromRei()
-    return stack
+    //return ReiCompat.getHoveredStackFromRei()
+    return null
 }
 
 fun slotUnderCursor(): Slot? {
