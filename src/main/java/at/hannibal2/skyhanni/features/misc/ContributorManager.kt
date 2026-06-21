@@ -285,7 +285,8 @@ object ContributorManager {
             }
 
             amount < 0 -> {
-                repeat(-amount) {
+                val amountToRemove = minOf(-amount, contributorMentions.size)
+                repeat(amountToRemove) {
                     contributorMentions.removeLastOrNull()
                 }
             }
