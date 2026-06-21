@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ErrorManagerJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
@@ -287,8 +286,8 @@ object ErrorManager {
         return this == ErrorState.LOGGED
     }
 
-    @HandleEvent(ClientConnectEvent::class)
-    fun onClientConnect() {
+    @HandleEvent
+    fun onConnect() {
         if (errorsToShowOnJoin.isEmpty()) return
         val label = getLabel()
         val state = if (MinecraftData.hasLeftMainScreen) "During startup" else "While not on a server"
@@ -320,28 +319,42 @@ object ErrorManager {
         val rawMessage = message.removeColor()
 
         var hideError = false
-        for (repoError in repoErrors) {
-            for (string in repoError.messageStartsWith) {
-                if (rawMessage.startsWith(string)) {
-                    hideError = true
+        try {
+            for (repoError in repoErrors) {
+                for (string in repoError.messageStartsWith) {
+                    if (rawMessage.startsWith(string)) {
+                        hideError = true
+                    }
+                }
+                for (string in repoError.messageContains) {
+                    if (rawMessage.contains(string)) {
+                        hideError = true
+                    }
+                }
+                for (string in repoError.messageExact) {
+                    if (rawMessage == string) {
+                        hideError = true
+                    }
+                }
+                if (hideError) {
+                    repoError.replaceMessage?.let {
+                        finalMessage = it
+                        hideError = false
+                    }
+                    repoError.customMessage?.let {
+                        ChatUtils.userError(it)
+                        return null
+                    }
+                    break
                 }
             }
-            for (string in repoError.messageExact) {
-                if (rawMessage == string) {
-                    hideError = true
-                }
-            }
-            if (hideError) {
-                repoError.replaceMessage?.let {
-                    finalMessage = it
-                    hideError = false
-                }
-                repoError.customMessage?.let {
-                    ChatUtils.userError(it)
-                    return null
-                }
-                break
-            }
+        } catch (e: NullPointerException) {
+            ChatUtils.chat(
+                "§cFailed to format error message! " +
+                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord."
+            )
+            // can not use error manager inside error manager
+            Error("Failed to format error message", e).printStackTrace()
         }
 
         if (finalMessage.last() !in ".?!") {

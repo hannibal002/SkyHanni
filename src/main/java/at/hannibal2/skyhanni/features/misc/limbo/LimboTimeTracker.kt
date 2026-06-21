@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,7 +19,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -40,12 +38,17 @@ import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object LimboTimeTracker {
+
+    private const val LIMBO_ACHIEVEMENT = "Limbo Time"
+
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val config get() = SkyHanniMod.feature.misc
 
     // TODO reshape to data class, use Resettable
     private var limboJoinTime = SimpleTimeMark.farPast()
-    var inLimbo = false
+    private val inLimbo get() = inRealLimbo || inFakeLimbo
+    private var inRealLimbo = false
+    private var inBedWarsLobby = false
     private var inFakeLimbo = false
     private var shownPB = false
     private var oldPB: Duration = 0.seconds
@@ -57,25 +60,28 @@ object LimboTimeTracker {
     private val bedWarsLobbyLimbo = AABB(-662.0, 43.0, -76.0, -619.0, 86.0, -27.0)
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        // TODO repo pattern
-        if (event.message == "§cYou are AFK. Move around to return from AFK." || event.message == "§cYou were spawned in Limbo.") {
-            limboJoinTime = SimpleTimeMark.now()
-            inLimbo = true
+    fun onServerChange(event: HypixelApiServerChangeEvent) {
+        val wasInLimbo = inLimbo
+
+        inRealLimbo = event.serverName == "limbo"
+        inBedWarsLobby = event.lobbyName?.startsWith("bedwarslobby") == true
+        inFakeLimbo = false
+
+        updateLimboState(wasInLimbo)
+    }
+
+    @HandleEvent
+    fun onTick() {
+        val wasInLimbo = inLimbo
+        inFakeLimbo = inBedWarsLobby && bedWarsLobbyLimbo.isPlayerInside()
+        updateLimboState(wasInLimbo)
+        if (inLimbo) {
             onFire = MinecraftCompat.localPlayer.isOnFire
         }
     }
 
     @HandleEvent
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
-        if (event.message.startsWith("/playtime") && inLimbo) {
-            event.cancel()
-            printStats(true)
-        }
-    }
-
-    @HandleEvent
-    fun onTick() {
+    fun onSecondPassed() {
         val personalBest = storage?.personalBest ?: 0
         if (inLimbo && !shownPB && limboJoinTime.passedSince() >= personalBest.seconds && personalBest != 0) {
             shownPB = true
@@ -99,39 +105,32 @@ object LimboTimeTracker {
                 },
             )
         }
-        val lobbyName: String? = HypixelData.locrawData?.get("lobbyname")?.asString
-        if (lobbyName.toString().startsWith("bedwarslobby")) {
-            if (bedWarsLobbyLimbo.isPlayerInside()) {
-                if (inFakeLimbo) return
-                limboJoinTime = SimpleTimeMark.now()
-                inLimbo = true
-                inFakeLimbo = true
-            } else {
-                if (inLimbo) {
-                    leaveLimbo()
-                    inFakeLimbo = false
-                }
-            }
-        }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        if (!inLimbo) return
-        leaveLimbo()
+        val wasInLimbo = inLimbo
+        inRealLimbo = false
+        inBedWarsLobby = false
+        inFakeLimbo = false
+        if (wasInLimbo) leaveLimbo()
+    }
+
+    @HandleEvent
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+        if (event.message.startsWith("/playtime") && inLimbo) {
+            event.cancel()
+            printStats(true)
+        }
     }
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.showTimeInLimbo || !inLimbo) return
-        @Suppress("InSkyBlockEarlyReturn")
-        if (SkyBlockUtils.inSkyBlock) return leaveLimbo()
         val duration = limboJoinTime.passedSince().format()
         val display = Renderable.text("§eIn Limbo since §b$duration")
         config.showTimeInLimboPosition.renderRenderable(display, posLabel = "Limbo Time Tracker")
     }
-
-    private const val LIMBO_ACHIEVEMENT = "Limbo Time"
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -148,36 +147,55 @@ object LimboTimeTracker {
         event.register(achievement, LIMBO_ACHIEVEMENT)
     }
 
+    private fun enterLimbo() {
+        limboJoinTime = SimpleTimeMark.now()
+        onFire = MinecraftCompat.localPlayer.isOnFire
+    }
+
     private fun leaveLimbo() {
-        inLimbo = false
-        if (!config.showTimeInLimbo) return
         val passedSince = limboJoinTime.passedSince()
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
         if (passedSince > 6.hours || currentPB > 6.hours) AchievementManager.completeAchievement(LIMBO_ACHIEVEMENT)
-        if (passedSince > currentPB) {
-            oldPB = currentPB
-            storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
-            userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).roundTo(2)
-            if (onFire) userLuck *= FIRE_MULTIPLIER
-            ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            if (oldPB != 0.seconds) {
-                ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
-            }
-
-        } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
-        if (userLuck > oldLuck) {
-            if (onFire) {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}§c✴ §aSkyHanni User Luck§f! ")
+        if (config.showTimeInLimbo) {
+            if (passedSince > currentPB) {
+                oldPB = currentPB
+                storage?.personalBest = passedSince.toInt(DurationUnit.SECONDS)
+                userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).roundTo(2)
+                if (onFire) userLuck *= FIRE_MULTIPLIER
+                ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
+                if (oldPB != 0.seconds) {
+                    ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+                }
             } else {
-                ChatUtils.chat("§fYour §aPersonal Bests§f perk is now granting you §a+${userLuck.roundTo(2)}✴ SkyHanni User Luck§f!")
+                ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
             }
-            storage?.userLuck = userLuck
+            if (userLuck > oldLuck) {
+                if (onFire) {
+                    ChatUtils.chat(
+                        "§fYour §aPersonal Bests§f perk is now granting you " +
+                            "§a+${userLuck.roundTo(2)}§c✴ §aSkyHanni User Luck§f! ",
+                    )
+                } else {
+                    ChatUtils.chat(
+                        "§fYour §aPersonal Bests§f perk is now granting you " +
+                            "§a+${userLuck.roundTo(2)}✴ SkyHanni User Luck§f!",
+                    )
+                }
+                storage?.userLuck = userLuck
+            }
         }
         storage?.playtime = storage?.playtime?.plus(passedSince.toInt(DurationUnit.SECONDS)) ?: 0
         onFire = false
         shownPB = false
+    }
+
+    private fun updateLimboState(wasInLimbo: Boolean) {
+        when {
+            inLimbo && !wasInLimbo -> enterLimbo()
+            !inLimbo && wasInLimbo -> leaveLimbo()
+        }
     }
 
     @HandleEvent
@@ -212,7 +230,7 @@ object LimboTimeTracker {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Limbo")
         if (!inLimbo) {
             event.addIrrelevant("not in limbo")

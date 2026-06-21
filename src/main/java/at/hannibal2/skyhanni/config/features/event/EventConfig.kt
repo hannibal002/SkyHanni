@@ -57,6 +57,11 @@ class EventConfig {
     @Category(name = "The Carnival", desc = "Features for games at §eThe Carnival §7when §bFoxy §7is Mayor.")
     val carnival: CarnivalConfig = CarnivalConfig()
 
+    @Expose
+    @Accordion
+    @Category(name = "Harvest Feast", desc = "Features for the Harvest Feast yearly farming event.")
+    val feast: HarvestFeastConfig = HarvestFeastConfig()
+
     // comment in if the event is needed again
     //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion

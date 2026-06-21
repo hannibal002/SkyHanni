@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
@@ -18,8 +19,7 @@ import java.util.Map;
 @Mixin(value = FluidRenderHandlerRegistryImpl.class, remap = false)
 public class MixinFluidRenderHandlerRegistry {
 
-    @Shadow
-    @Final
+    @Shadow @Final
     private Map<Fluid, FluidRenderHandler> handlers;
 
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
@@ -29,5 +29,5 @@ public class MixinFluidRenderHandlerRegistry {
             else if (fluid == Fluids.FLOWING_LAVA) cir.setReturnValue(handlers.get(Fluids.FLOWING_WATER));
         }
     }
-
 }
+*///?}
