@@ -176,8 +176,7 @@ object AchievementManager {
                                 append(achievement.getName())
                                 append(" is now locked!")
                             },
-
-                            )
+                        )
                     }
                 }
             }
