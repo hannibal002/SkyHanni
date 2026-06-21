@@ -71,10 +71,9 @@ object GardenCharmedVisitors {
         updateDisplay()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiRender() {
         if (!config.enabled) return
-        if (!GardenApi.inGarden()) return
         config.position.renderRenderables(display, posLabel = "Charmed Visitors")
     }
 
