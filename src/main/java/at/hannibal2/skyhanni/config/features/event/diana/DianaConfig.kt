@@ -134,7 +134,7 @@ class DianaConfig {
     var burrowNearestWarp: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Warp Key", desc = "Press this key to warp to nearest burrow waypoint.")
+    @ConfigOption(name = "Warp Key", desc = "Press this key to warp to the nearest burrow waypoint.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var keyBindWarp: Int = GLFW.GLFW_KEY_UNKNOWN
 

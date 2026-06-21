@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -42,7 +42,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -106,7 +105,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     )
 
     val DUNG_ITEM = "DUNG".toInternalName()
-    val SUNFLOWER_ITEM = "DOUBLE_PLANT".toInternalName()
+    val ENCHANTED_SUNFLOWER_ITEM = "ENCHANTED_SUNFLOWER".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
@@ -236,7 +235,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 // Field Mice drop 6 separate items, but we only want to count the kill once
                 PestType.FIELD_MOUSE -> internalName == DUNG_ITEM
                 // Lunar Moths drop 3 separate crops, but we only want to count the kill once
-                PestType.LUNAR_MOTH -> internalName == SUNFLOWER_ITEM
+                PestType.LUNAR_MOTH -> internalName == ENCHANTED_SUNFLOWER_ITEM
                 // Overclocker drops have the same format as crop drops and causes double counting kills
                 else -> internalName != OVERCLOCKER
             }
@@ -376,10 +375,9 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.GARDEN) {
-            firstUpdate()
-        }
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
+        firstUpdate()
     }
 
     @HandleEvent
