@@ -125,6 +125,12 @@ tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
+tasks.register<ClientProductionRunTask>("prodClient") {
+    notCompatibleWithConfigurationCache("Interactive client launches must start a new process every time.")
+    outputs.upToDateWhen { false }
+    runDir = file("run")
+}
+
 if (target == primaryTarget) {
     tasks.register("checkPrDescription", ChangelogVerification::class) {
         this.outputDirectory.set(layout.buildDirectory)
@@ -170,6 +176,7 @@ dependencies {
 
     if (isDeobf) runtimeOnly(libs.devauth)
     else modRuntimeOnly(libs.devauth)
+    "productionRuntimeMods"(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
     if (isDeobf) {
@@ -212,6 +219,7 @@ dependencies {
 
     // getting clock offset
     includeImplementation(libs.commons.net)
+    "minecraftTestClientRuntimeLibraries"(libs.commons.net)
 
     // Calculator
     includeImplementation(libs.keval) {
@@ -221,6 +229,7 @@ dependencies {
 
     // Repo mgmt
     includeImplementation(libs.jgit)
+    "minecraftTestClientRuntimeLibraries"(libs.jgit)
 
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
