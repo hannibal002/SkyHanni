@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -40,7 +41,6 @@ import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -219,7 +219,7 @@ object CFStrayTracker {
         return if (goldenList.isEmpty()) "" else ("\n" + goldenList.joinToString("\n"))
     }
 
-    fun handleStrayClicked(slotNumber: Int, itemStack: ItemStack): Boolean {
+    fun handleStrayClicked(slotNumber: Int, itemStack: SafeItemStack): Boolean {
         if (!isEnabled() || claimedStraysSlots.contains(slotNumber)) return false
 
         claimedStraysSlots.add(slotNumber)

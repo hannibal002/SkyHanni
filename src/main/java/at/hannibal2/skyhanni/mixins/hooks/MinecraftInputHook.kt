@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
-import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.phys.BlockHitResult
 import net.minecraft.world.phys.EntityHitResult
 import net.minecraft.world.phys.HitResult
@@ -17,16 +16,16 @@ object MinecraftInputHook {
     fun shouldCancelMouseRightClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
-            ClickType.RIGHT_CLICK,
-            ServerboundInteractPacket.ActionType.INTERACT_AT,
+            InteractClickType.RIGHT_CLICK,
+            EntityClickEvent.ActionType.INTERACT_AT,
         )
 
     @JvmStatic
     fun shouldCancelMouseLeftClick(hitResult: HitResult?): Boolean =
         handleClick(
             hitResult,
-            ClickType.LEFT_CLICK,
-            ServerboundInteractPacket.ActionType.ATTACK,
+            InteractClickType.LEFT_CLICK,
+            EntityClickEvent.ActionType.ATTACK,
         )
 
     @JvmStatic
@@ -40,10 +39,10 @@ object MinecraftInputHook {
 
         if (currentBlockPos == position) return false
 
-        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), ClickType.LEFT_CLICK).post()
+        val clickCancelled = ItemClickEvent(InventoryUtils.getItemInHand(), InteractClickType.LEFT_CLICK).post()
 
         return BlockClickEvent(
-            ClickType.LEFT_CLICK,
+            InteractClickType.LEFT_CLICK,
             position.toLorenzVec(),
             InventoryUtils.getItemInHand(),
         ).also {
@@ -53,8 +52,8 @@ object MinecraftInputHook {
 
     private fun handleClick(
         hitResult: HitResult?,
-        clickType: ClickType,
-        entityAction: ServerboundInteractPacket.ActionType,
+        clickType: InteractClickType,
+        entityAction: EntityClickEvent.ActionType,
     ): Boolean {
         if (hitResult == null) return false
 

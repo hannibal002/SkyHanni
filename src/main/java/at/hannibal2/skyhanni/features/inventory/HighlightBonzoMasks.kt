@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.interpolate
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.awt.Color
 import kotlin.time.Duration
@@ -46,7 +47,7 @@ object HighlightBonzoMasks {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.depletedBonzosMasks) return
         for (slot in event.container.slots) {
-            val internalName = slot.item?.getInternalName() ?: continue
+            val internalName = slot.item.getInternalName()
             val maskType = MaskType.getByInternalName(internalName) ?: continue
             val readyAt = maskTimers[maskType] ?: continue
 
