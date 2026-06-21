@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.isPlayerName
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -58,7 +58,7 @@ object HideExCoopMembers {
         changedSlotNumber = index
     }
 
-    private fun List<Component>.handleTooltip(storage: MutableSet<String>, item: ItemStack): MutableList<Component> =
+    private fun List<Component>.handleTooltip(storage: MutableSet<String>, item: SafeItemStack): MutableList<Component> =
         this.toMutableList().apply {
             val coopIndex = indexOfFirst { it.string == "Co-op Contributions:" }
             if (coopIndex == -1) return@apply
@@ -103,7 +103,7 @@ object HideExCoopMembers {
         if (!config.hideExCoopMembers || !historicMembersInventory.isInside()) return
 
         event.inventoryItems.values
-            .filter { it.item == Items.PLAYER_HEAD }
+            .filter { it.`is`(Items.PLAYER_HEAD) }
             .forEach { item ->
                 addHiddenMember(item.hoverName.string.cleanPlayerName())
             }

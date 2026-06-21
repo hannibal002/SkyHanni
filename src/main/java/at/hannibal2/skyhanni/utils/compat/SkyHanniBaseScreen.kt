@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import net.minecraft.client.input.MouseButtonEvent
@@ -14,20 +14,24 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
 
     val mc: Minecraft = Minecraft.getInstance()
 
-    override fun render(context: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(context, mouseX, mouseY, delta)
+    //~ if < 26.1 'extractRenderState' -> 'render' {
+    override fun extractRenderState(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, delta: Float) {
+        super.extractRenderState(context, mouseX, mouseY, delta)
         postDrawScreen(context, mouseX, mouseY, delta)
     }
+    //~}
 
-    override fun renderBackground(context: GuiGraphics, mouseX: Int, mouseY: Int, deltaTicks: Float) {
+    //~ if < 26.1 'extract' -> 'render'
+    override fun extractBackground(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, deltaTicks: Float) {
         try {
-            this.renderMenuBackground(context)
+            //~ if < 26.1 'extract' -> 'render'
+            this.extractMenuBackground(context)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while rendering background", "screen" to this)
         }
     }
 
-    private fun postDrawScreen(context: GuiGraphics, mouseX: Int, mouseY: Int, partialTicks: Float) {
+    private fun postDrawScreen(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         DrawContextUtils.setContext(context)
         try {
             onDrawScreen(mouseX, mouseY, partialTicks)
@@ -159,6 +163,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        renderMenuBackground(DrawContextUtils.drawContext)
+        //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
+        extractMenuBackground(DrawContextUtils.drawContext)
     }
 }

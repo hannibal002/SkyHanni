@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getInventoryItems
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
 import net.minecraft.client.resources.language.I18n
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
