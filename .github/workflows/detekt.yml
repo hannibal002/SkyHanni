@@ -5,7 +5,11 @@ on:
         types: [opened, synchronize, reopened]
         branches:
             - "**"
-    workflow_dispatch:
+    workflow_dispatch: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
 
 permissions:
     contents: read
@@ -30,10 +34,6 @@ jobs:
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
-            -   name: Disable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 if: github.repository == 'hannibal002/SkyHanni'

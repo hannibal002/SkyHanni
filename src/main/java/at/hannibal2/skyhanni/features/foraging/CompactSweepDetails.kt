@@ -182,9 +182,11 @@ object CompactSweepDetails {
         val chatComponent = chatText.asComponent()
 
         chatComponent.hover = hoverText.asComponent()
-        chatComponent.onClick(onClick = {
-            HypixelCommands.treeGifts()
-        })
+        chatComponent.onClick(
+            onClick = {
+                HypixelCommands.treeGifts()
+            },
+        )
 
         ChatUtils.chat(chatComponent, prefix = false)
         resetSweepDetailsVariables()
