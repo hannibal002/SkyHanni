@@ -17,7 +17,7 @@ permissions:
 jobs:
     build:
         runs-on: ubuntu-latest
-        name: "Build and test"
+        name: "Build Matrix"
         strategy:
             matrix:
                 minecraft_version:
@@ -66,3 +66,10 @@ jobs:
                     name: "Test Results (${{ matrix.minecraft_version }})"
                     path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
                     if-no-files-found: warn
+
+    build_success:
+        name: "Build and test"
+        runs-on: ubuntu-latest
+        needs: build
+        steps:
+            - run: echo "All jobs are successfully done"
