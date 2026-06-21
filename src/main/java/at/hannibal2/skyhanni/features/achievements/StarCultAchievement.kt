@@ -27,9 +27,9 @@ object StarCultAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Weekly Cult".asComponent(),
-            "Attend 7 cult meetings".asComponent(),
-            7f,
+            name = "Weekly Cult",
+            description = "Attend 7 cult meetings",
+            userLuckAmount = 7f,
         )
         event.register(achievement, STAR_CULT_ACHIEVEMENT)
     }

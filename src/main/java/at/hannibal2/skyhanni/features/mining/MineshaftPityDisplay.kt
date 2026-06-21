@@ -133,9 +133,9 @@ object MineshaftPityDisplay {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Quick Shafter".asComponent(),
-            "Spawn a Mineshaft in under 100 Pity".asComponent(),
-            10f,
+            name = "Quick Shafter",
+            description = "Spawn a Mineshaft in under 100 Pity",
+            userLuckAmount = 10f,
         )
         event.register(achievement, SHAFT_ACHIEVEMENT)
     }

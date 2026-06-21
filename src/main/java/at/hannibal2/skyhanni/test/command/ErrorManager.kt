@@ -118,7 +118,6 @@ object ErrorManager {
         }
     }
 
-
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
@@ -348,7 +347,7 @@ object ErrorManager {
         } catch (e: NullPointerException) {
             ChatUtils.chat(
                 "§cFailed to format error message! " +
-                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord."
+                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord.",
             )
             // can not use error manager inside error manager
             Error("Failed to format error message", e).printStackTrace()

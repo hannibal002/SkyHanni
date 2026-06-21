@@ -18,9 +18,9 @@ object XpAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "High Level Gamer".asComponent(),
-            "Have 1000 XP Levels".asComponent(),
-            25f,
+            name = "High Level Gamer",
+            description = "Have 1000 XP Levels",
+            userLuckAmount = 25f,
         )
         event.register(achievement, XP_ACHIEVEMENT)
     }

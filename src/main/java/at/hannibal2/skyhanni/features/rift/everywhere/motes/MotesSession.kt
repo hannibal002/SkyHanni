@@ -62,9 +62,9 @@ object MotesSession {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Mote Millionaire".asComponent(),
-            "Become a millionaire 20 times over".asComponent(),
-            20f,
+            name = "Mote Millionaire",
+            description = "Become a millionaire 20 times over",
+            userLuckAmount = 20f,
         )
         event.register(achievement, MOTES_ACHIEVEMENT)
     }

@@ -67,7 +67,7 @@ object CropMilestonesApi {
      */
     val tabListMaxPattern by patternGroup.pattern(
         "tablist.max-no-color",
-        " (?<crop>[\\w ]+) (?<tier>\\d+): MAX"
+        " (?<crop>[\\w ]+) (?<tier>\\d+): MAX",
     )
 
     /**
@@ -345,7 +345,7 @@ object CropMilestonesApi {
             messages.joinToString("\n"),
             { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
             "Click to copy!",
-            prefix = false
+            prefix = false,
         )
 
         val message = "§e§lYou have reached your milestone goal of §b§l$customGoalLevel " +
@@ -414,9 +414,9 @@ object CropMilestonesApi {
     @HandleEvent
     fun onAchievementRegistered(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Expert Gardener".asComponent(),
-            "Get a crop milestone to level 500".asComponent(),
-            15f,
+            name = "Expert Gardener",
+            description = "Get a crop milestone to level 500",
+            userLuckAmount = 15f,
         )
         event.register(achievement, CROP_MILESTONE_ACHIEVEMENT)
     }

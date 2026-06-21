@@ -27,9 +27,9 @@ object BlizzardAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Weather Mastermind".asComponent(),
-            "Spawn a blizzard".asComponent(),
-            1f,
+            name = "Weather Mastermind",
+            description = "Spawn a blizzard",
+            userLuckAmount = 1f,
         )
         event.register(achievement, BLIZZARD_ACHIEVEMENT)
     }

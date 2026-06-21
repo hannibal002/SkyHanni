@@ -21,9 +21,9 @@ object NpcSellLimitAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Bankrolled by NPCs".asComponent(),
-            "Steal 500mil coins from an NPC in one day".asComponent(),
-            20f,
+            name = "Bankrolled by NPCs",
+            description = "Steal 500mil coins from an NPC in one day",
+            userLuckAmount = 20f,
         )
         event.register(achievement, NPC_SELL_LIMIT_ACHIEVEMENT)
     }

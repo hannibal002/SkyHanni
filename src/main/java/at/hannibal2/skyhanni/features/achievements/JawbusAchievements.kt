@@ -15,9 +15,9 @@ object JawbusAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Lord Almighty".asComponent(),
-            "Double Hook a Lord Jawbus".asComponent(),
-            20f,
+            name = "Lord Almighty",
+            description = "Double Hook a Lord Jawbus",
+            userLuckAmount = 20f,
         )
         event.register(achievement, JAWBUS_ACHIEVEMENT)
     }

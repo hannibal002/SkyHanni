@@ -17,9 +17,10 @@ object PleadAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            pleadComponent,
-            pleadComponent,
-            secret = true
+            name = pleadComponent,
+            description = pleadComponent,
+            secret = true,
+            userLuckAmount = 1f,
         )
         event.register(achievement, PLEAD_ACHIEVEMENT)
     }

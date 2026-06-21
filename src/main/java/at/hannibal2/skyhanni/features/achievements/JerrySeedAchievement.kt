@@ -19,9 +19,9 @@ object JerrySeedAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Jerry".asComponent(),
-            "Make an Unripe Jerryseed do 5x damage".asComponent(),
-            -1f,
+            name = "Jerry",
+            description = "Make an Unripe Jerryseed do 5x damage",
+            userLuckAmount = -1f,
         )
         event.register(achievement, JERRYSEED_ACHIEVEMENT)
     }

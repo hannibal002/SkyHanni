@@ -25,9 +25,9 @@ object SealAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Seal Lookalike".asComponent(),
-            "Bounce a ball 100 times".asComponent(),
-            1f,
+            name = "Seal Lookalike",
+            description = "Bounce a ball 100 times",
+            userLuckAmount = 1f,
         )
         event.register(achievement, SEAL_BOUNCE_ACHIEVEMENT)
     }

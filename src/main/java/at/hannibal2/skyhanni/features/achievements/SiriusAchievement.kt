@@ -24,9 +24,9 @@ object SiriusAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Adopted by Sirius".asComponent(),
-            "Buy 20 items from Sirius".asComponent(),
-            20f,
+            name = "Adopted by Sirius",
+            description = "Buy 20 items from Sirius",
+            userLuckAmount = 20f,
         )
         event.register(achievement, DA_ACHIEVEMENT)
     }

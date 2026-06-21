@@ -15,7 +15,7 @@ object SowdustAchievement {
 
     private val maxSowdustPattern by AchievementManager.group.pattern(
         "sowdust",
-        " - 250,000,000 Sowdust"
+        " - 250,000,000 Sowdust",
     )
 
     private const val SOWDUST_ACHIEVEMENT = "sowdust"
@@ -24,9 +24,9 @@ object SowdustAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Funky Tasting Chips".asComponent(),
-            "Put maximum seasoning on your chips".asComponent(),
-            50f,
+            name = "Funky Tasting Chips",
+            description = "Put maximum seasoning on your chips",
+            userLuckAmount = 50f,
         )
         event.register(achievement, SOWDUST_ACHIEVEMENT)
     }

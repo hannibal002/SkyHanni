@@ -18,9 +18,9 @@ object SuperpairsAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "\"Memorisation\" Professional".asComponent(),
-            "Wow! You have such good memory".asComponent(),
-            2f,
+            "\"Memorisation\" Professional",
+            "Wow! You have such good memory",
+            userLuckAmount = 2f,
         )
         event.register(achievement, CHRONOMATRON_ACHIEVEMENT)
     }

@@ -15,9 +15,9 @@ object DianaAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "That was that book...".asComponent(),
-            "Die to an Inquisitor".asComponent(),
-            5f,
+            name = "That was that book...",
+            description = "Die to an Inquisitor",
+            userLuckAmount = 5f,
         )
         event.register(achievement, INQ_ACHIEVEMENT)
     }

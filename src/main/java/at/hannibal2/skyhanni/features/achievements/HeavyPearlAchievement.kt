@@ -28,8 +28,8 @@ object HeavyPearlAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Triple Pearls".asComponent(),
-            "Have the Matriarch Cub attribute trigger 3 times".asComponent(),
+            name = "Triple Pearls",
+            description = "Have the Matriarch Cub attribute trigger 3 times",
             userLuckAmount = 30f,
         )
         event.register(achievement, HEAVY_PEARL_ACHIEVEMENT)

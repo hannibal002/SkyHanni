@@ -15,9 +15,9 @@ object ChimeraAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Pet Symbiosis".asComponent(),
-            "Make your weapon gain all the stats of your pet".asComponent(),
-            25f,
+            name = "Pet Symbiosis",
+            description = "Make your weapon gain all the stats of your pet",
+            userLuckAmount = 25f,
         )
         event.register(achievement, CHIMERA_ACHIEVEMENT)
     }
