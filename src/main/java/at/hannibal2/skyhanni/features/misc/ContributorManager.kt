@@ -212,7 +212,7 @@ object ContributorManager {
             return
         }
         ChatUtils.clickableLinkChat(
-            "If you need support, please do not contact contributors directly. \n" +
+            "If you need support, please do not contact contributors directly.\n" +
                 "You can report issues or get help on the SkyHanni Discord.\n ",
             "https://discord.gg/skyhanni-997079228510117908",
             prefixColor = "§c"
