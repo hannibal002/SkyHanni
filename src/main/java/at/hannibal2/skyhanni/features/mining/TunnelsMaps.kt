@@ -221,7 +221,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         event.slot ?: return
         clickTranslate[event.slot.containerSlot]?.let {
-            event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
+            event.toolTip.add("§e§lRight Click §r§efor Tunnel Maps.")
         }
     }
 

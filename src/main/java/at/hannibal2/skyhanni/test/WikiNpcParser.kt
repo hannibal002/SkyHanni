@@ -39,36 +39,47 @@ object WikiNpcParser {
 
         for (line in text.lines()) {
             val trimmed = line.trim()
+
             if (trimmed == "Removed NPCs") break
 
             val mappedIsland = sectionToIsland[trimmed]
-                ?: if (trimmed.contains("⏣ Dwarven Mines") ||
+                ?: if (
+                    trimmed.contains("⏣ Dwarven Mines") ||
                     trimmed.contains("\u23E3 Dwarven Mines")
-                    ) IslandType.DWARVEN_MINES else null
+                ) {
+                    IslandType.DWARVEN_MINES
+                } else {
+                    null
+                }
 
             if (mappedIsland != null) {
                 currentIsland = mappedIsland
-                continue
+            } else if (currentIsland != null) {
+                parseLine(line, currentIsland, result)
             }
-
-            val island = currentIsland ?: continue
-
-            if (!line.startsWith("\t")) continue
-
-            val fields = line.split("\t").map { it.trim() }
-            if (fields.size < 5) continue
-
-            val name = fields.getOrNull(1)?.takeIf { it.isNotBlank() } ?: continue
-            if (name.toDoubleOrNull() != null) continue
-            if (name == "Name") continue
-
-            val coords = findCoordinateTriple(fields) ?: continue
-
-            result.getOrPut(island) { mutableMapOf() }[name] = coords
         }
 
         println("parsed ${result.values.sumOf { it.size }} npcs from ${result.size} islands")
         return result
+    }
+
+    private fun parseLine(
+        line: String,
+        currentIsland: IslandType,
+        result: MutableMap<IslandType, MutableMap<String, LorenzVec>>,
+    ) {
+        if (!line.startsWith("\t")) return
+
+        val fields = line.split("\t").map { it.trim() }
+        if (fields.size < 5) return
+
+        val name = fields.getOrNull(1)?.takeIf { it.isNotBlank() } ?: return
+        if (name.toDoubleOrNull() != null) return
+        if (name == "Name") return
+
+        val coords = findCoordinateTriple(fields) ?: return
+
+        result.getOrPut(currentIsland) { mutableMapOf() }[name] = coords
     }
 
     private fun findCoordinateTriple(fields: List<String>): LorenzVec? {
