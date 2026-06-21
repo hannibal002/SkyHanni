@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -24,7 +24,7 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    fun getBezierFitterCount(): Int { return bezierFitter.count() }
+    fun getBezierFitterCount() = bezierFitter.count()
 
     private var lastGuess: GuessEntry? = null
 
@@ -86,7 +86,7 @@ object PreciseGuessBurrow {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
-        if (event.clickType != ClickType.RIGHT_CLICK) {
+        if (event.clickType != InteractClickType.RIGHT_CLICK) {
             DelayedRun.runOrNextTick { GriffinBurrowHelper.removeInaccurateIfLooking() }
             return
         }

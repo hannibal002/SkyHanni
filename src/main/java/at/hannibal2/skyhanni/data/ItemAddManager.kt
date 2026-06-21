@@ -133,7 +133,7 @@ object ItemAddManager {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebugrecentitemadds") {
-            description = "Shows recent item addions."
+            description = "Shows recent item additions."
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
                 ChatUtils.clickToClipboard("Recent Item adds", formattedList())
