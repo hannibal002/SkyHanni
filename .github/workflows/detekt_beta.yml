@@ -6,6 +6,11 @@ on:
             - "beta"
         paths-ignore:
             - ".gitignore"
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     detekt:
         name: Run detekt
