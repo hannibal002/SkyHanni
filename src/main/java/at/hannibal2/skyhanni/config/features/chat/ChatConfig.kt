@@ -65,14 +65,11 @@ class ChatConfig {
 
     @Expose
     @ConfigOption(
-        name = "Copy Chat",
-        desc = "Right click a chat message to copy it. Holding Shift will copy the message with " +
-            "Shwords applied, and holding Ctrl will copy only one line.",
+        name = "Copy Chat", desc = "",
     )
     @SearchTag("control")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var copyChat: Boolean = false
+    @Accordion
+    val copyChat: CopyChatConfig = CopyChatConfig()
 
     @Expose
     @ConfigOption(name = "Dungeon Boss Messages", desc = "Hide messages from the Watcher and bosses in Dungeons.")

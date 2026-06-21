@@ -21,7 +21,7 @@ object CopyChat {
     @JvmStatic
     fun handleCopyChat(mouseX: Int, mouseY: Int) {
         try {
-            if (!config) return
+            if (!config.copyChat) return
             processCopyChat(mouseX, mouseY)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error while copying chat line")
@@ -37,7 +37,7 @@ object CopyChat {
             KeyboardManager.isMenuKeyDown() ->
                 formatted.stripHypixelMessage() to "formatted message"
 
-            KeyboardManager.isShiftKeyDown() -> (
+            KeyboardManager.isShiftKeyDown() != config.copyFormattedMessage -> (
                 OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText))
                     .removeColor()
                 ) to "modified message"
@@ -68,7 +68,7 @@ object CopyChat {
         val matchingLines = chatGui.allMessages.filter {
             it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
         }
-
+// TODO Fix the bug where it copies the wrong line when SHWords modifies the line count
         return when {
             matchingLines.isEmpty() -> null
             matchingLines.size == 1 -> matchingLines.first()
