@@ -82,6 +82,7 @@ object GraphEditorBugFinder {
         }
     }
 
+    @Suppress("UnusedParameter")
     private fun checkHasSpawn(
         graph: Graph,
         errorsInWorld: MutableMap<GraphNode, String>,

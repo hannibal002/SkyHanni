@@ -23,11 +23,15 @@ class CropDisplay : EliteLeaderboardDisplayBase<CropType, EliteLeaderboardType.C
 
     override var currentMode: EliteLeaderboardMode
         get() = cropStorage?.mode ?: EliteLeaderboardMode.ALL_TIME
-        set(value) { cropStorage?.mode = value }
+        set(value) {
+            cropStorage?.mode = value
+        }
 
     override var currentEnum: CropType?
         get() = cropStorage?.enum
-        set(value) { cropStorage?.enum = value }
+        set(value) {
+            cropStorage?.enum = value
+        }
 
     override fun getDefaultEnum(): CropType? {
         return if (!config.display.hideWhenNotFarming) {
