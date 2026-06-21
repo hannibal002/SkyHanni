@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ErrorManagerJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,6 +29,7 @@ import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.minutes
 
 /** Crashes if [value] is false and in developer environment */
+@Suppress("unused")
 fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
 
 /** Crashes if [value] is false and in developer environment */
@@ -130,7 +130,7 @@ object ErrorManager {
         val achievement = Achievement(
             "I'm Helping!!!".asComponent(),
             "Copy an error message to the clipboard to help the developers fix it.".asComponent(),
-            100f
+            100f,
         )
         event.register(achievement, COPY_ERROR_ACHIEVEMENT)
     }
@@ -368,7 +368,7 @@ object ErrorManager {
         } catch (e: NullPointerException) {
             ChatUtils.chat(
                 "§cFailed to format error message! " +
-                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord."
+                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord.",
             )
             // can not use error manager inside error manager
             Error("Failed to format error message", e).printStackTrace()
