@@ -1006,7 +1006,7 @@ interface Renderable {
         private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
             val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
             val set = map.keys.toMutableSet()
-            if (map.filterNotNullValues.isEmpty()) {
+            if (map.filterNotNullValues().isEmpty()) {
                 if (textBox.isNotEmpty()) {
                     set.add(empty)
                 }
