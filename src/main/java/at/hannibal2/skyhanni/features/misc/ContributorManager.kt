@@ -302,8 +302,8 @@ object ContributorManager {
     }
 
     private fun isContributorMentionMessage(message: String): Boolean {
-        if (message.contains(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
-        if (message.contains(FOUND_WILD_CONTRIBUTOR)) return true
+        if (message.startsWith(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
+        if (message.startsWith(FOUND_WILD_CONTRIBUTOR)) return true
 
         val msg = message.lowercase()
         return contribMentionPattern.find(msg)

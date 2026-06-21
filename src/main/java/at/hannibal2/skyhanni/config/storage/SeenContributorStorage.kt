@@ -5,7 +5,7 @@ import com.google.gson.annotations.Expose
 import java.util.UUID
 
 class SeenContributorStorage {
-    // uuid to first seen timestamp in milliseconds
+    // uuid to first seen timestamp
     @Expose
     val seenContributors: MutableMap<UUID, SimpleTimeMark> = mutableMapOf()
 

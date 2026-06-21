@@ -114,7 +114,7 @@ class DevConfig {
     @Expose
     @ConfigOption(
         name = "Contributor Fangirling Tracker",
-        desc = "Tracks how many times you have been noticed as a contributor by a player",
+        desc = "Tracks how many times you have been noticed as a contributor by a player.",
     )
     @ConfigEditorBoolean
     var contributorMentionTracker: Boolean = true
