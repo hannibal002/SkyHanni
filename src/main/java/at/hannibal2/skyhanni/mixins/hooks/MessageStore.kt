@@ -1,3 +1,5 @@
+@file:Suppress("NoEmptyFile")
+
 package at.hannibal2.skyhanni.mixins.hooks
 
 //? if < 26.1 {
@@ -7,14 +9,15 @@ interface MessageStore {
 
     fun `skyhanni$getParent`(): GuiMessage? = throw UnsupportedOperationException("Implemented via mixin")
 
-    fun `skyhanni$setParent`(parent: GuiMessage?): Unit {
+    fun `skyhanni$setParent`(parent: GuiMessage?) {
         throw UnsupportedOperationException("Implemented via mixin")
     }
 
-    var `skyhanni$parent`: GuiMessage?
+    // Kotlin-only accessor
+    @get:JvmSynthetic
+    @set:JvmSynthetic
+    var parent: GuiMessage?
         get() = `skyhanni$getParent`()
-        set(parent) {
-            `skyhanni$setParent`(parent)
-        }
+        set(parent) { `skyhanni$setParent`(parent) }
 }
 *///?}

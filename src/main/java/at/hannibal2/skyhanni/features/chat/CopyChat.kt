@@ -68,7 +68,6 @@ object CopyChat {
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, mc.gui.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
-        //~ if < 26.1 'parent' -> '`skyhanni$parent`'
         return visibleLine.parent
     }
 
