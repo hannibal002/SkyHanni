@@ -19,6 +19,7 @@ object SkyHanniVertexFormats {
         (0 until VertexFormatElement.MAX_COUNT).filter { VertexFormatElement.byId(it) != null }.max()
     }
 
+    @Suppress("UnusedPrivateProperty")
     internal enum class VertexElement(
         private val index: Int = 0,
         private val type: VFEType = VFEType.FLOAT,
@@ -58,6 +59,7 @@ object SkyHanniVertexFormats {
      * @param count The number of components in the element (default is 4).
      * @return The registered VertexFormatElement, guaranteed to have a unique ID.
      */
+    @Suppress("UnusedParameter")
     private fun safeRegister(
         desiredId: Int,
         index: Int = 0,
