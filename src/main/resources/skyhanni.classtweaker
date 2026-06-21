@@ -100,8 +100,8 @@ mutable field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 
 inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
-inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
-inject-interface net/minecraft/client/multiplayer/chat/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
+#? if < 26.1
+#inject-interface net/minecraft/client/multiplayer/chat/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageStore
 inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
