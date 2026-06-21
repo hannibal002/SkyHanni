@@ -303,8 +303,8 @@ object ErrorManager {
         return this == ErrorState.LOGGED
     }
 
-    @HandleEvent(ClientConnectEvent::class)
-    fun onClientConnect() {
+    @HandleEvent
+    fun onConnect() {
         if (errorsToShowOnJoin.isEmpty()) return
         val label = getLabel()
         val state = if (MinecraftData.hasLeftMainScreen) "During startup" else "While not on a server"
@@ -366,7 +366,10 @@ object ErrorManager {
                 }
             }
         } catch (e: NullPointerException) {
-            ChatUtils.chat("§cFailed to format error message! Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord.")
+            ChatUtils.chat(
+                "§cFailed to format error message! " +
+                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord."
+            )
             // can not use error manager inside error manager
             Error("Failed to format error message", e).printStackTrace()
         }
