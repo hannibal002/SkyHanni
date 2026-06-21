@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
 import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.math.max
@@ -131,7 +132,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         return false
     }
 
-    override fun keyboardInput(): Boolean {
+    override fun keyboardInput(event: KeyboardEvent): Boolean {
         return false
     }
 
