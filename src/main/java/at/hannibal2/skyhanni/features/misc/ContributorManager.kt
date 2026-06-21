@@ -225,9 +225,8 @@ object ContributorManager {
                 ChatUtils.chat {
                     append("Seen contributors (${seenContributors.size}):\n")
                     appendWithColor(
-                        seenContributors.keys
-                            .mapNotNull(::getDisplayNameFromUUID)
-                            .joinToString("\n"),
+                        seenContributors.keys.joinToString("\n")
+                            { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() },
                         ChatFormatting.AQUA,
                     )
                 }
