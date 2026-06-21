@@ -9,7 +9,7 @@ class SeenContributorStorage {
     @Expose
     val seenContributors: MutableMap<UUID, SimpleTimeMark> = mutableMapOf()
 
-    // Records of timestamps when a skyhanni contributor was recognized
+    // Records of timestamps when a Skyhanni contributor was recognized
     @Expose
     val contributorMentions: MutableList<SimpleTimeMark> = mutableListOf()
 }

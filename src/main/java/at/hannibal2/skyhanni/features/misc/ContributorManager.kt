@@ -55,8 +55,7 @@ object ContributorManager {
     var contributorNames = emptyList<String>()
         private set
     private var namesToUuid = emptyMap<String, UUID>()
-    var isContributor: Boolean? = null
-        private set
+    private var isContributor: Boolean? = null
 
     private val seenContributors get() = SkyHanniMod.seenContributorStorage.seenContributors
     private val contributorMentions get() = SkyHanniMod.seenContributorStorage.contributorMentions
