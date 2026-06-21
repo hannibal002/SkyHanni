@@ -11,14 +11,21 @@ on:
             - "**"
         paths-ignore:
             - ".gitignore"
-    workflow_dispatch:
+    workflow_dispatch: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 permissions:
     contents: read
+
 jobs:
     build:
         runs-on: ubuntu-latest
-        name: "Build and test"
+        name: Build and test
         strategy:
+            fail-fast: false
             matrix:
                 minecraft_version:
                     - "1.21.11"
@@ -44,8 +51,8 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v7
-                name: Upload development build
+            -   name: Upload development build
+                uses: actions/upload-artifact@v7
                 with:
                     path: build/libs/SkyHanni-*-mc${{ matrix.minecraft_version }}.jar
                     archive: false
@@ -59,10 +66,21 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:test
-            -   uses: actions/upload-artifact@v7
-                name: "Upload test report"
+            -   name: Upload test report
+                uses: actions/upload-artifact@v7
                 if: ${{ !cancelled() }}
                 with:
-                    name: "Test Results (${{ matrix.minecraft_version }})"
+                    name: Test Results (${{ matrix.minecraft_version }})
                     path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
                     if-no-files-found: warn
+
+    verify:
+        runs-on: ubuntu-latest
+        name: Verify build results
+        needs: build
+        if: always()
+        steps:
+            -   name: Check matrix result
+                uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # release/v1
+                with:
+                    jobs: ${{ toJSON(needs) }}

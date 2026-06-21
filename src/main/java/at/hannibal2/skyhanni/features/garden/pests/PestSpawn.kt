@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -27,29 +27,32 @@ object PestSpawn {
     /**
      * REGEX-TEST: GROSS! A ൠ Pest has appeared in Plot - S 4!
      * REGEX-TEST: GROSS! A ൠ Pest has appeared in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! A ൠ Pest has appeared in Plot - 67!
      */
     private val onePestPattern by patternGroup.list(
         "one.colorless",
-        ".*! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
-        ".*! A ൠ Pest has appeared in (?<plot>The Barn)!",
+        "^\\w+! A ൠ Pest has appeared in Plot - (?<plot>.*)!",
+        "^\\w+! A ൠ Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
      * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in Plot - 14!
      * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: YUCK! 6 ൠ Pest have spawned in Plot - 7!
      */
     private val multiplePestsPattern by patternGroup.list(
         "multiple.colorless",
-        ".*! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
-        ".*! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
+        "^\\w+! (?<amount>\\d) ൠ Pests? have spawned in Plot - (?<plot>.*)!",
+        "^\\w+! (?<amount>\\d) ൠ Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
      * REGEX-TEST: GROSS! While you were offline, ൠ Pest spawned in Plots 12, 9, 5, 11 and 3!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! While you were offline, ൠ Pest spawned in Plots 6 and 7!
      */
     private val offlinePestsPattern by patternGroup.pattern(
         "offline.colorless",
-        ".*! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
+        "^\\w+! While you were offline, ൠ Pests? spawned in Plots (?<plots>.*)!",
     )
 
     /**
@@ -61,7 +64,7 @@ object PestSpawn {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    fun onChat(event: SystemMessageEvent.Allow) {
         val message = event.cleanMessage
         var blocked = false
 
