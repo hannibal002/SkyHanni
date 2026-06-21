@@ -75,6 +75,7 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("[", "\\[")
     .replace("<", "&lt;")
     .replace(">", "&gt;")
+    .replace("@", "&#64;")
 
 fun buildBody(findings: List<Finding>, inlinePosted: Boolean): String = buildString {
     appendLine("## Detekt found ${findings.size} issue(s)\n")
