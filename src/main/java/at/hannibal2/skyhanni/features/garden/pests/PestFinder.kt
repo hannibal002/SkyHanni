@@ -151,7 +151,7 @@ object PestFinder {
     private fun shouldShowBasedOnHeldItem(): Boolean {
         return when (config.whenToShow) {
             WhenToShow.ALWAYS -> true
-            WhenToShow.BOTH -> PestApi.hasVacuumInHand() || PestApi.hasLassoInHand()
+            WhenToShow.BOTH -> PestApi.hasVacuumOrLassoInHand()
             WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> PestApi.hasVacuumInHand()
             WhenToShow.ONLY_WITH_LASSO_IN_HAND -> PestApi.hasLassoInHand()
         }

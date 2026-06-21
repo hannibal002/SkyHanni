@@ -31,7 +31,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
@@ -48,7 +47,7 @@ object EntityUtils {
     inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
-    @Deprecated("Use Mob Detection Instead")
+    @Legacy("Use Mob Detection Instead")
     fun LivingEntity.hasNameTagWith(
         y: Int,
         contains: String,
@@ -67,7 +66,7 @@ object EntityUtils {
         return list
     }
 
-    @Deprecated("Use Mob Detection Instead")
+    @Legacy("Use Mob Detection Instead")
     fun LivingEntity.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
@@ -75,7 +74,7 @@ object EntityUtils {
         it.name.string.contains(contains)
     }
 
-    @Deprecated("Use Mob Detection Instead")
+    @Legacy("Use Mob Detection Instead")
     fun LivingEntity.getNameTagWith(
         y: Int,
         contains: String,
@@ -84,7 +83,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): ArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
-    @Deprecated("Use Mob Detection Instead")
+    @Legacy("Use Mob Detection Instead")
     fun LivingEntity.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -114,10 +113,10 @@ object EntityUtils {
         return getEntitiesInBoundingBox<ArmorStand>(alignedBB)
     }
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Legacy("Old. Instead use entity detection feature instead.")
     fun LivingEntity.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Legacy("Old. Instead use entity detection feature instead.")
     fun LivingEntity.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (ElectionApi.isDerpy) 2.0 else if (ElectionApi.isAura) 1.1 else 1.0
         if (maxHealth == (health * derpyMultiplier).toInt()) return true
@@ -134,14 +133,10 @@ object EntityUtils {
         return false
     }
 
-    fun Player.getSkinTexture(): String? {
-        val gameProfile = gameProfile ?: return null
-
-        return gameProfile.properties.entries()
-            .filter { it.key == "textures" }
-            .map { it.value }
-            .firstOrNull { it.name == "textures" }?.value
-    }
+    internal fun Player.getSkinTexture(): String? = gameProfile.properties.entries()
+        .filter { it.key == "textures" }
+        .map { it.value }
+        .firstOrNull { it.name == "textures" }?.value
 
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
@@ -160,7 +155,7 @@ object EntityUtils {
 
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
 
-    @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
+    @Legacy("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun ArmorStand.hasSkullTexture(skin: String): Boolean {
         val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }
@@ -170,9 +165,9 @@ object EntityUtils {
     fun ArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
     fun ArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    fun Player.isNpc() = !isRealPlayer()
+    internal fun Player.isNpc() = !isRealPlayer()
 
-    fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    fun LivingEntity.getArmorInventory(): Array<SafeItemStack?>? {
         if (this !is Player) return null
         return buildList {
             add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
@@ -195,7 +190,7 @@ object EntityUtils {
     // and then filters both for entity type and with the predicate for entities inside those chunks.
     inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
+        return world.getEntitiesOfClass(E::class.java, aabb, predicate)
     }
 
     @AllEntitiesGetter
@@ -210,7 +205,7 @@ object EntityUtils {
         val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
         val blockEntityTickers = world.blockEntityTickers.let {
             if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
-        }.asSequence().filterNotNull()
+        }.asSequence()
 
         return blockEntityTickers.mapNotNull { invoker -> world.getBlockEntity(invoker.pos) }
     }

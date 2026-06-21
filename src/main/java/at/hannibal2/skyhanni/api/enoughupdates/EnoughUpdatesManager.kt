@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PrimitiveRecipe
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
@@ -31,20 +32,24 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import net.minecraft.nbt.StringTag
-import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.Items
-import net.minecraft.world.level.block.Blocks
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+//? if >= 26.1 {
+import at.hannibal2.skyhanni.utils.DeferredItemStack
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStackTemplate
+//?}
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -57,7 +62,7 @@ object EnoughUpdatesManager {
     private val loadingMutex = Mutex()
     private val itemMap = TreeMap<NeuInternalName, NeuItemJson>()
     private val internalNameSet: MutableSet<NeuInternalName> = mutableSetOf()
-    private val itemStackCache = mutableMapOf<NeuInternalName, ItemStack>()
+    private val itemStackCache = mutableMapOf<NeuInternalName, SafeItemStack>()
     private val displayNameCache = mutableMapOf<NeuInternalName, String>()
     private val recipesMap = HashMap<NeuInternalName, MutableSet<PrimitiveRecipe>>()
 
@@ -160,12 +165,12 @@ object EnoughUpdatesManager {
         if (inLoadingState()) null
         else itemMap[internalName]
 
-    fun stackToJson(stack: ItemStack): JsonObject {
+    fun stackToJson(stack: SafeItemStack): JsonObject {
         @Suppress("DEPRECATION")
         val lore = stack.getLore()
 
         val json = JsonObject()
-        json.addProperty("itemid", stack.item.getIdentifierString())
+        json.addProperty("itemid", stack.itemType.getIdentifierString())
         json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
         json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
 
@@ -177,23 +182,26 @@ object EnoughUpdatesManager {
         return json
     }
 
-    fun neuItemToStack(neuItem: NeuItemJson, useCache: Boolean = true, useReplacements: Boolean = false): ItemStack =
+    fun neuItemToStack(neuItem: NeuItemJson, useCache: Boolean = true, useReplacements: Boolean = false): SafeItemStack =
         neuItem.toStack(useCache, useReplacements)
 
     private fun NeuItemJson?.toStack(
         useCache: Boolean = true,
         useReplacements: Boolean = false,
-    ): ItemStack {
-        this ?: return ItemStack(Items.PAINTING)
+    ): SafeItemStack {
+        this ?: return SafeItemStack.EMPTY
 
         var usingCache = useCache && !useReplacements
         if (internalName.asString() == "_") usingCache = false
         if (usingCache) itemStackCache[internalName]?.let { return it.copy() }
 
-        val defaultStack = ItemStack(Blocks.AIR.asItem())
         val convertedItem = ComponentUtils.convertMinecraftIdToModern(itemId, damage ?: 0)
-        val baseItem = convertedItem.getVanillaItem() ?: return defaultStack
-        val stack = ItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return defaultStack
+        val baseItem = convertedItem.getVanillaItem() ?: return SafeItemStack.EMPTY
+
+        //? if >= 26.1 {
+        return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
+        //?} else {
+        /*val stack = SafeItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return SafeItemStack.EMPTY
 
         count?.let { stack.count = it }
         ComponentUtils.convertToComponents(stack, neuNbt)
@@ -217,9 +225,35 @@ object EnoughUpdatesManager {
 
         if (usingCache) itemStackCache[internalName] = stack
         return stack.copy()
+        *///?}
     }
 
-    private fun ItemStack?.getPetLoreReplacements(): Map<String, String> {
+    //? if >= 26.1 {
+    private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
+        val neuItemRef = this
+        val factory: () -> ItemStackTemplate = {
+            val freshStack = SafeItemStack(baseItem, countVal)
+            ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
+            var innerReplacements = emptyMap<String, String>()
+            if (useReplacements) {
+                innerReplacements = freshStack.getPetLoreReplacements()
+                neuItemRef.displayName?.let {
+                    var name = it
+                    for ((key, value) in innerReplacements) name = name.replace("{$key}", value)
+                    freshStack.setCustomItemName(name)
+                }
+            }
+            neuItemRef.lore.takeIfNotEmpty()?.let {
+                val componentLore = processLore(neuItemRef.lore, innerReplacements).map { line -> line.value.asComponent() }
+                freshStack.setLore(componentLore)
+            }
+            ItemStackTemplate.fromNonEmptyStack(freshStack)
+        }
+        return DeferredItemStack(baseItem, factory, countVal)
+    }
+    //?}
+
+    private fun SafeItemStack?.getPetLoreReplacements(): Map<String, String> {
         val petInfo = this?.getPetInfo() ?: return emptyMap()
         val properInternalName = petInfo.type
         // We let PetData do the heavy lifting of parsing the pet info

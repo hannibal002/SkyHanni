@@ -16,13 +16,13 @@ object SkullTextureHolder {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         skullTextures = event.getConstant<Map<String, String>>("Skulls").toMutableMap()
-        fixLateInits()
+    }
+
+    @HandleEvent
+    fun onComponentsLoaded() = DelayedRun.runNextTick {
+        // Any classes that rely on textures that cannot make use of by lazy or other late initializers
+        MiningEventType.fixGoblinItemStack()
     }
 
     fun getTexture(name: String): String = skullTextures[name] ?: ALEX_SKIN_TEXTURE
-
-    // Any classes that rely on textures that cannot make use of by lazy or other late initializers
-    private fun fixLateInits() = DelayedRun.runNextTick {
-        MiningEventType.fixGoblinItemStack()
-    }
 }

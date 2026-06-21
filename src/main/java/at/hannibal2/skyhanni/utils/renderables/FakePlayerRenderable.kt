@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.awt.Color
 import org.joml.Matrix3x2f
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.entity.LivingEntity
 
 fun Renderable.Companion.fakePlayer(
@@ -56,7 +56,7 @@ fun Renderable.Companion.fakePlayer(
 }
 
 private fun drawEntityWithoutScissor(
-    guiGraphics: GuiGraphics,
+    guiGraphics: GuiGraphicsExtractor,
     x1: Int,
     y1: Int,
     x2: Int,
@@ -67,5 +67,6 @@ private fun drawEntityWithoutScissor(
     mouseY: Float,
     entity: LivingEntity,
 ) {
-    InventoryScreen.renderEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
+    //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
+    InventoryScreen.extractEntityInInventoryFollowsMouse(guiGraphics, x1, y1, x2, y2, size, scale, mouseX, mouseY, entity)
 }
