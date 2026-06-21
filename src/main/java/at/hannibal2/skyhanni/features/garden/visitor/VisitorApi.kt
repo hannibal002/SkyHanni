@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 
 @SkyHanniModule
@@ -133,7 +133,7 @@ object VisitorApi {
     }
 
     class VisitorOffer(
-        val offerItem: ItemStack,
+        val offerItem: SafeItemStack,
     )
 
     class Visitor(
@@ -310,6 +310,17 @@ object VisitorApi {
         }
         event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
+        }
+        event.transform(134, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(
+                arrayOf(
+                    VisitorReward.VISITORS_GRATITUDE,
+                    VisitorReward.FARMING_CONTEST_DISPLAY,
+                    VisitorReward.ASTRONAUT_PERSONALITY,
+                    VisitorReward.FAST_FOOD_BARN_SKIN,
+                    VisitorReward.JELLY_GREENHOUSE_SKIN,
+                )
+            )
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")

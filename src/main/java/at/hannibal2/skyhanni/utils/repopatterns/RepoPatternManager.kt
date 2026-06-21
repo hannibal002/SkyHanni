@@ -57,8 +57,7 @@ object RepoPatternManager {
 
     private var wasPreInitialized = false
 
-    // idk what this is for
-    private const val insideTest = false
+    private val insideTest = runCatching { Class.forName("org.junit.jupiter.api.Test") }.isSuccess
 
     var inTestDuplicateUsage = true
 
@@ -80,7 +79,7 @@ object RepoPatternManager {
      * Crash if in a development environment.
      */
     private fun crash(reason: String) {
-        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
+        if (insideTest || PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
     }
 
     /**

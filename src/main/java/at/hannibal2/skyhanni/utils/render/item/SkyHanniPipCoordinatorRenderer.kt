@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
-import net.minecraft.client.gui.render.state.GuiRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.MultiBufferSource
 
 class SkyHanniPipCoordinatorRenderer(

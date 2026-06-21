@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
@@ -54,7 +55,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -191,7 +191,7 @@ object HideNotClickableItems {
 
     private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
 
-    private fun hide(chestName: String, stack: ItemStack): Boolean {
+    private fun hide(chestName: String, stack: SafeItemStack): Boolean {
         hideReason = ""
         showGreenLine = false
 
@@ -221,7 +221,7 @@ object HideNotClickableItems {
         }
     }
 
-    private fun hideFossilExcavator(stack: ItemStack): Boolean {
+    private fun hideFossilExcavator(stack: SafeItemStack): Boolean {
         if (!FossilExcavatorApi.inExcavatorMenu) return false
 
         showGreenLine = true
@@ -240,7 +240,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideResearchCenter(chestName: String, stack: ItemStack): Boolean {
+    private fun hideResearchCenter(chestName: String, stack: SafeItemStack): Boolean {
         if (chestName != "Research Center") return false
 
         showGreenLine = true
@@ -263,7 +263,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideRiftTransferChest(chestName: String, stack: ItemStack): Boolean {
+    private fun hideRiftTransferChest(chestName: String, stack: SafeItemStack): Boolean {
         if (chestName != "Rift Transfer Chest") return false
 
         showGreenLine = true
@@ -274,7 +274,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideRiftMotesGrubber(chestName: String, stack: ItemStack): Boolean {
+    private fun hideRiftMotesGrubber(chestName: String, stack: SafeItemStack): Boolean {
         if (!RiftApi.inRift()) return false
         if (chestName != "Motes Grubber" && !ShiftClickNpcSell.inInventory) return false
 
@@ -286,7 +286,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideComposter(stack: ItemStack): Boolean {
+    private fun hideComposter(stack: SafeItemStack): Boolean {
         if (!ComposterOverlay.isEnabled() || !ComposterOverlay.inInventory) return false
 
         showGreenLine = true
@@ -303,7 +303,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideYourEquipment(chestName: String, stack: ItemStack): Boolean {
+    private fun hideYourEquipment(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Your Equipment")) return false
 
         val list = listOf(
@@ -335,7 +335,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideAttributeFusion(chestName: String, stack: ItemStack): Boolean {
+    private fun hideAttributeFusion(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Attribute Fusion")) return false
 
         showGreenLine = true
@@ -346,7 +346,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
+    private fun hidePrivateIslandChest(stack: SafeItemStack): Boolean {
         if (!InventoryUtils.isInNormalChest()) return false
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
         if (!stack.isSoulbound()) return false
@@ -355,7 +355,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hidePotionBag(chestName: String, stack: ItemStack): Boolean {
+    private fun hidePotionBag(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Potion Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -370,7 +370,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideFishingBag(chestName: String, stack: ItemStack): Boolean {
+    private fun hideFishingBag(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Fishing Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -386,7 +386,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideSackOfSacks(chestName: String, stack: ItemStack): Boolean {
+    private fun hideSackOfSacks(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Sack of Sacks")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
@@ -398,7 +398,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideAccessoryBag(chestName: String, stack: ItemStack): Boolean {
+    private fun hideAccessoryBag(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Accessory Bag") && !chestName.startsWith("Accessory Bag (")) return false
         if (ItemUtils.isSkyBlockMenuItem(stack)) return false
 
@@ -409,7 +409,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideBasketOfSeeds(chestName: String, stack: ItemStack): Boolean {
+    private fun hideBasketOfSeeds(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Basket of Seeds")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -425,7 +425,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideNetherWartPouch(chestName: String, stack: ItemStack): Boolean {
+    private fun hideNetherWartPouch(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Nether Wart Pouch")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -439,7 +439,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideTrickOrTreatBag(chestName: String, stack: ItemStack): Boolean {
+    private fun hideTrickOrTreatBag(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("Trick or Treat Bag")) return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -453,7 +453,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
+    private fun hidePlayerTrade(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
         if ((HypixelData.noTrade && stack.isSoulbound()) || (!HypixelData.noTrade && stack.isAnySoulbound())) {
@@ -480,7 +480,7 @@ object HideNotClickableItems {
     }
 
     @Suppress("ReturnCount")
-    private fun hideNpcSell(stack: ItemStack): Boolean {
+    private fun hideNpcSell(stack: SafeItemStack): Boolean {
         if (RiftApi.inRift()) return false
         if (!ShiftClickNpcSell.inInventory) return false
         if (VisitorApi.inInventory) return false
@@ -520,7 +520,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideInStorage(chestName: String, stack: ItemStack): Boolean {
+    private fun hideInStorage(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.contains("Ender Chest") && !chestName.contains("Backpack") && chestName != "Storage") return false
 
         if (ItemUtils.isSkyBlockMenuItem(stack)) {
@@ -536,7 +536,7 @@ object HideNotClickableItems {
         return result
     }
 
-    private fun hideSalvage(chestName: String, stack: ItemStack): Boolean {
+    private fun hideSalvage(chestName: String, stack: SafeItemStack): Boolean {
         if (!chestName.equalsOneOf("Salvage Item", "Salvage Items")) return false
         showGreenLine = true
 
@@ -573,7 +573,7 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideBazaarOrAH(chestName: String, stack: ItemStack): Boolean {
+    private fun hideBazaarOrAH(chestName: String, stack: SafeItemStack): Boolean {
         val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
@@ -601,7 +601,7 @@ object HideNotClickableItems {
         return false
     }
 
-    private fun isNotAuctionable(stack: ItemStack): Boolean {
+    private fun isNotAuctionable(stack: SafeItemStack): Boolean {
         if (stack.isAnySoulbound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
