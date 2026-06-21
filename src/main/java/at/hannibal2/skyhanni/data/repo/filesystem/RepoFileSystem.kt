@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.RepoLogger
 import com.google.gson.JsonElement
-import java.io.File
 import org.apache.commons.compress.archivers.ArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream
+import java.io.File
 
 private const val MAX_EMPTY_TGZ_ENTRIES = 10
 
