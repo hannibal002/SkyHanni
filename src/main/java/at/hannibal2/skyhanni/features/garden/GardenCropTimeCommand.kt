@@ -23,41 +23,35 @@ object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
 
-    private fun onCommand(args: Array<String>) {
+    private fun onCommand(amount: Int, item: String) {
         if (!config.display) {
             ChatUtils.userError("Command /shcroptime requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 
-        if (args.size < 2) {
-            ChatUtils.userError("Usage: /shcroptime <amount> <item>")
-            return
-        }
-
-        val amount = args[0].formatLongOrUserError() ?: return
         val multipliers = CropMoneyDisplay.multipliers
         if (multipliers.isEmpty()) {
             ChatUtils.userError("Data not loaded yet. Join the garden and display the money per hour display.")
             return
         }
 
-        val rawSearchName = args.toMutableList().drop(1).joinToString(" ")
-        val searchName = rawSearchName.lowercase()
+        val searchName = item.lowercase()
+        val amountLong = amount.toLong()
 
         val map = mutableMapOf<String, Long>()
         for (entry in multipliers) {
             val internalName = entry.key
             val itemName = internalName.repoItemName
-            if (itemName.removeColor().lowercase().contains(searchName)) {
+            if (itemName.lowercase().contains(searchName)) {
                 val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
                 val baseName = baseId.repoItemName
-                val crop = CropType.getByName(baseName.removeColor())
+                val crop = CropType.getByName(baseName)
 
-                val fullAmount = baseAmount.toLong() * amount
+                val fullAmount = baseAmount.toLong() * amountLong
                 val text = if (baseAmount == 1) {
-                    "§e${amount.addSeparators()}x $itemName"
+                    "§e${amountLong.addSeparators()}x $itemName"
                 } else {
-                    "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
+                    "§e${amountLong.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
                 }
 
                 val speed = crop.getSpeed()
@@ -72,7 +66,7 @@ object GardenCropTimeCommand {
         }
 
         if (map.isEmpty()) {
-            ChatUtils.userError("No crop item found for '$rawSearchName'.")
+            ChatUtils.chat("Crop Speed for ${map.size} items:\n" + map.sorted().keys.joinToString("\n"))
             return
         }
 
@@ -94,7 +88,7 @@ object GardenCropTimeCommand {
                         CropMoneyDisplay.multipliers.keys.map { it.repoItemName.removeColor().lowercase() }
                     }
                 ) { item ->
-                    onCommand(arrayOf(getArg(amountArg).toString(), item))
+                    onCommand(getArg(amountArg), item)
                 }
             }
         }
