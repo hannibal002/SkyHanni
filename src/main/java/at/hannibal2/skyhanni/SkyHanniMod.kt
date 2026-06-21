@@ -45,7 +45,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
