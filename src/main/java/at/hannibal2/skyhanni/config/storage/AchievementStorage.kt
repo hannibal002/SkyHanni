@@ -5,5 +5,5 @@ import com.google.gson.annotations.Expose
 
 class AchievementStorage {
     @Expose
-    var achievements: MutableMap<String, Achievement> = mutableMapOf()
+    val achievements: MutableMap<String, Achievement> = mutableMapOf()
 }

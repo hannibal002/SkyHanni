@@ -52,7 +52,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
-    private val cooldownOverMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"
@@ -158,7 +158,9 @@ object PestSpawnTimer {
         if (shouldRepeatWarning) {
             countdownTitleContext?.stop()
             countdownTitleContext = null
-            if (!pestCooldownEndTime.isInPast()) {
+            if (pestCooldownEndTime.isInPast()) {
+                shouldRepeatWarning = false
+            } else {
                 countdownWarn(pestCooldownEndTime.timeUntil())
             }
         }
@@ -286,6 +288,7 @@ object PestSpawnTimer {
             option = config::cooldownOverWarning,
             messageId = cooldownOverMessageId,
         )
+        hasWarned = true
         hasReminderShown = true
 
         if (config.repeatWarning) {
