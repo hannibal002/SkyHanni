@@ -41,7 +41,7 @@ object ContributorManager {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to parse contributor UUID",
-                    "key" to it.key, "value" to it.value
+                    "key" to it.key, "value" to it.value,
                 )
                 null
             }
@@ -72,7 +72,8 @@ object ContributorManager {
                     withColor(TextHelper.chromaStyle)
                 }
                 append("contributor")
-            }
+            },
+            userLuckAmount = 0f,
         )
         event.register(achievement, CONTRIBUTOR_ACHIEVEMENT)
     }
