@@ -77,12 +77,12 @@ object ApiInternalUtils {
         .build()
 
     /**
-     * Driving logic for fetching a Zip response from the Api.
-     * @param this The [ApiStaticPath] to fetch the Zip response from.
-     * @param file The [File] to save the Zip response to.
-     * @return A [ZipApiResponse] containing the result of the request.
+     * Driving logic for fetching a Binary response from the Api.
+     * @param this The [ApiStaticPath] to fetch the Binary response from.
+     * @param file The [File] to save the Binary response to.
+     * @return A [BinaryApiResponse] containing the result of the request.
      */
-    internal suspend fun ApiStaticPath.internalGetZipResponse(file: File): ZipApiResponse = withZipHttpClient<HttpGet>(file)
+    internal suspend fun ApiStaticPath.internalGetBinaryResponse(file: File): BinaryApiResponse = withBinaryHttpClient<HttpGet>(file)
 
     /**
      * Driving logic for posting a JSON body to the Api.
@@ -116,8 +116,8 @@ object ApiInternalUtils {
      * Generic method to execute an Api request using the provided HttpClient.
      * Executes the given Api intention and returns an [Res] (ApiResponse subtype).
      * If the request fails, it will call the exceptionHandler with the error.
-     * @param Res The type of ApiResponse expected (e.g., [ZipApiResponse] or [JsonApiResponse]).
-     * @param T The type of data expected in the ApiResponse (e.g., [Long] for Zip responses or [JsonElement] for JSON responses).
+     * @param Res The type of ApiResponse expected (e.g., [BinaryApiResponse] or [JsonApiResponse]).
+     * @param T The type of data expected in the ApiResponse (e.g., [Long] for Binary responses or [JsonElement] for JSON responses).
      * @param Req The type of HttpRequestBase to be used (e.g., [HttpGet] or [HttpPost]).
      * @param requestFactory Creates the HttpRequestBase for the Api request.
      * @param entityHandler Processes the HttpEntity from the response and returns data of type [T].
@@ -180,20 +180,20 @@ object ApiInternalUtils {
 
     /**
      * See [withHttpClient] for general field definitions.
-     * Specific to fetching a Zip response and saving it to a file.
-     * Executes the given Api intention and returns a ZipApiResponse.
+     * Specific to fetching a Binary response and saving it to a file.
+     * Executes the given Api intention and returns a BinaryApiResponse.
      * @param Req The type of HttpRequestBase to be used (e.g., [HttpGet]).
      * @param this The [ApiStaticPath] to execute on the client.
-     * @param file The [File] to save the Zip response to.
-     * @return A [ZipApiResponse] containing the result of the request.
+     * @param file The [File] to save the Binary response to.
+     * @return A [BinaryApiResponse] containing the result of the request.
      */
-    internal suspend inline fun <reified Req : HttpRequestBase> ApiStaticPath.withZipHttpClient(
+    internal suspend inline fun <reified Req : HttpRequestBase> ApiStaticPath.withBinaryHttpClient(
         file: File,
         crossinline entityHandler: (HttpEntity?) -> Long? = { it.readEntityToFile(file) },
         crossinline requestFactory: ApiStaticPath.() -> Req = {
             buildRequest { addHeader("Accept-Encoding", "gzip") }
         }
-    ): ZipApiResponse = withHttpClient(requestFactory, entityHandler, ::ZipApiResponse)
+    ): BinaryApiResponse = withHttpClient(requestFactory, entityHandler, ::BinaryApiResponse)
 
     /**
      * The default method to fetch an [HttpEntity] from a [CloseableHttpResponse] (this).

@@ -8,7 +8,7 @@ import com.google.gson.JsonElement
  * @param success Indicates whether the Api request was successful.
  * @param message A message describing the result of the Api request, can be null if the request was successful.
  * @param data The data of type [T] returned by the Api request, can be null if the request was unsuccessful or if no data was returned.
- * This class is used as a base class for more specific Api responses like [ZipApiResponse] and [JsonApiResponse].
+ * This class is used as a base class for more specific Api responses like [BinaryApiResponse] and [JsonApiResponse].
  */
 open class ApiResponse<T> (open val success: Boolean, open val message: String?, open var data: T? = null) {
 
@@ -32,7 +32,7 @@ open class ApiResponse<T> (open val success: Boolean, open val message: String?,
  * @param data The [Long] representing the number of bytes written to the [java.io.File],
  *  can be null if the request was unsuccessful or if no data was returned.
  */
-data class ZipApiResponse(
+data class BinaryApiResponse(
     override val success: Boolean,
     override val message: String? = null,
     override var data: Long? = null,

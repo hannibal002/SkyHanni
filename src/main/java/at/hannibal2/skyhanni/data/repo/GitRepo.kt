@@ -48,7 +48,7 @@ class GitRepo(
             if (shouldError) {
                 SkyHanniMod.logger.info("Downloading $shaToUse for $location\nUrl: $fullArchiveUrl")
             }
-            ApiUtils.getZipResponse(destinationTgz, fullArchiveUrl, location, !shouldError)
+            ApiUtils.getBinaryResponse(destinationTgz, fullArchiveUrl, location, !shouldError)
             true
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Failed to download tar.gz from $fullArchiveUrl")
