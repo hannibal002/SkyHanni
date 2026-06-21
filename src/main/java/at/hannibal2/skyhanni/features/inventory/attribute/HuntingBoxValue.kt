@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HuntingBoxValue {
@@ -72,7 +72,7 @@ object HuntingBoxValue {
         addString("§cThen send the data on discord.")
     }
 
-    private fun processAttributeShardSlot(slotNumber: Int, stack: ItemStack, table: MutableList<DisplayTableEntry>) {
+    private fun processAttributeShardSlot(slotNumber: Int, stack: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val internalName = stack.getInternalNameOrNull() ?: return
 
         val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {

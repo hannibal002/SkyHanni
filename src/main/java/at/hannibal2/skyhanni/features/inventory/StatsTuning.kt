@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object StatsTuning {
@@ -44,7 +44,7 @@ object StatsTuning {
         if (config.points && inventoryName == "Stats Tuning") points(stack, event)
     }
 
-    private fun templateStats(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
+    private fun templateStats(stack: SafeItemStack, event: RenderInventoryItemTipEvent): Boolean {
         if (stack.hoverName.string != "Load") return false
 
         var grab = false
@@ -72,7 +72,7 @@ object StatsTuning {
         return true
     }
 
-    private fun renderTunings(stack: ItemStack, event: RenderInventoryItemTipEvent): Boolean {
+    private fun renderTunings(stack: SafeItemStack, event: RenderInventoryItemTipEvent): Boolean {
         if (stack.hoverName.string != "Stats Tuning") return false
         val tunings = MaxwellApi.tunings ?: return false
 
@@ -89,7 +89,7 @@ object StatsTuning {
         return true
     }
 
-    private fun points(stack: ItemStack, event: RenderInventoryItemTipEvent) {
+    private fun points(stack: SafeItemStack, event: RenderInventoryItemTipEvent) {
         statPointsPattern.firstMatcher(stack.getLore()) {
             val points = group("amount")
             event.stackTip = points
