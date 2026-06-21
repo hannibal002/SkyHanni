@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -22,7 +22,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
@@ -134,7 +133,7 @@ object GardenCustomKeybinds {
     }
 
     private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+        this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
         key.value != override
@@ -159,7 +158,7 @@ object GardenCustomKeybinds {
         if (pressedToggleKeys[this] == override) return false
 
         pressedToggleKeys[this] = override
-        setDown(true)
+        isDown = true
         return true
     }
 
@@ -175,6 +174,7 @@ object GardenCustomKeybinds {
 
         return internalName.isFarmingTool() ||
             (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+            (config.vacuum && PestApi.hasVacuumInHand()) ||
             (config.fishingRod && internalName.isFishingRod()) ||
             (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
     } ?: false

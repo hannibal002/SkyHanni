@@ -28,6 +28,10 @@ object HypixelLocationApi {
 
     private val patternGroup = RepoPattern.group("api.hypixellocation")
 
+    /**
+     * REGEX-TEST: legacylobby3
+     * REGEX-TEST: lobby1
+     */
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+",
@@ -144,7 +148,6 @@ object HypixelLocationApi {
     }
 
     private fun changeIsland() {
-        if (internalIsland == island) return
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
