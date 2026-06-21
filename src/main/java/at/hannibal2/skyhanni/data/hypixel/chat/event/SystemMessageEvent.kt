@@ -34,7 +34,7 @@ object SystemMessageEvent {
     /**
      * Fired during the modification phase of the chat processing pipeline.
      * Use this specific event to modify the text content or the visual style of the chat component before it shows up on chat.
-     * Cannot be used to block the message altogether. For that, see [Allow].
+     * Cannot be used to block the message altogether. Do not use this event for data collection. For both, see [Allow].
      *
      * @param message The original message text.
      * @param chatComponent The entire original chat component.
