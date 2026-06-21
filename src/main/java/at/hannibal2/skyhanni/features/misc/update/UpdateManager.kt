@@ -112,7 +112,7 @@ object UpdateManager {
         val context = updateContext ?: return
         hasCheckedForUpdate = true
 
-        var updateStream = forcedUpdateStream
+        val updateStream = forcedUpdateStream
         if (updateState != UpdateState.NONE) {
             if (updateState == UpdateState.AVAILABLE && force) {
                 updateState = UpdateState.NONE

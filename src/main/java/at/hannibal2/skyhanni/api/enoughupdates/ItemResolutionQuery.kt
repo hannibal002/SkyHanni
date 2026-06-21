@@ -208,6 +208,7 @@ class ItemResolutionQuery {
             "POTION" -> resolvePotionName()
             "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
             "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
+            "CAKE_HAT_2026" -> resolveCakeHatName()
             else -> resolvedName
         }
     }
@@ -293,6 +294,12 @@ class ItemResolutionQuery {
         val attributeName = attributes.keySet().singleOrNull()
         if (attributeName.isNullOrEmpty()) return null
         val rawInternalName = "ATTRIBUTE_SHARD_" + attributeName.uppercase() + ";" + attributes.getIntOrDefault(attributeName)
+        return rawInternalName.toInternalName()
+    }
+
+    private fun resolveCakeHatName(): NeuInternalName {
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
+        val rawInternalName = "CAKE_HAT_2026_" + color.uppercase()
         return rawInternalName.toInternalName()
     }
 

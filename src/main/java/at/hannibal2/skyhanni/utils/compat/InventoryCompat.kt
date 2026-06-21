@@ -25,12 +25,14 @@ fun LocalPlayer.getItemOnCursor(): SafeItemStack? {
 
 fun stackUnderCursor(): SafeItemStack? {
     val screen = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return null
-    var stack = screen.hoveredSlot?.item
+    val stack = screen.hoveredSlot?.item
     if (stack != null) return stack
     // TODO 26.1 REI compat needed
-    //? if < 26.1
-    //stack = ReiCompat.getHoveredStackFromRei()
-    return stack
+//? if < 26.1 {
+     /*return ReiCompat.getHoveredStackFromRei()
+*///?} else {
+    return null
+//?}
 }
 
 fun slotUnderCursor(): Slot? {
