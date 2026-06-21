@@ -205,7 +205,7 @@ object AchievementManager {
                 TextHelper.displayPaginatedList(
                     "SkyHanni Achievements! ($unlocked/$totalCount)",
                     achievementList,
-                    ChatUtils.getUniqueMessageId(),
+                    ChatUtils.getUniqueCustomMessageId(),
                     "No Achievements Found"
                 ) { achievement ->
                     componentBuilder {

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -22,6 +23,7 @@ import net.minecraft.network.chat.Style
 
 @SkyHanniModule
 object TrophyFishManager {
+
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
     private val patternGroup = RepoPattern.group("fishing.trophyfish")
@@ -41,6 +43,8 @@ object TrophyFishManager {
         "odger.rank.empty",
         "§.(?<rarity>.*) §c✖",
     )
+
+    val odgerInventory = InventoryDetector { name -> name == "Trophy Fish" }
 
     fun loadMissingTrophyFish(): Int {
         val savedFishes = fish ?: return 0
@@ -106,9 +110,10 @@ object TrophyFishManager {
     }
 
     // Fetch when talking with Odger
-    @HandleEvent
+    // Not island-gated because Odger has an Abiphone contact
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Trophy Fishing") return
+        if (event.inventoryName != "Trophy Fish") return
 
         var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return

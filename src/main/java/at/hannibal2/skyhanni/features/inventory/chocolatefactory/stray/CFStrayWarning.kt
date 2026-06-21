@@ -30,13 +30,13 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 import kotlin.math.sin
 import kotlin.time.Duration.Companion.seconds
 
@@ -58,17 +58,17 @@ object CFStrayWarning {
         activeStraySlots = setOf()
     }
 
-    private fun isRarityOrHigher(stack: ItemStack, rarity: LorenzRarity) =
+    private fun isRarityOrHigher(stack: SafeItemStack, rarity: LorenzRarity) =
         stack.getSkullTexture()?.let { skullTexture ->
             HoppityTextureHandler.getRarityBySkullId(skullTexture)?.let { skullRarity ->
                 skullRarity.ordinal >= rarity.ordinal
             } ?: false
         } ?: false
 
-    private fun isSpecial(stack: ItemStack) =
+    private fun isSpecial(stack: SafeItemStack) =
         clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures
 
-    private fun shouldWarnAboutStray(item: ItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
+    private fun shouldWarnAboutStray(item: SafeItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
 
         StrayTypeEntry.LEGENDARY_P -> isRarityOrHigher(item, LorenzRarity.LEGENDARY)
@@ -81,7 +81,7 @@ object CFStrayWarning {
         StrayTypeEntry.NONE -> false
     }
 
-    private fun handleRabbitWarnings(item: ItemStack) {
+    private fun handleRabbitWarnings(item: SafeItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
         val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())

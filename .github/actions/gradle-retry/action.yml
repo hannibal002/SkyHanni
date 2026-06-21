@@ -14,7 +14,10 @@ runs:
     steps:
         - name: Retryable Gradle
           shell: bash
+          env:
+              MAX_RETRIES: ${{ inputs.max-attempts }}
+              GRADLE_CMD: ${{ inputs.gradle-command }}
           run: |
-              export MAX_RETRIES=${{ inputs.max-attempts }}
               chmod +x .github/scripts/gradlew-retry.kts
-              .github/scripts/gradlew-retry.kts ${{ inputs.gradle-command }}
+              # shellcheck disable=SC2086  # word-split intentional: gradle args are space-separated
+              .github/scripts/gradlew-retry.kts $GRADLE_CMD
