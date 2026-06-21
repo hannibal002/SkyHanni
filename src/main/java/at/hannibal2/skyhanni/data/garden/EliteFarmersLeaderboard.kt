@@ -551,7 +551,7 @@ object EliteFarmersLeaderboard {
                 }
                 append("contributors in the farming leaderboards")
             },
-            userLuckAmount = 1f,
+            userLuckAmount = 0f,
         )
         event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }

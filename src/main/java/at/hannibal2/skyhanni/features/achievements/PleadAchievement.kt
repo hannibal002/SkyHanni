@@ -20,7 +20,7 @@ object PleadAchievement {
             name = pleadComponent,
             description = pleadComponent,
             secret = true,
-            userLuckAmount = 1f,
+            userLuckAmount = 0f,
         )
         event.register(achievement, PLEAD_ACHIEVEMENT)
     }

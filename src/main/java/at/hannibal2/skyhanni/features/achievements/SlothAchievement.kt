@@ -27,7 +27,7 @@ object SlothAchievement {
                     withColor(ChatFormatting.RED)
                 }
             },
-            userLuckAmount = 1f,
+            userLuckAmount = 0f,
         )
         event.register(achievement, SECURITY_SLOTH_ACHIEVEMENT)
     }
