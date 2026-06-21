@@ -276,6 +276,7 @@ object BingoCardDisplay {
     }
 
     private var lastSneak = false
+
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")

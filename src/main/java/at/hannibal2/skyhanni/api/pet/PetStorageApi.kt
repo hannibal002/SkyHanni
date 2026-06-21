@@ -62,13 +62,11 @@ object PetStorageApi {
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Pets
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: Pets: "a"
-     * REGEX-TEST: Pets: "e" (1/2)
+     * REGEX-TEST: (1/3) Pets
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
-        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?",
+        "(?:\\(\\d+/\\d+\\) )?Pets",
     )
 
     /**
