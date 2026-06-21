@@ -62,7 +62,7 @@ object ContributorManager {
     private val contributorMentions get() = SkyHanniMod.seenContributorStorage.contributorMentions
     private val contributorMentionersThisSession = mutableSetOf<String>()
 
-    private const val CONTRIBUTOR_ACHIEVEMENT_GOT = "[SkyHanni] Achievement Get! EEEEKK!"
+    private const val CONTRIBUTOR_ACHIEVEMENT_GOT = "[SkyHanni] Achievement Get! EEEEKK!!"
     private const val FOUND_WILD_CONTRIBUTOR = "A wild SkyHanni contributor appears!"
     private val patternGroup = RepoPattern.group("contributor")
 
