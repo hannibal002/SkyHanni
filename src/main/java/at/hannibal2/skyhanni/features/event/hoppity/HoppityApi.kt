@@ -292,10 +292,13 @@ object HoppityApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
+        val hoverName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
-        if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(SIDE_DISH, event.slotId).post()
+        if (sideDishNamePattern.matches(hoverName)) {
+            EggFoundEvent(SIDE_DISH, event.slotId).post()
+        }
 
-        milestoneNamePattern.matchMatcher(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        milestoneNamePattern.matchMatcher(hoverName) {
             val lore = slot.item.getLore()
             if (!claimableMilestonePattern.anyMatches(lore)) return
             if (allTimeLorePattern.anyMatches(lore)) EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, event.slotId).post()

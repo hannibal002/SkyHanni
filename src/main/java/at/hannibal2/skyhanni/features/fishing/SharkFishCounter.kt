@@ -35,6 +35,7 @@ object SharkFishCounter {
         override fun clear() {
             SharkType.entries.forEach { this[it] = 0 }
         }
+
         init {
             this.clear()
         }

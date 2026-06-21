@@ -40,6 +40,7 @@ object BingoCardTips {
         "reward",
         "Reward",
     )
+
     /**
      * REGEX-TEST: Contribution Rewards
      */
