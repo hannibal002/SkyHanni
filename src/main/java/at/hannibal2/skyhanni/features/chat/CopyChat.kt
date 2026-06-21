@@ -11,9 +11,18 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.Minecraft
-import net.minecraft.util.Mth
+import net.minecraft.client.gui.ActiveTextCollector
+import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.TextAlignment
+import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.renderer.state.gui.GuiTextRenderState
+import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
+import org.joml.Matrix3x2f
+
+//? if >= 26.1
+import net.minecraft.client.gui.components.ChatComponent
 
 object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
@@ -54,43 +63,65 @@ object CopyChat {
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
         val chatGui = mc.gui.chat ?: return null
-        val chatLineY = screenToChatY(mouseY.toDouble())
-        val chatLineX = screenToChatX(mouseX.toDouble())
-        val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
+        val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
+        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
+        chatGui.captureClickableText(finder, mc.window.guiScaledHeight, mc.gui.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
+        val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
-        if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null
+        return visibleLine.parent
+    }
 
-        if (lineIndex < 0) return null
-        val visibleLines = chatGui.trimmedMessages
-        if (lineIndex > visibleLines.size) return null
-        val visibleLine = visibleLines[lineIndex]
+    private class HoveredTextFinder(
+        private val font: Font,
+        private val mouseX: Int,
+        private val mouseY: Int,
+    ) : ActiveTextCollector {
+        private var defaultParameters = ActiveTextCollector.Parameters(Matrix3x2f())
 
-        val matchingLines = chatGui.allMessages.filter {
-            it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
+        var hoveredText: FormattedCharSequence? = null
+            private set
+
+        override fun defaultParameters(): ActiveTextCollector.Parameters = defaultParameters
+
+        override fun defaultParameters(newParameters: ActiveTextCollector.Parameters) {
+            defaultParameters = newParameters
         }
 
-        return when {
-            matchingLines.isEmpty() -> null
-            matchingLines.size == 1 -> matchingLines.first()
-            else -> {
-                matchingLines.firstOrNull {
-                    it.content.string.removeColor()
-                        .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
-                } ?: matchingLines.first()
+        override fun accept(
+            alignment: TextAlignment,
+            anchorX: Int,
+            y: Int,
+            parameters: ActiveTextCollector.Parameters,
+            text: FormattedCharSequence,
+        ) {
+            val leftX = alignment.calculateLeft(anchorX, font, text)
+            val renderState = GuiTextRenderState(
+                font,
+                text,
+                parameters.pose(),
+                leftX,
+                y,
+                -1,
+                0,
+                true,
+                true,
+                parameters.scissor(),
+            )
+            ActiveTextCollector.findElementUnderCursor(renderState, mouseX.toFloat(), mouseY.toFloat()) {
+                hoveredText = text
             }
         }
-    }
 
-    fun screenToChatX(d: Double): Double {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return 0.0
-        return d / chatGui.scale - 4.0
-    }
-
-    fun screenToChatY(d: Double): Double {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return 0.0
-        val e = mc.window.guiScaledHeight - d - 40.0
-        return e / (chatGui.scale * chatGui.lineHeight)
+        override fun acceptScrolling(
+            message: Component,
+            centerX: Int,
+            left: Int,
+            right: Int,
+            top: Int,
+            bottom: Int,
+            parameters: ActiveTextCollector.Parameters,
+        ) {
+            defaultScrollingHelper(message, centerX, left, right, top, bottom, font.width(message), 9, parameters)
+        }
     }
 }
