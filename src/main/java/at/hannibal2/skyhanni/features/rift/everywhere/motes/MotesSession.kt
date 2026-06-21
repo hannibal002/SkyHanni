@@ -3,9 +3,12 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -14,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -23,7 +27,7 @@ object MotesSession {
     private val config get() = SkyHanniMod.feature.rift.motes.motesPerSession
 
     private var initialMotes: Long? = null
-    private var currentMotes: Long? = null
+    private var lifetimeMotes: Long? = null
     private var enterRiftTime = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("rift.everywhere.motes")
@@ -36,6 +40,8 @@ object MotesSession {
         "\\s+Lifetime Motes: (?<motes>[\\d,.]+)",
     )
 
+    private const val MOTES_ACHIEVEMENT = "Mote Collector"
+
     @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RIFT_INFO)) return
@@ -45,9 +51,22 @@ object MotesSession {
                 initialMotes = amount
                 enterRiftTime = SimpleTimeMark.now()
             }
-            // TODO move into RiftAPI, rename to lifetimeMotes, reuse in custom scoreboard maybe?
-            currentMotes = amount
+            // TODO move into RiftAPI, reuse in custom scoreboard maybe?
+            lifetimeMotes = amount
+            if (amount > 20_000_000) {
+                AchievementManager.completeAchievement(MOTES_ACHIEVEMENT)
+            }
         }
+    }
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Mote Millionaire".asComponent(),
+            "Become a millionaire 20 times over".asComponent(),
+            20f,
+        )
+        event.register(achievement, MOTES_ACHIEVEMENT)
     }
 
     @HandleEvent
@@ -55,14 +74,14 @@ object MotesSession {
         if (event.island == IslandType.THE_RIFT) {
             sendMotesInfo()
             initialMotes = null
-            currentMotes = null
+            lifetimeMotes = null
         }
     }
 
     private fun sendMotesInfo() {
         if (!config) return
         val initial = initialMotes ?: return
-        val current = currentMotes ?: return
+        val current = lifetimeMotes ?: return
         val gained = current - initial
         if (gained < 1) return
         val timeInRift = enterRiftTime.passedSince()

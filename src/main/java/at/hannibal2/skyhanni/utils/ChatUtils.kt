@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
-import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,12 +24,15 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.LinkedList
 import java.util.Queue
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.reflect.KProperty0
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.times
@@ -140,7 +141,7 @@ object ChatUtils {
         val text = message.asComponent()
         if (onlySendOnce && !messagesThatAreOnlySentOnce.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            text.send(messageId ?: message.getUniqueMessageIdForString())
+            text.send(messageId ?: message.getCustomMessageIdForString())
             logAndSendMessage(text, false)
         } else logAndSendMessage(text)
     }
@@ -153,7 +154,7 @@ object ChatUtils {
     ): Boolean {
         if (onlySendOnce && !messagesThatAreOnlySentOnceComponent.add(message)) return false
         return if (replaceSameMessage || messageId != null) {
-            message.send(messageId ?: message.getUniqueMessageIdForString())
+            message.send(messageId ?: message.getCustomMessageIdForString())
             logAndSendMessage(message, false)
         } else logAndSendMessage(message)
     }
@@ -212,7 +213,7 @@ object ChatUtils {
         messageId?.let {
             text.send(it)
         } ?: run {
-            if (replaceSameMessage) text.send(text.getUniqueMessageIdForString())
+            if (replaceSameMessage) text.send(text.getCustomMessageIdForString())
             else logAndSendMessage(text)
         }
     }
@@ -234,18 +235,38 @@ object ChatUtils {
         )
     }
 
-    private val uniqueMessageIdStorage = mutableMapOf<String, Int>()
-    private fun String.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this) {
-        getUniqueMessageId()
-    }
 
-    private fun Component.getUniqueMessageIdForString() = uniqueMessageIdStorage.getOrPut(this.string) {
-        getUniqueMessageId()
-    }
+    // <editor-fold desc="GUI Message IDs">
+    private val lastGuiMessageId = AtomicInt(0)
 
-    private var lastUniqueMessageId = 123242
+    /**
+     * Atomically returns a unique message ID, to be used to associate [GuiMessage]s with
+     * [GuiMessage.Line]s to be able to delete past messages without causing lag with large chat
+     * history sizes.
+     */
+    @JvmStatic
+    fun getUniqueGuiMessageId() = lastGuiMessageId.fetchAndIncrement()
+    // </editor-fold>
 
-    fun getUniqueMessageId() = lastUniqueMessageId++
+
+    // <editor-fold desc="Custom Message IDs">
+    private val lastCustomMessageId = AtomicInt(0)
+
+    /**
+     * Atomically returns a unique message ID, to be used for custom messages sent by SkyHanni to be
+     * able to easily reference and delete them later.
+     */
+    fun getUniqueCustomMessageId() = lastCustomMessageId.fetchAndIncrement()
+
+    private val stringToCustomMessageId = mutableMapOf<String, Int>()
+
+    private fun String.getCustomMessageIdForString() =
+        stringToCustomMessageId.getOrPut(this) { getUniqueCustomMessageId() }
+
+    private fun Component.getCustomMessageIdForString() =
+        stringToCustomMessageId.getOrPut(string) { getUniqueCustomMessageId() }
+    // </editor-fold>
+
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -323,7 +344,7 @@ object ChatUtils {
             }
         }
 
-        if (replaceSameMessage) text.send(message.getUniqueMessageIdForString())
+        if (replaceSameMessage) text.send(message.getCustomMessageIdForString())
         else logAndSendMessage(text)
 
         if (autoOpen) OSUtils.openBrowser(url)
@@ -331,45 +352,8 @@ object ChatUtils {
 
     private val chatGui get() = Minecraft.getInstance().gui.chat
 
-    var chatLines: MutableList<GuiMessage>
+    val chatMessages: MutableList<GuiMessage>
         get() = chatGui.allMessages
-        set(value) {
-            chatGui.allMessages = value
-        }
-
-    var drawnChatLines: MutableList<GuiMessage.Line>
-        get() = chatGui.trimmedMessages
-        set(value) {
-            chatGui.trimmedMessages = value
-        }
-
-    /** Edits the first message in chat that matches the given [predicate] to the new [component]. */
-    fun editFirstMessage(
-        component: (Component) -> Component,
-        reason: String,
-        predicate: (GuiMessage) -> Boolean,
-    ) {
-        chatLines.editChatLine(component, predicate, reason)
-        refreshChat()
-    }
-
-    /**
-     * Deletes a maximum of [amount] messages in chat that match the given [predicate].
-     */
-    fun deleteMessage(
-        reason: String,
-        amount: Int = 1,
-        predicate: (GuiMessage) -> Boolean,
-    ) {
-        chatLines.deleteChatLine(amount, reason, predicate)
-        refreshChat()
-    }
-
-    private fun refreshChat() {
-        DelayedRun.runNextTick {
-            chatGui.rescaleChat()
-        }
-    }
 
     private var deleteNext: Pair<String, (Component) -> Boolean>? = null
 
@@ -406,20 +390,25 @@ object ChatUtils {
     @HandleEvent
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
-            MinecraftCompat.localPlayer.connection.sendChat(sendQueue.poll() ?: return)
-            lastMessageSent = SimpleTimeMark.now()
+            val message = sendQueue.poll() ?: return
+            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
         }
     }
 
     fun sendMessageToServer(message: String) {
         if (canSendInstantly()) {
             MinecraftCompat.localPlayerOrNull?.let {
-                it.connection.sendChat(message)
-                lastMessageSent = SimpleTimeMark.now()
+                it.connection.dispatchMessage(message)
                 return
             }
         }
         sendQueue.add(message)
+    }
+
+    private fun ClientPacketListener.dispatchMessage(message: String) {
+        if (message.startsWith('/')) sendCommand(message.drop(1))
+        else sendChat(message)
+        lastMessageSent = SimpleTimeMark.now()
     }
 
     private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay

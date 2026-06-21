@@ -52,6 +52,9 @@ object ParticleHider {
     @JvmStatic
     fun shouldHideBlazeParticles() = MinecraftCompat.localWorldExists && config.hideBlazeParticles
 
+    @JvmStatic
+    fun shouldHideFireballParticles() = MinecraftCompat.localWorldExists && config.hideFireballParticles
+
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.hideBlazeParticles", "misc.particleHiders.hideBlazeParticles")

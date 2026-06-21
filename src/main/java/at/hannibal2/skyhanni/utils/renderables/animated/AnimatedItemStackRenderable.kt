@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.utils.renderables.animated
 
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceLocalStorage
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable
 import at.hannibal2.skyhanni.utils.system.PropertyVar
 import net.minecraft.core.Direction
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 
 class AnimatedItemStackRenderable internal constructor(
@@ -29,7 +30,7 @@ class AnimatedItemStackRenderable internal constructor(
     RotatingBehavior,
     FramedBehavior<ItemStackAnimatedFrame> {
 
-    override val stack: ItemStack get() = currentFrame.stack
+    override val stack: SafeItemStack get() = currentFrame.stack
     override val bounceStartTime: SimpleTimeMark = SimpleTimeMark.now()
     override var lastRenderTime: SimpleTimeMark = SimpleTimeMark.now()
     override var ticksInFrame: Double = 0.0
@@ -45,7 +46,7 @@ class AnimatedItemStackRenderable internal constructor(
     }
 
     @Suppress("DEPRECATION")
-    @Deprecated("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
+    @Legacy("Use renderWithDelta instead", ReplaceWith("renderWithDelta(posX, posY, deltaTime)"))
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) = super<TimeDependentRenderable>.render(mouseOffsetX, mouseOffsetY)
 
     companion object {

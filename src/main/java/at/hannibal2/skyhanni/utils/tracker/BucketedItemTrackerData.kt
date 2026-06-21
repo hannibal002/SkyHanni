@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import kotlin.reflect.KClass
@@ -33,7 +34,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>, T : SessionUptime>(clazz: KC
         }
     }
 
-    @Deprecated("Make data class extend Resettable instead")
+    @Legacy("Make data class extend Resettable instead")
     final override fun reset() {
         super.reset()
         bucketedItems.clear()

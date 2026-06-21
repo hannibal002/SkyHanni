@@ -56,7 +56,7 @@ class TabCompleteConfig {
     @Expose
     @ConfigOption(
         name = "View Recipe",
-        desc = "Tab-complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.",
+        desc = "Tab-complete item IDs in the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

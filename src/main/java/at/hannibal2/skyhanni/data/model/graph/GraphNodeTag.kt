@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.data.model.graph
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.Legacy
 
 enum class GraphNodeTag(
     val internalName: String,
@@ -10,7 +12,7 @@ enum class GraphNodeTag(
     val description: String,
     val onlyIsland: IslandType? = null,
     // only show the node tag in the graph editor when on those islands. this is just a debug visual thing, no user impact
-    val onlyIslands: Set<IslandType> = emptySet(),
+    val onlyIslands: IslandTypeTag? = null,
     val onlySkyblock: Boolean? = true,
 ) {
     DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev.", onlySkyblock = null), // E.g. Spawn points, todos, etc
@@ -22,7 +24,7 @@ enum class GraphNodeTag(
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
     // TODO delete once no graph data contains this anymore
-    @Deprecated("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
+    @Legacy("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
     TELEPORT(
         "teleport",
         LorenzColor.BLUE,
@@ -126,7 +128,15 @@ enum class GraphNodeTag(
         LorenzColor.AQUA,
         "Fishing Hotspot",
         "A possible hotspot where you can fish.",
-        onlyIslands = setOf(IslandType.BACKWATER_BAYOU, IslandType.HUB, IslandType.CRIMSON_ISLE, IslandType.WINTER),
+        onlyIslands = IslandTypeTag.FISHING_HOTSPOT,
+    ),
+
+    FISHING_WORMHOLE(
+        "fishing_wormhole",
+        LorenzColor.LIGHT_PURPLE,
+        "Fishing Wormhole",
+        "A wormhole where you can fish Reality Hopper.",
+        onlyIslands = IslandTypeTag.WORMHOLE,
     ),
 
     FAIRY_SOUL(
@@ -141,7 +151,7 @@ enum class GraphNodeTag(
         LorenzColor.YELLOW,
         "Hideonleaf",
         "The green Shulkers.",
-        onlyIslands = setOf(IslandType.GALATEA),
+        onlyIsland = IslandType.GALATEA,
     ),
 
     ;

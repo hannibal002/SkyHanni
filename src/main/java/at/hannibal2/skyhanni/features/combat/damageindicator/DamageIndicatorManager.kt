@@ -55,8 +55,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -430,7 +430,7 @@ object DamageIndicatorManager {
             val customHealthText = if (health == 0L) {
                 entityData.dead = true
                 if (entityData.bossType.isSlayer && config.timeToKillSlayer) {
-                    entityData.nameAbove = "§e${entityData.timeToKill}"
+                    entityData.nameAbove = "§e${entityData.timeToKillString}"
                 }
                 "§cDead"
             } else {
@@ -974,11 +974,11 @@ object DamageIndicatorManager {
     }
 
     private fun setMaxHealth(entity: LivingEntity, currentMaxHealth: Long) {
-        maxHealth[entity.uuid!!] = currentMaxHealth
+        maxHealth[entity.uuid] = currentMaxHealth
     }
 
     private fun getMaxHealthFor(entity: LivingEntity): Long {
-        return maxHealth.getOrDefault(entity.uuid!!, 0L)
+        return maxHealth.getOrDefault(entity.uuid, 0L)
     }
 
     @HandleEvent
@@ -1041,6 +1041,7 @@ object DamageIndicatorManager {
                         tarantulaFoundTime = data.foundTime
                     }
                 }
+
                 BossType.SLAYER_SPIDER_5_2 -> if (!tarantulaFoundTime.isFarPast()) {
                     if (data.foundTime > tarantulaFoundTime) {
                         ChatUtils.debug("Setting foundTime to $tarantulaFoundTime")

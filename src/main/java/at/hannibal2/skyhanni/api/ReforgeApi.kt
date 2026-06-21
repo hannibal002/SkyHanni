@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object ReforgeApi {
@@ -41,8 +41,7 @@ object ReforgeApi {
         CLOAK(ItemCategory.CLOAK),
         BELT(ItemCategory.BELT),
         AXE(ItemCategory.AXE),
-        HOE(ItemCategory.HOE),
-        AXE_AND_HOE(ItemCategory.AXE, ItemCategory.HOE),
+        FARMING_TOOL(ItemCategory.FARMING_TOOL),
         PICKAXE(ItemCategory.PICKAXE, ItemCategory.DRILL, ItemCategory.GAUNTLET),
         EQUIPMENT(
             ItemCategory.NECKLACE, ItemCategory.CLOAK, ItemCategory.BELT,
@@ -80,7 +79,7 @@ object ReforgeApi {
         val isReforgeStone = reforgeStone != null
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
-        fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
+        fun isValid(itemStack: SafeItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
         fun isValid(itemCategory: ItemCategory?, internalName: NeuInternalName) = when (type) {
             ReforgeType.SPECIAL_ITEMS -> specialItems?.contains(internalName) ?: false
             else -> itemCategory in type.itemCategories
