@@ -36,7 +36,8 @@ object ItemAbilityCooldownNotification {
         val lastActivate = ability.lastActivation
         val delayTime = (ability.getRemainingCooldown() - thresholdDuration).coerceAtLeast(0.seconds)
         DelayedServerRun.runDelayed(delayTime) {
-            if (!SkyBlockUtils.inSkyBlock || !isEnabled()) return@runDelayed
+            if (!isEnabled()) return@runDelayed
+            if (!SkyBlockUtils.inSkyBlock) return@runDelayed
             if (ability.lastActivation != lastActivate) return@runDelayed
             updateCurrentDisplay(ability)
         }

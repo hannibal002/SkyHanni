@@ -34,7 +34,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Seconds before cooldown is ready to trigger title for all selected abilities.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 30f, minStep = 1f)
-    val notificationThreshold: Int = 0
+    var notificationThreshold: Int = 0
 
     @Expose
     @ConfigOption(
@@ -42,7 +42,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Duration the title notification is shown when an ability cooldown reaches the threshold.",
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 5f, minStep = 0.5f)
-    val titleDuration: Float = 3f
+    var titleDuration: Float = 3f
 
     @Expose
     @ConfigOption(
@@ -50,7 +50,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Select which sound to play when an ability cooldown reaches the threshold.",
     )
     @ConfigEditorDropdown
-    val soundType: NotificationSound = NotificationSound.PLING
+    var soundType: NotificationSound = NotificationSound.PLING
 
     @Expose
     @ConfigOption(
@@ -58,7 +58,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is ready.",
     )
     @ConfigEditorText
-    val readyMessage: String = "&e&l{ability}&r &ais ready"
+    var readyMessage: String = "&e&l{ability}&r &ais ready"
 
     @Expose
     @ConfigOption(
@@ -66,7 +66,7 @@ class ItemAbilityCooldownNotificationConfig {
         desc = "Message displayed when the ability is nearly ready.",
     )
     @ConfigEditorText
-    val soonMessage: String = "&e&l{ability}&r &6back in {time}s"
+    var soonMessage: String = "&e&l{ability}&r &6back in {time}s"
 
     @Expose
     @ConfigLink(owner = ItemAbilityCooldownNotificationConfig::class, field = "enabled")
