@@ -25,15 +25,17 @@ import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessage
-import net.minecraft.client.GuiMessageTag
+import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
-import kotlin.time.Duration.Companion.seconds
+
+//? if >= 26.1
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 
 @SkyHanniModule
 object ChatManager {
@@ -158,13 +160,6 @@ object ChatManager {
         val message = original.formattedTextCompat().stripHypixelMessage()
         var cancelled = false
 
-        if (message.startsWith("§f{\"server\":\"") || message.startsWith("{\"server\":\"")) {
-            HypixelData.checkForLocraw(message)
-            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
-                cancelled = true
-            }
-            return cancelled
-        }
         val key = IdentityCharacteristics(original)
         val chatEvent = SkyHanniChatEvent.Allow(message, original)
         chatEvent.post()
@@ -278,7 +273,14 @@ object ChatManager {
             }
         }
 
-        val newMessage = GuiMessage(counter, newComponent, id, GuiMessageTag.system())
+        val newMessage = GuiMessage(
+            counter,
+            newComponent,
+            id,
+            //? if >= 26.1
+            GuiMessageSource.SYSTEM_CLIENT,
+            GuiMessageTag.system(),
+        )
         chatGui.allMessages[messageIndex] = newMessage
 
         var targetIndex: Int? = null
@@ -303,17 +305,17 @@ object ChatManager {
             return@runOrNextTick
         }
         val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
-        //? if < 1.21.11 {
-        chatGui.refreshTrimmedMessages()
-        throw UnsupportedOperationException("You are running an unsupported development build. Please update to 1.21.11 or above.")
-        //? } else
-        /*val lines = newMessage.splitLines(mc.font, maxWidth)
+        val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
-            val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
+            //? if >= 26.1 {
+            val newLine = GuiMessage.Line(message, line, endOfEntry)
+            //?} else {
+            /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
             newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
+            *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
-        }*/
+        }
     }
 
     /**
