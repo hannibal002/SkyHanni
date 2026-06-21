@@ -9,14 +9,18 @@ env:
 on:
     push:
         branches: [beta]
-    workflow_dispatch:
+    workflow_dispatch: {}
 
-permissions: { }
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions: {}
 
 jobs:
     regexes:
         runs-on: ubuntu-latest
-        name: "Generate regexes"
+        name: Generate regexes
         steps:
             -   uses: actions/checkout@v6
             -   name: Set up JDK 25
@@ -31,17 +35,18 @@ jobs:
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: generateRepoPatterns --stacktrace
-            -   uses: actions/upload-artifact@v7
-                name: Upload generated repo regexes
+            -   name: Upload generated repo regexes
+                uses: actions/upload-artifact@v7
                 with:
                     name: Repo Regexes
                     path: versions/26.1/build/regexes/constants.json
+
     publish-regexes:
         runs-on: ubuntu-latest
         needs: regexes
-        name: "Publish regexes"
+        name: Publish regexes
         # 511310721 is the Repository ID for SkyHanni
-        if: ${{ 'push' == github.event_name && 'beta' == github.ref_name && '511310721' == github.repository_id }}
+        if: ${{ github.event_name == 'push' && github.ref_name == 'beta' && github.repository_id == '511310721' }}
         steps:
             -   uses: actions/checkout@v6
                 with:
@@ -63,9 +68,9 @@ jobs:
                     fi
                     mv constants.json constants/regexesModern.json
                     git config user.name 'github-actions[bot]'
-                    git config user.email 'github-action@users.noreply.github.com'
+                    git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
                     git add constants/regexesModern.json
-                    git commit -m "Update regexes based on https://github.com/hannibal002/Skyhanni/commit/$GITHUB_SHA"
+                    git commit -m "Update regexes based on https://github.com/hannibal002/SkyHanni/commit/$GITHUB_SHA"
             -   name: Publish new repository
                 env:
                     REPO_PAT: ${{ secrets.REPO_PAT }}
