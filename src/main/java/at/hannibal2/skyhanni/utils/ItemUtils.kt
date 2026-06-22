@@ -183,6 +183,13 @@ object ItemUtils {
         expireAfterWrite = 1.seconds,
     )
 
+    /**
+     * For use in [ItemUtilsTest].
+     */
+    internal fun SafeItemStack.cacheInternalName(internalName: NeuInternalName) {
+        internalNameCache[IdentityCharacteristics(this)] = internalName
+    }
+
     fun DataComponentMap.getLoreComponent(): List<Component> =
         loreComponentCache.getOrPut(IdentityCharacteristics(this)) {
             get(DataComponents.LORE)?.lines.orEmpty()
