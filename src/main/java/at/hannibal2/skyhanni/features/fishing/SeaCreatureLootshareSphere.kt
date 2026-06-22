@@ -17,8 +17,6 @@ object SeaCreatureLootshareSphere {
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
 
-    private val existingCircles = mutableSetOf<LorenzVec>()
-
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
 
@@ -28,7 +26,7 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
-        existingCircles.clear()
+        val existingCircles = mutableSetOf<LorenzVec>()
         scLoop@ for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
