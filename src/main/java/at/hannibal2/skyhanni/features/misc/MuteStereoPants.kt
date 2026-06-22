@@ -33,8 +33,9 @@ object MuteStereoPants {
 
     private val playersWearingStereoPants = TimeLimitedSet<Player>(1.seconds)
 
-    // We cache the players seen wearing Stereo Pants for a second, as well as allow a distance of 5.0 rather than 0.5,
-    // to avoid the sounds getting through for a moment when you take them off or you're moving
+    // We cache the players seen wearing Stereo Pants for a second, as well as allow a distance of
+    // 5.0 rather than 0.5, to avoid the sounds getting through for a moment when you take them off
+    // or you're moving.
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.muteStereoPants) return
