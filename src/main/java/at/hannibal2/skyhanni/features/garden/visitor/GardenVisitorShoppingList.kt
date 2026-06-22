@@ -386,6 +386,6 @@ object GardenVisitorShoppingList {
             }
             entry
         }
-        event.remove(135, "garden.visitors.shoppingList.ignoreSpaceman")
+        event.remove(137, "garden.visitors.shoppingList.ignoreSpaceman")
     }
 }
