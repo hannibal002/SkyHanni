@@ -88,7 +88,8 @@ object BrigadierUtils {
 
     fun String.escapeDoubleQuote(): String {
         if (firstOrNull() != DOUBLE_QUOTE) return this
-        return substring(1, lastIndex - 1)
+        if (lastOrNull() != DOUBLE_QUOTE) return this
+        return substring(1, lastIndex)
     }
 
     enum class ItemParsingFail {
