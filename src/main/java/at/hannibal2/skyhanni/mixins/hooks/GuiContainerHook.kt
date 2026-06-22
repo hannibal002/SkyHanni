@@ -65,7 +65,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun shouldCancelMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: ContainerInput): Boolean {
-        val item = container.items?.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
+        val item = container.items.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
         return SlotClickEvent(gui, container, item, slot, slotId, clickedButton, clickType).post()
     }
 }
