@@ -289,44 +289,47 @@ object TrevorFeatures {
         }
     }
 
+    private fun renderCooldown(event: SkyHanniRenderWorldEvent) {
+        trevorEntity?.let { entity ->
+            RenderLivingEntityHelper.setEntityColor(entity, currentStatus.color) {
+                config.cooldown
+            }
+            entity.getLorenzVec().let {
+                if (it.distanceToPlayer() < 15) {
+                    event.drawString(it.up(2.23), currentLabel)
+                }
+            }
+        }
+    }
+
+    private fun findMob(event: SkyHanniRenderWorldEvent): Boolean {
+        if (!config.solver) return false
+        if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return false
+
+        var location = TrevorSolver.mobLocation.coordinates
+        if (TrevorSolver.averageHeight != 0.0) {
+            location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
+        }
+
+        val found = TrevorSolver.mobLocation == TrapperMobArea.FOUND
+        if (found) {
+            val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
+            location = TrevorSolver.mobCoordinates
+            event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawDynamicText(location.up(), displayName, 1.5)
+        } else {
+            event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
+        }
+
+        return found
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (config.cooldown) {
-            trevorEntity?.let { entity ->
-                RenderLivingEntityHelper.setEntityColor(entity, currentStatus.color) {
-                    config.cooldown
-                }
-                entity.getLorenzVec().let {
-                    if (it.distanceToPlayer() < 15) {
-                        event.drawString(it.up(2.23), currentLabel)
-                    }
-                }
-            }
-        }
-
-        var mobFound = false
-
-        if (config.solver) {
-            var location = TrevorSolver.mobLocation.coordinates
-            if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return
-            if (TrevorSolver.averageHeight != 0.0) {
-                location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
-            }
-            if (TrevorSolver.mobLocation == TrapperMobArea.FOUND) {
-                mobFound = true
-                val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
-                location = TrevorSolver.mobCoordinates
-                event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(location.up(), displayName, 1.5)
-            } else {
-                event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
-                event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
-            }
-        }
-
-        if (config.talbotCircles && !mobFound) {
-            TalbotCircles.drawCircles(event)
-        }
+        if (config.cooldown) renderCooldown(event)
+        val mobFound = findMob(event)
+        if (config.talbotCircles && !mobFound) TalbotCircles.drawCircles(event)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
