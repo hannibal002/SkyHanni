@@ -66,7 +66,7 @@ object TrevorSolver {
             if ((animalHealths.any { it == entityHealth } && currentMob != null) || isTrevor) {
 
                 val currentMob = currentMob ?: ErrorManager.skyHanniError(
-                    "Found trevor mob but current mob is null",
+                    "Found Trevor mob but current mob is null",
                     "entity" to entity,
                     "mobDataMob" to mob,
                 )
