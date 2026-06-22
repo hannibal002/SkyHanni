@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -57,6 +58,16 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
+    fun onCorpseLooted(event: CorpseLootedEvent) {
+        if (waypoints.isEmpty()) return
+
+        val closestWaypoint = waypoints.filter { it.isCorpse && it.location.distanceToPlayer() <= 5 }
+            .minByOrNull { it.location.distanceToPlayer() } ?: return
+
+        closestWaypoint.isLootedCorpse = true
+    }
+
+    @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (Minecraft.getInstance().screen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
@@ -87,7 +98,7 @@ object MineshaftWaypoints {
             }
             .forEach {
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, "§e${it.waypointType.displayText}", 1.0)
+                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.displayText}", 1.0)
             }
     }
 

@@ -37,7 +37,7 @@ object GraphEditorIO {
         val compiledNodeMap = filteredNodes.associate { node ->
             node.id to GraphNode(
                 node.id,
-                node.position,
+                node.position.roundTo(0),
                 node.name,
                 node.tags.map { it.internalName },
                 node.extraWeight,

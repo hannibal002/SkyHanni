@@ -17,24 +17,24 @@ class BetterWikiCommandConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled: Boolean = true
 
     // TODO Make this method not suck
     @Expose
     @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var sbGuide: Boolean = false
+    var skyblockGuide: Boolean = false
 
     @Expose
     @ConfigOption(
-        name = "Use Unofficial Wiki",
-        desc = "Use the unofficial wiki instead of the official one in most wiki-related chat messages.",
+        name = "Use Independent Wiki",
+        desc = "Use the independent wiki instead of the official one in most wiki-related chat messages.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("fandom hypixel")
-    var useUnofficial: Boolean = false
+    var useIndependent: Boolean = true
 
     @Expose
     @ConfigOption(
