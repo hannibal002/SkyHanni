@@ -56,12 +56,12 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST:  4sn_: Archer (29)
-     * REGEX-TEST:  kaydo_odyak: Berserk (26)
-     * REGEX-TEST:  ItsKind: §eBerserk§b (§e38§b)
-     * REGEX-TEST:  sphxia: §eTank§b (§e36§b)
-     * REGEX-TEST:  Skept1x: §eMage§b (§e35§b)
-     * REGEX-TEST:  Mewlius: §eArcher§b (§e41§b)
+     * WRAPPED-REGEX-TEST: " 4sn_: Archer (29)"
+     * WRAPPED-REGEX-TEST: " kaydo_odyak: Berserk (26)"
+     * WRAPPED-REGEX-TEST: " ItsKind: §eBerserk§b (§e38§b)"
+     * WRAPPED-REGEX-TEST: " sphxia: §eTank§b (§e36§b)"
+     * WRAPPED-REGEX-TEST: " Skept1x: §eMage§b (§e35§b)"
+     * WRAPPED-REGEX-TEST: " Mewlius: §eArcher§b (§e41§b)"
      */
     private val memberPattern by patternGroup.pattern(
         "member",
