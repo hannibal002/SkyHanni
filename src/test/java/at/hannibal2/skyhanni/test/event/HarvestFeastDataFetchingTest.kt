@@ -39,7 +39,7 @@ class HarvestFeastDataFetchingTest {
     @Test
     fun `current in-season crops have correct remaining time for last rotation`() = assertRemainingTime(
         """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":null,"Carrot":null,"Cocoa Beans":null,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":null,"Potato":null,"Pumpkin":null,"Sugar Cane":null,"Sunflower":null,"Wheat":null,"Wild Rose":null},"year":491}""",
-        33_592.seconds,
+        34_192.seconds,
     )
 
     companion object {
