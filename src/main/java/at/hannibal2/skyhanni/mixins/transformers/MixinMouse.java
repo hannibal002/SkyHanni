@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.garden.SensitivityReducer;
+import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -57,6 +57,6 @@ public class MixinMouse {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V")
     )
     private void modifyMouseSensitivity(LocalPlayer instance, double xo, double yo, Operation<Void> original) {
-        original.call(instance, SensitivityReducer.remapSensitivity(xo), SensitivityReducer.remapSensitivity(yo));
+        original.call(instance, MouseSensitivityReducer.remapSensitivity(xo), MouseSensitivityReducer.remapSensitivity(yo));
     }
 }

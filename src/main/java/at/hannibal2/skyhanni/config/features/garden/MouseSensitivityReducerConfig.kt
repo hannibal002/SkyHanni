@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.garden.SensitivityReducer.Mode
+import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer.Mode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -13,7 +13,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
-class SensitivityReducerConfig {
+class MouseSensitivityReducerConfig {
     @ConfigOption(
         name = "Note",
         desc = "You can type §e/shmouselock §rto lock your mouse rotation, and §e/shsensreduce §rto reduce your sensitivity.",
@@ -47,12 +47,12 @@ class SensitivityReducerConfig {
     var chatMessage: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Reducing percent", desc = "Set sensitivity to this percentage of your normal sensitivity")
+    @ConfigOption(name = "Reducing Percent", desc = "Set sensitivity to this percentage of your normal sensitivity")
     @ConfigEditorSlider(minValue = 0.1f, maxValue = 99.9f, minStep = 0.1f)
     var reducingPercent: Float = 10f
 
     @Expose
-    @ConfigOption(name = "Lock mouse", desc = "Lock the mouse instead of reducing sensitivity.")
+    @ConfigOption(name = "Lock Mouse", desc = "Lock the mouse instead of reducing sensitivity.")
     @ConfigEditorBoolean
     var lockMouse: Boolean = false
 
@@ -80,7 +80,7 @@ class SensitivityReducerConfig {
     var onlyPlot: Boolean = true
 
     @Expose
-    @ConfigLink(owner = SensitivityReducerConfig::class, field = "showGui")
+    @ConfigLink(owner = MouseSensitivityReducerConfig::class, field = "showGui")
     val position: Position = Position(400, 200)
 
     enum class UnlockOnTeleport(private val displayName: String, val condition: (String) -> Boolean) {

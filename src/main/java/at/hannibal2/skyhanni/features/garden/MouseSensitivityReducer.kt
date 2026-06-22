@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
+import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -30,7 +30,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 
 @SkyHanniModule
-object SensitivityReducer {
+object MouseSensitivityReducer {
 
     private val config get() = GardenApi.config.sensitivityReducer
 
@@ -51,7 +51,7 @@ object SensitivityReducer {
      * REGEX-TEST: Warping...
      */
     private val teleportPattern by RepoPattern.list(
-        "garden.sensitivityreducer.chat.teleport.list",
+        "garden.mouse-sensitivity-reducer.chat.teleport.list",
         "Teleported you to Plot - (?<plot>.+)!",
         "Teleported you to (?<plot>The Barn)!",
         "(?<plot>Warping\\.\\.\\.)",
@@ -62,7 +62,7 @@ object SensitivityReducer {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (config.unlockOnTeleport == SensitivityReducerConfig.UnlockOnTeleport.NEVER) return
+        if (config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
         if (manualState == null) return
 
         teleportPattern.matchMatchers(event.cleanMessage) {
@@ -141,7 +141,10 @@ object SensitivityReducer {
             simpleCallback {
                 if (manualState != SensitivityState.LOCKED) {
                     manualState = SensitivityState.LOCKED
-                    ChatUtils.chat("Mouse rotation is now locked. Type /shlockmouse to unlock your mouse.", messageId = commandMessageId)
+                    ChatUtils.chat(
+                        "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
+                        messageId = commandMessageId,
+                    )
                 } else {
                     manualState = null
                     ChatUtils.chat("Mouse rotation is now unlocked.", messageId = commandMessageId)
@@ -157,13 +160,13 @@ object SensitivityReducer {
 
         config.position.renderRenderable(
             Renderable.text("§e" + if (state == SensitivityState.REDUCED) "Sensitivity Lowered" else "Mouse Locked"),
-            posLabel = "Sensitivity Reducer",
+            posLabel = "Mouse Sensitivity Reducer",
         )
     }
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Sensitivity Reducer")
+        event.title("Mouse Sensitivity Reducer")
 
         if (state == SensitivityState.UNCHANGED) event.addIrrelevant {
             add("not enabled")
