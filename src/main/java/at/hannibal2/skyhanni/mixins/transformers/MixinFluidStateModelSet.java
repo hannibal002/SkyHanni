@@ -19,7 +19,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.Map;
 
 @Mixin(FluidStateModelSet.class)
-public abstract class MixinFluidStateModelSet  {
+public abstract class MixinFluidStateModelSet {
+
     @ModifyReturnValue(method = "bake", at = @At("RETURN"))
     private static Map<Fluid, FluidModel> bake(Map<Fluid, FluidModel> original, MaterialBaker materials) {
         FluidModel opaqueWaterModel = LavaReplacement.OPAQUE_WATER_MODEL.bake(materials, () -> "Opaque Water");

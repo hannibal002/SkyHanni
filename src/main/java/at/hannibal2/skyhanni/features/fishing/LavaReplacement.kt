@@ -14,6 +14,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.material.Fluids
 
 //? if >= 26.1 {
 import net.minecraft.client.renderer.block.FluidModel
@@ -35,7 +36,7 @@ object LavaReplacement {
 
     init {
         // Force initialize vanilla fluid registry to avoid load order race conditions
-        Class.forName("net.minecraft.world.level.material.Fluids")
+        check(Fluids.LAVA != null)
     }
 
     @JvmField

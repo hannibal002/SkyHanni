@@ -120,7 +120,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     const val MODID: String = "skyhanni"
     const val VERSION: String = VersionConstants.MOD_VERSION
 
-    fun id(path: String) = Identifier.fromNamespaceAndPath(MODID, path)
+    fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
