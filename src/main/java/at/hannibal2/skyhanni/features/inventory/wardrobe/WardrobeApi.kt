@@ -15,13 +15,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -58,7 +58,7 @@ object WardrobeApi {
     var slots = listOf<WardrobeSlot>()
     var inCustomWardrobe = false
 
-    internal fun emptyArmor(): List<ItemStack?> = listOf(null, null, null, null)
+    internal fun emptyArmor(): List<SafeItemStack?> = listOf(null, null, null, null)
 
     var currentSlot: Int?
         get() = storage?.currentSlot
@@ -86,7 +86,7 @@ object WardrobeApi {
         slots = list
     }
 
-    private fun getWardrobeItem(itemStack: ItemStack?) =
+    private fun getWardrobeItem(itemStack: SafeItemStack?) =
         if (itemStack == null || itemStack.isStainedGlassPane()) null else itemStack
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
@@ -144,7 +144,7 @@ object WardrobeApi {
         }
     }
 
-    private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, ItemStack>): Boolean {
+    private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, SafeItemStack>): Boolean {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
@@ -177,7 +177,7 @@ object WardrobeApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {
             if (slots.isEmpty()) {
@@ -208,7 +208,7 @@ object WardrobeApi {
 
     class WardrobeData(
         @Expose val id: Int,
-        @Expose var armor: List<ItemStack?>,
+        @Expose var armor: List<SafeItemStack?>,
         @Expose var locked: Boolean,
         @Expose var favorite: Boolean,
     )

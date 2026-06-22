@@ -246,7 +246,7 @@ object RareMobWaypointShare {
             return
         }
         val location = rareMob.getLorenzVec().toChatFormat()
-        val mobName = rareMob.name.string.orEmpty()
+        val mobName = rareMob.name.string
         if (!isMobShareEnabled(mobName)) return
         lastShareTime = SimpleTimeMark.now()
         val name = if (mobName.isEmpty()) "" else "| $mobName"

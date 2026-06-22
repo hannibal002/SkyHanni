@@ -7,10 +7,10 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RenderableTooltips {
@@ -28,7 +28,7 @@ object RenderableTooltips {
 
     fun setTooltipForRender(
         tips: List<Renderable>,
-        stack: ItemStack? = null,
+        stack: SafeItemStack? = null,
         borderColor: LorenzColor? = null,
         snapsToTopIfToLong: Boolean = true,
         spacedTitle: Boolean = false,
@@ -125,7 +125,7 @@ object RenderableTooltips {
 
 private data class DeferredTooltip(
     val tips: List<Renderable>,
-    val stack: ItemStack? = null,
+    val stack: SafeItemStack? = null,
     private val borderColor: LorenzColor? = null,
     val snapsToTopIfToLong: Boolean = true,
     private val spacedTitle: Boolean = false,

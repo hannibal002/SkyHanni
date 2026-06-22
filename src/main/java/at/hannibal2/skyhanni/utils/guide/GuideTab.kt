@@ -3,14 +3,14 @@ package at.hannibal2.skyhanni.utils.guide
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import net.minecraft.world.item.ItemStack
 
 class GuideTab(
-    val item: ItemStack,
+    val item: SafeItemStack,
     val tip: Renderable,
     val isVertical: Boolean = false,
     var lastTab: GuideGui.TabWrapper,

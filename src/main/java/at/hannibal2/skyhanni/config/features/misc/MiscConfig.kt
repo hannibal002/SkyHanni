@@ -332,15 +332,6 @@ class MiscConfig {
     @FeatureToggle
     var lesserOrbHider: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Lock Mouse Message", desc = "Show a message in chat when toggling §e/shmouselock§7.")
-    @ConfigEditorBoolean
-    var lockMouseLookChatMessage: Boolean = true
-
-    @Expose
-    @NoConfigLink
-    val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
-
     // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
@@ -531,4 +522,10 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var muteStereoPants: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var giftCleanDisplay: Boolean = false
 }
