@@ -29,14 +29,14 @@ object SeaCreatureLootshareSphere {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
         existingCircles.clear()
-        var circleCount = 0
-        for (seaCreature in seaCreatures) {
+        scLoop@ for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
+            var circleCount = 0
             existingCircles.forEach {
                 if (it.distance(pos) < 10) circleCount++
+                if (circleCount > 2) continue@scLoop
             }
-            if (circleCount > 2) continue
             val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
             event.drawSphereWireframeInWorld(color.toColor(), pos, LootshareUtils.RANGE)
             existingCircles.add(pos)
