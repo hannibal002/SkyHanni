@@ -49,7 +49,7 @@ object MuteStereoPants {
         }
 
         for (player in EntityUtils.getEntitiesInBoundingBox<Player>(event.location.boundingCenter(5.0))) {
-            if (player.getItemBySlot(EquipmentSlot.LEGS)?.getInternalName() == MUSIC_PANTS) {
+            if (player.getItemBySlot(EquipmentSlot.LEGS).getInternalName() == MUSIC_PANTS) {
                 playersWearingStereoPants.add(player)
                 event.cancel()
                 return
