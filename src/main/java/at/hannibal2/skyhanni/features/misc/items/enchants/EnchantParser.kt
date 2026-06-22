@@ -51,6 +51,7 @@ object EnchantParser {
      * re-populate the tests over time with new examples I guess. (The tests are what is returned
      * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
      *
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
      * REGEX-TEST: §9Toxophilite VIII §82.1M
      * REGEX-TEST: §9Cultivating VII §81,625,381
@@ -62,6 +63,7 @@ object EnchantParser {
     )
 
     /**
+     * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
      * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
      * REGEX-TEST: §9Toxophilite VIII §82.1M
      * REGEX-TEST: §9Cultivating VII §81,625,381
@@ -70,7 +72,7 @@ object EnchantParser {
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?<=^|, )(?:§7§l|§d§l|§9|§7)+(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?<=^|, )(?:§l|§d|§9|§7|§5|§r)+(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
     private var currentItem: SafeItemStack? = null
