@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -48,7 +49,7 @@ object EnigmaSoulWaypoints {
     private val item by lazy {
         val neuItem = "SKYBLOCK_ENIGMA_SOUL".toInternalName().getItemStack()
         ItemUtils.createItemStack(
-            neuItem.item,
+            neuItem.itemType,
             "§5Toggle Missing",
             "§7Click here to toggle",
             "§7the waypoints for each",

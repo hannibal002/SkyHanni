@@ -120,7 +120,7 @@ object LogBookStats {
 
     private fun checkPages(event: InventoryFullyOpenedEvent) {
         val next = event.inventoryItems[53]
-        if (next?.item != Items.ARROW) {
+        if (next?.`is`(Items.ARROW) != true) {
             currentPage++
             return
         }

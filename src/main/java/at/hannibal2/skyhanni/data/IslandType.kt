@@ -41,6 +41,7 @@ enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
     MINESHAFT("Mineshaft"),
     BACKWATER_BAYOU("Backwater Bayou"),
     GALATEA("Galatea"),
+    LOTUS_ATOLL("Lotus Atoll"),
 
     NONE(""),
     ANY(""),

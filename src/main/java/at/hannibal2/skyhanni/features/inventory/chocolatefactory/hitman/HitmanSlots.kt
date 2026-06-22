@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object HitmanSlots {
@@ -69,7 +69,7 @@ object HitmanSlots {
         slotPricesLeft = CFApi.hitmanCosts.drop(ownedSlots)
     }
 
-    private fun Map<Int, ItemStack>.filterNotBorderSlots() = filterKeys {
+    private fun Map<Int, SafeItemStack>.filterNotBorderSlots() = filterKeys {
         it !in 0..8 && it !in 45..53 && // Horizontal borders
             it % 9 != 0 && (it + 1) % 9 != 0 // Vertical borders
     }

@@ -22,13 +22,11 @@ object HypixelEventApi {
     }
 
     private fun onHelloPacket(packet: ClientboundHelloPacket) {
-        if (!HypixelLocationApi.config) return
         val isAlpha = packet.environment != Environment.PRODUCTION
         HypixelApiJoinEvent(isAlpha).post()
     }
 
     private fun onLocationPacket(packet: ClientboundLocationPacket) {
-        if (!HypixelLocationApi.config) return
         HypixelApiServerChangeEvent(
             packet.serverName,
             packet.serverType.getOrNull(),
