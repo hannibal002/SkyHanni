@@ -44,9 +44,9 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     fun toMillis() = millis
 
-    override fun toString(): String = when (millis) {
-        FAR_PAST_MS -> "The Far Past"
-        FAR_FUTURE_MS -> "The Far Future"
+    override fun toString(): String = when (this) {
+        farPast() -> "The Far Past"
+        farFuture() -> "The Far Future"
         else -> "ServerTimeMark(millis=$millis})"
     }
 
