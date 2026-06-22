@@ -62,10 +62,20 @@ class RepoPatternElement private constructor(
 
             kDoc.getDefaultSection().getContent().lines().forEach { line ->
                 if (line.contains("REGEX-TEST: ")) {
-                    regexTests.add(line.substringAfter("REGEX-TEST: "))
+                    val test = line.substringAfter("REGEX-TEST: ")
+                    require(test.trim() == test) {
+                        "Plain REGEX-TEST must not contain leading or trailing whitespace. If the whitespace is " +
+                            "intentional, use WRAPPED-REGEX-TEST instead."
+                    }
+                    regexTests.add(test)
                 }
                 if (line.contains("REGEX-FAIL: ")) {
-                    failingRegexTests.add(line.substringAfter("REGEX-FAIL: "))
+                    val test = line.substringAfter("REGEX-FAIL: ")
+                    require(test.trim() == test) {
+                        "Plain REGEX-FAIL must not contain leading or trailing whitespace. If the whitespace is " +
+                            "intentional, use WRAPPED-REGEX-FAIL instead."
+                    }
+                    failingRegexTests.add(test)
                 }
                 wrappedRegexTestPattern.matcher(line).let { matcher ->
                     if (!matcher.find()) return@forEach
