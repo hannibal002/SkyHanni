@@ -53,13 +53,6 @@ data class EliteFeastData(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    private val feastEndTime: SimpleTimeMark
-        get() = if (isGrandFeast) {
-            SkyBlockTime(year, GRAND_FEAST_END_MONTH, GRAND_FEAST_END_DAY).toTimeMark()
-        } else {
-            SkyBlockTime(year, HARVEST_FEAST_END_MONTH, HARVEST_FEAST_END_DAY).toTimeMark()
-        }
-
     private val monthEndTime: SimpleTimeMark
         get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
 
@@ -100,11 +93,6 @@ data class EliteFeastData(
     private fun List<String>.toCropTypes(): List<CropType> = map { CropType.getByName(it) }
 
     companion object {
-        private const val HARVEST_FEAST_END_MONTH = 10
-        private const val HARVEST_FEAST_END_DAY = 1
-        private const val GRAND_FEAST_END_MONTH = 3
-        private const val GRAND_FEAST_END_DAY = 27
-
         fun of(
             year: Int,
             month: Int,
