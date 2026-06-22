@@ -32,7 +32,7 @@ object HighlightMissingRepoItems {
     private fun highlightItems(slots: Iterable<Slot>) {
         if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
-            val internalName = slot.item?.getInternalNameOrNull() ?: continue
+            val internalName = slot.item.getInternalNameOrNull() ?: continue
             val asString = internalName.asString()
             if (asString.startsWith("BUILDER_")) continue // Skip builder items as we filter them out of allInternalNames
 

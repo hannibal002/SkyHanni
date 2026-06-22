@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
@@ -62,7 +63,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
@@ -133,7 +133,7 @@ object ItemDisplayOverlayFeatures {
         tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
-    private fun getStackTip(item: ItemStack): String? {
+    private fun getStackTip(item: SafeItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
