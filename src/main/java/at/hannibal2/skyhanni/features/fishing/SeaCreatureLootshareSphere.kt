@@ -15,7 +15,14 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeIn
 object SeaCreatureLootshareSphere {
     private val config get() = SkyHanniMod.feature.fishing
 
-    private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
+    private val seaCreatures = mutableListOf<LivingSeaCreatureData>()
+
+    private val spherePositions = mutableListOf<LootshareSphere>()
+
+    data class LootshareSphere(
+        val position: LorenzVec? = null,
+        var color: LorenzColor = LorenzColor.WHITE,
+    )
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -26,18 +33,26 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
-        val existingCircles = mutableSetOf<LorenzVec>()
-        scLoop@ for (seaCreature in seaCreatures) {
+        scLoop@ for (lootshareSphere in spherePositions) {
+            if (lootshareSphere.position == null) return
+            event.drawSphereWireframeInWorld(lootshareSphere.color.toColor(), lootshareSphere.position, LootshareUtils.RANGE)
+            spherePositions.remove(lootshareSphere)
+        }
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
+        if (!config.lootshareRange) return
+        val seaCreaturesToRender = mutableSetOf<LorenzVec>()
+        for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
+            var otherNearbySpheres = 0
             val pos = seaCreature.pos ?: continue
-            var circleCount = 0
-            existingCircles.forEach {
-                if (it.distance(pos) < 10) circleCount++
-                if (circleCount > 2) continue@scLoop
-            }
             val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
-            event.drawSphereWireframeInWorld(color.toColor(), pos, LootshareUtils.RANGE)
-            existingCircles.add(pos)
+            seaCreaturesToRender.forEach {
+                if (it.distance(pos) < 10) otherNearbySpheres++
+                if (otherNearbySpheres < 2) spherePositions.add(LootshareSphere(pos, color))
+            }
         }
     }
 
