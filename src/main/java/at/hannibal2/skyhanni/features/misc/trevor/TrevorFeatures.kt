@@ -50,6 +50,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TrevorFeatures {
+
     private val patternGroup = RepoPattern.group("misc.trevor")
 
     // <editor-fold desc="Patterns">
@@ -276,6 +277,9 @@ object TrevorFeatures {
     @HandleEvent
     fun onRepoReload() = loadTrevorTexture()
 
+    @HandleEvent
+    fun onComponentsLoaded() = loadTrevorTexture()
+
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (trevorTexture != null &&
@@ -361,6 +365,7 @@ object TrevorFeatures {
         currentLabel = "§2Ready"
         questActive = false
         inBetweenQuests = false
+        trevorEntity = null
     }
 
     @HandleEvent

@@ -62,7 +62,7 @@ object ClientEvents {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
             //? if >= 26.1
-            ComponentsLoadedEvent.post()
+            DelayedRun.runOrNextTick(ComponentsLoadedEvent::post)
         }
 
         // World change event
