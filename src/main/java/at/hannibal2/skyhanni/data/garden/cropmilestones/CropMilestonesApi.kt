@@ -398,7 +398,7 @@ object CropMilestonesApi {
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Crop Milestones Api")
+        event.title("Crop Milestones API")
         event.addIrrelevant {
             for (crop in cropMilestoneTierCache) {
                 add("Crop: ${crop.key}, Tier: ${crop.value}")
