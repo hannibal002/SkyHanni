@@ -42,6 +42,20 @@ class HarvestFeastDataFetchingTest {
         """{"complete":true,"current":["Melon","Potato","Sunflower"],"isGrandFeast":false,"month":7,"next":{"Cactus":null,"Carrot":null,"Cocoa Beans":null,"Melon":null,"Moonflower":null,"Mushroom":null,"Nether Wart":null,"Potato":null,"Pumpkin":null,"Sugar Cane":null,"Sunflower":null,"Wheat":null,"Wild Rose":null},"year":491}""",
     )
 
+    @Test
+    fun `far future entries are ignored`() {
+        val data = EliteFeastData.of(
+            year = 491,
+            month = 7,
+            complete = true,
+            current = listOf("Melon", "Potato", "Sunflower"),
+            next = CropType.entries.associate { it.name to SimpleTimeMark.farFuture() },
+            isGrandFeast = false,
+        )
+
+        assertEquals(oneSkyblockMonth, data.getActiveDuration())
+    }
+
     companion object {
         const val MOCK_TIME = 1_779_237_908_000L
     }
