@@ -378,9 +378,9 @@ object GardenVisitorShoppingList {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(135, "garden.visitors.shoppingList.ignoreSpaceman") { entry ->
+        event.transform(137, "garden.visitors.shoppingList.ignoreSpaceman") { entry ->
             if (entry.asBoolean) {
-                event.add(135, "#profile.garden.ignoredVisitors") {
+                event.add(137, "#profile.garden.ignoredVisitors") {
                     JsonArray().apply { add("Spaceman") }
                 }
             }
