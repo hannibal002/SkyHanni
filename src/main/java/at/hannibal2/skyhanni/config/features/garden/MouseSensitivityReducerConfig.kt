@@ -71,7 +71,7 @@ class MouseSensitivityReducerConfig {
         name = "Only on Ground Tolerance",
         desc = "How close to ground counts as on ground when 'Only on Ground' is enabled. Useful for farms with small height drops.",
     )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 2f, minStep = 1f / 16f) // Block heights are multiples of 1/16
+    @ConfigEditorSlider(minValue = 0f, maxValue = 2f, minStep = 1f / 16f)
     var onGroundTolerance: Float = 2f / 16f // dirt to soulsand is 2 pixels
 
     @Expose

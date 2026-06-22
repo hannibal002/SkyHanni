@@ -34,7 +34,7 @@ object MouseSensitivityReducer {
 
     private val config get() = GardenApi.config.sensitivityReducer
 
-    private val commandMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val commandMessageId = ChatUtils.getUniqueMessageId()
     private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
 
     private var state: SensitivityState = SensitivityState.UNCHANGED
@@ -208,7 +208,6 @@ object MouseSensitivityReducer {
         UNCHANGED({ it }),
         REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
         LOCKED({ 0.0 }),
-        ;
     }
 
     enum class Mode(private val displayName: String, val condition: () -> Boolean) {

@@ -50,9 +50,9 @@ object PlayerUtils {
 
     /** the player is not flying, not riding a vehicle, and not using an elytra */
     fun hasNormalMovement(): Boolean =
-        !MinecraftCompat.localPlayer.abilities.flying
-            && !MinecraftCompat.localPlayer.isPassenger
-            && !MinecraftCompat.localPlayer.isFallFlying
+        !MinecraftCompat.localPlayer.abilities.flying &&
+            !MinecraftCompat.localPlayer.isPassenger &&
+            !MinecraftCompat.localPlayer.isFallFlying
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
 
