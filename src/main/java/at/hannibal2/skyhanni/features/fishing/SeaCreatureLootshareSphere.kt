@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LootshareUtils
-import at.hannibal2.skyhanni.utils.LootshareUtils.isInLootshareRange
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
@@ -34,11 +33,11 @@ object SeaCreatureLootshareSphere {
         for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
             val pos = seaCreature.pos ?: continue
-            val color = if (seaCreature.isOwn || isInLootshareRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
             existingCircles.forEach {
                 if (it.distance(pos) < 10) circleCount++
             }
             if (circleCount > 2) continue
+            val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
             event.drawSphereWireframeInWorld(color.toColor(), pos, LootshareUtils.RANGE)
             existingCircles.add(pos)
         }

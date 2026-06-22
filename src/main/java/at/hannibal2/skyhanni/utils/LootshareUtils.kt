@@ -6,5 +6,5 @@ object LootshareUtils {
 
     const val RANGE = 30.0f
 
-    fun isInLootshareRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
+    fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
 }

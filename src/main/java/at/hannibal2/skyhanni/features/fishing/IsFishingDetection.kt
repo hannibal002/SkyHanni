@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LootshareUtils.isInLootshareRange
+import at.hannibal2.skyhanni.utils.LootshareUtils.isInRange
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -87,6 +87,6 @@ object IsFishingDetection {
     private fun inLootshareOrHasOwn(): Boolean =
         SeaCreatureDetectionApi.getSeaCreatures().any { seaCreatureData ->
             val entity = seaCreatureData.entity
-            if (entity != null) isInLootshareRange(entity.getLorenzVec()) else seaCreatureData.isOwn
+            if (entity != null) isInRange(entity.getLorenzVec()) else seaCreatureData.isOwn
         }
 }
