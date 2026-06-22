@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.ItemBuyApi.buy
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -37,7 +35,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import com.google.gson.JsonArray
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
@@ -73,7 +70,7 @@ object GardenVisitorShoppingList {
         drawShoppingList(shoppingList)
         drawVisitorSection(
             visitors = newVisitors,
-            header = "new visitor",
+            header = "New Visitor",
             renderer = {
                 drawNewVisitor(it)
             },
@@ -106,7 +103,7 @@ object GardenVisitorShoppingList {
 
     /**
      * Aggregates shopping lists from all active visitors.
-     * Items from ignored visitors are excluded from the aggregated list,
+     * Items from ignored visitors are excluded from the aggregated list.
      * @return Pair of (globalShoppingList, activeVisitors)
      */
     private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<VisitorApi.Visitor>> {
@@ -369,23 +366,8 @@ object GardenVisitorShoppingList {
         return GardenApi.inGarden() && (GardenApi.onBarnPlot || !config.onlyWhenClose)
     }
 
-    @HandleEvent(ProfileJoinEvent::class)
+    @HandleEvent
     fun onProfileJoin() {
         updateDisplay()
-    }
-
-    val logger: Logger = LogManager.getLogger("SkyHanni")
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(137, "garden.visitors.shoppingList.ignoreSpaceman") { entry ->
-            if (entry.asBoolean) {
-                event.add(137, "#profile.garden.ignoredVisitors") {
-                    JsonArray().apply { add("Spaceman") }
-                }
-            }
-            entry
-        }
-        event.remove(137, "garden.visitors.shoppingList.ignoreSpaceman")
     }
 }

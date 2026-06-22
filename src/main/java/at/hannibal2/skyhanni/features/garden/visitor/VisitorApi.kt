@@ -331,6 +331,14 @@ object VisitorApi {
                 )
             )
         }
+        event.transform(137, "garden.visitors.shoppingList.ignoreSpaceman") { entry ->
+            if (entry.asBoolean) {
+                event.add(137, "#profile.garden.ignoredVisitors") {
+                    JsonArray().apply { add("Spaceman") }
+                }
+            }
+            entry
+        }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")
 
