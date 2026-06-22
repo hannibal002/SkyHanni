@@ -36,7 +36,7 @@ object LavaReplacement {
 
     init {
         // Force initialize vanilla fluid registry to avoid load order race conditions
-        check(Fluids.LAVA != null)
+        checkNotNull(Fluids.LAVA)
     }
 
     @JvmField
