@@ -59,7 +59,7 @@ class SensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Unlock on Teleport", desc = "Choose whether teleporting to a plot should unlock your mouse rotation.")
     @ConfigEditorDropdown
-    val unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
+    var unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
 
     @Expose
     @ConfigOption(name = "Only on Ground", desc = "When enabled, lower sensitivity only while on or near the ground.")
