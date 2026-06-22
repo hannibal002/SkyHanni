@@ -14,7 +14,7 @@ enum class PlayerNameSource(private val usernamesGetter: () -> List<String>) {
     GUILD({ GuildApi.getAllMembers() }),
     FRIENDS({ FriendApi.getAllFriends().map { it.name } }),
     BEST_FRIENDS({ FriendApi.getAllFriends().filter { it.bestFriend }.map { it.name } }),
-    CARRY_CUSTOMER({ CarryTracker.getCustomers().map { it.name } }),
+    CARRY_CUSTOMER({ CarryTracker.getCustomerNames() }),
     ;
 
     val usernames: List<String> get() = usernamesGetter()

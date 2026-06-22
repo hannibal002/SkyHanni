@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
+import at.hannibal2.skyhanni.config.commands.brigadier.PlayerSuggestions
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -14,12 +14,12 @@ import at.hannibal2.skyhanni.events.combat.CrimsonMinibossKilledEvent
 import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -52,9 +52,10 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss as CrimsonMiniBoss
 
+@Suppress("LargeClass")
 @SkyHanniModule
 object CarryTracker {
-    private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueCustomMessageId()
+    private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
     private val storage get() = SkyHanniMod.feature.storage.carryPrices
     private val config get() = SkyHanniMod.feature.misc
@@ -68,8 +69,7 @@ object CarryTracker {
     private val recentTrades: MutableMap<String, Double> = mutableMapOf()
 
     /**
-     * REGEX-TEST:
-     * §6Trade completed with §r§b[MVP§r§c+§r§b] ClachersHD§r§f§r§6!
+     * REGEX-TEST: §6Trade completed with §r§b[MVP§r§c+§r§b] ClachersHD§r§f§r§6!
      */
     private val tradeCompletedPattern by RepoPattern.pattern(
         "carry.trade.completed",
@@ -77,8 +77,7 @@ object CarryTracker {
     )
 
     /**
-     * REGEX-TEST:
-     *  §r§a§l+ §r§6500k coins
+     * WRAPPED-REGEX-TEST: " §r§a§l+ §r§6500k coins"
      */
     private val tradeCoinsGainedPattern by RepoPattern.pattern(
         "carry.trade.coins.gained",
@@ -86,8 +85,7 @@ object CarryTracker {
     )
 
     /**
-     * REGEX-TEST:
-     *  §r§c§l- §r§6500k coins
+     * WRAPPED-REGEX-TEST: " §r§c§l- §r§6500k coins"
      */
     private val tradeCoinsLostPattern by RepoPattern.pattern(
         "carry.trade.coins.lost",
@@ -178,6 +176,7 @@ object CarryTracker {
         }
     }
 
+    @Suppress("LongMethod")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcarry") {
@@ -187,10 +186,7 @@ object CarryTracker {
                 arg(
                     "player",
                     BrigadierArguments.word(),
-                    BrigadierUtils.dynamicSuggestionProvider {
-                        (customers.map { it.name } + PartyApi.partyMembers + EntityUtils.getPlayerEntities()
-                            .map { it.plainTextName }).distinct()
-                    },
+                    PlayerSuggestions.builder { includeAllSources() },
                 ) { player ->
                     arg(
                         "type",
@@ -220,7 +216,7 @@ object CarryTracker {
                 arg(
                     "player",
                     BrigadierArguments.word(),
-                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                    PlayerSuggestions.builder { include(PlayerNameSource.CARRY_CUSTOMER) },
                 ) { player ->
                     arg(
                         "type",
@@ -250,7 +246,7 @@ object CarryTracker {
                 arg(
                     "player",
                     BrigadierArguments.word(),
-                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                    PlayerSuggestions.builder { include(PlayerNameSource.CARRY_CUSTOMER) },
                 ) { player ->
                     arg(
                         "type",
@@ -276,7 +272,7 @@ object CarryTracker {
                 arg(
                     "player",
                     BrigadierArguments.word(),
-                    BrigadierUtils.dynamicSuggestionProvider { customers.map { it.name } },
+                    PlayerSuggestions.builder { include(PlayerNameSource.CARRY_CUSTOMER) },
                 ) { player ->
                     arg(
                         "coins",
@@ -613,7 +609,7 @@ object CarryTracker {
                         },
                         onLeftClick = {
                             if (KeyboardManager.isModifierKeyDown()) removeCustomerInternal(customer)
-                            else HypixelCommands.partyChat("${customer.name}: ${paidFormat}/${totalCostFormat} coins paid")
+                            else HypixelCommands.partyChat("${customer.name}: $paidFormat/$totalCostFormat coins paid")
                         },
                     ),
                 )
@@ -830,6 +826,6 @@ object CarryTracker {
         }
     }
 
-    fun getCustomers(): List<Customer> = customers.toList()
     fun isCustomer(customerName: String): Boolean = findCustomer(customerName) != null
+    fun getCustomerNames(): List<String> = customers.map { it.name }
 }
