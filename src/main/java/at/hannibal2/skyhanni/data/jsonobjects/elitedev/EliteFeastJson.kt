@@ -60,10 +60,13 @@ data class EliteFeastData(
             SkyBlockTime(year, HARVEST_FEAST_END_MONTH, HARVEST_FEAST_END_DAY).toTimeMark()
         }
 
+    private val monthEndTime: SimpleTimeMark
+        get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
+
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
     private fun getDurations(): List<Duration> {
-        return next.map { it.value?.timeUntil() ?: Duration.INFINITE }
+        return next.mapNotNull { it.value?.takeIfInitialized()?.timeUntil() }
     }
 
     private fun getDuration(): Duration {
@@ -72,8 +75,12 @@ data class EliteFeastData(
     }
 
     fun getActiveDuration(): Duration {
-        if (next.values.all { it == null }) return feastEndTime.timeUntil()
-        return getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+        if (next.values.all { it == null }) return monthEndTime.timeUntil()
+
+        return getDurations()
+            .filter(Duration::isPositive)
+            .minByOrNull { it.inWholeMilliseconds }
+            ?: monthEndTime.timeUntil()
     }
 
     fun getCurrentCrops(): List<CropType> {
