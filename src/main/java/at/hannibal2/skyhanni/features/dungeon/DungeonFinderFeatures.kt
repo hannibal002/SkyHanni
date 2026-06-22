@@ -65,7 +65,7 @@ object DungeonFinderFeatures {
      */
     private val memberPattern by patternGroup.pattern(
         "member",
-        " (?<playerName>.*): (?<className>.*) \\(.*?(?<level>\\d+).*?\\)",
+        " (?<playerName>.*): (?:§.?)?(?<className>.*?)(?:§.?)? \\(.*?(?<level>\\d+).*?\\)",
     )
 
     /**
