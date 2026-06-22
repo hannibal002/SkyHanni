@@ -9,24 +9,12 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import net.minecraft.SharedConstants
-import net.minecraft.server.Bootstrap
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class ItemUtilsTest {
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun bootstrapMinecraftRegistries() {
-            SharedConstants.tryDetectVersion()
-            Bootstrap.bootStrap()
-        }
-    }
 
     // <editor-fold desc="Item Amount Test">
     private val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(

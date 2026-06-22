@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.ViewRecipeCommand
-import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
@@ -26,7 +25,6 @@ object TabComplete {
     private fun customTabComplete(fullCommand: String, command: String): List<String>? {
         GetFromSacksTabComplete.handleTabComplete(command)?.let { return it }
         PlayerTabComplete.handleTabComplete(fullCommand)?.let { return it }
-        CollectionTracker.handleTabComplete(command)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
 

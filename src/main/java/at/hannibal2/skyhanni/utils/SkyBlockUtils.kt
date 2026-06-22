@@ -14,6 +14,7 @@ object SkyBlockUtils {
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
+    @JvmStatic
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby

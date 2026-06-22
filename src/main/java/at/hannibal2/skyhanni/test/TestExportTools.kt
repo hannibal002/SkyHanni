@@ -10,26 +10,75 @@ import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.KotlinTypeAdapterFactory
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
-import net.minecraft.world.item.ItemStack
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtAccounter
+import net.minecraft.nbt.NbtIo
+import net.minecraft.resources.Identifier
+import net.minecraft.world.item.component.CustomData
+import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 import java.io.Reader
+import java.util.Base64
+import kotlin.jvm.optionals.getOrNull
 
 @SkyHanniModule
 object TestExportTools {
 
     private val config get() = DevApi.config.debug
 
-    val gson = GsonBuilder()
+    @PublishedApi
+    internal val gson: Gson = GsonBuilder()
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
+        .registerTypeAdapter(SafeItemStack::class.java, LegacyItemStackTypeAdapter())
         .create()
+
+    private class LegacyItemStackTypeAdapter : TypeAdapter<SafeItemStack>() {
+        override fun write(out: JsonWriter, value: SafeItemStack?) {
+            out.nullValue()
+        }
+
+        override fun read(reader: JsonReader): SafeItemStack {
+            val base64 = reader.nextString()
+            val bytes = Base64.getDecoder().decode(base64)
+            val tag = NbtIo.readCompressed(ByteArrayInputStream(bytes), NbtAccounter.unlimitedHeap())
+            return buildFromLegacyNbt(tag)
+        }
+
+        private fun buildFromLegacyNbt(tag: CompoundTag): SafeItemStack {
+            val rawId = tag.getString("id").getOrNull().orEmpty()
+                .replace("minecraft:skull", "minecraft:player_head")
+            val count = tag.getByte("Count").getOrNull()?.toInt()?.coerceAtLeast(1) ?: 1
+            val oldTag = tag.getCompound("tag").getOrNull() ?: CompoundTag()
+            val extraAttribs = oldTag.getCompound("ExtraAttributes").getOrNull() ?: CompoundTag()
+
+            val item = BuiltInRegistries.ITEM.getValue(Identifier.parse(rawId))
+            val stack = SafeItemStack(item, count)
+
+            if (!extraAttribs.isEmpty) {
+                stack.set(DataComponents.CUSTOM_DATA, CustomData.of(extraAttribs))
+            }
+            if (oldTag.contains("ench")) {
+                stack.set(DataComponents.ENCHANTMENT_GLINT_OVERRIDE, true)
+            }
+
+            return stack
+        }
+    }
 
     class Key<T> internal constructor(val name: String)
 
-    val Item = Key<ItemStack>("Item")
+    val Item = Key<SafeItemStack>("Item")
 
     @KSerializable
     data class TestValue(
@@ -48,7 +97,7 @@ object TestExportTools {
     }
 
     @HandleEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!config.copyItemDataCompressed.isKeyHeld() && !config.copyItemData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         if (config.copyItemData.isKeyHeld()) {

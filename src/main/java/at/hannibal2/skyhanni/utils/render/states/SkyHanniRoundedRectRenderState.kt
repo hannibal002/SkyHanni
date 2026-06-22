@@ -16,7 +16,8 @@ class SkyHanniRoundedRectRenderState(
     private val smoothness: Float,
     params: RoundedRenderStateParams,
     scissor: ScreenRectangle?,
-) : AbstractSkyHanniRoundedRectRenderState(x, y, width, height, params, scissor) {
+    private val bottomColor: Int = color,
+) : AbstractSkyHanniRoundedShapeRenderState(x, y, width, height, params, scissor) {
 
     override val padding = 5
     override fun pipeline() = SkyHanniRenderPipeline.ROUNDED_RECT_DEFERRED()
@@ -24,7 +25,7 @@ class SkyHanniRoundedRectRenderState(
     override fun writeVertex(consumer: VertexConsumer, vx: Float, vy: Float, isTop: Boolean) = with(params) {
         val buf = consumer as BufferBuilder
         buf.addVertex(matXScale * vx + matXTranslation, matYScale * vy + matYTranslation, 0f)
-        buf.setColor(color)
+        buf.setColor(if (isTop) color else bottomColor)
         buf.writeParams(radius, smoothness, adjustedHalfSizeX, adjustedHalfSizeY, VertexElement.ROUNDED_PARAMS_0)
         buf.writeParams(adjustedCenterPosX, adjustedCenterPosY, 0f, 0f, VertexElement.ROUNDED_PARAMS_1)
     }
