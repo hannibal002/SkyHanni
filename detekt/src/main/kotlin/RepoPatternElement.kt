@@ -61,6 +61,18 @@ class RepoPatternElement private constructor(
             val failingRegexTests = mutableListOf<String>()
 
             kDoc.getDefaultSection().getContent().lines().forEach { line ->
+                wrappedRegexTestPattern.matcher(line).let { matcher ->
+                    if (!matcher.find()) return@let
+                    val test = matcher.group("test") ?: return@let
+                    regexTests.add(test)
+                    return@forEach
+                }
+                wrappedRegexFailPattern.matcher(line).let { matcher ->
+                    if (!matcher.find()) return@let
+                    val test = matcher.group("test") ?: return@let
+                    failingRegexTests.add(test)
+                    return@forEach
+                }
                 if (line.contains("REGEX-TEST: ")) {
                     val test = line.substringAfter("REGEX-TEST: ")
                     require(test.trim() == test) {
@@ -68,6 +80,7 @@ class RepoPatternElement private constructor(
                             "intentional, use WRAPPED-REGEX-TEST instead."
                     }
                     regexTests.add(test)
+                    return@forEach
                 }
                 if (line.contains("REGEX-FAIL: ")) {
                     val test = line.substringAfter("REGEX-FAIL: ")
@@ -76,16 +89,7 @@ class RepoPatternElement private constructor(
                             "intentional, use WRAPPED-REGEX-FAIL instead."
                     }
                     failingRegexTests.add(test)
-                }
-                wrappedRegexTestPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@forEach
-                    val test = matcher.group("test") ?: return@forEach
-                    regexTests.add(test)
-                }
-                wrappedRegexFailPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@forEach
-                    val test = matcher.group("test") ?: return@forEach
-                    failingRegexTests.add(test)
+                    return@forEach
                 }
             }
             return regexTests to failingRegexTests
