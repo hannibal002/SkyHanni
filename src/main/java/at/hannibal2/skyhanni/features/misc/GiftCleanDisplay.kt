@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -13,10 +12,9 @@ object GiftCleanDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.giftCleanDisplay
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStand>) {
         if (!config) return
-        if (!SkyBlockUtils.inSkyBlock) return
 
         if (event.chatComponent.string.startsWith("From:") || event.chatComponent.string.startsWith("To:")) {
             event.chatComponent = Component.empty()
