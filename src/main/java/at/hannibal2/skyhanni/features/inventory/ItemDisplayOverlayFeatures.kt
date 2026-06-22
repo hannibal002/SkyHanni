@@ -45,6 +45,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -319,8 +320,9 @@ object ItemDisplayOverlayFeatures {
 
         if (BESTIARY_LEVEL.isSelected() && (
                 chestName.contains("Bestiary ➜") ||
-                    chestName.contains("Fishing ➜")
-                ) && lore.any {
+                chestName.contains("Fishing ➜")
+            ) &&
+            lore.any {
                 it.contains("Deaths: ")
             }
         ) {
@@ -330,7 +332,9 @@ object ItemDisplayOverlayFeatures {
             } ?: run {
                 val tier = itemName.split(" ")
 
-                return tier.last().romanToDecimalIfNecessary().toString()
+                tier.last().romanToDecimalIfNecessaryOrNull()?.run {
+                    return toString()
+                }
             }
         }
 
