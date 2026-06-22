@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
@@ -40,7 +41,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
@@ -140,7 +140,7 @@ object SackApi {
     val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
-    private val stackList = mutableMapOf<Int, ItemStack>()
+    private val stackList = mutableMapOf<Int, SafeItemStack>()
     private const val GEMSTONE_FILTER_SLOT = 41
 
     // TODO replace string with internal name, but also test if this works for all items as expected!
@@ -199,7 +199,7 @@ object SackApi {
     private fun getGemInternalName(gemType: GemstoneType, quality: GemstoneQuality = GemstoneQuality.ROUGH) =
         "${quality.name}_${gemType.name}_GEM".toInternalName()
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processGemstoneItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
         gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val gemName = group("gem") ?: return@matchMatcher
@@ -248,7 +248,7 @@ object SackApi {
         }
     }
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processRuneItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processRuneItem(savingSacks: Boolean) {
         val rune = SackRune()
         numPattern.matchAll(value.getLore()) {
             val level = group("level").romanToDecimal()
@@ -269,7 +269,7 @@ object SackApi {
         }
     }
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processOtherItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processOtherItem(savingSacks: Boolean) {
         val item = SackOtherItem()
         numPattern.firstMatcher(value.getLore()) {
             val stored = group("stored").formatInt()
@@ -456,7 +456,7 @@ object SackApi {
     }
 
     data class SackRune(
-        var stack: ItemStack? = null,
+        var stack: SafeItemStack? = null,
         var lvl1: Int = 0,
         var lvl2: Int = 0,
         var lvl3: Int = 0,

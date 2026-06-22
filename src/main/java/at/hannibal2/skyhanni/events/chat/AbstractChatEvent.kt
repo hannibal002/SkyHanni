@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.skyhanni.utils.Legacy
 import net.minecraft.network.chat.Component
 
 object AbstractChatEvent {
@@ -12,7 +13,7 @@ object AbstractChatEvent {
         chatComponent: Component,
         blockedReason: String? = null,
     ) : SystemMessageEvent.Allow(messageComponent.getText(), chatComponent, blockedReason) {
-        @Deprecated(
+        @Legacy(
             "Use cleanMessage unless you really need color codes",
             replaceWith = ReplaceWith("this.cleanMessage")
         )
@@ -23,9 +24,8 @@ object AbstractChatEvent {
     open class Modify(
         val messageComponent: ComponentSpan,
         chatComponent: Component,
-        blockedReason: String? = null,
-    ) : SystemMessageEvent.Modify(messageComponent.getText(), chatComponent, blockedReason) {
-        @Deprecated(
+    ) : SystemMessageEvent.Modify(messageComponent.getText(), chatComponent) {
+        @Legacy(
             "Use cleanMessage unless you really need color codes",
             replaceWith = ReplaceWith("this.cleanMessage")
         )

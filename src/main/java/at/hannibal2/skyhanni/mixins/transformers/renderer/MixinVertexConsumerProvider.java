@@ -19,10 +19,10 @@ public class MixinVertexConsumerProvider {
 
     @Inject(method = "getBuffer", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;endBatch(Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/mojang/blaze3d/vertex/BufferBuilder;)V", shift = At.Shift.BEFORE), cancellable = true)
     private void onGetBuffer(RenderType renderType, CallbackInfoReturnable<VertexConsumer> cir, @Local BufferBuilder bufferBuilder) {
-        if (!renderType./*? if < 1.21.11 {*/ getName() /*?} else {*/ /*name *//*?}*/.contains("skyhanni")) {
+        if (!renderType.name.contains("skyhanni")) {
             return;
         }
-        if (renderType./*? if < 1.21.11 {*/ getName() /*?} else {*/ /*name *//*?}*/.equals(this.lastSharedType./*? if < 1.21.11 {*/ getName() /*?} else {*/ /*name *//*?}*/)) {
+        if (renderType.name.equals(this.lastSharedType.name)) {
             cir.setReturnValue(bufferBuilder);
         }
     }

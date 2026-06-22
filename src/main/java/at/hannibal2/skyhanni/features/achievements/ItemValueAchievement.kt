@@ -24,7 +24,7 @@ object ItemValueAchievement {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityClick(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (AchievementManager.isCompleted(ITEM_VALUE_ACHIEVEMENT)) return
         val stack = event.newStack
         val value = EstimatedItemValueCalculator.getTotalPrice(stack, ignoreBasePrice = true) ?: return
