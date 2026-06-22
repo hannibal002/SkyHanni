@@ -28,7 +28,7 @@ open class ApiResponse<T> (open val success: Boolean, open val message: String?,
 
 /**
  * See [ApiResponse] for general field definitions.
- * Represents the response from an API request that returns a ZIP file.
+ * Represents the response from an API request that returns a binary file.
  * @param data The [Long] representing the number of bytes written to the [java.io.File],
  *  can be null if the request was unsuccessful or if no data was returned.
  */
