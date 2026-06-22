@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import kotlin.collections.orEmpty
 import kotlin.time.Duration.Companion.minutes
 
 /**
