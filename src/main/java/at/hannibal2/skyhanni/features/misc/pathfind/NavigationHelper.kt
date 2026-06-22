@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.hover
 object NavigationHelper {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
-    private val messageId = ChatUtils.getUniqueCustomMessageId()
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
         GraphNodeTag.NPC,
