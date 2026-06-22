@@ -288,7 +288,7 @@ object ChatManager {
         while (iterator.hasNext()) {
             val lineIndex = iterator.nextIndex()
             val line = iterator.next()
-            if (line.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()) {
+            if (line.parent == message) {
                 if (targetIndex == null) targetIndex = lineIndex
                 iterator.remove()
             }
@@ -312,7 +312,7 @@ object ChatManager {
             val newLine = GuiMessage.Line(message, line, endOfEntry)
             //?} else {
             /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
+            newLine.parent = newMessage
             *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
         }
@@ -349,9 +349,7 @@ object ChatManager {
             if (predicate(message)) {
                 iterator.remove()
 
-                val found = chatGui.trimmedMessages.removeIf {
-                    it.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()
-                }
+                val found = chatGui.trimmedMessages.removeIf { it.parent == message }
                 if (!found) {
                     ErrorManager.logErrorWithData(
                         IllegalStateException("Failed to find associated chat lines"),

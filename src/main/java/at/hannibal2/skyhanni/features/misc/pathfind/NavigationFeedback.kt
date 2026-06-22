@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 object NavigationFeedback {
 
     private val config get() = SkyHanniMod.feature.misc.navigation.pathfinding
-    private val pathFindMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val pathFindMessageId = ChatUtils.getUniqueMessageId()
     private var guiRenderable: Renderable? = null
     private var lastChatMessageSent = SimpleTimeMark.farPast()
     private var navActive: Boolean = false
