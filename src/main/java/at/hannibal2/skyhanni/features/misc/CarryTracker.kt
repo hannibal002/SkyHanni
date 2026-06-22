@@ -200,6 +200,8 @@ object CarryTracker {
 
     fun isCustomer(customerName: String): Boolean = getCustomerOrNull(customerName) != null
 
+    fun getCustomers(): List<Customer> = customers.toList()
+
     private fun getCustomerOrNull(customerName: String): Customer? = customers.find {
         it.name.equals(customerName, ignoreCase = true)
     }
