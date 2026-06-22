@@ -15,7 +15,7 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val commonShortNameCased = "SH"
     override val configDirectory = ConfigManager.configDirectory
     override val config get() = SkyHanniMod.feature.dev.repo
-    override val backupRepoResourcePath: String = "assets/skyhanni/repo.zip"
+    override val backupRepoResourcePath: String = "assets/skyhanni/repo.tar.gz"
 
     override val reloadCommand: String = "shreloadlocalrepo"
     override val statusCommand: String = "shrepostatus"
