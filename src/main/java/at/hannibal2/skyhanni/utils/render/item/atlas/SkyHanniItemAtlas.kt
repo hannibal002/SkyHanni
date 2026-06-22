@@ -8,9 +8,6 @@ import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.resources.Identifier
 
-//? if >= 26.1
-import org.joml.Matrix4f
-
 internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHanniItemAtlasEntry>() {
 
     override val identifier: Identifier by lazy {
