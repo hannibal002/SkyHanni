@@ -24,7 +24,7 @@ class MemoryRepoFileSystem(
     private val storage = ConcurrentHashMap<String, ByteArray>()
 
     /**
-     * Tracks the result of the background disk-flush started in [loadFromZip].
+     * Tracks the result of the background disk-flush started in [loadFromTgz].
      * Completed (successfully or exceptionally) before [transitionAfterReload] proceeds.
      */
     private var flushResult: CompletableDeferred<Unit>? = null
@@ -48,21 +48,21 @@ class MemoryRepoFileSystem(
     }.map { it.removePrefix("$path/") }
 
     /**
-     * Loads entries from [zipFile] into in-memory storage (via [loadFromZip]), then
+     * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz]), then
      * kicks off a background [flushResult] job to persist those bytes to [root].
      *
      * The flush is intentionally deferred to after the reload event fires, so that event
      * handlers benefit from fast in-memory reads without waiting for disk I/O. Call
      * [transitionAfterReload] to wait for the flush and switch to [DiskRepoFileSystem].
      */
-    override suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean {
-        progress.update("repo memory file system loadFromZip")
-        val success = super.loadFromZip(progress, zipFile)
+    override suspend fun loadFromTgz(progress: ChatProgressUpdates, tgzFile: File): Boolean {
+        progress.update("repo memory file system loadFromTgz")
+        val success = super.loadFromTgz(progress, tgzFile)
         check(flushResult == null) {
-            "loadFromZip called twice on the same MemoryRepoFileSystem instance"
+            "loadFromTgz called twice on the same MemoryRepoFileSystem instance"
         }
         flushResult = flushToDisk(progress.category, root)
-        progress.update("loadFromZip end")
+        progress.update("loadFromTgz end")
         return success
     }
 
