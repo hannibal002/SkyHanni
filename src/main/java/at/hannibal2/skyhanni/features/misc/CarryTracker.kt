@@ -830,5 +830,6 @@ object CarryTracker {
         }
     }
 
+    fun getCustomers(): List<Customer> = customers.toList()
     fun isCustomer(customerName: String): Boolean = findCustomer(customerName) != null
 }
