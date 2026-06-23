@@ -40,29 +40,29 @@ object ToolkitCropReplacer {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
         if (!GardenApi.toolkitInventory.isInside()) return
-        if (event.slot !in 10..16 && event.slot !in 20..24) return
+        
+        val slot = event.slot
+        if (slot !in 10..16 && slot !in 20..24) return
 
         val item = event.originalItem
-        if (item.isEmpty) {
-            if (!fullyLoaded) return
-            iconCache.remove(event.slot)
-        }
+        if (item.isEmpty) return
+
         val cropType = item.getCropType()
         if (cropType == null) {
-            storedTools.remove(event.slot)
-            iconCache.remove(event.slot)
+            storedTools.remove(slot)
+            iconCache.remove(slot)
             return
         }
 
         // For swapping sunflower/moonflower icon
-        if (storedTools[event.slot] != cropType) {
-            iconCache.remove(event.slot)
+        if (storedTools[slot] != cropType) {
+            iconCache.remove(slot)
         }
-        storedTools[event.slot] = cropType
+        storedTools[slot] = cropType
 
         val iconId = "toolkit_crop_replacer:${cropType.name}"
 
-        val replacementStack = iconCache.getOrPut(event.slot) {
+        val replacementStack = iconCache.getOrPut(slot) {
             val stack = cropType.getItemStackCopy(iconId).apply {
                 setLore(item.getLoreComponent())
                 setCustomItemName(item.hoverName)
