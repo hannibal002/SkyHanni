@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -44,8 +45,8 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.MINESHAFT) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.MINESHAFT) return
 
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
         val direction = MinecraftCompat.localPlayer.direction.unitVec3i
@@ -60,7 +61,7 @@ object MineshaftWaypoints {
         when (event.packet) {
             is ClientboundLevelChunkWithLightPacket -> isWorldLoaded = true
             is ClientboundPlayerPositionPacket -> {
-                if (!event.packet.relatives.isEmpty()) return
+                if (event.packet.relatives.isNotEmpty()) return
 
                 val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
                 val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
