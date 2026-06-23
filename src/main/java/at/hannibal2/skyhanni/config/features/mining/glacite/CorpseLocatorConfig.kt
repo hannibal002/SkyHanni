@@ -13,10 +13,22 @@ class CorpseLocatorConfig {
     var enabled: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Show All Corpse Locations", desc = "Marks a waypoint at all possible corpse locations inside the Mineshaft.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var allCorpseLocations: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Auto Send Location",
         desc = "Automatically send the location and type of the corpse in party chat."
     )
     @ConfigEditorBoolean
     var autoSendLocation: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "All Found Alert", desc = "Displays an alert when all corpses have been found.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var allFoundAlert: Boolean = false
 }

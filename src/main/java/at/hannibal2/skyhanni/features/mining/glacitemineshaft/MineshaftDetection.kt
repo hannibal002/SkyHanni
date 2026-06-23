@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.MineshaftUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -126,6 +127,22 @@ object MineshaftDetection {
         for (otherTypes in MineshaftType.entries) {
             if (otherTypes == type) continue
             setSinceMineshaftType(otherTypes, getSinceMineshaftType(otherTypes) + 1)
+        }
+
+        val locatorConfig = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+
+        if (locatorConfig.enabled && locatorConfig.allCorpseLocations) {
+            val locations = MineshaftUtils.corpseLocations.getOrElse(type) { mutableListOf() }
+
+            for (loc in locations) {
+                MineshaftWaypoints.waypoints.add(
+                    MineshaftWaypoint(
+                        waypointType = MineshaftWaypointType.POTENTIAL,
+                        location = loc,
+                        isCorpse = true,
+                    ),
+                )
+            }
         }
     }
 

@@ -13,6 +13,7 @@ enum class MineshaftWaypointType(
     UMBER("Umber Corpse", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET"),
     TUNGSTEN("Tungsten Corpse", LorenzColor.GRAY, "MINERAL_HELMET"),
     VANGUARD("Vanguard Corpse", LorenzColor.BLUE, "VANGUARD_HELMET"),
+    POTENTIAL("Potential Corpse", LorenzColor.WHITE),
     ENTRANCE("Entrance", LorenzColor.YELLOW),
     LADDER("Ladder", LorenzColor.YELLOW)
     ;

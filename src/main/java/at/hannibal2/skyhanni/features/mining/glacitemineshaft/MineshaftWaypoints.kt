@@ -97,8 +97,9 @@ object MineshaftWaypoints {
                 (it.isCorpse && config.corpseLocator.enabled) || (!it.isCorpse && config.mineshaftWaypoints.enabled)
             }
             .forEach {
-                event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.displayText}", 1.0)
+                val maxAlpha = if (it.waypointType == MineshaftWaypointType.POTENTIAL) 0.2f else 0.33f
+                event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true, maximumAlpha = maxAlpha)
+                event.drawDynamicText(it.location, "${it.colorCode}${it.waypointType.displayText}", it.scale)
             }
     }
 
