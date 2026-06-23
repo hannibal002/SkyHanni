@@ -9,8 +9,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 class CenturyCelebrationConfig {
 
     @ConfigOption(
-        name = "Daily Highlight",
-        desc = "Highlights incomplete daily tasks.",
+        name = "Raffle Task Highlighter",
+        desc = "Highlights incomplete raffle tasks.",
     )
     @Expose
     @ConfigEditorBoolean
