@@ -142,7 +142,7 @@ object MineshaftWaypoints {
                 // Adjust 2 blocks to the right to be in the center of the ladder shaft
                 .add(x = direction.z * -2, z = direction.x * 2)
                 // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = -15)
+                .add(y = BLOCKS_DOWN)
 
             waypoints.removeIf { it.waypointType == MineshaftWaypointType.LADDER }
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
