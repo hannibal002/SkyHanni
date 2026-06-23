@@ -24,7 +24,7 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
 
         val compiledPattern = repoPatternElement.pattern
         val internalRegexGroups: Set<String> = compiledPattern.namedGroups().keys
-        var foundAnyNonEmptyInternalCapture = false
+        val exercisedGroups = mutableSetOf<String>()
 
         passingTests.forEach { test ->
             val regex = test.test
@@ -51,7 +51,7 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
                 val capturedValue = matcher.group(groupName) ?: ""
 
                 if (capturedValue.isNotEmpty()) {
-                    foundAnyNonEmptyInternalCapture = true
+                    exercisedGroups.add(groupName)
                 }
 
                 val expectedValue = test.groups[groupName] ?: return@forEach
@@ -66,11 +66,12 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
             }
         }
 
-        if (internalRegexGroups.isNotEmpty() && !foundAnyNonEmptyInternalCapture) {
+        if (exercisedGroups.size < internalRegexGroups.size) {
+            val unexercisedGroups = internalRegexGroups - exercisedGroups
             delegate.reportIssue(
                 "Repo pattern `$variableName` defines internal named groups $internalRegexGroups, " +
-                    "but all test strings capture nothing but empty strings (\"\"). Provide a test string " +
-                    "that actually exercises and populates at least one group."
+                    "but the following groups never captured a non-empty value in any test: $unexercisedGroups. " +
+                    "Every group must capture non-empty text at least once."
             )
         }
 

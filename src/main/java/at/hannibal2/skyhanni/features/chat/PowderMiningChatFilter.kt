@@ -148,6 +148,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§9Ascension Rope
+     * REGEX-TEST: §r§9Ascension Rope §r§8x2
      */
     private val ascensionRopeRewardPattern by patternGroup.pattern(
         "reward.ascensionrope",
@@ -156,6 +157,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§aWishing Compass
+     * REGEX-TEST: §r§aWishing Compass §r§8x3
      */
     private val wishingCompassRewardPattern by patternGroup.pattern(
         "reward.wishingcompass",
@@ -164,6 +166,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§aOil Barrel
+     * REGEX-TEST: §r§aOil Barrel §r§8x5
      */
     private val oilBarrelRewardPattern by patternGroup.pattern(
         "reward.oilbarrel",
@@ -172,6 +175,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§fPrehistoric Egg
+     * REGEX-TEST: §r§fPrehistoric Egg §r§8x2
      */
     private val prehistoricEggPattern by patternGroup.pattern(
         "reward.prehistoricegg",
@@ -180,6 +184,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§5Pickonimbus 2000
+     * REGEX-TEST: §r§5Pickonimbus 2000 §r§8x2
      */
     private val pickonimbusPattern by patternGroup.pattern(
         "reward.pickonimbus",
@@ -188,6 +193,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§6Jungle Heart
+     * REGEX-TEST: §r§6Jungle Heart §r§8x2
      */
     private val jungleHeartPattern by patternGroup.pattern(
         "reward.jungleheart",
@@ -196,6 +202,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§aSludge Juice
+     * REGEX-TEST: §r§aSludge Juice §r§8x16
      */
     private val sludgeJuicePattern by patternGroup.pattern(
         "reward.sludgejuice",
@@ -204,6 +211,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§aYoggie
+     * REGEX-TEST: §r§aYoggie §r§8x4
      */
     private val yoggiePattern by patternGroup.pattern(
         "reward.yoggie",
@@ -212,6 +220,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§9FTX 3070
+     * REGEX-TEST: §r§9FTX 3070 §r§8x2
      * REGEX-TEST: §r§9Synthetic Heart
      * REGEX-TEST: §r§9Control Switch
      * REGEX-TEST: §r§9Robotron Reflector
@@ -226,6 +235,7 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §r§5Treasurite
+     * REGEX-TEST: §r§5Treasurite §r§8x2
      */
     private val treasuritePattern by patternGroup.pattern(
         "reward.treasurite",

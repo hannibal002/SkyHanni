@@ -98,6 +98,7 @@ object EffectApi {
 
     /**
      * WRAPPED-REGEX-TEST: " Repellent: MAX (12s)"
+     * WRAPPED-REGEX-TEST: " Repellent: (12s)"
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",

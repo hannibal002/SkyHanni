@@ -68,6 +68,7 @@ object SackApi {
     /**
      * REGEX-TEST: §7Stored: §e28,183§7/60.5k
      * REGEX-TEST: §7Stored: §80§7/60.5k
+     * REGEX-TEST: §aIII§7: §e28,183§7/60.5k
      */
     @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
