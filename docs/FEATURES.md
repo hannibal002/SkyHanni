@@ -722,8 +722,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Optimal Speed** - Show the optimal speed for your current tool in the hand. (Ty MelonKingDE for the values)
     + Also available to select directly in the rancher boots overlay (contributed by nea)
 + Desk shortcut in SkyBlock Menu.
-+ **Garden Level Display** - Show the curren
-t garden level and progress to the next level.
++ **Garden Level Display** - Show the current garden level and progress to the next level.
 + **Fake garden level up** message: - hannibal2
     + In 10k garden exp steps after level 15.
     + Uses the overflow exp that hypixel still calculates (maybe official upgrade with more garden levels in the
