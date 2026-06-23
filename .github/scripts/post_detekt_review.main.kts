@@ -147,7 +147,8 @@ val findings = buildList {
                     Finding(
                         path = normalizePath(uri, workspace),
                         line = region.get("startLine")
-                            ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }?.asInt ?: 1,
+                            ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+                            ?.asInt?.takeIf { it > 0 } ?: 1,
                         ruleId = resultObj.get("ruleId")
                             ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown",
                         message = resultObj.getAsJsonObject("message")?.get("text")

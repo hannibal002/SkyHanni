@@ -37,9 +37,9 @@ jobs:
                     HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
                     TARGET_REPO: ${{ github.repository }}
                 run: |
-                    PR_NUMBER=$(gh api "repos/$TARGET_REPO/pulls?state=open" \
-                      | jq --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
-                      '[.[] | select(.head.repo.full_name == $repo and .head.ref == $branch)] | .[0].number // empty')
+                    PR_NUMBER=$(gh api --paginate "repos/$TARGET_REPO/pulls?state=open" \
+                    | jq -s --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
+                    'add | map(select(.head.repo.full_name == $repo and .head.ref == $branch)) | .[0].number // empty')
                     echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
             -   name: Cache Kotlin compiler
