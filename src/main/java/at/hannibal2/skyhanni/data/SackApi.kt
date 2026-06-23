@@ -76,11 +76,11 @@ object SackApi {
     )
 
     /**
-     * REGEX-TEST:  Rough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
-     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
-     * REGEX-TEST:  §7Amount: §a5,968
+     * WRAPPED-REGEX-TEST: " Rough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §fRough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §aFlawed: §e604 §8(48,320)"
+     * WRAPPED-REGEX-TEST: " §9Fine: §e35 §8(224,000)"
+     * WRAPPED-REGEX-TEST: " §7Amount: §a5,968"
      */
     @Suppress("MaxLineLength")
     private val gemstoneCountPattern by patternGroup.pattern(
