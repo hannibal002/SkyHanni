@@ -10,5 +10,5 @@ data class WikiJson(
 data class Wiki(
     @Expose val name: String,
     @Expose val urlPrefix: String,
-    @Expose val searchPrefix: String,
+    @Expose val fullSearchPrefix: String,
 )

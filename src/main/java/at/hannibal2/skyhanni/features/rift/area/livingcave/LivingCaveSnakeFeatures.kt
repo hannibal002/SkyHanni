@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
@@ -98,7 +98,7 @@ object LivingCaveSnakeFeatures {
         val snake = snakes.find { event.position in it.blocks } ?: return
 
         selectedSnake = snake
-        if (event.clickType == ClickType.RIGHT_CLICK) {
+        if (event.clickType == InteractClickType.RIGHT_CLICK) {
             if (InventoryUtils.itemInHandId == FROZEN_WATER_PUNGI)
                 snake.lastCalmTime = SimpleTimeMark.now()
         } else {

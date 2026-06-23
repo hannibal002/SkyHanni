@@ -3,17 +3,18 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 
 abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val container: AbstractContainerMenu) : SkyHanniEvent() {
 
     @PrimaryFunction("onBackgroundDrawn")
     data class BackgroundDrawnEvent(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -22,7 +23,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     ) : GuiContainerEvent(gui, container), Rendering
 
     data class PreDraw(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -31,7 +32,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     ) : GuiContainerEvent(gui, container), Cancellable, Rendering
 
     data class PostDraw(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -61,7 +62,7 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     }
 
     data class ForegroundDrawnEvent(
-        override val context: GuiGraphics,
+        override val context: GuiGraphicsExtractor,
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
         val mouseX: Int,
@@ -72,32 +73,20 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
     data class SlotClickEvent(
         override val gui: SkyHanniGuiContainer,
         override val container: AbstractContainerMenu,
-        val item: ItemStack?,
+        val item: SafeItemStack?,
         val slot: Slot?,
         val slotId: Int,
         val clickedButton: Int,
-        val clickType: ClickType?,
+        val clickType: ContainerInput?,
     ) : GuiContainerEvent(gui, container), Cancellable {
 
         fun makePickblock() {
-            if (this.clickedButton == 2 && this.clickType == ClickType.MIDDLE) return
+            if (this.clickedButton == 2 && this.clickType == ContainerInput.CLONE) return
             slot?.index?.let { slotNumber ->
-                InventoryUtils.clickSlot(slotNumber, container.containerId, mouseButton = 2, mode = ClickType.MIDDLE)
+                InventoryUtils.clickSlot(slotNumber, container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
                 cancel()
             }
         }
     }
 
-    enum class ClickType(val id: Int) {
-        NORMAL(0),
-        SHIFT(1),
-        HOTBAR(2),
-        MIDDLE(3),
-        DROP(4),
-        ;
-
-        companion object {
-            fun getTypeById(id: Int) = entries.firstOrNull { it.id == id }
-        }
-    }
 }

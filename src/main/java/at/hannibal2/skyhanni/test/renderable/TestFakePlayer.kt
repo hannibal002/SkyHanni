@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
 import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.random.Random
 
@@ -60,7 +60,7 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
         Items.CHAINMAIL_BOOTS,
     )
 
-    private fun createRandomArmorPiece(armorPieces: Set<Item>): ItemStack = ItemStack(armorPieces.random()).also {
+    private fun createRandomArmorPiece(armorPieces: Set<Item>): SafeItemStack = SafeItemStack(armorPieces.random()).also {
         if (Random.nextBoolean()) it.enchant(
             EnchantmentsCompat.PROTECTION.enchantment, 1,
         )

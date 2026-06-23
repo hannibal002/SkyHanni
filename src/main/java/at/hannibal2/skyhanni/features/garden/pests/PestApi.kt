@@ -75,6 +75,7 @@ object PestApi {
 
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
+    fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
     fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
@@ -86,8 +87,8 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
-     * REGEX-TEST:  §7⏣ §aThe Garden
+     * WRAPPED-REGEX-TEST: " §7⏣ §aPlot §7- §b22a"
+     * WRAPPED-REGEX-TEST: " §7⏣ §aThe Garden"
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.no-pests",
@@ -95,7 +96,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
+     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b4 §4§lൠ§7 x1"
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
@@ -103,12 +104,13 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  §aPlot §7- §b3
+     * WRAPPED-REGEX-TEST: " §aPlot §7- §b3"
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.no-pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
+
     /**
      * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
      */
@@ -118,7 +120,7 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
+     * WRAPPED-REGEX-TEST: " Plots: 4, 12, 13, 18, 20"
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
         "tablist.infected-plots-no-color",
