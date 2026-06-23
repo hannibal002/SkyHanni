@@ -497,8 +497,7 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    if (isDeobf) enabled = false
-    else dependsOn("stonecutterPrepare")
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {
