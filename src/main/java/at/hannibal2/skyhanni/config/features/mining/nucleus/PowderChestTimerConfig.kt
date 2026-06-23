@@ -72,11 +72,13 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(name = "Mute Chest Discovery Sound", desc = "Mute the sound from discovering treasure chests.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var muteChestDiscover: Boolean = false
 
     @Expose
     @ConfigOption(name = "Mute Chest Opening Sound", desc = "Mute the sound from opening treasure chests.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var muteChestOpen: Boolean = false
 
     @Expose
