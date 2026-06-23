@@ -63,12 +63,11 @@ object ToolkitCropReplacer {
         val iconId = "toolkit_crop_replacer:${cropType.name}"
 
         val replacementStack = iconCache.getOrPut(slot) {
-            val stack = cropType.getItemStackCopy(iconId).apply {
+            cropType.getItemStackCopy(iconId).apply {
                 setLore(item.getLoreComponent())
                 setCustomItemName(item.hoverName)
+                    .set(DataComponents.CUSTOM_DATA, item.getExtraAttributes()?.let { CustomData.of(it) })
             }
-            stack.set(DataComponents.CUSTOM_DATA, item.getExtraAttributes()?.let { CustomData.of(it) })
-            return@getOrPut stack
         }
 
         event.replace(replacementStack.copy())
