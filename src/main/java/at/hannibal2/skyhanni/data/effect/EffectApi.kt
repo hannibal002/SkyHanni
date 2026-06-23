@@ -97,12 +97,12 @@ object EffectApi {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " Repellent: MAX (12s)"
-     * WRAPPED-REGEX-TEST: " Repellent: (12s)"
+     * WRAPPED-REGEX-TEST: " Repellent: MAX (12s)"; tier="MAX", time="12"
+     * WRAPPED-REGEX-TEST: " Repellent: (12s)";     tier="",    time="12"
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
-        " Repellent: (?<tier>\\w+)?(?: \\((?<time>\\d)s\\))?",
+        " Repellent: (?:(?<tier>\\w+) )?(?:\\((?<time>\\d+)s\\))?",
     )
 
     /**

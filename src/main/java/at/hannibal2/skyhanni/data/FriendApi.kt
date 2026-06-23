@@ -48,19 +48,19 @@ object FriendApi {
     )
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§e is no longer a best friend!§r§9§m
+     * REGEX-TEST: [MVP++] hannibal2 is no longer a best friend!
      */
     private val noBestFriendPattern by patternGroup.pattern(
-        "removebest",
-        ".*\n§r(?<name>.*)§e is no longer a best friend!§r§9§m\n.*",
+        "removebest.colorless",
+        "(?<name>.*) is no longer a best friend!",
     )
 
     /**
-     * REGEX-TEST: §r§b[MVP§r§c+§r§b] hannibal2§r§a is now a best friend!§r§9§m
+     * REGEX-TEST: [MVP++] hannibal2 is now a best friend!
      */
     private val bestFriendPattern by patternGroup.pattern(
-        "addbest",
-        ".*\n(?<name>.*)§a is now a best friend!§r§9§m\n.*",
+        "addbest.colorless",
+        "(?<name>.*) is now a best friend!",
     )
 
     /**
@@ -135,11 +135,11 @@ object FriendApi {
             addFriend(name)
         }
 
-        noBestFriendPattern.matchMatcher(event.message) {
+        noBestFriendPattern.matchMatcher(event.cleanMessage) {
             val name = group("name").cleanPlayerName()
             setBestFriend(name, false)
         }
-        bestFriendPattern.matchMatcher(event.message) {
+        bestFriendPattern.matchMatcher(event.cleanMessage) {
             val name = group("name").cleanPlayerName()
             setBestFriend(name, true)
         }
