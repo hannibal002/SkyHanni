@@ -35,11 +35,11 @@ object GeorgeHelper {
     private val patternGroup = RepoPattern.group("george.taming-sixty")
 
     /**
-     * REGEX-TEST:   §dMythic Enderman
-     * REGEX-TEST:   §6Legendary Black Cat
-     * REGEX-TEST:   §5Epic Rift Ferret
-     * REGEX-TEST:   §5Epic Jellyfish
-     * REGEX-TEST:   §9Rare Frost Wisp
+     * WRAPPED-REGEX-TEST: "  §dMythic Enderman"
+     * WRAPPED-REGEX-TEST: "  §6Legendary Black Cat"
+     * WRAPPED-REGEX-TEST: "  §5Epic Rift Ferret"
+     * WRAPPED-REGEX-TEST: "  §5Epic Jellyfish"
+     * WRAPPED-REGEX-TEST: "  §9Rare Frost Wisp"
      */
     private val neededPetPattern by patternGroup.pattern(
         "needed-pet.loreline",

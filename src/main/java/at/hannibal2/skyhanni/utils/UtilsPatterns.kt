@@ -88,7 +88,7 @@ object UtilsPatterns {
 
     /**
      * REGEX-TEST: 8x Enchanted Pork
-     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     * WRAPPED-REGEX-TEST: "  §810x §r§bGlacite Jewel"
      */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",

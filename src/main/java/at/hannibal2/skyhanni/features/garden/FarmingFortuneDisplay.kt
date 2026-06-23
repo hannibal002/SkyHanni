@@ -56,7 +56,7 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
 
     /**
-     * REGEX-TEST:  Farming Fortune: ☘1234
+     * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
@@ -98,10 +98,10 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEST:  Bonus: INACTIVE
-     * REGEX-TEST:  Bonus: +200☘ 29m
-     * REGEX-TEST:  Bonus: +200☘ 5m 2s
-     * REGEX-TEST:  Bonus: +200☘ 8s
+     * WRAPPED-REGEX-TEST: " Bonus: INACTIVE"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 29m"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 5m 2s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 8s"
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
