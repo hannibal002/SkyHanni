@@ -11,8 +11,8 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
-        val (element, variableName, rawPattern) =
-            ctx.getRepoPatternElementSplat(delegate) ?: return
+        val element = ctx.getRepoPatternElement(delegate) ?: return
+        if (!element.needsRegexTest()) return
 
         element.regexTests.forEach { test ->
             val regex = test.test
@@ -21,7 +21,7 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
 
             if (!matcher.find()) {
                 delegate.reportIssue(
-                    "Repo pattern `$variableName` failed regex test: `$regex` pattern: `$rawPattern`. " +
+                    "Repo pattern `${element.variableName}` failed regex test: `$regex` pattern: `${element.rawPattern}`. " +
                         "[View on Regex101](${element.regex101Url})",
                 )
             }
@@ -30,7 +30,7 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
         element.failingRegexTests.forEach { test ->
             if (element.pattern.matcher(test).find()) {
                 delegate.reportIssue(
-                    "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
+                    "Repo pattern `${element.variableName}` passed regex test: `$test` pattern: `${element.rawPattern}` " +
                         "even though it was set to fail. [View on Regex101](${element.regex101Url})",
                 )
             }

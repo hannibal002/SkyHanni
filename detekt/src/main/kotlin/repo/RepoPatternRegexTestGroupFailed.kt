@@ -11,8 +11,8 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
-        val (element, variableName, rawPattern) =
-            ctx.getRepoPatternElementSplat(delegate) ?: return
+        val element = ctx.getRepoPatternElement(delegate) ?: return
+        if (!element.needsRegexTest()) return
         val compiledPattern = element.pattern
 
         val internalRegexGroups: Set<String> = compiledPattern.namedGroups().keys
@@ -26,7 +26,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
             test.groups.keys.forEach { specifiedGroupName ->
                 if (!internalRegexGroups.contains(specifiedGroupName)) {
                     delegate.reportIssue(
-                        "Repo pattern `$variableName` specifies a test value for group `$specifiedGroupName`, " +
+                        "Repo pattern `${element.variableName}` specifies a test value for group `$specifiedGroupName`, " +
                             "but no group named `$specifiedGroupName` exists inside the regular expression."
                     )
                 }
@@ -43,7 +43,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
 
                 if (expectedValue != capturedValue) {
                     delegate.reportIssue(
-                        "Repo pattern `$variableName` failed regex test: `${test.test}` pattern: `$rawPattern`. " +
+                        "Repo pattern `${element.variableName}` failed regex test: `${test.test}` pattern: `${element.rawPattern}`. " +
                             "Group `$groupName` expected `$expectedValue` got `$capturedValue`. " +
                                 "[View on Regex101](${element.regex101Url})",
                     )
@@ -55,7 +55,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
             val unexercisedGroups = internalRegexGroups - exercisedGroups
 
             delegate.reportIssue(
-                "Repo pattern `$variableName` defines internal named groups $internalRegexGroups, " +
+                "Repo pattern `${element.variableName}` defines internal named groups $internalRegexGroups, " +
                     "but the following groups never captured a non-empty value in any test: $unexercisedGroups. " +
                     "Every group must capture non-empty text at least once."
             )

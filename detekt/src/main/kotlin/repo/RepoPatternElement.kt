@@ -33,6 +33,10 @@ class RepoPatternElement private constructor(
         "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests&flavor=java"
     }
 
+    fun needsRegexTest(): Boolean {
+        return regexConstructs.containsMatchIn(rawPattern)
+    }
+
     companion object {
         private val wrappedRegexTestPattern =
             "WRAPPED-REGEX-TEST: \"(?<test>(?:\\\\\"|[^\"])*)\"(?:\\s*;(?<rest>.*))?".toPattern()
@@ -213,5 +217,7 @@ class RepoPatternElement private constructor(
                 key to value.removeSurrounding("\"")
             }
         }
+
+        private val regexConstructs = Regex("""(?<!\\)[.*+(){}\[|?]""")
     }
 }

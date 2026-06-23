@@ -11,7 +11,6 @@ class RepoPatternUnnamedGroup(config: Config, private val ctx: RepoPatternContex
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
-
         val element = ctx.getRepoPatternElement(delegate) ?: return
 
         if (element.rawPattern.hasUnnamedGroup()) {
