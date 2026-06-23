@@ -19,7 +19,7 @@ class MouseSensitivityReducerConfig {
         desc = "You can type §e/shmouselock §rto lock your mouse rotation, and §e/shsensreduce §rto reduce your sensitivity.",
     )
     @ConfigEditorInfoText
-    val notice: String = ""
+    var notice: String = ""
 
     @Expose
     @ConfigOption(name = "Auto Enable", desc = "Automatically lower mouse sensitivity while in the garden.")
