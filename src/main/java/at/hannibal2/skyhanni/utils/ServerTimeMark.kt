@@ -47,7 +47,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
     override fun toString(): String = when (this) {
         farPast() -> "The Far Past"
         farFuture() -> "The Far Future"
-        else -> "ServerTimeMark(millis=$millis})"
+        else -> "ServerTimeMark(millis=$millis)"
     }
 
     @OptIn(ExperimentalTime::class)

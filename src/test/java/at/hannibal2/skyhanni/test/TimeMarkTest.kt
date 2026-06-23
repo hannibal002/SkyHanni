@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.days
 
 class TimeMarkTest {
