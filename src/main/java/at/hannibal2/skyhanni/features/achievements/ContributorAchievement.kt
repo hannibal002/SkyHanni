@@ -30,7 +30,8 @@ object ContributorAchievement {
                     append("Be in the same lobby as a")
                     appendWithColor(" SkyHanni ", TextHelper.chromaStyle)
                     append("contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
             CONTRIBUTOR_ACHIEVEMENT
         )
@@ -42,7 +43,8 @@ object ContributorAchievement {
                     append("Have a ")
                     appendWithColor("SkyHanni ", TextHelper.chromaStyle)
                     append("contributor as a friend")
-                }
+                },
+                userLuckAmount = 0f,
             ),
             CONTRIBUTOR_FRIEND_ACHIEVEMENT
         )
@@ -53,7 +55,8 @@ object ContributorAchievement {
                 componentBuilder {
                     append("Have your friend request ignored by ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
-                }
+                },
+                userLuckAmount = 0f,
             ),
             CONTRIBUTOR_NOBODY_ACHIEVEMENT
         )
@@ -65,7 +68,8 @@ object ContributorAchievement {
                     append("Have your friend request declined by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
                     append(" contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
             CONTRIBUTOR_REJECTED_ACHIEVEMENT
         )
