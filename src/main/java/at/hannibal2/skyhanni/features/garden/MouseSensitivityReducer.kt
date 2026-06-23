@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfig
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -26,16 +26,13 @@ import com.google.gson.JsonPrimitive
 @SkyHanniModule
 object MouseSensitivityReducer {
 
+    // shared /shmouselock and /shsensreduce because they modify the same state
     private val MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
     val config get() = GardenApi.config.mouseSensitivityReducer
 
     private var activeState: SensitivityState = SensitivityState.UNCHANGED
     private var manualState: SensitivityState? = null
-        set(value) {
-            field = value
-            onTick()
-        }
 
     /**
      * REGEX-TEST: Teleported you to Plot - 1!
@@ -50,20 +47,19 @@ object MouseSensitivityReducer {
         "(?<plot>Warping\\.\\.\\.)",
     )
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
-        if (manualState == null) return
+        if (manualState == null || config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
 
         teleportPattern.matchMatchers(event.cleanMessage) {
-            if (config.unlockOnTeleport.condition(group("plot"))) DelayedRun.runNextTick {
-                if (config.chatMessage) ChatUtils.notifyOrDisable(
-                    if (manualState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
-                    else "Mouse rotation has been unlocked because you teleported.",
-                    config::unlockOnTeleport,
-                    messageId = MESSAGE_ID,
-                )
+            if (config.unlockOnTeleport.condition(group("plot"))) {
+                val message = if (manualState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
+                else "Mouse rotation has been unlocked because you teleported."
+
                 manualState = null
+                update()
+
+                if (config.chatMessage) ChatUtils.notifyOrDisable(message, config::unlockOnTeleport, messageId = MESSAGE_ID)
             }
         }
     }
@@ -71,25 +67,27 @@ object MouseSensitivityReducer {
     @HandleEvent
     fun onWorldChange() {
         manualState = null
+        update()
     }
 
     @HandleEvent
     fun onTick() {
-        val manualState = manualState
-        activeState = when {
-            manualState != null -> manualState
-            !shouldAutoReduce() -> SensitivityState.UNCHANGED
+        update()
+    }
+
+    private fun update() {
+        activeState = manualState ?: when {
+            !isAutoEnabled() -> SensitivityState.UNCHANGED
             !config.lockMouse -> SensitivityState.REDUCED
             else -> SensitivityState.LOCKED
         }
     }
 
-    private fun shouldAutoReduce(): Boolean =
+    private fun isAutoEnabled(): Boolean = GardenApi.inGarden() &&
         config.autoEnable &&
-            GardenApi.inGarden() &&
-            config.autoModes.any { it.condition() } &&
-            !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
-            !(config.onGround && !isOnGround())
+        config.autoModes.any { it.condition() } &&
+        !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
+        !(config.onGround && !isOnGround())
 
     private fun isOnGround(): Boolean {
         if (PlayerUtils.onGround()) return true
@@ -158,7 +156,7 @@ object MouseSensitivityReducer {
         else event.addData {
             add("current state: $activeState")
             add("manual state: $manualState")
-            add("reducing percent: " + if (activeState == SensitivityState.LOCKED) 0.0 else config.reducingPercent.fractionOf(100.0))
+            add("sensitivity factor: " + remapSensitivity(1.0))
         }
     }
 
