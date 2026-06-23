@@ -1,3 +1,5 @@
+package repo
+
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtEscapeStringTemplateEntry
@@ -7,7 +9,6 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import org.jetbrains.kotlin.psi.KtStringTemplateEntryWithExpression
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
 import java.net.URLEncoder
-import java.util.regex.Pattern
 
 data class RegexTest(
     val test: String,
@@ -212,39 +213,5 @@ class RepoPatternElement private constructor(
                 key to value.removeSurrounding("\"")
             }
         }
-
-        data class RepoPatternTestContext(
-            val element: RepoPatternElement,
-            val variableName: String,
-            val rawPattern: String,
-            val passingTests: List<RegexTest>,
-            val compiledPattern: Pattern,
-        )
-
-        // This is since IntelliJ keep complaining about duplicated code
-        fun KtPropertyDelegate.getRepoPatternTestContext(): RepoPatternTestContext? {
-            val element = asRepoPatternElement() ?: return null
-            val rawPattern = element.rawPattern
-
-            if (!rawPattern.needsRegexTest()) return null
-
-            val tests = element.regexTests
-            if (tests.isEmpty()) return null
-
-            return RepoPatternTestContext(
-                element = element,
-                variableName = element.variableName,
-                rawPattern = rawPattern,
-                compiledPattern = element.pattern,
-                passingTests = tests,
-            )
-        }
-
-
-        private fun String.needsRegexTest(): Boolean {
-            return regexConstructs.containsMatchIn(this)
-        }
-
-        private val regexConstructs = Regex("""(?<!\\)[.*+(){}\[|?]""")
     }
 }

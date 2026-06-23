@@ -1,24 +1,24 @@
 package repo
 
-import RepoPatternElement.Companion.getRepoPatternTestContext
 import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTestGroupFailed(config: Config) : SkyHanniRule(
+class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatternContext) : SkyHanniRule(
     config,
-    "All repo pattern regex groups must be correctly tested."
+    "All repo pattern regex groups must be correctly tested.",
 ) {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
-        val (repoPatternElement, variableName, rawPattern, passingTests, compiledPattern) =
-            delegate.getRepoPatternTestContext() ?: return
+        val (element, variableName, rawPattern) =
+            ctx.getRepoPatternElementSplat(delegate) ?: return
+        val compiledPattern = element.pattern
 
         val internalRegexGroups: Set<String> = compiledPattern.namedGroups().keys
         val exercisedGroups = mutableSetOf<String>()
 
-        passingTests.forEach { test ->
+        element.regexTests.forEach { test ->
             val matcher = compiledPattern.matcher(test.test)
 
             if (!matcher.find()) return@forEach
@@ -45,7 +45,7 @@ class RepoPatternRegexTestGroupFailed(config: Config) : SkyHanniRule(
                     delegate.reportIssue(
                         "Repo pattern `$variableName` failed regex test: `${test.test}` pattern: `$rawPattern`. " +
                             "Group `$groupName` expected `$expectedValue` got `$capturedValue`. " +
-                            "[View on Regex101](${repoPatternElement.regex101Url})",
+                                "[View on Regex101](${element.regex101Url})",
                     )
                 }
             }
