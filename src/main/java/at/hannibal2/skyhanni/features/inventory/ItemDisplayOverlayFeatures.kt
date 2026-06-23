@@ -329,11 +329,7 @@ object ItemDisplayOverlayFeatures {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {
-                val tier = itemName.split(" ")
-
-                tier.last().romanToDecimalIfNecessaryOrNull()?.run {
-                    return toString()
-                }
+                return itemName.split(" ").last().romanToDecimalIfNecessaryOrNull()?.toString()
             }
         }
 
