@@ -87,7 +87,7 @@ object GardenLevelDisplay {
     )
 
     /**
-     * REGEX-TEST:     §r§8+§r§215 §r§7Garden Experience
+     * WRAPPED-REGEX-TEST: "    §r§8+§r§215 §r§7Garden Experience"
      */
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
