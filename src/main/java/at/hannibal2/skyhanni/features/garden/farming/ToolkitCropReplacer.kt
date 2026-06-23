@@ -40,7 +40,7 @@ object ToolkitCropReplacer {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
         if (!GardenApi.toolkitInventory.isInside()) return
-        
+
         val slot = event.slot
         if (slot !in 10..16 && slot !in 20..24) return
 
