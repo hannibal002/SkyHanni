@@ -13,8 +13,8 @@ enum class CorpseType(
     key: String? = null,
 ) {
     LAPIS("Lapis", LorenzColor.BLUE, MineshaftWaypointType.LAPIS, "LAPIS_ARMOR_HELMET"),
-    TUNGSTEN("Tungsten", LorenzColor.GRAY, MineshaftWaypointType.TUNGSTEN, "LAPIS_ARMOR_HELMET", "TUNGSTEN_KEY"),
-    UMBER("Umber", LorenzColor.GOLD, MineshaftWaypointType.UMBER, "MINERAL_HELMET", "UMBER_KEY"),
+    TUNGSTEN("Tungsten", LorenzColor.GRAY, MineshaftWaypointType.TUNGSTEN, "MINERAL_HELMET", "TUNGSTEN_KEY"),
+    UMBER("Umber", LorenzColor.GOLD, MineshaftWaypointType.UMBER, "ARMOR_OF_YOG_HELMET", "UMBER_KEY"),
     VANGUARD("Vanguard", LorenzColor.WHITE, MineshaftWaypointType.VANGUARD, "VANGUARD_HELMET", "SKELETON_KEY"),
     ;
 
