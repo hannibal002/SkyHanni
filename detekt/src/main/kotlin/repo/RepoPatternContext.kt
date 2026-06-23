@@ -24,7 +24,7 @@ class RepoPatternContext {
         val rawPattern: String,
     )
 
-    // This is since IntelliJ keep complaining about duplicated code
+    // This is since IntelliJ kept complaining about duplicated code
     fun getRepoPatternElementSplat(delegate: KtPropertyDelegate): RepoPatternTestContext? {
         val element = getRepoPatternElement(delegate) ?: return null
         val rawPattern = element.rawPattern
