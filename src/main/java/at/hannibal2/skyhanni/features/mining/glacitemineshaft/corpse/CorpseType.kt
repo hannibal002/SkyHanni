@@ -10,7 +10,7 @@ enum class CorpseType(
     val color: LorenzColor,
     val waypointType: MineshaftWaypointType,
     helmet: String,
-    key: String? = null
+    key: String? = null,
 ) {
     LAPIS("Lapis", LorenzColor.BLUE, MineshaftWaypointType.LAPIS, "LAPIS_ARMOR_HELMET"),
     TUNGSTEN("Tungsten", LorenzColor.GRAY, MineshaftWaypointType.TUNGSTEN, "LAPIS_ARMOR_HELMET", "TUNGSTEN_KEY"),

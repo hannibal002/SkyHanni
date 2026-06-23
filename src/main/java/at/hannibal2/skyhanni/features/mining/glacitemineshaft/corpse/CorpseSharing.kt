@@ -28,7 +28,7 @@ object CorpseSharing {
         "mineshaft.corpse.coords",
         "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
-    
+
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
 
     // This list only keeps track of already shared waypoints by anyone in the chat.
@@ -42,7 +42,7 @@ object CorpseSharing {
         if (PartyApi.partyMembers.isEmpty()) return
         shareCorpse()
     }
-    
+
     private fun shareCorpse() {
         val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
             .filterNot { corpse ->

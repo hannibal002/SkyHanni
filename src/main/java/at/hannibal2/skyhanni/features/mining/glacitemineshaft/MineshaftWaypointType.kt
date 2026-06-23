@@ -12,5 +12,4 @@ enum class MineshaftWaypointType(
     VANGUARD("Vanguard Corpse", LorenzColor.BLUE),
     ENTRANCE("Entrance", LorenzColor.YELLOW),
     LADDER("Ladder", LorenzColor.YELLOW)
-    ;
 }
