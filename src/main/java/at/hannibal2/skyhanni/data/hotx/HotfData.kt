@@ -13,11 +13,11 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.pow
@@ -258,7 +258,7 @@ enum class HotfData(
     override val effectiveLevel: Int get() = rawLevel
 
     override var slot: Slot? = null
-    override var item: ItemStack? = null
+    override var item: SafeItemStack? = null
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
     override fun getStorage(): HotxTree? = ProfileStorageData.profileSpecific?.foraging?.hotFTree
 
@@ -367,7 +367,7 @@ enum class HotfData(
         )
 
         /**
-         * REGEX-TEST:   §8- §a5 §aToken of the Forest
+         * WRAPPED-REGEX-TEST: "  §8- §a5 §aToken of the Forest"
          */
         override val resetTokensPattern: Pattern by patternGroup.pattern(
             "inventory.reset.token",
@@ -375,7 +375,7 @@ enum class HotfData(
         )
 
         /**
-         * REGEX-TEST:  §7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset.
+         * WRAPPED-REGEX-TEST: " §7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset."
          */
         override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
@@ -391,7 +391,7 @@ enum class HotfData(
         )
 
         /**
-         * REGEX-TEST:  §8- §3114,060 Forest Whispers
+         * WRAPPED-REGEX-TEST: " §8- §3114,060 Forest Whispers"
          */
         private val whisperResetPattern by patternGroup.pattern(
             "whisper.reset",
