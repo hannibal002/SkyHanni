@@ -51,6 +51,7 @@ object ContributorManager {
             contributorNames = namesToUuid.keys.toList()
             isContributor = null
         }
+
     // Do not modify these: they are automatically updated when the contributors map is updated
     var contributorNames = emptyList<String>()
         private set
@@ -73,7 +74,7 @@ object ContributorManager {
      */
     private val contribMentionPattern by patternGroup.pattern(
         "mention",
-        """\b(?:skyhanni|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*)\b"""
+        """\b(?:skyhanni|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*)\b""",
     )
 
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
@@ -180,7 +181,7 @@ object ContributorManager {
 
         val testEntry = ContributorJsonEntry(
             displayName = displayName,
-            componentSuffix = suffix
+            componentSuffix = suffix,
         )
         contributors = contributors + (uuid to testEntry)
 
@@ -214,7 +215,7 @@ object ContributorManager {
             "If you need support, please do not contact contributors directly.\n" +
                 "You can report issues or get help on the SkyHanni Discord.\n ",
             "https://discord.gg/skyhanni-997079228510117908",
-            prefixColor = "§c"
+            prefixColor = "§c",
         )
         ChatUtils.clickableChat(
             "[View seen contributors]",
@@ -225,12 +226,12 @@ object ContributorManager {
                     append("Seen contributors (${seenContributors.size}):\n")
                     appendWithColor(
                         seenContributors.keys.joinToString("\n")
-                            { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() },
+                        { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() },
                         ChatFormatting.AQUA,
                     )
                 }
             },
-            hover = "§eClick to view contributors you've encountered."
+            hover = "§eClick to view contributors you've encountered.",
         )
     }
 
@@ -245,7 +246,7 @@ object ContributorManager {
                     appendWithColor("Seen contributors list cleared.", ChatFormatting.GREEN)
                 }
             },
-            hover = "§eClick to confirm clearing the seen contributors list."
+            hover = "§eClick to confirm clearing the seen contributors list.",
         )
     }
     // </editor-fold>
@@ -333,10 +334,8 @@ object ContributorManager {
                     appendWithColor(" for the first time!", ChatFormatting.GRAY)
                 }
                 append("contributor")
-            },
-            userLuckAmount = 0f,
-        )
-    }
+            }
+        }
 
         saveConfig("added new seen contributor")
         ContributorAchievement.onUniqueContributorSeen()
@@ -353,7 +352,7 @@ object ContributorManager {
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
 
     // Due to using PlayerUtils.getRawUuid(), this will only work if logged in
-    // which is why it HAS to be a lazy-loaded value instead of being calculated on repo load
+// which is why it HAS to be a lazy-loaded value instead of being calculated on repo load
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }
 
@@ -365,7 +364,7 @@ object ContributorManager {
     private fun saveConfig(reason: String) {
         SkyHanniMod.configManager.saveConfig(
             ConfigFileType.SEEN_CONTRIBUTORS,
-            reason
+            reason,
         )
     }
 }
