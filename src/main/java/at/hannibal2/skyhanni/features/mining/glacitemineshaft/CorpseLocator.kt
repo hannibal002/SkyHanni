@@ -9,10 +9,9 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -22,7 +21,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -44,21 +43,14 @@ object CorpseLocator {
     )
 
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
-
+    private val corpseEntities: MutableSet<ArmorStand> = mutableSetOf()
     private var foundAllCorpses = false
 
-    @OptIn(AllEntitiesGetter::class)
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onTick() {
         if (!isEnabled() || foundAllCorpses) return
 
-        val entities = EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
-
-        val corpsesFound = MineshaftWaypoints.waypoints.count {
-            it.isCorpse && (it.isLootedCorpse || it.waypointType != MineshaftWaypointType.POTENTIAL)
-        }
-
-        for (entity in entities) {
+        for (entity in corpseEntities) {
             if (!entity.showArms() || entity.showBasePlate() || entity.isInvisible) continue
 
             val helmetName = entity.getStandHelmet()?.getInternalName()
@@ -91,27 +83,37 @@ object CorpseLocator {
             }
         }
 
-        checkAllCorpsesFound(entities, corpsesFound)
-    }
-
-    private fun checkAllCorpsesFound(entities: Sequence<ArmorStand>, alreadyFoundAmount: Int) {
-        val totalCorpseAmount = TabWidget.FROZEN_CORPSES.lines.size - 1
-        val newFoundAmount = MineshaftWaypoints.waypoints.count {
-            it.isCorpse && it.waypointType != MineshaftWaypointType.POTENTIAL
-        }
-        foundAllCorpses = totalCorpseAmount == newFoundAmount
-
-        if (foundAllCorpses && newFoundAmount > alreadyFoundAmount && config.allFoundAlert) {
-            TitleManager.sendTitle("§aAll Corpses Found", duration = 3.seconds)
-            SoundUtils.playBeepSound()
-        }
+        if (!foundAllCorpses) checkAllCorpsesFound()
 
         MineshaftWaypoints.waypoints.removeIf { waypoint ->
             if (waypoint.waypointType != MineshaftWaypointType.POTENTIAL) return@removeIf false
             if (foundAllCorpses) return@removeIf true
             if (!waypoint.location.canBeSeen(-1..3)) return@removeIf false
 
-            entities.none { waypoint.location.distance(it.getLorenzVec()) <= 3 }
+            corpseEntities.none { waypoint.location.distance(it.getLorenzVec()) <= 3 }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onArmorChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        if (!event.isHead || !isEnabled() || foundAllCorpses) return
+
+        val helmetName = event.entity.getStandHelmet()?.getInternalName() ?: return
+        if (helmetName.let(MineshaftWaypointType::getByHelmetOrNull) == null) return
+
+        corpseEntities.add(event.entity)
+    }
+
+    private fun checkAllCorpsesFound() {
+        val totalCorpseAmount = TabWidget.FROZEN_CORPSES.lines.size - 1
+        val newFoundAmount = MineshaftWaypoints.waypoints.count {
+            it.isCorpse && it.waypointType != MineshaftWaypointType.POTENTIAL
+        }
+        foundAllCorpses = totalCorpseAmount == newFoundAmount
+
+        if (foundAllCorpses && config.allFoundAlert) {
+            TitleManager.sendTitle("§aAll Corpses Found", duration = 3.seconds)
+            SoundUtils.playBeepSound()
         }
     }
 
@@ -134,6 +136,7 @@ object CorpseLocator {
     @HandleEvent
     fun onWorldChange() {
         sharedWaypoints.clear()
+        corpseEntities.clear()
         foundAllCorpses = false
     }
 
