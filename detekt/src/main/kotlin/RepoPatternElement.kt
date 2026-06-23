@@ -14,14 +14,6 @@ data class RegexTest(
     val groups: Map<String, String>,
 )
 
-data class RepoPatternTestContext(
-    val element: RepoPatternElement,
-    val variableName: String,
-    val rawPattern: String,
-    val passingTests: List<RegexTest>,
-    val compiledPattern: Pattern,
-)
-
 class RepoPatternElement private constructor(
     val variableName: String,
     val rawPattern: String,
@@ -204,9 +196,11 @@ class RepoPatternElement private constructor(
                 pairs.add(lastToken)
             }
 
-            return pairs.mapNotNull { pair ->
+            return pairs.associate { pair ->
                 val split = pair.split("=", limit = 2)
-                if (split.size != 2) return@mapNotNull null
+                require(split.size == 2) {
+                    "Group values must be in the format `key=\"value\"`. Invalid group assertion: `$pair`"
+                }
 
                 val key = split[0].trim()
                 val value = split[1].trim()
@@ -216,9 +210,18 @@ class RepoPatternElement private constructor(
                 }
 
                 key to value.removeSurrounding("\"")
-            }.toMap()
+            }
         }
 
+        data class RepoPatternTestContext(
+            val element: RepoPatternElement,
+            val variableName: String,
+            val rawPattern: String,
+            val passingTests: List<RegexTest>,
+            val compiledPattern: Pattern,
+        )
+
+        // This is since IntelliJ keep complaining about duplicated code
         fun KtPropertyDelegate.getRepoPatternTestContext(): RepoPatternTestContext? {
             val element = asRepoPatternElement() ?: return null
             val rawPattern = element.rawPattern

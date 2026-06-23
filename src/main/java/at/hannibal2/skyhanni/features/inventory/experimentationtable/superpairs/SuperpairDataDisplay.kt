@@ -61,7 +61,7 @@ object SuperpairDataDisplay {
     )
 
     /**
-     * REGEX-TEST: GUARDIAN;4
+     * WRAPPED-REGEX-TEST: "GUARDIAN;4"
      */
     private val guardianPetInternalNamePattern by ExperimentationTableApi.patternGroup.pattern(
         "guardian.pet.internalname",
