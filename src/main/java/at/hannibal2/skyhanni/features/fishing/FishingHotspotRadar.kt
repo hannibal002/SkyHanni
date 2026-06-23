@@ -91,7 +91,7 @@ object FishingHotspotRadar {
         )
     }
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         val location = hotspotLocation ?: return
         if (!isUnknown || lastUpdate.passedSince() < 3.seconds) return
