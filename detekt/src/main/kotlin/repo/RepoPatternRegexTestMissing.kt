@@ -11,10 +11,10 @@ class RepoPatternRegexTestMissing(config: Config, private val ctx: RepoPatternCo
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
-        val (repoPatternElement, variableName, _) =
+        val (element, variableName, _) =
             ctx.getRepoPatternElementSplat(delegate) ?: return
 
-        if (repoPatternElement.regexTests.isEmpty()) {
+        if (element.regexTests.isEmpty()) {
             delegate.reportIssue("Repo pattern `${variableName}` must have a regex test.")
             return
         }
