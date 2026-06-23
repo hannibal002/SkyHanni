@@ -126,7 +126,7 @@ object LavaReplacement {
         if (!isActive) return original
         return when (original) {
             Fluids.LAVA -> OPAQUE_WATER
-            Fluids.WATER -> OPAQUE_FLOWING_WATER
+            Fluids.FLOWING_LAVA -> OPAQUE_FLOWING_WATER
             else -> original
         }
     }
