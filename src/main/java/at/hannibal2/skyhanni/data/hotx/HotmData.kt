@@ -522,7 +522,7 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:   §8- §54 Token of the Mountain
+         * WRAPPED-REGEX-TEST: "  §8- §54 Token of the Mountain"
          */
         override val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
@@ -535,8 +535,8 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: 99,918
-         * REGEX-TEST:  Gemstone: 37,670
+         * WRAPPED-REGEX-TEST: " Mithril: 99,918"
+         * WRAPPED-REGEX-TEST: " Gemstone: 37,670"
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder-nocolor",
