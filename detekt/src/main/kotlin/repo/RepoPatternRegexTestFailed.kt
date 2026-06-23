@@ -19,11 +19,16 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
 
         if (!rawPattern.needsRegexTest()) return
 
-        if (repoPatternElement.regexTests.isEmpty()) return
+        val passingTests = repoPatternElement.regexTests
+        if (passingTests.isEmpty()) return
 
-        repoPatternElement.regexTests.forEach { test ->
+        val compiledPattern = repoPatternElement.pattern
+        val internalRegexGroups: Set<String> = compiledPattern.namedGroups().keys
+        var foundAnyNonEmptyInternalCapture = false
+
+        passingTests.forEach { test ->
             val regex = test.test
-            val matcher = repoPatternElement.pattern.matcher(regex)
+            val matcher = compiledPattern.matcher(regex)
 
             if (!matcher.find()) {
                 delegate.reportIssue(
@@ -33,21 +38,44 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
                 return@forEach
             }
 
-            test.groups.forEach { (groupName, groupValue) ->
-                val value = matcher.group(groupName) ?: return@forEach
+            test.groups.keys.forEach { specifiedGroupName ->
+                if (!internalRegexGroups.contains(specifiedGroupName)) {
+                    delegate.reportIssue(
+                        "Repo pattern `$variableName` specifies a test value for group `$specifiedGroupName`, " +
+                            "but no group named `$specifiedGroupName` exists inside the regular expression."
+                    )
+                }
+            }
 
-                if (groupValue != value) {
+            internalRegexGroups.forEach { groupName ->
+                val capturedValue = matcher.group(groupName) ?: ""
+
+                if (capturedValue.isNotEmpty()) {
+                    foundAnyNonEmptyInternalCapture = true
+                }
+
+                val expectedValue = test.groups[groupName] ?: return@forEach
+
+                if (expectedValue != capturedValue) {
                     delegate.reportIssue(
                         "Repo pattern `$variableName` failed regex test: `$regex` pattern: `$rawPattern`. " +
-                            "Group `$groupName` expected `$groupValue` got `$value`. " +
+                            "Group `$groupName` expected `$expectedValue` got `$capturedValue`. " +
                             "[View on Regex101](${repoPatternElement.regex101Url})",
                     )
                 }
             }
         }
 
+        if (internalRegexGroups.isNotEmpty() && !foundAnyNonEmptyInternalCapture) {
+            delegate.reportIssue(
+                "Repo pattern `$variableName` defines internal named groups $internalRegexGroups, " +
+                    "but all test strings capture nothing but empty strings (\"\"). Provide a test string " +
+                    "that actually exercises and populates at least one group."
+            )
+        }
+
         repoPatternElement.failingRegexTests.forEach { test ->
-            if (repoPatternElement.pattern.matcher(test).find()) {
+            if (compiledPattern.matcher(test).find()) {
                 delegate.reportIssue(
                     "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
                         "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})"
