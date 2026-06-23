@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.itemability.FireVeilWandConfig.DisplayEntry
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -38,7 +38,7 @@ object FireVeilWandParticles {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val internalName = event.itemInHand?.getInternalName()
 
         if (AshfangFreezeCooldown.isCurrentlyFrozen()) return

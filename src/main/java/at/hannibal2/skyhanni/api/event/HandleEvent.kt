@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api.event
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
+import at.hannibal2.skyhanni.utils.Legacy
 import kotlin.reflect.KClass
 
 @Retention(AnnotationRetention.RUNTIME)
@@ -12,14 +13,14 @@ annotation class HandleEvent(
      * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
      * To specify multiple events, use [eventTypes] instead.
      */
-    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
+    @Legacy("Use Primary Function Name, or explicit type parameter instead.")
     val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
 
     /**
      * For cases where multiple events are listened to, and properties are unnecessary.
      * To specify only one event, use [eventType] instead.
      */
-    @Deprecated("Use Primary Function Name, or explicit type parameter instead.")
+    @Legacy("Use Primary Function Name, or explicit type parameter instead.")
     val eventTypes: Array<KClass<out SkyHanniEvent>> = [],
 
     /**

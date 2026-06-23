@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 // TODO also fix up this all being coded very poorly and having the same patterns in multiple places
 @SkyHanniModule
@@ -56,16 +56,16 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST:  4sn_: Archer (29)
-     * REGEX-TEST:  kaydo_odyak: Berserk (26)
-     * REGEX-TEST:  ItsKind: §eBerserk§b (§e38§b)
-     * REGEX-TEST:  sphxia: §eTank§b (§e36§b)
-     * REGEX-TEST:  Skept1x: §eMage§b (§e35§b)
-     * REGEX-TEST:  Mewlius: §eArcher§b (§e41§b)
+     * WRAPPED-REGEX-TEST: " 4sn_: Archer (29)"
+     * WRAPPED-REGEX-TEST: " kaydo_odyak: Berserk (26)"
+     * WRAPPED-REGEX-TEST: " ItsKind: §eBerserk§b (§e38§b)"
+     * WRAPPED-REGEX-TEST: " sphxia: §eTank§b (§e36§b)"
+     * WRAPPED-REGEX-TEST: " Skept1x: §eMage§b (§e35§b)"
+     * WRAPPED-REGEX-TEST: " Mewlius: §eArcher§b (§e41§b)"
      */
     private val memberPattern by patternGroup.pattern(
         "member",
-        " (?<playerName>.*): (?<className>.*) \\((?<level>.*)\\)",
+        " (?<playerName>.*): (?:§.?)?(?<className>.*?)(?:§.?)? \\(.*?(?<level>\\d+).*?\\)",
     )
 
     /**
@@ -197,7 +197,7 @@ object DungeonFinderFeatures {
         return map
     }
 
-    private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun selectFloorStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
             val name = stack.hoverName.string.removeColor()
@@ -213,7 +213,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun partyFinderStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
             val name = stack.cleanName()
@@ -228,7 +228,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    private fun catacombsGateStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun catacombsGateStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         val dungeonClassItemIndex = 45
         inInventory = true
         inventoryItems[dungeonClassItemIndex]?.getLoreComponent()?.let {

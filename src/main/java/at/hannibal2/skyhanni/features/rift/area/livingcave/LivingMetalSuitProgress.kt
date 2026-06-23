@@ -9,20 +9,20 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object LivingMetalSuitProgress {
 
     private val config get() = RiftApi.config.area.livingCave.livingMetalSuitProgress
     private var display = emptyList<Renderable>()
-    private var progressMap = mapOf<ItemStack, Double?>()
+    private var progressMap = mapOf<SafeItemStack, Double?>()
 
     @HandleEvent
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

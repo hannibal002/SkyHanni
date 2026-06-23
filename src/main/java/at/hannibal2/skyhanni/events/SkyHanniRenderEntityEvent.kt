@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.skyhanni.utils.Legacy
 import net.minecraft.world.entity.LivingEntity
 
 // TODO replace all "cancel only" usages of this event. the only remaining stuff should be EntityOpacityManager
@@ -9,7 +10,7 @@ import net.minecraft.world.entity.LivingEntity
  * This is super inefficient, only use it if absolutely necessary, and then also only with heavy caching added.
  * For normal cases of "hide this entity" rather use [CheckRenderEntityEvent].
  */
-@Deprecated("use CheckRenderEntityEvent instead")
+@Legacy("use CheckRenderEntityEvent instead")
 open class SkyHanniRenderEntityEvent<T : LivingEntity>(
     val entity: T,
     val x: Double,

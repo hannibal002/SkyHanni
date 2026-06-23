@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WiltedBerberisLocationsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -247,7 +247,7 @@ object RiftWiltedBerberisHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled() || !config.respawnSequence) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.blockState.block != Blocks.DEAD_BUSH) return
 
         for (seq in fieldSequences.values) {
