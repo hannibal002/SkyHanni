@@ -240,8 +240,7 @@ object GardenVisitorShoppingList {
         val visitorName = visitor.visitorName
 
         val list = mutableListOf<Renderable>()
-        list.addString(" §7- ")
-        list.add(visitor.toClickableName())
+        list.addString(" §7- $visitorName")
 
         if (config.itemPreview) {
             val repoVisitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
