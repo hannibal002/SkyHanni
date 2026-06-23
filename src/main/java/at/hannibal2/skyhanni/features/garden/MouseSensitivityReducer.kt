@@ -7,16 +7,11 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfig
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -27,17 +22,15 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object MouseSensitivityReducer {
 
-    private val config get() = GardenApi.config.sensitivityReducer
+    private val MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
-    private val commandMessageId = ChatUtils.getUniqueMessageId()
-    private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
+    val config get() = GardenApi.config.mouseSensitivityReducer
 
-    private var state: SensitivityState = SensitivityState.UNCHANGED
+    private var activeState: SensitivityState = SensitivityState.UNCHANGED
     private var manualState: SensitivityState? = null
         set(value) {
             field = value
@@ -57,9 +50,6 @@ object MouseSensitivityReducer {
         "(?<plot>Warping\\.\\.\\.)",
     )
 
-    @JvmStatic
-    fun remapSensitivity(original: Double): Double = state.transform(original)
-
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
@@ -71,7 +61,7 @@ object MouseSensitivityReducer {
                     if (manualState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
                     else "Mouse rotation has been unlocked because you teleported.",
                     config::unlockOnTeleport,
-                    messageId = commandMessageId,
+                    messageId = MESSAGE_ID,
                 )
                 manualState = null
             }
@@ -86,7 +76,7 @@ object MouseSensitivityReducer {
     @HandleEvent
     fun onTick() {
         val manualState = manualState
-        state = when {
+        activeState = when {
             manualState != null -> manualState
             !shouldAutoReduce() -> SensitivityState.UNCHANGED
             !config.lockMouse -> SensitivityState.REDUCED
@@ -94,19 +84,12 @@ object MouseSensitivityReducer {
         }
     }
 
-    private fun shouldAutoReduce(): Boolean {
-        if (!config.enabled) return false
-
-        if (!GardenApi.inGarden()) return false
-
-        if (config.mode.none { it.condition() }) return false
-
-        if (config.onlyPlot && GardenApi.onUnfarmablePlot) return false
-
-        if (config.onGround && !isOnGround()) return false
-
-        return true
-    }
+    private fun shouldAutoReduce(): Boolean =
+        config.autoEnable &&
+            GardenApi.inGarden() &&
+            config.autoModes.any { it.condition() } &&
+            !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
+            !(config.onGround && !isOnGround())
 
     private fun isOnGround(): Boolean {
         if (PlayerUtils.onGround()) return true
@@ -126,11 +109,11 @@ object MouseSensitivityReducer {
                     manualState = SensitivityState.REDUCED
                     ChatUtils.chat(
                         "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.",
-                        messageId = commandMessageId,
+                        messageId = MESSAGE_ID,
                     )
                 } else {
                     manualState = null
-                    ChatUtils.chat("Mouse sensitivity is now restored.", messageId = commandMessageId)
+                    ChatUtils.chat("Mouse sensitivity is now restored.", messageId = MESSAGE_ID)
                 }
             }
         }
@@ -143,11 +126,11 @@ object MouseSensitivityReducer {
                     manualState = SensitivityState.LOCKED
                     ChatUtils.chat(
                         "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
-                        messageId = commandMessageId,
+                        messageId = MESSAGE_ID,
                     )
                 } else {
                     manualState = null
-                    ChatUtils.chat("Mouse rotation is now unlocked.", messageId = commandMessageId)
+                    ChatUtils.chat("Mouse rotation is now unlocked.", messageId = MESSAGE_ID)
                 }
             }
         }
@@ -155,11 +138,12 @@ object MouseSensitivityReducer {
 
     @HandleEvent
     fun onGuiRenderOverlay() {
-        if (!config.showGui) return
-        if (state == SensitivityState.UNCHANGED) return
-
-        config.position.renderRenderable(
-            Renderable.text("§e" + if (state == SensitivityState.REDUCED) "Sensitivity Lowered" else "Mouse Locked"),
+        if (config.showGui) config.position.renderRenderable(
+            when (activeState) {
+                SensitivityState.UNCHANGED -> return
+                SensitivityState.REDUCED -> Renderable.text("§eSensitivity Lowered")
+                SensitivityState.LOCKED -> Renderable.text("§eMouse Locked")
+            },
             posLabel = "Mouse Sensitivity Reducer",
         )
     }
@@ -168,22 +152,24 @@ object MouseSensitivityReducer {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mouse Sensitivity Reducer")
 
-        if (state == SensitivityState.UNCHANGED) event.addIrrelevant {
+        if (activeState == SensitivityState.UNCHANGED) event.addIrrelevant {
             add("not enabled")
-        } else event.addData {
-            add("current state: $state")
+        }
+        else event.addData {
+            add("current state: $activeState")
             add("manual state: $manualState")
-            add("reducing factor: " + if (state == SensitivityState.LOCKED) 0.0 else config.reducingPercent.fractionOf(100.0))
+            add("reducing percent: " + if (activeState == SensitivityState.LOCKED) 0.0 else config.reducingPercent.fractionOf(100.0))
         }
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val base = "garden.sensitivityReducer"
-        event.move(80, "garden.sensitivityReducerConfig", base)
-        event.move(81, "$base.showGUI", "$base.showGui")
-        event.transform(116, "$base.mode") { element ->
-            event.add(116, "$base.enabled") {
+        val oldBase = "garden.sensitivityReducer"
+        val base = "garden.mouseSensitivityReducer"
+        event.move(80, "garden.sensitivityReducerConfig", oldBase)
+        event.move(81, "$oldBase.showGUI", "$oldBase.showGui")
+        event.transform(116, "$oldBase.mode") { element ->
+            event.add(116, "$oldBase.enabled") {
                 JsonPrimitive(element.asString != "OFF")
             }
             val newList = JsonArray()
@@ -193,32 +179,28 @@ object MouseSensitivityReducer {
             }
             newList
         }
-        // migrate from old path
-        event.move(135, "misc.lockMouseLookChatMessage", "$base.chatMessage")
-        // migrate from "new" path
-        event.move(136, "garden.mouseLock.chatMessage", "$base.chatMessage")
-        event.move(136, "garden.mouseLock.unlockOnTeleport", "$base.unlockOnTeleport")
-        // convert old reducing factor to percent
-        event.move(136, "$base.reducingFactor", "$base.reducingPercent") {
+        // old migrations from separate mouse lock feature
+        event.move(135, "misc.lockMouseLookChatMessage", "garden.mouseLock.chatMessage")
+        event.move(135, "misc.lockedMouseDisplay", "garden.mouseLock.display")
+        // variable renames
+        event.move(137, oldBase, base)
+        event.move(137, "$base.enable", "$base.autoEnable")
+        event.move(137, "$base.mode", "$base.autoModes")
+        // convert old factor to new percent
+        event.move(137, "$base.reducingFactor", "$base.reducingPercent") {
             JsonPrimitive((1f.fractionOf(it.asFloat) * 100f).toFloat().roundTo(2))
         }
+        // move mouse lock settings to new config
+        event.move(137, "garden.mouseLock.chatMessage", "$base.chatMessage")
+        event.move(137, "garden.mouseLock.unlockOnTeleport", "$base.unlockOnTeleport")
     }
+
+    @JvmStatic
+    fun remapSensitivity(original: Double): Double = activeState.transform(original)
 
     private enum class SensitivityState(val transform: (Double) -> Double) {
         UNCHANGED({ it }),
         REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
         LOCKED({ 0.0 }),
-    }
-
-    enum class Mode(private val displayName: String, val condition: () -> Boolean) {
-        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
-        TOOL("Farming tool", { GardenApi.toolInHand != null }),
-        FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
-        MOUSEMAT("Squeaky Mousemat", { GardenApi.itemInHand?.getInternalName() == SQUEAKY_MOUSEMAT }),
-        VACUUM("Vacuum", { PestApi.hasVacuumInHand() }),
-        SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
-        ;
-
-        override fun toString() = displayName
     }
 }

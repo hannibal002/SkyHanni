@@ -56,7 +56,7 @@ public class MixinMouse {
         method = "turnPlayer",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V")
     )
-    private void modifyMouseSensitivity(LocalPlayer instance, double xo, double yo, Operation<Void> original) {
-        original.call(instance, MouseSensitivityReducer.remapSensitivity(xo), MouseSensitivityReducer.remapSensitivity(yo));
+    private void modifyMouseSensitivity(LocalPlayer instance, double x, double y, Operation<Void> original) {
+        original.call(instance, MouseSensitivityReducer.remapSensitivity(x), MouseSensitivityReducer.remapSensitivity(y));
     }
 }

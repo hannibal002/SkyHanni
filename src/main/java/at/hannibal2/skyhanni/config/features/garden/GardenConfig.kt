@@ -135,7 +135,7 @@ class GardenConfig {
     @Expose
     @ConfigOption(name = "Mouse Sensitivity Reducer", desc = "")
     @Accordion
-    val sensitivityReducer: MouseSensitivityReducerConfig = MouseSensitivityReducerConfig()
+    val mouseSensitivityReducer: MouseSensitivityReducerConfig = MouseSensitivityReducerConfig()
 
     @Expose
     @ConfigOption(name = "Crop Start Location", desc = "")
