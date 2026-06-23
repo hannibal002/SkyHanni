@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
@@ -132,7 +132,7 @@ object FishingHotspotRadar {
     @HandleEvent(onlyOnSkyblock = true)
     fun onUseAbility(event: ItemClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (item.getInternalNameOrNull() != HOTSPOT_RADAR) return
         if (lastParticle.passedSince() < 0.2.seconds) {

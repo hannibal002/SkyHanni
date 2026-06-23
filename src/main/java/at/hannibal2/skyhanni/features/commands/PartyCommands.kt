@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.PartyApi.partyLeader
 import at.hannibal2.skyhanni.data.PartyApi.transferVoluntaryPattern
@@ -50,7 +51,7 @@ object PartyCommands {
 
     private fun transfer(name: String? = null) {
         if (name == null) {
-            if (LimboTimeTracker.inLimbo) {
+            if (HypixelData.inLimbo) {
                 LimboTimeTracker.printStats(true)
                 return
             }

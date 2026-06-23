@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -54,24 +55,26 @@ object CraftableItemList {
         if (!craftItemPattern.matches(event.inventoryName)) return
         inInventory = true
 
-        val pricePer = mutableMapOf<NeuInternalName, Double>()
-        val lines = mutableMapOf<NeuInternalName, Searchable>()
-        loadItems(pricePer, lines)
+        DelayedRun.runOrNextTick {
+            val pricePer = mutableMapOf<NeuInternalName, Double>()
+            val lines = mutableMapOf<NeuInternalName, Searchable>()
+            loadItems(pricePer, lines)
 
-        display = if (lines.isEmpty()) {
-            Renderable.hoverTips(
-                "§7No Items to craft",
-                tips = listOf(
-                    "§7No items found in your Inventory",
-                    "or sacks that can be used as",
-                    "material in crafting recipes.",
-                ),
-            ).toSingletonListOrEmpty()
-        } else {
-            buildList<Renderable> {
-                val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
-                addString("§e§lCraftable Items §7(${items.size})")
-                add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
+            display = if (lines.isEmpty()) {
+                Renderable.hoverTips(
+                    "§7No Items to craft",
+                    tips = listOf(
+                        "§7No items found in your Inventory",
+                        "or sacks that can be used as",
+                        "material in crafting recipes.",
+                    ),
+                ).toSingletonListOrEmpty()
+            } else {
+                buildList<Renderable> {
+                    val items = pricePer.sortedDesc().keys.map { lines[it] ?: error("impossible") }
+                    addString("§e§lCraftable Items §7(${items.size})")
+                    add(items.buildSearchableScrollable(height = 250, textInput, velocity = 20.0))
+                }
             }
         }
     }

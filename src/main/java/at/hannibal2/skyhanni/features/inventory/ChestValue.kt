@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -39,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ChestValue {
@@ -203,7 +203,7 @@ object ChestValue {
         chestItems = createItems(stacks)
     }
 
-    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
+    fun createItems(stacks: Map<Int, SafeItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -272,7 +272,7 @@ object ChestValue {
     data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
-        val stack: ItemStack,
+        val stack: SafeItemStack,
         var total: Double,
         val tips: List<String>,
     )

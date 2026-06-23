@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
@@ -63,13 +64,16 @@ object CrimsonIsleReputationHelper {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onProfileDataReady(event: ProfileDataReadyEvent) {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             DailyMiniBossHelper.loadData(it)
             DailyKuudraBossHelper.loadData(it)
             DailyQuestHelper.load(it)
         }
+    }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
         config.hideComplete.afterChange {
             updateRender()
         }
