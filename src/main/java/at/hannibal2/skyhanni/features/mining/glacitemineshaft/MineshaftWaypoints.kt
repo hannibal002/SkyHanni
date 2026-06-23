@@ -77,7 +77,7 @@ object MineshaftWaypoints {
     @HandleEvent
     fun onCorpseFound(event: CorpseFoundEvent) {
         if (!config.mineshaftWaypoints.enabled || !config.corpseLocator.enabled) return
-        
+
         val corpseType = event.corpseType
         val article = if (corpseType == CorpseType.UMBER) "an" else "a"
         ChatUtils.chat("Found $article $corpseType Corpse§e and marked its location with a waypoint.")
