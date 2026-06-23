@@ -45,6 +45,7 @@ object RareDropMessages {
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      * REGEX-TEST: §6§lPET DROP! §r§6Rat
      */
+    @Suppress("RepoPatternRegexTestFailed")
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
         "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*)?)",
@@ -75,9 +76,9 @@ object RareDropMessages {
     )
 
     /**
-     * REGEX-TEST: SMITE;6
-     * REGEX-TEST: ENDER_SLAYER;7
-     * REGEX-TEST: ULTIMATE_REITERATE;1
+     * WRAPPED-REGEX-TEST: "SMITE;6"
+     * WRAPPED-REGEX-TEST: "ENDER_SLAYER;7"
+     * WRAPPED-REGEX-TEST: "ULTIMATE_REITERATE;1"
      */
     private val slayerBookIDPattern by repoGroup.pattern(
         "slayerbook",
