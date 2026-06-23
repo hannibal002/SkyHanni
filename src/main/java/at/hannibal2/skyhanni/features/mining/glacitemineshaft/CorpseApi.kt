@@ -17,10 +17,10 @@ object CorpseApi {
     private val chatPatternGroup = patternGroup.group("chat")
 
     /**
-     * REGEX-TEST:   §r§b§l§r§9§lLAPIS §r§b§lCORPSE LOOT!
-     * REGEX-TEST:   §r§b§l§r§7§lTUNGSTEN §r§b§lCORPSE LOOT!
-     * REGEX-TEST:   §r§b§l§r§6§lUMBER §r§b§lCORPSE LOOT!
-     * REGEX-TEST:   §r§b§l§r§f§lVANGUARD §r§b§lCORPSE LOOT!
+     * WRAPPED-REGEX-TEST: "  §r§b§l§r§9§lLAPIS §r§b§lCORPSE LOOT!"
+     * WRAPPED-REGEX-TEST: "  §r§b§l§r§7§lTUNGSTEN §r§b§lCORPSE LOOT!"
+     * WRAPPED-REGEX-TEST: "  §r§b§l§r§6§lUMBER §r§b§lCORPSE LOOT!"
+     * WRAPPED-REGEX-TEST: "  §r§b§l§r§f§lVANGUARD §r§b§lCORPSE LOOT!"
      */
     private val startPattern by chatPatternGroup.pattern(
         "start",
@@ -33,8 +33,8 @@ object CorpseApi {
     private val endPattern by chatPatternGroup.pattern("end", "§a§l▬{64}")
 
     /**
-     * REGEX-TEST:     §r§9☠ Fine Onyx Gemstone §r§8x2
-     * REGEX-TEST:     §r§fEnchanted Book (Ice Cold I§r§f)
+     * WRAPPED-REGEX-TEST: "    §r§9☠ Fine Onyx Gemstone §r§8x2"
+     * WRAPPED-REGEX-TEST: "    §r§fEnchanted Book (Ice Cold I§r§f)"
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
