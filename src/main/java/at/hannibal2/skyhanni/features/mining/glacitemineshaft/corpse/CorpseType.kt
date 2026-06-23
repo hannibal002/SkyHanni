@@ -9,8 +9,8 @@ enum class CorpseType(
     val type: String,
     val color: LorenzColor,
     val waypointType: MineshaftWaypointType,
-    helmet: String,
-    key: String? = null,
+    helmetInternalName: String,
+    keyInternalName: String? = null,
 ) {
     LAPIS("Lapis", LorenzColor.BLUE, MineshaftWaypointType.LAPIS, "LAPIS_ARMOR_HELMET"),
     TUNGSTEN("Tungsten", LorenzColor.GRAY, MineshaftWaypointType.TUNGSTEN, "MINERAL_HELMET", "TUNGSTEN_KEY"),
@@ -19,8 +19,8 @@ enum class CorpseType(
     ;
 
     val displayName = color.getChatColor() + type
-    val helmet = helmet.toInternalName()
-    val key = key?.toInternalName()
+    val helmet = helmetInternalName.toInternalName()
+    val key = keyInternalName?.toInternalName()
 
     override fun toString(): String = displayName
 
