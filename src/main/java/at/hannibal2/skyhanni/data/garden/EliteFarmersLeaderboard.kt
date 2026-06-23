@@ -115,7 +115,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
         eliteLeaderboardData.forEach { lbType ->
             if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
@@ -529,7 +529,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {

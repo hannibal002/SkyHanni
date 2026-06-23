@@ -19,7 +19,7 @@ object ReplaceRomanNumerals {
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepoReload() {
         cachedStrings.clear()
     }
 
@@ -44,7 +44,7 @@ object ReplaceRomanNumerals {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Replace Roman Numerals")
         event.addIrrelevant {
             val map = cachedStrings.toMap()

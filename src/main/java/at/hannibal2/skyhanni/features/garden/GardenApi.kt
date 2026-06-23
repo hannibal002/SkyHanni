@@ -132,7 +132,7 @@ object GardenApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden API")
         if (!inGarden()) return event.addIrrelevant("Not in garden")
 
@@ -212,8 +212,8 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    @HandleEvent
-    fun onProfileDataReady(event: ProfileDataReadyEvent) {
+    @HandleEvent(ProfileDataReadyEvent::class)
+    fun onProfileDataReady() {
         GardenBestCropTime.reset()
     }
 

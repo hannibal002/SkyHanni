@@ -64,7 +64,7 @@ object ItemAddManager {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         if (inSackInventory) {
             inSackInventory = false
             lastSackInventoryLeave = SimpleTimeMark.now()
@@ -118,7 +118,7 @@ object ItemAddManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Recent Item Adds")
         if (recentItems.isEmpty()) return event.addIrrelevant("no items added")
 

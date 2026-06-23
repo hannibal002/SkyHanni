@@ -90,7 +90,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Rift Blood Effigies")
 
         if (!isEnabled()) {
@@ -145,7 +145,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
 
         eLoop@for (entity in LocationUtils.playerLocation().getEntitiesNearby<ArmorStand>(15.0)) {

@@ -13,7 +13,7 @@ object TestBingo {
     var testBingo = false
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bingo Test")
         if (testBingo) {
             event.addData {
