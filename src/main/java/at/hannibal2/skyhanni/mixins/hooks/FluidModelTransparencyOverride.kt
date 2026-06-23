@@ -4,7 +4,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 import com.mojang.blaze3d.platform.Transparency
 
 // Naming is intentional
-@Suppress("FunctionName", "PropertyName")
+@Suppress("FunctionName")
 interface FluidModelTransparencyOverride {
 
     fun `skyhanni$getTransparency`(): Transparency? = throw UnsupportedOperationException("Implemented via mixin")

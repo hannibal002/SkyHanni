@@ -111,6 +111,16 @@ object LavaReplacement {
         return config.islands.get().any(IslandsToReplace::inIsland)
     }
 
+    @JvmStatic
+    fun addOpaqueWaterModel(original: Map<Fluid, FluidModel>, materials: MaterialBaker) = buildMap {
+        val opaqueWaterModel = OPAQUE_WATER_MODEL.bake(materials) { "Opaque Water" }
+        opaqueWaterModel.transparency = Transparency.NONE
+
+        putAll(original)
+        put(OPAQUE_WATER, opaqueWaterModel)
+        put(OPAQUE_FLOWING_WATER, opaqueWaterModel)
+    }
+
     // False positive
     @Suppress("unused")
     enum class IslandsToReplace(private val displayName: String, val island: IslandType) {
