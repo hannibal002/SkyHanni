@@ -64,8 +64,8 @@ object PowderChestTimer {
             lastSound = SimpleTimeMark.now()
             if (config.muteChestDiscover) event.cancel()
         }
-        if (config.muteChestOpen && event.soundName == "block.chest.open"
-            && event.pitch == 1f && event.volume == 1.0f
+        if (config.muteChestOpen && event.soundName == "block.chest.open" && 
+                event.pitch == 1f && event.volume == 1.0f
         ) {
             event.cancel()
         }
