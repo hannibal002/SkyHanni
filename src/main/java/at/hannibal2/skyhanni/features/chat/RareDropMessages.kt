@@ -45,7 +45,7 @@ object RareDropMessages {
      * REGEX-TEST: §6§lPET DROP! §r§5Slug §6(§6+1300☘)
      * REGEX-TEST: §6§lPET DROP! §r§6Rat
      */
-    @Suppress("RepoPatternRegexTestFailed")
+    @Suppress("RepoPatternRegexTestGroupFailed")
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
         "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>(?: .*)?)",
