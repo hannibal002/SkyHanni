@@ -33,6 +33,7 @@ object GardenVisitorChat {
     private val logger = SkyHanniLogger("garden/visitors/chat")
 
     private val patternGroup = RepoPattern.group("garden.visitor.chat")
+    private var allowedChatMessageVisitors: Set<String> = emptySet()
 
     /**
      * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
@@ -58,8 +59,6 @@ object GardenVisitorChat {
         "partialaccepted",
         "§aYou gave some of the required items!",
     )
-
-    var allowedChatMessageVisitors: Set<String> = emptySet()
 
     private val repoReloadCoroutine = CoroutineSettings("allowed chat message visitors repo reload")
 
