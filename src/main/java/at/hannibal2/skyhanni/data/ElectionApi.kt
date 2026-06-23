@@ -147,6 +147,7 @@ object ElectionApi {
         if (!ElectionCandidate.JERRY.isActive()) return
         if (jerryExtraMayor.first != null && jerryExtraMayor.second.isInPast()) {
             jerryExtraMayor = null to SimpleTimeMark.farPast()
+            lastJerryExtraMayorReminder = SimpleTimeMark.now()
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor has expired! Click here to update the new temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
