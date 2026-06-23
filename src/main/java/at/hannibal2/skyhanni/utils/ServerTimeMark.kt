@@ -52,7 +52,7 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
 
     @OptIn(ExperimentalTime::class)
     companion object {
-        fun now() = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
+        fun now(): ServerTimeMark = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
 
         private val FAR_PAST_MS = KInstant.DISTANT_PAST.toEpochMilliseconds()
         private val FAR_FUTURE_MS = KInstant.DISTANT_FUTURE.toEpochMilliseconds()
