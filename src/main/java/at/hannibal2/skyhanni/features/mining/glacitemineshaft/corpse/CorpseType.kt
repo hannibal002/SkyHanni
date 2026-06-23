@@ -25,7 +25,7 @@ enum class CorpseType(
     override fun toString(): String = displayName
 
     companion object {
-        fun getByHelmetOrNull(internalName: NeuInternalName): CorpseType? {
+        fun fromHelmetOrNull(internalName: NeuInternalName): CorpseType? {
             return CorpseType.entries.firstOrNull { it.helmet == internalName }
         }
     }

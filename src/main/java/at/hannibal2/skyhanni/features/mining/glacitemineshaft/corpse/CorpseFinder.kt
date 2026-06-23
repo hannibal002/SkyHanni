@@ -1,58 +1,48 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.AllEntitiesGetter
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
 object CorpseFinder {
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+    // Map with the corpse entity as the key and whether it was found by the player as value
+    private val corpseEntities = mutableMapOf<ArmorStand, Boolean>()
 
-    private val foundCorpses = mutableListOf<LorenzVec>()
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
+        if (!event.isHead || event.newItemStack == null) return
+        if (CorpseType.fromHelmetOrNull(event.newItemStack.getInternalName()) == null) return
+        if (corpseEntities.any { it.key.getLorenzVec().distance(event.entity.getLorenzVec()) <= 3 }) return
 
-    // TODO: use entity events
-    @OptIn(AllEntitiesGetter::class)
-    private fun findCorpse() {
-        EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
-            .filterNot { corpse -> foundCorpses.any { it.distance(corpse.getLorenzVec()) <= 3 } }
-            .filter { entity ->
-                entity.showArms() && entity.showBasePlate().not() && !entity.isInvisible
-            }
-            .forEach { entity ->
-                val helmetName = entity.getStandHelmet()?.getInternalName() ?: return
-                val corpseType = CorpseType.getByHelmetOrNull(helmetName) ?: return
-
-                val canSee = entity.getLorenzVec().canBeSeen(-1..3)
-                if (canSee) {
-                    val location = entity.getLorenzVec().up()
-                    CorpseFoundEvent(corpseType, location).post()
-                    foundCorpses.add(location)
-                }
-            }
+        corpseEntities[event.entity] = false
     }
 
-    @HandleEvent
-    fun onSecondPassed() {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
+        for ((entity, found) in corpseEntities) {
+            // TODO: Maybe adjust the canBeSeen range; it kept marking corpses as seen when I did not see them.
+            if (found || !entity.getLorenzVec().canBeSeen(-1..3)) continue
+            val helmetInternalName = entity.equipment.items[EquipmentSlot.HEAD]?.getInternalName() ?: continue
+            val corpseType = CorpseType.fromHelmetOrNull(helmetInternalName) ?: continue
 
-        findCorpse()
+            CorpseFoundEvent(corpseType, entity.getLorenzVec()).post()
+            corpseEntities[entity] = true
+        }
     }
 
     @HandleEvent
     fun onWorldChange() {
-        foundCorpses.clear()
+        corpseEntities.clear()
     }
-
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.enabled
 }

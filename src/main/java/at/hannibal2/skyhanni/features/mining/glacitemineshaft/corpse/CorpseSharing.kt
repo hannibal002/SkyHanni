@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseFinder.isEnabled
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -35,7 +35,7 @@ object CorpseSharing {
     // They don't get rendered.
     private val sharedWaypoints = mutableListOf<LorenzVec>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onSecondPassed() {
         if (!config.autoSendLocation) return
         if (MineshaftWaypoints.waypoints.isEmpty()) return
@@ -74,7 +74,7 @@ object CorpseSharing {
     }
 
     private fun handleChatEvent(author: String, message: String) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
