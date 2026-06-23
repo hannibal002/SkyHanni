@@ -37,7 +37,7 @@ object DungeonSecretTrackerLocator {
      */
     private val secretTrackerMessagePattern by patternGroup.pattern(
         "message.colorless",
-        "There's a secret *(?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?",
+        "There's a secret (?<distance>\\d+) blocks(?:.+and (?<distance2>\\d+) blocks)?",
     )
 
     private val noMissingSecretsPattern by patternGroup.pattern(
