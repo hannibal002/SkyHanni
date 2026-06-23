@@ -23,12 +23,8 @@ public abstract class MixinFluidRenderHandlerRegistryImpl {
 
     @ModifyReturnValue(method = "get", at = @At("RETURN"))
     private FluidRenderHandler replaceLava(FluidRenderHandler original, Fluid fluid) {
-        if (!LavaReplacement.isActive()) return original;
-
-        if (fluid == Fluids.LAVA) return handlers.get(LavaReplacement.OPAQUE_WATER);
-        if (fluid == Fluids.FLOWING_LAVA) return handlers.get(LavaReplacement.OPAQUE_FLOWING_WATER);
-
-        return original;
+        Fluid replacementFluid = LavaReplacement.getReplacementFluid(fluid);
+        return replacementFluid != fluid ? handlers.get(replacementFluid) : original;
     }
 }
 *///?}

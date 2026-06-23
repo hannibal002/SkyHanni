@@ -14,11 +14,14 @@ import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.material.Fluids
 
 //? if >= 26.1 {
+import com.mojang.blaze3d.platform.Transparency
 import net.minecraft.client.renderer.block.FluidModel
 import net.minecraft.client.renderer.block.FluidStateModelSet
+import net.minecraft.client.resources.model.sprite.MaterialBaker
 //?} else {
 /*import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
@@ -39,23 +42,20 @@ object LavaReplacement {
         checkNotNull(Fluids.LAVA)
     }
 
-    @JvmField
-    internal val OPAQUE_WATER = Registry.register(
+    private val OPAQUE_WATER = Registry.register(
         BuiltInRegistries.FLUID,
         SkyHanniMod.id("opaque_water"),
         OpaqueWaterFluid.Source,
     )
 
-    @JvmField
-    internal val OPAQUE_FLOWING_WATER = Registry.register(
+    private val OPAQUE_FLOWING_WATER = Registry.register(
         BuiltInRegistries.FLUID,
         SkyHanniMod.id("opaque_flowing_water"),
         OpaqueWaterFluid.Flowing,
     )
 
     //? if >= 26.1 {
-    @JvmField
-    internal val OPAQUE_WATER_MODEL = FluidModel.Unbaked(
+    private val OPAQUE_WATER_MODEL = FluidModel.Unbaked(
         FluidStateModelSet.WATER_MODEL.stillMaterial(),
         FluidStateModelSet.WATER_MODEL.flowingMaterial(),
         FluidStateModelSet.WATER_MODEL.overlayMaterial(),
@@ -84,9 +84,7 @@ object LavaReplacement {
 
     private val config get() = SkyHanniMod.feature.fishing.lavaReplacement
 
-    @JvmStatic
-    var isActive: Boolean = false
-        private set
+    private var isActive: Boolean = false
 
     @HandleEvent
     fun onIslandJoin() = update()
@@ -111,6 +109,7 @@ object LavaReplacement {
         return config.islands.get().any(IslandsToReplace::inIsland)
     }
 
+    //? if >= 26.1 {
     @JvmStatic
     fun addOpaqueWaterModel(original: Map<Fluid, FluidModel>, materials: MaterialBaker) = buildMap {
         val opaqueWaterModel = OPAQUE_WATER_MODEL.bake(materials) { "Opaque Water" }
@@ -119,6 +118,17 @@ object LavaReplacement {
         putAll(original)
         put(OPAQUE_WATER, opaqueWaterModel)
         put(OPAQUE_FLOWING_WATER, opaqueWaterModel)
+    }
+    //?}
+
+    @JvmStatic
+    fun getReplacementFluid(original: Fluid): Fluid {
+        if (!isActive) return original
+        return when (original) {
+            Fluids.LAVA -> OPAQUE_WATER
+            Fluids.WATER -> OPAQUE_FLOWING_WATER
+            else -> original
+        }
     }
 
     // False positive
