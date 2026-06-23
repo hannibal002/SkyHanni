@@ -681,7 +681,7 @@ object CarryTracker {
         }
 
         fun sinceStart(): Duration = stopwatch.getDuration()
-        fun sinceLast(): Duration = stopwatch.getLapTime()!! // never null as long as stopwatch is not paused
+        fun sinceLast(): Duration = stopwatch.getLapTime() ?: Duration.ZERO
         fun elapsed(): Duration = sinceStart() - sinceLast()
 
         fun perHour(): Double = (totalDone / ((elapsed().inPartialHours).takeUnless { it == 0.0 } ?: 1.0))
