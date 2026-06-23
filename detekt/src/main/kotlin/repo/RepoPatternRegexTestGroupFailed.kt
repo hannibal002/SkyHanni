@@ -27,7 +27,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
                 if (!internalRegexGroups.contains(specifiedGroupName)) {
                     delegate.reportIssue(
                         "Repo pattern `${element.variableName}` specifies a test value for group `$specifiedGroupName`, " +
-                            "but no group named `$specifiedGroupName` exists inside the regular expression."
+                            "but no group named `$specifiedGroupName` exists inside the regular expression.",
                     )
                 }
             }
@@ -45,7 +45,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
                     delegate.reportIssue(
                         "Repo pattern `${element.variableName}` failed regex test: `${test.test}` pattern: `${element.rawPattern}`. " +
                             "Group `$groupName` expected `$expectedValue` got `$capturedValue`. " +
-                                "[View on Regex101](${element.regex101Url})",
+                            "[View on Regex101](${element.regex101Url})",
                     )
                 }
             }
@@ -57,7 +57,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
             delegate.reportIssue(
                 "Repo pattern `${element.variableName}` defines internal named groups $internalRegexGroups, " +
                     "but the following groups never captured a non-empty value in any test: $unexercisedGroups. " +
-                    "Every group must capture non-empty text at least once."
+                    "Every group must capture non-empty text at least once.",
             )
         }
     }
