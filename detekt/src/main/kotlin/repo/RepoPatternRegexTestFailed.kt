@@ -5,7 +5,10 @@ import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(config, "All repo patterns must be accompanied by one or more passing regex test.") {
+class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(
+    config,
+    "All repo patterns must be accompanied by one or more passing regex test."
+) {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
@@ -19,18 +22,36 @@ class RepoPatternRegexTestFailed(config: Config) : SkyHanniRule(config, "All rep
         if (repoPatternElement.regexTests.isEmpty()) return
 
         repoPatternElement.regexTests.forEach { test ->
-            if (!repoPatternElement.pattern.matcher(test).find()) {
+            val regex = test.test
+            val matcher = repoPatternElement.pattern.matcher(regex)
+
+            if (!matcher.find()) {
                 delegate.reportIssue(
-                    "Repo pattern `$variableName` failed regex test: `$test` pattern: `$rawPattern`. " +
+                    "Repo pattern `$variableName` failed regex test: `$regex` pattern: `$rawPattern`. " +
                         "[View on Regex101](${repoPatternElement.regex101Url})",
                 )
+                return@forEach
+            }
+
+            test.groups.forEach { (groupName, groupValue) ->
+                val value = matcher.group(groupName) ?: return@forEach
+
+                if (groupValue != value) {
+                    delegate.reportIssue(
+                        "Repo pattern `$variableName` failed regex test: `$regex` pattern: `$rawPattern`. " +
+                            "Group `$groupName` expected `$groupValue` got `$value`. " +
+                            "[View on Regex101](${repoPatternElement.regex101Url})",
+                    )
+                }
             }
         }
 
         repoPatternElement.failingRegexTests.forEach { test ->
             if (repoPatternElement.pattern.matcher(test).find()) {
-                delegate.reportIssue("Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
-                    "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})")
+                delegate.reportIssue(
+                    "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
+                        "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})"
+                )
             }
         }
     }
