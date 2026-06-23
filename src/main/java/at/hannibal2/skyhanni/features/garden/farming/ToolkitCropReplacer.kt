@@ -23,30 +23,16 @@ object ToolkitCropReplacer {
     private val iconCache: MutableMap<Int, SafeItemStack> = mutableMapOf()
     private val storedTools: MutableMap<Int, CropType> = mutableMapOf()
 
-    private var fullyLoaded = false
-
-    @HandleEvent
-    fun onInventoryFullyOpened() {
-        if (!GardenApi.toolkitInventory.isInside()) return
-        fullyLoaded = true
-    }
-
-    @HandleEvent
-    fun onInventoryClose() {
-        fullyLoaded = false
-    }
-
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.replaceMenuIcons) return
         if (!GardenApi.toolkitInventory.isInside()) return
+        if (!event.hasItem) return
 
         val slot = event.slot
         if (slot !in 10..16 && slot !in 20..24) return
 
         val item = event.originalItem
-        if (item.isEmpty) return
-
         val cropType = item.getCropType()
         if (cropType == null) {
             storedTools.remove(slot)
@@ -60,17 +46,21 @@ object ToolkitCropReplacer {
         }
         storedTools[slot] = cropType
 
-        val iconId = "toolkit_crop_replacer:${cropType.name}"
-
         val replacementStack = iconCache.getOrPut(slot) {
-            cropType.getItemStackCopy(iconId).apply {
-                setLore(item.getLoreComponent())
-                setCustomItemName(item.hoverName)
-                    .set(DataComponents.CUSTOM_DATA, item.getExtraAttributes()?.let { CustomData.of(it) })
-            }
+            createIcon(item, cropType)
         }
 
         event.replace(replacementStack.copy())
+    }
+
+    private fun createIcon(item: SafeItemStack, cropType: CropType): SafeItemStack {
+        val iconId = "toolkit_crop_replacer:${cropType.name}"
+
+        return cropType.getItemStackCopy(iconId).apply {
+            setLore(item.getLoreComponent())
+            setCustomItemName(item.hoverName)
+            set(DataComponents.CUSTOM_DATA, item.getExtraAttributes()?.let { CustomData.of(it) })
+        }
     }
 
     @HandleEvent
