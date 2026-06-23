@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.glacitemineshaft
+package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
