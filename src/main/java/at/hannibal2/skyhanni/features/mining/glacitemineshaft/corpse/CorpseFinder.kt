@@ -18,13 +18,14 @@ import net.minecraft.world.entity.decoration.ArmorStand
 @SkyHanniModule
 object CorpseFinder {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
-    private val foundCorpses = mutableSetOf<Pair<CorpseType, LorenzVec>>()
+
+    private val foundCorpses = mutableListOf<LorenzVec>()
 
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     private fun findCorpse() {
         EntityUtils.getAllEntities().filterIsInstance<ArmorStand>()
-            .filterNot { corpse -> foundCorpses.any { it.second.distance(corpse.getLorenzVec()) <= 3 } }
+            .filterNot { corpse -> foundCorpses.any { it.distance(corpse.getLorenzVec()) <= 3 } }
             .filter { entity ->
                 entity.showArms() && entity.showBasePlate().not() && !entity.isInvisible
             }
@@ -36,7 +37,7 @@ object CorpseFinder {
                 if (canSee) {
                     val location = entity.getLorenzVec().up()
                     CorpseFoundEvent(corpseType, location).post()
-                    foundCorpses.add(Pair(corpseType, location))
+                    foundCorpses.add(location)
                 }
             }
     }
