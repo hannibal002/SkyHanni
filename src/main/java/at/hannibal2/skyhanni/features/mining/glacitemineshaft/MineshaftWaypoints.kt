@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -75,10 +75,10 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onCorpseLocated(event: CorpseFoundEvent) {
+    fun onCorpseFound(event: CorpseFoundEvent) {
         val corpseType = event.corpseType
         val article = if (corpseType == CorpseType.UMBER) "an" else "a"
-        ChatUtils.chat("Located $article $corpseType Corpse§e and marked its location with a waypoint.")
+        ChatUtils.chat("Found $article $corpseType Corpse§e and marked its location with a waypoint.")
 
         val waypoint = MineshaftWaypoint(corpseType.waypointType, event.location, isCorpse = true)
         waypoints.add(waypoint)
