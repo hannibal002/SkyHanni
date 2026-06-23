@@ -123,7 +123,6 @@ class RepoPatternElement private constructor(
                                 "If the whitespace is intentional, use WRAPPED-REGEX-TEST instead."
                         }
 
-                        // Parse the plain line cleanly using the new semicolon boundary layout
                         val (testString, groupText) = splitAtFirstSemicolonOutsideQuotes(fullContent)
 
                         regexTests.add(
