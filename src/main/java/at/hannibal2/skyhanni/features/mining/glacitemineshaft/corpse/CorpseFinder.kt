@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.mining.CorpseLocatedEvent
+import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
@@ -34,7 +34,7 @@ object CorpseFinder {
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
                 if (canSee) {
                     val location = entity.getLorenzVec().up()
-                    CorpseLocatedEvent(corpseType, location).post()
+                    CorpseFoundEvent(corpseType, location).post()
                 }
             }
     }
