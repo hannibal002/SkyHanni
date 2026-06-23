@@ -138,8 +138,9 @@ object SeaCreatureManager {
                 val rarity = seaCreature.rarity
                 val rare = seaCreature.rare
                 val lootshareSphere = seaCreature.lootshareSphereOverride
+                val oldNames = seaCreature.oldNames.orEmpty()
 
-                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere)
+                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere, oldNames)
                 seaCreatureMap[chatMessage] = creature
                 for (alternateMessage in seaCreature.alternateMessages.orEmpty()) {
                     seaCreatureMap[alternateMessage] = creature
