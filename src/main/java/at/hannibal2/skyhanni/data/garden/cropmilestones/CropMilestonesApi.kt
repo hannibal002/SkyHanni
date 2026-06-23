@@ -53,8 +53,8 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:  Cocoa Beans 31: 68%
-     * REGEX-TEST:  Potato 32: 97.7%
+     * WRAPPED-REGEX-TEST: " Cocoa Beans 31: 68%"
+     * WRAPPED-REGEX-TEST: " Potato 32: 97.7%"
      */
     val tabListPercentPattern by patternGroup.pattern(
         "tablist.percent-no-color",
@@ -62,8 +62,8 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:  Potato 46: MAX
-     * REGEX-TEST:  Cocoa Beans 46: MAX
+     * WRAPPED-REGEX-TEST: " Potato 46: MAX"
+     * WRAPPED-REGEX-TEST: " Cocoa Beans 46: MAX"
      */
     val tabListMaxPattern by patternGroup.pattern(
         "tablist.max-no-color",
@@ -71,7 +71,7 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:   §r§b§lGARDEN MILESTONE §3Melon §845➜§346
+     * WRAPPED-REGEX-TEST: "  §r§b§lGARDEN MILESTONE §3Melon §845➜§346"
      */
     val levelUpPattern by patternGroup.pattern(
         "levelup",

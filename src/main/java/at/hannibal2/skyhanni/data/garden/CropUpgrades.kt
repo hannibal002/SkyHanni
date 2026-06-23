@@ -28,7 +28,7 @@ object CropUpgrades {
     )
 
     /**
-     * REGEX-TEST:   §r§6§lCROP UPGRADE §eNether Wart§7 #7
+     * WRAPPED-REGEX-TEST: "  §r§6§lCROP UPGRADE §eNether Wart§7 #7"
      */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",

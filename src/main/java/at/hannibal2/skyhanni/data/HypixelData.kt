@@ -60,8 +60,8 @@ object HypixelData {
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §bVillage
-     * REGEX-TEST:  §5ф §dWizard Tower
+     * WRAPPED-REGEX-TEST: " §7⏣ §bVillage"
+     * WRAPPED-REGEX-TEST: " §5ф §dWizard Tower"
      */
     private val skyblockAreaPattern by patternGroup.pattern(
         "skyblock.area",

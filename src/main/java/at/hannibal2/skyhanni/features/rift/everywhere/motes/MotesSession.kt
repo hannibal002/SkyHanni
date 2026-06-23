@@ -33,7 +33,7 @@ object MotesSession {
     private val patternGroup = RepoPattern.group("rift.everywhere.motes")
 
     /**
-     * REGEX-TEST:  Lifetime Motes: 593,922
+     * WRAPPED-REGEX-TEST: " Lifetime Motes: 593,922"
      */
     private val lifetimeMotesPattern by patternGroup.pattern(
         "lifetime-nocolor",
