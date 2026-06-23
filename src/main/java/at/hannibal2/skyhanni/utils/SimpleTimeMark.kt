@@ -84,8 +84,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         private val FAR_FUTURE = SimpleTimeMark(FAR_FUTURE_MS)
 
         @JvmStatic
-        @JvmName("farPast")
         fun farPast() = FAR_PAST
+        @JvmStatic
         fun farFuture() = FAR_FUTURE
 
         fun fromUnixSeconds(seconds: Long) = SimpleTimeMark(seconds * 1000)

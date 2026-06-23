@@ -61,8 +61,8 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
         @JvmStatic
-        @JvmName("farPast")
         fun farPast() = FAR_PAST
+        @JvmStatic
         fun farFuture() = FAR_FUTURE
 
         fun Duration.fromServerNow() = now() + this
