@@ -33,8 +33,8 @@ class RepoPatternElement private constructor(
         "https://regex101.com/?regex=$encodedPattern&testString=$encodedTests&flavor=java"
     }
 
-    fun needsRegexTest(): Boolean {
-        return regexConstructs.containsMatchIn(rawPattern)
+    val needsRegexTest: Boolean by lazy {
+        regexConstructs.containsMatchIn(rawPattern)
     }
 
     companion object {

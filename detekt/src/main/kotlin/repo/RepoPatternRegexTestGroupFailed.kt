@@ -12,7 +12,7 @@ class RepoPatternRegexTestGroupFailed(config: Config, private val ctx: RepoPatte
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
         val element = ctx.getRepoPatternElement(delegate) ?: return
-        if (!element.needsRegexTest()) return
+        if (!element.needsRegexTest) return
         val compiledPattern = element.pattern
 
         val internalRegexGroups: Set<String> = compiledPattern.namedGroups().keys

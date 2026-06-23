@@ -12,7 +12,7 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
         super.visitPropertyDelegate(delegate)
         val element = ctx.getRepoPatternElement(delegate) ?: return
-        if (!element.needsRegexTest()) return
+        if (!element.needsRegexTest) return
 
         element.regexTests.forEach { test ->
             val regex = test.test
