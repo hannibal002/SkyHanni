@@ -100,7 +100,7 @@ object FishingApi {
         "Bait Remaining: (?<amount>[\\d,]+)",
     )
 
-    private val obfuscatedBaits = listOf(
+    private val obfuscatedBaits = setOf(
         "OBFUSCATED_FISH_1_BRONZE",
         "OBFUSCATED_FISH_1_SILVER",
         "OBFUSCATED_FISH_1_GOLD",
