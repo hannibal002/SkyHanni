@@ -2,13 +2,18 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -16,8 +21,32 @@ import net.minecraft.world.entity.decoration.ArmorStand
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
 object CorpseFinder {
+
+    /**
+     * WRAPPED-REGEX-TEST: " Lapis: NOT LOOTED"
+     * WRAPPED-REGEX-TEST: " Tungsten: NOT LOOTED"
+     * WRAPPED-REGEX-TEST: " Umber: NOT LOOTED"
+     * WRAPPED-REGEX-TEST: " Vanguard: NOT LOOTED"
+     * WRAPPED-REGEX-TEST: " Lapis: LOOTED"
+     * WRAPPED-REGEX-TEST: " Tungsten: LOOTED"
+     * WRAPPED-REGEX-TEST: " Umber: LOOTED"
+     * WRAPPED-REGEX-TEST: " Vanguard: LOOTED"
+     */
+    private val tabWidgetCorpsePattern by RepoPattern.pattern(
+        "mining.glacitemineshaft.tabwidgetcorpse",
+        "\\s*(?<corpse>\\w+): (?:NOT )?LOOTED\\s*",
+    )
+
     // Map with the corpse entity as the key and whether it was found by the player as value
     private val corpseEntities = mutableMapOf<ArmorStand, Boolean>()
+    private var totalCorpseCount = 0
+
+    fun allCorpsesFound(): Boolean {
+        return SkyBlockUtils.currentIsland != IslandType.MINESHAFT &&
+            totalCorpseCount > 0 &&
+            totalCorpseCount == corpseEntities.size &&
+            corpseEntities.all { it.value }
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
@@ -36,13 +65,20 @@ object CorpseFinder {
             val helmetInternalName = entity.equipment.items[EquipmentSlot.HEAD]?.getInternalName() ?: continue
             val corpseType = CorpseType.fromHelmetOrNull(helmetInternalName) ?: continue
 
-            CorpseFoundEvent(corpseType, entity.getLorenzVec().up()).post()
             corpseEntities[entity] = true
+            CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), allCorpsesFound()).post()
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (event.widget != TabWidget.FROZEN_CORPSES) return
+        totalCorpseCount = event.lines.count { tabWidgetCorpsePattern.matches(it) }
     }
 
     @HandleEvent
     fun onWorldChange() {
         corpseEntities.clear()
+        totalCorpseCount = 0
     }
 }

@@ -7,7 +7,11 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 /**
  * Fired when a Mineshaft corpse entity is in line of sight of the player.
  */
-class CorpseFoundEvent(val corpseType: CorpseType, val location: LorenzVec) : SkyHanniEvent()
+class CorpseFoundEvent(
+    val corpseType: CorpseType,
+    val location: LorenzVec,
+    val allCorpsesFound: Boolean,
+) : SkyHanniEvent()
 
 /**
  * Fired when a Mineshaft corpse is looted, signaled in the chat.
