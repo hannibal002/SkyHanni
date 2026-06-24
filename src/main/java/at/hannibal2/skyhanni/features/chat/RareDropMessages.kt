@@ -76,9 +76,9 @@ object RareDropMessages {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "SMITE;6"
-     * WRAPPED-REGEX-TEST: "ENDER_SLAYER;7"
-     * WRAPPED-REGEX-TEST: "ULTIMATE_REITERATE;1"
+     * REGEX-TEST: SMITE;6
+     * REGEX-TEST: ENDER_SLAYER;7
+     * REGEX-TEST: ULTIMATE_REITERATE;1
      */
     private val slayerBookIDPattern by repoGroup.pattern(
         "slayerbook",

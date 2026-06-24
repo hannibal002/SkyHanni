@@ -1,7 +1,8 @@
 package repo
 
+import RepoPatternElement
+import RepoPatternElement.Companion.asRepoPatternElement
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
-import repo.RepoPatternElement.Companion.asRepoPatternElement
 import java.util.IdentityHashMap
 
 class RepoPatternContext {

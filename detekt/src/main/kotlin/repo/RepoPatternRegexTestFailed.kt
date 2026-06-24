@@ -15,13 +15,11 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
         if (!element.needsRegexTest) return
 
         element.regexTests.forEach { test ->
-            val regex = test.test
-            val pattern = element.pattern
-            val matcher = pattern.matcher(regex)
+            val matcher = element.pattern.matcher(test)
 
             if (!matcher.find()) {
                 delegate.reportIssue(
-                    "Repo pattern `${element.variableName}` failed regex test: `$regex` pattern: `${element.rawPattern}`. " +
+                    "Repo pattern `${element.variableName}` failed regex test: `$test` pattern: `${element.rawPattern}`. " +
                         "[View on Regex101](${element.regex101Url})",
                 )
             }

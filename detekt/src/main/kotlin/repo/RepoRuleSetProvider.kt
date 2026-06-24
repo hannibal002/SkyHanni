@@ -20,7 +20,7 @@ class RepoRuleSetProvider : RuleSetProvider {
                 RuleName("RepoPatternRegexTestFailed") to { config -> RepoPatternRegexTestFailed(config, context) },
                 RuleName("RepoPatternRegexTestMissing") to { config -> RepoPatternRegexTestMissing(config, context) },
                 RuleName("RepoPatternUnnamedGroup") to { config -> RepoPatternUnnamedGroup(config, context) },
-                RuleName("RepoPatternRegexTestGroupFailed") to { config -> RepoPatternRegexTestGroupFailed(config, context) },
+                RuleName("RepoPatternRegexTestGroupMissing") to { config -> RepoPatternRegexTestGroupMissing(config, context) },
             ),
         )
     }
