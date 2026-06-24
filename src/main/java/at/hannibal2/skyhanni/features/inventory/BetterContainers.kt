@@ -215,7 +215,8 @@ object BetterContainers {
     private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
         stack.count == 1 &&
         stack.hoverName.string.isEmpty() &&
-        stack.getLoreComponent().isEmpty()
+        stack.getLoreComponent().isEmpty() &&
+        stack.getTooltipLines().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,
