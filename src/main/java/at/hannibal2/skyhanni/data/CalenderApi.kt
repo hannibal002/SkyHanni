@@ -49,7 +49,7 @@ object CalenderApi {
     )
 
     /**
-     * REGEX-TEST: Ends in: 1d 4h 20m
+     * REGEX-TEST: 1d 4h 20m
      */
     val timeComponentPattern by group.pattern(
         "time-component",
