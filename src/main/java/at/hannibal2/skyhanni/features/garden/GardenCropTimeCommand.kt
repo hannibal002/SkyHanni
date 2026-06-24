@@ -4,12 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
-import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils.dynamicSuggestionProvider
+import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.features.garden.farming.CropMoneyDisplay
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -21,6 +22,30 @@ import kotlin.time.Duration.Companion.seconds
 object GardenCropTimeCommand {
 
     private val config get() = GardenApi.config.moneyPerHours
+
+    private fun processCropEntry(internalName: NeuInternalName, amount: Long, searchName: String): Pair<String, Long>? {
+        val itemName = internalName.repoItemName.removeColor()
+        if (!itemName.contains(searchName, ignoreCase = true)) return null
+
+        val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
+        val baseName = baseId.repoItemName.removeColor()
+        val crop = CropType.getByName(baseName)
+
+        val fullAmount = baseAmount.toLong() * amount
+        val text = if (baseAmount == 1) {
+            "§e${amount.addSeparators()}x $itemName"
+        } else {
+            "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
+        }
+
+        val speed = crop.getSpeed()
+        return if (speed == null) {
+            "$text §cNo speed data!" to -1L
+        } else {
+            val missingTime = (fullAmount / speed).seconds
+            "$text §b${missingTime.format()}" to missingTime.inWholeSeconds
+        }
+    }
 
     private fun onCommand(amount: Long, item: String) {
         if (!config.display) {
@@ -34,33 +59,10 @@ object GardenCropTimeCommand {
             return
         }
 
-        val searchName = item.lowercase()
-
         val map = mutableMapOf<String, Long>()
         for (entry in multipliers) {
-            val internalName = entry.key
-            val itemName = internalName.repoItemName.removeColor()
-            if (itemName.lowercase().contains(searchName)) {
-                val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
-                val baseName = baseId.repoItemName.removeColor()
-                val crop = CropType.getByName(baseName)
-
-                val fullAmount = baseAmount.toLong() * amount
-                val text = if (baseAmount == 1) {
-                    "§e${amount.addSeparators()}x $itemName"
-                } else {
-                    "§e${amount.addSeparators()}x $itemName §7(§e${fullAmount.addSeparators()}x $baseName§7)"
-                }
-
-                val speed = crop.getSpeed()
-                if (speed == null) {
-                    map["$text §cNo speed data!"] = -1
-                } else {
-                    val missingTime = (fullAmount / speed).seconds
-                    val duration = missingTime.format()
-                    map["$text §b$duration"] = missingTime.inWholeSeconds
-                }
-            }
+            val (text, time) = processCropEntry(entry.key, amount, item) ?: continue
+            map[text] = time
         }
 
         if (map.isEmpty()) {
@@ -82,9 +84,9 @@ object GardenCropTimeCommand {
                 argCallback(
                     "item",
                     BrigadierArguments.greedyString(),
-                    suggestions = dynamicSuggestionProvider {
-                        CropMoneyDisplay.multipliers.keys.map { it.repoItemName.removeColor().lowercase() }
-                    }
+                    suggestions = BrigadierUtils.dynamicSuggestionProvider {
+                        CropMoneyDisplay.multipliers.keys.map { it.repoItemName.removeColor() }
+                    },
                 ) { item ->
                     onCommand(getArg(amountArg), item)
                 }
