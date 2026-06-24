@@ -182,7 +182,7 @@ object CalenderApi {
         return result
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (calendarGuiPattern.matches(event.inventoryName)) {
             inMainCalendar = true
@@ -194,7 +194,7 @@ object CalenderApi {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW)
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!event.reopenSameName) {
             inMainCalendar = false

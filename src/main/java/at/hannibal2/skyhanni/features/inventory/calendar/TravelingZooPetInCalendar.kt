@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.calendar
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.CalenderApi
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -23,6 +24,7 @@ object TravelingZooPetInCalendar {
 
     @HandleEvent
     fun onTooltip(event: ToolTipTextEvent) {
+        if (!isEnabled()) return
         if (!CalenderApi.inCalendar) return
         event.slot ?: return
         val skyblockEvents = CalenderApi.parseTooltip(event.toolTip)
@@ -59,4 +61,6 @@ object TravelingZooPetInCalendar {
 
         return (time.year * 2 + extraSeason)
     }
+
+    fun isEnabled() = SkyHanniMod.feature.inventory.oringoPetInCalendar
 }

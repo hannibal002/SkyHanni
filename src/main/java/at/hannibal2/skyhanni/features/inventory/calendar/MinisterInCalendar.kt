@@ -90,5 +90,5 @@ object MinisterInCalendar {
         return item.setLoreString(ministerLore).setCustomItemName(ministerDisplayName)
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.inventory.ministerInCalendar
+    fun isEnabled() = SkyHanniMod.feature.inventory.ministerInCalendar
 }
