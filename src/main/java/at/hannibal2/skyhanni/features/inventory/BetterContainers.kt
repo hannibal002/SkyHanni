@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -211,9 +212,10 @@ object BetterContainers {
 
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
-    private fun isBlankStack(
-        stack: SafeItemStack,
-    ): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK)
+    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+        stack.count == 1 &&
+        stack.hoverName.string.isEmpty() &&
+        stack.getLoreComponent().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,
