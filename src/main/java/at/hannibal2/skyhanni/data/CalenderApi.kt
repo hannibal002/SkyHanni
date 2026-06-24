@@ -91,7 +91,7 @@ object CalenderApi {
         "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
     )
 
-    fun parseTooltip(tooltipLines: List<Component>, ): List<CalendarEvent> {
+    fun parseTooltip(tooltipLines: List<Component>): List<CalendarEvent> {
         val events = mutableListOf<CalendarEvent>()
         var currentDay = 1
         for (component in tooltipLines) {

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.getSeasonByMonth
 
 @SkyHanniModule
-object OringoZooFeature {
+object OringoPetInCalendar {
     private val ORINGO_PETS = arrayOf(
         "Lion",
         "Monkey",
