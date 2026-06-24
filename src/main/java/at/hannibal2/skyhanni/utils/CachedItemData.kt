@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.mixins.transformers.MixinItemStack
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
@@ -55,11 +57,7 @@ data class CachedItemData(
             cache.map { action(it.value) }
         }
 
-        // TODO: We can probably cache item uuid and item id directly in SafeItemStack
-        private fun hashItem(item: SafeItemStack): Int {
-            item.getItemUuid()?.let { return it.hashCode() }
-            item.getItemId()?.let { return it.hashCode() }
-            return SafeItemStack.hashItemAndComponents(item)
-        }
+        private fun hashItem(item: SafeItemStack): Int =
+            (item as ItemStackCachedData).skyhanni_uniqueId
     }
 }

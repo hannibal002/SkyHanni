@@ -5,6 +5,9 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 
 /**
  * Tracks whether Minecraft's item component data has been fully bound.
@@ -31,5 +34,12 @@ object SafeItemStackUtils {
     @HandleEvent
     fun onComponentsLoaded() {
         componentsLoaded = true
+    }
+
+    @JvmStatic
+    fun getUniqueIdentifier(item: SafeItemStack): Int {
+        item.getItemUuid()?.let { return it.hashCode() }
+        item.getItemId()?.let { return it.hashCode() }
+        return SafeItemStack.hashItemAndComponents(item)
     }
 }

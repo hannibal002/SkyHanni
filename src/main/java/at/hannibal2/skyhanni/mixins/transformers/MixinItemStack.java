@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData;
+import at.hannibal2.skyhanni.utils.SafeItemStackUtils;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
@@ -11,6 +13,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.component.TooltipProvider;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -24,7 +27,17 @@ import org.spongepowered.asm.mixin.Shadow;
 //?}
 
 @Mixin(ItemStack.class)
-public class MixinItemStack {
+public class MixinItemStack implements ItemStackCachedData {
+    @Unique
+    public Integer skyhanni_uniqueId = null;
+
+    @Override
+    public int getSkyhanni_uniqueId() {
+        if (skyhanni_uniqueId == null) {
+            skyhanni_uniqueId = SafeItemStackUtils.getUniqueIdentifier((ItemStack) (Object) this);
+        }
+        return skyhanni_uniqueId;
+    }
 
     //? if >= 26.1 {
     @Shadow private Holder<Item> item;
