@@ -44,7 +44,7 @@ object TabListData {
     var fullyLoaded = false
         internal set
 
-    private suspend fun copyCommand(asComponents: Boolean = true) {
+    private fun copyCommand(asComponents: Boolean = true) {
         fun Component?.localCopyFormat() = if (asComponents) this?.toString().orEmpty() else this?.formattedTextCompat().orEmpty()
 
         val tabHeader = header.localCopyFormat()

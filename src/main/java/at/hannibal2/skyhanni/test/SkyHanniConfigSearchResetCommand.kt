@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.async
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -360,6 +359,7 @@ object SkyHanniConfigSearchResetCommand {
             val scale = getPrivateFieldValue("scale")
             "($x, $y, $scale)"
         }
+
         this is String && isEmpty() -> "<empty string>"
         this is String -> "'$this'"
         this is Property<*> -> getPrivateFieldValue("value").getObjectName()

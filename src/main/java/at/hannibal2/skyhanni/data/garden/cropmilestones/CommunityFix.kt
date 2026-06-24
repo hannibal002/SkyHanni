@@ -75,10 +75,9 @@ object CommunityFix {
         if (data.isNotEmpty()) {
             ClipboardUtils.copyToClipboardAsyncWithResponse(
                 "```${data.joinToString("\n")}```",
-                info =
-                    "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
-                        "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e." +
-                        "Correct data",
+                info = "Found §c${data.size} §ewrong crop milestone steps in the menu! " +
+                    "Please share it on the §bSkyHanni Discord §ein the channel §b#share-data§e." +
+                    "Correct data",
             )
         } else {
             if (showWhenAllCorrect) {

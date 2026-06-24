@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
@@ -97,7 +96,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
 
     private fun splitLine(comp: Component): List<FormattedCharSequence> {
         return ComponentRenderUtils.wrapComponents(
-            comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font
+            comp, w - (ChatManager.ActionKind.maxLength + reasonMaxLength + 10 + 10), Minecraft.getInstance().font,
         )
     }
 
