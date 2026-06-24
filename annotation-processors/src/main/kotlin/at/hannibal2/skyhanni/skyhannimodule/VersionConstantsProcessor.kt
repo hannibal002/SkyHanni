@@ -25,7 +25,7 @@ class VersionConstantsProcessor(
                 |    const val MOD_VERSION = "$modVersion"
                 |    /**
                 |     * Do not use this Minecraft version as it is reflective of the compile-time version
-                |     * and might not be correct at runtime. We use it for the auto-updater only.
+                |     * and might not be correct at runtime. We use it for update checks only.
                 |     */
                 |    internal var MC_VERSION = "$mcVersion"
                 |        private set
