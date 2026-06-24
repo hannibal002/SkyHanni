@@ -460,7 +460,7 @@ afterEvaluate {
 }
 
 fun SourceTask.excludeBuildDirectories() {
-    exclude { it.file.toPath().any { it.toString() == "build" } }
+    exclude { it.file.toPath().any { path -> path.toString() == "build" } }
 }
 
 tasks.withType<Detekt>().configureEach {
