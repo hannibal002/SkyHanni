@@ -80,7 +80,7 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:   §r§6§lCHEST LOCKPICKED
+     * WRAPPED-REGEX-TEST: "  §r§6§lCHEST LOCKPICKED"
      */
     private val lockPickedPattern by patternGroup.pattern(
         "powder.picked",
@@ -88,7 +88,7 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:   §r§5§lLOOT CHEST COLLECTED
+     * WRAPPED-REGEX-TEST: "  §r§5§lLOOT CHEST COLLECTED"
      */
     private val lootChestCollectedPattern by patternGroup.pattern(
         "lootchest.collected",
@@ -96,7 +96,7 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:   §r§a§lREWARDS
+     * WRAPPED-REGEX-TEST: "  §r§a§lREWARDS"
      */
     private val rewardHeaderPattern by patternGroup.pattern(
         "reward.header",
@@ -104,22 +104,22 @@ object PowderMiningChatFilter {
     )
 
     /**
-     * REGEX-TEST:     §r§a§r§aGreen Goblin Egg
-     * REGEX-TEST:     §r§9Goblin Egg
-     * REGEX-TEST:     §r§dDiamond Essence
-     * REGEX-TEST:     §r§dGold Essence
-     * REGEX-TEST:     §r§dGold Essence §r§8x3
-     * REGEX-TEST:     §r§dGemstone Powder §r§8x537
-     * REGEX-TEST:     §r§dDiamond Essence §r§8x2
-     * REGEX-TEST:     §r§2Mithril Powder §r§8x153
-     * REGEX-TEST:     §r§5Treasurite
-     * REGEX-TEST:     §r§f⸕ Rough Amber Gemstone §r§8x24
-     * REGEX-TEST:     §r§f❤ Rough Ruby Gemstone §r§8x24
-     * REGEX-TEST:     §r§f❈ Rough Amethyst Gemstone §r§8x24
-     * REGEX-TEST:     §r§9§r§eYellow Goblin Egg
-     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone
-     * REGEX-TEST:     §r§aWishing Compass §r§8x3
-     * REGEX-TEST:     §r§a⸕ Flawed Amber Gemstone §r§8x2
+     * WRAPPED-REGEX-TEST: "    §r§a§r§aGreen Goblin Egg"
+     * WRAPPED-REGEX-TEST: "    §r§9Goblin Egg"
+     * WRAPPED-REGEX-TEST: "    §r§dDiamond Essence"
+     * WRAPPED-REGEX-TEST: "    §r§dGold Essence"
+     * WRAPPED-REGEX-TEST: "    §r§dGold Essence §r§8x3"
+     * WRAPPED-REGEX-TEST: "    §r§dGemstone Powder §r§8x537"
+     * WRAPPED-REGEX-TEST: "    §r§dDiamond Essence §r§8x2"
+     * WRAPPED-REGEX-TEST: "    §r§2Mithril Powder §r§8x153"
+     * WRAPPED-REGEX-TEST: "    §r§5Treasurite"
+     * WRAPPED-REGEX-TEST: "    §r§f⸕ Rough Amber Gemstone §r§8x24"
+     * WRAPPED-REGEX-TEST: "    §r§f❤ Rough Ruby Gemstone §r§8x24"
+     * WRAPPED-REGEX-TEST: "    §r§f❈ Rough Amethyst Gemstone §r§8x24"
+     * WRAPPED-REGEX-TEST: "    §r§9§r§eYellow Goblin Egg"
+     * WRAPPED-REGEX-TEST: "    §r§a⸕ Flawed Amber Gemstone"
+     * WRAPPED-REGEX-TEST: "    §r§aWishing Compass §r§8x3"
+     * WRAPPED-REGEX-TEST: "    §r§a⸕ Flawed Amber Gemstone §r§8x2"
      */
     val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",

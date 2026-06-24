@@ -125,9 +125,9 @@ object GardenNextJacobContest {
      * REGEX-TEST: ○ Cactus
      * REGEX-TEST: ☘ Carrot
      * REGEX-TEST: ○ Melon
-     * REGEX-TEST:  ☘ Mushroom
-     * REGEX-TEST:  ○ Pumpkin
-     * REGEX-TEST:  ○ Wheat
+     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
+     * WRAPPED-REGEX-TEST: " ○ Pumpkin"
+     * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",

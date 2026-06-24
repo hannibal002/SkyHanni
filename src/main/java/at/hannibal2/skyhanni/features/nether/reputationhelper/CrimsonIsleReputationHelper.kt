@@ -39,9 +39,9 @@ object CrimsonIsleReputationHelper {
     var tabListQuestsMissing = false
 
     /**
-     * REGEX-TEST:  ✖ Rescue Mission
-     * REGEX-TEST:  ✔ Digested Mushrooms x20
-     * REGEX-TEST:  ✖ Slugfish x1
+     * WRAPPED-REGEX-TEST: " ✖ Rescue Mission"
+     * WRAPPED-REGEX-TEST: " ✔ Digested Mushrooms x20"
+     * WRAPPED-REGEX-TEST: " ✖ Slugfish x1"
      */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputationhelper.tablist.quest-no-color",
