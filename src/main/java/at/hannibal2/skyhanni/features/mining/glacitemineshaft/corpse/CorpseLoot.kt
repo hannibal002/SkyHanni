@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object CorpseApi {
+object CorpseLoot {
 
     private val patternGroup = RepoPattern.group("mining.mineshaft")
     private val chatPatternGroup = patternGroup.group("chat")

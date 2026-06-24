@@ -28,5 +28,9 @@ enum class CorpseType(
         fun fromHelmetOrNull(internalName: NeuInternalName): CorpseType? {
             return CorpseType.entries.firstOrNull { it.helmet == internalName }
         }
+
+        fun isHelmetForCorpse(internalName: NeuInternalName): Boolean {
+            return fromHelmetOrNull(internalName) != null
+        }
     }
 }

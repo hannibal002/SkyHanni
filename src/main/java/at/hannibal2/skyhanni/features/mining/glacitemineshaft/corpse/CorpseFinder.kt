@@ -22,7 +22,7 @@ object CorpseFinder {
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!event.isHead || event.newItemStack == null) return
-        if (CorpseType.fromHelmetOrNull(event.newItemStack.getInternalName()) == null) return
+        if (!CorpseType.isHelmetForCorpse(event.newItemStack.getInternalName())) return
         if (corpseEntities.any { it.key.getLorenzVec().distance(event.entity.getLorenzVec()) <= 3 }) return
 
         corpseEntities[event.entity] = false
@@ -36,7 +36,7 @@ object CorpseFinder {
             val helmetInternalName = entity.equipment.items[EquipmentSlot.HEAD]?.getInternalName() ?: continue
             val corpseType = CorpseType.fromHelmetOrNull(helmetInternalName) ?: continue
 
-            CorpseFoundEvent(corpseType, entity.getLorenzVec()).post()
+            CorpseFoundEvent(corpseType, entity.getLorenzVec().up()).post()
             corpseEntities[entity] = true
         }
     }
