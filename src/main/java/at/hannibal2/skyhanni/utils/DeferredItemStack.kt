@@ -4,6 +4,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentPatch
@@ -19,7 +20,7 @@ internal class DeferredItemStack private constructor(
     private val sourceItem: Item,
     private val factory: () -> ItemStackTemplate,
     count: Int,
-) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY) {
+) : ItemStack(Holder.direct(sourceItem), count, DataComponentPatch.EMPTY), ItemStackCachedData {
 
     private var isBuilt = false
 
@@ -49,6 +50,12 @@ internal class DeferredItemStack private constructor(
         else DeferredItemStack(sourceItem, factory, this.count).also {
             it.applyComponents(componentsPatch)
             it.popTime = popTime
+        }
+
+    private var uniqueId: Int? = null
+    override fun getSkyhanni_uniqueId(): Int =
+        uniqueId ?: SafeItemStackUtils.getUniqueIdentifier(this).also {
+            uniqueId = it
         }
 
     init {

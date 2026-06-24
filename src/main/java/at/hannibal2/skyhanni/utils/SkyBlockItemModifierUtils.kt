@@ -296,6 +296,7 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getItemId() = getAttributeString("id")
 
+    @Suppress("CAST_NEVER_SUCCEEDS")
     fun SafeItemStack.getUniqueId() = (this as ItemStackCachedData).skyhanni_uniqueId
 
     fun SafeItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(itemType)
