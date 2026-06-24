@@ -46,7 +46,7 @@ object SafeItemStackUtils {
 
     // Do not use getItemUuid since then it would recursively call this function and cause a stack overflow
     private fun getUuidDirect(item: SafeItemStack): String? {
-        val extraAttributes = item.get(DataComponents.CUSTOM_DATA)?.copyTag() ?: return null
+        val extraAttributes = item.get(DataComponents.CUSTOM_DATA) ?: return null
         return extraAttributes.getStringOrDefault("uuid").takeUnless { it.isBlank() }
     }
 }
