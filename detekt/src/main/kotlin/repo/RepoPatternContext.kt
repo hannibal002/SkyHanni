@@ -8,7 +8,7 @@ import java.util.IdentityHashMap
 class RepoPatternContext {
     private object NullValue
 
-    private val cache = IdentityHashMap<KtPropertyDelegate, Any>()
+    private val cache = IdentityHashMap<KtPropertyDelegate, Any>(2048)
 
     fun getRepoPatternElement(property: KtPropertyDelegate): RepoPatternElement? {
         val cachedValue = cache[property]
