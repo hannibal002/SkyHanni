@@ -104,31 +104,32 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         wasInsideDownload = isInsideDownload
         wasInsideChangelog = isInsideChangelog
 
-        if (downloadClicked) {
-            when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE ->
-                    UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
+        return when {
+            downloadClicked -> {
+                when (UpdateManager.updateState) {
+                    UpdateManager.UpdateState.AVAILABLE ->
+                        UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
 
-                UpdateManager.UpdateState.NONE ->
-                    UpdateManager.checkUpdate()
-            }
-            return true
-        }
-
-        if (changelogClicked) {
-            if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
-                UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
-                    ?: ErrorManager.logErrorStateWithData(
-                        "Can't get Changelog because of internal error",
-                        "UpdateManager.getNextVersion is null even though updateState is != NONE",
-                        "state" to UpdateManager.updateState,
-                    )
+                    UpdateManager.UpdateState.NONE ->
+                        UpdateManager.checkUpdate()
+                }
+                true
             }
 
-            return true
-        }
+            changelogClicked -> {
+                if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
+                    UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
+                        ?: ErrorManager.logErrorStateWithData(
+                            "Can't get Changelog because of internal error",
+                            "UpdateManager.getNextVersion is null even though updateState is != NONE",
+                            "state" to UpdateManager.updateState,
+                        )
+                }
+                true
+            }
 
-        return false
+            else -> false
+        }
     }
 
     override fun keyboardInput(event: KeyboardEvent): Boolean {
