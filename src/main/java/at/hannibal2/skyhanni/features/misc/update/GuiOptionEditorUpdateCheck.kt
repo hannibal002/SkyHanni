@@ -15,10 +15,10 @@ import kotlin.math.max
 
 class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
 
-    val download = GuiElementButton()
-    val changelog = GuiElementButton().apply { text = "Show Changelog" }
+    private val download = GuiElementButton()
+    private val changelog = GuiElementButton().apply { text = "Show Changelog" }
 
-    val currentVersion = SkyHanniMod.VERSION
+    private val currentVersion = SkyHanniMod.VERSION
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         val fr = context.minecraft.defaultFontRenderer
