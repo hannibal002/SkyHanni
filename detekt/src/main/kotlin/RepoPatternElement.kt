@@ -29,8 +29,6 @@ class RepoPatternElement private constructor(
     }
 
     companion object {
-        private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
-        private val wrappedRegexFailPattern = "WRAPPED-REGEX-FAIL: \"(?<test>.*)\"".toPattern()
         private val regexConstructs = Regex("""(?<!\\)[.*+(){}\[|?]""")
 
         fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
@@ -42,15 +40,8 @@ class RepoPatternElement private constructor(
 
             // We only want to match on plain strings, not string templates
             if (patternArg !is KtStringTemplateExpression) return null
-            if (patternArg.entries.any { it is KtStringTemplateEntryWithExpression }) return null
 
-            val rawPattern = patternArg.entries.joinToString("") { entry ->
-                when (entry) {
-                    is KtLiteralStringTemplateEntry -> entry.text
-                    is KtEscapeStringTemplateEntry -> entry.unescapedValue
-                    else -> "" // Skip any other types of entries
-                }
-            }.removeSurrounding("\"").replace("\n", "")
+            val rawPattern = buildRawPattern(patternArg) ?: return null
 
             val parent = parent as? KtProperty ?: return null
             val variableName = parent.name ?: "unknownPattern"
@@ -60,44 +51,72 @@ class RepoPatternElement private constructor(
         }
 
         private fun findRegexTestInKDoc(property: KtProperty): Pair<List<String>, List<String>> {
-            val kDoc = property.docComment ?: return listOf<String>() to listOf()
+            val kDoc = property.docComment ?: return emptyList<String>() to emptyList()
 
             val regexTests = mutableListOf<String>()
             val failingRegexTests = mutableListOf<String>()
 
             kDoc.getDefaultSection().getContent().lines().forEach { line ->
-                if (line.startsWith("REGEX-TEST: ")) {
-                    val test = line.substringAfter("REGEX-TEST: ")
-                    require(test.trim() == test) {
-                        "Plain REGEX-TEST must not contain leading or trailing whitespace. If the whitespace is " +
-                            "intentional, use WRAPPED-REGEX-TEST instead."
+                when {
+                    line.startsWith("REGEX-TEST: ") -> {
+                        val test = line.substring("REGEX-TEST: ".length)
+
+                        require(test.trim() == test) {
+                            "Plain REGEX-TEST must not contain leading or trailing whitespace. If the whitespace is " +
+                                "intentional, use WRAPPED-REGEX-TEST instead."
+                        }
+
+                        regexTests.add(test)
                     }
-                    regexTests.add(test)
-                    return@forEach
-                }
-                wrappedRegexTestPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@let
-                    val test = matcher.group("test") ?: return@let
-                    regexTests.add(test)
-                    return@forEach
-                }
-                if (line.startsWith("REGEX-FAIL: ")) {
-                    val test = line.substringAfter("REGEX-FAIL: ")
-                    require(test.trim() == test) {
-                        "Plain REGEX-FAIL must not contain leading or trailing whitespace. If the whitespace is " +
-                            "intentional, use WRAPPED-REGEX-FAIL instead."
+
+                    line.startsWith("REGEX-FAIL: ") -> {
+                        val test = line.substring("REGEX-FAIL: ".length)
+
+                        require(test.trim() == test) {
+                            "Plain REGEX-FAIL must not contain leading or trailing whitespace. If the whitespace is " +
+                                "intentional, use WRAPPED-REGEX-FAIL instead."
+                        }
+
+                        failingRegexTests.add(test)
                     }
-                    failingRegexTests.add(test)
-                    return@forEach
-                }
-                wrappedRegexFailPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@let
-                    val test = matcher.group("test") ?: return@let
-                    failingRegexTests.add(test)
-                    return@forEach
+
+                    line.startsWith("WRAPPED-REGEX-TEST: ") -> {
+                        extractWrappedValue(line)?.let(regexTests::add)
+                    }
+
+                    line.startsWith("WRAPPED-REGEX-FAIL: ") -> {
+                        extractWrappedValue(line)?.let(failingRegexTests::add)
+                    }
                 }
             }
             return regexTests to failingRegexTests
+        }
+
+        private fun extractWrappedValue(line: String): String? {
+            val firstQuote = line.indexOf('"')
+            if (firstQuote == -1) return null
+
+            val lastQuote = line.lastIndexOf('"')
+            if (lastQuote <= firstQuote) return null
+
+            return line.substring(firstQuote + 1, lastQuote)
+        }
+
+        private fun buildRawPattern(expression: KtStringTemplateExpression): String? {
+            val builder = StringBuilder()
+
+            for (entry in expression.entries) {
+                when (entry) {
+                    is KtStringTemplateEntryWithExpression -> return null
+                    is KtLiteralStringTemplateEntry -> builder.append(entry.text)
+                    is KtEscapeStringTemplateEntry -> builder.append(entry.unescapedValue)
+                }
+            }
+
+            return builder
+                .toString()
+                .removeSurrounding("\"")
+                .replace("\n", "")
         }
     }
 }
