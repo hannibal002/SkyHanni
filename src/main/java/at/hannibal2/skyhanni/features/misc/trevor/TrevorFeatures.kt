@@ -270,7 +270,7 @@ object TrevorFeatures {
         }
     }
 
-    fun loadTrevorTexture() {
+    private fun loadTrevorTexture() {
         trevorTexture = SkullTextureHolder.getTextureOrNull("TREVOR")
     }
 
