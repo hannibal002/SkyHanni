@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import net.minecraft.nbt.CompoundTag
 import kotlin.time.Duration.Companion.minutes
 
@@ -45,8 +45,8 @@ data class CachedItemData(
     var identifier: String? = null,
 ) {
     companion object {
-        private val cache = TimeLimitedCache<IdentityCharacteristics<SafeItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
-        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
+        private val cache = TimeAndSizeLimitedCache<Int, CachedItemData>(1_000_000, expireAfterWrite = 2.minutes)
+        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(SafeItemStack.hashItemAndComponents(this)) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
             cache.map { action(it.value) }
