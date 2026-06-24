@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.getSeasonByMonth
 
 @SkyHanniModule
-object OringoPetInCalendar {
+object TravelingZooPetInCalendar {
     private val ORINGO_PETS = arrayOf(
         "Lion",
         "Monkey",
@@ -36,6 +36,12 @@ object OringoPetInCalendar {
     }
 
     private fun getZooPet(time: SkyBlockTime): String? {
+        val zooNumber = getTravelZooNumber(time) ?: return null
+        val pet = ORINGO_PETS[zooNumber % ORINGO_PETS.size]
+        return "§7Pet available: §6$pet"
+    }
+
+    private fun getTravelZooNumber(time: SkyBlockTime): Int? {
         val extraSeason = when (getSeasonByMonth(time.month).first) {
             SkyblockSeason.SUMMER -> 0
             SkyblockSeason.WINTER -> 1
@@ -51,8 +57,6 @@ object OringoPetInCalendar {
             }
         }
 
-        val idx = (time.year * 2 + extraSeason)
-        val pet = ORINGO_PETS[idx % ORINGO_PETS.size]
-        return "§7Pet available: §6$pet"
+        return (time.year * 2 + extraSeason)
     }
 }
