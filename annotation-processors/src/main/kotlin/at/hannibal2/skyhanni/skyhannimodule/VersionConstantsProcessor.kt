@@ -27,8 +27,7 @@ class VersionConstantsProcessor(
                 |     * Do not use this Minecraft version as it is reflective of the compile-time version
                 |     * and might not be correct at runtime. We use it for update checks only.
                 |     */
-                |    internal var MC_VERSION = "$mcVersion"
-                |        private set
+                |    internal const val MC_VERSION = "$mcVersion"
                 |}
                 """.trimMargin(),
             )
