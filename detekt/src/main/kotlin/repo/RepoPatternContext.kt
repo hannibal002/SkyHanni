@@ -6,16 +6,24 @@ import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import java.util.IdentityHashMap
 
 class RepoPatternContext {
-    private val cache = IdentityHashMap<KtPropertyDelegate, RepoPatternElement?>()
+    private object NullValue
 
-    // This intentionally caches null values, so that we don't have to reparse the same property delegate multiple times.
+    private val cache = IdentityHashMap<KtPropertyDelegate, Any>()
+
     fun getRepoPatternElement(property: KtPropertyDelegate): RepoPatternElement? {
-        if (cache.containsKey(property)) {
-            return cache[property]
+        val cachedValue = cache[property]
+
+        if (cachedValue != null) {
+            @Suppress("UNCHECKED_CAST")
+            return if (cachedValue === NullValue) {
+                null
+            } else {
+                cachedValue as RepoPatternElement
+            }
         }
 
         val element = property.asRepoPatternElement()
-        cache[property] = element
+        cache[property] = element ?: NullValue
         return element
     }
 }
