@@ -163,7 +163,7 @@ class ModuleProcessor(
             (argument.location as? FileLocation)?.filePath == annotationFilePath &&
                 when (value) {
                     is KSType -> true
-                    is Iterable<*> -> !value.isEmpty() && value.all { it is KSType }
+                    is List<*> -> !value.isEmpty() && value.all { it is KSType }
                     else -> false
                 }
         }
