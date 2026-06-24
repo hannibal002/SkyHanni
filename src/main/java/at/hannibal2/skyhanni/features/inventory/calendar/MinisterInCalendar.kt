@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.calendar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -41,7 +41,7 @@ object MinisterInCalendar {
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
-        if (!CalenderApi.inCalender) return
+        if (!CalenderApi.inMainCalendar) return
         val minister = ElectionApi.currentMinister ?: return
 
         val itemStack = "${minister.name}_MAYOR_MONSTER".toInternalName().getItemStack()
@@ -55,7 +55,7 @@ object MinisterInCalendar {
     @HandleEvent
     fun onInventoryClose() {
         if (!isEnabled()) return
-        if (!CalenderApi.inCalender) return
+        if (!CalenderApi.inMainCalendar) return
         ministerItemStack = null
     }
 
@@ -63,7 +63,7 @@ object MinisterInCalendar {
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory !is SimpleContainer || event.slot != MINISTER_SLOT) return
-        if (!CalenderApi.inCalender) return
+        if (!CalenderApi.inMainCalendar) return
         event.replace(ministerItemStack ?: return)
     }
 

@@ -1,0 +1,58 @@
+package at.hannibal2.skyhanni.features.inventory.calendar
+
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.CalenderApi
+import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
+import at.hannibal2.skyhanni.events.minecraft.add
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.getSeasonByMonth
+
+@SkyHanniModule
+object OringoZooFeature {
+    private val ORINGO_PETS = arrayOf(
+        "Lion",
+        "Monkey",
+        "Elephant",
+        "Giraffe",
+        "Blue Whale",
+        "Tiger"
+    )
+
+    @HandleEvent
+    fun onTooltip(event: ToolTipTextEvent) {
+        if (!CalenderApi.inCalendar) return
+        event.slot ?: return
+        val skyblockEvents = CalenderApi.parseTooltip(event.toolTip)
+        for (sbEvent in skyblockEvents) {
+            if (sbEvent.name == "Traveling Zoo") {
+                val pet = getZooPet(sbEvent.startTime) ?: return
+                event.toolTip.add(pet)
+                return
+            }
+        }
+    }
+
+    private fun getZooPet(time: SkyBlockTime): String? {
+        val extraSeason = when (getSeasonByMonth(time.month).first) {
+            SkyblockSeason.SUMMER -> 0
+            SkyblockSeason.WINTER -> 1
+            SkyblockSeason.AUTUMN, SkyblockSeason.SPRING -> {
+                ErrorManager.logErrorStateWithData(
+                    "Unexpected season",
+                    "Unexpected season for Traveling Zoo",
+                    "time" to time.toString(),
+                    "month" to time.month.toString(),
+                    "year" to time.year.toString()
+                )
+                return null
+            }
+        }
+
+        val idx = (time.year * 2 + extraSeason)
+        val pet = ORINGO_PETS[idx % ORINGO_PETS.size]
+        return "§7Pet available: §6$pet"
+    }
+}
