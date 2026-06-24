@@ -459,10 +459,6 @@ afterEvaluate {
     )
 }
 
-fun SourceTask.excludeBuildDirectories() {
-    exclude { it.file.toPath().any { path -> path.toString() == "build" } }
-}
-
 tasks.withType<Detekt>().configureEach {
     source = source.matching {
         exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
@@ -470,7 +466,6 @@ tasks.withType<Detekt>().configureEach {
     val isTargetVersion = target == primaryTarget
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
-    excludeBuildDirectories()
 
     val isDetektMain = name == "detektMain"
     val outputFileName = if (isDetektMain) "main" else "detekt"
@@ -488,7 +483,6 @@ tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }
-    excludeBuildDirectories()
 
     val isMainBaseline = name == "detektBaselineMain"
     val outputFileName = if (isMainBaseline) "baseline-main" else "baseline"
