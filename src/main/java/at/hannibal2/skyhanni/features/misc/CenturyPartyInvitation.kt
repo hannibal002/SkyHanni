@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import kotlin.time.Duration.Companion.milliseconds
@@ -146,7 +146,7 @@ object CenturyPartyInvitation {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.name.formattedTextCompatLessResets()
+        val displayName = mob.baseEntity.name.formattedTextCompat(leadingWhite = false)
         val colorCode = playerRankColorPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {

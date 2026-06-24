@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import java.net.URLEncoder
 
@@ -82,7 +82,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: SafeItemStack, autoOpen: Boolean, useIndependent: Boolean = config.useIndependent) {
         val itemDisplayName =
-            item.hoverName.formattedTextCompatLeadingWhiteLessResets().replace("§a✔ ", "").replace("§c✖ ", "")
+            item.hoverName.formattedTextCompat().replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 

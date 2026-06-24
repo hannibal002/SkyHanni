@@ -111,7 +111,7 @@ object Year400Features {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.displayName.formattedTextCompat()
+        val displayName = mob.baseEntity.displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
         val colorCode = playerColorNametagPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {

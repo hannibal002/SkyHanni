@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -81,7 +80,11 @@ object ComponentUtils {
         )
         val lore = stack.getLore()
         val color = stack.get(DataComponents.DYED_COLOR)?.rgb
-        val displayInfo = DisplayInfo(name = stack.hoverName.formattedTextCompat(), lore = lore, color = color)
+        val displayInfo = DisplayInfo(
+            name = stack.hoverName.formattedTextCompat(extraResets = true, leadingWhite = false),
+            lore = lore,
+            color = color,
+        )
         val customData = stack.get(DataComponents.CUSTOM_DATA)
         val itemModel = stack.getItemModel()?.getIdentifierString()
         val extraAttributes: JsonObject? = if (customData != null) {

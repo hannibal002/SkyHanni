@@ -107,7 +107,7 @@ public class MixinGui {
 
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
-        String formattedText = TextCompatKt.formattedTextCompat(component);
+        String formattedText = TextCompatKt.formattedTextCompat(component, false, false);
         if (!new TitleReceivedEvent(formattedText, false).post()) {
             original.call(component);
         }
@@ -115,7 +115,7 @@ public class MixinGui {
 
     @WrapMethod(method = "setSubtitle")
     private void handleSubtitle(Component component, Operation<Void> original) {
-        String formattedText = TextCompatKt.formattedTextCompat(component);
+        String formattedText = TextCompatKt.formattedTextCompat(component, false, false);
         if (!new TitleReceivedEvent(formattedText, true).post()) {
             original.call(component);
         }

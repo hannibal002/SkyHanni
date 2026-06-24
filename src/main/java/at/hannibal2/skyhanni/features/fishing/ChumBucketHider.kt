@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.Entity
@@ -42,7 +41,7 @@ object ChumBucketHider {
             return
         }
 
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.formattedTextCompat(leadingWhite = false)
 
         // First text line
         if (name.endsWith("'s Chum Bucket") || name.endsWith("'s Chumcap Bucket")) {

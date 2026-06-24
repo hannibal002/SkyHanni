@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
-import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
@@ -157,7 +156,7 @@ object ChatManager {
      * If the message is cancelled return true.
      */
     fun onChatAllow(original: Component): Boolean {
-        val message = original.formattedTextCompat().stripHypixelMessage()
+        val message = original.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
         var cancelled = false
 
         val key = IdentityCharacteristics(original)
@@ -189,7 +188,7 @@ object ChatManager {
      * If the message is modified return the modified message otherwise return null.
      */
     fun onChatModify(original: Component): Component? {
-        val message = original.formattedTextCompat().stripHypixelMessage()
+        val message = original.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
 
         val key = IdentityCharacteristics(original)
         val chatEvent = SkyHanniChatEvent.Modify(message, original)
@@ -201,8 +200,8 @@ object ChatManager {
             val reason = replacementReasonMap[key].orEmpty().uppercase()
             modified = true
             loggerModified.log(" ")
-            loggerModified.log("[original] " + original.formattedTextCompat())
-            loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat())
+            loggerModified.log("[original] " + original.formattedTextCompat(extraResets = true, leadingWhite = false))
+            loggerModified.log("[modified] " + modifiedComponent.formattedTextCompat(extraResets = true, leadingWhite = false))
             messageHistory[key] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modifiedComponent, reason)
         } else {
             messageHistory[key] = MessageFilteringResult(original, ActionKind.ALLOWED, null, null, null)
@@ -218,7 +217,7 @@ object ChatManager {
         val key = IdentityCharacteristics(original)
         if (messageHistory.contains(key)) return
         val blockReason = "OTHER_MOD"
-        val message = original.formattedTextCompat().stripHypixelMessage()
+        val message = original.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
 
         loggerFiltered.log("[$blockReason] $message")
         loggerAll.log("[$blockReason] $message")
@@ -235,8 +234,8 @@ object ChatManager {
         val key2 = IdentityCharacteristics(modified)
         if (messageHistory[key2]?.actionKind == ActionKind.ALLOWED && messageHistory[key] == null) {
             loggerModified.log(" ")
-            loggerModified.log("[original] " + original.formattedTextCompat())
-            loggerModified.log("[modified] " + modified.formattedTextCompat())
+            loggerModified.log("[original] " + original.formattedTextCompat(extraResets = true, leadingWhite = false))
+            loggerModified.log("[modified] " + modified.formattedTextCompat(extraResets = true, leadingWhite = false))
             messageHistory[key2] = MessageFilteringResult(original, ActionKind.MODIFIED, null, modified, "OTHER_MOD")
         }
     }

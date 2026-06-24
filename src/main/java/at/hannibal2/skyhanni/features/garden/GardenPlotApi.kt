@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -365,11 +365,11 @@ object GardenPlotApi {
         for (plot in plots) {
             val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
             val lore = itemStack.getLore()
-            plotNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            plotNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompat()) {
                 val plotName = group("name")
                 plot.name = plotName
             }
-            barnNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            barnNamePattern.matchMatcher(itemStack.hoverName.formattedTextCompat()) {
                 plot.name = group("name")
             }
             plot.locked = false

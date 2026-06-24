@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -53,7 +53,7 @@ object BitsPerCookieVisual {
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (event.itemStack.getInternalNameOrNull() != boosterCookie) return
-        if (wrongCookiePattern.matches(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
+        if (wrongCookiePattern.matches(event.itemStack.hoverName.formattedTextCompat())) return
         var timeReplaced = false
 
         val toolTip = event.toolTip

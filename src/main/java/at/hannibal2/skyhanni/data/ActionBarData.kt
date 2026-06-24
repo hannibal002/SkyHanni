@@ -64,13 +64,15 @@ object ActionBarData {
      * If the action bar is modified return the new one, otherwise return null.
      */
     fun onChatReceive(component: Component): Component? {
-        val message = debugActionBar ?: component.formattedTextCompat().stripHypixelMessage()
+        val message = debugActionBar ?: component.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
 
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, component)
         actionBarEvent.post()
 
-        if (component.formattedTextCompat() != actionBarEvent.chatComponent.formattedTextCompat()) {
+        if (component.formattedTextCompat(extraResets = true, leadingWhite = false) !=
+            actionBarEvent.chatComponent.formattedTextCompat(extraResets = true, leadingWhite = false)
+        ) {
             return actionBarEvent.chatComponent
         }
         return null

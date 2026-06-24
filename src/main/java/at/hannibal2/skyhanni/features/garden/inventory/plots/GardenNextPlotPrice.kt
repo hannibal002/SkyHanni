@@ -37,7 +37,7 @@ object GardenNextPlotPrice {
             }
 
             if (next) {
-                val readItemAmount = ItemUtils.readItemAmount(line.formattedTextCompat())
+                val readItemAmount = ItemUtils.readItemAmount(line.formattedTextCompat(extraResets = true, leadingWhite = false))
                 readItemAmount?.let {
                     val (itemName, amount) = it
                     val lowestBin = NeuInternalName.fromItemName(itemName).getPrice()

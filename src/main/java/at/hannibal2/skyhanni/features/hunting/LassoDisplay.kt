@@ -51,7 +51,7 @@ object LassoDisplay {
             if (!leashEntity.isLocalPlayer) continue
             val entitiesNearby = entity.blockPosition().toLorenzVec().up(2).getEntitiesNearby<ArmorStand>(2.0)
             for (armorStandEntity in entitiesNearby) {
-                val name = armorStandEntity.displayName.formattedTextCompat()
+                val name = armorStandEntity.displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
                 if (name.contains("§l§m")) {
                     progressBar = name
                 }

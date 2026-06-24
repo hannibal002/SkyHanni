@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.put
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
@@ -318,7 +318,7 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name.formattedTextCompatLessResets()}`${retry.entity.id} missed {\n " +
+                    "`${retry.entity.name.formattedTextCompat(leadingWhite = false)}`${retry.entity.id} missed {\n " +
                         "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
                         "\n Position: ${retry.entity.getLorenzVec()}\n " +
                         "DistanceC: ${

@@ -108,7 +108,7 @@ object CustomScoreboardUtils {
         val first = TabWidget.EVENT.lines.first()
         return TabWidget.EVENT.pattern.matchMatcher(first) {
             val matcher = TextHelper.matcher(first, group("event")) ?: return null
-            matcher.formattedTextCompat()
+            matcher.formattedTextCompat(extraResets = true, leadingWhite = false)
         }
     }
 

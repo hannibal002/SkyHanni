@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -125,12 +125,12 @@ object EquipmentApi {
             }
             add("Equipment:")
             storage.slots.forEach { item ->
-                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                val name = item?.hoverName.formattedTextCompat()
                 add(" - $name")
             }
             add("Rift Equipment:")
             storage.riftSlots.forEach { item ->
-                val name = item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                val name = item?.hoverName.formattedTextCompat()
                 add(" - $name")
             }
         }

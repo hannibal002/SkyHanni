@@ -160,7 +160,7 @@ object ChatUtils {
     }
 
     private fun logAndSendMessage(message: Component, send: Boolean = true): Boolean {
-        val formattedMessage = message.formattedTextCompat()
+        val formattedMessage = message.formattedTextCompat(extraResets = true, leadingWhite = false)
         log.log(formattedMessage)
 
         if (!MinecraftCompat.localPlayerExists) {
@@ -482,7 +482,7 @@ object ChatUtils {
             `skyhanni$setFullComponent`(value)
         }
 
-    val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
+    val GuiMessage.chatMessage get() = content.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {

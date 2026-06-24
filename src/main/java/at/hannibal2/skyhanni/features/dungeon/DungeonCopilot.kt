@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -115,11 +115,11 @@ object DungeonCopilot {
 
         if (!searchForKey) return
 
-        if (entity.name.formattedTextCompatLessResets() == "§6§8Wither Key") {
+        if (entity.name.formattedTextCompat(leadingWhite = false) == "§6§8Wither Key") {
             changeNextStep("Pick up Wither Key")
             searchForKey = false
         }
-        if (entity.name.formattedTextCompatLessResets() == "§c§cBlood Key") {
+        if (entity.name.formattedTextCompat(leadingWhite = false) == "§c§cBlood Key") {
             changeNextStep("Pick up Blood Key")
             searchForKey = false
         }

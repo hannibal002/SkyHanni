@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.GsonBuilder
 import com.google.gson.annotations.Expose
@@ -70,7 +70,7 @@ object TestCopyBestiaryValues {
     }
 
     private fun copy(titleItem: SafeItemStack, inventoryItems: Map<Int, SafeItemStack>) {
-        val titleName = titleItem.hoverName.formattedTextCompatLeadingWhiteLessResets().removeWordsAtEnd(1)
+        val titleName = titleItem.hoverName.formattedTextCompat().removeWordsAtEnd(1)
 
         val obj = BestiaryObject()
         obj.name = titleName

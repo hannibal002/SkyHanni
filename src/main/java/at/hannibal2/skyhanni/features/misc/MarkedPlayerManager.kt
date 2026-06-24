@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 
@@ -57,7 +57,7 @@ object MarkedPlayerManager {
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
-        val name = entity.name.formattedTextCompatLessResets().lowercase()
+        val name = entity.name.formattedTextCompat(leadingWhite = false).lowercase()
         if (name in playerNamesToMark) {
             markedPlayers[name] = entity
             entity.setColor()
@@ -70,7 +70,7 @@ object MarkedPlayerManager {
         for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
-            val name = entity.name.formattedTextCompatLessResets().lowercase()
+            val name = entity.name.formattedTextCompat(leadingWhite = false).lowercase()
             if (name in playerNamesToMark) {
                 markedPlayers[name] = entity
                 entity.setColor()

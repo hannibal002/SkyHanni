@@ -80,7 +80,7 @@ class ChatHistoryGui(private val history: List<ChatManager.MessageFilteringResul
                         OSUtils.copyToClipboard(msg.message.convertToJsonString())
                         ChatUtils.chat("Copied structured chat line to clipboard", false)
                     } else {
-                        val message = msg.message.formattedTextCompat().stripHypixelMessage()
+                        val message = msg.message.formattedTextCompat(extraResets = true, leadingWhite = false).stripHypixelMessage()
                         OSUtils.copyToClipboard(message)
                         ChatUtils.chat("Copied chat line to clipboard")
                     }

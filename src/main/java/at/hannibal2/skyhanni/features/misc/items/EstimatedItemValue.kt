@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
@@ -208,7 +208,7 @@ object EstimatedItemValue {
 
     private fun SafeItemStack.shouldIgnoreDraw(): Boolean {
         this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = this.hoverName.formattedTextCompat()
             return (
                 this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
                     name.contains("Salesperson") ||

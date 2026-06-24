@@ -37,7 +37,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
@@ -201,7 +201,7 @@ object SackApi {
 
     private fun MutableMap.MutableEntry<Int, SafeItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
-        gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompat()) {
             val gemName = group("gem") ?: return@matchMatcher
             gemTypeProp = GemstoneType.getByNameOrNull(gemName) ?: return@matchMatcher
         }
@@ -244,7 +244,7 @@ object SackApi {
             priceUpdater(price)
             gem.price += price
             if (savingSacks) setSackItem(internalName, stored)
-            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = gem
+            if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.hoverName.formattedTextCompat()] = gem
         }
     }
 
@@ -262,7 +262,7 @@ object SackApi {
                 3 -> {
                     rune.slot = key
                     rune.lvl3 = stored
-                    runeItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = rune
+                    runeItem[value.hoverName.formattedTextCompat()] = rune
                 }
             }
             if (savingSacks) setSackItem(value.getInternalName(), stored)

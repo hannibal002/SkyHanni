@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -101,7 +101,7 @@ object FishyTreatProfit {
 
         val additionalCost = getAdditionalCost(additionalMaterials)
 
-        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompatLeadingWhiteLessResets()) ?: return
+        val (name, amount) = ItemUtils.readItemAmount(itemName.formattedTextCompat()) ?: return
 
         var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
@@ -202,7 +202,7 @@ object FishyTreatProfit {
                     ErrorManager.logErrorStateWithData(
                         "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
-                        "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                        "name" to item.hoverName.formattedTextCompat(),
                         "lore" to lore,
                     )
                     continue

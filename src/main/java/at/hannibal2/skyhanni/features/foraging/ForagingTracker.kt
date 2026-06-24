@@ -308,7 +308,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     private fun Component.getHoverLootPairs(): Set<Pair<NeuInternalName, Int>> = buildSet {
         val treeType = treeType ?: return this
         lastHover = hover
-        val lootLines = hover?.formattedTextCompat()?.split("\n")?.takeIfNotEmpty() ?: return this
+        val lootLines = hover?.formattedTextCompat(extraResets = true, leadingWhite = false)?.split("\n")?.takeIfNotEmpty() ?: return this
         ChatUtils.debug("found loot lines:\n${lootLines.joinToString("\n").replace("§", "&")}")
         lootLines.forEach { line ->
             val (item, amountString) = ForagingTrackerLegacy.hoverRewardPattern.matchMatcher(line) {

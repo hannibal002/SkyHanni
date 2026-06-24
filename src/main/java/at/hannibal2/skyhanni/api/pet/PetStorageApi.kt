@@ -185,7 +185,7 @@ object PetStorageApi {
                     LorenzRarity.getByComponent(component, group("pet")) ?: return@matchMatcher false
                 val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
                     val trimmedLine =
-                        line.formattedTextCompat().trim().removeResets().takeIf { it.isNotBlank() }
+                        line.formattedTextCompat(extraResets = true, leadingWhite = false).trim().removeResets().takeIf { it.isNotBlank() }
                             ?: return@firstNotNullOfOrNull null
                     PetUtils.resolvePetItemOrNull(trimmedLine)
                 }
@@ -233,7 +233,7 @@ object PetStorageApi {
             val petSkinTag = groupOrNull("skin")
 
             val hoverInfo = event.chatComponent.hover?.siblings?.joinToString {
-                it.formattedTextCompat()
+                it.formattedTextCompat(extraResets = true, leadingWhite = false)
             }?.split("\n") ?: return
 
             val petHeldItem = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo) {

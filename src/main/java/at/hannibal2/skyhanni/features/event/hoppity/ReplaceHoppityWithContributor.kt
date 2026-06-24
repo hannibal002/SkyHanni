@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CircularList
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -63,11 +62,14 @@ object ReplaceHoppityWithContributor {
         val last = lore.lastOrNull() ?: return
         if (!last.string.endsWith(" RABBIT")) return
 
-        val realName = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val realName = itemStack.hoverName.formattedTextCompat()
         val cleanName = realName.removeColor()
         val fakeName = replaceMap[cleanName] ?: return
 
-        event.toolTip[0] = event.toolTip[0].formattedTextCompat().replace(cleanName, fakeName).asComponent()
+        event.toolTip[0] = event.toolTip[0]
+            .formattedTextCompat(extraResets = true, leadingWhite = false)
+            .replace(cleanName, fakeName)
+            .asComponent()
 
         event.toolTip.add(" ")
         event.toolTip.add("§8§oSome might say this rabbit is also known as $realName")
@@ -75,7 +77,9 @@ object ReplaceHoppityWithContributor {
         val index = event.toolTip.indexOfFirstOrNull { it.string.contains(" a duplicate") }
         if (index == null) return
         val oldLine = event.toolTip[index]
-        event.toolTip[index] = Component.literal(oldLine.formattedTextCompat().replace(cleanName, fakeName))
+        event.toolTip[index] = Component.literal(
+            oldLine.formattedTextCompat(extraResets = true, leadingWhite = false).replace(cleanName, fakeName),
+        )
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.contributorRabbitName

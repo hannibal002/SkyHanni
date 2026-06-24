@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.container
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -69,7 +69,7 @@ object DungeonSpiritLeapOverlay {
             for ((slot, stack) in chest.getUpperItems()) {
                 val lore = stack.getLore()
                 if (lore.isNotEmpty()) {
-                    val playerInfo = DungeonApi.getPlayerInfo(stack.hoverName.formattedTextCompatLeadingWhiteLessResets().cleanPlayerName())
+                    val playerInfo = DungeonApi.getPlayerInfo(stack.hoverName.formattedTextCompat().cleanPlayerName())
                     add(PlayerStackInfo(playerInfo, stack, slot.index))
                 }
             }

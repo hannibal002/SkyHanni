@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import kotlin.math.ceil
@@ -44,7 +44,7 @@ object JacobContestFFNeededDisplay {
             return
         }
 
-        val time = FarmingContestApi.getSBTimeFor(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return
+        val time = FarmingContestApi.getSBTimeFor(stack.hoverName.formattedTextCompat()) ?: return
         val contest = FarmingContestApi.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)

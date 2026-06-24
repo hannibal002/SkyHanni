@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
@@ -290,13 +290,13 @@ object EffectApi {
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
         effectsInventoryPattern.matches(this.inventoryName) &&
             this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())
+                filterPattern.matches(it.hoverName.formattedTextCompat())
             }?.getLore()?.any {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
     private fun SafeItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        hoverName.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
+        hoverName.formattedTextCompat().contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

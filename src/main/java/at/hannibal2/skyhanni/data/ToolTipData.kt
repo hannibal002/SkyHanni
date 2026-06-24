@@ -8,8 +8,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component
@@ -34,7 +33,7 @@ object ToolTipData {
         stack: SafeItemStack,
         originalToolTip: MutableList<Component>,
     ): MutableList<Component> {
-        val tooltip = originalToolTip.map { it.formattedTextCompatLessResets().removePrefix("§5") }.toMutableList()
+        val tooltip = originalToolTip.map { it.formattedTextCompat(leadingWhite = false).removePrefix("§5") }.toMutableList()
         val tooltipCopy = tooltip.toMutableList()
         getTooltip(tooltip)
         RenderItemTooltipEvent(context, stack).post()
@@ -73,7 +72,7 @@ object ToolTipData {
                 "slotNumber" to slot.index,
                 "slotIndex" to slot.containerSlot,
                 "itemStack" to itemStack,
-                "name" to itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                "name" to itemStack.hoverName.formattedTextCompat(),
                 "internal name" to itemStack.getInternalName(),
                 "lore" to itemStack.getLore(),
             )

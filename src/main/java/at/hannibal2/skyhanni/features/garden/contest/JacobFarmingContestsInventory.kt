@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -73,8 +73,8 @@ object JacobFarmingContestsInventory {
         for ((slot, item) in event.inventoryItems) {
             if (!item.getLore().any { it.startsWith("§7Your score: §e") }) continue
 
-            foundEvents.add(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
-            val time = FarmingContestApi.getSBTimeFor(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: continue
+            foundEvents.add(item.hoverName.formattedTextCompat())
+            val time = FarmingContestApi.getSBTimeFor(item.hoverName.formattedTextCompat()) ?: continue
             FarmingContestApi.addContest(time, item)
             if (config.realTime) {
                 readRealTime(time, slot)
@@ -96,7 +96,7 @@ object JacobFarmingContestsInventory {
         if (!config.openOnElite.isKeyHeld()) return
 
         val slot = event.slot ?: return
-        val itemName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = slot.item.hoverName.formattedTextCompat()
 
         when (val chestName = InventoryUtils.openInventoryName()) {
             "Your Contests" -> {

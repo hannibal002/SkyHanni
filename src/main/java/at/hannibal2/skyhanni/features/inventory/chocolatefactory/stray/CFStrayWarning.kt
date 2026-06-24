@@ -34,7 +34,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.inventory.ChestMenu
 import kotlin.math.sin
@@ -66,7 +66,7 @@ object CFStrayWarning {
         } ?: false
 
     private fun isSpecial(stack: SafeItemStack) =
-        clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures
+        clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompat()) || stack.getSkullTexture() in specialRabbitTextures
 
     private fun shouldWarnAboutStray(item: SafeItemStack) = when (config.rabbitWarning.rabbitWarningLevel) {
         StrayTypeEntry.SPECIAL -> isSpecial(item)
@@ -76,7 +76,7 @@ object CFStrayWarning {
         StrayTypeEntry.RARE_P -> isRarityOrHigher(item, LorenzRarity.RARE)
         StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(item, LorenzRarity.UNCOMMON)
 
-        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(item)
+        StrayTypeEntry.ALL -> clickMeRabbitPattern.matches(item.hoverName.formattedTextCompat()) || isSpecial(item)
 
         StrayTypeEntry.NONE -> false
     }
@@ -84,8 +84,8 @@ object CFStrayWarning {
     private fun handleRabbitWarnings(item: SafeItemStack) {
         if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
 
-        val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompat())
+        val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.hoverName.formattedTextCompat())
         if (!clickMeMatches && !goldenClickMeMatches || !shouldWarnAboutStray(item)) return
 
         val isSpecial = goldenClickMeMatches || item.getSkullTexture() in specialRabbitTextures
@@ -144,7 +144,7 @@ object CFStrayWarning {
                 StrayTypeEntry.UNCOMMON_P -> isRarityOrHigher(stack, LorenzRarity.UNCOMMON)
 
                 StrayTypeEntry.ALL -> {
-                    clickMeRabbitPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()) || isSpecial(stack)
+                    clickMeRabbitPattern.matches(it.value.hoverName.formattedTextCompat()) || isSpecial(stack)
                 }
 
                 StrayTypeEntry.NONE -> false

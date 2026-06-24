@@ -177,7 +177,7 @@ object TimeUtils {
             } else {
                 Component.literal("$datePart$timePart".trim())
             },
-        ).formattedTextCompat()
+        ).formattedTextCompat(extraResets = true, leadingWhite = false)
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))

@@ -438,7 +438,7 @@ object StringUtils {
         transformationReason: String? = null,
         transform: (String) -> String,
     ) {
-        val original = chatComponent.formattedTextCompat()
+        val original = chatComponent.formattedTextCompat(extraResets = true, leadingWhite = false)
         val new = transform(original)
         if (new == original) return
 

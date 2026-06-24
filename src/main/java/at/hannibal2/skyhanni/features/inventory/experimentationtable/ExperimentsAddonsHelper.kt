@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -117,7 +117,7 @@ object ExperimentsAddonsHelper {
         "Orange" -> LorenzColor.GOLD
         "Purple" -> LorenzColor.DARK_PURPLE
         else -> try {
-            LorenzColor.valueOf(hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().uppercase())
+            LorenzColor.valueOf(hoverName.formattedTextCompat().removeColor().uppercase())
         } catch (exception: IllegalArgumentException) {
             null
         }
@@ -135,7 +135,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun tryHighlightUltrasequencer() = InventoryUtils.getItemsInOpenChest().filter {
-        it.item.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty() && it.index in hypixelUltrasequencerData &&
+        it.item.hoverName.formattedTextCompat().trim().isNotEmpty() && it.index in hypixelUltrasequencerData &&
             hypixelUltrasequencerData.indexOf(it.index) > (userUltrasequencerProgress.size - 1)
     }.sortedBy {
         hypixelUltrasequencerData.indexOf(it.index)
@@ -248,7 +248,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readPhaseOrNull(): HelperPhase? {
-        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val phaseItemName = inventoryItems[PHASE_STATUS_SLOT]?.hoverName?.formattedTextCompat() ?: return null
         return when {
             replicatePhaseItemPattern.matches(phaseItemName) -> HelperPhase.REPLICATE
             readPhaseItemPattern.matches(phaseItemName) -> HelperPhase.READ
@@ -257,7 +257,7 @@ object ExperimentsAddonsHelper {
     }
 
     private fun InventoryUpdatedEvent.readChronomatronRoundOrNull(): Int? {
-        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return null
+        val roundItemName = inventoryItems[ROUND_STATUS_SLOT]?.hoverName?.formattedTextCompat() ?: return null
         return roundItemPattern.matchGroup(roundItemName, "round")?.formatIntOrNull()
     }
 
@@ -306,7 +306,7 @@ object ExperimentsAddonsHelper {
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
         val orderedUltrasequencerSlots = inventoryItems.filter {
-            it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
+            it.value.hoverName.formattedTextCompat().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
             val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)

@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.UUID
 import kotlin.math.floor
@@ -34,7 +34,7 @@ object ProfitPerDragon {
         scannedLootUUIDs.removeIf { uuid -> entities.none { it.uuid == uuid } }
 
         for (entity in entities) {
-            val entityName = entity.name.formattedTextCompatLessResets()
+            val entityName = entity.name.formattedTextCompat(leadingWhite = false)
             val amount: Int = entityName.split("§8x").last().toIntOrNull() ?: 1
             val internalNameFromEntityName = NeuInternalName.fromItemNameOrNull(entityName)
 

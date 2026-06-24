@@ -42,7 +42,7 @@ object TreeProgressDisplay {
             return
         }
         for (entity in EntityUtils.getEntities<ArmorStand>()) {
-            val name = entity.displayName.formattedTextCompat()
+            val name = entity.displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
             ModernPatterns.currentTreeProgressPattern.matchMatcher(name) {
                 display = if (config.compact) {
                     Renderable.text("${group("treeType")} §b§l${group("percent")}%")

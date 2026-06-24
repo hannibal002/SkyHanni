@@ -47,7 +47,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -145,7 +145,7 @@ object DailyQuestHelper {
             if (dojoQuest.state != QuestState.ACCEPTED) return
 
             for ((slot, stack) in chest.getUpperItems()) {
-                if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().contains(dojoQuest.dojoName)) {
+                if (stack.hoverName.formattedTextCompat().contains(dojoQuest.dojoName)) {
                     slot.highlight(LorenzColor.AQUA)
                 }
             }
@@ -196,7 +196,7 @@ object DailyQuestHelper {
         val itemName = fetchQuest.itemName
 
         val count =
-            InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == itemName }
+            InventoryUtils.countItemsInLowerInventory { it.hoverName.formattedTextCompat().removeColor() == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 
@@ -296,7 +296,7 @@ object DailyQuestHelper {
         val item = quest.displayItem.getItemStack()
 
         val displayName = if (category == QuestCategory.FETCH || category == QuestCategory.FISHING) {
-            val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = item.hoverName.formattedTextCompat()
             if (category == QuestCategory.FISHING) {
                 name.removeWordsAtEnd(1)
             } else name

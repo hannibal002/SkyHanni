@@ -79,7 +79,7 @@ object CraftRoomHolographicMob {
 
     private fun LivingEntity.display() = buildString {
         if (config.showName) {
-            val mobName = displayName.formattedTextCompat()
+            val mobName = displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
             append("§a$mobName ")
         }
         if (config.showHealth) {

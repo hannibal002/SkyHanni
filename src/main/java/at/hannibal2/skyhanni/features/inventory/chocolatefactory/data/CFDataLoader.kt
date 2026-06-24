@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 @SkyHanniModule
 object CFDataLoader {
@@ -343,7 +343,7 @@ object CFDataLoader {
     private fun processPrestigeItem(list: MutableList<CFUpgrade>, item: SafeItemStack) {
         val profileStorage = profileStorage ?: return
 
-        prestigeLevelPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        prestigeLevelPattern.matchMatcher(item.hoverName.formattedTextCompat()) {
             CFApi.currentPrestige = group("prestige").romanToDecimal()
         }
         var prestigeCost: Long? = null

@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -171,7 +171,7 @@ object EnoughUpdatesManager {
 
         val json = JsonObject()
         json.addProperty("itemid", stack.itemType.getIdentifierString())
-        json.addProperty("displayname", stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        json.addProperty("displayname", stack.hoverName.formattedTextCompat())
         json.add("nbttag", ComponentUtils.convertToNeuNbtInfoJson(stack))
 
         val jsonLore = JsonArray()

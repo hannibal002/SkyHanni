@@ -334,7 +334,12 @@ object EnchantParser {
             val strippedLine = loreList[i].unformattedTextCompat()
 
             if (startEnchant == -1) {
-                if (this.enchants.containsEnchantment(enchants, loreList[i].formattedTextCompat())) startEnchant = i
+                if (
+                    this.enchants.containsEnchantment(
+                        enchants,
+                        loreList[i].formattedTextCompat(extraResets = true, leadingWhite = false),
+                    )
+                ) startEnchant = i
             } else {
                 if (strippedLine.trim().isEmpty() && endEnchant == -1) endEnchant = i - 1 // Handles item tooltips end line
                 else if (strippedLine.contains("\n\n")) { // Handles chat component tooltips end line
@@ -355,7 +360,9 @@ object EnchantParser {
         val isRoman = !SkyHanniMod.feature.misc.replaceRomanNumerals.get()
         val regex = "[\\d,.kKmMbB]+\$".toRegex()
         for (i in startEnchant..endEnchant) {
-            val matcher = enchantmentPattern.matcher(loreList[i].formattedTextCompat().replace("\n", ""))
+            val matcher = enchantmentPattern.matcher(
+                loreList[i].formattedTextCompat(extraResets = true, leadingWhite = false).replace("\n", ""),
+            )
             var containsEnchant = false
             var enchantsOnThisLine = 0
 

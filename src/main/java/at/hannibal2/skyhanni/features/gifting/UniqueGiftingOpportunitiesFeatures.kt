@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
@@ -40,7 +40,7 @@ object UniqueGiftingOpportunitiesFeatures {
         "\\+1 Unique Gift given! To (?<player>.+)!",
     )
 
-    private fun hasGiftedPlayer(player: Player) = playerList?.contains(player.name.formattedTextCompatLessResets()) == true
+    private fun hasGiftedPlayer(player: Player) = playerList?.contains(player.name.formattedTextCompat(leadingWhite = false)) == true
 
     private fun addGiftedPlayer(playerName: String) {
         playerList?.add(playerName)
@@ -57,11 +57,11 @@ object UniqueGiftingOpportunitiesFeatures {
 
     private fun analyzeArmorStand(entity: ArmorStand) {
         if (!config.useArmorStandDetection) return
-        if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
+        if (entity.name.formattedTextCompat(leadingWhite = false) != HAS_GIFTED_NAMETAG) return
 
         val matchedPlayer = entity.getLorenzVec().getEntitiesNearby<Player>(2.0)
             .singleOrNull { !it.isNpc() } ?: return
-        addGiftedPlayer(matchedPlayer.name.formattedTextCompatLessResets())
+        addGiftedPlayer(matchedPlayer.name.formattedTextCompat(leadingWhite = false))
     }
 
     @HandleEvent(onlyOnSkyblock = true)

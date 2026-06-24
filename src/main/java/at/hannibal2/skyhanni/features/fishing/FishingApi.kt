@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -214,12 +214,12 @@ object FishingApi {
         }
 
         val baitAmount = stack.getLoreComponent().asSequence()
-            .map { it.formattedTextCompatLessResets() }
+            .map { it.formattedTextCompat(leadingWhite = false) }
             .firstNotNullOfOrNull { lineText ->
                 baitRemainingPattern.matchMatcher(lineText.removeColor()) { group("amount").formatInt() }
             } ?: return
 
-        val baitType = BaitType(stack.hoverName.formattedTextCompatLessResets(), stack.getInternalName())
+        val baitType = BaitType(stack.hoverName.formattedTextCompat(leadingWhite = false), stack.getInternalName())
         postBaitUpdate(baitType, baitAmount, stack)
     }
 
@@ -321,7 +321,7 @@ object FishingApi {
     private val frostyNpcLocation = LorenzVec(-1.5, 76.0, 92.5)
 
     private fun countIsZero(entity: ArmorStand): Boolean {
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.formattedTextCompat(leadingWhite = false)
         // a dragon, will always be fought
         if (name == "Reindrake") return true
 

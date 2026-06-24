@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import net.minecraft.world.entity.Mob
@@ -61,9 +61,9 @@ object SummoningSoulsName {
         for (entity in EntityUtils.getEntities<Mob>()) {
             val id = entity.id
             val consumer = entity.getNameTagWith(2, "§c❤")
-            if (consumer != null && !consumer.name.formattedTextCompatLessResets().contains("§e0")) {
+            if (consumer != null && !consumer.name.formattedTextCompat(leadingWhite = false).contains("§e0")) {
                 mobsLastLocation[id] = entity.getLorenzVec()
-                mobsName[id] = consumer.name.formattedTextCompatLessResets()
+                mobsName[id] = consumer.name.formattedTextCompat(leadingWhite = false)
             }
         }
 

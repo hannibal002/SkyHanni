@@ -39,27 +39,13 @@ import net.minecraft.client.multiplayer.chat.GuiMessageSource
 private val unformattedTextCache = TimeLimitedCache<Component, String>(3.minutes)
 private val formattedTextCache = TimeLimitedCache<TextCacheKey, String>(3.minutes)
 
-private enum class FormattedTextSettings {
-    DEFAULT,
-    LESS_RESETS,
-    LEADING_WHITE,
-    LEADING_WHITE_LESS_RESETS,
-    ;
+private data class TextCacheKey(
+    val extraResets: Boolean,
+    val leadingWhite: Boolean,
+    val component: Component,
+)
 
-    companion object {
-        fun getByArgs(noExtraResets: Boolean, leadingWhite: Boolean): FormattedTextSettings {
-            return when {
-                noExtraResets && leadingWhite -> LEADING_WHITE_LESS_RESETS
-                noExtraResets -> LESS_RESETS
-                leadingWhite -> LEADING_WHITE
-                else -> DEFAULT
-            }
-        }
-    }
-}
-
-private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
-
+@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
 fun Component.unformattedTextForChatCompat(): String {
     return unformattedTextCache.getOrPut(this) {
         computeUnformattedTextCompat()
@@ -73,26 +59,23 @@ private fun Component.computeUnformattedTextCompat(): String {
     return (this.contents as? PlainTextContents)?.text().orEmpty()
 }
 
-fun Component.unformattedTextCompat(): String =
-    iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
-
-// has to be a separate function for pattern mappings
-fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
-fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
-    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
+@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+fun Component.unformattedTextCompat(): String = iterator().joinToString(separator = "") {
+    @Suppress("DEPRECATION")
+    it.unformattedTextForChatCompat()
+}
 
 @JvmOverloads
-@Suppress("unused")
-fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
+@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+fun Component?.formattedTextCompat(extraResets: Boolean = false, leadingWhite: Boolean = true): String {
     this ?: return ""
-    val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
+    val cacheKey = TextCacheKey(extraResets, leadingWhite, this)
     return formattedTextCache.getOrPut(cacheKey) {
-        computeFormattedTextCompat(noExtraResets, leadingWhite)
+        computeFormattedTextCompat(extraResets, leadingWhite)
     }
 }
 
-private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
+private fun Component?.computeFormattedTextCompat(extraResets: Boolean, leadingWhite: Boolean): String {
     this ?: return ""
     val sb = StringBuilder(50)
     var wasFormatted = false
@@ -102,8 +85,9 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
             sb.append(chatStyle)
             wasFormatted = true
         }
+        @Suppress("DEPRECATION")
         sb.append(component.unformattedTextForChatCompat())
-        if (!noExtraResets) {
+        if (extraResets) {
             sb.append("§r")
             wasFormatted = true
         } else if (component == Component.empty()) {

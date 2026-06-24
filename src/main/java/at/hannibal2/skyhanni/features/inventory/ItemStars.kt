@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 
@@ -41,7 +41,7 @@ object ItemStars {
         val stack = event.itemStack
         if (stack.count != 1) return
         val stars = stack.grabStarCount() ?: return
-        starPattern.findMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        starPattern.findMatcher(stack.hoverName.formattedTextCompat()) {
             val name = group("name")
             event.toolTip[0] = Component.literal("$name §c$stars✪")
         }

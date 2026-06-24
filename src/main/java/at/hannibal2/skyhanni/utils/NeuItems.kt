@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isVanillaItem
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
@@ -24,7 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -120,7 +119,7 @@ object NeuItems {
                 ChatUtils.debug("skipped `$this`from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase().removePrefix(neuPetLevelRegex).takeIf {
+            val cleanName = stack.hoverName.formattedTextCompat().lowercase().removePrefix(neuPetLevelRegex).takeIf {
                 it.isNotEmpty()
             } ?: return@forEach
 

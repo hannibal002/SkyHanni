@@ -36,7 +36,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -168,7 +168,7 @@ object CroesusChestTracker {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
+            if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompat())) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = OpenedState.getOpenState(lore)
         }
@@ -177,7 +177,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompat())
         if (event.inventoryItems[BACK_ARROW_SLOT]?.`is`(Items.ARROW) != true) {
             currentPage = 0
         }
@@ -220,7 +220,7 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!kismetPattern.matches(event.stack.hoverName.formattedTextCompat())) return
         if (kismetUsedInChestPattern.matches(event.stack.getLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }

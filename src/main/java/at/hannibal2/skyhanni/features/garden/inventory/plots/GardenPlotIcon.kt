@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.Items
 
@@ -148,7 +148,7 @@ object GardenPlotIcon {
             val stack = originalStack[index] ?: return
             val lore = stack.getLore()
             list.clear()
-            list.add(0, stack.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            list.add(0, stack.hoverName.formattedTextCompat())
             for (i in lore.indices) {
                 list.add(i + 1, stack.getLore()[i])
             }

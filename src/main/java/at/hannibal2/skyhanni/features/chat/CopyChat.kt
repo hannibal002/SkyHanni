@@ -40,7 +40,7 @@ object CopyChat {
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
         val chatLine = getChatLine(mouseX, mouseY) ?: return
 
-        val formatted = chatLine.fullComponent.formattedTextCompat()
+        val formatted = chatLine.fullComponent.formattedTextCompat(extraResets = true, leadingWhite = false)
 
         val (clipboard, infoMessage) = when {
             KeyboardManager.isMenuKeyDown() ->

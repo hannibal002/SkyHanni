@@ -52,7 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -190,7 +190,7 @@ object MinionFeatures {
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (minionCollectItemPattern.matches(it.hoverName.formattedTextCompat())) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -330,7 +330,7 @@ object MinionFeatures {
         val coinsPerDay = (coins / (duration.inWholeMilliseconds)) * 1000 * 60 * 60 * 24
 
         val format = coinsPerDay.toInt().addSeparators()
-        return "§7Coins/day with ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}§7: §6$format coins"
+        return "§7Coins/day with ${stack.hoverName.formattedTextCompat()}§7: §6$format coins"
     }
 
     // TODO reshape to data class, use Resettable

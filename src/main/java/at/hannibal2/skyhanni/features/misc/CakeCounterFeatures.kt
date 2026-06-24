@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -100,7 +100,7 @@ object CakeCounterFeatures {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val entity = event.entity
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.formattedTextCompat(leadingWhite = false)
         val entityId = entity.id
 
         if (cakesEatenEntityId == null) {
@@ -141,7 +141,7 @@ object CakeCounterFeatures {
 
         val nearbyArmorStands = cakesStand.blockPosition().toLorenzVec().getEntitiesNearby<ArmorStand>(1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
-            soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
+            soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompat(leadingWhite = false)) {
                 soulsFoundEntityId = armorStand.id
                 ChatUtils.debug("Found \"Souls Found\" entity (from \"Cakes Eaten\" location)")
                 updateSoulsFound()

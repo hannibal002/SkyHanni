@@ -45,7 +45,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -259,7 +259,7 @@ object GardenNextJacobContest {
             val lore = item.getLoreComponent()
             if (!lore.any { it.string.contains("Jacob's Farming Contest") }) return@mapNotNull null
 
-            val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            val day = dayPattern.matchMatcher(item.hoverName.formattedTextCompat()) {
                 group("day").toInt()
             } ?: return@mapNotNull null
 

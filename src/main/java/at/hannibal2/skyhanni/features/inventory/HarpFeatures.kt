@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
 import at.hannibal2.skyhanni.utils.compat.container
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
@@ -202,7 +202,7 @@ object HarpFeatures {
         if (!event.stack.isStainedClay()) return
 
         // Example: §9| §7Click! will select the 9
-        val index = buttonColors.indexOfFirst { it == event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets()[1] }
+        val index = buttonColors.indexOfFirst { it == event.stack.hoverName.formattedTextCompat()[1] }
         if (index == -1) return // this should never happen unless there's an update
 
         val keyCode = getKey(index) ?: return

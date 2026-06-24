@@ -42,8 +42,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -164,7 +163,7 @@ object InstanceChestProfit {
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
             event.inventoryItems.forEach { (slot, item) ->
-                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompatLeadingWhite())
+                val chestType = CroesusChestType.getByStackName(item.hoverName.formattedTextCompat(extraResets = true))
                 if (chestType != null) {
                     if (!alreadyProcessedChests.contains(chestType)) {
                         alreadyProcessedChests.add(chestType)
@@ -191,7 +190,7 @@ object InstanceChestProfit {
         val slots = slotsWithFavorites
         if (isInCroesusMenu()) {
             slots.forEach {
-                if (it == event.stack.hoverName.formattedTextCompatLeadingWhite()) event.stackTip = "§6✯"
+                if (it == event.stack.hoverName.formattedTextCompat(extraResets = true)) event.stackTip = "§6✯"
             }
         }
         if (isInstanceChestGUI()) {
@@ -330,12 +329,12 @@ object InstanceChestProfit {
 
         val itemsWithCost: MutableMap<String, Double> = mutableMapOf()
         items.forEach {
-            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())) return@forEach
+            if (fakeItemNamePattern.matches(it.value.hoverName.formattedTextCompat())) return@forEach
             if (it.value.getInternalNameOrNull() != null) {
                 val cost = EstimatedItemValueCalculator.getTotalPrice(it.value)
                 if (cost != null) itemsWithCost.addOrPut(it.value.getInternalName().repoItemName, (cost * it.value.count))
             }
-            val name = it.value.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = it.value.hoverName.formattedTextCompat()
             if (attributeShardPattern.matches(name)) {
                 val price = getAttribute(name)
                 itemsWithCost.addOrPut(name, price)

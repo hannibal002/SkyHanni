@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -73,7 +73,7 @@ object VampireSlayerFeatures {
 
     // Nicked support
     private val username
-        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompatLessResets()
+        get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompat(leadingWhite = false)
             ?: error("own player is null")
 
     private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
@@ -119,9 +119,9 @@ object VampireSlayerFeatures {
 
     private fun List<String>.spawnedByCoop(stand: ArmorStand): Boolean = any {
         var contain = false
-        if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(stand.name.formattedTextCompatLessResets())) {
+        if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(stand.name.formattedTextCompat(leadingWhite = false))) {
             val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-                .find(stand.name.formattedTextCompatLessResets())?.groupValues?.get(1)
+                .find(stand.name.formattedTextCompat(leadingWhite = false))?.groupValues?.get(1)
             contain = it == name
         }
         contain
@@ -133,11 +133,11 @@ object VampireSlayerFeatures {
 
         for (stand in getAllNameTagsInRadiusWith("TWINCLAWS")) {
             if (!".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex()
-                    .matches(stand.name.formattedTextCompatLessResets())
+                    .matches(stand.name.formattedTextCompat(leadingWhite = false))
             ) continue
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
-                it.name.formattedTextCompatLessResets().contains(username)
+                it.name.formattedTextCompat(leadingWhite = false).contains(username)
             }
             val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
                 configCoopBoss.highlight && coopList.spawnedByCoop(it)
@@ -161,12 +161,12 @@ object VampireSlayerFeatures {
     }
 
     private fun RemotePlayer.process() {
-        if (name.formattedTextCompatLessResets() != "Bloodfiend ") return
+        if (name.formattedTextCompat(leadingWhite = false) != "Bloodfiend ") return
 
         processTwinClawsTitle()
         for (it in getAllNameTagsInRadiusWith("Spawned by")) {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
-            val containUser = it.name.formattedTextCompatLessResets().contains(username)
+            val containUser = it.name.formattedTextCompat(leadingWhite = false).contains(username)
             val containCoop = coopList.spawnedByCoop(it)
             val neededHealth = baseMaxHealth * 0.2f
             if (containUser && taggedEntityList.contains(id)) {
@@ -219,13 +219,13 @@ object VampireSlayerFeatures {
             val containCoop = coopList.isNotEmpty() &&
                 coopList.any {
                     var contain = false
-                    if (regexA.matches(armorStand.name.formattedTextCompatLessResets())) {
-                        val name = regexB.find(armorStand.name.formattedTextCompatLessResets())?.groupValues?.get(1)
+                    if (regexA.matches(armorStand.name.formattedTextCompat(leadingWhite = false))) {
+                        val name = regexB.find(armorStand.name.formattedTextCompat(leadingWhite = false))?.groupValues?.get(1)
                         contain = it == name
                     }
                     contain
                 }
-            if (armorStand.name.formattedTextCompatLessResets().contains(username) || containCoop) return
+            if (armorStand.name.formattedTextCompat(leadingWhite = false).contains(username) || containCoop) return
             if (!taggedEntityList.contains(event.clickedEntity.id)) {
                 taggedEntityList.add(event.clickedEntity.id)
             }

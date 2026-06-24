@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
@@ -203,7 +203,7 @@ object MaxwellApi {
 
         if (yourBagsGuiPattern.matches(event.inventoryName)) {
             for (stack in event.inventoryItems.values) {
-                if (accessoryBagStack.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) processStack(stack)
+                if (accessoryBagStack.matches(stack.hoverName.formattedTextCompat())) processStack(stack)
             }
         }
         if (statsTuningGuiPattern.matches(event.inventoryName)) {
@@ -216,11 +216,11 @@ object MaxwellApi {
         for (stack in inventoryItems.values) {
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.hoverName.formattedTextCompat()) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
-                        "stack name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                        "stack name" to stack.hoverName.formattedTextCompat(),
                         "line" to line,
                     )
                     map.add(it)
@@ -320,7 +320,7 @@ object MaxwellApi {
                         UnknownMaxwellPower("Unknown power: $power"),
                         "Unknown power: $power",
                         "line" to line,
-                        "displayName" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                        "displayName" to stack.hoverName.formattedTextCompat(),
                         "lore" to stack.getLore(),
                     )
             }

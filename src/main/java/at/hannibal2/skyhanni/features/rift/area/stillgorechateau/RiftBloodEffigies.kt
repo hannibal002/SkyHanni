@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -149,7 +149,7 @@ object RiftBloodEffigies {
         if (!isEnabled()) return
 
         eLoop@for (entity in LocationUtils.playerLocation().getEntitiesNearby<ArmorStand>(15.0)) {
-            effigiesTimerPattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
+            effigiesTimerPattern.matchMatcher(entity.name.formattedTextCompat(leadingWhite = false)) {
                 val index = getIndex(entity) ?: continue@eLoop
                 val time = TimeUtils.getDuration(group("time"))
                 effigies[index]?.let {
@@ -159,7 +159,7 @@ object RiftBloodEffigies {
                 continue@eLoop
             }
 
-            if (effigiesBreakPattern.matches(entity.name.formattedTextCompatLessResets())) {
+            if (effigiesBreakPattern.matches(entity.name.formattedTextCompat(leadingWhite = false))) {
                 val index = getIndex(entity) ?: continue
                 effigies[index]?.state = EffigyState.NOT_BROKEN
                 continue

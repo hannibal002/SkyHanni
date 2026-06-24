@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import org.lwjgl.glfw.GLFW
 
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
@@ -21,7 +21,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
     ) {
-        val itemName = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = event.itemStack.hoverName.formattedTextCompat()
         val perk = hotx.getPerkByNameOrNull(itemName.removeColor()) ?: return
 
         if (perk.getLevelUpCost() == null) return

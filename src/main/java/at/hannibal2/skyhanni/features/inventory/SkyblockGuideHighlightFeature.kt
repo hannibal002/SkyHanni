@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 
@@ -130,7 +130,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) + item.getLore()
+                val loreAndName = listOf(item.hoverName.formattedTextCompat()) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }

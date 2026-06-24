@@ -30,8 +30,6 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEquipmentSlots
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Display
@@ -68,9 +66,9 @@ object CopyNearbyEntitiesCommand {
             val simpleName = entity.javaClass.simpleName
             add("entity: $simpleName")
             val displayName = entity.displayName
-            add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
+            add("name: '" + entity.name.formattedTextCompat(leadingWhite = false) + "'")
             if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
-            add("displayName: '${displayName.formattedTextCompat()}'")
+            add("displayName: '${displayName.formattedTextCompat(extraResets = true, leadingWhite = false)}'")
             add("entityId: ${entity.id}")
             add("Category of Mob: ${getCategory(entity, mob)}")
             add("uuid version: ${entity.uuid.version()} (${entity.uuid})")
@@ -108,7 +106,7 @@ object CopyNearbyEntitiesCommand {
                 if (armor != null) {
                     add("armor:")
                     for ((i, itemStack) in armor.withIndex()) {
-                        val name = itemStack?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                        val name = itemStack?.hoverName.formattedTextCompat()
                         add("-  at: $i: $name")
                     }
                 }
@@ -181,8 +179,8 @@ object CopyNearbyEntitiesCommand {
     private fun MutableList<String>.addItem(entity: ItemEntity) {
         add("EntityItem:")
         val stack = entity.item
-        val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
-        val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val stackName = stack.hoverName.formattedTextCompat()
+        val stackDisplayName = stack.hoverName.formattedTextCompat()
         val cleanName = stack.cleanName()
         val itemEnchanted = stack.isEnchanted
         val stackSize = stack.count
@@ -276,7 +274,7 @@ object CopyNearbyEntitiesCommand {
         add("EntityBlockDisplay:")
         val block = entity.blockState.block
 
-        add("-  block: ${block.name.formattedTextCompat()}")
+        add("-  block: ${block.name.formattedTextCompat(extraResets = true, leadingWhite = false)}")
     }
 
     private fun MutableList<String>.addTextDisplayEntity(entity: Display.TextDisplay) {
@@ -301,7 +299,7 @@ object CopyNearbyEntitiesCommand {
                 add("-     $skullTexture")
             }
             val cleanName = stack.cleanName()
-            val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val stackName = stack.hoverName.formattedTextCompat()
             val type = stack.javaClass.name
             add("-     name: '$stackName'")
             add("-     cleanName: '$cleanName'")
@@ -393,5 +391,5 @@ object CopyNearbyEntitiesCommand {
     }
 
     private fun LivingEntity.asString() =
-        this.id.toString() + " - " + this.javaClass.simpleName + " \"" + this.name.formattedTextCompatLessResets() + "\""
+        this.id.toString() + " - " + this.javaClass.simpleName + " \"" + this.name.formattedTextCompat(leadingWhite = false) + "\""
 }

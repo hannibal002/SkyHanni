@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO: Split reading into ExperimentationSuperpairApi, leaving display to just use the data
@@ -134,12 +134,12 @@ object SuperpairDataDisplay {
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
-        if (isOutOfBounds(event.slotId, currentTier) || item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "?") return
+        if (isOutOfBounds(event.slotId, currentTier) || item.hoverName.formattedTextCompat().removeColor() == "?") return
 
         val items = uncoveredItems.toMutableMap()
         val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
-        val clicksItemName = clicksItem?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.removeColor().orEmpty()
+        val clicksItemName = clicksItem?.hoverName?.formattedTextCompat()?.removeColor().orEmpty()
         val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItemName) {
             group("clicks").toInt() > 0
         } ?: false
@@ -150,7 +150,7 @@ object SuperpairDataDisplay {
 
     private fun handleItem(items: MutableMap<Int, SuperpairItem>, slot: Int) = DelayedRun.runDelayed(200.milliseconds) {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
-        val itemName = itemNow.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor()
+        val itemName = itemNow.hoverName.formattedTextCompat().removeColor()
         val reward = itemNow.convertToReward()
         val itemData = SuperpairItem(slot, reward, DyeCompat.toDamage(itemNow))
         val uncovered = items.keys.maxOrNull() ?: -1
@@ -321,7 +321,7 @@ object SuperpairDataDisplay {
         ((currentExperiment.gridSize - 2) / 2) - currentFoundData.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
     private fun SafeItemStack.convertToReward() = when {
-        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
+        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompat().split("] ")[1]
         hoverName.string.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
         else -> hoverName.string.removeColor()
     }

@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration
@@ -111,7 +111,7 @@ object EnchantedClockHelper {
             fun byUsageStringOrNull(usageString: String) = entries.firstOrNull { it.usageString == usageString }
             fun bySimpleBoostType(simple: SimpleBoostType) = entries.firstOrNull { it.name == simple.name }
             fun byItemStackOrNull(stack: SafeItemStack) = entries.firstOrNull {
-                it.formattedName == stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                it.formattedName == stack.hoverName.formattedTextCompat()
             }
 
             fun populateFromJson(json: EnchantedClockJson) {

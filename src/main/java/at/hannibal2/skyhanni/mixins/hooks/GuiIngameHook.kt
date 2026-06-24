@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.network.chat.Component

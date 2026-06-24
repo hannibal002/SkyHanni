@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
@@ -20,7 +20,7 @@ class TextHelperTest {
 
         Assertions.assertEquals(listOf("Cookie Buff", "10 months, 19 days"), split.map { it.string })
         Assertions.assertFalse(split.any { "\n" in it.string })
-        Assertions.assertEquals("§dCookie Buff", split[0].formattedTextCompatLessResets())
-        Assertions.assertEquals("§a10 months, 19 days", split[1].formattedTextCompatLessResets())
+        Assertions.assertEquals("§dCookie Buff", split[0].formattedTextCompat(leadingWhite = false))
+        Assertions.assertEquals("§a10 months, 19 days", split[1].formattedTextCompat(leadingWhite = false))
     }
 }

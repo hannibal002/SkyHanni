@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getInventoryItems
 import net.minecraft.client.resources.language.I18n
 import net.minecraft.world.entity.Entity
@@ -35,7 +35,7 @@ object MobUtils {
     fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }.minByOrNull { it.distanceTo(entity) }
 
-    fun ArmorStand.isDefaultValue() = this.name.formattedTextCompatLessResets() == defaultArmorStandName
+    fun ArmorStand.isDefaultValue() = this.name.formattedTextCompat(leadingWhite = false) == defaultArmorStandName
 
     fun ArmorStand?.takeNonDefault() = this?.takeIf { !it.isDefaultValue() }
 

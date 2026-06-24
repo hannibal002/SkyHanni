@@ -290,7 +290,7 @@ object HypixelData {
         val world = MinecraftCompat.localWorldOrNull ?: return null
 
         val objective = world.scoreboard.getSidebarObjective() ?: return null
-        val displayName = objective.displayName.formattedTextCompat()
+        val displayName = objective.displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
         return displayName
     }
 

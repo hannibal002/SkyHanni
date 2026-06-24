@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -73,7 +73,7 @@ object HoppityRabbitTheFishChecker {
         rabbitTheFishIndex = event.inventoryItems.filter {
             it.value.hoverName.string.isNotEmpty() && it.key != 22
         }.entries.firstOrNull {
-            rabbitTheFishItemPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            rabbitTheFishItemPattern.matches(it.value.hoverName.formattedTextCompat())
         }?.key
     }
 

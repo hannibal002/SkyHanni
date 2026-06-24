@@ -31,7 +31,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -249,7 +249,7 @@ object ItemPickupLog {
             ItemCategory.PET -> true
             else -> false
         }
-        val default = hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val default = hoverName.formattedTextCompat()
         return runCatching {
             if (compact) getInternalName().repoItemName else default
         }.getOrElse {

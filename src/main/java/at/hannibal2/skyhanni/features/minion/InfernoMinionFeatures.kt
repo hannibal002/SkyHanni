@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -57,7 +57,7 @@ object InfernoMinionFeatures {
 
         val fuelItemName = event.container.getSlot(MINION_FUEL_SLOT).item.hoverName
         val containsFuel =
-            NeuInternalName.fromItemNameOrNull(fuelItemName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+            NeuInternalName.fromItemNameOrNull(fuelItemName.formattedTextCompat()) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot?.index == MINION_FUEL_SLOT || event.slot?.index == MINION_PICKUP_SLOT) {
@@ -72,7 +72,7 @@ object InfernoMinionFeatures {
         if (!inInventory) return
         event.slot?.index ?: return
 
-        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds
+        val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompat()) in fuelItemIds
         if (!containsFuel) return
 
         if (event.slot.index == MINION_FUEL_SLOT) {

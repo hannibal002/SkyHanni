@@ -199,7 +199,7 @@ object VisitorApi {
                 continue
             }
 
-            visitorNamePattern.matchMatcher(line.formattedTextCompat()) {
+            visitorNamePattern.matchMatcher(line.formattedTextCompat(extraResets = true, leadingWhite = false)) {
                 visitorsInTab.add(group("name").trim())
             }
 

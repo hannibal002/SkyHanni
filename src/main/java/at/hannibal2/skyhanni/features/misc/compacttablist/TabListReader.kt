@@ -168,7 +168,7 @@ object TabListReader {
 
         for (entry in fullTabComponents.indices step 20) {
             val titleComponent = fullTabComponents[entry]
-            val trimmedTitle = Component.literal(titleComponent.formattedTextCompat().trim())
+            val trimmedTitle = Component.literal(titleComponent.formattedTextCompat(extraResets = true, leadingWhite = false).trim())
             val column = getColumnFromComponent(this, trimmedTitle) ?: TabColumn(trimmedTitle).also {
                 add(it)
             }
@@ -238,7 +238,7 @@ object TabListReader {
         }
         upgradesPattern.matchMatcher(component) {
             if (!inUpgrades) return@matchMatcher
-            if (!component.formattedTextCompat().startsWith("§e")) return@matchMatcher
+            if (!component.formattedTextCompat(extraResets = true, leadingWhite = false).startsWith("§e")) return@matchMatcher
 
             val firstComponent = TextHelper.matcher(component, group("firstPart")) ?: return@apply
             val secondComponent = TextHelper.matcher(component, group("secondPart")) ?: return@apply
@@ -251,7 +251,7 @@ object TabListReader {
             return@apply
         }
 
-        val formatted = component.formattedTextCompat()
+        val formatted = component.formattedTextCompat(extraResets = true, leadingWhite = false)
         when {
             // Separators are truly emptied
             formatted.removeColor().trim().isEmpty() -> {

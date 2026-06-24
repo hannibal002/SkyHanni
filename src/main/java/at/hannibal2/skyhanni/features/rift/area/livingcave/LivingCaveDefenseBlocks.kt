@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -80,7 +80,7 @@ object LivingCaveDefenseBlocks {
                 // read new entity data
                 val compareLocation = event.location.add(-0.5, -1.5, -0.5)
                 entity = compareLocation.getEntitiesNearby<RemotePlayer>(2.0)
-                    .filter { isCorrectMob(it.name.formattedTextCompatLessResets()) }
+                    .filter { isCorrectMob(it.name.formattedTextCompat(leadingWhite = false)) }
                     .filter { !it.isAtFullHealth() }
                     .minByOrNull { it.distanceTo(compareLocation) }
             }

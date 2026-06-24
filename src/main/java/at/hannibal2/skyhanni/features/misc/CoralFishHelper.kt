@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -61,7 +61,7 @@ object CoralFishHelper {
         val neededFish = mutableListOf<String>()
 
         for (item in items) {
-            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val itemName = item.hoverName.formattedTextCompat()
             if (!ModernPatterns.coralFishNamePattern.matches(itemName)) continue
 
             if (!item.isDye(DyeCompat.GRAY)) continue

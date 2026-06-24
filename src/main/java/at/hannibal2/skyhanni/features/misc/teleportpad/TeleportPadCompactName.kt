@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -35,7 +35,7 @@ object TeleportPadCompactName {
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return
         val entity = event.entity
 
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.formattedTextCompat(leadingWhite = false)
 
         noNamePattern.matchMatcher(name) {
             event.cancel()

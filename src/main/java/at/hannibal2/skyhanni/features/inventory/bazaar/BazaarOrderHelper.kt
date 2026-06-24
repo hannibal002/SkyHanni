@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -61,7 +61,7 @@ object BazaarOrderHelper {
         val slots = mutableMapOf<Int, LorenzColor>()
         val errorItems = mutableSetOf<NeuInternalName>()
         for ((slot, stack) in inventoryItems) {
-            bazaarItemNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            bazaarItemNamePattern.matchMatcher(stack.hoverName.formattedTextCompat()) {
                 val buyOrSell = group("type").let { (it == "BUY") to (it == "SELL") }
                 if (buyOrSell.let { !it.first && !it.second }) return@matchMatcher
 

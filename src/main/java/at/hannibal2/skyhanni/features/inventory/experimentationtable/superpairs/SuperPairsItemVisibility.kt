@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 // Todo: Merge this with SuperpairDataDisplay
 //  Store slots over there
@@ -39,7 +39,7 @@ object SuperPairsItemVisibility {
         if (!config.enabled) return
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem.hoverName.formattedTextCompat())) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -56,7 +56,7 @@ object SuperPairsItemVisibility {
             it !in superpairsSlotMap.keys
         } ?: return
         val clickedItem = item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompatLeadingWhiteLessResets())) superpairsSlotsToRead.add(slotNumber)
+        if (unknownSuperpairsClickPattern.matches(clickedItem.hoverName.formattedTextCompat())) superpairsSlotsToRead.add(slotNumber)
         else superpairsSlotMap[slotNumber] = clickedItem
     }
 
@@ -66,7 +66,7 @@ object SuperPairsItemVisibility {
         if (superpairsSlotsToRead.isEmpty()) return
 
         inventoryItems.filter {
-            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            it.key in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(it.value.hoverName.formattedTextCompat())
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)

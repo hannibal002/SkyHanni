@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -120,7 +120,7 @@ class Mob(
      * @property isRunic does not change.
      */
     val isRunic = !RiftApi.inRift() &&
-        armorStand?.name.formattedTextCompatLessResets().startsWith("§5") &&
+        armorStand?.name.formattedTextCompat(leadingWhite = false).startsWith("§5") &&
         category == MobCategory.BASIC
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS

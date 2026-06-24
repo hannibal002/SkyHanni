@@ -52,7 +52,7 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeasonModifier
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
@@ -192,7 +192,7 @@ object HoppityApi {
             // Stack must be a skull.
             stack.`is`(Items.PLAYER_HEAD) &&
             // All strays have a display name, all the time.
-            stack.hoverName.string.isNotEmpty() && stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty()
+            stack.hoverName.string.isNotEmpty() && stack.hoverName.formattedTextCompat().isNotEmpty()
     }
 
     private fun Map<Int, SafeItemStack>.filterStrayProcessable() = filterMayBeStray(this).filter {
@@ -250,7 +250,7 @@ object HoppityApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
-            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
+            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompat() != it.value
         }
 
         // Only process if we're in the Chocolate Factory.
@@ -258,7 +258,7 @@ object HoppityApi {
 
         event.inventoryItems.filterStrayProcessable().forEach { (slotNumber, itemStack) ->
             var processed = false
-            CFStrayTracker.strayCaughtPattern.matchMatcher(itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            CFStrayTracker.strayCaughtPattern.matchMatcher(itemStack.hoverName.formattedTextCompat()) {
                 processed = CFStrayTracker.handleStrayClicked(slotNumber, itemStack)
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
@@ -284,7 +284,7 @@ object HoppityApi {
                 hoppityDataSet.duplicate = itemStack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                 EggFoundEvent(STRAY, slotNumber).post()
             }
-            if (processed) processedStraySlots[slotNumber] = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            if (processed) processedStraySlots[slotNumber] = itemStack.hoverName.formattedTextCompat()
         }
     }
 
@@ -292,7 +292,7 @@ object HoppityApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!miscProcessInvPattern.matches(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.takeIf { it.isMiscProcessable() } ?: return
-        val hoverName = slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val hoverName = slot.item.hoverName.formattedTextCompat()
 
         if (sideDishNamePattern.matches(hoverName)) {
             EggFoundEvent(SIDE_DISH, event.slotId).post()

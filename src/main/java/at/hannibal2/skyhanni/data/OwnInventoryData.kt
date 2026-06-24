@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket
@@ -149,7 +149,7 @@ object OwnInventoryData {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
-        val itemName = event.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = event.item?.hoverName.formattedTextCompat()
         checkAHMovements(itemName)
     }
 

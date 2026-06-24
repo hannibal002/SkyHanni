@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 
 @SkyHanniModule
 object DnaAnalyzerSolver {
@@ -267,7 +267,7 @@ object DnaAnalyzerSolver {
 
         companion object {
             fun SafeItemStack.toColor(): Colors? {
-                val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
+                val name = this.hoverName.formattedTextCompat()
                 return when {
                     name.startsWith("§cDNA") -> RED
                     name.startsWith("§eDNA") -> YELLOW

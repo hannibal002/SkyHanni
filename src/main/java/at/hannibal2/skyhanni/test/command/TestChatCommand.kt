@@ -70,7 +70,10 @@ object TestChatCommand {
         println("${component.unformattedTextForChatCompat()} ${component.style} ${component.siblings}")
         println(component)
 
-        val rawText = component.formattedTextCompat().stripHypixelMessage().replace("§", "&").replace("\n", "\\n")
+        val rawText = component.formattedTextCompat(extraResets = true, leadingWhite = false)
+            .stripHypixelMessage()
+            .replace("§", "&")
+            .replace("\n", "\\n")
         if (!isSilent) ChatUtils.chat("Testing message: §7$rawText", prefixColor = "§a")
 
         test(component)

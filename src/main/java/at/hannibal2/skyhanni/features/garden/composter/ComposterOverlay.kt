@@ -57,7 +57,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -140,7 +140,7 @@ object ComposterOverlay {
     fun onToolTip(event: ToolTipTextEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = event.itemStack.hoverName.formattedTextCompat()
             if (name.contains(upgrade.displayName)) {
                 maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0

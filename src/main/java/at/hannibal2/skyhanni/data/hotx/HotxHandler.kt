@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -83,7 +83,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         if (this.handleCurrency()) return
 
-        val entry = data.firstOrNull { it.guiNamePattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
+        val entry = data.firstOrNull { it.guiNamePattern.matches(item.hoverName.formattedTextCompat()) } ?: return
         entry.slot = this
         entry.item = item
 
@@ -138,8 +138,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val item = this.item ?: return false
 
         val isHeartItem = when {
-            heartItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> true
-            resetItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> false
+            heartItemPattern.matches(item.hoverName.formattedTextCompat()) -> true
+            resetItemPattern.matches(item.hoverName.formattedTextCompat()) -> false
             else -> return false
         }
 

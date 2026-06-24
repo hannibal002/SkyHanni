@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -145,7 +145,7 @@ object ShowMotesNpcSellPrice {
                 addString("  §7- ")
                 addItemStack(stack)
                 val tips = buildList {
-                    add("§6Item: ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}")
+                    add("§6Item: ${stack.hoverName.formattedTextCompat()}")
                     add("§6Value per: §d$valuePer Motes")
                     add("§6Total in chest: §d${(value / valuePer).toInt()}")
                     add("")
@@ -153,7 +153,7 @@ object ShowMotesNpcSellPrice {
                 }
                 add(
                     Renderable.hoverTips(
-                        "§6${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: §b$price",
+                        "§6${stack.hoverName.formattedTextCompat()}: §b$price",
                         tips,
                         highlightsOnHoverSlots = index,
                         stack = stack,

@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -243,7 +243,7 @@ object CarnivalZombieShootout {
                     "Could not identify Zombie Shootout type",
                     "zombie type for zombie entity helmet is null",
                     "helmet" to helmet,
-                    "helmet.displayName" to helmet.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "helmet.displayName" to helmet.hoverName.formattedTextCompat(),
                     "helmet.item" to helmet.itemType,
                     "helmet.unlocalizedName" to helmet.itemType.descriptionId,
                 )

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.Items
@@ -67,7 +67,7 @@ object LogBookStats {
         val list = mutableListOf<VisitorInfo>()
 
         for ((index, item) in event.inventoryItems) {
-            val visitorName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().takeIfNotEmpty() ?: continue
+            val visitorName = item.hoverName.formattedTextCompat().takeIfNotEmpty() ?: continue
             var timesVisited = 0L
             var timesAccepted = 0L
             val lore = item.getLore()

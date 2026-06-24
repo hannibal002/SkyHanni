@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -31,7 +31,7 @@ object PetNametag {
     fun onNameTagRender(event: EntityDisplayNameEvent<ArmorStand>) {
         if (!isEnabled()) return
 
-        val standName: String = event.chatComponent.formattedTextCompatLessResets()
+        val standName: String = event.chatComponent.formattedTextCompat(leadingWhite = false)
 
         petNametagPattern.matchMatcher(standName) {
             val start = group("start")

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -51,7 +51,7 @@ object DojoRankDisplay {
 
         var totalScore = 0
         for (stack in items) {
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().takeIfNotEmpty() ?: continue
+            val name = stack.hoverName.formattedTextCompat().takeIfNotEmpty() ?: continue
             testNamePattern.matchMatcher(name) {
                 val testColor = group("color")
                 val testName = group("name")

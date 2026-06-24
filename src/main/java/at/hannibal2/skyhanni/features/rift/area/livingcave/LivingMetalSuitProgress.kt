@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgress
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 
@@ -53,7 +53,7 @@ object LivingMetalSuitProgress {
             addLine {
                 addString("§7- ")
                 addItemStack(stack)
-                addString("${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: ")
+                addString("${stack.hoverName.formattedTextCompat()}: ")
                 addString(
                     progress?.let {
                         drawProgressBar(it) + " §b${it.formatPercentage()}"

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Style
@@ -125,7 +125,7 @@ object TrophyFishManager {
                     "unknown trophy fish rarity in odger inventory",
                     "rawRarity" to rawRarity,
                     "line" to line,
-                    "stack.name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "stack.name" to stack.hoverName.formattedTextCompat(),
                     "internalName" to internalName,
                 )
 

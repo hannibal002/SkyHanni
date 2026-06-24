@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
@@ -56,7 +56,7 @@ object HideMobNames {
         val entity = event.entity
         if (!entity.hasCustomName()) return
 
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.name.formattedTextCompat(leadingWhite = false)
         val id = entity.id
         if (lastMobName[id] == name) {
             if (id in mobNamesHidden) {

@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -81,7 +81,7 @@ object FishingHookDisplay {
         if (!armorStand.hasCustomName() || !armorStand.isCustomNameVisible) return
         val alertText = Renderable.text(
             if (armorStand.name.string == "!!!") config.customAlertText.replace("&", "§")
-            else armorStand.name.formattedTextCompatLessResets(),
+            else armorStand.name.formattedTextCompat(leadingWhite = false),
         )
 
         isRendering = true
@@ -94,7 +94,7 @@ object FishingHookDisplay {
     }
 
     private fun ArmorStand.hasCorrectName(): Boolean =
-        (name.string == "!!!") || pattern.matcher(name.formattedTextCompatLessResets()).matches()
+        (name.string == "!!!") || pattern.matcher(name.formattedTextCompat(leadingWhite = false)).matches()
 
     fun isEnabled() = config.enabled && FishingApi.holdingRod
 }

@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.hasPotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
@@ -59,7 +59,7 @@ object TrevorSolver {
             if (entity is RemotePlayer) continue
             val mob = MobData.entityToMob[entity]
             if (mob?.isAlive == false) continue
-            val name = entity.name.formattedTextCompatLessResets()
+            val name = entity.name.formattedTextCompat(leadingWhite = false)
             val isTrevor = mob?.let { it.name != name && isTrevorMob(it) } ?: false
             val entityHealth = if (entity is LivingEntity) entity.baseMaxHealth.derpy() else 0
             currentMob = TrevorMob.findByName(name)

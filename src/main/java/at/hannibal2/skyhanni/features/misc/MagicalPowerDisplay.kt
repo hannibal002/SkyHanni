@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -86,7 +86,7 @@ object MagicalPowerDisplay {
         val internalName = item.getInternalNameOrNull() ?: return
 
         var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
-            "Unknown rarity '$rarity' for item '${item.hoverName.formattedTextCompatLeadingWhiteLessResets()}§7'",
+            "Unknown rarity '$rarity' for item '${item.hoverName.formattedTextCompat()}§7'",
         )
 
         when (internalName) {

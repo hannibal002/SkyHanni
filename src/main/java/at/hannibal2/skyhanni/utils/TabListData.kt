@@ -45,17 +45,19 @@ object TabListData {
         internal set
 
     private suspend fun copyCommand(asComponents: Boolean = true) {
-        fun Component?.localCopyFormat() = if (asComponents) this?.toString().orEmpty() else this?.formattedTextCompat().orEmpty()
+        fun Component?.localCopyFormat() =
+            if (asComponents) this?.toString().orEmpty()
+            else this?.formattedTextCompat(extraResets = true, leadingWhite = false).orEmpty()
 
         val tabHeader = header.localCopyFormat()
         val tabFooter = footer.localCopyFormat()
         val joinedResults = tablistCache.joinToString("\n") {
-            val line = if (asComponents) it.toString() else it.formattedTextCompat()
+            val line = if (asComponents) it.toString() else it.formattedTextCompat(extraResets = true, leadingWhite = false)
             if (it.string == "") " " else line
         }
         val widgets = TabWidget.entries.filter { it.isActive }.joinToString("\n") {
             val widgetFormat = it.lines.joinToString { line ->
-                if (asComponents) line.toString() else line.formattedTextCompat()
+                if (asComponents) line.toString() else line.formattedTextCompat(extraResets = true, leadingWhite = false)
             }
             "\n${it.name} : \n$widgetFormat"
         }

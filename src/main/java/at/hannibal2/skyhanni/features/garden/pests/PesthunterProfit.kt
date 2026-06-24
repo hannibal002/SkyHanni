@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -79,7 +79,7 @@ object PesthunterProfit {
         if (slot == 49) return null
 
         val totalCost = getFullCost(getRequiredItems(item)).takeIf { it >= 0 } ?: return null
-        val nameString = itemName.formattedTextCompatLeadingWhiteLessResets()
+        val nameString = itemName.formattedTextCompat()
         val (name, amount) = ItemUtils.readItemAmount(nameString) ?: return null
         val fixedDisplayName = name.replace("[Lvl 100]", "[Lvl {LVL}]")
         val internalName = NeuInternalName.fromItemNameOrNull(fixedDisplayName)

@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -56,8 +55,7 @@ import at.hannibal2.skyhanni.utils.compat.NbtCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
@@ -181,7 +179,7 @@ object ItemUtils {
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
             return data.lastLore
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
+        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompat(leadingWhite = false) }.orEmpty()
         data.lastLore = lore
         data.lastLoreFetchTime = SimpleTimeMark.now()
         return lore
@@ -196,7 +194,7 @@ object ItemUtils {
 
     fun DataComponentMap?.getLore(): List<String> {
         this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
+        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompat(leadingWhite = false) }.orEmpty()
     }
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
@@ -219,7 +217,7 @@ object ItemUtils {
 
     fun getDisplayName(compound: DataComponentMap?): String? {
         compound ?: return null
-        val name = compound.get(DataComponents.CUSTOM_NAME)?.formattedTextCompatLeadingWhiteLessResets()
+        val name = compound.get(DataComponents.CUSTOM_NAME)?.formattedTextCompat()
         if (name.isNullOrEmpty()) return null
         return name
     }
@@ -431,7 +429,7 @@ object ItemUtils {
                 category to rarity
             } ?: continue
 
-            val name = hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = hoverName.formattedTextCompat()
             val itemCategory = getItemCategory(category, name, cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
@@ -594,7 +592,7 @@ object ItemUtils {
     private fun getPetRarity(pet: SafeItemStack): LorenzRarity? {
         val rarityId = pet.getInternalName().asString().split(";").last().toInt()
         val rarity = LorenzRarity.getById(rarityId)
-        val name = pet.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val name = pet.hoverName.formattedTextCompat()
         if (rarity == null) {
             ErrorManager.logErrorStateWithData(
                 "Could not read rarity for pet $name",
@@ -722,7 +720,7 @@ object ItemUtils {
             addMissingRepoItem(name, "Could not find item name for $name")
             return "§c$name"
         }
-        val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val name = itemStack.hoverName.formattedTextCompat()
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {

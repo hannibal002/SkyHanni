@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -228,7 +228,7 @@ object CakeTracker {
     private fun checkCakeContainer(event: InventoryFullyOpenedEvent) {
         if (!cakeContainerPattern.matches(event.inventoryName)) return
         knownCakesInCurrentInventory = event.inventoryItems.values.mapNotNull { item ->
-            cakeNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            cakeNamePattern.matchMatcher(item.hoverName.formattedTextCompat()) {
                 val year = group("year").formatInt()
                 addCake(year)
                 year
@@ -242,9 +242,9 @@ object CakeTracker {
         if (!auctionBrowserPattern.matches(event.inventoryName)) return false
         searchingForCakes = auctionCakeSearchPattern.matches(event.inventoryName)
         slotHighlightCache = event.inventoryItems.filter {
-            cakeNamePattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())
+            cakeNamePattern.matches(it.value.hoverName.formattedTextCompat())
         }.mapValues { (_, item) ->
-            val year = cakeNamePattern.matchGroup(item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt() ?: -1
+            val year = cakeNamePattern.matchGroup(item.hoverName.formattedTextCompat(), "year")?.toInt() ?: -1
             val owned = storage?.ownedCakes?.contains(year) ?: false
             if (owned) config.ownedColor else config.missingColor
         }
@@ -274,7 +274,7 @@ object CakeTracker {
     private fun checkInventoryCakes() {
         if (timeOpenedCakeInventory.passedSince() < 500.milliseconds) return
         val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
-            cakeNamePattern.matchGroup(item.item.hoverName.formattedTextCompatLeadingWhiteLessResets(), "year")?.toInt()
+            cakeNamePattern.matchGroup(item.item.hoverName.formattedTextCompat(), "year")?.toInt()
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }

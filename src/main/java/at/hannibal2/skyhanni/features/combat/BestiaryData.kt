@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -157,7 +157,7 @@ object BestiaryData {
         for ((index, stack) in stackList) {
             if (stack.hoverName.string == " ") continue
             if (!indexes.contains(index)) continue
-            val name = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = stack.hoverName.formattedTextCompat()
             var familiesFound: Long = 0
             var totalFamilies: Long = 0
             var familiesCompleted: Long = 0
@@ -183,11 +183,11 @@ object BestiaryData {
 
     private fun notInCategory() {
         for ((index, stack) in stackList) {
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
+            if (stack.hoverName.formattedTextCompat() == " ") continue
             if (!indexes.contains(index)) continue
-            val name = " [IVX0-9]+$".toPattern().matcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()).replaceFirst("")
+            val name = " [IVX0-9]+$".toPattern().matcher(stack.hoverName.formattedTextCompat()).replaceFirst("")
             val level =
-                " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())?.groupValues?.get(1) ?: "0"
+                " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompat())?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0

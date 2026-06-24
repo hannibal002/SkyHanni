@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -175,7 +175,7 @@ object ExperimentsProfitTracker {
     }
 
     private fun NeuInternalName.formatWarningString(amount: Int) = buildString {
-        val displayName = getItemStackOrNull()?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: "XP Bottle"
+        val displayName = getItemStackOrNull()?.hoverName?.formattedTextCompat() ?: "XP Bottle"
         val amountFormat = "§8${amount}x ".takeIf { amount > 1 }.orEmpty()
         appendLine("§aExperiments Tracker§7:")
         appendLine("§eAutomatically tracked usage of $amountFormat$displayName §ewhile near the Experimentation Table§7.")

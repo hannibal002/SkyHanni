@@ -57,7 +57,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import com.google.gson.JsonArray
@@ -595,7 +595,7 @@ object DamageIndicatorManager {
         var found = false
         for (shield in HellionShield.entries) {
             entity.getNameTagWith(3, shield.name)?.let { armorStand ->
-                val number = armorStand.name.formattedTextCompatLessResets().split(" ♨")[1].substring(0, 1)
+                val number = armorStand.name.formattedTextCompat(leadingWhite = false).split(" ♨")[1].substring(0, 1)
                 entity.setHellionShield(shield)
                 if (SlayerApi.config.blazes.hellion.coloredMobs) {
                     entityData.nameAbove = shield.formattedName + " $number"
@@ -795,9 +795,9 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_4 -> 100
                 else -> 100
             }
-            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
+            val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompat(leadingWhite = false)) {
                 group("hits").toInt()
-            } ?: error("No hits number found in ender slayer name '${armorStandHits.name.formattedTextCompatLessResets()}'")
+            } ?: error("No hits number found in ender slayer name '${armorStandHits.name.formattedTextCompat(leadingWhite = false)}'")
 
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }

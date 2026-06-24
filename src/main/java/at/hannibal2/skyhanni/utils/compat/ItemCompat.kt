@@ -18,8 +18,9 @@ fun SafeItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
 
 fun SafeItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
-    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }
-        .toMutableList()
+    return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map {
+        it.formattedTextCompat(extraResets = true, leadingWhite = false)
+    }.toMutableList()
 }
 
 fun Item.getIdentifierString(): String {

@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
@@ -125,7 +125,7 @@ object AgathaCouponProfit {
             val internalName = item.getInternalNameOrNull() ?: return null
             internalName to item.repoItemName.asComponent()
         } else {
-            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) ?: return null
+            val internalName = NeuInternalName.fromItemNameOrNull(item.hoverName.formattedTextCompat()) ?: return null
             internalName to item.hoverName
         }
     }
@@ -146,7 +146,7 @@ object AgathaCouponProfit {
                 ErrorManager.logErrorStateWithData(
                     "Error in AnitaCoupon Profit", "Could not read item amount",
                     "rawItemName" to rawItemName,
-                    "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "name" to item.hoverName.formattedTextCompat(),
                     "lore" to lore,
                 )
                 continue

@@ -39,7 +39,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.api.ApiUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
@@ -169,7 +169,7 @@ object BazaarApi {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val item = event.item ?: return
-        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = item.hoverName.formattedTextCompat()
         if (isBazaarOrderInventory(InventoryUtils.openInventoryName())) {
             val internalName = item.getInternalNameOrNull() ?: return
             if (itemName.contains("SELL")) {
@@ -198,16 +198,16 @@ object BazaarApi {
     private fun getOpenedProduct(inventoryItems: Map<Int, SafeItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
-        if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
+        if (buyInstantly.hoverName.formattedTextCompat() != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompat())
     }
 
     private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {
         val sellInstantly = inventoryItems[11] ?: return
 
-        if (sellInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§6Sell Instantly") return
+        if (sellInstantly.hoverName.formattedTextCompat() != "§6Sell Instantly") return
         taxPattern.firstMatcher(sellInstantly.getLore()) {
             taxRate = group("tax").formatDouble()
         }
@@ -238,7 +238,7 @@ object BazaarApi {
                 continue
             }
 
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == currentSearchedItem) {
+            if (stack.hoverName.formattedTextCompat().removeColor() == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

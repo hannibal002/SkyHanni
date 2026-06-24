@@ -16,8 +16,9 @@ import at.hannibal2.skyhanni.utils.MobUtils.takeNonDefault
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityHelmet
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.LivingEntity
@@ -64,7 +65,10 @@ object IslandExceptions {
     ) = when {
         baseEntity is Zombie &&
             armorStand != null &&
-            (armorStand.name.formattedTextCompatLessResets() == "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿" || armorStand.name.formattedTextCompatLessResets() == "§3§lWatchful Eye§r") ->
+            armorStand.name.formattedTextCompat(leadingWhite = false).equalsOneOf(
+                "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿",
+                "§3§lWatchful Eye§r",
+            ) ->
             MobData.MobResult.found(
                 MobFactories.special(baseEntity, armorStand.cleanName(), armorStand),
             )
@@ -72,22 +76,26 @@ object IslandExceptions {
         baseEntity is CaveSpider -> MobUtils.getClosestArmorStand(baseEntity, 2.0).takeNonDefault()
             .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "Shadow Assassin" ->
+        baseEntity is RemotePlayer &&
+            baseEntity.isNpc() &&
+            baseEntity.name.formattedTextCompat(leadingWhite = false) == "Shadow Assassin" ->
             MobUtils.getClosestArmorStandWithName(baseEntity, 3.0, "Shadow Assassin")
                 .makeMobResult { MobFactories.dungeon(baseEntity, it) }
 
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "The Professor" ->
+        baseEntity is RemotePlayer &&
+            baseEntity.isNpc() &&
+            baseEntity.name.formattedTextCompat(leadingWhite = false) == "The Professor" ->
             MobUtils.getArmorStand(baseEntity, 9)
                 .makeMobResult { MobFactories.boss(baseEntity, it) }
 
         baseEntity is RemotePlayer &&
             baseEntity.isNpc() &&
             (nextEntity is Giant || nextEntity == null) &&
-            baseEntity.name.formattedTextCompatLessResets().contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
-            ?.takeIf { getNextEntity(it, -1)?.takeIf { entity -> entity.name.formattedTextCompatLessResets().contains("Livid") } == null }
+            baseEntity.name.formattedTextCompat(leadingWhite = false).contains("Livid") -> MobUtils.getArmorStand(baseEntity, 10)
+            ?.takeIf { !getNextEntity(it, -1)?.name.formattedTextCompat(leadingWhite = false).contains("Livid") }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
-        baseEntity is IronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.formattedTextCompatLessResets().orEmpty()) ->
+        baseEntity is IronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.formattedTextCompat(leadingWhite = false)) ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
 
         else -> null
@@ -117,7 +125,9 @@ object IslandExceptions {
         baseEntity is Slime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.BOSS, armorStand, name = "Bacte"))
 
-        baseEntity is RemotePlayer && baseEntity.isNpc() && baseEntity.name.formattedTextCompatLessResets() == "Branchstrutter " ->
+        baseEntity is RemotePlayer &&
+            baseEntity.isNpc() &&
+            baseEntity.name.formattedTextCompat(leadingWhite = false) == "Branchstrutter " ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DISPLAY_NPC, name = "Branchstrutter"))
 
         else -> null
@@ -128,7 +138,7 @@ object IslandExceptions {
         armorStand: ArmorStand?,
         nextEntity: LivingEntity?,
     ) = when {
-        baseEntity is Slime && MobFilter.heavyPearlPattern.matches(armorStand?.name.formattedTextCompatLessResets()) ->
+        baseEntity is Slime && MobFilter.heavyPearlPattern.matches(armorStand?.name.formattedTextCompat(leadingWhite = false)) ->
             MobData.MobResult.found(MobFactories.special(baseEntity, "Heavy Pearl"))
 
         baseEntity is Pig && nextEntity is Pig -> MobData.MobResult.illegal // Matriarch Tongue
@@ -193,7 +203,7 @@ object IslandExceptions {
         baseEntity is Ocelot &&
             armorStand?.isDefaultValue() == false &&
             // TODO fix pattern
-            armorStand.name.formattedTextCompatLessResets().startsWith("§8[§7Lv155§8] §cAzrael§r") ->
+            armorStand.name.formattedTextCompat(leadingWhite = false).startsWith("§8[§7Lv155§8] §cAzrael§r") ->
             MobUtils.getArmorStand(baseEntity, 1)
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
 
@@ -202,7 +212,7 @@ object IslandExceptions {
                 .makeMobResult { MobFactories.basic(baseEntity, it) }
 
         baseEntity is RemotePlayer &&
-            baseEntity.name.formattedTextCompatLessResets()
+            baseEntity.name.formattedTextCompat(leadingWhite = false)
                 .let { it == "Minos Champion" || it == "Minos Inquisitor" || it == "Minotaur " } &&
             armorStand != null ->
             MobUtils.getArmorStand(baseEntity, 2)
@@ -210,7 +220,7 @@ object IslandExceptions {
 
         baseEntity is Zombie &&
             armorStand?.isDefaultValue() == true &&
-            MobUtils.getNextEntity(baseEntity, 4)?.name.formattedTextCompatLessResets().startsWith("§e") ->
+            MobUtils.getNextEntity(baseEntity, 4)?.name.formattedTextCompat(leadingWhite = false).startsWith("§e") ->
             petCareHandler(baseEntity)
 
         baseEntity is Zombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
@@ -249,7 +259,7 @@ object IslandExceptions {
         val armorStand = MobUtils.getArmorStand(baseEntity, 2)
         return when {
             baseEntity is MagmaCube &&
-                MobFilter.jerryMagmaCubePattern.matches(armorStand?.name.formattedTextCompatLessResets()) ->
+                MobFilter.jerryMagmaCubePattern.matches(armorStand?.name.formattedTextCompat(leadingWhite = false)) ->
                 MobData.MobResult.found(Mob(baseEntity, MobCategory.BOSS, armorStand, "Jerry Magma Cube"))
 
             else -> null

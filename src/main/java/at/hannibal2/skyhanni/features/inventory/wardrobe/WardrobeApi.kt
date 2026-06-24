@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import kotlin.time.Duration.Companion.milliseconds
@@ -99,7 +99,7 @@ object WardrobeApi {
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
-                add("  §7- ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}: §6${price.shortFormat()}")
+                add("  §7- ${stack.hoverName.formattedTextCompat()}: §6${price.shortFormat()}")
                 totalPrice += price
             }
         }
@@ -154,7 +154,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompat())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -197,7 +197,7 @@ object WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
+                        slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompat()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }

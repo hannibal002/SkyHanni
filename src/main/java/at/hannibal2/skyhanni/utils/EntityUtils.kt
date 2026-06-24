@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.client.Minecraft
@@ -93,9 +93,9 @@ object EntityUtils {
     ): List<ArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.name.formattedTextCompatLessResets().contains(contains)
+            val result = it.name.formattedTextCompat(leadingWhite = false).contains(contains)
             if (debugWrongEntity && !result) {
-                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name.formattedTextCompatLessResets() + "'")
+                ChatUtils.consoleLog("wrong entity in aabb: '" + it.name.formattedTextCompat(leadingWhite = false) + "'")
             }
             if (debugRightEntity && result) {
                 ChatUtils.consoleLog("mob: " + center.printWithAccuracy(2))

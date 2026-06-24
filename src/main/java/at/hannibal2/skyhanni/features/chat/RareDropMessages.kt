@@ -163,7 +163,9 @@ object RareDropMessages {
         if (anyRecentMessage && config.enchantedBook) {
             ChatManager.editMessage(
                 replacement = {
-                    it.formattedTextCompat().replace("Enchanted Book", internalName.repoItemName).asComponent()
+                    it.formattedTextCompat(extraResets = true, leadingWhite = false)
+                        .replace("Enchanted Book", internalName.repoItemName)
+                        .asComponent()
                 },
                 reason = "enchanted book",
             ) { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.chatMessage) }

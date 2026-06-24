@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -115,7 +115,8 @@ object MobFactories {
             additionalEntities = listOf(clickArmorStand),
         )
 
-    fun player(baseEntity: LivingEntity): Mob = Mob(baseEntity, MobCategory.PLAYER, name = baseEntity.name.formattedTextCompatLessResets())
+    fun player(baseEntity: LivingEntity): Mob =
+        Mob(baseEntity, MobCategory.PLAYER, name = baseEntity.name.formattedTextCompat(leadingWhite = false))
     fun projectile(baseEntity: LivingEntity, name: String): Mob =
         Mob(baseEntity = baseEntity, category = MobCategory.PROJECTILE, name = name)
 

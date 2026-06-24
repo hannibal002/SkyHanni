@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.util.TreeSet
@@ -225,7 +224,7 @@ object CFApi {
     fun getNextLevelName(stack: SafeItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
         val isEmployee = stack.getLore().any { it == "§8Employee" }
         val upgradeName = if (!isEmployee) groupOrNull("upgradename")
-        else employeeNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+        else employeeNamePattern.matchMatcher(stack.hoverName.formattedTextCompat()) {
             groupOrNull("employee")
         }
         val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
@@ -292,7 +291,7 @@ object CFApi {
 
     fun partyModeReplace(text: Component): Component {
         return if (config.partyMode.get() && inChocolateFactory && chromaEnabled) {
-            text.formattedTextCompat().replace(partyModeRegex, "§z").asComponent()
+            text.formattedTextCompat(extraResets = true, leadingWhite = false).replace(partyModeRegex, "§z").asComponent()
         } else text
     }
 

@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
@@ -108,7 +108,7 @@ object VisitorListener {
 
         val visitorOffer = VisitorApi.VisitorOffer(offerItem)
 
-        var name = npcItem.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        var name = npcItem.hoverName.formattedTextCompat()
         if (name.length == name.removeColor().length + 4) {
             name = name.substring(2)
         }

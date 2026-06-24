@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -127,7 +127,7 @@ object CFCustomReminder {
                 missing to "§6${amount.shortFormat()} Chocolate Milestone"
             }
 
-        val nextLevelName = CFApi.getNextLevelName(item) ?: item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val nextLevelName = CFApi.getNextLevelName(item) ?: item.hoverName.formattedTextCompat()
         return cost to nextLevelName
     }
 

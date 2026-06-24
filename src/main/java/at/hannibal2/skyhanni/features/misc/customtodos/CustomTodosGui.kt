@@ -42,7 +42,7 @@ object CustomTodosGui {
         todos.forEach { todo ->
             if (todo.triggerTarget != CustomTodo.TriggerTarget.TAB_LIST) return@forEach
             event.tabList.forEach { line ->
-                if (matchString(todo, line.formattedTextCompat())) todo.setDoneNow()
+                if (matchString(todo, line.formattedTextCompat(extraResets = true, leadingWhite = false))) todo.setDoneNow()
             }
         }
     }

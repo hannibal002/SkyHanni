@@ -36,7 +36,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isWool
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat
 import at.hannibal2.skyhanni.utils.compat.EffectsCompat.Companion.activePotionEffect
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -68,7 +68,7 @@ object DungeonLividFinder {
             .filterTo(mutableListOf()) {
                 it.isNpc() &&
                     (
-                        lividNamePattern.matches(it.name.formattedTextCompatLessResets()) ||
+                        lividNamePattern.matches(it.name.formattedTextCompat(leadingWhite = false)) ||
                             lividTextureToColor.containsKey(it.getSkinTexture())
                         )
             }
@@ -129,7 +129,7 @@ object DungeonLividFinder {
 
         for (entity in lividEntities) {
             val lividColor = entity.getLividColor() ?: run {
-                lividNamePattern.matchMatcher(entity.name.formattedTextCompatLessResets()) {
+                lividNamePattern.matchMatcher(entity.name.formattedTextCompat(leadingWhite = false)) {
                     val name = group("name")
                     val nameColor = lividNameToColor[name] ?: return@matchMatcher
                     val texture = entity.getSkinTexture() ?: return@matchMatcher
@@ -206,7 +206,7 @@ object DungeonLividFinder {
         if (livid == null) return // in case livid detection fails, don't hide anything
         if (event.entity is RemotePlayer && event.entity in fakeLivids) event.cancel()
         if (event.entity is ArmorStand) {
-            lividArmorStandNamePattern.matchMatcher(event.entity.name.formattedTextCompatLessResets()) {
+            lividArmorStandNamePattern.matchMatcher(event.entity.name.formattedTextCompat(leadingWhite = false)) {
                 val colorChar = group("colorCode")[0]
 
                 if (colorChar.toLorenzColor() != color) event.cancel()
@@ -218,7 +218,7 @@ object DungeonLividFinder {
 
     private fun RemotePlayer.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
-        return name.formattedTextCompatLessResets().startsWith("$chatColor﴾ $chatColor§lLivid")
+        return name.formattedTextCompat(leadingWhite = false).startsWith("$chatColor﴾ $chatColor§lLivid")
     }
 
     private fun RemotePlayer.getLividColor(): LorenzColor? {
@@ -329,7 +329,7 @@ object DungeonLividFinder {
             add("inBoss: ${inLividBossRoom()}")
             add("isBlind: $isBlind")
             add("blockColor: ${blockLocation.getBlockStateAt()}")
-            add("livid: '${livid?.name.formattedTextCompatLessResets()}'")
+            add("livid: '${livid?.name.formattedTextCompat(leadingWhite = false)}'")
             add("color: '${color?.name}'")
             add("lividTextureToColor:")
             for ((key, value) in lividTextureToColor) add("  $value: $key")

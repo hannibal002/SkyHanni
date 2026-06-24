@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
@@ -38,7 +38,7 @@ object PetExpTooltip {
 
         val itemStack = event.itemStack
         val petExperience = itemStack.getPetInfo()?.exp?.roundTo(1) ?: return
-        val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val name = itemStack.hoverName.formattedTextCompat()
         try {
             val index = findIndex(event.toolTip) ?: return
             val fixedIndex = if (index > event.toolTip.size) {

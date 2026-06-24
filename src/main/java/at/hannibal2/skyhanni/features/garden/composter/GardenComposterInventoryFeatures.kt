@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 
@@ -50,7 +50,9 @@ object GardenComposterInventoryFeatures {
             if (next) {
                 if (line.string.endsWith(" Copper")) continue
                 if (line.string == "") break
-                val (itemName, amount) = ItemUtils.readItemAmount(line.formattedTextCompatLessResets().removePrefix("§5")) ?: run {
+                val (itemName, amount) = ItemUtils.readItemAmount(
+                    line.formattedTextCompat(leadingWhite = false).removePrefix("§5"),
+                ) ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Error reading item line",
                         "could not read item line",

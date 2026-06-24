@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.getPlayerNames
 import at.hannibal2.skyhanni.utils.compat.getSidebarObjective
 import net.minecraft.ChatFormatting
@@ -37,9 +36,11 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String
-        get() =
-            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()
+    val objectiveTitle: String get() = MinecraftCompat.localWorldOrNull
+        ?.scoreboard
+        ?.getSidebarObjective()
+        ?.displayName
+        .formattedTextCompat(extraResets = true, leadingWhite = false)
 
     private var dirty = false
 
@@ -99,7 +100,7 @@ object ScoreboardData {
                 if (type != ObjectiveCriteria.RenderType.INTEGER) return
                 val objectiveName = packet.objectiveName
                 if (objectiveName == "health") return
-                val objectiveValue = packet.displayName.formattedTextCompat()
+                val objectiveValue = packet.displayName.formattedTextCompat(extraResets = true, leadingWhite = false)
                 ScoreboardTitleUpdateEvent(objectiveValue, objectiveName).post()
             }
         }
@@ -156,7 +157,7 @@ object ScoreboardData {
         val objective = scoreboard.getSidebarObjective() ?: return emptyList()
         val scores = scoreboard.listPlayerScores(objective)
         val list = scores.getPlayerNames(scoreboard)
-        return list.map { it.formattedTextCompatLessResets() }
+        return list.map { it.formattedTextCompat(leadingWhite = false) }
     }
 
     /**

@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.Entity
@@ -65,7 +65,7 @@ object DungeonHideItems {
         val head = entity.getStandHelmet()
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
-            if (entity.name.formattedTextCompatLessResets().startsWith("§9Superboom TNT")) {
+            if (entity.name.formattedTextCompat(leadingWhite = false).startsWith("§9Superboom TNT")) {
                 event.cancel()
             }
 
@@ -76,7 +76,7 @@ object DungeonHideItems {
         }
 
         if (config.hideBlessing) {
-            if (entity.name.formattedTextCompatLessResets().startsWith("§dBlessing of ")) {
+            if (entity.name.formattedTextCompat(leadingWhite = false).startsWith("§dBlessing of ")) {
                 event.cancel()
             }
 
@@ -86,7 +86,7 @@ object DungeonHideItems {
         }
 
         if (config.hideReviveStone) {
-            if (entity.name.formattedTextCompatLessResets() == "§6Revive Stone") {
+            if (entity.name.formattedTextCompat(leadingWhite = false) == "§6Revive Stone") {
                 event.cancel()
             }
 
@@ -97,7 +97,7 @@ object DungeonHideItems {
         }
 
         if (config.hidePremiumFlesh) {
-            if (entity.name.formattedTextCompatLessResets() == "§9Premium Flesh") {
+            if (entity.name.formattedTextCompat(leadingWhite = false) == "§9Premium Flesh") {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }
@@ -118,9 +118,9 @@ object DungeonHideItems {
 
         if (config.hideHealerOrbs) {
             when {
-                entity.name.formattedTextCompatLessResets().startsWith("§c§lDAMAGE §e") -> event.cancel()
-                entity.name.formattedTextCompatLessResets().startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
-                entity.name.formattedTextCompatLessResets().startsWith("§a§lDEFENSE §e") -> event.cancel()
+                entity.name.formattedTextCompat(leadingWhite = false).startsWith("§c§lDAMAGE §e") -> event.cancel()
+                entity.name.formattedTextCompat(leadingWhite = false).startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
+                entity.name.formattedTextCompat(leadingWhite = false).startsWith("§a§lDEFENSE §e") -> event.cancel()
             }
 
             when (skullTexture) {

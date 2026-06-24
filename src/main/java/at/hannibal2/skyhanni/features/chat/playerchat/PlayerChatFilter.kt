@@ -14,7 +14,7 @@ object PlayerChatFilter {
     private val filters = mutableMapOf<String, MultiFilter>()
 
     fun shouldChatFilter(original: Component): Boolean {
-        val message = original.formattedTextCompat().lowercase()
+        val message = original.formattedTextCompat(extraResets = true, leadingWhite = false).lowercase()
         for (filter in filters) {
             filter.value.matchResult(message)?.let {
                 return true

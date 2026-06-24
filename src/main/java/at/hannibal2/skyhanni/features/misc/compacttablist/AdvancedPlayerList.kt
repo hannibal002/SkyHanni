@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.flow.merge
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -71,7 +70,7 @@ object AdvancedPlayerList {
         var i = 0
 
         for (component in original) {
-            val line = component.formattedTextCompat()
+            val line = component.formattedTextCompat(extraResets = true, leadingWhite = false)
             i++
             if (i == 1) continue
             if (line.isEmpty() || line.contains("Server Info")) break

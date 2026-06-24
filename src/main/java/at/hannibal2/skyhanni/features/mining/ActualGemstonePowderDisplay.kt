@@ -194,7 +194,12 @@ object ActualGemstonePowderDisplay {
             if (upgradeDrill > 0) drillFactors.add(SimpleFactor("Goblin Egg", upgradeDrill / 100.0))
 
             if (drillFactors.isNotEmpty()) {
-                hotmFactors.add(AdditiveFactor(heldItem.displayName.formattedTextCompat(), factors = drillFactors))
+                hotmFactors.add(
+                    AdditiveFactor(
+                        heldItem.displayName.formattedTextCompat(extraResets = true, leadingWhite = false),
+                        factors = drillFactors,
+                    ),
+                )
             }
         }
 

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 // scoreboard
 // widget update event
 object ScoreboardEventBroodmother : ScoreboardEvent() {
-    override fun getDisplay() = TabWidget.BROODMOTHER.lines.map { it.formattedTextCompat().trim() }
+    override fun getDisplay() = TabWidget.BROODMOTHER.lines.map { it.formattedTextCompat(extraResets = true, leadingWhite = false).trim() }
 
     override val configLine = "Broodmother§7: §eDormant"
 
