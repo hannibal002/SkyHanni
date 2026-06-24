@@ -65,14 +65,6 @@ object ElectionApi {
     )
 
     /**
-     * REGEX-TEST: Calendar and Events
-     */
-    val calendarGuiPattern by group.pattern(
-        "calendar.gui",
-        "Calendar and Events",
-    )
-
-    /**
      * REGEX-TEST: §dMayor Jerry
      * REGEX-TEST: §cMayor Aatrox
      */
@@ -176,8 +168,7 @@ object ElectionApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-
-        if (!calendarGuiPattern.matches(event.inventoryName)) return
+        if (!CalenderApi.inCalender) return
 
         val stack: SafeItemStack = event.inventoryItems.values.firstOrNull {
             mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
