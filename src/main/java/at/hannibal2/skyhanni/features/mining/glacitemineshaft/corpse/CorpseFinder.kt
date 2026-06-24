@@ -42,7 +42,7 @@ object CorpseFinder {
     private var totalCorpseCount = 0
 
     fun allCorpsesFound(): Boolean {
-        return SkyBlockUtils.currentIsland != IslandType.MINESHAFT &&
+        return SkyBlockUtils.currentIsland == IslandType.MINESHAFT &&
             totalCorpseCount > 0 &&
             totalCorpseCount == corpseEntities.size &&
             corpseEntities.all { it.value }
