@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SafeItemStackUtils.componentsLoaded
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 
 /**
@@ -39,7 +38,6 @@ object SafeItemStackUtils {
     @JvmStatic
     fun getUniqueIdentifier(item: SafeItemStack): Int {
         item.getItemUuid()?.let { return it.hashCode() }
-        item.getItemId()?.let { return it.hashCode() }
         return SafeItemStack.hashItemAndComponents(item)
     }
 }
