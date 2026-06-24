@@ -248,6 +248,7 @@ object CopyNearbyEntitiesCommand {
     }
 
 
+    @Suppress("UnnecessarySafeCall")
     private fun MutableList<String>.addDisplayEntity(entity: Display) {
         add("EntityDisplay:")
         val rotation = entity.lookAngle

@@ -515,6 +515,12 @@ class MiscConfig {
     var achievementMessages: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var giftCleanDisplay: Boolean = false
+
+    @Expose
     @ConfigOption(
         name = "Copy Information To Clipboard",
         desc = "Automatically copy information related to skyhanni features you use to your clipboard. " +
