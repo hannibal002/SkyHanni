@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import net.minecraft.nbt.CompoundTag
 import kotlin.time.Duration.Companion.minutes
@@ -46,10 +49,17 @@ data class CachedItemData(
 ) {
     companion object {
         private val cache = TimeAndSizeLimitedCache<Int, CachedItemData>(1_000_000, expireAfterWrite = 2.minutes)
-        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(SafeItemStack.hashItemAndComponents(this)) { CachedItemData() }
+        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(hashItem(this)) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
             cache.map { action(it.value) }
+        }
+
+        // TODO: We can probably cache item uuid and item id directly in SafeItemStack
+        private fun hashItem(item: SafeItemStack): Int {
+            item.getItemUuid()?.let { return it.hashCode() }
+            item.getItemId()?.let { return it.hashCode() }
+            return SafeItemStack.hashItemAndComponents(item)
         }
     }
 }
