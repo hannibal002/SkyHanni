@@ -169,7 +169,6 @@ object TrevorFeatures {
             currentLabel = "§cActive Quest"
             trapperReady = false
             TrevorTracker.startQuest(this)
-            updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
