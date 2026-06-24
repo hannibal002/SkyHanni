@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getUniqueId
 import at.hannibal2.skyhanni.utils.collection.TimeAndSizeLimitedCache
 import net.minecraft.nbt.CompoundTag
 import kotlin.time.Duration.Companion.minutes
@@ -46,13 +46,10 @@ data class CachedItemData(
 ) {
     companion object {
         private val cache = TimeAndSizeLimitedCache<Int, CachedItemData>(1_000_000, expireAfterWrite = 2.minutes)
-        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(hashItem(this)) { CachedItemData() }
+        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(this.getUniqueId()) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
             cache.map { action(it.value) }
         }
-
-        private fun hashItem(item: SafeItemStack): Int =
-            (item as ItemStackCachedData).skyhanni_uniqueId
     }
 }
