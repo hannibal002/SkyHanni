@@ -55,7 +55,7 @@ class ModuleProcessor(
         val dirtyCount = symbols.count { it.containingFile?.filePath in (dirtyFilePaths ?: emptySet()) }
         val cachedCount = symbols.size - dirtyCount
         println(
-            "Found ${symbols.size.withPlural("symbol")} with @SkyHanniModule for mc $mcVersion " +
+            "Found ${symbols.size.withPlural("symbol")} with @SkyHanniModule for Minecraft $mcVersion " +
                 "($dirtyCount revalidated, $cachedCount from cache)",
         )
 
