@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 class CorpseFoundEvent(
     val corpseType: CorpseType,
     val location: LorenzVec,
-    val allCorpsesFound: Boolean,
+    val isLastCorpse: Boolean,
 ) : SkyHanniEvent()
 
 /**

@@ -41,7 +41,7 @@ object CorpseFinder {
     private val corpseEntities = mutableMapOf<ArmorStand, Boolean>()
     private var totalCorpseCount = 0
 
-    fun allCorpsesFound(): Boolean {
+    fun areAllCorpsesFound(): Boolean {
         return SkyBlockUtils.currentIsland == IslandType.MINESHAFT &&
             totalCorpseCount > 0 &&
             totalCorpseCount == corpseEntities.size &&
@@ -66,7 +66,7 @@ object CorpseFinder {
             val corpseType = CorpseType.fromHelmetOrNull(helmetInternalName) ?: continue
 
             corpseEntities[entity] = true
-            CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), allCorpsesFound()).post()
+            CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
         }
     }
 
