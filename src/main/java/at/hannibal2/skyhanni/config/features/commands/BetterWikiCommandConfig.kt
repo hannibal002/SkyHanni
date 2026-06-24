@@ -17,14 +17,14 @@ class BetterWikiCommandConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Boolean = false
+    var enabled: Boolean = true
 
     // TODO Make this method not suck
     @Expose
     @ConfigOption(name = "SkyBlock Guide", desc = "Use SkyHanni's method in the SkyBlock Guide.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var sbGuide: Boolean = false
+    var skyblockGuide: Boolean = false
 
     @Expose
     @ConfigOption(
