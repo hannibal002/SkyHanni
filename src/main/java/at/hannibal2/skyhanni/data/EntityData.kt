@@ -22,6 +22,7 @@ object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds, useWeakKeys = true)
+    // The Component key is owned by an entity render state
     private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds, useWeakKeys = true)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
