@@ -287,9 +287,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
-        if (trevorTexture != null &&
-            event.entity.getSkinTexture() == trevorTexture
-        ) {
+        if (trevorTexture != null && event.entity.getSkinTexture() == trevorTexture) {
             trevorEntity = event.entity
         }
     }
