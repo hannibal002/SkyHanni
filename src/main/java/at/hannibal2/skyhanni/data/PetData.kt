@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import com.google.gson.annotations.Expose
 import java.util.UUID
@@ -84,6 +86,8 @@ data class PetData(
         append(coloredName)
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
+
+    fun getItemStackOrNull(): SafeItemStack? = petInternalName.getItemStackOrNull()
 
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
