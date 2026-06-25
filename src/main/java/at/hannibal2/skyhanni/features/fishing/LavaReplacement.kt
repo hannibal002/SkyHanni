@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluid
 import net.minecraft.world.level.material.Fluids
 
 //? if >= 26.1 {
+import at.hannibal2.skyhanni.mixins.hooks.FluidModelTransparencyOverride.Companion.transparency
 import com.mojang.blaze3d.platform.Transparency
 import net.minecraft.client.renderer.block.FluidModel
 import net.minecraft.client.renderer.block.FluidStateModelSet
