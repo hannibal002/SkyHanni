@@ -22,8 +22,8 @@ object PhantomleafSolver {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
 
-    private val GREENHOUSE_PLOT_LENGTH = 10;
-    private val MUTATION_Y_LEVEL = 74.0;
+    private const val GREENHOUSE_PLOT_LENGTH = 10
+    private const val MUTATION_Y_LEVEL = 74.0
 
     private var isSearchingForPhantomleaf = false
 
