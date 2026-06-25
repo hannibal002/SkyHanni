@@ -88,7 +88,7 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                                 §r§9§lTREE GIFT
+     * WRAPPED-REGEX-TEST: "                                §r§9§lTREE GIFT"
      */
     val giftHeaderPattern by patternGroup.pattern(
         "header",
@@ -96,9 +96,9 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                  §r§7You helped cut §r§a100% §r§7of the §r§aFig Tree§r§7.
-     * REGEX-TEST:              §r§7You helped cut §r§a100% §r§7of the §r§aMangrove Tree§r§7.
-     * REGEX-TEST:                  §r§7You helped cut §r§c15.2% §r§7of the §r§aFig Tree§r§7.
+     * WRAPPED-REGEX-TEST: "                 §r§7You helped cut §r§a100% §r§7of the §r§aFig Tree§r§7."
+     * WRAPPED-REGEX-TEST: "             §r§7You helped cut §r§a100% §r§7of the §r§aMangrove Tree§r§7."
+     * WRAPPED-REGEX-TEST: "                 §r§7You helped cut §r§c15.2% §r§7of the §r§aFig Tree§r§7."
      */
     val percentageContributedPattern by patternGroup.pattern(
         "contribution-percentage",
@@ -107,7 +107,7 @@ object ForagingTrackerLegacy {
 
     /**
      * REGEX-TEST: §f                       §e+5 rewards gained! §8(hover)
-     * REGEX-TEST:                             §r§e+0 rewards gained!
+     * WRAPPED-REGEX-TEST: "                            §r§e+0 rewards gained!"
      */
     val rewardsGainedPattern by patternGroup.pattern(
         "rewards-gained",
@@ -132,7 +132,7 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                                 §r§d§lBONUS GIFT
+     * WRAPPED-REGEX-TEST: "                                §r§d§lBONUS GIFT"
      */
     val bonusGiftSeparatorPattern by patternGroup.pattern(
         "bonus-gift.separator",
@@ -140,15 +140,15 @@ object ForagingTrackerLegacy {
     )
 
     /**
-     * REGEX-TEST:                           §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)
-     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
-     * REGEX-TEST:           §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)
-     * REGEX-TEST:                            §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)
-     * REGEX-TEST:                     §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)
-     * REGEX-TEST:                   §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)
-     * REGEX-TEST:                           §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)
-     * REGEX-TEST:                             §r§6Chameleon §r§8(§r§a0.08%§r§8)
-     * REGEX-FAIL:                      §r§7A §r§dPhanflare §r§7fell from the Tree!
+     * WRAPPED-REGEX-TEST: "                          §r§7§r§aStretching Sticks §r§8(§r§a20%§r§8)"
+     * WRAPPED-REGEX-TEST: "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
+     * WRAPPED-REGEX-TEST: "          §r§7§r§aEnchanted Book (§r§d§lFirst Impression I§r§a) §r§8(§r§a0.4%§r§8)"
+     * WRAPPED-REGEX-TEST: "                           §r§7§r§fSweep Booster §r§8(§r§a1%§r§8)"
+     * WRAPPED-REGEX-TEST: "                    §r§7§r§fForaging Wisdom Booster §r§8(§r§a0.5%§r§8)"
+     * WRAPPED-REGEX-TEST: "                  §r§7§r§aEnchanted Book (§r§d§lMissile I§r§a) §r§8(§r§a0.2%§r§8)"
+     * WRAPPED-REGEX-TEST: "                          §r§7§r§cTree the Fish §r§8(§r§a0.05%§r§8)"
+     * WRAPPED-REGEX-TEST: "                            §r§6Chameleon §r§8(§r§a0.08%§r§8)"
+     * WRAPPED-REGEX-FAIL: "                     §r§7A §r§dPhanflare §r§7fell from the Tree!"
      */
     val bonusGiftRewardPattern by patternGroup.pattern(
         "bonus-gift.reward",
