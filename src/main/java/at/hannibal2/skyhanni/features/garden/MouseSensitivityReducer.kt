@@ -57,13 +57,18 @@ object MouseSensitivityReducer {
 
         teleportPattern.matchMatchers(event.cleanMessage) {
             if (config.unlockOnTeleport.condition(group("plot"))) {
-                val message = if (manualState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
-                else "Mouse rotation has been unlocked because you teleported."
+                val oldState = manualState
 
                 manualState = null
                 update()
 
-                if (config.chatMessage) ChatUtils.notifyOrDisable(message, config::unlockOnTeleport, messageId = MESSAGE_ID)
+                if (config.chatMessage)
+                    ChatUtils.notifyOrDisable(
+                        if (oldState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
+                        else "Mouse rotation has been unlocked because you teleported.",
+                        config::unlockOnTeleport,
+                        messageId = MESSAGE_ID,
+                    )
             }
         }
     }
