@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -26,13 +27,13 @@ object BazaarCancelledBuyOrderClipboard {
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
     /**
-     * REGEX-TEST: §6§7from §a50§7x §7missing items.
-     * REGEX-TEST: §7§a22§7x §7missing items.
-     * REGEX-TEST: §6coins §7from §a2,000§7x §7missing items.
+     * REGEX-TEST: from 50x missing items.
+     * REGEX-TEST: 22x missing items.
+     * REGEX-TEST: coins from 2,000x missing items.
      */
     private val lastAmountPattern by patternGroup.pattern(
-        "lastamount",
-        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\.",
+        "lastamount.colorless",
+        "(?:coins from |from |)(?<amount>.*)x missing items\\.",
     )
     private val cancelledMessagePattern by patternGroup.pattern(
         "cancelledmessage",
@@ -52,14 +53,14 @@ object BazaarCancelledBuyOrderClipboard {
         val stack = event.inventoryItems[11] ?: return
         if (!stack.hoverName.string.contains("Cancel Order")) return
 
-        val lore = stack.getLore()
+        val lore = stack.getLore().map { it.removeColor() }
         lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
         }
 
         // nothing to cancel
-        if (lore.firstOrNull() == "§7Cannot cancel order while there are") {
+        if (lore.firstOrNull() == "Cannot cancel order while there are") {
             return
         }
 
