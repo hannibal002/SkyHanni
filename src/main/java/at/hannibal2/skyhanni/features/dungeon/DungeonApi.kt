@@ -87,7 +87,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     * WRAPPED-REGEX-TEST: "                                 Master Mode The Catacombs - Floor V"
      */
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",

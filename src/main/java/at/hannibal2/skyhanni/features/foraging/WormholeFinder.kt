@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -104,8 +103,10 @@ object WormholeFinder {
     }
 
     private fun Display.TextDisplay.arrowForwardVec(): LorenzVec? {
+        val renderState = renderState() ?: return null
+        val transformation = renderState.transformation().get(0f)
         //~ if < 26.1 'leftRotation()' -> 'leftRotation'
-        val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return null
+        val quat = transformation.leftRotation()
         val localY = Vector3f(0f, 1f, 0f)
         quat.transform(localY)
         return LorenzVec(localY.x.toDouble(), 0.0, localY.z.toDouble()).normalizeOrNull()

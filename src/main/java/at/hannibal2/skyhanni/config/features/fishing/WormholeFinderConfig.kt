@@ -23,7 +23,8 @@ class WormholeFinderConfig {
     enum class LineMode {
         OFF,
         DIRECT,
-        NAVIGATION;
+        NAVIGATION,
+        ;
 
         private val displayName = toFormattedName()
         override fun toString(): String = displayName

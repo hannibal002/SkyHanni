@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.utils
 
+/**
+ * Alternative to [Deprecated] for things that can never be removed due to backwards compatibility reasons
+ * (e.g. item categories that no longer exist but may appear on legacy items).
+ */
 @Retention(AnnotationRetention.BINARY)
 @Target(
     AnnotationTarget.CLASS,
@@ -7,7 +11,6 @@ package at.hannibal2.skyhanni.utils
     AnnotationTarget.PROPERTY,
     AnnotationTarget.FIELD,
 )
-// This class is to replace @Deprecated, which gets flagged by detekt
 annotation class Legacy(
     val message: String,
     val replaceWith: ReplaceWith = ReplaceWith(""),

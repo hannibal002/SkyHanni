@@ -21,7 +21,7 @@ object FossilExcavatorApi {
     private val chatPatternGroup = patternGroup.group("chat")
 
     /**
-     * REGEX-TEST:   §r§6§lEXCAVATION COMPLETE
+     * WRAPPED-REGEX-TEST: "  §r§6§lEXCAVATION COMPLETE"
      */
     private val startPattern by chatPatternGroup.pattern("start", " {2}§r§6§lEXCAVATION COMPLETE ?")
 
@@ -31,7 +31,7 @@ object FossilExcavatorApi {
     private val endPattern by chatPatternGroup.pattern("end", "§a§l▬{64}")
 
     /**
-     * REGEX-TEST:     §r§6Tusk Fossil
+     * WRAPPED-REGEX-TEST: "    §r§6Tusk Fossil"
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
