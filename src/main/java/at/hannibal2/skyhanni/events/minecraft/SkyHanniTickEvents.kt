@@ -49,6 +49,8 @@ class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
  * @see SecondPassedEvent
  */
 @PrimaryFunction("onServerTick")
-class ServerTickEvent(val tick: Long) : SkyHanniEvent() {
-    val timeMark = ServerTimeMark(tick)
+class ServerTickEvent(val tick: Int) : SkyHanniEvent() {
+    fun isMod(i: Int, offset: Int = 0) = (tick + offset) % i == 0
+
+    fun repeatSeconds(i: Int, offset: Int = 0) = isMod(i * 20, offset)
 }
