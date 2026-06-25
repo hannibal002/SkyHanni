@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
