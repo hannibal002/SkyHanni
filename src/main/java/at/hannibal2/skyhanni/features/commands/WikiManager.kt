@@ -33,6 +33,11 @@ object WikiManager {
         event.move(6, "commands.useFandomWiki", "commands.fandomWiki.enabled")
         // Apparently the above got changed again at some point but never got a migration
         event.move(123, "commands.betterWiki.useFandom", "commands.betterWiki.useIndependent")
+
+        event.move(136, "commands.betterWiki.sbGuide", "commands.betterWiki.skyblockGuide", { element ->
+            config.enabled = true
+            return@move element
+        })
     }
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -75,7 +75,10 @@ class DebugConfig {
     var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Copy Cosmetics Skull Data", desc = "Copies the cosmetic data for skins with different variants but no animations.")
+    @ConfigOption(
+        name = "Copy Cosmetics Skull Data",
+        desc = "Copies the cosmetic data for skins with different variants but no animations."
+    )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var copyCosmeticsSkullData: Int = GLFW.GLFW_KEY_UNKNOWN
 

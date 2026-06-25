@@ -24,8 +24,7 @@ object AbstractChatEvent {
     open class Modify(
         val messageComponent: ComponentSpan,
         chatComponent: Component,
-        blockedReason: String? = null,
-    ) : SystemMessageEvent.Modify(messageComponent.getText(), chatComponent, blockedReason) {
+    ) : SystemMessageEvent.Modify(messageComponent.getText(), chatComponent) {
         @Legacy(
             "Use cleanMessage unless you really need color codes",
             replaceWith = ReplaceWith("this.cleanMessage")
