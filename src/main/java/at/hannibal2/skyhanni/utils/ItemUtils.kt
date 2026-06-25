@@ -175,7 +175,7 @@ object ItemUtils {
 
     fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    @Legacy("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
+    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
     fun SafeItemStack.getLore(): List<String> {
         val data = cachedData
         if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
@@ -488,7 +488,7 @@ object ItemUtils {
     private fun getItemCategory(itemCategory: String, name: String, cleanName: String = name.removeColor()) =
         if (itemCategory.isEmpty() || itemCategory == "ITEM") when {
             UtilsPatterns.abiPhonePattern.matches(name) -> ItemCategory.ABIPHONE
-            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.FISHING_BAIT
+            UtilsPatterns.baitPattern.matches(cleanName) -> ItemCategory.BAIT
             UtilsPatterns.enchantedBookPattern.matches(name) -> ItemCategory.ENCHANTED_BOOK
             UtilsPatterns.potionPattern.matches(name) -> ItemCategory.POTION
             UtilsPatterns.sackPattern.matches(name) -> ItemCategory.SACK
@@ -812,7 +812,7 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val testItemMessageId = ChatUtils.getUniqueMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())
