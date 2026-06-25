@@ -215,12 +215,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
-      the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
+    - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
+      after the first build.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -358,8 +359,15 @@ It allows to easily modify methods in Minecraft itself, without conflicting with
 For more information, see https://github.com/SpongePowered/Mixin
 or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
-When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
-possible.
+When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
+The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
+
+### KSP (Kotlin Symbol Processing)
+
+SkyHanni uses KSP via the `annotation-processors` module to generate code at compile time.
+
+- `@SkyHanniModule`: Generates `LoadedModules.kt`, which registers all event handlers and repo patterns automatically.
+- Mixin registration: Scans for `@Mixin`-annotated classes and generates the mixin configuration. There is no manual mixin list to update.
 
 ### Repo
 
