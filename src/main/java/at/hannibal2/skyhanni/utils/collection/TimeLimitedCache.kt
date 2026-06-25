@@ -8,10 +8,12 @@ import kotlin.time.Duration
 @Suppress("UnstableApiUsage")
 class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
+    useWeakKeys: Boolean = false,
     removalListener: ((K?, V?, RemovalCause) -> Unit)? = null,
 ) : CacheMap<K, V>() {
 
     override val cache: Cache<K, V> = buildCache {
+        if (useWeakKeys) weakKeys()
         expireAfterWrite(expireAfterWrite.inWholeNanoseconds, TimeUnit.NANOSECONDS)
         setRemovalListener(removalListener)
     }

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.collection.TimeAndWeakKeyCache
+import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.nbt.CompoundTag
 import kotlin.time.Duration.Companion.minutes
 
@@ -45,7 +45,7 @@ data class CachedItemData(
     var identifier: String? = null,
 ) {
     companion object {
-        private val cache = TimeAndWeakKeyCache<IdentityCharacteristics<SafeItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
+        private val cache = TimeLimitedCache<IdentityCharacteristics<SafeItemStack>, CachedItemData>(expireAfterWrite = 2.minutes, useWeakKeys = true)
         val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
