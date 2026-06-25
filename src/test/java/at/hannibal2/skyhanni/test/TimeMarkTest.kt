@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
 import kotlin.time.Duration.Companion.days
 
 class TimeMarkTest {
@@ -32,5 +32,17 @@ class TimeMarkTest {
     fun `subtracting duration from far past is still far past`() {
         Assertions.assertTrue((SimpleTimeMark.farPast() - farThreshold).isFarPast())
         Assertions.assertTrue((ServerTimeMark.farPast() - farThreshold).isFarPast())
+    }
+
+    @Test
+    fun `adding duration to far future does not overflow`() {
+        Assertions.assertTrue(ServerTimeMark.farFuture() + farThreshold >= ServerTimeMark.farFuture())
+        Assertions.assertTrue(SimpleTimeMark.farFuture() + farThreshold >= SimpleTimeMark.farFuture())
+    }
+
+    @Test
+    fun `adding duration to far future is still far future`() {
+        Assertions.assertTrue((SimpleTimeMark.farFuture() + farThreshold).isFarFuture())
+        Assertions.assertTrue((ServerTimeMark.farFuture() + farThreshold).isFarFuture())
     }
 }
