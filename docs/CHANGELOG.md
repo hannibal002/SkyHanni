@@ -175,6 +175,7 @@
 + Added Harvest Feast rare drops and other missing rare crops to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
 + Refactored Armor Drop Tracker to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
 + Added Include Vacuum to Custom Keybinds. - LukV (https://github.com/hannibal002/SkyHanni/pull/5752)
++ Added enchantment color support to Toolkit Crop Icons. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5872)
 
 #### Combat
 
@@ -241,6 +242,8 @@
 + Fixed SkyHanni incorrectly submitting Harvest Feast, Jacob Contest, and Mining Event data on the alpha server. - Luna (https://github.com/hannibal002/SkyHanni/pull/5860)
 + Fixed Pest Cooldown Warning triggering twice. - Luna (https://github.com/hannibal002/SkyHanni/pull/5879)
 + Fixed some player messages being falsely detected as pest spawns. - Luna (https://github.com/hannibal002/SkyHanni/pull/5839)
++ Fixed Harvest Feast data submission sometimes failing. - Luna (https://github.com/hannibal002/SkyHanni/pull/5831)
++ Fixed Toolkit Crop Icons cache not updating. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5872)
 
 #### Combat
 
@@ -319,6 +322,8 @@
 + Updated trophy fishing detection to only require 2 pieces of Trophy Hunter Armor. - Luna (https://github.com/hannibal002/SkyHanni/pull/5810)
 + Fixed Trophy Fish Display not updating when talking to Odger. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
 + Fixed Trophy Fish Total Caught Tooltip feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
++ Fixed exception thrown while parsing Fishing Bestiary level. - Twarug (https://github.com/hannibal002/SkyHanni/pull/5914)
++ Fixed Sea Creature Tracker error when attempting to migrate outdated sea creature names to new ones. - Luna (https://github.com/hannibal002/SkyHanni/pull/5900)
 
 #### Item
 
@@ -333,6 +338,7 @@
 
 + Fixed Croesus Highlight not working on chests made on a separate game instance. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5322)
 + Fixed Dungeon Clean End feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5386)
++ Fixed Dungeon Finder class and Catacombs level detection. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5910)
 
 #### Foraging
 
@@ -451,6 +457,10 @@
 + Fixed in-world chroma text not rendering properly (especially with Everything Chroma). - Luna (https://github.com/hannibal002/SkyHanni/pull/5863)
 + Fixed Kotlin being bundled in the 26.1 JAR which may have caused compatibility issues with some mods. - Luna (https://github.com/hannibal002/SkyHanni/pull/5828)
 + Fixed minor spelling mistakes. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5875)
++ Fixed error with Lava Replacement when switching lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/5878)
++ Fixed Lava Replacement not working on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5878)
++ Fixed mods that interfere with lava rendering (e.g. IQ Addons) making SkyHanni's Lava Replacement translucent. - Luna (https://github.com/hannibal002/SkyHanni/pull/5878)
++ Fixed Trapper Cooldown often showing as ready up to a second too early. - Luna (https://github.com/hannibal002/SkyHanni/pull/5890)
 
 #### Commands
 
@@ -468,6 +478,8 @@
 + Fixed Glacite Mineshaft pity display falsely reporting pity tab widget as missing. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5873)
 + Fixed Mining Event Tracker sometimes failing to load with an error. - Luna (https://github.com/hannibal002/SkyHanni/pull/5888)
 + Fixed Mineshaft Cave-in Timer estimate not working. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5907)
++ Fixed description for Auto-Load Shaft Routes giving incorrect examples for route names. - Luna (https://github.com/hannibal002/SkyHanni/pull/5904)
++ Fixed Glacite Mineshaft entrance/ladder waypoints being set to wrong location. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5858)
 
 #### Chat
 
@@ -719,6 +731,12 @@
 + Improved GitHub Actions build process. - Luna (https://github.com/hannibal002/SkyHanni/pull/5877)
     + All versions are now built in parallel and the uploaded JARs are no longer zipped.
 + Removed the unused `blockedReason` parameter from all Modify chat event classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5903)
++ Added documentation for some events. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5922)
++ Added WRAPPED-REGEX-FAIL type for regex tests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5913)
++ Changed regex tests that contain leading or trailing whitespace to require WRAPPED-REGEX-TEST or WRAPPED-REGEX-FAIL. - Luna (https://github.com/hannibal002/SkyHanni/pull/5913)
++ Documented KSP annotation processing and mixin coding conventions in CONTRIBUTING.md. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5918)
++ Fixed invalid Classtweaker entries for 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5845)
++ Re-enabled Classtweaker validation for 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5845)
 
 ### Removed Features
 
