@@ -78,11 +78,14 @@ object TalbotCircles {
 
         // using a step size reduces computation and makes it easier for players
         // to judge distance away compared to one big highlighted blob
-        for (y in yMin.toInt()..yMax.toInt())
-            for (x in xMin.toInt()..xMax.toInt() step LATTICE_WIDTH)
-                for (z in zMin.toInt()..zMax.toInt() step LATTICE_WIDTH)
+        for (y in yMin.toInt()..yMax.toInt()) {
+            for (x in xMin.toInt()..xMax.toInt() step LATTICE_WIDTH) {
+                for (z in zMin.toInt()..zMax.toInt() step LATTICE_WIDTH) {
                     if (constraints.all { it.contains(x, y, z) })
                         candidateBlocks.add(LorenzVec(x, y, z))
+                }
+            }
+        }
     }
 
     private fun Constraint.maxRadius(yMin: Double, yMax: Double): Double {
