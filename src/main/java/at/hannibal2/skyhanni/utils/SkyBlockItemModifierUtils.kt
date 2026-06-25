@@ -296,8 +296,13 @@ object SkyBlockItemModifierUtils {
 
     fun SafeItemStack.getItemId() = getAttributeString("id")
 
-    @Suppress("CAST_NEVER_SUCCEEDS")
-    fun SafeItemStack.getUniqueId() = (this as ItemStackCachedData).skyhanni_uniqueId
+    fun SafeItemStack.getUniqueId(): Int =
+        if (this is ItemStackCachedData) {
+            this.skyhanni_uniqueId
+        } else {
+            // I do not know why this is needed, but sometimes the Mixin does not apply
+            SafeItemStackUtils.getUniqueIdentifier(this)
+        }
 
     fun SafeItemStack.getMinecraftId() = BuiltInRegistries.ITEM.getKey(itemType)
 
