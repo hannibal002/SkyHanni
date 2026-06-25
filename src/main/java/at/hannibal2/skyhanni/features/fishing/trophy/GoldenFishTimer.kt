@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.GoldenFishTim
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent

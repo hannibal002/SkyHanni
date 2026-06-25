@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
