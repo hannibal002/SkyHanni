@@ -48,7 +48,7 @@ object MouseSensitivityReducer {
         "garden.mouse-sensitivity-reducer.chat.teleport.list",
         "Teleported you to Plot - (?<plot>.+)!",
         "Teleported you to (?<plot>The Barn)!",
-        "(?<plot>Warping\\.\\.\\.)",
+        "(?<plot>Warping\\.\\.\\.)", // TODO: decide what to do with /warp garden, this will not unlock mouse for now
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

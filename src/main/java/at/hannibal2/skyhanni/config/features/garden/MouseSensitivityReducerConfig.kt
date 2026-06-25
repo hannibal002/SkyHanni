@@ -84,7 +84,7 @@ class MouseSensitivityReducerConfig {
     val position: Position = Position(400, 200)
 
     enum class UnlockOnTeleport(private val displayName: String, val condition: (String) -> Boolean) {
-        ALWAYS("Always", { true }),
+        ALWAYS("Always", { it != "Warping..." }), // TODO: decide what to do with /warp garden
         BARN_ONLY("Barn Only", { it == "The Barn" }),
         NEVER("Never", { false }),
         ;
