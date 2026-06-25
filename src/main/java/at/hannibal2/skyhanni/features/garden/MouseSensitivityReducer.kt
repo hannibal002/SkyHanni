@@ -8,9 +8,12 @@ import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -22,6 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
+import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object MouseSensitivityReducer {
@@ -83,11 +87,12 @@ object MouseSensitivityReducer {
         }
     }
 
-    private fun isAutoEnabled(): Boolean = GardenApi.inGarden() &&
-        config.autoEnable &&
-        config.autoModes.any { it.condition() } &&
-        !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
-        !(config.onGround && !isOnGround())
+    private fun isAutoEnabled(): Boolean =
+        GardenApi.inGarden() &&
+            config.autoEnable &&
+            config.autoEnableMode.any { it.condition() } &&
+            !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
+            !(config.onGround && !isOnGround())
 
     private fun isOnGround(): Boolean {
         if (PlayerUtils.onGround()) return true
@@ -182,8 +187,8 @@ object MouseSensitivityReducer {
         event.move(135, "misc.lockedMouseDisplay", "garden.mouseLock.display")
         // variable renames
         event.move(137, oldBase, base)
-        event.move(137, "$base.enable", "$base.autoEnable")
-        event.move(137, "$base.mode", "$base.autoModes")
+        event.move(137, "$base.enabled", "$base.autoEnable")
+        event.move(137, "$base.mode", "$base.autoEnableMode")
         // convert old factor to new percent
         event.move(137, "$base.reducingFactor", "$base.reducingPercent") {
             JsonPrimitive((1f.fractionOf(it.asFloat) * 100f).toFloat().roundTo(2))
@@ -200,5 +205,17 @@ object MouseSensitivityReducer {
         UNCHANGED({ it }),
         REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
         LOCKED({ 0.0 }),
+    }
+
+    enum class AutoEnableMode(private val displayName: String, val condition: () -> Boolean) {
+        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
+        TOOL("Farming tool", { GardenApi.hasFarmingToolInHand() }),
+        FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
+        MOUSEMAT("Squeaky Mousemat", { GardenApi.hasMousematInHand() }),
+        VACUUM("Vacuum", { PestApi.hasVacuumInHand() }),
+        SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
+        ;
+
+        override fun toString() = displayName
     }
 }

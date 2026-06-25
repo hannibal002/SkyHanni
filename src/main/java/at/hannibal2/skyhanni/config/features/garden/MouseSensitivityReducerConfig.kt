@@ -1,11 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden
 
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.features.fishing.FishingApi
-import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer
-import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer.AutoEnableMode
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
@@ -15,7 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 
 class MouseSensitivityReducerConfig {
@@ -32,9 +27,9 @@ class MouseSensitivityReducerConfig {
     var autoEnable: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Auto Modes", desc = "Decide when the mouse sensitivity should be lowered.")
+    @ConfigOption(name = "Auto Mode", desc = "Decide when the mouse sensitivity should be lowered.")
     @ConfigEditorDraggableList
-    val autoModes: MutableList<AutoMode> = mutableListOf(AutoMode.KEYBIND, AutoMode.TOOL)
+    val autoEnableMode: MutableList<AutoEnableMode> = mutableListOf(AutoEnableMode.KEYBIND, AutoEnableMode.TOOL)
 
     @Expose
     @ConfigOption(name = "Keybind", desc = "When selected above, press this key to reduce the mouse sensitivity.")
@@ -47,7 +42,7 @@ class MouseSensitivityReducerConfig {
     var showGui: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Chat Message", desc = "Show a message in chat when toggling mouse lock.")
+    @ConfigOption(name = "Chat Message", desc = "Show a message in chat when toggling §e/shmouselock §ror §e/shsensreduce§r.")
     @ConfigEditorBoolean
     var chatMessage: Boolean = true
 
@@ -87,18 +82,6 @@ class MouseSensitivityReducerConfig {
     @Expose
     @ConfigLink(owner = MouseSensitivityReducerConfig::class, field = "showGui")
     val position: Position = Position(400, 200)
-
-    enum class AutoMode(private val displayName: String, val condition: () -> Boolean) {
-        KEYBIND("Holding Keybind", { MouseSensitivityReducer.config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
-        TOOL("Farming tool", { GardenApi.hasFarmingToolInHand() }),
-        FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
-        MOUSEMAT("Squeaky Mousemat", { GardenApi.hasMousematInHand() }),
-        VACUUM("Vacuum", { PestApi.hasVacuumInHand() }),
-        SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
-        ;
-
-        override fun toString() = displayName
-    }
 
     enum class UnlockOnTeleport(private val displayName: String, val condition: (String) -> Boolean) {
         ALWAYS("Always", { true }),
