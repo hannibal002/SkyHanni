@@ -33,17 +33,12 @@ object PetUtils {
     private var customPetLeveling: Map<String, NeuPetData> = mapOf()
     private var displayNameMap: Map<String, String> = mapOf()
     private var petInternalNames: Set<NeuInternalName> = setOf()
-    private var petSkinNbtNames: Set<String> = setOf()
     private var petItemResolution: Map<String, NeuInternalName> = mapOf()
 
     // Late load from SH repo
     private var seasonalVariants: Set<NeuInternalName> = setOf()
     private var dayNightVariants: Set<NeuInternalName> = setOf()
     private var ciFactionVariants: Set<NeuInternalName> = setOf()
-
-    fun getVariantIndexOrNull(extraData: JsonObject): Int? = petSkinNbtNames.firstNotNullOfOrNull {
-        extraData.get(it)?.asInt
-    }
 
     fun resolvePetItemOrNull(itemName: String): NeuInternalName? {
         petItemResolutionCache[itemName]?.let { return it }
