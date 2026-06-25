@@ -73,6 +73,11 @@ class InventoryConfig {
     val craftableItemList: CraftableItemListConfig = CraftableItemListConfig()
 
     @Expose
+    @Category(name = "Compact Item Recipes", desc = "")
+    @Accordion
+    val compactItemFormRecipe: CompactItemRecipeConfig = CompactItemRecipeConfig()
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     val hideNotClickable: HideNotClickableConfig = HideNotClickableConfig()
@@ -232,7 +237,7 @@ class InventoryConfig {
     @ConfigOption(
         name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click (Cmd+Click on macOS) to craft items that aren't often quick " +
-            "crafted (e.g. armor, weapons, accessories). Sack items can be crafted normally.",
+                "crafted (e.g. armor, weapons, accessories). Sack items can be crafted normally.",
     )
     @SearchTag("command control")
     @ConfigEditorBoolean
@@ -270,7 +275,7 @@ class InventoryConfig {
     @ConfigOption(
         name = "Old SkyBlock Menu",
         desc = "Show old buttons in the SkyBlock Menu: Trade, Accessories, Potions, Quiver, Fishing and Sacks. " +
-            "§cOnly works with the booster cookie effect active.",
+                "§cOnly works with the booster cookie effect active.",
     )
     @ConfigEditorBoolean
     @SearchTag("SB")
@@ -344,7 +349,10 @@ class InventoryConfig {
     var essenceShopHelper: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game.")
+    @ConfigOption(
+        name = "Snake Game Keybinds",
+        desc = "Use WASD-Keys to move around in the Abiphone/PlantBoy Advance snake game."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var snakeGameKeybinds: Boolean = true
@@ -362,7 +370,7 @@ class InventoryConfig {
     @ConfigOption(
         name = "Save Private Island Chests",
         desc = "Saves every chest you looked at on your private island. The Data gets used by other features, " +
-            "so this does not do anything directly noticeable",
+                "so this does not do anything directly noticeable",
     )
     @ConfigEditorBoolean
     @FeatureToggle
