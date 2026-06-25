@@ -4,19 +4,26 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.core.Direction
+import net.minecraft.core.Vec3i
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO rename to something else to reduce confusion
@@ -28,32 +35,38 @@ object MineshaftWaypoints {
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
+    private var isWorldLoaded = false
 
     @HandleEvent
     fun onWorldChange() {
         waypoints.clear()
+        isWorldLoaded = false
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.MINESHAFT) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.MINESHAFT) return
 
-        val playerLocation = LocationUtils.getBlockBelowPlayer()
+        val spawnLocation = LocationUtils.getBlockBelowPlayer()
+        val direction = MinecraftCompat.localPlayer.direction.unitVec3i
 
-        if (config.mineshaftWaypoints.entranceLocation) {
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))
-        }
+        addEntranceWaypoints(spawnLocation, direction)
+    }
 
-        if (config.mineshaftWaypoints.ladderLocation) {
-            val vec = MinecraftCompat.localPlayer.direction.unitVec3i
-            val location = playerLocation
-                // Move 7 blocks in front of the player to be in the ladder shaft
-                .add(x = vec.x * BLOCKS_FORWARD, z = vec.z * BLOCKS_FORWARD)
-                // Adjust 2 blocks to the right to be in the center of the ladder shaft
-                .add(x = vec.z * -2, z = vec.x * 2)
-                // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = -15)
-            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = location))
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onPacketReceived(event: PacketReceivedEvent) {
+        if (isWorldLoaded) return
+
+        when (event.packet) {
+            is ClientboundLevelChunkWithLightPacket -> isWorldLoaded = true
+            is ClientboundPlayerPositionPacket -> {
+                if (event.packet.relatives.isNotEmpty()) return
+
+                val spawnLocation = event.packet.change.position.toLorenzVec().add(y = -1).roundToBlock()
+                val direction = Direction.fromYRot(event.packet.change.yRot.toDouble()).unitVec3i
+
+                addEntranceWaypoints(spawnLocation, direction)
+            }
         }
     }
 
@@ -100,6 +113,26 @@ object MineshaftWaypoints {
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
                 event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.displayText}", 1.0)
             }
+    }
+
+    private fun addEntranceWaypoints(spawnLocation: LorenzVec, direction: Vec3i) {
+        if (config.mineshaftWaypoints.entranceLocation) {
+            waypoints.removeIf { it.waypointType == MineshaftWaypointType.ENTRANCE }
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = spawnLocation))
+        }
+
+        if (config.mineshaftWaypoints.ladderLocation) {
+            val ladderLocation = spawnLocation
+                // Move 7 blocks in front of the player to be in the ladder shaft
+                .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)
+                // Adjust 2 blocks to the right to be in the center of the ladder shaft
+                .add(x = direction.z * -2, z = direction.x * 2)
+                // Move 15 blocks down to be at the bottom of the ladder shaft
+                .add(y = -15)
+
+            waypoints.removeIf { it.waypointType == MineshaftWaypointType.LADDER }
+            waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
+        }
     }
 
     fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
