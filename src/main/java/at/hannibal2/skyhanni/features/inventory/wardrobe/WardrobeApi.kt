@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
@@ -33,10 +34,20 @@ object WardrobeApi {
 
     /**
      * REGEX-TEST: Wardrobe (2/2)
+     * REGEX-TEST: (1/3) Armor Sets
      */
-    private val inventoryPattern by patternGroup.pattern(
+    private val inventoryPattern by patternGroup.list(
         "inventory.name",
         "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
+        "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets"
+    )
+
+    /**
+     * REGEX-TEST: (1/2) Equipment Sets
+     */
+    private val equipmentInventoryPattern by patternGroup.pattern(
+        "inventory.name.equipment",
+        "\\((?<currentPage>\\d+)/\\d+\\) Equipment Sets"
     )
 
     /**
@@ -68,6 +79,7 @@ object WardrobeApi {
 
     var currentPage: Int? = null
     private var inWardrobe = false
+    private var inEquipmentWardrobe = false
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -93,6 +105,8 @@ object WardrobeApi {
 
     fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
 
+    fun inEquipmentWardrobe() = InventoryUtils.inInventory() && inEquipmentWardrobe
+
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
@@ -112,12 +126,19 @@ object WardrobeApi {
             inWardrobe = it
             if (CustomWardrobe.config.enabled) inCustomWardrobe = it
         }
+        equipmentInventoryPattern.matches(event.inventoryName).let {
+            inEquipmentWardrobe = it
+        }
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        inventoryPattern.matchMatcher(event.inventoryName) {
+        inventoryPattern.matchMatchers(event.inventoryName) {
             inWardrobe = true
+            currentPage = group("currentPage").formatInt()
+        } ?: return
+        equipmentInventoryPattern.matchMatcher(event.inventoryName) {
+            inEquipmentWardrobe = true
             currentPage = group("currentPage").formatInt()
         } ?: return
 
@@ -167,10 +188,14 @@ object WardrobeApi {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inWardrobe) return
+        if (!inWardrobe && !inEquipmentWardrobe) return
         DelayedRun.runDelayed(250.milliseconds) {
             if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
                 inWardrobe = false
+                currentPage = null
+            }
+            if (!equipmentInventoryPattern.matches(InventoryUtils.openInventoryName())) {
+                inEquipmentWardrobe = false
                 currentPage = null
             }
         }

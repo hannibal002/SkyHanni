@@ -9,6 +9,11 @@ class WardrobeSlot(
     val leggingsSlot: Int,
     val bootsSlot: Int,
 ) {
+    val necklaceSlot get() = helmetSlot
+    val cloakSlot get() = chestplateSlot
+    val beltSlot get() = leggingsSlot
+    val gloveSlot get() = bootsSlot
+
     fun getData() = WardrobeApi.storage?.data?.getOrPut(id) {
         WardrobeApi.WardrobeData(
             id,
