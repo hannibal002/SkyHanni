@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
@@ -42,6 +42,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.roundedUpSeconds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -110,7 +111,8 @@ object TrevorFeatures {
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     // TODO form to data class, use Resettable
-    private var timeUntilNextReady = 0
+    private var nextReadyTime = SimpleTimeMark.farPast()
+    private val timeUntilNextReady get() = nextReadyTime.timeUntil().roundedUpSeconds.coerceAtLeast(0)
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
     private var currentLabel = "§2Ready"
@@ -126,9 +128,13 @@ object TrevorFeatures {
     var inTrapperDen = false
     var lastTitle: TitleContext? = null
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onTick() {
         updateTrapper()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onSecondPassed() {
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
         if (config.solver && questActive) {
@@ -150,7 +156,7 @@ object TrevorFeatures {
             }
             trapperReady = true
             TrevorSolver.mobLocation = TrapperMobArea.NONE
-            if (timeUntilNextReady <= 0) {
+            if (nextReadyTime.isInPast()) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
             } else {
@@ -161,12 +167,11 @@ object TrevorFeatures {
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = 21
+            nextReadyTime = 20.seconds.fromNow()
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
             TrevorTracker.startQuest(this)
-            updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
@@ -242,7 +247,7 @@ object TrevorFeatures {
     fun onGuiRenderOverlay() {
         if (!config.cooldownGui) return
 
-        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        val cooldownMessage = if (nextReadyTime.isInPast()) "Trapper Ready"
         else if (timeUntilNextReady == 1) "1 second left"
         else "$timeUntilNextReady seconds left"
 
@@ -251,14 +256,14 @@ object TrevorFeatures {
     }
 
     private fun updateTrapper() {
-        timeUntilNextReady -= 1
-        if (trapperReady && timeUntilNextReady > 0) {
+        if (trapperReady && nextReadyTime.isInFuture()) {
             currentStatus = TrapperStatus.WAITING
             currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
         }
 
-        if (timeUntilNextReady <= 0 && trapperReady) {
-            if (timeUntilNextReady == 0) {
+        if (nextReadyTime.isInPast() && trapperReady) {
+            if (!nextReadyTime.isFarPast()) {
+                nextReadyTime = SimpleTimeMark.farPast()
                 if (config.readyTitle) {
                     lastTitle?.stop()
                     lastTitle = TitleManager.sendTitle("§2Trapper Ready")
