@@ -59,6 +59,11 @@ class GuiPositionEditor(
     private var grabbedX = 0
     private var grabbedY = 0
     private var clickedPos = -1
+    private val oldScreenRenderContext = OldScreenRenderContext(
+        oldScreen,
+        { getEditorScaledWidth() },
+        { getEditorScaledHeight() },
+    )
 
     override fun guiClosed() {
         clickedPos = -1
@@ -72,146 +77,22 @@ class GuiPositionEditor(
         width = getEditorScaledWidth()
         height = getEditorScaledHeight()
         drawDefaultBackground(mouseX, mouseY, partialTicks)
-        renderOldScreen(mouseX, mouseY, partialTicks)
+        oldScreenRenderContext.render(mouseX, mouseY, partialTicks)
 
         val hoveredPos = renderRectangles()
 
         renderLabels(hoveredPos)
     }
 
-    private fun renderOldScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val oldScreen = oldScreen ?: return
-        val scaleX = oldScreenScaleX(oldScreen)
-        val scaleY = oldScreenScaleY(oldScreen)
-        val oldScreenMouseX = (mouseX / scaleX).toInt()
-        val oldScreenMouseY = (mouseY / scaleY).toInt()
-
-        //? if < 26.1 {
-        /*if (oldScreen is InventoryScreen) {
-            renderOldInventoryScreen(oldScreen, scaleX, scaleY, mouseX, mouseY, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            return
-        }
-        *///?}
-
-        DrawContextUtils.pushPop {
-            DrawContextUtils.scale(scaleX, scaleY)
-            //? if >= 26.1 {
-            oldScreen.extractBackground(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            oldScreen.extractRenderState(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            //?} else {
-            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, oldScreenMouseX, oldScreenMouseY)
-            oldScreen.render(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            *///?}
-        }
-    }
-
-    fun renderWithOldScreenMetrics(action: () -> Unit) = withOldScreenRenderTransform(action)
-
-    private fun <T> withOldScreenMetrics(action: () -> T): T {
-        val oldScreen = oldScreen ?: return action()
-        return GuiScreenUtils.withScreenMetricsOverride(
-            oldScreen.width,
-            oldScreen.height,
-            oldScreenScaleFactor(oldScreen),
-            action,
-        )
-    }
-
-    private fun <T> withOldScreenRenderTransform(action: () -> T): T = withOldScreenMetrics {
-        val oldScreen = oldScreen ?: return@withOldScreenMetrics action()
-        DrawContextUtils.pushPopResult {
-            DrawContextUtils.scale(oldScreenScaleX(oldScreen), oldScreenScaleY(oldScreen))
-            action()
-        }
-    }
+    fun renderWithOldScreenMetrics(action: () -> Unit) = oldScreenRenderContext.withRenderTransform(action)
 
     private fun <T> Position.withPositionMetrics(action: () -> T): T =
-        if (this in chestGuiPositions) withOldScreenMetrics(action) else action()
+        if (this in chestGuiPositions) oldScreenRenderContext.withMetrics(action) else action()
 
     private fun <T> Position.withPositionRenderTransform(action: () -> T): T =
-        if (this in chestGuiPositions) withOldScreenRenderTransform(action) else action()
+        if (this in chestGuiPositions) oldScreenRenderContext.withRenderTransform(action) else action()
 
     private fun Position.isHoveredWithMetrics() = withPositionMetrics { isHovered() }
-
-    private fun oldScreenScaleX(oldScreen: SkyHanniGuiContainer) = getEditorScaledWidth().toFloat() / oldScreen.width
-    private fun oldScreenScaleY(oldScreen: SkyHanniGuiContainer) = getEditorScaledHeight().toFloat() / oldScreen.height
-
-    private fun oldScreenScaleFactor(oldScreen: SkyHanniGuiContainer): Int {
-        val windowWidth = Minecraft.getInstance().window.width
-        return ((windowWidth + oldScreen.width - 1) / oldScreen.width).coerceAtLeast(1)
-    }
-
-    //? if < 26.1 {
-    /*private fun renderOldInventoryScreen(
-        oldScreen: InventoryScreen,
-        scaleX: Float,
-        scaleY: Float,
-        mouseX: Int,
-        mouseY: Int,
-        oldScreenMouseX: Int,
-        oldScreenMouseY: Int,
-        partialTicks: Float,
-    ) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.scale(scaleX, scaleY)
-            drawInventoryBackground(oldScreen)
-        }
-        renderInventoryPlayer(oldScreen, scaleX, scaleY, mouseX, mouseY)
-        DrawContextUtils.pushPop {
-            DrawContextUtils.scale(scaleX, scaleY)
-            oldScreen.renderContents(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
-            oldScreen.renderCarriedItem(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY)
-            oldScreen.renderSnapbackItem(DrawContextUtils.drawContext)
-        }
-    }
-
-    private fun drawInventoryBackground(oldScreen: InventoryScreen) {
-        DrawContextUtils.drawContext.blit(
-            RenderCompat.getMinecraftGuiTextured(),
-            AbstractContainerScreen.INVENTORY_LOCATION,
-            oldScreen.containerLeft(),
-            oldScreen.containerTop(),
-            0f,
-            0f,
-            oldScreen.containerImageWidth(),
-            oldScreen.containerImageHeight(),
-            256,
-            256,
-        )
-    }
-
-    private fun renderInventoryPlayer(
-        oldScreen: InventoryScreen,
-        scaleX: Float,
-        scaleY: Float,
-        originalMouseX: Int,
-        originalMouseY: Int,
-    ) {
-        val player = Minecraft.getInstance().player ?: return
-        val left = oldScreen.containerLeft()
-        val top = oldScreen.containerTop()
-        val entityScale = (30 * ((scaleX + scaleY) / 2f)).roundToInt()
-
-        //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
-        InventoryScreen.extractEntityInInventoryFollowsMouse(
-            DrawContextUtils.drawContext,
-            ((left + 26) * scaleX).roundToInt(),
-            ((top + 8) * scaleY).roundToInt(),
-            ((left + 75) * scaleX).roundToInt(),
-            ((top + 78) * scaleY).roundToInt(),
-            entityScale,
-            0.0625f * ((scaleX + scaleY) / 2f),
-            originalMouseX.toFloat(),
-            originalMouseY.toFloat(),
-            player,
-        )
-    }
-
-    private fun AbstractContainerScreen<*>.containerLeft() = leftPos
-    private fun AbstractContainerScreen<*>.containerTop() = topPos
-    private fun AbstractContainerScreen<*>.containerImageWidth() = imageWidth
-    private fun AbstractContainerScreen<*>.containerImageHeight() = imageHeight
-    *///?}
 
     private fun renderLabels(hoveredPos: Int) {
         val displayPos = when {
@@ -420,4 +301,135 @@ class GuiPositionEditor(
             Minecraft.getInstance().screen = oldScreen
         }
     }
+}
+
+private class OldScreenRenderContext(
+    private val oldScreen: SkyHanniGuiContainer?,
+    private val getEditorScaledWidth: () -> Int,
+    private val getEditorScaledHeight: () -> Int,
+) {
+
+    fun render(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        val oldScreen = oldScreen ?: return
+        val scaleX = oldScreenScaleX(oldScreen)
+        val scaleY = oldScreenScaleY(oldScreen)
+        val oldScreenMouseX = (mouseX / scaleX).toInt()
+        val oldScreenMouseY = (mouseY / scaleY).toInt()
+
+        //? if < 26.1 {
+        /*if (oldScreen is InventoryScreen) {
+            renderOldInventoryScreen(oldScreen, scaleX, scaleY, mouseX, mouseY, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            return
+        }
+        *///?}
+
+        DrawContextUtils.pushPop {
+            DrawContextUtils.scale(scaleX, scaleY)
+            //? if >= 26.1 {
+            oldScreen.extractBackground(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            oldScreen.extractRenderState(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            //?} else {
+            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, oldScreenMouseX, oldScreenMouseY)
+            oldScreen.render(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            *///?}
+        }
+    }
+
+    fun <T> withMetrics(action: () -> T): T {
+        val oldScreen = oldScreen ?: return action()
+        return GuiScreenUtils.withScreenMetricsOverride(
+            oldScreen.width,
+            oldScreen.height,
+            oldScreenScaleFactor(oldScreen),
+            action,
+        )
+    }
+
+    fun <T> withRenderTransform(action: () -> T): T = withMetrics {
+        val oldScreen = oldScreen ?: return@withMetrics action()
+        DrawContextUtils.pushPopResult {
+            DrawContextUtils.scale(oldScreenScaleX(oldScreen), oldScreenScaleY(oldScreen))
+            action()
+        }
+    }
+
+    private fun oldScreenScaleX(oldScreen: SkyHanniGuiContainer) = getEditorScaledWidth().toFloat() / oldScreen.width
+    private fun oldScreenScaleY(oldScreen: SkyHanniGuiContainer) = getEditorScaledHeight().toFloat() / oldScreen.height
+
+    private fun oldScreenScaleFactor(oldScreen: SkyHanniGuiContainer): Int {
+        val windowWidth = Minecraft.getInstance().window.width
+        return ((windowWidth + oldScreen.width - 1) / oldScreen.width).coerceAtLeast(1)
+    }
+
+    //? if < 26.1 {
+    /*private fun renderOldInventoryScreen(
+        oldScreen: InventoryScreen,
+        scaleX: Float,
+        scaleY: Float,
+        mouseX: Int,
+        mouseY: Int,
+        oldScreenMouseX: Int,
+        oldScreenMouseY: Int,
+        partialTicks: Float,
+    ) {
+        DrawContextUtils.pushPop {
+            DrawContextUtils.scale(scaleX, scaleY)
+            drawInventoryBackground(oldScreen)
+        }
+        renderInventoryPlayer(oldScreen, scaleX, scaleY, mouseX, mouseY)
+        DrawContextUtils.pushPop {
+            DrawContextUtils.scale(scaleX, scaleY)
+            oldScreen.renderContents(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            oldScreen.renderCarriedItem(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY)
+            oldScreen.renderSnapbackItem(DrawContextUtils.drawContext)
+        }
+    }
+
+    private fun drawInventoryBackground(oldScreen: InventoryScreen) {
+        DrawContextUtils.drawContext.blit(
+            RenderCompat.getMinecraftGuiTextured(),
+            AbstractContainerScreen.INVENTORY_LOCATION,
+            oldScreen.containerLeft(),
+            oldScreen.containerTop(),
+            0f,
+            0f,
+            oldScreen.containerImageWidth(),
+            oldScreen.containerImageHeight(),
+            256,
+            256,
+        )
+    }
+
+    private fun renderInventoryPlayer(
+        oldScreen: InventoryScreen,
+        scaleX: Float,
+        scaleY: Float,
+        originalMouseX: Int,
+        originalMouseY: Int,
+    ) {
+        val player = Minecraft.getInstance().player ?: return
+        val left = oldScreen.containerLeft()
+        val top = oldScreen.containerTop()
+        val entityScale = (30 * ((scaleX + scaleY) / 2f)).roundToInt()
+
+        //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
+        InventoryScreen.extractEntityInInventoryFollowsMouse(
+            DrawContextUtils.drawContext,
+            ((left + 26) * scaleX).roundToInt(),
+            ((top + 8) * scaleY).roundToInt(),
+            ((left + 75) * scaleX).roundToInt(),
+            ((top + 78) * scaleY).roundToInt(),
+            entityScale,
+            0.0625f * ((scaleX + scaleY) / 2f),
+            originalMouseX.toFloat(),
+            originalMouseY.toFloat(),
+            player,
+        )
+    }
+
+    private fun AbstractContainerScreen<*>.containerLeft() = leftPos
+    private fun AbstractContainerScreen<*>.containerTop() = topPos
+    private fun AbstractContainerScreen<*>.containerImageWidth() = imageWidth
+    private fun AbstractContainerScreen<*>.containerImageHeight() = imageHeight
+    *///?}
 }
