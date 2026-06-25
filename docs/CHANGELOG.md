@@ -61,6 +61,7 @@
 + Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
 + Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
   + Highlights completed categories in green.
++ Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 
 #### Garden
 
@@ -79,6 +80,7 @@
 
 + Added SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5472)
   + Do /shachievements to see them all.
++ Added a chat message when you encounter a SkyHanni contributor for the first time. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 #### Mining
 
@@ -135,6 +137,7 @@
 #### Mining
 
 + Added support for Littlefoot's Den Shaft. - nopo (https://github.com/hannibal002/SkyHanni/pull/5523)
++ Frozen corpse waypoint text in mineshafts now turns green after looting. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5581)
 
 #### Misc
 
@@ -162,6 +165,7 @@
 + Made the Pet Symbiosis Achievement trigger as soon as you hold the weapon. - Luna (https://github.com/hannibal002/SkyHanni/pull/5562)
 + The day counter fix in the debug menu (F3) now works correctly when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5583)
 + Added mineshaft types to /shtestisland. - Rain. (https://github.com/hannibal002/SkyHanni/pull/5625)
++ Enabled Better Wiki for everyone. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5893)
 
 #### Garden
 
@@ -170,6 +174,7 @@
 + Added options to use custom keybinds in the Garden while holding a Squeaky Mousemat or a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5454)
 + Added Harvest Feast rare drops and other missing rare crops to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
 + Refactored Armor Drop Tracker to Rare Crop Tracker. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5665)
++ Added Include Vacuum to Custom Keybinds. - LukV (https://github.com/hannibal002/SkyHanni/pull/5752)
 
 #### Combat
 
@@ -179,6 +184,11 @@
 
 + Improved Berberis Helper by using the respawn sequence. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/5615)
 + Added Sun's Grasp support for Garden Custom Keybinds. - Luna (https://github.com/hannibal002/SkyHanni/pull/5688)
+
+#### Chat
+
++ Improved `/shmarkplayer` player completion. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Improved Command Tab Completion to include Carry Customers. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 #### Inventory
 
@@ -226,6 +236,11 @@
 + Fixed Pest Repellent 1 being added when Pest Repellent 2 is active. - Alex (https://github.com/hannibal002/SkyHanni/pull/5734)
 + Fixed Locust Larva and Pesterminator & Sunset books not being tracked on Pest Profit Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/5818)
 + Fixed pest spawns on the barn plot not being properly detected. - Luna (https://github.com/hannibal002/SkyHanni/pull/5795)
++ Fixed Lunar Moth kills not counting towards Pest Profit Tracker and Mantid Kill Display. - Luna (https://github.com/hannibal002/SkyHanni/pull/5837)
++ Fixed Pets menu no longer being detected after a recent Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/5857)
++ Fixed SkyHanni incorrectly submitting Harvest Feast, Jacob Contest, and Mining Event data on the alpha server. - Luna (https://github.com/hannibal002/SkyHanni/pull/5860)
++ Fixed Pest Cooldown Warning triggering twice. - Luna (https://github.com/hannibal002/SkyHanni/pull/5879)
++ Fixed some player messages being falsely detected as pest spawns. - Luna (https://github.com/hannibal002/SkyHanni/pull/5839)
 
 #### Combat
 
@@ -251,6 +266,7 @@
 + Fixed Cocoon Features triggering in incorrect conditions. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
 + Fixed Cocoon Overlay showing from very far away. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
 + Fixed Kuudra Profit Tracker showing key cost as 0. - Luna (https://github.com/hannibal002/SkyHanni/pull/5623)
++ Fixed Crown of Avarice Counter not working. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/5899)
 
 #### GUI
 
@@ -301,6 +317,8 @@
 + Fixed false fishing bait change warnings when opening a GUI while holding a fishing rod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5806)
 + Fixed fishing profit tracker falsely reporting gaining bait when using it. - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Updated trophy fishing detection to only require 2 pieces of Trophy Hunter Armor. - Luna (https://github.com/hannibal002/SkyHanni/pull/5810)
++ Fixed Trophy Fish Display not updating when talking to Odger. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
++ Fixed Trophy Fish Total Caught Tooltip feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5861)
 
 #### Item
 
@@ -339,6 +357,11 @@
 + Fixed Wardrobe background rendering over entities. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5577)
 + Fixed not being able to move both displays while in the trade menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5680)
 + Fixed Recipe Achievement not being possible. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Fixed Croesus chest tracker sometimes producing an error for expired chests. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5884)
++ Fixed enchant parsing for Fatal Tempo and stacked enchants. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5892)
++ Fixed enchant parsing for items with Fatal Tempo or missing color code prefixes. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5908)
++ Fixed random errors happening while in inventories. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5895)
++ Fixed stacking enchant progress not displaying. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5908)
 
 #### Misc
 
@@ -422,11 +445,18 @@
 + Fixed profit trackers falsely reporting gaining an item when equipping it in your wardrobe (e.g. Tiki Mask) (hopefully). - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Fixed the mod sometimes not correctly detecting the island you're on. - Luna (https://github.com/hannibal002/SkyHanni/pull/5762)
   + The "Hypixel Mod API" mod (https://modrinth.com/mod/hypixel-mod-api) is now required to use SkyHanni. You might already have this installed because of other mods.
++ Fixed a potential issue with glowing entities on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5826)
++ Fixed features that check for Current Island not working when swapping from equivalent islands (HUB --> HUB). - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5836)
+    + This includes any feature that relied on the Graph system to check current area such as Slayer/Carnival features.
++ Fixed in-world chroma text not rendering properly (especially with Everything Chroma). - Luna (https://github.com/hannibal002/SkyHanni/pull/5863)
++ Fixed Kotlin being bundled in the 26.1 JAR which may have caused compatibility issues with some mods. - Luna (https://github.com/hannibal002/SkyHanni/pull/5828)
++ Fixed minor spelling mistakes. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5875)
 
 #### Commands
 
 + Fixed colored item names in `/viewrecipe` autocomplete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5434)
 + Fixed issues with GFS auto-complete. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5494)
++ Fixed SkyHanni command arguments containing quotes getting truncated. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 #### Mining
 
@@ -435,6 +465,14 @@
 + Fixed custom Mineshaft type names not displaying correctly. - Rain (https://github.com/hannibal002/SkyHanni/pull/5613)
 + Fixed Mineshaft Pity Message Modification requiring the Pity Display to be enabled. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 + Fixed Quick Shafter Achievement not being granted properly. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
++ Fixed Glacite Mineshaft pity display falsely reporting pity tab widget as missing. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5873)
++ Fixed Mining Event Tracker sometimes failing to load with an error. - Luna (https://github.com/hannibal002/SkyHanni/pull/5888)
++ Fixed Mineshaft Cave-in Timer estimate not working. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5907)
+
+#### Chat
+
++ Fixed Copy Chat sometimes copying the wrong message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5854)
++ Fixed occasional error while editing/deleting a message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5843)
 
 ### Technical Details
 
@@ -667,6 +705,20 @@
 + Migrated to Hypixel Mod API for server and location detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5762)
 + OwnInventoryItemUpdateEvent is now only posted for actual inventory slots, excluding armor slots and the last hotbar slot (SkyBlock Menu). - Luna (https://github.com/hannibal002/SkyHanni/pull/5819)
 + Updated MoulConfig to 4.7.0. - Luna (https://github.com/hannibal002/SkyHanni/pull/5813)
++ Added incremental cache for primary functions. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5642)
++ Added support for the 2026 Cake Hat colors to the Item Resolution Query. - jani (https://github.com/hannibal002/SkyHanni/pull/5865)
++ Fixed generateRepoPatterns Gradle task not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5840)
++ Added Component, UUID, and Player Brigadier Argument types. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Added comprehensive docs to the chat event classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5903)
++ Added prodClient Gradle task for testing non-dev-env behavior. - Luna (https://github.com/hannibal002/SkyHanni/pull/5704)
++ Added storage for seen SkyHanni contributors. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Added storage for tracking timestamps of when another player mentioned a SkyHanni contributor in chat (only active for contributor players). - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Changed backup repo from .zip to .tar.gz. - Luna (https://github.com/hannibal002/SkyHanni/pull/5633)
++ Changed repo download from JGit/.zip to .tar.gz. - Luna (https://github.com/hannibal002/SkyHanni/pull/5633)
++ Fixed all the Detekt warnings. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5785)
++ Improved GitHub Actions build process. - Luna (https://github.com/hannibal002/SkyHanni/pull/5877)
+    + All versions are now built in parallel and the uploaded JARs are no longer zipped.
++ Removed the unused `blockedReason` parameter from all Modify chat event classes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5903)
 
 ### Removed Features
 

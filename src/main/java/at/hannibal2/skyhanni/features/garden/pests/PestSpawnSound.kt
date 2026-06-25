@@ -30,6 +30,7 @@ object PestSpawnSound {
                 event.cancel()
                 repeatSpawnSound()
             }
+
             PestSpawnConfig.PestSpawnSoundMode.PLUMBER -> {
                 event.cancel()
                 plumberSpawnSound()
