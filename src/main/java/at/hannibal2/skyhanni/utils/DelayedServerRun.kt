@@ -7,6 +7,16 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
+/**
+ * This is a Helper Class for delaying execution until a specific Server Time Mark.
+ *
+ * Unlike [DelayedRun], which uses client ticks, this class schedules tasks based on
+ * server ticks. This makes it useful for timers and actions that should stay in sync
+ * with the server tick rate and be affected by server lag.
+ *
+ * Tasks are queued from any context but are executed during the server tick event
+ * on the main Minecraft thread.
+ */
 @SkyHanniModule
 object DelayedServerRun {
     private val tasks = mutableListOf<Pair<() -> Any, ServerTimeMark>>()
