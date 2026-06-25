@@ -27,7 +27,7 @@ object TravelingZooPetInCalendar {
         if (!isEnabled()) return
         if (!CalendarApi.inCalendar) return
         event.slot ?: return
-        val skyblockEvents = CalendarApi.parseTooltip(event.toolTip)
+        val skyblockEvents = CalendarApi.parseTooltip(event.toolTip) ?: return
         for (sbEvent in skyblockEvents) {
             if (sbEvent.name == "Traveling Zoo") {
                 val pet = getZooPet(sbEvent.startTime) ?: return

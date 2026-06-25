@@ -91,32 +91,29 @@ object CalendarApi {
         "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
     )
 
-    fun parseTooltip(tooltipLines: List<Component>): List<CalendarEvent> {
-        val events = mutableListOf<CalendarEvent>()
-        var currentDay = 1
-        for (component in tooltipLines) {
-            val line = component.string.removeColor().trim()
-            dayHeaderPattern.matchMatcher(line) {
-                currentDay = group("dayNum").toInt()
-                return@matchMatcher
-            }
+    fun parseTooltip(tooltipLines: List<Component>): List<CalendarEvent>? {
+        val line = tooltipLines.firstOrNull()?.string?.removeColor()?.trim() ?: return null
+        val currentDay = dayHeaderPattern.matchMatcher(line) {
+            group("dayNum")?.toInt()
+        } ?: return null
 
-            eventLinePattern.matchMatcher(line) {
-                val timePrefix = group("timePrefix").ifBlank { "All day" }
-                val eventName = group("eventName").trim()
-                if (eventName.isBlank()) return@matchMatcher
-                val (start, end) = parseEventTimes(currentDay, timePrefix)
-                events.add(
+        return tooltipLines.asSequence()
+            .drop(1)
+            .mapNotNull { component: Component ->
+                val line = component.string.removeColor().trim()
+                eventLinePattern.matchMatcher(line) {
+                    val timePrefix = group("timePrefix") ?: return@matchMatcher null
+                    val eventName = group("eventName")?.trim() ?: return@matchMatcher null
+                    if (eventName.isBlank()) return@matchMatcher null
+                    val (start, end) = parseEventTimes(currentDay, timePrefix)
+
                     CalendarEvent(
                         name = eventName,
                         startTime = start,
                         endTime = end
                     )
-                )
-            }
-        }
-
-        return events
+                }
+            }.toList()
     }
 
     private fun parseEventTimes(day: Int, prefix: String): Pair<SkyBlockTime, SkyBlockTime> {
