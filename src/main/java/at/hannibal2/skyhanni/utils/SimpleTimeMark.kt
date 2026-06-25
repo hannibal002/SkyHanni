@@ -74,8 +74,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     @OptIn(ExperimentalTime::class)
     companion object {
-
-        fun now() = SimpleTimeMark(timeProvider.currentTimeMillis())
+        fun now(): SimpleTimeMark = SimpleTimeMark(timeProvider.currentTimeMillis())
 
         private const val FAR_PAST_MS = 0L
         private val FAR_FUTURE_MS = KInstant.DISTANT_FUTURE.toEpochMilliseconds()
@@ -83,8 +82,6 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         private val FAR_PAST = SimpleTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = SimpleTimeMark(FAR_FUTURE_MS)
 
-        @JvmStatic
-        @JvmName("farPast")
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 

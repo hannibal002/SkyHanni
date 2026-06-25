@@ -47,12 +47,12 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
     override fun toString(): String = when (this) {
         farPast() -> "The Far Past"
         farFuture() -> "The Far Future"
-        else -> "ServerTimeMark(millis=$millis)"
+        else -> "ServerTimeMark(millis=$millis, now=${MinecraftData.totalServerTicks})"
     }
 
     @OptIn(ExperimentalTime::class)
     companion object {
-        fun now() = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
+        fun now(): ServerTimeMark = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
 
         private val FAR_PAST_MS = KInstant.DISTANT_PAST.toEpochMilliseconds()
         private val FAR_FUTURE_MS = KInstant.DISTANT_FUTURE.toEpochMilliseconds()
@@ -60,8 +60,6 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         private val FAR_PAST = ServerTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = ServerTimeMark(FAR_FUTURE_MS)
 
-        @JvmStatic
-        @JvmName("farPast")
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
