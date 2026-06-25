@@ -24,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HotmApi {
 
+    fun copyCurrentTree() = HotmData.storage?.deepCopy()
 
     val activeMiningAbility get() = HotmData.abilities.firstOrNull { it.enabled }
 
