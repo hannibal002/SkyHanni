@@ -1,20 +1,15 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.AnimatedSkinJson
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.hasValidHigherTier
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
-import at.hannibal2.skyhanni.utils.renderables.animated.framed.ItemStackAnimatedFrame
 import com.google.gson.annotations.Expose
 import java.util.UUID
 
@@ -34,7 +29,6 @@ data class PetDataStorage(
 data class PetData(
     @Expose private val petInternalName: NeuInternalName, // The internal name of the pet, e.g., `RABBIT;5`
     @Expose var skinInternalName: NeuInternalName? = null, // The skin of the pet, e.g., `PET_SKIN_WOLF_DOGE`
-    @Expose var skinVariantIndex: Int? = null, // Used for pet skins that have variants, otherwise unused
     @Expose var heldItemInternalName: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
     @Expose var exp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
     @Expose val uuid: UUID? = null, // If this data is for a 'real' pet, this is the UUID of it
@@ -42,7 +36,6 @@ data class PetData(
     constructor(petInfo: SkyBlockItemModifierUtils.PetInfo) : this(
         petInfo.let { "${it.type};${it.tier.id}".toInternalName() },
         petInfo.properSkinItem,
-        petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
         petInfo.exp,
         petInfo.uniqueId
@@ -92,44 +85,6 @@ data class PetData(
         if (includeSkinTag && skinTag != null) append(" $skinTag")
     }
 
-    fun getItemStackOrNull(frameIndex: Int = 0): SafeItemStack? =
-        getSkinItemStackOrNull(frameIndex) ?: petInternalName.getItemStackOrNull()
-
-    fun getAnimatedItemStackSequence(firstFrameOnly: Boolean = false): List<ItemStackAnimatedFrame>? {
-        val baseStack = getSkinItemStackOrNull(0) ?: run {
-            return null
-        }
-        val firstFrame = ItemStackAnimatedFrame(baseStack)
-        val animationJson = getAnimatedJsonOrNull()
-        if (firstFrameOnly || animationJson == null) {
-            return listOf(firstFrame)
-        }
-        return animationJson.textures.map {
-            ItemStackAnimatedFrame(
-                it.buildTextureItemStack(),
-                ticks = animationJson.ticks,
-            )
-        }
-    }
-
-    private fun String.buildTextureItemStack(): SafeItemStack {
-        val (uuid, texture) = this.split(":")
-        return ItemUtils.createSkull("Pet Skin", uuid, texture)
-    }
-
-    private fun getAnimatedJsonOrNull(): AnimatedSkinJson? {
-        val skinInternalName = skinInternalName ?: return null
-        return PetUtils.getAnimatedJsonOrNull(skinInternalName, skinVariantIndex)
-    }
-
-    private fun getSkinItemStackOrNull(frameIndex: Int = 0): SafeItemStack? {
-        val skinInternalName = skinInternalName ?: return null
-        val baseItemStack = skinInternalName.getItemStackOrNull() ?: return null
-        val animatedSkinJson = getAnimatedJsonOrNull()?.takeIf { it.textures.any() } ?: return baseItemStack
-        val boundedFrameIndex = frameIndex.takeIf { it > 0 && it < animatedSkinJson.textures.size } ?: 0
-        return animatedSkinJson.textures[boundedFrameIndex].buildTextureItemStack()
-    }
-
     companion object {
         private val TIER_BOOST = "PET_ITEM_TIER_BOOST".toInternalName()
     }
@@ -141,8 +96,6 @@ data class PetData(
         appendLine("    isPet: '${petInternalName.isPet}'")
         appendLine("    hasValidHigherTier: '${petInternalName.hasValidHigherTier()}'")
         appendLine("  skinInternalName: '${skinInternalName?.asString()}'")
-        appendLine("  skinVariantIndex: '$skinVariantIndex'")
-        appendLine("    knownAnimationJson?: '${getAnimatedJsonOrNull() != null}'")
         appendLine("  heldItemInternalName: '${heldItemInternalName?.asString()}'")
         appendLine("  exp: '${exp?.addSeparators() ?: 0.0}'")
         appendLine("  uuid: '$uuid'")

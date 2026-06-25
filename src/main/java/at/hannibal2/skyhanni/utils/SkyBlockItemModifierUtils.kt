@@ -104,7 +104,6 @@ object SkyBlockItemModifierUtils {
         @Expose val extraData: JsonObject? = null,
     ) {
         val properSkinItem get() = skin?.let { "PET_SKIN_$skin".toInternalName() }
-        fun getSkinVariantIndex() = extraData?.let { PetUtils.getVariantIndexOrNull(it) }
     }
 
     fun SafeItemStack.getPetCandyUsed(): Int? {
