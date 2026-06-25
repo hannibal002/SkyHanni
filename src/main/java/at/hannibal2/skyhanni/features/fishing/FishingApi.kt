@@ -279,7 +279,7 @@ object FishingApi {
 
     fun SafeItemStack.isBait(): Boolean {
         val category = getItemCategoryOrNull() ?: return false
-        if (category == ItemCategory.BAIT || category == ItemCategory.FISHING_BAIT) return true
+        if (category == ItemCategory.BAIT) return true
         val internalName = getInternalNameOrNull() ?: return false
         return internalName in obfuscatedBaits
     }
