@@ -125,9 +125,9 @@ object GardenNextJacobContest {
      * REGEX-TEST: ○ Cactus
      * REGEX-TEST: ☘ Carrot
      * REGEX-TEST: ○ Melon
-     * REGEX-TEST:  ☘ Mushroom
-     * REGEX-TEST:  ○ Pumpkin
-     * REGEX-TEST:  ○ Wheat
+     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
+     * WRAPPED-REGEX-TEST: " ○ Pumpkin"
+     * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
@@ -355,7 +355,7 @@ object GardenNextJacobContest {
         }
 
         display = if (fetchingContestsMutex.isLocked) {
-            Renderable.text("§cFetching this years jacob contests...")
+            Renderable.text("§cFetching this year's Jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
@@ -463,6 +463,7 @@ object GardenNextJacobContest {
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
+
     @Suppress("DEPRECATION")
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
@@ -506,7 +507,7 @@ object GardenNextJacobContest {
         if (!haveAllContests || isCloseToNewYear()) return
         CoroutineSettings("garden jacob contest send").withIOContext().withMutex(sendingContestsMutex).launchCoroutine {
             if (EliteDevApi.submitContests(knownContests)) {
-                ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+                ChatUtils.chat("Successfully submitted this year's upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(
                 "Something went wrong submitting upcoming contests!",
                 "submitContestsToElite not successful",

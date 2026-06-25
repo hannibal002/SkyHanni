@@ -23,7 +23,6 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import java.util.TreeSet
 
 private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
 private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()

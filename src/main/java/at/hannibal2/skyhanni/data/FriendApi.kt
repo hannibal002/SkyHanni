@@ -5,12 +5,19 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
+import at.hannibal2.skyhanni.events.FriendAddEvent
+import at.hannibal2.skyhanni.events.FriendRemoveEvent
+import at.hannibal2.skyhanni.events.FriendRequestDeclinedEvent
+import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
+import at.hannibal2.skyhanni.events.FriendRequestSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
@@ -18,6 +25,7 @@ import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.util.UUID
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object FriendApi {
@@ -71,6 +79,23 @@ object FriendApi {
         "/viewprofile (?<uuid>.*)",
     )
 
+    /**
+     * REGEX-TEST: The friend request to ouppy has expired.
+     */
+    private val friendRequestExpiredPattern by patternGroup.pattern(
+        "friend-request-expired",
+        "The friend request to (?<name>.*) has expired.",
+    )
+
+    /**
+     * REGEX-TEST: You sent a friend request to enbylae!
+     */
+    private val friendRequestSentPattern by patternGroup.pattern(
+        "friend-request-sent",
+        "You sent a friend request to (?<name>.*)!",
+    )
+
+    private val pendingRequests = mutableListOf<String>()
     private val tempFriends = mutableListOf<Friend>()
 
     private fun getFriends() = SkyHanniMod.friendsData.players.getOrPut(PlayerUtils.getRawUuid()) {
@@ -106,6 +131,7 @@ object FriendApi {
         }
         addedFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
+            removePendingRequest(name)
             addFriend(name)
         }
 
@@ -116,6 +142,16 @@ object FriendApi {
         bestFriendPattern.matchMatcher(event.message) {
             val name = group("name").cleanPlayerName()
             setBestFriend(name, true)
+        }
+
+        friendRequestExpiredPattern.matchMatcher(event.cleanMessage) {
+            val name = group("name")
+            removePendingRequest(name)
+            FriendRequestExpiredEvent(name).post()
+        }
+        friendRequestSentPattern.matchMatcher(event.cleanMessage) {
+            val name = group("name")
+            addPendingRequest(name)
         }
     }
 
@@ -128,12 +164,14 @@ object FriendApi {
 
     private fun addFriend(name: String) {
         tempFriends.add(Friend().also { it.name = name })
+        FriendAddEvent(name).post()
     }
 
     private fun removedFriend(name: String) {
         tempFriends.removeIf { it.name == name }
         getFriends().entries.removeIf { it.value.name == name }
         saveConfig()
+        FriendRemoveEvent(name).post()
     }
 
     private fun readFriendsList(event: SkyHanniChatEvent.Allow) {
@@ -184,5 +222,25 @@ object FriendApi {
         }
 
         return null
+    }
+
+    private fun addPendingRequest(name: String) {
+        pendingRequests.add(name)
+
+        // This is 6 minutes instead of 5 minutes to be extra sure that the request has expired
+        DelayedRun.runDelayed(6.minutes) {
+            val stillPending = pendingRequests.contains(name)
+            if (!stillPending) return@runDelayed
+
+            removePendingRequest(name)
+            if (!SkyBlockUtils.onHypixel) return@runDelayed
+            FriendRequestDeclinedEvent(name).post()
+        }
+
+        FriendRequestSentEvent(name).post()
+    }
+
+    private fun removePendingRequest(name: String) {
+        pendingRequests.removeIf { it == name }
     }
 }

@@ -29,7 +29,7 @@ public abstract class MixinChatComponent {
         GuiMessage message
     ) {
         GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
-        line.skyhanni$setMessageId(message.skyhanni$getMessageId());
+        line.skyhanni$setParent(message);
         return line;
     }
 }

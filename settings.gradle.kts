@@ -1,5 +1,3 @@
-import at.skyhanni.sharedvariables.MultiVersionStage
-
 pluginManagement {
     includeBuild("sharedVariables")
     repositories {
@@ -34,8 +32,6 @@ plugins {
     id("at.skyhanni.shared-variables")
     id("dev.kikugie.stonecutter") version "0.9"
 }
-
-MultiVersionStage.initFrom(file(".gradle/private.properties"))
 
 include("annotation-processors")
 include("detekt")

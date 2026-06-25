@@ -22,7 +22,6 @@ import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
@@ -134,7 +133,7 @@ object GardenCustomKeybinds {
     }
 
     private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+        this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
         key.value != override
@@ -159,7 +158,7 @@ object GardenCustomKeybinds {
         if (pressedToggleKeys[this] == override) return false
 
         pressedToggleKeys[this] = override
-        setDown(true)
+        isDown = true
         return true
     }
 
