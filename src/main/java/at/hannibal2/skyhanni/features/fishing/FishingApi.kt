@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -101,15 +102,15 @@ object FishingApi {
     )
 
     private val obfuscatedBaits = setOf(
-        "OBFUSCATED_FISH_1_BRONZE".toInternalName(),
-        "OBFUSCATED_FISH_1_SILVER".toInternalName(),
-        "OBFUSCATED_FISH_1_GOLD".toInternalName(),
-        "OBFUSCATED_FISH_1_DIAMOND".toInternalName(),
-        "OBFUSCATED_FISH_2_BRONZE".toInternalName(),
-        "OBFUSCATED_FISH_2_SILVER".toInternalName(),
-        "OBFUSCATED_FISH_2_GOLD".toInternalName(),
-        "OBFUSCATED_FISH_2_DIAMOND".toInternalName(),
-    )
+        "OBFUSCATED_FISH_1_BRONZE",
+        "OBFUSCATED_FISH_1_SILVER",
+        "OBFUSCATED_FISH_1_GOLD",
+        "OBFUSCATED_FISH_1_DIAMOND",
+        "OBFUSCATED_FISH_2_BRONZE",
+        "OBFUSCATED_FISH_2_SILVER",
+        "OBFUSCATED_FISH_2_GOLD",
+        "OBFUSCATED_FISH_2_DIAMOND",
+    ).toInternalNames()
 
     const val babySlugName = "Baby Magma Slug"
 
