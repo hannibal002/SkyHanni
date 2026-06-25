@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.garden.leaderboards
 
-import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteLeaderboardGenericConfig
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.GardenDisplayGenericConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.MultiTypeRankGoalConfig
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.rankgoals.CropTypeRankGoalsConfig
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -19,7 +19,7 @@ class CropCollectionLeaderboardConfig : EliteLeaderboardGenericConfig<
     { CropCollectionDisplayConfig() }
 )
 
-class CropCollectionDisplayConfig : EliteDisplayGenericConfig() {
+class CropCollectionDisplayConfig : GardenDisplayGenericConfig() {
 
     @Expose
     @ConfigOption(

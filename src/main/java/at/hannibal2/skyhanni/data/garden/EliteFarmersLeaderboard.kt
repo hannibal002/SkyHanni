@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getLeaderboardConfig
@@ -18,8 +18,13 @@ import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardMode
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
+import at.hannibal2.skyhanni.data.foraging.ForagingCollectionApi
+
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
+import at.hannibal2.skyhanni.events.foraging.ForagingCollectionAddEvent
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.foragingLog
+import at.hannibal2.skyhanni.features.foraging.ForagingLogType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
@@ -36,6 +41,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
@@ -59,6 +65,7 @@ object EliteFarmersLeaderboard {
         EliteLeaderboardType.Crop::class to Mutex(),
         EliteLeaderboardType.Weight::class to Mutex(),
         EliteLeaderboardType.Pest::class to Mutex(),
+        EliteLeaderboardType.ForagingLog::class to Mutex(),
     )
     private val storage get() = GardenApi.storage?.farmingWeight
 
@@ -104,6 +111,21 @@ object EliteFarmersLeaderboard {
         val leaderboardType = EliteLeaderboardType.Crop(event.crop, EliteLeaderboardMode.MONTHLY)
         val currentAmount = leaderboardAmountMap?.get(leaderboardType) ?: event.amount.toDouble()
         leaderboardAmountMap?.set(leaderboardType, currentAmount + event.amount.toDouble())
+    }
+
+    @HandleEvent
+    fun onForagingCollectionAdd(event: ForagingCollectionAddEvent) {
+        // ALL_TIME: getForagingLogCollection reads the local storage counter directly, so it updates in
+        // real time as ForagingCollectionApi.recordLogGain writes to storage before firing this event.
+        // No leaderboardAmountMap update needed here for ALL_TIME.
+
+        // MONTHLY: accumulate the session delta on top of the API baseline so the displayed count
+        // decreases in real time while the player forages.
+        // Guard with ?: return so we only accumulate once the Elite API has provided an initial monthly
+        // amount — starting from 0 would show a misleadingly large "until next player" value.
+        val monthlyType = EliteLeaderboardType.ForagingLog(event.logType, EliteLeaderboardMode.MONTHLY)
+        val monthlyCurrent = leaderboardAmountMap?.get(monthlyType) ?: return
+        leaderboardAmountMap?.set(monthlyType, monthlyCurrent + event.amount.toDouble())
     }
 
     @HandleEvent
@@ -183,8 +205,12 @@ object EliteFarmersLeaderboard {
             }
         }
 
-        // We want to prevent spamming the api, especially when swapping leaderboard displays
-        if (lastFetchAttempt.passedSince() <= 3.seconds) return null
+        // We want to prevent spamming the api, especially when swapping leaderboard displays.
+        // However, allow an immediate fetch when this leaderboard type has never been loaded this session
+        // (apiData == null) — e.g. when the player switches to a new tree type mid-session.
+        // The throttle only applies to re-fetches of already-seen types.
+        val neverFetchedThisSession = lbData.apiData == null
+        if (!neverFetchedThisSession && lastFetchAttempt.passedSince() <= 3.seconds) return null
         lastFetchAttempt = SimpleTimeMark.now()
         fetchAttempts++
 
@@ -226,7 +252,31 @@ object EliteFarmersLeaderboard {
         return when (leaderboardType) {
             is EliteLeaderboardType.Weight -> getWeight(leaderboardType.mode)
             is EliteLeaderboardType.Crop -> getCropCollection(leaderboardType.crop, leaderboardType.mode)
+            is EliteLeaderboardType.ForagingLog -> getForagingLogCollection(leaderboardType.log, leaderboardType.mode)
             else -> leaderboardAmountMap?.get(leaderboardType)
+        }
+    }
+
+    private fun getForagingLogCollection(logType: ForagingLogType, mode: EliteLeaderboardMode): Double {
+        // Optimistic block-break estimates that make the counter decrement immediately on each
+        // axe swing instead of waiting for the sack/inventory packet to arrive.
+        // Long (whole numbers) so the display never shows fractional log counts.
+        val optimistic = ForagingCollectionApi.optimisticGains[logType] ?: 0L
+        return when (mode) {
+            // Mirror getCropCollection: always return local count so getNextPlayer() can compute
+            // amountBehind even for unranked players (where leaderboardAmountMap is cleared).
+            EliteLeaderboardMode.ALL_TIME -> {
+                val localCount = with(ForagingCollectionApi) { logType.getCollection() }
+                (localCount + optimistic).toDouble()
+            }
+            // Fall back to 0.0 when the base is null (unranked player, or first load before API
+            // responds). This lets getNextPlayer() find the last-ranked player to show as the
+            // overtake target, and lets onForagingCollectionAdd accumulate gains once the base
+            // has been initialised to 0.0 by the unranked handler below.
+            EliteLeaderboardMode.MONTHLY -> {
+                val base = leaderboardAmountMap?.get(EliteLeaderboardType.ForagingLog(logType, mode)) ?: 0.0
+                base + optimistic
+            }
         }
     }
 
@@ -241,6 +291,10 @@ object EliteFarmersLeaderboard {
             )
 
             is EliteLeaderboardType.Pest -> getAmount(
+                leaderboardType.copy(mode = eliteLeaderboardMode),
+            )
+
+            is EliteLeaderboardType.ForagingLog -> getAmount(
                 leaderboardType.copy(mode = eliteLeaderboardMode),
             )
         }
@@ -286,7 +340,7 @@ object EliteFarmersLeaderboard {
 
         val category = leaderboardType::class
 
-        SkyHanniMod.launchIOCoroutine("load elite lb", timeout = 15.seconds) {
+        CoroutineSettings("load elite lb", timeout = 15.seconds).withIOContext().launchCoroutine {
             try {
                 loadingLeaderboardMutex[leaderboardType::class]?.withLock {
                     val oldPos = leaderboardPosMap?.get(leaderboardType)
@@ -336,7 +390,12 @@ object EliteFarmersLeaderboard {
         // Fetch upcoming players from current lb pos if api hasn't updated, or from rank goal
         val rankGoal = getRankGoal(leaderboardType)
         val useRankGoal = getRankConfig(leaderboardType).useRankGoal.get() && rankGoal != null
-        val atRank = getAtRank(currentPos, rankGoal, useRankGoal)
+        // For unranked players (currentPos == Int.MAX_VALUE) the normal atRank calculation returns
+        // null, which causes the Elite API to omit the "upcoming players" window entirely.
+        // Re-using the upcomingRank from the previous API response gives the API an anchor so it
+        // can return the bottom-of-the-leaderboard players on subsequent fetches.
+        val previousUpcomingRank = lbData.apiData?.upcomingRank
+        val atRank = getAtRank(currentPos, rankGoal, useRankGoal, previousUpcomingRank)
 
         val apiData = EliteDevApi.fetchLeaderboardPositions(
             profileId = profileId,
@@ -366,8 +425,38 @@ object EliteFarmersLeaderboard {
             // correct wrong data
             leaderboardAmountMap?.remove(leaderboardType)
             leaderboardPosMap?.remove(leaderboardType)
+            // For ForagingLog ALL_TIME the Elite API still returns the player's actual collection
+            // count even when they are unranked — seed the local store with it so the
+            // "until ranked" display shows the real remaining amount instead of session-only gains.
+            // Guard with > 0 in case the API returns 0/invalid for this leaderboard type.
+            // Guard with > current so a stale API response never overwrites fresher local data.
+            if (leaderboardType is EliteLeaderboardType.ForagingLog &&
+                leaderboardType.mode == EliteLeaderboardMode.ALL_TIME
+            ) {
+                val logType = leaderboardType.foragingLog
+                if (logType != null && apiData.amount > 0) {
+                    with(ForagingCollectionApi) {
+                        val current = logType.getCollection()
+                        if (apiData.amount.toLong() > current) {
+                            logType.setCollectionCounter(apiData.amount.toLong())
+                        }
+                    }
+                }
+            }
+            // For ForagingLog MONTHLY, initialise the session base to 0 instead of leaving it
+            // null.  onForagingCollectionAdd uses ?: return, so without this the monthly amount
+            // can never accumulate while the player is unranked.  Starting from 0 lets real-time
+            // gains add up correctly from the moment the API confirms the player is unranked.
+            if (leaderboardType is EliteLeaderboardType.ForagingLog &&
+                leaderboardType.mode == EliteLeaderboardMode.MONTHLY
+            ) {
+                leaderboardAmountMap?.set(leaderboardType, 0.0)
+            }
             if (!useRankGoal) {
-                lbData.nextPlayers.clear()
+                // Still populate nextPlayers so the overtake line can display
+                // "X logs behind [LowestRankedPlayer]" instead of a bare "until ranked!" message.
+                // handleUpcomingPlayers internally clears nextPlayers before re-populating.
+                handleUpcomingPlayers(leaderboardType, apiData, false)
                 lbData.lastPlayer = null
             }
 
@@ -376,6 +465,15 @@ object EliteFarmersLeaderboard {
         lbData.isUnranked = false
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
         handleUpcomingPlayers(leaderboardType, apiData, shouldUpdateData)
+        // On the very first fetch (currentPos == Int.MAX_VALUE) the API call had no atRank
+        // anchor, so it returns upcoming players based on its own heuristic (often the top-N
+        // boundary, e.g. rank 10 000) rather than the players adjacent to the player's actual
+        // rank.  When no rank goal is active this means the display incorrectly shows e.g.
+        // "2,177,026 behind ItsAqito [#10,000]" for a player at rank 61,286.  Schedule an
+        // immediate re-fetch so the correct adjacent players are loaded after the throttle.
+        if (currentPos == Int.MAX_VALUE && !useRankGoal && apiData.rank > 0) {
+            lbData.shouldRefresh = true
+        }
         // prefer our lb pos
         return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
@@ -402,10 +500,15 @@ object EliteFarmersLeaderboard {
         return 10
     }
 
-    private fun getAtRank(currentPos: Int, rankGoal: Int?, useRankGoal: Boolean): Int? = when {
+    private fun getAtRank(currentPos: Int, rankGoal: Int?, useRankGoal: Boolean, previousUpcomingRank: Int?): Int? = when {
         useRankGoal -> minOf((rankGoal ?: 0) + 1, currentPos)
         currentPos != Int.MAX_VALUE -> currentPos
-        else -> null
+        // For unranked players, no positional anchor is available.
+        // Re-use the upcomingRank that the previous API response reported so the Elite API can
+        // anchor the "upcoming players" window at the bottom of the leaderboard.  On first load
+        // this will still be null, but the second fetch will have a valid anchor and will return
+        // the last-ranked player(s), allowing the display to show "X behind [PlayerName]".
+        else -> previousUpcomingRank?.takeIf { it > 0 }
     }
 
     // only update data if api data has changed since last request
@@ -421,6 +524,7 @@ object EliteFarmersLeaderboard {
             is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData)
             is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData)
             is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData)
+            is EliteLeaderboardType.ForagingLog -> handleForagingDiff(leaderboardType, apiData)
         }
         eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.apply {
             lastApiAmount = apiData.amount
@@ -451,6 +555,26 @@ object EliteFarmersLeaderboard {
         apiData: EliteLeaderboard,
     ) {
         leaderboardAmountMap?.set(leaderboardType, apiData.amount)
+    }
+
+    private fun handleForagingDiff(
+        leaderboardType: EliteLeaderboardType,
+        apiData: EliteLeaderboard,
+    ) {
+        val logType = leaderboardType.foragingLog
+        if (logType == null) {
+            leaderboardAmountMap?.set(leaderboardType, apiData.amount)
+            return
+        }
+        when (leaderboardType.mode) {
+            EliteLeaderboardMode.ALL_TIME -> with(ForagingCollectionApi) {
+                val current = logType.getCollection()
+                if (apiData.amount.toLong() > current) {
+                    logType.setCollectionCounter(apiData.amount.toLong())
+                }
+            }
+            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.set(leaderboardType, apiData.amount)
+        }
     }
 
     private fun handleUpcomingPlayers(

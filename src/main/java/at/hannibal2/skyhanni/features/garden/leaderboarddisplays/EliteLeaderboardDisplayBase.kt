@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getConfigFromClass
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
+import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.GardenDisplayGenericConfig
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.LeaderboardPlayerInfo
 import at.hannibal2.skyhanni.data.garden.EliteFarmersLeaderboard.clearCategories
@@ -83,7 +84,6 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
 
     open fun currentLeaderboardType(): EliteLeaderboardType? {
         val enum = currentEnum ?: run {
-            // Debounce leaderboard when auto switching
             val now = SimpleTimeMark.now()
             if (lastEnumSwitchTime.passedSince() < 5.seconds) {
                 lastAutoSelectedEnum
@@ -257,10 +257,13 @@ abstract class EliteLeaderboardDisplayBase<E : Enum<E>, T : EliteLeaderboardType
         apiError = false
     }
 
-    fun isEnabled(): Boolean = (baseClass?.let { EliteLeaderboards.getFromTypeOrNull(it)?.isEnabled } ?: false) && (inGardenEnabled())
+    open fun isEnabled(): Boolean = (baseClass?.let { EliteLeaderboards.getFromTypeOrNull(it)?.isEnabled } ?: false) && (inIslandEnabled())
 
-    private fun inGardenEnabled() =
-        SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || (config?.display?.showOutsideGarden ?: false))
+    open fun inIslandEnabled(): Boolean {
+        if (!SkyBlockUtils.inSkyBlock) return false
+        val showOutsideGarden = (config?.display as? GardenDisplayGenericConfig)?.showOutsideGarden ?: false
+        return GardenApi.inGarden() || showOutsideGarden
+    }
 
     abstract fun shouldShowDisplay(): Boolean
 

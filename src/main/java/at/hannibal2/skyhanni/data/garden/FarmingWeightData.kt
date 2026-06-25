@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data.garden
 
-import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.foraging.ForagingCollectionApi
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.lastGainedCrop
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
@@ -18,10 +19,11 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.foraging.ForagingLogType
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,6 +36,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.api.ApiStaticGetPath
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -61,12 +64,12 @@ object FarmingWeightData {
     private var shouldRecalculateWeight = false
 
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
+    fun onWorldChange(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
         updateCollections()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onProfileJoin(event: ProfileJoinEvent) {
         updateCollections()
     }
@@ -87,7 +90,7 @@ object FarmingWeightData {
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
 
-        SkyHanniMod.launchIOCoroutine("get crop weights") {
+        CoroutineSettings("get crop weights").withIOContext().launchCoroutine {
             getCropWeights()
         }
     }
@@ -140,13 +143,13 @@ object FarmingWeightData {
         fetchCollections()
     }
 
-    private fun fetchCollections() = SkyHanniMod.launchIOCoroutine("fetch collections", timeout = 30.seconds) {
+    private fun fetchCollections() = CoroutineSettings("fetch collections", timeout = 30.seconds).withIOContext().launchCoroutine {
         collectionMutex.withLock {
             val apiData = EliteDevApi.fetchWeightProfile(HypixelData.profileName) ?: run {
                 if (weightMap.isEmpty()) {
                     apiError = true
                 }
-                return@launchIOCoroutine
+                return@launchCoroutine
             }
             profileId = apiData.profileId
             // we track this, so we only want elite values if they're higher or significantly different from what we have tracked
@@ -167,6 +170,8 @@ object FarmingWeightData {
             apiData.uncountedCrops.forEach { (name, value) ->
                 CropType.getByNameOrNull(name)?.let { ignoredCollection[it] = value.toLong() }
             }
+
+
             bonusWeight = apiData.bonusWeight.sumAllValues()
 
             weightGain = 0.0

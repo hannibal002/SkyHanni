@@ -34,7 +34,9 @@ import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
+import at.hannibal2.skyhanni.features.foraging.ForagingLogType
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
+import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.ForagingLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
@@ -627,6 +629,10 @@ class ProfileSpecificStorage(
             @Expose
             var minAmountMap: MutableMap<EliteLeaderboardType, Double> = mutableMapOf()
 
+            @Expose
+            var foragingLogDisplayType: ForagingLeaderboardStorage =
+                ForagingLeaderboardStorage(null, EliteLeaderboardMode.ALL_TIME)
+
         }
 
         @Expose
@@ -743,6 +749,15 @@ class ProfileSpecificStorage(
         // todo when we're fully 1.21, change ForagingTrackerLegacy to ForagingTracker
         @Expose
         var trackerData: ForagingTrackerLegacy.BucketData = ForagingTrackerLegacy.BucketData()
+
+        @Expose
+        var foragingCollection: MutableMap<ForagingLogType, Long> = enumMapOf()
+
+        @Expose
+        var lastGainedLog: ForagingLogType? = null
+
+        @Expose
+        var lastGainedLogCollectionTime: SimpleTimeMark = farPast()
     }
 
     // - mining

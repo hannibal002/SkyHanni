@@ -82,27 +82,47 @@ object CompactSweepDetails {
     private var isInsideSweepDetails = false
     private var sweepDetails: SweepDetails = SweepDetails()
 
+    /**
+     * The most recently observed logs-per-break for each [ForagingLogType], read directly
+     * from Hypixel's "Sweep Details" chat messages. This value already incorporates the
+     * game's full calculation (Sweep toughness formula + Foraging Fortune + any penalties),
+     * so it is used by [at.hannibal2.skyhanni.data.foraging.ForagingCollectionApi] as the
+     * optimistic per-block-break increment instead of the naïve +1 default.
+     *
+     * Updated every time a finalised sweep-details sequence is received, regardless of
+     * whether the [at.hannibal2.skyhanni.config.features.foraging.TreesConfig.compactSweepDetails]
+     * setting is enabled.
+     */
+    val lastKnownLogsPerBreak: MutableMap<ForagingLogType, Double> = mutableMapOf()
+
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!isInIsland() || !config.compactSweepDetails) return
+        // Data-capture runs regardless of compactSweepDetails; only suppression is gated.
+        if (!isInIsland()) return
         sweepDetailsPattern.matchMatcher(event.message) {
-            if (sweepDetails.penalties.isNotEmpty()) {
-                sendCompactedResults()
+            // If the previous sweep-details block never finalised (e.g. interrupted), clean up.
+            if (isInsideSweepDetails) {
+                if (config.compactSweepDetails && sweepDetails.penalties.isNotEmpty()) {
+                    sendCompactedResults()
+                } else {
+                    resetSweepDetailsVariables()
+                }
             }
-            // Set these to true so future messages get blocked properly regardless of Axe Throw status
             isInsideSweepDetails = true
             sweepDetailsAreDirty = true
             sweepDetails = SweepDetails()
             sweepDetails.addedInitialLogs = false
-            sweepDetails.sweepDisplay = group("sweep")
-            sweepDetails.penalties.addAll(
-                listOf(
-                    "§eClick to open the Tree Gifts guide!",
-                    "§6Initial §2Sweep§7: §2${group("sweepAmt").formatDouble()}",
-                ),
-            )
-            sweepDetails.breakdown.add("§2Sweep: ${sweepDetails.sweepDisplay}")
-            event.blockedReason = "SWEEP_DETAILS"
+            if (config.compactSweepDetails) {
+                sweepDetails.sweepDisplay = group("sweep")
+                sweepDetails.penalties.addAll(
+                    listOf(
+                        "§eClick to open the Tree Gifts guide!",
+                        "§6Initial §2Sweep§7: §2${group("sweepAmt").formatDouble()}",
+                    ),
+                )
+                sweepDetails.breakdown.add("§2Sweep: ${sweepDetails.sweepDisplay}")
+                event.blockedReason = "SWEEP_DETAILS"
+            }
             return
         }
         if (!isInsideSweepDetails) return
@@ -111,35 +131,50 @@ object CompactSweepDetails {
             val fixedToughness = toughnessAmount.removeSuffix(".0")
             sweepDetails.treeType = group("treeType")
             sweepDetails.toughness = toughnessAmount.formatDouble()
-            sweepDetails.logCountDisplay = group("logsDisplay")
             sweepDetails.logs = group("logsAmount").formatDouble()
-            sweepDetails.penalties.add(
-                "§6Initial Logs: ${sweepDetails.logs} " +
-                    "${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)",
-            )
-            event.blockedReason = "SWEEP_DETAILS"
+            if (config.compactSweepDetails) {
+                sweepDetails.logCountDisplay = group("logsDisplay")
+                sweepDetails.penalties.add(
+                    "§6Initial Logs: ${sweepDetails.logs} " +
+                        "${sweepDetails.treeType} Logs §7(§6$fixedToughness toughness§7)",
+                )
+                event.blockedReason = "SWEEP_DETAILS"
+            }
             if (isFinalCalculation(group("isItGreen"))) {
-                sendCompactedResults()
+                recordFinalLogsPerBreak()
+                if (config.compactSweepDetails) sendCompactedResults()
+                else resetSweepDetailsVariables()
             }
         }
         penaltyPattern.matchMatcher(event.message) {
-            if (!sweepDetails.addedInitialLogs) {
+            if (config.compactSweepDetails && !sweepDetails.addedInitialLogs) {
                 sweepDetails.breakdown.add("§7, §e${sweepDetails.logs} logs")
                 sweepDetails.addedInitialLogs = true
             }
             sweepDetails.logs = group("logsAmount").formatDouble()
-            sweepDetails.logCountDisplay = group("logsDisplay")
-            sweepDetails.penalties.add(
-                "§e${group("penaltyReason")}§7: " +
-                    "§c-${group("penaltyPercent").formatDouble()}% " +
-                    "§7(${sweepDetails.logs} logs)",
-            )
-            sweepDetails.breakdown.add("§7(${group("penaltyDisplay")}§7)")
-            sweepDetails.proTip = groupOrEmpty("proTip")
-            event.blockedReason = "SWEEP_DETAILS"
-            if (isFinalCalculation(group("isItGreen"))) {
-                sendCompactedResults()
+            if (config.compactSweepDetails) {
+                sweepDetails.logCountDisplay = group("logsDisplay")
+                sweepDetails.penalties.add(
+                    "§e${group("penaltyReason")}§7: " +
+                        "§c-${group("penaltyPercent").formatDouble()}% " +
+                        "§7(${sweepDetails.logs} logs)",
+                )
+                sweepDetails.breakdown.add("§7(${group("penaltyDisplay")}§7)")
+                sweepDetails.proTip = groupOrEmpty("proTip")
+                event.blockedReason = "SWEEP_DETAILS"
             }
+            if (isFinalCalculation(group("isItGreen"))) {
+                recordFinalLogsPerBreak()
+                if (config.compactSweepDetails) sendCompactedResults()
+                else resetSweepDetailsVariables()
+            }
+        }
+    }
+
+    /** Persists the finalised logs-per-break into [lastKnownLogsPerBreak] for ForagingCollectionApi. */
+    private fun recordFinalLogsPerBreak() {
+        ForagingLogType.fromSweepTreeName(sweepDetails.treeType)?.let { logType ->
+            lastKnownLogsPerBreak[logType] = sweepDetails.logs
         }
     }
 

@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data.jsonobjects.elitedev
 
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Crop
+import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.ForagingLog
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Pest
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType.Weight
+import at.hannibal2.skyhanni.features.foraging.ForagingLogType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -101,11 +103,20 @@ sealed class EliteLeaderboardType {
         override fun toString() = "${pest?.displayName ?: "Pest"} Kills${mode.displaySuffix}"
     }
 
+    data class ForagingLog(
+        @Expose val log: ForagingLogType,
+        @Expose override val mode: EliteLeaderboardMode,
+    ) : EliteLeaderboardType(), WithEnum<ForagingLogType> {
+        override val enumValue: ForagingLogType = log
+        override fun toString() = "${log.logName} Collection${mode.displaySuffix}"
+    }
+
     val lbName: String
         get() = when (this) {
             is Weight -> "${weight.apiName}${mode.lbSuffix}"
             is Crop -> "${crop.eliteLbName}${mode.lbSuffix}"
             is Pest -> "${pest?.eliteLbName ?: "pests"}${mode.lbSuffix}"
+            is ForagingLog -> "${log.eliteLbName}${mode.lbSuffix}"
         }
 
     val type
@@ -113,6 +124,7 @@ sealed class EliteLeaderboardType {
             is Weight -> this.weight
             is Crop -> this.crop
             is Pest -> this.pest
+            is ForagingLog -> this.log
         }
 }
 
@@ -121,6 +133,9 @@ val EliteLeaderboardType.pest: PestType?
 
 val EliteLeaderboardType.crop: CropType?
     get() = (this as? Crop)?.crop
+
+val EliteLeaderboardType.foragingLog: ForagingLogType?
+    get() = (this as? ForagingLog)?.log
 
 enum class EliteLeaderboardMode(
     val displayName: String,
@@ -167,6 +182,12 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                 }
                 out.name("mode").value(value.mode.name)
             }
+
+            is ForagingLog -> {
+                out.name("type").value("foraging")
+                out.name("log").value(value.log.name)
+                out.name("mode").value(value.mode.name)
+            }
         }
         out.endObject()
     }
@@ -177,6 +198,7 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
         var weight: FarmingWeight? = null
         var crop: CropType? = null
         var pest: PestType? = null
+        var log: ForagingLogType? = null
 
         reader.beginObject()
         while (reader.hasNext()) {
@@ -193,6 +215,7 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                         pest = PestType.valueOf(reader.nextString())
                     }
                 }
+                "log" -> log = ForagingLogType.valueOf(reader.nextString())
 
                 else -> reader.skipValue()
             }
@@ -219,6 +242,13 @@ class EliteLeaderboardTypeAdapter : TypeAdapter<EliteLeaderboardType>() {
                     throw JsonParseException("Missing required fields for Pest")
                 }
                 Pest(pest, mode)
+            }
+
+            "foraging" -> {
+                if (log == null || mode == null) {
+                    throw JsonParseException("Missing required fields for ForagingLog")
+                }
+                ForagingLog(log, mode)
             }
 
             else -> throw JsonParseException("Unknown type: $type")
