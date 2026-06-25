@@ -53,7 +53,7 @@ object BazaarCancelledBuyOrderClipboard {
         val stack = event.inventoryItems[11] ?: return
         if (!stack.hoverName.string.contains("Cancel Order")) return
 
-        val lore = stack.getLore().map { it.removeColor() }
+        val lore = stack.getLoreComponent().map { it.string.removeColor() }
         lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
