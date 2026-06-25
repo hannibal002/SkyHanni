@@ -170,7 +170,7 @@ object ElectionApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!CalenderApi.inCalendar) return
+        if (!CalendarApi.inCalendar) return
 
         val stack: SafeItemStack = event.inventoryItems.values.firstOrNull {
             mayorHeadPattern.matchMatcher(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) {

@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
-object CalenderApi {
-    private val group = RepoPattern.group("calenderapi")
+object CalendarApi {
+    private val group = RepoPattern.group("calendarapi")
 
     var inMainCalendar = false
         private set
