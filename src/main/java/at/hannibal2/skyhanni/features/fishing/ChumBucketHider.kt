@@ -21,8 +21,8 @@ import kotlin.time.Duration.Companion.seconds
 object ChumBucketHider {
 
     private val config get() = SkyHanniMod.feature.fishing.chumBucketHider
-    private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
-    private val hiddenEntities = TimeLimitedCache<Entity, Boolean>(5.seconds)
+    private val titleEntity = TimeLimitedSet<Entity>(5.seconds, weak = true)
+    private val hiddenEntities = TimeLimitedCache<Entity, Boolean>(5.seconds, useWeakKeys = true)
 
     @HandleEvent
     fun onWorldChange() {

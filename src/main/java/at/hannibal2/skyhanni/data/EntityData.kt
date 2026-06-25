@@ -21,8 +21,8 @@ import kotlin.time.Duration.Companion.milliseconds
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds)
-    private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
+    private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds, useWeakKeys = true)
+    private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds, useWeakKeys = true)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
     // TODO replace with packet detection

@@ -64,7 +64,7 @@ object VanquisherApi {
     private var lastSoundPos: LorenzVec? = null
     private var lastSoundTime = SimpleTimeMark.farPast()
 
-    private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
+    private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes, useWeakKeys = true) { mob, data, _ ->
         if (mob != null && data != null) data.postDespawn()
     }
 
