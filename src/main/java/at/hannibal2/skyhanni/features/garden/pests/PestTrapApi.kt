@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import com.google.common.cache.RemovalCause.EXPIRED
-import com.google.common.cache.RemovalCause.COLLECTED
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -132,7 +131,7 @@ object PestTrapApi {
     private fun baseWidgetStatus() = TimeLimitedCache<TabWidget, Boolean>(
         expireAfterWrite = 30.seconds,
         removalListener = { key, _, removalCause ->
-            if (removalCause != EXPIRED && removalCause != COLLECTED) return@TimeLimitedCache
+            if (removalCause != EXPIRED) return@TimeLimitedCache
             widgetErrors.addOrPut(key ?: return@TimeLimitedCache, 1)
         },
     )
