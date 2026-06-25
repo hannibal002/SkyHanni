@@ -171,7 +171,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
             else -> content.points.toDouble()
         }
 
-        private fun distribution(cell: Int): Map<Fruit, Double> = beliefs[cell] ?: emptyMap()
+        private fun distribution(cell: Int): Map<Fruit, Double> = beliefs[cell].orEmpty()
 
         private fun probabilityOf(cell: Int, content: Fruit): Double {
             knownContent[cell]?.let { return if (it == content) 1.0 else 0.0 }
