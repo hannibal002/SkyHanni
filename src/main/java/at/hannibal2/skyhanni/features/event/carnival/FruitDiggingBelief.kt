@@ -2,9 +2,6 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalFruitDigging.Fruit
 import kotlin.random.Random
-
-internal fun fruitDowsingRank(fruit: Fruit): Int = if (fruit == Fruit.APPLE) 0 else fruit.points
-
 internal class FruitDiggingBelief(
     private val openCells: List<Int>,
     private val pool: List<Fruit>,
@@ -105,7 +102,10 @@ internal class FruitDiggingBelief(
             for (slot in slots) {
                 val fruit = deal[slot]
                 if (!fruit.isEdible) continue
-                if (fruitDowsingRank(fruit) < clue.minRank) { ok = false; break } // a fruit below the floor
+                if (fruitDowsingRank(fruit) < clue.minRank) {
+                    ok = false
+                    break
+                } // a fruit below the floor
                 if (fruit == clue.named) foundNamed = true
             }
             ok && foundNamed
@@ -117,7 +117,10 @@ internal class FruitDiggingBelief(
             for (slot in slots) {
                 val fruit = deal[slot]
                 if (!fruit.isEdible) continue
-                if (fruitDowsingRank(fruit) > clue.maxRank) { ok = false; break } // a fruit above the cap
+                if (fruitDowsingRank(fruit) > clue.maxRank) {
+                    ok = false
+                    break
+                } // a fruit above the cap
                 if (fruit == clue.named) foundNamed = true
             }
             ok && foundNamed
@@ -135,10 +138,12 @@ internal class FruitDiggingBelief(
         }
     }
 
-    private companion object {
-        /** How many boards with clue we aim to collect before reporting probabilities. */
-        const val TARGET_SAMPLES = 500
+    companion object {
+        fun fruitDowsingRank(fruit: Fruit): Int = if (fruit == Fruit.APPLE) 0 else fruit.points
 
-        const val MAX_ATTEMPTS = 20_000
+        /** How many boards with clue we aim to collect before reporting probabilities. */
+        private const val TARGET_SAMPLES = 500
+
+        private const val MAX_ATTEMPTS = 20_000
     }
 }

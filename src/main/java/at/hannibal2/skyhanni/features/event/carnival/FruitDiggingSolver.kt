@@ -40,11 +40,13 @@ class FruitDiggingSolver(private val size: Int = 7) {
             val row = id / n
             val col = id % n
             buildList {
-                for (dr in -1..1) for (dc in -1..1) {
-                    if (dr == 0 && dc == 0) continue
-                    val r = row + dr
-                    val c = col + dc
-                    if (r in 0 until n && c in 0 until n) add(r * n + c)
+                for (dr in -1..1) {
+                    for (dc in -1..1) {
+                        if (dr == 0 && dc == 0) continue
+                        val r = row + dr
+                        val c = col + dc
+                        if (r in 0 until n && c in 0 until n) add(r * n + c)
+                    }
                 }
             }.toIntArray()
         }
@@ -85,28 +87,30 @@ class FruitDiggingSolver(private val size: Int = 7) {
         private val sampleCount: Int
 
         init {
-            for (row in 0 until size) for (col in 0 until size) {
-                val id = row * size + col
-                val cell = grid[row][col]
-                val content = cell.content?.takeIf { it != Fruit.UNKNOWN && it != Fruit.NO_FRUIT }
+            for (row in 0 until size) {
+                for (col in 0 until size) {
+                    val id = row * size + col
+                    val cell = grid[row][col]
+                    val content = cell.content?.takeIf { it != Fruit.UNKNOWN && it != Fruit.NO_FRUIT }
 
-                knownContent[id] = content
-                diggable[id] = cell.diggable
-                ghost[id] = cell.ghost && content == null
+                    knownContent[id] = content
+                    diggable[id] = cell.diggable
+                    ghost[id] = cell.ghost && content == null
 
-                if (cell.diggable) {
-                    candidates.add(id)
-                    if (content == null) {
-                        openCells.add(id)
-                        openCellsOnBoard.add(id)
+                    if (cell.diggable) {
+                        candidates.add(id)
+                        if (content == null) {
+                            openCells.add(id)
+                            openCellsOnBoard.add(id)
+                        }
+                    } else if (content == null) {
+                        openCells.add(id) // off-board but still an unknown
                     }
-                } else if (content == null) {
-                    openCells.add(id) // off-board but still an unknown
-                }
 
-                if (content != null && !cell.diggable) {
-                    if (content == Fruit.APPLE) applesCollected++
-                    if (content == Fruit.CHERRY) cherriesCollected++
+                    if (content != null && !cell.diggable) {
+                        if (content == Fruit.APPLE) applesCollected++
+                        if (content == Fruit.CHERRY) cherriesCollected++
+                    }
                 }
             }
 
@@ -125,16 +129,18 @@ class FruitDiggingSolver(private val size: Int = 7) {
         }
 
         private fun gatherClues(grid: Array<Array<CellInput>>): List<FruitDiggingBelief.Clue> = buildList {
-            for (row in 0 until size) for (col in 0 until size) {
-                val id = row * size + col
-                val cell = grid[row][col]
-                val hiddenNeighbors = neighborsOf[id].filter { it in openCellsOnBoard }
+            for (row in 0 until size) {
+                for (col in 0 until size) {
+                    val id = row * size + col
+                    val cell = grid[row][col]
+                    val hiddenNeighbors = neighborsOf[id].filter { it in openCellsOnBoard }
 
-                cell.minesCount?.let { add(FruitDiggingBelief.BombCount(hiddenNeighbors, it)) }
-                cell.treasure?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = false)) }
-                cell.anchor?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = true)) }
+                    cell.minesCount?.let { add(FruitDiggingBelief.BombCount(hiddenNeighbors, it)) }
+                    cell.treasure?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = false)) }
+                    cell.anchor?.let { add(orderClue(id, hiddenNeighbors, it, isAnchor = true)) }
 
-                if (ghost[id] || cell.mustFruit) add(FruitDiggingBelief.MustBeFruit(id))
+                    if (ghost[id] || cell.mustFruit) add(FruitDiggingBelief.MustBeFruit(id))
+                }
             }
         }
 
@@ -149,7 +155,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
             // If a neighbor we already know IS the named fruit, the "named fruit
             // exists nearby" half of the clue is satisfied without sampling
             val satisfiedByKnown = neighborsOf[center].any { knownContent[it] == named && diggable[it] }
-            val rank = fruitDowsingRank(named)
+            val rank = FruitDiggingBelief.fruitDowsingRank(named)
             return if (isAnchor) {
                 FruitDiggingBelief.FruitFloor(hiddenNeighbors, rank, named, satisfiedByKnown)
             } else {
@@ -199,10 +205,16 @@ class FruitDiggingSolver(private val size: Int = 7) {
                 if (!diggable[nb]) continue // dug / destroyed / ghost: not a nearby fruit any more
                 val known = knownContent[nb]
                 if (known != null) {
-                    if (known.isEdible) { value += pointValue(known); weight += 1 }
+                    if (known.isEdible) {
+                        value += pointValue(known)
+                        weight += 1
+                    }
                 } else {
                     for ((content, p) in distribution(nb)) {
-                        if (content.isEdible) { value += p * pointValue(content); weight += p }
+                        if (content.isEdible) {
+                            value += p * pointValue(content)
+                            weight += p
+                        }
                     }
                 }
             }
@@ -316,9 +328,9 @@ class FruitDiggingSolver(private val size: Int = 7) {
     private companion object {
         const val MAX_DIGS = 15
 
-        const val RISK_WEIGHT = 1.0         // cost of a wasted dig, scaled by P(bomb)+P(rum)
+        const val RISK_WEIGHT = 1.0 // cost of a wasted dig, scaled by P(bomb)+P(rum)
         const val DESTRUCTION_WEIGHT = 0.10 // extra penalty: fraction of neighbor fruit a bomb would destroy
-        const val SETUP_WEIGHT = 0.5        // worth of the multiplier an ability cell sets up
-        const val INFO_WEIGHT = 15.0        // bonus per hidden neighbor a dig would reveal
+        const val SETUP_WEIGHT = 0.5 // worth of the multiplier an ability cell sets up
+        const val INFO_WEIGHT = 15.0 // bonus per hidden neighbor a dig would reveal
     }
 }

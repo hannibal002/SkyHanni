@@ -119,7 +119,7 @@ object CarnivalFruitDigging {
         COCONUT("Coconut", 200, 3, "CARNIVAL_COCONUT"),
         CHERRY("Cherry", 200, 2, "CARNIVAL_CHERRY"),
         DURIAN("Durian", 800, 2, "CARNIVAL_DURIAN"),
-        DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT");
+        DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT"), ;
 
         private val textureId: String by lazy {
             if (textureKey.isEmpty()) ""
