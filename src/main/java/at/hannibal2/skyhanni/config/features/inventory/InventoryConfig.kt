@@ -73,7 +73,7 @@ class InventoryConfig {
     val craftableItemList: CraftableItemListConfig = CraftableItemListConfig()
 
     @Expose
-    @Category(name = "Compact Item Recipes", desc = "")
+    @Category(name = "Compact Item Recipes", desc = "Quickly open recipes for compacting items.")
     @Accordion
     val compactItemFormRecipe: CompactItemRecipeConfig = CompactItemRecipeConfig()
 
