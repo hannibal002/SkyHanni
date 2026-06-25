@@ -485,7 +485,7 @@ object PetXpEstimateApi {
         val baseRate = expShareBaseRate()
         val whyNotMoreRate = whyNotMoreExpShareRate()
         var updated = false
-        PetStorageApi.getActiveExpSharePets().forEach { petData ->
+        PetStorageExpShare.getActivePets().forEach { petData ->
             val currentExp = petData.exp ?: return@forEach
             if (petData.uuid == currentPetUuid) return@forEach
 

@@ -3,22 +3,15 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
-import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -48,7 +41,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.util.UUID
 import java.util.regex.Matcher
@@ -60,12 +52,9 @@ object PetStorageApi {
 
     private val config get() = SkyHanniMod.feature.misc.pets
     private val petStorage get() = ProfileStorageData.petProfiles
-    private val patternGroup = RepoPattern.group("misc.pet.storage")
     private const val PET_MENU_CURRENT_PET_SLOT = 4
     private const val SB_MENU_CURRENT_PET_SLOT = 30
     private const val EQUIP_MENU_CURRENT_PET_SLOT = 47
-    private val EXP_SHARE_SLOTS = listOf(30, 31, 32)
-    private const val EXP_SHARING_INVENTORY_NAME = "Exp Sharing"
     private val WIDGET_LOAD_GRACE = 3.seconds
     private var jsonNeedsSave: Boolean = false
     private var lastSaved: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -88,134 +77,15 @@ object PetStorageApi {
             else -> null
         }
 
+    internal val debugPetWidgetState: String get() = petWidgetState.name
+
+    internal fun hasRecentExactPetMenuClick() = lastExactPetMenuClick.passedSince() < 5.seconds
+
     private enum class PetWidgetState {
         NOT_READY,
         READY,
         MAXED_WITHOUT_OVERFLOW_XP,
     }
-
-    // <editor-fold desc="Patterns">
-    /**
-     * REGEX-TEST: Pets
-     * REGEX-TEST: (1/3) Pets
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: (6/6) Pets
-     * REGEX-TEST: Pets: "a"
-     * REGEX-TEST: Pets: "e" (1/2)
-     * REGEX-TEST: (6/6) Pets: "e"
-     */
-    private val mainPetMenuNamePattern by patternGroup.pattern(
-        "menu.gui.name",
-        "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
-    )
-
-    /**
-     * REGEX-TEST: §7[Lvl 8] §6Squid
-     * REGEX-TEST: §7[Lvl 100] §dHermit Crab
-     * REGEX-TEST: §7[Lvl 200] §8[§6122§4✦§8] §6Golden Dragon
-     */
-    @Suppress("MaxLineLength")
-    private val petMenuPetStackNamePattern by patternGroup.pattern(
-        "menu.petstack.name",
-        "(?:§.)*\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+?)(?<skin>§. ✦)?",
-    )
-
-    /**
-     * WRAPPED-REGEX-TEST: " [Lvl 100] Hedgehog"
-     * WRAPPED-REGEX-TEST: " [Lvl 68] Blaze"
-     * WRAPPED-REGEX-TEST: " [Lvl 51] Kuudra"
-     * WRAPPED-REGEX-TEST: " [Lvl 100] Flying Fish"
-     * WRAPPED-REGEX-TEST: " [Lvl 100] Chicken ✦"
-     * WRAPPED-REGEX-TEST: " [Lvl 200] [122✦] Golden Dragon"
-     * WRAPPED-REGEX-FAIL: " No pet selected"
-     */
-    @Suppress("MaxLineLength")
-    private val petTabWidgetNamePattern by patternGroup.pattern(
-        "tab.name",
-        " \\[Lvl (?<level>[\\d,]+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w ]+?)(?:(?<skin> ✦))?$",
-    )
-
-    /**
-     * WRAPPED-REGEX-TEST: " +163,119,730.2 XP"
-     * WRAPPED-REGEX-TEST: " 33,915/179.7k XP (18.9%)"
-     * WRAPPED-REGEX-TEST: " 2,877.5/9.7k XP (29.7%)"
-     * WRAPPED-REGEX-TEST: " 931,886.2/1.4M XP (67.2%)"
-     * WRAPPED-REGEX-TEST: " 251,016.4/561.7k XP (44.7%)"
-     * WRAPPED-REGEX-TEST: " 3,138.4/9.7k XP (32.4%)"
-     * WRAPPED-REGEX-TEST: " MAX LEVEL"
-     */
-    @Suppress("MaxLineLength")
-    private val petTabWidgetXpPattern by patternGroup.pattern(
-        "tab.xp",
-        " (?:(?<max>MAX LEVEL)|(?:\\+)?(?<current>[\\d,.kM]+)(?:(?:|\\/)*(?<next>[\\d,.kM]+))? XP(?: \\((?<percentage>[\\d.]+)%\\))?)",
-    )
-
-    /**
-     * REGEX-TEST: §7§7Selected pet: §6Chicken§5 ✦
-     * REGEX-TEST: §7§7Selected pet: §5Rift Ferret
-     * REGEX-TEST: §7§7Selected pet: §dEndermite
-     * REGEX-FAIL: §7§7Selected pet: §cNone
-     */
-    private val petMenuSelectedPetNamePattern by patternGroup.pattern(
-        "menu.selected.name",
-        "(?:§.)+Selected pet: §(?<rarity>[^c])(?<pet>[\\w ]+)(?<skin>§. ✦)?",
-    )
-
-    /**
-     * REGEX-TEST: §7Progress to Level 52: §e29.7%
-     * REGEX-TEST: §7Progress to Level 2: §e0%
-     * REGEX-TEST: §7Progress to Level 69: §e18.9%
-     * REGEX-TEST: §b§lMAX LEVEL
-     */
-    private val petMenuSelectedPetProgressPattern by patternGroup.pattern(
-        "menu.selected.progress",
-        "(?:§.)+(?:MAX LEVEL|Progress to Level (?<next>\\d+): (?:§.)+(?<percentage>[\\d.]+)%)",
-    )
-
-    /**
-     * REGEX-TEST: §2§l§m        §f§l§m                 §r §e2,877.5§6/§e9.7k
-     * REGEX-TEST: §2§l§m     §f§l§m                    §r §e33,915§6/§e179.7k
-     * REGEX-TEST: §2§l§m                 §f§l§m        §r §e931,886.2§6/§e1.4M
-     * REGEX-TEST: §f§l§m                         §r §e0§6/§e660
-     * REGEX-TEST: §8▸ 25,353,248 XP
-     */
-    private val petMenuSelectedPetXpPattern by patternGroup.pattern(
-        "menu.selected.xp",
-        "(?:§.|▸| )+(?<current>[\\d,.kM]+)(?: XP|(?:§.|\\/)+(?<next>[\\d,.kM]+))",
-    )
-
-    /**
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dEnderman§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
-     */
-    @Suppress("MaxLineLength")
-    private val autoPetMessagePattern by patternGroup.pattern(
-        "autopet.message",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
-    )
-
-    /**
-     * REGEX-TEST: Held Item: Poignant Lucky Clover
-     * REGEX-TEST: Equip: [Lvl 200] Rose Dragon Held Item: Poignant Lucky Clover
-     */
-    private val autoPetHoverHeldItemPattern by patternGroup.pattern(
-        "autopet.hover.helditem.clean",
-        ".*Held Item: (?<item>.*)",
-    )
-
-    /**
-     * REGEX-TEST: §aYour pet is now holding §r§6Burnt Texts§r§a.
-     * REGEX-TEST: §aYour pet is now holding §r§9Combat Exp Boost§r§a.
-     * REGEX-TEST: Your pet is now holding Burnt Texts.
-     */
-    private val petItemHeldMessagePattern by patternGroup.pattern(
-        "chat.helditem",
-        "(?:§a)?Your pet is now holding (?<item>.+?)(?:§r)?(?:§a)?\\.",
-    )
-    // </editor-fold>
 
     private fun Int.isPetStackLocation() = this in 10..43 &&
         this % 9 != 0 && (this + 1) % 9 != 0
@@ -256,7 +126,7 @@ object PetStorageApi {
     private fun String.isExactPetExpText() =
         !contains('k', ignoreCase = true) && !contains('m', ignoreCase = true)
 
-    fun isMainPetMenuName(inventoryName: String?) = mainPetMenuNamePattern.matches(inventoryName)
+    fun isMainPetMenuName(inventoryName: String?) = PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
 
     private data class PetExpRead(
         val value: Double,
@@ -264,7 +134,7 @@ object PetStorageApi {
     )
 
     private fun SafeItemStack.toVisiblePetDataOrNull(petInfo: PetInfo? = getPetInfo()): PetData? =
-        petMenuPetStackNamePattern.matchMatcher(hoverName.formattedTextCompat()) {
+        PetStoragePatterns.petMenuPetStackNamePattern.matchMatcher(hoverName.formattedTextCompat()) {
             val level = group("level").formatInt()
             val petName = groupOrNull("pet")?.trim() ?: return@matchMatcher null
             val itemInternalName = getInternalNameOrNull()?.takeIf { PetUtils.getPetRarity(it) != null }
@@ -274,7 +144,7 @@ object PetStorageApi {
             }
             val petSkin = getPetSkinOrNull(petInternalName)
             val lore = getLore()
-            val petExp = petMenuSelectedPetXpPattern.firstMatcher(lore) {
+            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(lore) {
                 val currentValue = group("current").formatDouble()
                 when (groupOrNull("next")) {
                     null -> currentValue
@@ -330,7 +200,7 @@ object PetStorageApi {
         }
         var foundUsableWidgetPet = false
         for (component in event.lines) {
-            petTabWidgetNamePattern.matchMatcher(component.string) {
+            PetStoragePatterns.petTabWidgetNamePattern.matchMatcher(component.string) {
                 val petName = groupOrNull("pet") ?: return@matchMatcher false
                 val level = group("level").toInt()
                 val rarity: LorenzRarity =
@@ -347,7 +217,7 @@ object PetStorageApi {
                 }
 
                 var maxedWithoutOverflowXp = false
-                val petExp = petTabWidgetXpPattern.firstMatcher(event.lines.map { it.string }) expFirstMatcher@{
+                val petExp = PetStoragePatterns.petTabWidgetXpPattern.firstMatcher(event.lines.map { it.string }) expFirstMatcher@{
                     // We don't know XP if it's just "MAX LEVEL"
                     if (groupOrNull("max") != null) {
                         maxedWithoutOverflowXp = true
@@ -412,12 +282,12 @@ object PetStorageApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        petItemHeldMessagePattern.matchMatcher(event.message) {
+        PetStoragePatterns.petItemHeldMessagePattern.matchMatcher(event.message) {
             val petHeldItem = resolveAppliedPetItemOrNull(group("item").removeResets().trim()) ?: return
             updateCurrentPetHeldItem(petHeldItem)
         }
 
-        autoPetMessagePattern.matchMatcher(event.message) {
+        PetStoragePatterns.autoPetMessagePattern.matchMatcher(event.message) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
             val petName = groupOrNull("pet") ?: return
@@ -428,7 +298,7 @@ object PetStorageApi {
             val petSkinTag = (groupOrNull("skin") ?: groupOrNull("altskin"))?.replace(" ", "")
 
             val hoverInfo = event.chatComponent.hoverTextLines()
-            val petHeldItemName = autoPetHoverHeldItemPattern.firstMatcher(hoverInfo.map { it.removeResets() }) {
+            val petHeldItemName = PetStoragePatterns.autoPetHoverHeldItemPattern.firstMatcher(hoverInfo.map { it.removeResets() }) {
                 group("item")
             }?.trim()
             val petHeldItem = petHeldItemName?.let(PetUtils::resolvePetItemOrNull)
@@ -572,7 +442,7 @@ object PetStorageApi {
         val exactPetMenuUuids = event.readPetsMenuItems()
         event.readEquipmentPetData()
         event.readSelectedPetData(exactPetMenuUuids)
-        event.readExpSharePets()
+        PetStorageExpShare.readInventory(event)
     }
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems(): Set<UUID> {
@@ -629,21 +499,21 @@ object PetStorageApi {
         if (currentPetItem.readExactSelectedPetData()) return
         val currentPetItemLore = currentPetItem.getLore().takeIfNotEmpty() ?: return
 
-        petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
+        PetStoragePatterns.petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
             val petName = groupOrNull("pet") ?: return@firstMatcher false
             val rarity = getRarityOrNull() ?: return@firstMatcher false
             val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petInternalName)
             val petSkinTag = groupOrNull("skin")?.replace(" ", "")
 
-            val level = petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
+            val level = PetStoragePatterns.petMenuSelectedPetProgressPattern.firstMatcher(currentPetItemLore) {
                 when (groupOrNull("next")) {
                     null -> PetUtils.getMaxLevel(petInternalName)
                     else -> (group("next").formatInt() - 1)
                 }
             } ?: return@firstMatcher false
 
-            val petExp = petMenuSelectedPetXpPattern.firstMatcher(currentPetItemLore) {
+            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(currentPetItemLore) {
                 val current = group("current")
                 val currentValue = current.formatDouble()
                 val exact = current.isExactPetExpText()
@@ -717,46 +587,11 @@ object PetStorageApi {
         this.level <= level &&
         this.skinTag == skinTag
 
-    private fun InventoryFullyOpenedEvent.readExpSharePets() {
-        if (inventoryName != EXP_SHARING_INVENTORY_NAME) return
-        val petStorage = petStorage ?: return
-        petStorage.expSharePets.clear()
-        petStorage.expSharePets.addAll(
-            EXP_SHARE_SLOTS.map { expShareSlot ->
-                val slotItem = inventoryItems[expShareSlot]?.takeIf {
-                    it.hoverName.string != "No pet in slot"
-                } ?: return@map null
-                slotItem.getPetInfo()?.ownedUuid
-            },
-        )
-    }
-
-    fun isAutopetMessage(message: String): Boolean = autoPetMessagePattern.matches(message)
+    fun isAutopetMessage(message: String): Boolean = PetStoragePatterns.autoPetMessagePattern.matches(message)
 
     fun markDirty() {
         jsonNeedsSave = true
     }
-
-    fun getActiveExpSharePets(): List<PetData> = petStorage?.let { petStorage ->
-        petStorage.expSharePets.take(activeExpShareSlotCount()).mapNotNull { uuid ->
-            uuid?.let { petUuid -> petStorage.pets.firstOrNull { it.uuid == petUuid } }
-        }
-    } ?: emptyList()
-
-    fun getActiveExpSharePetUuids(): Set<UUID> =
-        petStorage?.expSharePets?.take(activeExpShareSlotCount())?.filterNotNull()?.toSet().orEmpty()
-
-    fun getDisabledExpSharePetUuids(): Set<UUID> =
-        petStorage?.expSharePets?.drop(activeExpShareSlotCount())?.filterNotNull()?.toSet().orEmpty()
-
-    fun isExpShareSlotDisabled(slot: Int) =
-        slot in EXP_SHARE_SLOTS.drop(activeExpShareSlotCount())
-
-    fun isExpSharingInventory(inventoryName: String?) =
-        inventoryName == EXP_SHARING_INVENTORY_NAME
-
-    private fun activeExpShareSlotCount() =
-        if (Perk.SHARING_IS_CARING.isActive) EXP_SHARE_SLOTS.size else 1
 
     fun resolvePetDataOrNull(
         name: String,
@@ -781,54 +616,4 @@ object PetStorageApi {
         abs((this.exp ?: 0.0) - readExp) <= allowedError
     } ?: true
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shresetpetstorage") {
-            description = "Removes all pets from SkyHanni's storage"
-            category = CommandCategory.USERS_RESET
-            simpleCallback {
-                ProfileStorageData.petProfiles = PetDataStorage.ProfileSpecific()
-                ChatUtils.clickableChat(
-                    "Cleared all pets from storage. Re-open the §b/pet §emenu to re-populate it.",
-                    onClick = { HypixelCommands.pet() },
-                    hover = "Click to re-open the pet menu",
-                )
-            }
-        }
-    }
-
-    @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        fun PetData.formatForDebug(currentPetUuid: UUID?) = buildString {
-            append(if (uuid == currentPetUuid) "* " else "- ")
-            append(fauxInternalName.asString())
-            append(" lvl=$level")
-            append(" rarity=$rarity")
-            append(" uuid=$uuid")
-            append(" exp=${exp?.toLong() ?: 0L}")
-            append(" held=${heldItemInternalName?.asString() ?: "<none>"}")
-            append(" skin=${skinInternalName?.asString() ?: "<none>"}")
-            append(" skinTag=${skinTag ?: "<none>"}")
-            append(" variant=${skinVariantIndex ?: "<none>"}")
-        }
-        event.title("Pet Storage API")
-        event.addIrrelevant {
-            val petStorage = petStorage ?: run {
-                add("petStorage is null")
-                return@addIrrelevant
-            }
-            val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
-            add("currentPetUuid: $currentPetUuid")
-            add("petWidgetState: $petWidgetState")
-            add("recentExactPetMenuClick: ${lastExactPetMenuClick.passedSince() < 5.seconds}")
-            add("petCount: ${petStorage.pets.size}")
-            LorenzRarity.entries.reversed().forEach { rarity ->
-                val pets = petStorage.pets.filter { it.rarity == rarity }.takeIfNotEmpty() ?: return@forEach
-                add("pets (${rarity.name}):")
-                pets.forEach { add(it.formatForDebug(currentPetUuid)) }
-                add("")
-            }
-            add("expSharePets: " + petStorage.expSharePets.joinToString(", ") { it?.toString() ?: "<empty>" })
-        }
-    }
 }

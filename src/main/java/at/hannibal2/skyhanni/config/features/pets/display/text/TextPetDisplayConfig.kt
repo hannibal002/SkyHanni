@@ -12,16 +12,16 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOrder
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 interface PetTextDisplaySettings {
-    val enabledTexts: Property<MutableList<TextPetDisplayConfig.TextElement>>
-    val textLabels: Property<Boolean>
-    val nameLevel: Property<Boolean>
-    val nameSkinSymbol: Property<Boolean>
-    val nextLevelPercent: Property<Boolean>
-    val xpFormat: Property<TextPetDisplayConfig.NumberFormatEntry>
-    val textScale: Property<Float>
-    val textLocation: Property<TextPetDisplayConfig.TextLocationOption>
-    val verticalAlign: Property<RenderUtils.VerticalAlignment>
-    val horizontalAlign: Property<RenderUtils.HorizontalAlignment>
+    fun enabledTextsProperty(): Property<MutableList<TextPetDisplayConfig.TextElement>>
+    fun textLabelsProperty(): Property<Boolean>
+    fun nameLevelProperty(): Property<Boolean>
+    fun nameSkinSymbolProperty(): Property<Boolean>
+    fun nextLevelPercentProperty(): Property<Boolean>
+    fun xpFormatProperty(): Property<TextPetDisplayConfig.NumberFormatEntry>
+    fun textScaleProperty(): Property<Float>
+    fun textLocationProperty(): Property<TextPetDisplayConfig.TextLocationOption>
+    fun verticalAlignProperty(): Property<RenderUtils.VerticalAlignment>
+    fun horizontalAlignProperty(): Property<RenderUtils.HorizontalAlignment>
 }
 
 class TextPetDisplayConfig {
@@ -73,7 +73,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDraggableList
         @ConfigOrder(10)
-        override val enabledTexts: Property<MutableList<TextElement>> = Property.of(
+        val enabledTexts: Property<MutableList<TextElement>> = Property.of(
             mutableListOf(
                 TextElement.PET_NAME,
                 TextElement.NEXT_LEVEL,
@@ -88,7 +88,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(20)
-        override val textLabels: Property<Boolean> = Property.of(true)
+        val textLabels: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -98,7 +98,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(30)
-        override val nameLevel: Property<Boolean> = Property.of(true)
+        val nameLevel: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -108,7 +108,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(40)
-        override val nameSkinSymbol: Property<Boolean> = Property.of(true)
+        val nameSkinSymbol: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -118,7 +118,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(50)
-        override val nextLevelPercent: Property<Boolean> = Property.of(true)
+        val nextLevelPercent: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -130,7 +130,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(60)
-        override val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
+        val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
 
         @Expose
         @ConfigOption(
@@ -139,7 +139,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.05f)
         @ConfigOrder(70)
-        override val textScale: Property<Float> = Property.of(1.0f)
+        val textScale: Property<Float> = Property.of(1.0f)
 
         @Expose
         @ConfigOption(
@@ -149,7 +149,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(80)
-        override val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
+        val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
 
         @Expose
         @ConfigOption(
@@ -175,7 +175,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(100)
-        override val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
+        val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
 
         @Expose
         @ConfigOption(
@@ -184,7 +184,18 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(110)
-        override val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+        val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+
+        override fun enabledTextsProperty() = enabledTexts
+        override fun textLabelsProperty() = textLabels
+        override fun nameLevelProperty() = nameLevel
+        override fun nameSkinSymbolProperty() = nameSkinSymbol
+        override fun nextLevelPercentProperty() = nextLevelPercent
+        override fun xpFormatProperty() = xpFormat
+        override fun textScaleProperty() = textScale
+        override fun textLocationProperty() = textLocation
+        override fun verticalAlignProperty() = verticalAlign
+        override fun horizontalAlignProperty() = horizontalAlign
     }
 
     @Expose
@@ -245,7 +256,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.05f)
         @ConfigOrder(50)
-        override val textScale: Property<Float> = Property.of(1.0f)
+        val textScale: Property<Float> = Property.of(1.0f)
 
         enum class BundledTextLocation(private val displayName: String) {
             ABOVE("Above Main Text"),
@@ -264,7 +275,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDraggableList
         @ConfigOrder(60)
-        override val enabledTexts: Property<MutableList<TextElement>> = Property.of(
+        val enabledTexts: Property<MutableList<TextElement>> = Property.of(
             mutableListOf(
                 TextElement.PET_NAME,
                 TextElement.NEXT_LEVEL,
@@ -278,7 +289,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(70)
-        override val textLabels: Property<Boolean> = Property.of(true)
+        val textLabels: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -288,7 +299,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(80)
-        override val nameLevel: Property<Boolean> = Property.of(true)
+        val nameLevel: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -298,7 +309,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(90)
-        override val nameSkinSymbol: Property<Boolean> = Property.of(true)
+        val nameSkinSymbol: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -308,7 +319,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorBoolean
         @ConfigOrder(100)
-        override val nextLevelPercent: Property<Boolean> = Property.of(true)
+        val nextLevelPercent: Property<Boolean> = Property.of(true)
 
         @Expose
         @ConfigOption(
@@ -320,7 +331,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(110)
-        override val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
+        val xpFormat: Property<NumberFormatEntry> = Property.of(NumberFormatEntry.DEFAULT)
 
         @Expose
         @ConfigOption(
@@ -329,7 +340,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(120)
-        override val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
+        val textLocation: Property<TextLocationOption> = Property.of(TextLocationOption.RIGHT)
 
         @Expose
         @ConfigOption(
@@ -338,7 +349,7 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(130)
-        override val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
+        val verticalAlign: Property<RenderUtils.VerticalAlignment> = Property.of(RenderUtils.VerticalAlignment.CENTER)
 
         @Expose
         @ConfigOption(
@@ -347,6 +358,17 @@ class TextPetDisplayConfig {
         )
         @ConfigEditorDropdown
         @ConfigOrder(140)
-        override val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+        val horizontalAlign: Property<RenderUtils.HorizontalAlignment> = Property.of(RenderUtils.HorizontalAlignment.LEFT)
+
+        override fun enabledTextsProperty() = enabledTexts
+        override fun textLabelsProperty() = textLabels
+        override fun nameLevelProperty() = nameLevel
+        override fun nameSkinSymbolProperty() = nameSkinSymbol
+        override fun nextLevelPercentProperty() = nextLevelPercent
+        override fun xpFormatProperty() = xpFormat
+        override fun textScaleProperty() = textScale
+        override fun textLocationProperty() = textLocation
+        override fun verticalAlignProperty() = verticalAlign
+        override fun horizontalAlignProperty() = horizontalAlign
     }
 }

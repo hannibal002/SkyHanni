@@ -5,15 +5,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.api.pet.PetStorageApi
+import at.hannibal2.skyhanni.api.pet.PetStorageExpShare
 import at.hannibal2.skyhanni.config.features.pets.display.PetDisplayConfig
-import at.hannibal2.skyhanni.config.features.pets.display.text.PetTextDisplaySettings
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.BorderRingConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetOrganizationConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.IconConfig.IconRotationConfig
-import at.hannibal2.skyhanni.config.features.pets.display.visual.PetItemConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RarityBackgroundConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.RingConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.VisualPetDisplayConfig
@@ -30,23 +27,14 @@ import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
@@ -60,27 +48,15 @@ import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AnimatedRotationP
 import at.hannibal2.skyhanni.utils.renderables.animated.rotate.AxisRotationDefinition
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.CircularRenderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
-import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.Vec3
-import java.awt.Color
-import java.util.Locale
 import java.util.UUID
-import kotlin.math.atan2
-import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.milliseconds
 
-private typealias TElement = TextPetDisplayConfig.TextElement
-private typealias TLO = TextPetDisplayConfig.TextLocationOption
-private typealias NFE = TextPetDisplayConfig.NumberFormatEntry
 private typealias ESTextMode = TextPetDisplayConfig.ExpSharePetTextConfig.TextMode
 private typealias ETextCenter = TextPetDisplayConfig.EquippedPetTextConfig.CenterTarget
-private typealias ESBundledLocation = TextPetDisplayConfig.ExpSharePetTextConfig.BundledTextLocation
 private typealias EXPSharePlace = ExpSharePetOrganizationConfig.ExpShareLocationOption
 private typealias EXPShareGO = ExpSharePetOrganizationConfig.GroupOrientation
 
@@ -108,22 +84,6 @@ object CurrentPetDisplay {
         )
     }
 
-    private data class AnchoredRenderable(
-        val renderable: Renderable,
-        val anchorX: Int,
-        val anchorY: Int,
-        val anchorWidth: Int,
-        val anchorHeight: Int,
-    )
-
-    private fun Renderable.anchorToSelf() = AnchoredRenderable(
-        renderable = this,
-        anchorX = 0,
-        anchorY = 0,
-        anchorWidth = width,
-        anchorHeight = height,
-    )
-
     private fun PetData.buildMainIconRenderableOrNull(preview: Boolean): Renderable? = with(equippedVisualConfig) {
         val iconLayer = buildVisualIconLayerOrNull(this, preview) ?: return null
 
@@ -148,8 +108,8 @@ object CurrentPetDisplay {
 
     private fun getVisibleExpSharePetStates(currentPetUuid: UUID): List<ExpSharePetState> {
         val storage = ProfileStorageData.petProfiles ?: return emptyList()
-        val activeExpSharePets = PetStorageApi.getActiveExpSharePetUuids()
-        val disabledExpSharePets = PetStorageApi.getDisabledExpSharePetUuids()
+        val activeExpSharePets = PetStorageExpShare.getActivePetUuids()
+        val disabledExpSharePets = PetStorageExpShare.getDisabledPetUuids()
         return storage.pets.mapNotNull {
             it.visibleExpShareStateOrNull(currentPetUuid, activeExpSharePets, disabledExpSharePets)
         }
@@ -356,204 +316,6 @@ object CurrentPetDisplay {
         preview = preview,
     )
 
-    private fun buildCircularContainer(
-        root: Renderable,
-        backgroundColor: ChromaColour,
-        filledPercentage: Double = 100.0,
-        unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
-        padding: Int = 2,
-        preview: Boolean,
-    ): Renderable = if (preview) {
-        PreviewCircularContainerRenderable(root, backgroundColor, filledPercentage, unfilledColor, padding)
-    } else {
-        PetDisplayCircularContainerRenderable(root, backgroundColor, filledPercentage, unfilledColor, padding)
-    }
-
-    private fun Renderable.wrapInPetItemOrSelf(
-        enabled: Boolean,
-        petData: PetData,
-        petItemConfig: PetItemConfig,
-        opacity: Float = 1.0f,
-    ): Renderable = if (!enabled) this else petData.heldItemInternalName?.getItemStackOrNull()?.let {
-        PetItemOverlayRenderable(
-            root = this,
-            item = Renderable.item(it) {
-                scale = petItemConfig.scale.get().toDouble()
-                alpha = opacity
-            },
-            placement = petItemConfig.placement.get(),
-        )
-    } ?: this
-
-    private class PetItemOverlayRenderable(
-        private val root: Renderable,
-        private val item: Renderable,
-        private val placement: PetItemConfig.PetItemPlacement,
-    ) : Renderable {
-        override val width = root.width
-        override val height = root.height
-        override val horizontalAlign = root.horizontalAlign
-        override val verticalAlign = root.verticalAlign
-
-        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-            root.render(mouseOffsetX, mouseOffsetY)
-            val itemX = anchorX() - item.width / 2
-            val itemY = anchorY() - item.height / 2
-            DrawContextUtils.translated(itemX, itemY) {
-                item.render(mouseOffsetX + itemX, mouseOffsetY + itemY)
-            }
-        }
-
-        private fun anchorX(): Int = when (placement.horizontal) {
-            RenderUtils.HorizontalAlignment.LEFT -> 0
-            RenderUtils.HorizontalAlignment.CENTER -> width / 2
-            RenderUtils.HorizontalAlignment.RIGHT -> width
-            RenderUtils.HorizontalAlignment.DONT_ALIGN -> width / 2
-        }
-
-        private fun anchorY(): Int = when (placement.vertical) {
-            RenderUtils.VerticalAlignment.TOP -> 0
-            RenderUtils.VerticalAlignment.CENTER -> height / 2
-            RenderUtils.VerticalAlignment.BOTTOM -> height
-            RenderUtils.VerticalAlignment.DONT_ALIGN -> height / 2
-        }
-    }
-
-    private class PreviewCircularContainerRenderable(
-        private val root: Renderable,
-        private val backgroundColor: ChromaColour,
-        private val filledPercentage: Double,
-        private val unfilledColor: ChromaColour,
-        private val padding: Int,
-    ) : Renderable {
-        private val radius = (max(root.width, root.height) / 2) + padding
-        private val takenSpace = 2 * (radius - padding)
-        override val width = radius * 2
-        override val height = radius * 2
-        override val horizontalAlign = root.horizontalAlign
-        override val verticalAlign = root.verticalAlign
-        private val circleSegments = buildCircleSegments()
-
-        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-            circleSegments.forEach { it.render() }
-            DrawContextUtils.translated(padding.toFloat(), padding.toFloat()) {
-                root.renderCentered(mouseOffsetX + padding, mouseOffsetY + padding, takenSpace, takenSpace)
-            }
-        }
-
-        private fun buildCircleSegments(): List<CircleSegment> {
-            if (filledPercentage >= 100.0) {
-                return buildCirclePixels(backgroundColor.toColor().rgb) { _, _ -> true }
-            }
-
-            val baseAngle = Math.PI.toFloat() * 3f / 2f
-            val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat())
-                .mod(2f * Math.PI.toFloat())
-            return buildCircleArc(backgroundColor.toColor().rgb, baseAngle, endAngle) +
-                buildCircleArc(unfilledColor.toColor().rgb, endAngle, baseAngle)
-        }
-
-        private fun buildCircleArc(color: Int, startAngle: Float, endAngle: Float): List<CircleSegment> {
-            return buildCirclePixels(color) { dx, dy ->
-                angleBetween(
-                    atan2(-dy, -dx).toFloat().mod(TAU),
-                    startAngle,
-                    endAngle,
-                )
-            }
-        }
-
-        private fun buildCirclePixels(color: Int, includeSample: (Double, Double) -> Boolean): List<CircleSegment> = buildList {
-            val radiusSquared = radius.toDouble() * radius
-            val alpha = color ushr 24 and 0xFF
-            val rgb = color and 0x00FFFFFF
-            for (y in 0 until width) {
-                var runStart: Int? = null
-                var runColor = 0
-                for (x in 0 until width) {
-                    var samplesInside = 0
-                    for (sampleY in SAMPLE_OFFSETS) {
-                        for (sampleX in SAMPLE_OFFSETS) {
-                            val dx = x + sampleX - radius
-                            val dy = y + sampleY - radius
-                            if (dx * dx + dy * dy <= radiusSquared && includeSample(dx, dy)) samplesInside++
-                        }
-                    }
-
-                    val sampleColor = if (samplesInside > 0) {
-                        ((alpha * samplesInside / SAMPLE_COUNT) shl 24) or rgb
-                    } else 0
-
-                    if (sampleColor == runColor) continue
-                    runStart?.let { add(CircleSegment(it, y, x, runColor)) }
-                    runStart = if (sampleColor == 0) null else x
-                    runColor = sampleColor
-                }
-                runStart?.let {
-                    add(CircleSegment(it, y, width, runColor))
-                }
-            }
-        }
-
-        private data class CircleSegment(
-            val startX: Int,
-            val y: Int,
-            val endX: Int,
-            val color: Int,
-        ) {
-            fun render() {
-                GuiRenderUtils.drawRect(startX, y, endX, y + 1, color)
-            }
-        }
-
-        private fun angleBetween(angle: Float, startAngle: Float, endAngle: Float): Boolean {
-            return if (startAngle <= endAngle) {
-                angle in startAngle..endAngle
-            } else {
-                angle >= startAngle || angle <= endAngle
-            }
-        }
-
-        private companion object {
-            private val SAMPLE_OFFSETS = DoubleArray(4) { (it + 0.5) / 4.0 }
-            private const val SAMPLE_COUNT = 16
-            private val TAU = (2.0 * Math.PI).toFloat()
-        }
-    }
-
-    private class PetDisplayCircularContainerRenderable(
-        private val root: Renderable,
-        backgroundColor: ChromaColour,
-        filledPercentage: Double = 100.0,
-        unfilledColor: ChromaColour = Color.LIGHT_GRAY.toChromaColor(255),
-        private val padding: Int = 2,
-    ) : CircularRenderable(
-        backgroundColor,
-        radius = (max(root.width, root.height) / 2) + padding,
-        1f,
-        filledPercentage,
-        unfilledColor,
-        root.horizontalAlign,
-        root.verticalAlign,
-    ) {
-        private val takenSpace = 2 * (radius - padding)
-
-        override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-            super.render(mouseOffsetX, mouseOffsetY)
-            DrawContextUtils.translated(padding.toFloat(), padding.toFloat()) {
-                root.renderCentered(mouseOffsetX + padding, mouseOffsetY + padding, takenSpace, takenSpace)
-            }
-        }
-    }
-
-    private fun Renderable.renderCentered(mouseOffsetX: Int, mouseOffsetY: Int, xSpace: Int, ySpace: Int) {
-        val xOffset = (xSpace - width) / 2f
-        val yOffset = (ySpace - height) / 2f
-        DrawContextUtils.translated(xOffset, yOffset) {
-            render(mouseOffsetX + xOffset.roundToInt(), mouseOffsetY + yOffset.roundToInt())
-        }
-    }
-
     private fun PetData.buildBaseItemRenderable(
         rotationConfig: IconRotationConfig,
         iconScale: Double,
@@ -597,207 +359,6 @@ object CurrentPetDisplay {
         }
     }
 
-    private fun PetData.buildTextRenderableOrNull(
-        textConfig: PetTextDisplaySettings,
-        opacity: Float = 1.0f,
-        textScale: Double = textConfig.textScale.get().toDouble(),
-    ): Renderable? {
-        val enabledTexts = textConfig.enabledTexts.get().takeIfNotEmpty() ?: return null
-        val textColor = Color(255, 255, 255, (255 * opacity).roundToInt().coerceIn(0, 255))
-        val xpFormat = textConfig.xpFormat.get()
-        val lines = enabledTexts.mapNotNull {
-            it to when (it) {
-                TElement.PET_NAME -> getUserFriendlyName(
-                    includeLevel = textConfig.nameLevel.get(),
-                    includeSkinTag = textConfig.nameSkinSymbol.get(),
-                )
-                TElement.HELD_ITEM -> heldItemInternalName?.repoItemName ?: return@mapNotNull null
-                TElement.OVERFLOW_XP -> {
-                    val overflowXp = overflowXp.takeIf { overflow -> overflow > 1000.0 } ?: return@mapNotNull null
-                    "§7+§b${overflowXp.formatExpByConfigOption(xpFormat)}"
-                }
-                TElement.TOTAL_XP -> {
-                    val totalXp = exp?.takeIf { totalXp -> totalXp > 0.0 } ?: return@mapNotNull null
-                    "§b${totalXp.formatExpByConfigOption(xpFormat)}"
-                }
-                TElement.NEXT_LEVEL -> {
-                    if (level >= PetUtils.getMaxLevel(fauxInternalName)) return@mapNotNull null
-
-                    val currentExp = exp ?: 0.0
-                    val currentXpOverLevel = currentExp - currentLevelXp
-                    val neededXp = nextLevelXp - currentLevelXp
-                    val percentageFormat = if (textConfig.nextLevelPercent.get()) {
-                        " §7- §e${levelProgressionPercentage.formatLevelProgressionPercentage()}%"
-                    } else ""
-                    formatExpPairByConfigOption(currentXpOverLevel, neededXp, xpFormat) + percentageFormat
-                }
-            }
-        }.map { (textElement, textElementFormat) ->
-            val labelFormat = textElement.getFormattedLabel().takeIf { textConfig.textLabels.get() }.orEmpty()
-            StringRenderable(
-                "$labelFormat$textElementFormat",
-                scale = textScale,
-                color = textColor,
-                horizontalAlign = textConfig.horizontalAlign.get()
-            )
-        }.takeIfNotEmpty() ?: return null
-        return Renderable.vertical(
-            lines,
-            horizontalAlign = textConfig.horizontalAlign.get(),
-            verticalAlign = textConfig.verticalAlign.get(),
-        )
-    }
-
-    private fun List<ExpSharePetState>.buildBundledExpShareTextRenderables(): List<Renderable> {
-        val textConfig = config.text.expSharePets
-        if (!textConfig.enabled.get()) return emptyList()
-        if (textConfig.textMode.get() != ESTextMode.BUNDLED_WITH_MAIN) return emptyList()
-        return mapNotNull {
-            it.petData.buildTextRenderableOrNull(
-                textConfig = textConfig,
-                opacity = it.opacity,
-            )
-        }
-    }
-
-    private fun Double.formatExpByConfigOption(xpFormat: NFE) = when (xpFormat) {
-        NFE.DEFAULT, NFE.UNFORMATTED -> toLong().addSeparators()
-        NFE.FORMATTED -> toLong().shortFormat()
-    }
-
-    private fun Double.formatLevelProgressionPercentage(): String {
-        val rounded = coerceIn(0.0, 100.0).roundTo(1)
-        return String.format(Locale.US, "%.1f", rounded)
-    }
-
-    private fun ChromaColour.withOpacity(opacity: Float): ChromaColour {
-        val color = toColor()
-        val alpha = (color.alpha * opacity).roundToInt().coerceIn(0, 255)
-        return color.toChromaColor(alpha)
-    }
-
-    private fun formatExpPairByConfigOption(
-        firstExp: Double,
-        secondExp: Double,
-        xpFormat: NFE,
-    ): String = when (xpFormat) {
-        NFE.DEFAULT -> "§b${firstExp.toLong().addSeparators()}§9/§b${secondExp.toLong().shortFormat()}"
-        NFE.FORMATTED -> "§b${firstExp.toLong().shortFormat()}§9/§b${secondExp.toLong().shortFormat()}"
-        NFE.UNFORMATTED -> "§b${firstExp.toLong().addSeparators()}§9/§b${secondExp.toLong().addSeparators()}"
-    }
-
-    private fun combineVisualAndTextRenderables(
-        itemRenderable: AnchoredRenderable?,
-        textRenderable: Renderable?,
-        textLocation: TLO,
-        centerTarget: ETextCenter,
-    ): Renderable? = if (itemRenderable != null && textRenderable != null) {
-        if (centerTarget == ETextCenter.EQUIPPED_PET_VISUALS) {
-            combineAnchoredVisualAndTextRenderables(itemRenderable, textRenderable, textLocation)
-        } else {
-            val visualRenderable = itemRenderable.renderable
-            val orderedList = when (textLocation) {
-                TLO.TOP, TLO.LEFT -> listOf(textRenderable, visualRenderable)
-                TLO.BOTTOM, TLO.RIGHT -> listOf(visualRenderable, textRenderable)
-            }
-            when (textLocation) {
-                TLO.TOP, TLO.BOTTOM -> Renderable.vertical(orderedList, spacing = 2)
-                TLO.LEFT, TLO.RIGHT -> Renderable.horizontal(orderedList, spacing = 2)
-            }
-        }
-    } else textRenderable ?: itemRenderable?.renderable
-
-    private fun combineAnchoredVisualAndTextRenderables(
-        itemRenderable: AnchoredRenderable,
-        textRenderable: Renderable,
-        textLocation: TLO,
-    ): Renderable {
-        val visualRenderable = itemRenderable.renderable
-        val spacing = 2
-        val textX = when (textLocation) {
-            TLO.LEFT -> itemRenderable.anchorX - textRenderable.width - spacing
-            TLO.RIGHT -> itemRenderable.anchorX + itemRenderable.anchorWidth + spacing
-            else -> itemRenderable.anchorX + RenderableUtils.calculateAlignmentXOffset(textRenderable, itemRenderable.anchorWidth)
-        }
-        val textY = when (textLocation) {
-            TLO.TOP -> itemRenderable.anchorY - textRenderable.height - spacing
-            TLO.BOTTOM -> itemRenderable.anchorY + itemRenderable.anchorHeight + spacing
-            else -> itemRenderable.anchorY + RenderableUtils.calculateAlignmentYOffset(textRenderable, itemRenderable.anchorHeight)
-        }
-        val minX = minOf(0, textX)
-        val minY = minOf(0, textY)
-        val visualX = -minX
-        val visualY = -minY
-        val shiftedTextX = textX - minX
-        val shiftedTextY = textY - minY
-        val renderTextFirst = textLocation == TLO.TOP || textLocation == TLO.LEFT
-
-        return object : Renderable {
-            override val width = maxOf(visualRenderable.width, textX + textRenderable.width) - minX
-            override val height = maxOf(visualRenderable.height, textY + textRenderable.height) - minY
-            override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
-            override val verticalAlign = RenderUtils.VerticalAlignment.TOP
-
-            override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
-                if (renderTextFirst) {
-                    textRenderable.renderAt(mouseOffsetX, mouseOffsetY, shiftedTextX, shiftedTextY)
-                    visualRenderable.renderAt(mouseOffsetX, mouseOffsetY, visualX, visualY)
-                } else {
-                    visualRenderable.renderAt(mouseOffsetX, mouseOffsetY, visualX, visualY)
-                    textRenderable.renderAt(mouseOffsetX, mouseOffsetY, shiftedTextX, shiftedTextY)
-                }
-            }
-        }
-    }
-
-    private fun Renderable.renderAt(mouseOffsetX: Int, mouseOffsetY: Int, x: Int, y: Int) {
-        DrawContextUtils.pushPop {
-            DrawContextUtils.translate(x.toFloat(), y.toFloat())
-            render(mouseOffsetX + x, mouseOffsetY + y)
-        }
-    }
-
-    private fun combineMainAndExpShareTextRenderables(
-        mainTextRenderable: Renderable?,
-        expShareTextRenderables: List<Renderable>,
-    ): Renderable? {
-        if (expShareTextRenderables.isEmpty()) return mainTextRenderable
-        val renderables = when (config.text.expSharePets.bundledLocation.get()) {
-            ESBundledLocation.ABOVE -> expShareTextRenderables + listOfNotNull(mainTextRenderable)
-            ESBundledLocation.BELOW -> listOfNotNull(mainTextRenderable) + expShareTextRenderables
-            ESBundledLocation.SPLIT -> {
-                val aboveCount = (expShareTextRenderables.size + 1) / 2
-                expShareTextRenderables.take(aboveCount) +
-                    listOfNotNull(mainTextRenderable) +
-                    expShareTextRenderables.drop(aboveCount)
-            }
-        }.takeIfNotEmpty() ?: return null
-
-        return Renderable.vertical(
-            renderables,
-            spacing = config.text.expSharePets.bundledSpacing.get(),
-            horizontalAlign = config.text.equippedPet.horizontalAlign.get(),
-            verticalAlign = config.text.equippedPet.verticalAlign.get(),
-        )
-    }
-
-    private fun buildWidgetMessageRenderable(lines: List<String>): Renderable {
-        val textConfig = config.text.equippedPet
-        val textScale = textConfig.textScale.get().toDouble()
-        val horizontalAlign = textConfig.horizontalAlign.get()
-        return Renderable.vertical(
-            lines.map {
-                StringRenderable(
-                    it,
-                    scale = textScale,
-                    horizontalAlign = horizontalAlign,
-                )
-            },
-            horizontalAlign = horizontalAlign,
-            verticalAlign = textConfig.verticalAlign.get(),
-        )
-    }
-
     private fun PetData.buildRenderable(preview: Boolean = false): Renderable? {
         val storage = ProfileStorageData.petProfiles
         val currentPetUuid = uuid
@@ -815,10 +376,11 @@ object CurrentPetDisplay {
         val itemRenderable = buildMainIconRenderableOrNull(preview)
             ?.let { if (currentPetUuid != null) it.wrapInExpShareIconsOrSelf(expSharePets, preview) else it.anchorToSelf() }
         val mainTextRenderable = buildTextRenderableOrNull(config.text.equippedPet)
-        val expShareTextRenderables = expSharePets.buildBundledExpShareTextRenderables()
+        val expShareTextRenderables = expSharePets.buildBundledExpShareTextRenderables(config)
         val textRenderable = combineMainAndExpShareTextRenderables(
             mainTextRenderable,
             expShareTextRenderables,
+            config.text,
         )
         val renderable = combineVisualAndTextRenderables(
             itemRenderable,
@@ -882,110 +444,6 @@ object CurrentPetDisplay {
         return copy(exp = displayedExp)
     }
 
-    private fun IconConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        skinAnimation.get(),
-        skinAnimationSpeed.get(),
-        scale.get(),
-        rotation.renderHash(),
-    ).hashCode()
-
-    private fun IconRotationConfig.renderHash(): Int = listOf(
-        staticRotation.xRotation.get(),
-        staticRotation.yRotation.get(),
-        staticRotation.zRotation.get(),
-        spinRotation.speedX.get(),
-        spinRotation.speedY.get(),
-        spinRotation.speedZ.get(),
-    ).hashCode()
-
-    private fun PetItemConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        placement.get(),
-        scale.get(),
-    ).hashCode()
-
-    private fun VisualPetDisplayConfig.BackgroundColorConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        customization.renderHash(),
-        borderRing.renderHash(),
-    ).hashCode()
-
-    private fun RarityBackgroundConfig.renderHash(): Int = listOf(
-        padding.get(),
-        commonColor.get(),
-        uncommonColor.get(),
-        rareColor.get(),
-        epicColor.get(),
-        legendaryColor.get(),
-        mythicColor.get(),
-    ).hashCode()
-
-    private fun BorderRingConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        customization.padding.get(),
-        customization.filledColor.get(),
-        customization.unfilledColor.get(),
-        separator.enabled.get(),
-        separator.padding.get(),
-        separator.color.get(),
-    ).hashCode()
-
-    private fun ExpSharePetDisplayConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        organization.placement.get(),
-        organization.groupOrientation.get(),
-        organization.subOrbit.orbitDistance.get(),
-        organization.subOrbit.orbitDirection.get(),
-        organization.subOrbit.orbitSpeed.get(),
-        icon.renderHash(),
-        icon.iconSpacing.get(),
-        petItem.renderHash(),
-        rarityBackground.renderHash(),
-        activeSlotsOnly.get(),
-        disabledOpacity.get(),
-    ).hashCode()
-
-    private fun PetTextDisplaySettings.settingsRenderHash(): Int = listOf(
-        enabledTexts.get().toList(),
-        textLabels.get(),
-        nameLevel.get(),
-        nameSkinSymbol.get(),
-        nextLevelPercent.get(),
-        xpFormat.get(),
-        textScale.get(),
-        textLocation.get(),
-        verticalAlign.get(),
-        horizontalAlign.get(),
-    ).hashCode()
-
-    private fun TextPetDisplayConfig.ExpSharePetTextConfig.renderHash(): Int = listOf(
-        enabled.get(),
-        textMode.get(),
-        bundledLocation.get(),
-        bundledSpacing.get(),
-        settingsRenderHash(),
-    ).hashCode()
-
-    private fun TextPetDisplayConfig.renderHash(): Int = listOf(
-        equippedPet.settingsRenderHash(),
-        equippedPet.centerTarget.get(),
-        expSharePets.renderHash(),
-    ).hashCode()
-
-    private fun VisualPetDisplayConfig.renderHash(): Int = listOf(
-        icon.renderHash(),
-        rarityBackground.renderHash(),
-        petItem.renderHash(),
-    ).hashCode()
-
-    private fun PetDisplayConfig.renderHash(): Int = listOf(
-        general.enabled.get(),
-        visual.equippedPet.renderHash(),
-        visual.expSharePets.renderHash(),
-        text.renderHash(),
-    ).hashCode()
-
     fun invalidateRenderable() {
         liveRenderCache = null
         previewRenderCache = null
@@ -1008,9 +466,9 @@ object CurrentPetDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ToolTipTextEvent) {
-        if (!PetStorageApi.isExpSharingInventory(InventoryUtils.openInventoryName())) return
+        if (!PetStorageExpShare.isInventory(InventoryUtils.openInventoryName())) return
         val slot = event.slot?.containerSlot ?: return
-        if (!PetStorageApi.isExpShareSlotDisabled(slot)) return
+        if (!PetStorageExpShare.isSlotDisabled(slot)) return
 
         event.toolTip.add("")
         event.toolTip.add("§cThis Exp Share slot is disabled.")
@@ -1023,7 +481,10 @@ object CurrentPetDisplay {
         if (RiftApi.inRift() || !config.general.enabled.get()) return
         PetStorageApi.petWidgetDisplayMessage?.let { lines ->
             invalidateRenderable()
-            config.general.position.renderRenderable(buildWidgetMessageRenderable(lines), posLabel = "Pet Display")
+            config.general.position.renderRenderable(
+                buildWidgetMessageRenderable(lines, config.text.equippedPet),
+                posLabel = "Pet Display",
+            )
             return
         }
         if (!PetStorageApi.isPetWidgetReadyForDisplay) return invalidateRenderable()
@@ -1067,10 +528,7 @@ object CurrentPetDisplay {
     }
 
     private data class RenderCache(val key: Int, val renderable: Renderable?)
-    private data class VisualIconLayer(val renderable: Renderable, val backgroundEnabled: Boolean)
-    private data class ExpSharePetState(val petData: PetData, val disabled: Boolean) {
-        val opacity get() = if (disabled) expShareConfig.disabledOpacity.get() else 1.0f
-    }
+    private val ExpSharePetState.opacity get() = if (disabled) expShareConfig.disabledOpacity.get() else 1.0f
 
     private data class XpAnimation(
         val uuid: UUID?,
