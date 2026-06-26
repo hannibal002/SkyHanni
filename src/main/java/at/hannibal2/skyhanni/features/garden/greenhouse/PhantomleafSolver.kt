@@ -22,10 +22,10 @@ object PhantomleafSolver {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
 
-    private const val GREENHOUSE_PLOT_LENGTH = 10
+    private const val HYPIXEL_VOLUME_SCALING_FACTOR = 30
     private const val MUTATION_Y_LEVEL = 74.0
 
-    private val NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN = -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1
+    private val SEARCH_RANGE = -HYPIXEL_VOLUME_SCALING_FACTOR - 1..HYPIXEL_VOLUME_SCALING_FACTOR + 1
 
     private var isSearchingForPhantomleaf = false
 
@@ -49,6 +49,13 @@ object PhantomleafSolver {
      */
     private val failPattern by patternGroup.pattern("failure", "Phantomleaf: That's not me! Better luck next time!")
 
+    /**
+     * When a note is played with a pitch between 0.61 and 0.62, its volume follows the formula:
+     * vol = 1 - dist / 30
+     * where dist is the distance from the center of the phantomleaf hiding spot.
+     * We can check all nearby positions to see which ones have a distance that matches
+     * the expected distance based on the sound.
+     */
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.phantomleafSolver) return
@@ -60,7 +67,7 @@ object PhantomleafSolver {
         val currentPos = PlayerUtils.getLocation()
 
         if (lastPos?.equalsIgnoreY(currentPos) ?: false) {
-            val dist = 30.0 * (1.0 - event.volume)
+            val dist = HYPIXEL_VOLUME_SCALING_FACTOR * (1.0 - event.volume)
             updateCandidates(currentPos, dist)
             if (candidates.isEmpty()) {
                 ChatUtils.chat("No solutions found. Try moving a little.")
@@ -72,11 +79,16 @@ object PhantomleafSolver {
         lastPos = currentPos
     }
 
+    /**
+     * Given a center position and a radius from that center, find all candidate blocks
+     * near the center with that exact distance from the center (within 0.001 tolerance)
+     */
     private fun updateCandidates(center: LorenzVec, radius: Double) {
         candidates.clear()
         val rounded = center.blockCenter()
-        for (dx in NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN) {
-            for (dz in NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN) {
+        for (dx in SEARCH_RANGE) {
+            for (dz in SEARCH_RANGE) {
+                // calculate distance from candidate (rounded.x + dx, rounded.z + dz) to center
                 val d = hypot(rounded.x + dx - center.x, rounded.z + dz - center.z)
                 if (abs(d - radius) < 0.001) {
                     candidates.add(LorenzVec(rounded.x + dx, MUTATION_Y_LEVEL, rounded.z + dz).roundToBlock())
