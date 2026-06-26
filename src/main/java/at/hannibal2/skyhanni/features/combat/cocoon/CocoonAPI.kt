@@ -46,6 +46,7 @@ object CocoonAPI {
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
      */
+    // TODO: fix this leaking Mob and ArmorStand references
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
 
