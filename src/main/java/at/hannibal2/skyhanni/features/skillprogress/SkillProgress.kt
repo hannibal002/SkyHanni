@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.api.SkillApi.skillXPInfoMap
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
@@ -87,8 +86,8 @@ object SkillProgress {
         }
     }
 
-    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
-    fun onGuiRenderAllSkills() {
+    @HandleEvent
+    fun onGuiRenderTop() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 

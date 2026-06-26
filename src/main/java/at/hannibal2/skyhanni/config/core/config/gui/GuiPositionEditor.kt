@@ -337,20 +337,26 @@ private class OldScreenRenderContext(
 
     fun <T> withMetrics(action: () -> T): T {
         val oldScreen = oldScreen ?: return action()
+        return withMetrics(oldScreen, action)
+    }
+
+    fun <T> withRenderTransform(action: () -> T): T {
+        val oldScreen = oldScreen ?: return action()
+        return withMetrics(oldScreen) {
+            DrawContextUtils.pushPopResult {
+                DrawContextUtils.scale(oldScreenScaleX(oldScreen), oldScreenScaleY(oldScreen))
+                action()
+            }
+        }
+    }
+
+    private fun <T> withMetrics(oldScreen: SkyHanniGuiContainer, action: () -> T): T {
         return GuiScreenUtils.withScreenMetricsOverride(
             oldScreen.width,
             oldScreen.height,
             oldScreenScaleFactor(oldScreen),
             action,
         )
-    }
-
-    fun <T> withRenderTransform(action: () -> T): T = withMetrics {
-        val oldScreen = oldScreen ?: return@withMetrics action()
-        DrawContextUtils.pushPopResult {
-            DrawContextUtils.scale(oldScreenScaleX(oldScreen), oldScreenScaleY(oldScreen))
-            action()
-        }
     }
 
     private fun oldScreenScaleX(oldScreen: SkyHanniGuiContainer) = getEditorScaledWidth().toFloat() / oldScreen.width
