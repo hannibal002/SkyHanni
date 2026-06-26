@@ -58,8 +58,8 @@ class FeatureToggleProcessor : ConfigStructureReader {
             Property::class.java -> {
                 val genericType = field.genericType
                 require(genericType is ParameterizedType)
-                require((genericType.actualTypeArguments[0] as Class<*>) == (java.lang.Boolean::class.java))
-                val prop = field.get(baseObject) as Property<Boolean>
+                require((genericType.actualTypeArguments[0] as Class<*>) == (Boolean::class.java))
+                @Suppress("UNCHECKED_CAST") val prop = field.get(baseObject) as Property<Boolean>
                 setter = { prop.set(it) }
                 value = prop.get()
             }

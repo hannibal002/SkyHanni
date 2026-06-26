@@ -109,8 +109,8 @@ object HotmApi {
 
     enum class SkymallPerk(
         override val perkDescription: String,
-        @Language("RegExp") val chatFallback: String,
-        @Language("RegExp") val itemFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
             perkDescription = "§6+100⸕ Mining Speed",
@@ -150,7 +150,7 @@ object HotmApi {
     }
 
     enum class MayhemPerk(
-        @Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
     ) {
         SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),

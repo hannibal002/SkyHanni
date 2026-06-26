@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -138,7 +139,7 @@ object BetterContainers {
         lastInvHashcode = inventory.hashCode()
         hasItem = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
-            stack != null
+            stack.isNotEmpty()
         }
         hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)

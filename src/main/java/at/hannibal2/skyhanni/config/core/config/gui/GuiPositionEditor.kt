@@ -61,15 +61,15 @@ class GuiPositionEditor(
         OtherInventoryData.close()
     }
 
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
         if (oldScreen != null) {
             //? if >= 26.1 {
-            oldScreen.extractBackground(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
-            oldScreen.extractRenderState(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            oldScreen.extractBackground(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
+            oldScreen.extractRenderState(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
             //?} else {
-            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, originalMouseX, originalMouseY)
-            oldScreen.render(DrawContextUtils.drawContext, originalMouseX, originalMouseY, partialTicks)
+            /*oldScreen.renderBg(DrawContextUtils.drawContext, partialTicks, mouseX, mouseY)
+            oldScreen.render(DrawContextUtils.drawContext, mouseX, mouseY, partialTicks)
             *///?}
         }
 
