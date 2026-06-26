@@ -50,7 +50,7 @@ fun DependencyHandler.include(dep: Any): Dependency? = add("include", dep.unwrap
 fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dep.unwrapProvider())
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modImplementation", dep.unwrapProvider()).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompi leOnly", dep.unwrapProvider())
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dep.unwrapProvider())
 fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modCompileOnly", dep.unwrapProvider()).also { (it as? ExternalModuleDependency)?.configure() }
 fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dep.unwrapProvider())
