@@ -1,17 +1,19 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.MouseSensitivityHook;
+import at.hannibal2.skyhanni.features.garden.MouseSensitivityReducer;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.client.player.LocalPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.input.MouseButtonInfo;
 
 @Mixin(MouseHandler.class)
 public class MixinMouse {
@@ -50,8 +52,11 @@ public class MixinMouse {
         MouseCompat.INSTANCE.setTimeDelta(timeDelta * 10000);
     }
 
-    @ModifyVariable(method = "turnPlayer", at = @At("STORE"), ordinal = 1)
-    private double modifyMouseX(double value) {
-        return MouseSensitivityHook.remapSensitivity((float) value);
+    @WrapOperation(
+        method = "turnPlayer",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;turn(DD)V")
+    )
+    private void modifyMouseSensitivity(LocalPlayer instance, double x, double y, Operation<Void> original) {
+        original.call(instance, MouseSensitivityReducer.remapSensitivity(x), MouseSensitivityReducer.remapSensitivity(y));
     }
 }

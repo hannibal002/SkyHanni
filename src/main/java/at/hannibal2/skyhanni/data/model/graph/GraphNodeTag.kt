@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.model.graph
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.Legacy
 
 enum class GraphNodeTag(
     val internalName: String,
@@ -24,7 +23,7 @@ enum class GraphNodeTag(
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map.", onlySkyblock = null),
 
     // TODO delete once no graph data contains this anymore
-    @Legacy("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
+    @Deprecated("gets split up into WARP, JUMP_PAD and TELEPORT_PAD")
     TELEPORT(
         "teleport",
         LorenzColor.BLUE,
