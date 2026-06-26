@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfig
+import at.hannibal2.skyhanni.config.features.garden.MouseSensitivityReducerConfig.UnlockOnTeleport
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
+import kotlin.reflect.KProperty0
 
 @SkyHanniModule
 object MouseSensitivityReducer {
@@ -34,10 +35,19 @@ object MouseSensitivityReducer {
     // shared /shmouselock and /shsensreduce because they modify the same state
     private val MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
-    val config get() = GardenApi.config.mouseSensitivityReducer
+    private val config get() = GardenApi.config.mouseSensitivityReducer
 
-    private var activeState: SensitivityState = SensitivityState.UNCHANGED
-    private var manualState: SensitivityState? = null
+    private var activeState: SensitivityState? = null // internal state used by mouse mixin
+    private var autoState: SensitivityState? = null // auto enable state
+        set(value) {
+            field = value
+            updateActiveState()
+        }
+    private var manualState: SensitivityState? = null // manual state from commands or other features
+        set(value) {
+            field = value
+            updateActiveState()
+        }
 
     /**
      * REGEX-TEST: Teleported you to Plot - 1!
@@ -61,62 +71,23 @@ object MouseSensitivityReducer {
         "Snapped to squeaky mousemat!",
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (manualState == null || config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
+    @JvmStatic
+    fun remapSensitivity(original: Double): Double = activeState?.transform(original) ?: original
 
-        teleportPattern.matchMatchers(event.cleanMessage) {
-            if (config.unlockOnTeleport.condition(group("plot"))) {
-                val oldState = manualState
-
-                manualState = null
-                update()
-
-                if (config.chatMessage)
-                    ChatUtils.notifyOrDisable(
-                        if (oldState == SensitivityState.REDUCED) "Mouse sensitivity has been restored because you teleported."
-                        else "Mouse rotation has been unlocked because you teleported.",
-                        config::unlockOnTeleport,
-                        messageId = MESSAGE_ID,
-                    )
-            }
-            return
-        }
-
-        mousematPattern.matchMatcher(event.cleanMessage) {
-            if (config.lockOnMousemat) {
-                manualState = SensitivityState.LOCKED
-                update()
-                ChatUtils.chat(
-                    "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
-                    messageId = MESSAGE_ID,
-                )
-            }
-        }
+    private fun updateActiveState() {
+        activeState = manualState ?: autoState // implicit ?: null
     }
 
-    @HandleEvent
-    fun onWorldChange() {
-        manualState = null
-        update()
-    }
-
-    @HandleEvent
-    fun onTick() {
-        update()
-    }
-
-    private fun update() {
-        activeState = manualState ?: when {
-            !isAutoEnabled() -> SensitivityState.UNCHANGED
-            !config.lockMouse -> SensitivityState.REDUCED
-            else -> SensitivityState.LOCKED
+    private fun updateAutoState() {
+        autoState = when {
+            !isAutoEnabled() -> null
+            config.lockMouse -> SensitivityState.LOCKED
+            else -> SensitivityState.REDUCED
         }
     }
 
     private fun isAutoEnabled(): Boolean =
-        GardenApi.inGarden() &&
-            config.autoEnable &&
+        config.autoEnable &&
             config.autoEnableMode.any { it.condition() } &&
             !(config.onlyPlot && GardenApi.onUnfarmablePlot) &&
             !(config.onGround && !isOnGround())
@@ -129,43 +100,72 @@ object MouseSensitivityReducer {
         return playerLocation().let { !BlockUtils.raycast(it, it.down(tolerance)).miss }
     }
 
+    fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
+        manualState = state
+
+        if (config.chatMessage) {
+            val message = message ?: when (state) {
+                null -> "Mouse rotation is now unlocked."
+                SensitivityState.LOCKED -> "Mouse rotation is now locked. Type /shmouselock to unlock your mouse."
+                SensitivityState.REDUCED -> "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity."
+            }
+
+            if (configDisableOption != null) ChatUtils.notifyOrDisable(message, configDisableOption, messageId = MESSAGE_ID)
+            else ChatUtils.chat(message, messageId = MESSAGE_ID)
+        }
+    }
+
+    @HandleEvent
+    fun onWorldChange() {
+        manualState = null
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onTick() {
+        updateAutoState()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (config.unlockOnTeleport != UnlockOnTeleport.NEVER && manualState != null)
+            teleportPattern.matchMatchers(event.cleanMessage) {
+                if (config.unlockOnTeleport.condition(group("plot")))
+                    setManualState(
+                        null,
+                        "Mouse rotation is now unlocked because you teleported.",
+                        config::unlockOnTeleport,
+                    )
+                return
+            }
+
+        if (config.lockOnMousemat)
+            mousematPattern.matchMatcher(event.cleanMessage) {
+                setManualState(
+                    SensitivityState.LOCKED,
+                    "Mouse rotation is now locked because you snapped to squeaky mousemat.",
+                    config::lockOnMousemat,
+                )
+                return
+            }
+    }
+
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.registerBrigadier("shsensreduce") {
-            description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
-            category = CommandCategory.USERS_ACTIVE
-            simpleCallback {
-                if (manualState != SensitivityState.REDUCED) {
-                    manualState = SensitivityState.REDUCED
-                    update()
-                    ChatUtils.chat(
-                        "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.",
-                        messageId = MESSAGE_ID,
-                    )
-                } else {
-                    manualState = null
-                    update()
-                    ChatUtils.chat("Mouse sensitivity is now restored.", messageId = MESSAGE_ID)
-                }
-            }
-        }
         event.registerBrigadier("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
             simpleCallback {
-                if (manualState != SensitivityState.LOCKED) {
-                    manualState = SensitivityState.LOCKED
-                    update()
-                    ChatUtils.chat(
-                        "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
-                        messageId = MESSAGE_ID,
-                    )
-                } else {
-                    manualState = null
-                    update()
-                    ChatUtils.chat("Mouse rotation is now unlocked.", messageId = MESSAGE_ID)
-                }
+                if (manualState != SensitivityState.LOCKED) setManualState(SensitivityState.LOCKED)
+                else setManualState(null)
+            }
+        }
+        event.registerBrigadier("shsensreduce") {
+            description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback {
+                if (manualState != SensitivityState.REDUCED) setManualState(SensitivityState.REDUCED)
+                else setManualState(null)
             }
         }
     }
@@ -174,11 +174,11 @@ object MouseSensitivityReducer {
     fun onGuiRenderOverlay() {
         if (config.showGui) config.position.renderRenderable(
             when (activeState) {
-                SensitivityState.UNCHANGED -> return
-                SensitivityState.REDUCED -> Renderable.text("§eSensitivity Lowered")
+                null -> return
                 SensitivityState.LOCKED -> Renderable.text("§eMouse Locked")
+                SensitivityState.REDUCED -> Renderable.text("§eSensitivity Lowered")
             },
-            posLabel = "Mouse Sensitivity Reducer",
+            "Mouse Sensitivity Reducer",
         )
     }
 
@@ -186,11 +186,12 @@ object MouseSensitivityReducer {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mouse Sensitivity Reducer")
 
-        if (activeState == SensitivityState.UNCHANGED) event.addIrrelevant {
+        if (activeState == null) event.addIrrelevant {
             add("not enabled")
         }
         else event.addData {
-            add("current state: $activeState")
+            add("active state: $activeState")
+            add("auto state: $autoState")
             add("manual state: $manualState")
             add("sensitivity factor: " + remapSensitivity(1.0))
         }
@@ -229,13 +230,9 @@ object MouseSensitivityReducer {
         event.move(137, "garden.mouseLock.unlockOnTeleport", "$base.unlockOnTeleport")
     }
 
-    @JvmStatic
-    fun remapSensitivity(original: Double): Double = activeState.transform(original)
-
-    private enum class SensitivityState(val transform: (Double) -> Double) {
-        UNCHANGED({ it }),
-        REDUCED({ it * config.reducingPercent.fractionOf(100.0) }),
+    enum class SensitivityState(val transform: (Double) -> Double) {
         LOCKED({ 0.0 }),
+        REDUCED({ it * (config.reducingPercent / 100.0).coerceIn(0.0..1.0) }),
     }
 
     enum class AutoEnableMode(private val displayName: String, val condition: () -> Boolean) {
@@ -245,6 +242,7 @@ object MouseSensitivityReducer {
         MOUSEMAT("Squeaky Mousemat", { GardenApi.hasMousematInHand() }),
         VACUUM("Vacuum", { PestApi.hasVacuumInHand() }),
         SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
+        SUNS_GRASP("Sun's Grasp", { GardenApi.hasActiveSunsGrasp() }),
         ;
 
         override fun toString() = displayName
