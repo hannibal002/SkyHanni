@@ -24,8 +24,8 @@ object GardenCropTimeCommand {
     private val config get() = GardenApi.config.moneyPerHours
 
     private fun processCropEntry(internalName: NeuInternalName, amount: Long, searchName: String): Pair<String, Long>? {
-        val itemName = internalName.repoItemName.removeColor()
-        if (!itemName.contains(searchName, ignoreCase = true)) return null
+        val itemName = internalName.repoItemName
+        if (!itemName.removeColor().startsWith(searchName, ignoreCase = true)) return null
 
         val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
         val baseName = baseId.repoItemName.removeColor()
@@ -79,6 +79,10 @@ object GardenCropTimeCommand {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
+
+            simpleCallback {
+                ChatUtils.userError("Usage: /shcroptime <amount> <item>")
+            }
 
             arg("amount", BrigadierArguments.long(1)) { amountArg ->
                 argCallback(
