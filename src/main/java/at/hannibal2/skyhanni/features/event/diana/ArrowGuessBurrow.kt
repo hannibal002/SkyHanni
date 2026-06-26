@@ -80,7 +80,7 @@ object ArrowGuessBurrow {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Arrow Burrow Guess")
 
         if (!DianaApi.isDoingDiana()) {
