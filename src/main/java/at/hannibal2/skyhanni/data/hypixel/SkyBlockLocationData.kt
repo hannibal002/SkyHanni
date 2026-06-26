@@ -58,7 +58,7 @@ object SkyBlockLocationData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("SkyBlock Location Data")
         val list = listOf(
             "onHypixel: ${HypixelLocationApi.inHypixel}",
