@@ -20,13 +20,13 @@ object MetalDetectorMute {
     private var oldItem: NeuInternalName? = null
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onItemChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         oldItem = event.oldItem
         currentItem = event.newItem
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled()) return
         if (oldItem != METAL_DETECTOR && currentItem != METAL_DETECTOR) return
         if (event.soundName == "block.note_block.harp") {

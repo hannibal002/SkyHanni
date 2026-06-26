@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DevApi
@@ -384,12 +383,12 @@ object MobDetection {
     }
 
     @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
+    fun onDisconnect() {
         shouldClear.set(true)
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mob Detection")
         if (!mainToggle) {
             event.addData("Mob Detection is manually disabled!")
