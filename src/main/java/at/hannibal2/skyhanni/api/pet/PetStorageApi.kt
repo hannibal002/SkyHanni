@@ -70,13 +70,13 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST:  [Lvl 100] Hedgehog
-     * REGEX-TEST:  [Lvl 68] Blaze
-     * REGEX-TEST:  [Lvl 51] Kuudra
-     * REGEX-TEST:  [Lvl 100] Flying Fish
-     * REGEX-TEST:  [Lvl 100] Chicken ✦
-     * REGEX-TEST:  [Lvl 200] [122✦] Golden Dragon
-     * REGEX-FAIL:  No pet selected
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Hedgehog"
+     * WRAPPED-REGEX-TEST: " [Lvl 68] Blaze"
+     * WRAPPED-REGEX-TEST: " [Lvl 51] Kuudra"
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Flying Fish"
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Chicken ✦"
+     * WRAPPED-REGEX-TEST: " [Lvl 200] [122✦] Golden Dragon"
+     * WRAPPED-REGEX-FAIL: " No pet selected"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetNamePattern by patternGroup.pattern(
@@ -85,13 +85,13 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST:  +163,119,730.2 XP
-     * REGEX-TEST:  33,915/179.7k XP (18.9%)
-     * REGEX-TEST:  2,877.5/9.7k XP (29.7%)
-     * REGEX-TEST:  931,886.2/1.4M XP (67.2%)
-     * REGEX-TEST:  251,016.4/561.7k XP (44.7%)
-     * REGEX-TEST:  3,138.4/9.7k XP (32.4%)
-     * REGEX-TEST:  MAX LEVEL
+     * WRAPPED-REGEX-TEST: " +163,119,730.2 XP"
+     * WRAPPED-REGEX-TEST: " 33,915/179.7k XP (18.9%)"
+     * WRAPPED-REGEX-TEST: " 2,877.5/9.7k XP (29.7%)"
+     * WRAPPED-REGEX-TEST: " 931,886.2/1.4M XP (67.2%)"
+     * WRAPPED-REGEX-TEST: " 251,016.4/561.7k XP (44.7%)"
+     * WRAPPED-REGEX-TEST: " 3,138.4/9.7k XP (32.4%)"
+     * WRAPPED-REGEX-TEST: " MAX LEVEL"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(

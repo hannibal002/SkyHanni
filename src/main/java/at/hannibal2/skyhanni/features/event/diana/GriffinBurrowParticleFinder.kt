@@ -37,7 +37,7 @@ object GriffinBurrowParticleFinder {
     )
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Particle Finder")
 
         if (!DianaApi.isDoingDiana()) {

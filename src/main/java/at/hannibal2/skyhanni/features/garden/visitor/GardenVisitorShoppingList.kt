@@ -244,7 +244,7 @@ object GardenVisitorShoppingList {
                 return
             }
             if (items.isEmpty()) {
-                if (visitor.unknownRewards == true) {
+                if (visitor.unknownRewards) {
                     list.addString(" §7(§fUnknown§7)")
                 } else {
                     list.addString(" §7(§fAny§7)")

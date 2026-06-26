@@ -68,7 +68,7 @@ object IslandDetectionWatcher {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Detection Watcher")
 
         val currentEventType = latestEventType

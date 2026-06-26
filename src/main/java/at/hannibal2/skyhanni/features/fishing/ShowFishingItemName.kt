@@ -41,7 +41,7 @@ object ShowFishingItemName {
             val itemStack = entityItem.item.orNull() ?: continue
             var text = ""
 
-            val isBait = itemStack.isBait()
+            val isBait = itemStack.count == 1 && itemStack.isBait()
             if (isBait && !config.showBaits) continue
 
             if (itemStack.getSkullTexture() in cheapCoins) {
