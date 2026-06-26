@@ -13,9 +13,9 @@ class HorizontalContainerRenderable private constructor(
     override val verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.TOP,
 ) : ContainerRenderable() {
 
-    override val width = renderables.sumOf { it.width } + spacing * (renderables.size - 1)
+    override val width by lazy { renderables.sumOf { it.width } + spacing * (renderables.size - 1) }
 
-    override val height = renderables.maxOfOrNull { it.height } ?: 0
+    override val height by lazy { renderables.maxOfOrNull { it.height } ?: 0 }
 
     override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
         var x = mouseOffsetX

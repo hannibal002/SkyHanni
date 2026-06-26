@@ -48,7 +48,7 @@ object RemainingSlayerKills {
     private val patternGroup = RepoPattern.group("slayer.remaining-kills")
 
     /**
-     * REGEX-TEST:  ☯ Combat Wisdom 2
+     * WRAPPED-REGEX-TEST: " ☯ Combat Wisdom 2"
      */
     private val combatWisdomPattern by patternGroup.pattern(
         "combat-wisdom",
