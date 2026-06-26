@@ -136,7 +136,7 @@ object SkyHanniEvents {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
             add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")
