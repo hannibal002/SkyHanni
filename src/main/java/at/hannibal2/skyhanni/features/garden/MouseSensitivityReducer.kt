@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -52,6 +53,14 @@ object MouseSensitivityReducer {
         "(?<plot>Warping\\.\\.\\.)", // this is safe because plot names cannot have dots
     )
 
+    /**
+     * REGEX-TEST: Snapped to squeaky mousemat!
+     */
+    private val mousematPattern by RepoPattern.pattern(
+        "garden.mouse-sensitivity-reducer.chat.mousemat",
+        "Snapped to squeaky mousemat!",
+    )
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (manualState == null || config.unlockOnTeleport == MouseSensitivityReducerConfig.UnlockOnTeleport.NEVER) return
@@ -70,6 +79,18 @@ object MouseSensitivityReducer {
                         config::unlockOnTeleport,
                         messageId = MESSAGE_ID,
                     )
+            }
+            return
+        }
+
+        mousematPattern.matchMatcher(event.cleanMessage) {
+            if (config.lockOnMousemat) {
+                manualState = SensitivityState.LOCKED
+                update()
+                ChatUtils.chat(
+                    "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
+                    messageId = MESSAGE_ID,
+                )
             }
         }
     }
@@ -116,12 +137,14 @@ object MouseSensitivityReducer {
             simpleCallback {
                 if (manualState != SensitivityState.REDUCED) {
                     manualState = SensitivityState.REDUCED
+                    update()
                     ChatUtils.chat(
                         "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.",
                         messageId = MESSAGE_ID,
                     )
                 } else {
                     manualState = null
+                    update()
                     ChatUtils.chat("Mouse sensitivity is now restored.", messageId = MESSAGE_ID)
                 }
             }
@@ -133,12 +156,14 @@ object MouseSensitivityReducer {
             simpleCallback {
                 if (manualState != SensitivityState.LOCKED) {
                     manualState = SensitivityState.LOCKED
+                    update()
                     ChatUtils.chat(
                         "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
                         messageId = MESSAGE_ID,
                     )
                 } else {
                     manualState = null
+                    update()
                     ChatUtils.chat("Mouse rotation is now unlocked.", messageId = MESSAGE_ID)
                 }
             }

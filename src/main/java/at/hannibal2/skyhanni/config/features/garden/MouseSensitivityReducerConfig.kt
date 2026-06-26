@@ -62,6 +62,11 @@ class MouseSensitivityReducerConfig {
     var unlockOnTeleport: UnlockOnTeleport = UnlockOnTeleport.ALWAYS
 
     @Expose
+    @ConfigOption(name = "Lock on Mousemat", desc = "Lock mouse when snapping to Squeaky Mousemat.")
+    @ConfigEditorDropdown
+    var lockOnMousemat: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Only on Ground", desc = "When enabled, lower sensitivity only while on or near the ground.")
     @ConfigEditorBoolean
     var onGround: Boolean = true
