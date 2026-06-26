@@ -43,17 +43,17 @@ else apply(plugin = "net.fabricmc.fabric-loom-remap")
 // plugins applied in the plugins block. Since both loom plugins are declared with
 // apply false, no accessors are auto-generated, so we define them explicitly.
 val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
-private fun Any.unwrapProvider(): Any = (this as? Provider<*>)?.get() ?: this
-fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep.unwrapProvider())
-fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep.unwrapProvider())
-fun DependencyHandler.include(dep: Any): Dependency? = add("include", dep.unwrapProvider())
-fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dep.unwrapProvider())
+fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
+fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
+fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
+fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
+fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modImplementation", dep.unwrapProvider()).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dep.unwrapProvider())
+    add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
 fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modCompileOnly", dep.unwrapProvider()).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dep.unwrapProvider())
+    add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -236,13 +236,11 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
-
     if (isDeobf) {
-        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
     } else {
-        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
-        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        include(dep).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dep).also { (it as? ExternalModuleDependency)?.configure() }
     }
 }
 
