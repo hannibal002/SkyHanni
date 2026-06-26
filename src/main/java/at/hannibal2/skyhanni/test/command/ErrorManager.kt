@@ -213,9 +213,14 @@ object ErrorManager {
 
     // This is intentionally not an enum, because unnecessary object allocation can be problematic
     // if we're dealing with a stack overflow.
-    private const val ERROR_STATE_LOGGED = 0
-    private const val ERROR_STATE_BLOCKED_NOT_NEEDED = 1
-    private const val ERROR_STATE_BLOCKED_CAN_NOT_SHOW = 2
+    @JvmInline
+    private value class ErrorState(val value: Int) {
+        companion object {
+            val LOGGED = ErrorState(0)
+            val BLOCKED_NOT_NEEDED = ErrorState(1)
+            val BLOCKED_CAN_NOT_SHOW = ErrorState(2)
+        }
+    }
 
     @Suppress("ReturnCount")
     private fun logError(
@@ -226,18 +231,18 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ): Int {
-        if (!condition()) return ERROR_STATE_BLOCKED_NOT_NEEDED
+    ): ErrorState {
+        if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
 
         // TODO add missing debug enabled check
-        if (betaOnly && !SkyHanniMod.isBetaVersion) return ERROR_STATE_BLOCKED_NOT_NEEDED
+        if (betaOnly && !SkyHanniMod.isBetaVersion) return ErrorState.BLOCKED_NOT_NEEDED
 
         val throwable = originalThrowable.maybeSkipError()
         if (!ignoreErrorCache) {
             val cachedError = throwable.stackTrace.getOrNull(0)?.let {
                 CachedError(it.fileName ?: "<unknown>", it.lineNumber, message)
             } ?: CachedError("<empty stack trace>", 0, message)
-            if (cachedError in cache) return ERROR_STATE_BLOCKED_NOT_NEEDED
+            if (cachedError in cache) return ErrorState.BLOCKED_NOT_NEEDED
             cache.add(cachedError)
         }
 
@@ -264,10 +269,10 @@ object ErrorManager {
 
         val isConnected = MinecraftCompat.localPlayerOrNull != null
 
-        val finalMessage = buildFinalMessage(message) ?: return ERROR_STATE_BLOCKED_CAN_NOT_SHOW
+        val finalMessage = buildFinalMessage(message) ?: return ErrorState.BLOCKED_CAN_NOT_SHOW
         if (!isConnected) {
             errorsToShowOnJoin[randomId] = finalMessage
-            return ERROR_STATE_BLOCKED_CAN_NOT_SHOW
+            return ErrorState.BLOCKED_CAN_NOT_SHOW
         }
         ChatUtils.clickableChat(
             "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
@@ -275,7 +280,7 @@ object ErrorManager {
             "§eClick to copy!",
             prefix = false,
         )
-        return ERROR_STATE_LOGGED
+        return ErrorState.LOGGED
     }
 
     private fun getLabel(): String {
@@ -287,8 +292,8 @@ object ErrorManager {
     // random id -> final message
     private val errorsToShowOnJoin = mutableMapOf<String, String>()
 
-    private fun Int.crashIfNotYetOnAServer(): Boolean {
-        if (this == ERROR_STATE_BLOCKED_NOT_NEEDED) return false
+    private fun ErrorState.crashIfNotYetOnAServer(): Boolean {
+        if (this == ErrorState.BLOCKED_NOT_NEEDED) return false
 
         // TODO find way to properly do this before the config loads
         val devCrash = false
@@ -302,7 +307,7 @@ object ErrorManager {
             }
         }
 
-        return this == ERROR_STATE_LOGGED
+        return this == ErrorState.LOGGED
     }
 
     @HandleEvent
