@@ -100,7 +100,7 @@ object PreciseGuessBurrow {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Precise Burrow Guess")
 
         if (!DianaApi.isDoingDiana()) {

@@ -237,7 +237,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
         val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
