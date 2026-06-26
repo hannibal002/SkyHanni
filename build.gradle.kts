@@ -355,14 +355,10 @@ tasks.withType<KotlinCompile> {
                            else target.minecraftVersion.formattedJavaLanguageVersion
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
         optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
-        freeCompilerArgs.addAll(
-            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
-            // leaving corrupt .class files that break subsequent incremental builds.
-            // see: https://youtrack.jetbrains.com/issue/KT-85498/
-            "-Xbackend-threads=1",
-            // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
-            "-Xsuppress-warnings=DEPRECATION"
-        )
+        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+        // leaving corrupt .class files that break subsequent incremental builds.
+        // see: https://youtrack.jetbrains.com/issue/KT-85498/
+        freeCompilerArgs.addAll("-Xbackend-threads=1")
     }
 }
 
