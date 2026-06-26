@@ -653,9 +653,13 @@ class ProfileSpecificStorage(
         @Expose
         var greenhouse: GreenHouseStorage = GreenHouseStorage()
 
-        class GreenHouseStorage(
-            @Expose var nextCycle: SimpleTimeMark = farPast(),
-        )
+        class GreenHouseStorage {
+            @Expose
+            var nextCycle: SimpleTimeMark = farPast()
+
+            @Expose
+            var protectedSlots: MutableSet<LorenzVec> = mutableSetOf()
+        }
     }
 
     // - gui
