@@ -62,4 +62,17 @@ class MountaintopConfig {
     @Expose
     @ConfigLink(owner = MountaintopConfig::class, field = "ubikGui")
     val timerPosition: Position = Position(100, 10)
+
+    @Expose
+    @ConfigOption(
+        name = "Connect 4 Solver",
+        desc = "Solver for Wizardman's Quad Link Legacy (Connect Four) game"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var connectFourSolver: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = MountaintopConfig::class, field = "connectFourSolver")
+    val connectFourDebugPosition: Position = Position(10, 80)
 }
