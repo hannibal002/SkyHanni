@@ -25,6 +25,8 @@ object PhantomleafSolver {
     private const val GREENHOUSE_PLOT_LENGTH = 10
     private const val MUTATION_Y_LEVEL = 74.0
 
+    private val NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN = -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1
+
     private var isSearchingForPhantomleaf = false
 
     private var lastPos: LorenzVec? = null
@@ -73,11 +75,12 @@ object PhantomleafSolver {
     private fun updateCandidates(center: LorenzVec, radius: Double) {
         candidates.clear()
         val rounded = center.blockCenter()
-        for (dx in -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1) {
-            for (dz in -GREENHOUSE_PLOT_LENGTH - 1..GREENHOUSE_PLOT_LENGTH + 1) {
+        for (dx in NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN) {
+            for (dz in NEGATIVE_ELEVEN_TO_POSITIVE_ELEVEN) {
                 val d = hypot(rounded.x + dx - center.x, rounded.z + dz - center.z)
-                if (abs(d - radius) < 0.001)
+                if (abs(d - radius) < 0.001) {
                     candidates.add(LorenzVec(rounded.x + dx, MUTATION_Y_LEVEL, rounded.z + dz).roundToBlock())
+                }
             }
         }
     }
