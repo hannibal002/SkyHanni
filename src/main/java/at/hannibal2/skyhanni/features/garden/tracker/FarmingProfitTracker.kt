@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig
-import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig.DisplayStat
 import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig.TrackedSource
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
@@ -65,10 +64,76 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
-import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.seconds
+
+private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
+private val seasoningInternalName = "SEASONING".toInternalName()
+private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
+private val bountifulCoinCauses = setOf(PurseChangeCause.GAIN_MOB_KILL, PurseChangeCause.GAIN_UNKNOWN)
+private val sackCompactionTimeout = 30.seconds
+private val farmingProfitTrackerPatternGroup = RepoPattern.group("garden.farming.profit.tracker")
+
+private data class CropPrimitiveItem(
+    val crop: CropType,
+    val rawInternalName: NeuInternalName,
+    val rawAmount: Long,
+)
+
+data class ProfitAction(val amount: Long, val action: String, val plural: String)
+
+private fun FarmingProfitTracker.Data.hasNoFarmingData(): Boolean =
+    bucketedItems.values.all { it.isEmpty() } &&
+        cropAmounts.isEmpty() &&
+        blocksBroken.isEmpty() &&
+        rareCropDrops.isEmpty() &&
+        blessedDrops.isEmpty() &&
+        cropFevers.isEmpty() &&
+        cropFeverDrops.isEmpty() &&
+        pestKills.isEmpty() &&
+        spraysUsed.isEmpty() &&
+        visitorsServed == 0L &&
+        visitorCopper == 0L &&
+        toolExpCapsules == 0L &&
+        bountifulCoins == 0L
+
+private fun CropCollectionType.toTrackedSource(): TrackedSource? = when (this) {
+    CropCollectionType.BREAKING_CROPS -> TrackedSource.CROPS
+    CropCollectionType.MOOSHROOM_COW -> TrackedSource.MOOSHROOM_COW
+    CropCollectionType.GREENHOUSE -> TrackedSource.GREENHOUSE
+    CropCollectionType.CROP_FEVER,
+    CropCollectionType.PEST_BASE,
+    CropCollectionType.PEST_RNG,
+    CropCollectionType.UNKNOWN,
+    -> null
+}
+
+/**
+ * REGEX-TEST: +20 Copper
+ */
+private val visitorCopperPattern by farmingProfitTrackerPatternGroup.pattern(
+    "visitor.copper",
+    "[+](?<amount>.*) Copper",
+)
+
+/**
+ * REGEX-TEST: RARE DROP! You dropped 48x Enchanted Melon Slice!
+ * REGEX-TEST: UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
+ */
+private val cropFeverDropPattern by farmingProfitTrackerPatternGroup.pattern(
+    "cropfever.drop",
+    "^(?<rarity>[\\w ]+)! You dropped (?<amount>\\d+)x (?<crop>[\\w ]+)!",
+)
+
+/**
+ * REGEX-TEST: BLESSED! You found an Enchanted Nether Wart!
+ * REGEX-TEST: BLESSED! You found a Cropie!
+ */
+private val blessedDropPattern by farmingProfitTrackerPatternGroup.pattern(
+    "blessed.drop",
+    "^BLESSED! You found an? (?<item>.+)!$",
+)
 
 @SkyHanniModule
 object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, FarmingProfitTracker.Data>(
@@ -81,7 +146,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
 ) {
 
     private val config: FarmingProfitTrackerConfig get() = SkyHanniMod.feature.garden.farmingProfitTracker
-    private val patternGroup = RepoPattern.group("garden.farming.profit.tracker")
     private val blocksBrokenCache: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
     private val pendingReplenishCosts: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
     private val cropInternalNames = mutableMapOf<CropType, NeuInternalName>()
@@ -89,44 +153,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     private var lastFarmingActivity = SimpleTimeMark.farPast()
     private var lastVisitorAccept = SimpleTimeMark.farPast()
     private var currentToolHasBountiful = false
-
-    private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
-    private val seasoningInternalName = "SEASONING".toInternalName()
-    private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
-    private val bountifulCoinCauses = setOf(PurseChangeCause.GAIN_MOB_KILL, PurseChangeCause.GAIN_UNKNOWN)
-    private val sackCompactionTimeout = 30.seconds
-
-    private data class CropPrimitiveItem(
-        val crop: CropType,
-        val rawInternalName: NeuInternalName,
-        val rawAmount: Long,
-    )
-
-    /**
-     * REGEX-TEST: +20 Copper
-     */
-    private val visitorCopperPattern by patternGroup.pattern(
-        "visitor.copper",
-        "[+](?<amount>.*) Copper",
-    )
-
-    /**
-     * REGEX-TEST: RARE DROP! You dropped 48x Enchanted Melon Slice!
-     * REGEX-TEST: UNCOMMON DROP! You dropped 24x Enchanted Melon Slice!
-     */
-    private val cropFeverDropPattern by patternGroup.pattern(
-        "cropfever.drop",
-        "^(?<rarity>[\\w ]+)! You dropped (?<amount>\\d+)x (?<crop>[\\w ]+)!",
-    )
-
-    /**
-     * REGEX-TEST: BLESSED! You found an Enchanted Nether Wart!
-     * REGEX-TEST: BLESSED! You found a Cropie!
-     */
-    private val blessedDropPattern by patternGroup.pattern(
-        "blessed.drop",
-        "^BLESSED! You found an? (?<item>.+)!$",
-    )
 
     data class Data(
         @Expose var cropAmounts: MutableMap<CropType, MutableMap<TrackedSource, Long>> =
@@ -278,8 +304,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         }
     }
 
-    data class ProfitAction(val amount: Long, val action: String, val plural: String)
-
     init {
         initRenderer({ config.position }, onlyOnIsland = IslandType.GARDEN) { shouldShowDisplay() }
     }
@@ -348,7 +372,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         modify {
             it.bountifulCoins += coins
         }
-        addTrackedItem(TrackedSource.BOUNTIFUL, SKYBLOCK_COIN, coins, message = false)
+        addTrackedItem(TrackedSource.BOUNTIFUL, SKYBLOCK_COIN, coins.toLong(), message = false)
         lastFarmingActivity = SimpleTimeMark.now()
     }
 
@@ -370,7 +394,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         }
         if (BitsApi.bitsAvailable > 0 && PestProfitTracker.config.includeBits.get()) {
             val bitsAmount = PestProfitTracker.KILL_BITS * BitsApi.bitsMultiplier()
-            addTrackedItem(TrackedSource.PESTS, PestProfitTracker.BITS, bitsAmount.toInt(), message = false)
+            addTrackedItem(TrackedSource.PESTS, PestProfitTracker.BITS, bitsAmount.toLong(), message = false)
         }
         lastFarmingActivity = SimpleTimeMark.now()
     }
@@ -379,7 +403,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     fun onShardGain(event: ShardGainEvent) {
         if (!shouldTrack(TrackedSource.PESTS)) return
         if (event.shardInternalName != pestShard) return
-        addTrackedItem(TrackedSource.PESTS, pestShard, event.amount)
+        addTrackedItem(TrackedSource.PESTS, pestShard, event.amount.toLong())
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -389,10 +413,10 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
             it.visitorsServed++
         }
         for ((internalName, amount) in event.visitor.shoppingList) {
-            addTrackedItem(TrackedSource.VISITORS, internalName, -amount, message = false)
+            addTrackedItem(TrackedSource.VISITORS, internalName, -amount.toLong(), message = false)
         }
         for (internalName in event.visitor.allRewards) {
-            addTrackedItem(TrackedSource.VISITORS, internalName, 1, message = false)
+            addTrackedItem(TrackedSource.VISITORS, internalName, 1L, message = false)
         }
         lastVisitorAccept = SimpleTimeMark.now()
         lastFarmingActivity = SimpleTimeMark.now()
@@ -434,7 +458,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     fun addPestItem(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         rememberSpecialCropItem(internalName, amount.toLong())
         if (!shouldTrack(TrackedSource.PESTS)) return
-        addTrackedItem(TrackedSource.PESTS, internalName, amount, message = message)
+        addTrackedItem(TrackedSource.PESTS, internalName, amount.toLong(), message = message)
         val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
         CropType.getByNameOrNull(primitiveStack.internalName.itemNameWithoutColor)?.let { crop ->
             modify {
@@ -446,7 +470,13 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
 
     fun addPestCoins(coins: Int) {
         if (!shouldTrack(TrackedSource.PESTS)) return
-        addTrackedItem(TrackedSource.PESTS, SKYBLOCK_COIN, coins, message = false)
+        addTrackedItem(TrackedSource.PESTS, SKYBLOCK_COIN, coins.toLong(), message = false)
+        lastFarmingActivity = SimpleTimeMark.now()
+    }
+
+    fun addRareCropItem(internalName: NeuInternalName) {
+        if (!shouldTrack(TrackedSource.RARE_CROPS)) return
+        addTrackedItem(TrackedSource.RARE_CROPS, internalName, 1L)
         lastFarmingActivity = SimpleTimeMark.now()
     }
 
@@ -468,7 +498,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
             val internalName = NeuInternalName.fromItemNameOrNull(dropType.dropName.removeColor()) ?: dropType.name.toInternalName()
             rememberSpecialCropItem(internalName, 1)
             if (!shouldTrack(TrackedSource.RARE_CROPS)) return
-            addTrackedItem(TrackedSource.RARE_CROPS, internalName, 1)
+            addTrackedItem(TrackedSource.RARE_CROPS, internalName, 1L)
             modify {
                 it.rareCropDrops.addOrPut(dropType, 1)
             }
@@ -492,7 +522,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val crop = CropType.getByNameOrNull(primitiveStack.internalName.itemNameWithoutColor)
 
-            addTrackedItem(TrackedSource.BLESSED, internalName, 1)
+            addTrackedItem(TrackedSource.BLESSED, internalName, 1L)
             modify {
                 it.blessedDrops.addOrPut(internalName, 1)
                 crop?.let { cropType ->
@@ -525,7 +555,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
                 CropType.getByNameOrNull(primitiveStack.internalName.itemNameWithoutColor)
             } ?: return
 
-            addTrackedItem(TrackedSource.CROP_FEVER, internalName, amount)
+            addTrackedItem(TrackedSource.CROP_FEVER, internalName, amount.toLong())
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             modify {
                 it.cropFeverDrops.addOrPut(rarity, 1)
@@ -538,7 +568,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     private fun checkToolExpCapsule(message: String) {
         if (!shouldTrack(TrackedSource.CROPS)) return
         if (!HoeLevelDisplay.levelUpPattern.matches(message)) return
-        addTrackedItem(TrackedSource.CROPS, toolExpCapsule, 1)
+        addTrackedItem(TrackedSource.CROPS, toolExpCapsule, 1L)
         modify {
             it.toolExpCapsules++
         }
@@ -573,27 +603,25 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     private fun trackCropItemFromItemAdd(event: ItemAddEvent) {
-        if (!shouldTrack(TrackedSource.CROPS)) return
-        if (event.amount <= 0) return
+        if (!shouldTrack(TrackedSource.CROPS) || event.amount <= 0) return
         if (lastFarmingActivity.passedSince() > sackCompactionTimeout) return
         clearSessionStateIfSessionWasReset()
 
         val cropItem = event.internalName.getCropPrimitiveItemOrNull() ?: return
         val currentCrop = GardenApi.getCurrentlyFarmedCrop() ?: GardenApi.lastBrokenCropType ?: return
-        if (cropItem.crop != currentCrop) return
+        if (cropItem.crop != currentCrop || cropItem.rawAmount <= 1) return
         if (cropItem.rawInternalName == event.internalName) {
             lastFarmingActivity = SimpleTimeMark.now()
             return
         }
-        if (cropItem.rawAmount <= 1) return
 
         val consumedSpecial = consumeRecentSpecialCropItem(event.internalName, event.amount.toLong())
         val amount = event.amount.toLong() - consumedSpecial
-        if (amount <= 0) return
-
-        removeTrackedRawCrop(cropItem.rawInternalName, amount * cropItem.rawAmount)
-        addTrackedItem(TrackedSource.CROPS, event.internalName, amount, message = false)
-        lastFarmingActivity = SimpleTimeMark.now()
+        if (amount > 0) {
+            removeTrackedRawCrop(cropItem.rawInternalName, amount * cropItem.rawAmount)
+            addTrackedItem(TrackedSource.CROPS, event.internalName, amount, message = false)
+            lastFarmingActivity = SimpleTimeMark.now()
+        }
     }
 
     private fun NeuInternalName.getCropPrimitiveItemOrNull(): CropPrimitiveItem? {
@@ -637,9 +665,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     private fun Data.getTrackedCropItemAmount(internalName: NeuInternalName): Long =
         bucketedItems[TrackedSource.CROPS]?.get(internalName)?.totalAmount?.coerceAtLeast(0L) ?: 0L
 
-    private fun addTrackedItem(source: TrackedSource, internalName: NeuInternalName, amount: Int, message: Boolean = true) =
-        addTrackedItem(source, internalName, amount.toLong(), message)
-
     private fun addTrackedItem(source: TrackedSource, internalName: NeuInternalName, amount: Long, message: Boolean = true) {
         if (amount == 0L) return
         var remaining = amount
@@ -665,32 +690,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         recentSpecialCropItems.clear()
     }
 
-    private fun Data.hasNoFarmingData(): Boolean =
-        bucketedItems.values.all { it.isEmpty() } &&
-            cropAmounts.isEmpty() &&
-            blocksBroken.isEmpty() &&
-            rareCropDrops.isEmpty() &&
-            blessedDrops.isEmpty() &&
-            cropFevers.isEmpty() &&
-            cropFeverDrops.isEmpty() &&
-            pestKills.isEmpty() &&
-            spraysUsed.isEmpty() &&
-            visitorsServed == 0L &&
-            visitorCopper == 0L &&
-            toolExpCapsules == 0L &&
-            bountifulCoins == 0L
-
-    private fun CropCollectionType.toTrackedSource(): TrackedSource? = when (this) {
-        CropCollectionType.BREAKING_CROPS -> TrackedSource.CROPS
-        CropCollectionType.MOOSHROOM_COW -> TrackedSource.MOOSHROOM_COW
-        CropCollectionType.GREENHOUSE -> TrackedSource.GREENHOUSE
-        CropCollectionType.CROP_FEVER,
-        CropCollectionType.PEST_BASE,
-        CropCollectionType.PEST_RNG,
-        CropCollectionType.UNKNOWN,
-        -> null
-    }
-
     private fun CropType.getCropInternalName(): NeuInternalName = cropInternalNames.getOrPut(this) {
         val itemName = if (this == CropType.MUSHROOM) "Red Mushroom" else cropName
         NeuInternalName.fromItemNameOrNull(itemName) ?: icon.getInternalName()
@@ -703,215 +702,13 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         var profit = drawItems(data, { it != seasoningInternalName }, this)
         profit = addPestSprayCost(data, profit)
 
-        addConfiguredStats(data)
+        FarmingProfitTrackerStats.addStats(this, data)
 
         val duration = data.getTotalUptime()
         val action = data.profitAction()
         addAll(addTotalProfit(profit, action.amount, action.action, duration, action.plural))
 
         addPriceFromButton(this)
-    }
-
-    private fun MutableList<Searchable>.addConfiguredStats(data: Data) {
-        config.displayedStats.forEach { stat ->
-            when (stat) {
-                DisplayStat.CROPS_TRACKED -> addCropAmountLine(data)
-                DisplayStat.BLOCKS_BROKEN -> addBlocksBrokenLine(data)
-                DisplayStat.RARE_CROP_DROPS -> addRareCropLine(data)
-                DisplayStat.BLESSED_DROPS -> addBlessedLine(data)
-                DisplayStat.CROP_FEVERS -> addCropFeversLine(data)
-                DisplayStat.CROP_FEVER_DROPS -> addCropFeverLine(data)
-                DisplayStat.PESTS_KILLED -> addPestLine(data)
-                DisplayStat.VISITORS_SERVED -> addVisitorsLine(data)
-                DisplayStat.BOUNTIFUL_COINS -> addBountifulLine(data)
-            }
-        }
-    }
-
-    private fun MutableList<Searchable>.addCropAmountLine(data: Data) {
-        val total = data.getTotalCropAmount()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Crops tracked: §e${total.addSeparators()}",
-                buildList {
-                    add("§7By crop:")
-                    data.getCropAmountsByCrop().entries.sortedBy { it.key.cropName }.forEach { (crop, amount) ->
-                        add(" §7- §e${amount.addSeparators()}x §7${crop.cropName}")
-                    }
-                    add("")
-                    add("§7By source:")
-                    data.getCropAmountsBySource().entries.sortedBy { it.key.ordinal }.forEach { (source, amount) ->
-                        add(" §7- §e${amount.addSeparators()}x §7${source.displayName}")
-                    }
-                },
-            ).toSearchable("Crops tracked"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addBlocksBrokenLine(data: Data) {
-        val total = data.getTotalBlocksBroken()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Blocks broken: §e${total.addSeparators()}",
-                data.blocksBroken.entries.sortedBy { it.key.cropName }.map { (crop, amount) ->
-                    "§7${crop.cropName}: §e${amount.addSeparators()}"
-                },
-            ).toSearchable("Blocks broken"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addRareCropLine(data: Data) {
-        val rareDrops = data.getRareCropDropsByType()
-        if (rareDrops.isNotEmpty()) {
-            val total = rareDrops.values.sum()
-            add(
-                Renderable.hoverTips(
-                    "§7Rare crop drops: §e${total.addSeparators()}",
-                    rareDrops.entries.sortedBy { it.key.dropName.removeColor() }.map { (drop, amount) ->
-                        "§7${drop.dropName}: §e${amount.addSeparators()}"
-                    },
-                ).toSearchable("Rare crop drops"),
-            )
-        }
-        addSeasoningLine(data)
-    }
-
-    private fun MutableList<Searchable>.addSeasoningLine(data: Data) {
-        val total = data.getTotalSeasoningDrops()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Seasoning: §e${total.addSeparators()}",
-                listOf("§7Automatically donated to the Harvest Feast."),
-            ).toSearchable("Seasoning"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addBlessedLine(data: Data) {
-        val total = data.getTotalBlessedDrops()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Blessed drops: §e${total.addSeparators()}",
-                data.blessedDrops.entries.sortedBy { it.key.itemNameWithoutColor }.map { (drop, amount) ->
-                    "§7${drop.itemNameWithoutColor}: §e${amount.addSeparators()}"
-                },
-            ).toSearchable("Blessed drops"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addCropFeversLine(data: Data) {
-        val total = data.getTotalCropFevers()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Crop Fevers: §e${total.addSeparators()}",
-                data.cropFevers.entries.sortedBy { it.key.cropName }.map { (crop, amount) ->
-                    "§7${crop.cropName}: §e${amount.addSeparators()}"
-                },
-            ).toSearchable("Crop Fevers"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addCropFeverLine(data: Data) {
-        val total = data.getTotalCropFeverDrops()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Crop Fever drops: §e${total.addSeparators()}",
-                data.cropFeverDrops.entries.sortedBy { it.key.ordinal }.map { (drop, amount) ->
-                    "§7$drop: §e${amount.addSeparators()}"
-                },
-            ).toSearchable("Crop Fever drops"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addPestLine(data: Data) {
-        val total = data.getTotalPestKills()
-        if (total == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Pests killed: §e${total.addSeparators()}",
-                data.pestKills.entries
-                    .filter { it.key != PestType.UNKNOWN && it.value > 0 }
-                    .sortedBy { it.key.displayName }
-                    .map { (pest, amount) -> "§7${pest.pluralName}: §e${amount.addSeparators()}" },
-            ).toSearchable("Pests killed"),
-        )
-    }
-
-    private fun MutableList<Searchable>.addVisitorsLine(data: Data) {
-        if (!data.isShowing(TrackedSource.VISITORS)) return
-        val visitorsServed = data.visitorsServed
-        if (visitorsServed == 0L) return
-
-        val visitorItems = data.bucketedItems[TrackedSource.VISITORS].orEmpty()
-        var netValue = 0.0
-        val hoverTips = buildList {
-            val costLines = mutableListOf<String>()
-            val rewardLines = mutableListOf<String>()
-
-            visitorItems.entries.sortedBy { it.key.itemNameWithoutColor }.forEach { (internalName, item) ->
-                val amount = item.totalAmount
-                if (amount == 0L) return@forEach
-                val countedInProfit = !item.hidden || !trackerDisplayConfig.itemTracker.excludeHiddenItemsInPrice
-                val displayAmount = if (internalName == SKYBLOCK_COIN && data.visitorCopper > 0) {
-                    data.visitorCopper
-                } else {
-                    amount.absoluteValue
-                }
-                val itemName = if (internalName == SKYBLOCK_COIN) "Copper" else internalName.itemNameWithoutColor
-                val price = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName, this@FarmingProfitTracker)
-                val total = price * amount
-                val profitText = if (countedInProfit) {
-                    netValue += total
-                    signedCoinFormat(total)
-                } else {
-                    "§8hidden"
-                }
-                val line = "§7$itemName: §e${displayAmount.addSeparators()} §7($profitText§7)"
-                if (amount > 0) rewardLines.add(line) else costLines.add(line)
-            }
-
-            if (costLines.isNotEmpty()) {
-                add("§7Items given:")
-                addAll(costLines)
-            }
-            if (rewardLines.isNotEmpty()) {
-                if (isNotEmpty()) add("")
-                add("§7Rewards:")
-                addAll(rewardLines)
-            }
-            if (isNotEmpty()) add("")
-            add("§7Net visitor value: ${signedCoinFormat(netValue)}")
-        }
-
-        add(
-            Renderable.hoverTips(
-                "§7Visitors served: §a${visitorsServed.addSeparators()} §7(${signedCoinFormat(netValue)}§7)",
-                hoverTips,
-            ).toSearchable("Visitors served"),
-        )
-    }
-
-    private fun signedCoinFormat(value: Double): String = when {
-        value > 0.0 -> "§a+${value.shortFormat()}"
-        value < 0.0 -> "§c-${value.absoluteValue.shortFormat()}"
-        else -> "§60"
-    }
-
-    private fun MutableList<Searchable>.addBountifulLine(data: Data) {
-        if (!data.isShowing(TrackedSource.BOUNTIFUL)) return
-        val coins = data.bountifulCoins
-        if (coins == 0L) return
-        add(
-            Renderable.hoverTips(
-                "§7Bountiful coins: §6${coins.addSeparators()}",
-                listOf("§7Coins gained directly from the Bountiful reforge."),
-            ).toSearchable("Bountiful coins"),
-        )
     }
 
     private fun MutableList<Searchable>.addPestSprayCost(data: Data, profit: Double): Double {

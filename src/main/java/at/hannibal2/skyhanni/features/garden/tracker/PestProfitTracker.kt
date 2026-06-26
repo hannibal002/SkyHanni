@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -89,7 +90,16 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     //  from breaking crops vs. killing pests since they use the same message
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[☘☀]|Cocoaleech)\\)",
+        "§6§l(?:RARE|PET) DROP! (?:(?:§.)*\\[Lvl \\d+] )?(?:§r)?(?<item>.+?)" +
+            "(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[☘☀]|Cocoaleech)\\)",
+    )
+
+    /**
+     * REGEX-TEST: WOW! [MVP+] Eisengolem found a Dung Dye!
+     */
+    private val dyeDropPattern by patternGroup.pattern(
+        "dye.drop",
+        "^WOW! (?<player>.+) found an? (?<item>.+ Dye)!$",
     )
 
     /**
@@ -107,6 +117,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val DUNG_ITEM = "DUNG".toInternalName()
     val ENCHANTED_SUNFLOWER_ITEM = "ENCHANTED_SUNFLOWER".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
+    val DUNG_DYE = "DYE_DUNG".toInternalName()
     val BITS = "SKYBLOCK_BIT".toInternalName()
     const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
@@ -249,8 +260,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
             val pest = PestType.getByItemInternalNameOrNull(internalName) ?: return@matchMatcher
             val amount = groupOrNull("amount")?.toIntOrNull() ?: 1
 
-            addItem(pest, internalName, amount, command = false)
-            FarmingProfitTracker.addPestItem(internalName, amount)
+            addPestItem(pest, internalName, amount)
 
             val primitiveStack = NeuItems.getPrimitiveMultiplier(internalName)
             val rawName = primitiveStack.internalName.itemNameWithoutColor
@@ -259,6 +269,17 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
                 ?.addCollectionCounter(CropCollectionType.PEST_RNG, primitiveStack.amount.toLong() * amount.toLong())
             // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
+
+        dyeDropPattern.matchMatcher(cleanMessage) {
+            if (!group("player").endsWith(PlayerUtils.getName())) return@matchMatcher
+            if (group("item") != "Dung Dye") return@matchMatcher
+            addPestItem(PestType.UNKNOWN, DUNG_DYE, 1)
+        }
+    }
+
+    private fun addPestItem(pest: PestType, internalName: NeuInternalName, amount: Int) {
+        addItem(pest, internalName, amount, command = false)
+        FarmingProfitTracker.addPestItem(internalName, amount)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
