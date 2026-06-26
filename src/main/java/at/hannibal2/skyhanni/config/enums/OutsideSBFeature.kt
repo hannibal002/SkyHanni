@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.enums
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 enum class OutsideSBFeature(private val displayName: String) {
@@ -27,6 +26,6 @@ enum class OutsideSBFeature(private val displayName: String) {
 
     override fun toString() = displayName
 
-    @Legacy("Use onlyOnSkyblockOrFeatures instead")
+    @Deprecated("Use onlyOnSkyblockOrFeatures instead")
     fun isSelected() = MinecraftCompat.localPlayerExists && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
 }

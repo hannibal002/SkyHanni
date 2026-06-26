@@ -17,7 +17,7 @@ object SkyBlockIslandTest {
     var testIsland: IslandType? = null
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Test")
         testIsland?.let {
             event.addData {
