@@ -16,4 +16,13 @@ class LivingSnakeHelperConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlight: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Solo Mode",
+        desc = "Highlights both the head and tail, regardless of item in hand."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var solo: Boolean = true
 }
