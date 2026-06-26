@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.nether
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -38,19 +39,19 @@ object CrimsonMinibossRespawnTimer {
     private val patternGroup = RepoPattern.group("crimson.miniboss")
 
     /**
-     * REGEX-TEST: §c§lBEWARE - Bladesoul Is Spawning.
+     * REGEX-TEST: BEWARE - Bladesoul Is Spawning.
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§c§lBEWARE - (?<name>.+) Is Spawning\\.",
+        "BEWARE - (?<name>.+) Is Spawning\\.",
     )
 
     /**
-     * REGEX-TEST:                             §r§6§lBLADESOUL DOWN!
+     * WRAPPED-REGEX-TEST: "                            BLADESOUL DOWN!"
      */
     private val downPattern by patternGroup.pattern(
         "down",
-        "\\s*§r§6§l(?<name>.+) DOWN!",
+        "\\s*(?<name>.+) DOWN!",
     )
 
     private var currentAreaBoss: MiniBoss? = null
@@ -59,7 +60,7 @@ object CrimsonMinibossRespawnTimer {
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+        val message = event.cleanMessage
         downPattern.matchMatcher(message) {
             val miniBoss = MiniBoss.fromName(group("name")) ?: return
             miniBoss.nextSpawnTime = SimpleTimeMark.now() + 2.minutes

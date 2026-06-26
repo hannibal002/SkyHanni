@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.PlayerSuggestions
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -69,32 +70,32 @@ object CarryTracker {
     private val recentTrades: MutableMap<String, Double> = mutableMapOf()
 
     /**
-     * REGEX-TEST: §6Trade completed with §r§b[MVP§r§c+§r§b] ClachersHD§r§f§r§6!
+     * REGEX-TEST: Trade completed with [MVP+] ClachersHD!
      */
     private val tradeCompletedPattern by RepoPattern.pattern(
         "carry.trade.completed",
-        "§6Trade completed with (?<name>.*)§r§6!",
+        "Trade completed with (?<name>.+)!",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §r§a§l+ §r§6500k coins"
+     * WRAPPED-REGEX-TEST: " + 500k coins"
      */
     private val tradeCoinsGainedPattern by RepoPattern.pattern(
         "carry.trade.coins.gained",
-        " §r§a§l\\+ §r§6(?<coins>.*) coins",
+        " \\+ (?<coins>.+) coins",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §r§c§l- §r§6500k coins"
+     * WRAPPED-REGEX-TEST: " - 500k coins"
      */
     private val tradeCoinsLostPattern by RepoPattern.pattern(
         "carry.trade.coins.lost",
-        " §r§c§l- §r§6(?<coins>.*) coins",
+        " - (?<coins>.+) coins",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        tradeCompletedPattern.matchMatcher(event.message) {
+        tradeCompletedPattern.matchMatcher(event.cleanMessage) {
             val name = group("name").cleanPlayerName()
 
             recentTrades.remove(name) // clear old trades with player
@@ -139,14 +140,14 @@ object CarryTracker {
             }
         }
 
-        tradeCoinsGainedPattern.matchMatcher(event.message) {
+        tradeCoinsGainedPattern.matchMatcher(event.cleanMessage) {
             val name = lastTradedPlayer ?: return
             val coins = group("coins").formatDouble()
 
             recentTrades.addOrPut(name, coins)
         }
 
-        tradeCoinsLostPattern.matchMatcher(event.message) {
+        tradeCoinsLostPattern.matchMatcher(event.cleanMessage) {
             val name = lastTradedPlayer ?: return
             val coins = group("coins").formatDouble()
 
