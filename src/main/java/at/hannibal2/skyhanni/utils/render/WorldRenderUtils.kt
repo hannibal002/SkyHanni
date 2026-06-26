@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.Legacy
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -819,7 +818,7 @@ object WorldRenderUtils {
         drawLineToCrosshair(location, color.toColor(), lineWidth, depth)
     }
 
-    @Legacy("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
+    @Deprecated("use drawLineToCrosshair", ReplaceWith("drawLineToCrosshair(location, color, lineWidth, depth)"))
     fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: ChromaColour, lineWidth: Int, depth: Boolean) {
         drawLineToCrosshair(location, color, lineWidth, depth)
     }

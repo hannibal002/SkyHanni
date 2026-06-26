@@ -108,7 +108,7 @@ object SkyHanniDebugsAndTests {
 
         // TODO can we rename this to ore_block?
         registerDebugScreenEntry("targeted_oreblock", SkyBlockUtils::inSkyBlock) {
-            BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
+            BlockUtils.getTargetedBlockAtDistance(50.0).let { pos ->
                 OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                     add("[SkyHanni] Looking at: ${ore.name} (${pos.toCleanString()})")
                 }

@@ -59,7 +59,7 @@ object OSUtils {
         openBrowser(url)
     }
 
-    @Legacy(
+    @Deprecated(
         "Use copyToClipboardAsync instead for a success boolean return",
         ReplaceWith("copyToClipboardAsync(text)"),
     )

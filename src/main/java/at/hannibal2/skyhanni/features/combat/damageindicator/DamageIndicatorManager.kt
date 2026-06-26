@@ -1096,7 +1096,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")
