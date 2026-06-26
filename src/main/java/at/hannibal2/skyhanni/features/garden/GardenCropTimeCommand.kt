@@ -85,6 +85,10 @@ object GardenCropTimeCommand {
             }
 
             arg("amount", BrigadierArguments.long(1)) { amountArg ->
+                simpleCallback {
+                    ChatUtils.userError("Usage: /shcroptime <amount> <item>")
+                }
+
                 argCallback(
                     "item",
                     BrigadierArguments.greedyString(),
