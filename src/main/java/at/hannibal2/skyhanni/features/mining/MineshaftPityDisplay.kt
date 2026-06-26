@@ -104,7 +104,7 @@ object MineshaftPityDisplay {
 
 
     /**
-     * REGEX-TEST:  Glacite Mineshafts: 124/2,000
+     * WRAPPED-REGEX-TEST: " Glacite Mineshafts: 124/2,000"
      */
     private val tabPityPattern by group.pattern(
         "tablist",
@@ -206,14 +206,14 @@ object MineshaftPityDisplay {
     private var tablistPity = MAX_COUNTER
     private var everFoundPityWidget = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!MiningApi.inGlacialTunnels() && !MiningApi.inDwarvenBaseCamp()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true
                 tablistPity = MAX_COUNTER - group("pity").formatInt()
+                update()
             }
         }
     }

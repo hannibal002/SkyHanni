@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
+import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.math.max
 
@@ -67,7 +69,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         return 55
     }
 
-    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
+    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, mouseEvent: MouseEvent): Boolean {
         fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
             val inX = (mouseX - width - x) in (0..def.width)
             val inY = (mouseY - height - y) in (0..def.height)
@@ -97,7 +99,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         return true
     }
 
-    override fun keyboardInput(): Boolean {
+    override fun keyboardInput(event: KeyboardEvent): Boolean {
         return false
     }
 
