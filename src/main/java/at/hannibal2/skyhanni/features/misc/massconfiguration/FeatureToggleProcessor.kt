@@ -43,6 +43,7 @@ class FeatureToggleProcessor : ConfigStructureReader {
         pathStack.pop()
     }
 
+    @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     override fun emitOption(baseObject: Any, field: Field, option: ConfigOption) {
         val featureToggle = field.getAnnotation(FeatureToggle::class.java) ?: return
         field.getAnnotation(ConfigEditorBoolean::class.java)
@@ -58,8 +59,8 @@ class FeatureToggleProcessor : ConfigStructureReader {
             Property::class.java -> {
                 val genericType = field.genericType
                 require(genericType is ParameterizedType)
-                require((genericType.actualTypeArguments[0] as Class<*>) == (Boolean::class.java))
-                @Suppress("UNCHECKED_CAST") val prop = field.get(baseObject) as Property<Boolean>
+                require((genericType.actualTypeArguments[0] as Class<*>) == (java.lang.Boolean::class.java))
+                val prop = field.get(baseObject) as Property<Boolean>
                 setter = { prop.set(it) }
                 value = prop.get()
             }
