@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -14,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 import kotlin.time.Duration.Companion.seconds
@@ -29,6 +33,7 @@ object GardenVisitorChat {
     private val logger = SkyHanniLogger("garden/visitors/chat")
 
     private val patternGroup = RepoPattern.group("garden.visitor.chat")
+    private var allowedChatMessageVisitors: Set<String> = emptySet()
 
     /**
      * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
@@ -54,6 +59,14 @@ object GardenVisitorChat {
         "partialaccepted",
         "§aYou gave some of the required items!",
     )
+
+    private val repoReloadCoroutine = CoroutineSettings("allowed chat message visitors repo reload")
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        val data = event.getConstantAsync<GardenJson>("Garden")
+        allowedChatMessageVisitors = data.visitors.filterValues { visitorData -> visitorData.showChatMessage }.keys.toSet()
+    }
 
     // TODO use event.chatComponent.string instead of event.message here
     @HandleEvent
@@ -102,7 +115,7 @@ object GardenVisitorChat {
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 
         val name = group("name")
-        if (name in setOf("Beth", "Maeve", "Spaceman")) return false
+        if (name in allowedChatMessageVisitors) return false
 
         val isInKnownVisitors = VisitorApi.getVisitorsMap().keys.any { it.removeColor() == name }
 
