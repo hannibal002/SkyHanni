@@ -47,7 +47,7 @@ object EntityUtils {
     inline val ALWAYS get(): (Entity) -> Boolean = { true }
 
     // TODO remove this relatively heavy call everywhere
-    @Legacy("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.hasNameTagWith(
         y: Int,
         contains: String,
@@ -66,7 +66,7 @@ object EntityUtils {
         return list
     }
 
-    @Legacy("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
@@ -74,7 +74,7 @@ object EntityUtils {
         it.name.string.contains(contains)
     }
 
-    @Legacy("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.getNameTagWith(
         y: Int,
         contains: String,
@@ -83,7 +83,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): ArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
-    @Legacy("Use Mob Detection Instead")
+    @Deprecated("Use Mob Detection Instead")
     fun LivingEntity.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -113,10 +113,10 @@ object EntityUtils {
         return getEntitiesInBoundingBox<ArmorStand>(alignedBB)
     }
 
-    @Legacy("Old. Instead use entity detection feature instead.")
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun LivingEntity.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    @Legacy("Old. Instead use entity detection feature instead.")
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun LivingEntity.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (ElectionApi.isDerpy) 2.0 else if (ElectionApi.isAura) 1.1 else 1.0
         if (maxHealth == (health * derpyMultiplier).toInt()) return true
@@ -155,7 +155,7 @@ object EntityUtils {
 
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
 
-    @Legacy("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
+    @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
     fun ArmorStand.hasSkullTexture(skin: String): Boolean {
         val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }

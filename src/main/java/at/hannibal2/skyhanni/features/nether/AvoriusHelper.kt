@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -48,7 +47,7 @@ object AvoriusHelper {
         if (lastSentMessage.passedSince() < 15.seconds) return
 
         if (!avoriusLines.matches(event.cleanMessage)) return
-        if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == CUP_OF_BLOOD } > 0) return
+        if (InventoryUtils.containsInLowerInventoryInternalName { it == CUP_OF_BLOOD }) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

@@ -191,7 +191,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaApi.isDoingDiana()) {
