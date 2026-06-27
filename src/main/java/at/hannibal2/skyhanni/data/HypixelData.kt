@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
-import at.hannibal2.skyhanni.data.hypixel.SkyBlockLocationData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -35,7 +34,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
  * This class handles "am I on hypixel", and similar states.
- * For "am I in SkyBlock" and "what SkyBlock island am I on" checks see [SkyBlockLocationData].
+ * For "am I in SkyBlock" and "what SkyBlock island am I on" checks see [HypixelLocationApi].
  */
 @SkyHanniModule
 object HypixelData {
