@@ -7,15 +7,15 @@ import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
@@ -29,14 +29,18 @@ import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.patternGroup
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.isBabyCrop
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -44,6 +48,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
@@ -55,7 +61,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -63,16 +68,19 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object GardenApi {
 
-    private val RARE_MOOSHROOM_COW_PET_ITEM = "MOOSHROOM_COW;2".toInternalName()
+    private const val GARDEN_OVERFLOW_EXP = 10000
+    private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
+    val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
+    val SUNS_GRASP = "SUNS_GRASP".toInternalName()
 
     var toolInHand: String? = null
-    var itemInHand: ItemStack? = null
+    var itemInHand: SafeItemStack? = null
     var cropInHand: CropType? = null
     var lastBrokenCropType: CropType? = null
     var pestCooldownEndTime = SimpleTimeMark.farPast()
     var lastCropBrokenTime = SimpleTimeMark.farPast()
     val mushroomCowPet
-        get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET_ITEM)
+        get() = CurrentPetApi.isCurrentPetOrHigherRarity(RARE_MOOSHROOM_COW_PET)
     private var inBarn = false
     val onBarnPlot get() = inBarn && inGarden()
     val onUnfarmablePlot get() = inGarden() && (inBarn || GardenPlotApi.inGreenhouse())
@@ -86,13 +94,13 @@ object GardenApi {
                 storage?.experience = it
             }
         }
-    private val cropIconCache = TimeLimitedCache<String, ItemStack>(10.minutes)
+    private val cropIconCache = TimeLimitedCache<String, SafeItemStack>(10.minutes)
     val barnArea = AABB(35.5, 70.0, -4.5, -32.5, 100.0, -46.5)
-
-    private var extraFarmingTools: Set<NeuInternalName> = setOf()
+    private var gardenExpTiers = emptyList<Int>()
+    private var extraFarmingTools = emptySet<NeuInternalName>()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange() {
         checkItemInHand()
     }
 
@@ -121,14 +129,14 @@ object GardenApi {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.GARDEN) return
+    fun onIslandJoin(event: IslandJoinEvent) {
+        if (event.island != IslandType.GARDEN) return
         checkItemInHand()
         checkCurrentPlot()
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden API")
         if (!inGarden()) return event.addIrrelevant("Not in garden")
 
@@ -162,7 +170,7 @@ object GardenApi {
         }
     }
 
-    private fun getToolInHand(toolItem: ItemStack?, crop: CropType?): String? {
+    private fun getToolInHand(toolItem: SafeItemStack?, crop: CropType?): String? {
         if (crop != null) return crop.cropName
 
         val internalName = toolItem?.getInternalName() ?: return null
@@ -172,9 +180,12 @@ object GardenApi {
     private fun isOtherTool(internalName: NeuInternalName): Boolean =
         internalName in extraFarmingTools
 
+    fun NeuInternalName.isFarmingTool() = getCropType() != null || isOtherTool(this)
+
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
-    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
+    fun isCurrentlyFarming() =
+        inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && (hasFarmingToolInHand() || hasActiveSunsGrasp())
 
     fun hasFarmingToolInHand() = InventoryUtils.getItemInHand()?.let {
         val crop = it.getCropType()
@@ -184,18 +195,22 @@ object GardenApi {
     fun isHoldingCropFever(): Boolean =
         InventoryUtils.getItemInHand()?.getHypixelEnchantments()?.containsKeys("ultimate_crop_fever") == true
 
-    fun ItemStack.getCropType(): CropType? {
-        val internalName = getInternalName()
-        if (internalName.startsWith("THEORETICAL_HOE_SUNFLOWER")) {
-            return CropType.getTimeFlower()
-        }
-        return CropType.entries.firstOrNull { internalName.startsWith(it.toolName) }
-    }
+    fun hasMousematInHand(): Boolean = InventoryUtils.getItemInHand()?.getInternalName() == SQUEAKY_MOUSEMAT
 
-    fun readCounter(itemStack: ItemStack): Long? =
+    fun hasActiveSunsGrasp(): Boolean =
+        EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
+            InventoryUtils.getItemInHand()?.isEmpty == true
+
+    fun NeuInternalName.getCropType(): CropType? =
+        if (this.startsWith("THEORETICAL_HOE_SUNFLOWER")) CropType.getTimeFlower()
+        else CropType.entries.firstOrNull { this.startsWith(it.toolName) }
+
+    fun SafeItemStack.getCropType() = getInternalName().getCropType()
+
+    fun readCounter(itemStack: SafeItemStack): Long? =
         itemStack.getCultivatingCounter() ?: itemStack.getHoeExp() ?: itemStack.getOldHoeCounter()
 
-    fun CropType.getItemStackCopy(iconId: String): ItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
+    fun CropType.getItemStackCopy(iconId: String): SafeItemStack = cropIconCache.getOrPut(iconId) { icon.copy() }
 
     fun hideExtraGuis() = ComposterOverlay.inInventory ||
         AnitaMedalProfit.inInventory ||
@@ -208,8 +223,8 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    @HandleEvent(ProfileDataReadyEvent::class)
+    fun onProfileDataReady() {
         GardenBestCropTime.reset()
     }
 
@@ -221,9 +236,21 @@ object GardenApi {
 
     private var lastLocation: LorenzVec? = null
 
+    /**
+     * REGEX-TEST: Farming Toolkit
+     */
+    private val toolkitInventoryPattern by patternGroup.pattern(
+        "toolkit.inventory",
+        "Farming Toolkit"
+    )
+    val toolkitInventory = InventoryDetector { name -> toolkitInventoryPattern.matches(name) }
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        val blockState = event.getBlockState
+        // TODO Reevaluate this if Hypixel ever adds right click harvest crops
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
+
+        val blockState = event.blockState
         val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
@@ -233,13 +260,13 @@ object GardenApi {
         }
 
         lastLocation = position
-        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).post()
+        CropClickEvent(event, cropBroken).post()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {
         var totalExp = 0L
         var tier = 0
-        for (tierExp in gardenExperience) {
+        for (tierExp in gardenExpTiers) {
             totalExp += tierExp
             tier++
             if (tier == requestedLevel) {
@@ -248,7 +275,7 @@ object GardenApi {
         }
 
         while (tier < requestedLevel) {
-            totalExp += gardenOverflowExp
+            totalExp += GARDEN_OVERFLOW_EXP
             tier++
             if (tier == requestedLevel) {
                 return totalExp
@@ -261,7 +288,7 @@ object GardenApi {
         val gardenExp = this.gardenExp ?: return 0
         var tier = 0
         var totalExp = 0L
-        for (tierExp in gardenExperience) {
+        for (tierExp in gardenExpTiers) {
             totalExp += tierExp
             if (totalExp > gardenExp) {
                 return tier
@@ -269,11 +296,11 @@ object GardenApi {
             tier++
         }
         if (overflow) {
-            totalExp += gardenOverflowExp
+            totalExp += GARDEN_OVERFLOW_EXP
 
             while (totalExp < gardenExp) {
                 tier++
-                totalExp += gardenOverflowExp
+                totalExp += GARDEN_OVERFLOW_EXP
             }
         }
         return tier
@@ -282,13 +309,10 @@ object GardenApi {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        gardenExperience = data.gardenExp
+        gardenExpTiers = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
         extraFarmingTools = data.extraFarmingTools
     }
-
-    private var gardenExperience = listOf<Int>()
-    private const val gardenOverflowExp = 10000
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

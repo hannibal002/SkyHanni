@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SeenContributorStorage
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
@@ -164,7 +166,10 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             logger.log(e.stackTraceToString())
-                            PlatformUtils.shutdownMinecraft("Config is corrupt inside development environment.")
+                            PlatformUtils.shutdownMinecraft(
+                                "Config is corrupt inside development environment. " +
+                                    "Maybe you forgot to implement a config migration, or the migration failed."
+                            )
                         }
                     } else {
                         run()
@@ -207,6 +212,7 @@ class ConfigManager {
 
     private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
+        if (HypixelData.hypixelAlpha && !PlatformUtils.isDevEnvironment) return
         logger.log("saveConfig: $reason")
         try {
             logger.log("Saving $fileName file")
@@ -270,6 +276,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
     SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
     ACHIEVEMENTS("achievements", AchievementStorage::class.java, SkyHanniMod::achievementStorage),
+    SEEN_CONTRIBUTORS("seen_contributors", SeenContributorStorage::class.java, SkyHanniMod::seenContributorStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }

@@ -45,10 +45,12 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getNewYearCake
@@ -62,7 +64,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ItemDisplayOverlayFeatures {
@@ -133,7 +134,7 @@ object ItemDisplayOverlayFeatures {
         tip?.takeIf { it.isNotEmpty() }?.let { event.stackTip = it }
     }
 
-    private fun getStackTip(item: ItemStack): String? {
+    private fun getStackTip(item: SafeItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
@@ -328,9 +329,7 @@ object ItemDisplayOverlayFeatures {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {
-                val tier = itemName.split(" ")
-
-                return tier.last().romanToDecimalIfNecessary().toString()
+                return itemName.split(" ").last().romanToDecimalIfNecessaryOrNull()?.toString()
             }
         }
 

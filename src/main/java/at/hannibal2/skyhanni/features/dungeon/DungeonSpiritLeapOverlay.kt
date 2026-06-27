@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.dungeon.spiritleap.SpiritLeapColorConfig
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
+import net.minecraft.world.inventory.ContainerInput
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
@@ -51,7 +51,7 @@ object DungeonSpiritLeapOverlay {
     private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
     private val inventory = InventoryDetector { it in validInventoryNames }
 
-    data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: ItemStack, val slotNumber: Int)
+    data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: SafeItemStack, val slotNumber: Int)
 
     @HandleEvent
     fun onGuiContainerPreDraw(event: GuiContainerEvent.PreDraw) {
@@ -216,10 +216,10 @@ object DungeonSpiritLeapOverlay {
     private fun leapToPlayer(player: PlayerStackInfo) {
         val playerInfo = player.playerInfo ?: return
         if (playerInfo.playerDead) {
-            ChatUtils.chat("§cCannot leap — §e${playerInfo.username} §cis dead.")
+            ChatUtils.chat("§cCannot leap - §e${playerInfo.username} §cis dead.")
             return
         }
-        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = ClickType.MIDDLE)
+        InventoryUtils.clickSlot(player.slotNumber, mouseButton = 2, mode = ContainerInput.CLONE)
     }
 
     private val deadTeammateColor = colorConfig.deadTeammateColor

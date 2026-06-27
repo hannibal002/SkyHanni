@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -88,7 +87,7 @@ object RobloxReminder {
     }
 
     // Tech-savvy ppl who have debug enabled should have fun as well :)
-    private fun isContributor() = PlayerUtils.getRawUuid() in ContributorManager.contributors || SkyBlockUtils.debug
+    private fun isContributor() = ContributorManager.isSelfContributor() || SkyBlockUtils.debug
 
     private fun robuxError() {
         if (!TimeUtils.isAprilFoolsDay) return

@@ -158,6 +158,11 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(name = "Boop Party", desc = "")
+    @Accordion
+    val boopParty: BoopPartyConfig = BoopPartyConfig()
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     var resetSearchGuiOnClose: Boolean = true
@@ -206,6 +211,11 @@ class MiscConfig {
     @ConfigOption(name = "Crash on Death", desc = "Crashes your game every time you die in SkyBlock")
     @ConfigEditorBoolean
     var crashOnDeath: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Crash on TTT Fail", desc = "Crashes your game every time you fail Tic-Tac-Toe in Dungeons")
+    @ConfigEditorBoolean
+    var crashOnTttFail: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -322,15 +332,6 @@ class MiscConfig {
     @FeatureToggle
     var lesserOrbHider: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Lock Mouse Message", desc = "Show a message in chat when toggling §e/shmouselock§7.")
-    @ConfigEditorBoolean
-    var lockMouseLookChatMessage: Boolean = true
-
-    @Expose
-    @NoConfigLink
-    val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
-
     // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
@@ -433,6 +434,11 @@ class MiscConfig {
     var warnAboutPcTimeOffset: Boolean = true
 
     @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
+
+    @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -507,4 +513,10 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var achievementMessages: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var giftCleanDisplay: Boolean = false
 }

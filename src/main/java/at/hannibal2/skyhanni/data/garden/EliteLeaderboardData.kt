@@ -11,7 +11,8 @@ data class EliteLeaderboardData(
     var lastPlayer: EliteLeaderboardPlayer? = null,
     val nextPlayers: MutableList<EliteLeaderboardPlayer> = mutableListOf(),
     var apiData: EliteLeaderboard? = null,
+    var lastApiAmount: Double? = null,
     var isUnranked: Boolean = false,
     var rankGoal: Int? = null,
-    val passedPlayers: MutableList<String> = mutableListOf()
+    val passedPlayers: MutableList<String> = mutableListOf(),
 )

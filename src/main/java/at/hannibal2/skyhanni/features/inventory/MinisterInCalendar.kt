@@ -14,18 +14,18 @@ import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MinisterInCalendar {
 
     private const val MINISTER_SLOT = 38
-    private var ministerItemStack: ItemStack? = null
+    private var ministerItemStack: SafeItemStack? = null
 
     private val prefix = listOf(
         "§8(From SkyHanni)",
@@ -72,14 +72,19 @@ object MinisterInCalendar {
     private fun changeItem(
         ministerColor: String,
         minister: ElectionCandidate,
-        item: ItemStack,
-    ): ItemStack? {
+        item: SafeItemStack,
+    ): SafeItemStack {
         val ministerDisplayName = "${ministerColor}Minister ${minister.mayorName}"
         val ministerLore = buildList {
             addAll(prefix)
-            for (perk in minister.activePerks) {
-                add("$ministerColor${perk.perkName}")
-                addAll(perk.description.splitLines(170).removeResets().split("\n").map { "§7$it" })
+            val activePerks = minister.activePerks
+            if (activePerks.isEmpty()) {
+                add("§eSomehow this minister has no perks!")
+            } else {
+                for (perk in activePerks) {
+                    add("$ministerColor${perk.perkName}")
+                    addAll(perk.description.splitLines(170).removeResets().split("\n").map { "§7$it" })
+                }
             }
             addAll(suffix)
         }

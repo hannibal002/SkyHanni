@@ -5,8 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -19,16 +17,18 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CenturyPartyInvitation {
+
+    private val CENTURY_PARTY_INVITATION = "CENTURY_PARTY_INVITATION".toInternalName()
 
     private val config get() = SkyHanniMod.feature.misc.centuryPartyInvitation
 
@@ -87,7 +87,7 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange() {
         if (!isEnabled()) return
 
         colorsNeeded = updateColorsNeeded()
@@ -97,19 +97,16 @@ object CenturyPartyInvitation {
 
     private fun updateColorsNeeded(): Set<LorenzColor> {
         val hand = InventoryUtils.getItemInHand() ?: return emptySet()
-        if (hand.getInternalNameOrNull() != "CENTURY_PARTY_INVITATION".toInternalName()) return emptySet()
+        if (hand.getInternalNameOrNull() != CENTURY_PARTY_INVITATION) return emptySet()
 
-        val set = mutableSetOf<LorenzColor>()
-        for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
-            readLine(line, hand)?.let {
-                set.add(it)
+        return buildSet {
+            for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
+                readLine(line, hand)?.let(::add)
             }
         }
-
-        return set
     }
 
-    private fun readLine(line: String, hand: ItemStack): LorenzColor? {
+    private fun readLine(line: String, hand: SafeItemStack): LorenzColor? {
         val colorCode = itemMissingColorLinePattern.matchMatcher(line) {
             group("color")
         } ?: return null
@@ -204,7 +201,7 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(canColor, canNotColor) {
                 if (isEnabled()) {

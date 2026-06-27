@@ -81,7 +81,7 @@ object VanquisherApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName != "entity.wither.spawn" || event.pitch != 1f || event.volume != 2f) return
         lastSoundPos = event.location
         lastSoundTime = SimpleTimeMark.now()
@@ -92,7 +92,7 @@ object VanquisherApi {
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         val entity = event.entity as? ArmorStand ?: return
         val helmet = entity.getStandHelmet() ?: return
-        if (helmet.item != Items.WITHER_SKELETON_SKULL) return
+        if (!helmet.`is`(Items.WITHER_SKELETON_SKULL)) return
         lastSpawnEntityPos = entity.getLorenzVec()
         lastPossibleSpawnEntity = entity
         lastSpawnEntityTime = SimpleTimeMark.now()
@@ -166,7 +166,7 @@ object VanquisherApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("VanquisherAPI")
         event.addIrrelevant {
             addAll(

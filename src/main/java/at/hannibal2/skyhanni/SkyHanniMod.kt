@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SeenContributorStorage
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CompatCoroutineManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.coroutines.SkyHanniCoroutineManager
+import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -46,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -111,15 +114,20 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     @HandleEvent
     fun onRenderShutdown() {
         SkyHanniItemRenderCoordinator.closeAtlas()
+        SkyHanniRoundedShapeRenderManager.closeAtlas()
     }
 
     const val MODID: String = "skyhanni"
     const val VERSION: String = VersionConstants.MOD_VERSION
 
+    fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
+
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
     val isBetaVersion: Boolean
         get() = modVersion.isBeta
+
+    val userAgent: String = "SkyHanni/$VERSION-${PlatformUtils.MC_VERSION}"
 
     // TODO rename to config. whoever does this, have fun with 644 lines changed
     @JvmField
@@ -135,6 +143,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var customTodos: CustomTodosStorage
     lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
     lateinit var achievementStorage: AchievementStorage
+    lateinit var seenContributorStorage: SeenContributorStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

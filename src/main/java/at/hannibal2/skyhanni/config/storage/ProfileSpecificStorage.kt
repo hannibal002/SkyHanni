@@ -38,10 +38,10 @@ import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboard
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
-import at.hannibal2.skyhanni.features.garden.tracker.ArmorDropTracker
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
+import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
+import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
@@ -69,13 +70,13 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
@@ -484,7 +485,7 @@ class ProfileSpecificStorage(
         var nextSixthVisitorArrival: SimpleTimeMark = farPast()
 
         @Expose
-        var armorDropTracker: ArmorDropTracker.Data = ArmorDropTracker.Data()
+        var rareCropTracker: RareCropTracker.Data = RareCropTracker.Data()
 
         @Expose
         var composterUpgrades: MutableMap<ComposterUpgrade, Int> = enumMapOf()
@@ -716,10 +717,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var slots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var riftSlots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
     }
 
     // - foraging
@@ -830,6 +831,9 @@ class ProfileSpecificStorage(
         }
     }
 
+    @Expose
+    var infernoMinionProfitTracker: InfernoMinionProfitTracker.Data = InfernoMinionProfitTracker.Data()
+
     // - misc
     @Expose
     var trapperData: TrapperData = TrapperData()
@@ -860,6 +864,17 @@ class ProfileSpecificStorage(
 
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+
+    @Expose
+    var npcDayLimit: NpcDayLimitStorage = NpcDayLimitStorage()
+
+    class NpcDayLimitStorage {
+        @Expose
+        var gmtEpochDay: Long = 0L
+
+        @Expose
+        var soldCoins: Long = 0L
+    }
 
     // - nether
     @Expose

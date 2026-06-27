@@ -174,7 +174,7 @@ object ComposterDisplay {
             } else "?"
         } ?: "§cJoin SkyBlock to show composter timer."
 
-        if (SkyBlockUtils.inSkyBlock && !GardenApi.inGarden() && !config.displayOutsideGarden) return
+        if (GardenApi.inGarden() || SkyBlockUtils.inSkyBlock && !config.displayOutsideGarden) return
         val outsideGardenDisplay = Renderable.horizontal {
             addItemStack(bucket)
             addString("§b$format")

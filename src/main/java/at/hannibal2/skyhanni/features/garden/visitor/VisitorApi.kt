@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
@@ -20,15 +20,15 @@ import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.json.addElementsAfter
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.world.item.ItemStack
+import net.minecraft.network.chat.Component
 import java.awt.Color
 
 @SkyHanniModule
@@ -47,9 +47,9 @@ object VisitorApi {
     val patternGroup = RepoPattern.group("garden.visitor.api")
 
     /**
-     * REGEX-TEST:  §r§aEmissary Carlton
-     * REGEX-TEST:  §r§6Madame Eleanor Q. Goldsworth III
-     * REGEX-TEST:  §r§9Lazy Miner
+     * WRAPPED-REGEX-TEST: " §r§aEmissary Carlton"
+     * WRAPPED-REGEX-TEST: " §r§6Madame Eleanor Q. Goldsworth III"
+     * WRAPPED-REGEX-TEST: " §r§9Lazy Miner"
      */
     private val visitorNamePattern by patternGroup.pattern(
         "visitor.name",
@@ -133,7 +133,7 @@ object VisitorApi {
     }
 
     class VisitorOffer(
-        val offerItem: ItemStack,
+        val offerItem: SafeItemStack,
     )
 
     class Visitor(
@@ -310,6 +310,17 @@ object VisitorApi {
         }
         event.transform(124, "garden.visitors.rewardWarning.drops") { element ->
             element.addElementsAfter(arrayOf(VisitorReward.DYE_WILD_STRAWBERRY))
+        }
+        event.transform(134, "garden.visitors.rewardWarning.drops") { element ->
+            element.addElementsAfter(
+                arrayOf(
+                    VisitorReward.VISITORS_GRATITUDE,
+                    VisitorReward.FARMING_CONTEST_DISPLAY,
+                    VisitorReward.ASTRONAUT_PERSONALITY,
+                    VisitorReward.FAST_FOOD_BARN_SKIN,
+                    VisitorReward.JELLY_GREENHOUSE_SKIN,
+                )
+            )
         }
 
         event.move(18, "garden.visitors.needs", "garden.visitors.shoppingList")

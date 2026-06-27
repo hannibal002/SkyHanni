@@ -247,8 +247,8 @@ object MiningApi {
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
-        if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
+        if (OreBlock.getByStateOrNull(event.blockState) == null) return
         val now = SimpleTimeMark.now()
         recentClickedBlocks[event.position] = now
         lastClickedPos = event.position
@@ -478,7 +478,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")

@@ -76,7 +76,7 @@ object BingoApi {
     var lastBingoCardOpenTime = SimpleTimeMark.farPast()
 
     /**
-     * REGEX-TEST:  §9Ⓑ §9Bingo
+     * WRAPPED-REGEX-TEST: " §9Ⓑ §9Bingo"
      */
     private val detectionPattern by RepoPattern.pattern(
         "bingo.detection.scoreboard",
@@ -225,13 +225,13 @@ object BingoApi {
         val shouldHideAlixer = !SkyBlockUtils.isBingoProfile
         if (shouldHideAlixer != alixerHidden) {
             alixerHidden = shouldHideAlixer
-            IslandGraphs.node("Alixer", GraphNodeTag.NPC).enabled = !shouldHideAlixer
+            IslandGraphs.nodeOrNull("Alixer", GraphNodeTag.NPC)?.enabled = !shouldHideAlixer
         }
 
         val shouldHideBingoNpc = !isInBingoEventWindow()
         if (shouldHideBingoNpc != bingoNpcHidden) {
             bingoNpcHidden = shouldHideBingoNpc
-            IslandGraphs.node("Bingo", GraphNodeTag.NPC).enabled = !shouldHideBingoNpc
+            IslandGraphs.nodeOrNull("Bingo", GraphNodeTag.NPC)?.enabled = !shouldHideBingoNpc
         }
     }
 

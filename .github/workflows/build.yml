@@ -3,20 +3,33 @@ name: Build
 on:
     push:
         branches:
-            - "*"
+            - "**"
         paths-ignore:
             - ".gitignore"
-    pull_request_target:
+    pull_request:
         branches:
-            - "*"
+            - "**"
         paths-ignore:
             - ".gitignore"
-    workflow_dispatch:
-permissions: write-all
+    workflow_dispatch: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
 jobs:
     build:
         runs-on: ubuntu-latest
-        name: "Build and test"
+        name: Build and test
+        strategy:
+            fail-fast: false
+            matrix:
+                minecraft_version:
+                    - "1.21.11"
+                    - "26.1"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v6
@@ -24,94 +37,50 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
+            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
-            -   name: Disable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=off > .gradle/private.properties
             -   name: Build with Gradle w/retry
                 if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
                 with:
-                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace -PskipDetekt=true
             -   name: Build with Gradle w/retry
                 if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: assemble -x test --stacktrace -PskipDetekt=true
-            -   uses: actions/upload-artifact@v7
-                name: Upload development build
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace -PskipDetekt=true
+            -   name: Upload development build
+                uses: actions/upload-artifact@v7
                 with:
-                    name: "Development Build"
-                    path: build/libs/*.jar
+                    path: build/libs/SkyHanni-*-mc${{ matrix.minecraft_version }}.jar
+                    archive: false
             -   name: Test with Gradle w/retry
                 if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
+                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
                 with:
-                    gradle-command: test
+                    gradle-command: ${{ matrix.minecraft_version }}:test
             -   name: Test with Gradle w/retry
                 if: github.repository != 'hannibal002/SkyHanni'
                 uses: ./.github/actions/gradle-retry
                 with:
-                    gradle-command: test
-            -   uses: actions/upload-artifact@v7
-                name: "Upload test report"
-                if: ${{ !cancelled() }}
-                with:
-                    name: "Test Results"
-                    path: versions/*/build/reports/tests/test/
-                    if-no-files-found: warn
-
-    preprocess:
-        runs-on: ubuntu-latest
-        name: "Build multi version"
-        steps:
-            -   name: Checkout code
-                uses: actions/checkout@v6
-                with:
-                    ref: ${{ github.event.pull_request.head.ref }}
-                    repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@beta
-                if: github.repository == 'hannibal002/SkyHanni'
-            -   uses: ./.github/actions/setup-normal-workspace
-                if: github.repository != 'hannibal002/SkyHanni'
-            -   name: Enable preprocessor
-                run: |
-                    mkdir -p .gradle
-                    echo skyhanni.multi-version=compile > .gradle/private.properties
-            -   name: Build with Gradle w/retry
-                if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@beta
-                with:
-                    gradle-command: build --stacktrace -PskipDetekt=true
-            -   name: Build with Gradle w/retry
-                if: github.repository != 'hannibal002/SkyHanni'
-                uses: ./.github/actions/gradle-retry
-                with:
-                    gradle-command: build --stacktrace -PskipDetekt=true
-
-            -   name: Add label if build fails
-                if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                uses: actions-ecosystem/action-add-labels@v1
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
-
-            -   name: Remove label if build passes
-                if: ${{ success() && github.event_name == 'pull_request_target' && github.event.pull_request.state == 'open' }}
-                continue-on-error: true
-                uses: actions-ecosystem/action-remove-labels@v1
-                with:
-                    github_token: ${{ secrets.GITHUB_TOKEN }}
-                    labels: 'Fails Multi-Version'
-
-            -   name: Upload multi-version build
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Upload test report
                 uses: actions/upload-artifact@v7
                 if: ${{ !cancelled() }}
                 with:
-                    name: "Multi-version Development Build"
-                    path: build/libs/*.jar
+                    name: Test Results (${{ matrix.minecraft_version }})
+                    path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
+                    if-no-files-found: warn
+
+    verify:
+        runs-on: ubuntu-latest
+        name: Verify build results
+        needs: build
+        if: always()
+        steps:
+            -   name: Check matrix result
+                uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # release/v1
+                with:
+                    jobs: ${{ toJSON(needs) }}

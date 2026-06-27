@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -51,7 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -67,6 +67,9 @@ import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MinionFeatures {
+
+    const val MINION_FUEL_SLOT = 19
+    const val MINION_PICKUP_SLOT = 53
 
     private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
@@ -108,6 +111,14 @@ object MinionFeatures {
         "^§aCollect All$",
     )
 
+    /**
+     * REGEX-TEST: You applied the eyedrops on the minion and ran out!
+     */
+    val eyedropsRanOutPattern by patternGroup.pattern(
+        "eyedrops.ranout",
+        "You applied the eyedrops on the minion and ran out!",
+    )
+
     var lastMinion: LorenzVec? = null
     private var lastStorage: LorenzVec? = null
     var minionInventoryOpen = false
@@ -136,7 +147,7 @@ object MinionFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastClickedEntity = event.clickedEntity.getLorenzVec()
     }
@@ -144,7 +155,7 @@ object MinionFeatures {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastStorage = event.position
     }
