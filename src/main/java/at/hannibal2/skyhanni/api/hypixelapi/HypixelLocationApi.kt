@@ -152,9 +152,11 @@ object HypixelLocationApi {
         logger.log("Island change: '$oldIsland' -> '$island'")
 
         if (oldIsland != IslandType.NONE) {
+            oldIsland.inIsland = false
             IslandLeaveEvent(oldIsland).post()
         }
         if (island != IslandType.NONE) {
+            island.inIsland = true
             IslandJoinEvent(island = island, previousIsland = previousIsland).post()
             previousIsland = island
         }
@@ -198,6 +200,9 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
+        for (islandType in IslandType.entries) {
+            islandType.inIsland = false
+        }
     }
 
     private val debugData
