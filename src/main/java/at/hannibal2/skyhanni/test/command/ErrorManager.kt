@@ -213,13 +213,11 @@ object ErrorManager {
 
     // This is intentionally not an enum, because unnecessary object allocation can be problematic
     // if we're dealing with a stack overflow.
-    @JvmInline
-    private value class ErrorState(val value: Int) {
-        companion object {
-            val LOGGED = ErrorState(0)
-            val BLOCKED_NOT_NEEDED = ErrorState(1)
-            val BLOCKED_CAN_NOT_SHOW = ErrorState(2)
-        }
+    private typealias ErrorStateT = Int
+    private object ErrorState {
+        const val LOGGED = 0
+        const val BLOCKED_NOT_NEEDED = 1
+        const val BLOCKED_CAN_NOT_SHOW = 2
     }
 
     @Suppress("ReturnCount")
@@ -231,7 +229,7 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ): ErrorState {
+    ): ErrorStateT {
         if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
 
         // TODO add missing debug enabled check
@@ -292,7 +290,7 @@ object ErrorManager {
     // random id -> final message
     private val errorsToShowOnJoin = mutableMapOf<String, String>()
 
-    private fun ErrorState.crashIfNotYetOnAServer(): Boolean {
+    private fun ErrorStateT.crashIfNotYetOnAServer(): Boolean {
         if (this == ErrorState.BLOCKED_NOT_NEEDED) return false
 
         // TODO find way to properly do this before the config loads
