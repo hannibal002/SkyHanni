@@ -32,7 +32,7 @@ object CropUpgrades {
      */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",
-        "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
+        " +§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
     )
 
     private val cropUpgradesStorage: MutableMap<CropType, Int>? get() = GardenApi.storage?.cropUpgrades

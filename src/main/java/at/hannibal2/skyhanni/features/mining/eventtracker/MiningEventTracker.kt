@@ -62,7 +62,7 @@ object MiningEventTracker {
      */
     private val eventStartedPattern by patternGroup.pattern(
         "started",
-        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) STARTED!",
+        "(?:§.)* +(?:§.)+§l(?<event>.+) STARTED!",
     )
 
     /**
@@ -70,7 +70,7 @@ object MiningEventTracker {
      */
     private val eventEndedPattern by patternGroup.pattern(
         "ended",
-        "(?:§.)*\\s+(?:§.)+§l(?<event>.+) ENDED!",
+        "(?:§.)* +(?:§.)+§l(?<event>.+) ENDED!",
     )
     // </editor-fold>
 

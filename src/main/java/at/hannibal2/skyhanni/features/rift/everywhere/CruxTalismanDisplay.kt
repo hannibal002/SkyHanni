@@ -32,7 +32,7 @@ object CruxTalismanDisplay {
     @Suppress("MaxLineLength")
     private val progressPattern by RepoPattern.pattern(
         "rift.everywhere.crux.progress",
-        ".*(?<tier>(?:§.)?[IV1-4-]+)\\s+(?<name>(?:§.)?\\w+)§.:\\s*(?<progress>(?:§.)*MAXED|§.\\d+§./§.\\d+).*",
+        ".*(?<tier>(?:§.)?[IV1-4-]+) +(?<name>(?:§.)?\\w+)§.: *(?<progress>(?:§.)*MAXED|§.\\d+§./§.\\d+).*",
     )
 
     private const val PARTIAL_NAME = "CRUX_TALISMAN"

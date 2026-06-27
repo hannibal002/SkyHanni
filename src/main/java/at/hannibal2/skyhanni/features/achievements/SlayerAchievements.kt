@@ -21,7 +21,7 @@ object SlayerAchievements {
      */
     private val rngMeterPattern by AchievementManager.group.pattern(
         "rng-meter",
-        "\\s*RNG Meter - (?<xp>[\\d,]+) Stored XP",
+        " *RNG Meter - (?<xp>[\\d,]+) Stored XP",
     )
 
     private const val RNG_ACHIEVEMENT_3M = "3m rng xp"

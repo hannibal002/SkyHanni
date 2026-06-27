@@ -34,8 +34,8 @@ import java.util.regex.Pattern
 // TODO refactor
 @Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions")
 object StringUtils {
-    private val whiteSpaceResetPattern = "^(?:\\s|§r)*|(?:\\s|§r)*$".toPattern()
-    private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
+    private val whiteSpaceResetPattern = "^(?: |§r)*|(?: |§r)*$".toPattern()
+    private val whiteSpacePattern = "^ *| *$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
     private val asciiWithColorCodePattern = "[^\\x00-\\x7F§]".toPattern()

@@ -48,7 +48,7 @@ object CompactSweepDetails {
     @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
         "toughness-and-logs",
-        "\\s+(?:§.)+(?<treeType>[\\S ]+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,.]+)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs",
+        " +(?:§.)+(?<treeType>[\\S ]+) Tree Toughness: (?<toughnessDisplay>§r§6(?<toughnessAmount>[\\d,.]+)) (?<logsDisplay>(?:§.)+(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs",
     )
 
     /**
@@ -62,7 +62,7 @@ object CompactSweepDetails {
     @Suppress("MaxLineLength")
     private val penaltyPattern by patternGroup.pattern(
         "penalty",
-        "\\s+(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,.]+)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
+        " +(?:§.)+(?<penaltyReason>[\\S ]+): (?<penaltyDisplay>(?:§.)+-(?<penaltyPercent>[\\d,.]+)%) Sweep (?<logsDisplay>(?:§.)?(?<isItGreen>§.)(?<logsAmount>[\\d,.]+)) Logs(?: (?<proTip>(?:§.)+[\\S ]+))?",
     )
 
     data class SweepDetails(

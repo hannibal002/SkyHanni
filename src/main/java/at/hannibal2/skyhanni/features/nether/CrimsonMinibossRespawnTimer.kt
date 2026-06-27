@@ -49,7 +49,7 @@ object CrimsonMinibossRespawnTimer {
      */
     private val downPattern by patternGroup.pattern(
         "down",
-        "§f\\s*§r§6§l(?<name>.+) DOWN!",
+        "§f *§r§6§l(?<name>.+) DOWN!",
     )
 
     private var currentAreaBoss: MiniBoss? = null

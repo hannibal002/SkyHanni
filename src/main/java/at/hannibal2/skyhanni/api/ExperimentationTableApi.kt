@@ -195,7 +195,7 @@ object ExperimentationTableApi {
      */
     private val expOverRewardsLorePattern by patternGroup.pattern(
         "inventory.experiment-over.rewards",
-        "§8 \\+(?:§.| )*(?:\\[Lvl \\d+] )?(?<reward>.*?)(?=\\s\\((?:Stakes|Pairs)\\)|\$)(?:\\s\\((?:Stakes|Pairs)\\))?",
+        "§8 \\+(?:§.| )*(?:\\[Lvl \\d+] )?(?<reward>.*?)(?= \\((?:Stakes|Pairs)\\)|\$)(?: \\((?:Stakes|Pairs)\\))?",
     )
 
     /**

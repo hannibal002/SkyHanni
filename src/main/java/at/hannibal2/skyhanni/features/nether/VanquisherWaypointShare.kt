@@ -49,7 +49,7 @@ object VanquisherWaypointShare {
     @Suppress("MaxLineLength")
     private val sharedPattern by patternGroup.list(
         "share",
-        "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x:\\s*(?<x>-?[\\d.]+).*?y:\\s*(?<y>-?[\\d.]+).*?z:\\s*(?<z>-?[\\d.]+).*?Vanquisher.*",
+        "^(?<channel>Party > |Guild > |Officer > )?(?<playerName>[^:]+):.*?x: *(?<x>-?[\\d.]+).*?y: *(?<y>-?[\\d.]+).*?z: *(?<z>-?[\\d.]+).*?Vanquisher.*",
     )
 
     /**

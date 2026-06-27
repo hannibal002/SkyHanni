@@ -145,7 +145,7 @@ object DragonFeatures {
      */
     private val tabDamagePattern by tabListGroup.pattern(
         "fight.player",
-        "\\s(?<name>.+): (?<damage>[\\d.]+[kM]?)❤",
+        " (?<name>.+): (?<damage>[\\d.]+[kM]?)❤",
     )
 
     private var yourEyes = 0

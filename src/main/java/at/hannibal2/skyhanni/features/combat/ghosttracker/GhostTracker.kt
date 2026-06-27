@@ -146,7 +146,7 @@ object GhostTracker {
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary-no-color",
-        "\\s*Ghost (?<level>\\d+|[XVI]+): (?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
+        " *Ghost (?<level>\\d+|[XVI]+): (?<kills>[\\d,.]+)\\/(?<killsToNext>[\\d,.]+)",
     )
 
     /**
@@ -154,7 +154,7 @@ object GhostTracker {
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax-no-color",
-        "\\s*Ghost (?<level>\\d+|[XVI]+): MAX",
+        " *Ghost (?<level>\\d+|[XVI]+): MAX",
     )
 
     private val SORROW = "SORROW".toInternalName()

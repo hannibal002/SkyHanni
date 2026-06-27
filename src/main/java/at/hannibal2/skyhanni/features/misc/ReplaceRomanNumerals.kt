@@ -14,7 +14,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ReplaceRomanNumerals {
     // Using toRegex here since toPattern doesn't seem to provide the necessary functionality
-    private val splitRegex = "((§\\w)|(\\s+)|(\\W))+|(\\w*)".toRegex()
+    private val splitRegex = "((§\\w)|( +)|(\\W))+|(\\w*)".toRegex()
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
     @HandleEvent(priority = HandleEvent.LOW)

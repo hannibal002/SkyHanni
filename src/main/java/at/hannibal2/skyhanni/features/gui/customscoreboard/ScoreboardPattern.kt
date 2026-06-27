@@ -46,7 +46,7 @@ object ScoreboardPattern {
      */
     val sowdustPattern by mainSB.pattern(
         "sowdust",
-        "\\s?(?:§.)*Sowdust: (?:§.)*(?<sowdust>[\\d,]+)",
+        " ?(?:§.)*Sowdust: (?:§.)*(?<sowdust>[\\d,]+)",
     )
 
     /**
@@ -74,7 +74,7 @@ object ScoreboardPattern {
      */
     val locationPattern by mainSB.pattern(
         "location",
-        "\\s*(?<location>(?:§7⏣|§5ф) .*)",
+        " *(?<location>(?:§7⏣|§5ф) .*)",
     )
 
     /**
@@ -82,7 +82,7 @@ object ScoreboardPattern {
      */
     val lobbyCodePattern by mainSB.pattern(
         "lobbycode",
-        "\\s*§.(?:\\d{2}/?){3} §8(?<code>.*)",
+        " *§.(?:\\d{2}/?){3} §8(?<code>.*)",
     )
 
     /**
@@ -90,7 +90,7 @@ object ScoreboardPattern {
      */
     val datePattern by mainSB.pattern(
         "date",
-        "\\s*(?:(?:Late|Early) )?(?:Spring|Summer|Autumn|Winter) \\d+(?:st|nd|rd|th)?.*",
+        " *(?:(?:Late|Early) )?(?:Spring|Summer|Autumn|Winter) \\d+(?:st|nd|rd|th)?.*",
     )
 
     /**
@@ -99,7 +99,7 @@ object ScoreboardPattern {
      */
     val timePattern by mainSB.pattern(
         "time",
-        "\\s*§7\\d+:\\d+(?:am|pm)\\s*(?<symbol>§b☽|§e☀|§.⚡|§.☔)?.*",
+        " *§7\\d+:\\d+(?:am|pm) *(?<symbol>§b☽|§e☀|§.⚡|§.☔)?.*",
     )
 
     /**
@@ -152,7 +152,7 @@ object ScoreboardPattern {
      */
     val profileTypePattern by mainSB.pattern(
         "profiletype",
-        "\\s*(?:§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*",
+        " *(?:§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*",
     )
 
     // multi use
@@ -195,7 +195,7 @@ object ScoreboardPattern {
      */
     val timeLeftPattern by multiUseSB.pattern(
         "timeleft",
-        "(?:§.)*Time Left: (?:§.)*[\\w:,.\\s]+",
+        "(?:§.)*Time Left: (?:§.)*[\\w:,. ]+",
     )
 
     // dungeon scoreboard
@@ -207,7 +207,7 @@ object ScoreboardPattern {
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.❤)?",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w ]+Dragon§a [\\w,.]+(?:§.❤)?",
     )
     val keysPattern by dungeonSB.pattern(
         "keys",
@@ -265,7 +265,7 @@ object ScoreboardPattern {
      */
     val submergesPattern by kuudraSB.pattern(
         "submerges",
-        "(?:§.)*Submerges In: (?:§.)*[\\w\\s?]+",
+        "(?:§.)*Submerges In: (?:§.)*[\\w ?]+",
     )
 
     // farming
@@ -286,7 +286,7 @@ object ScoreboardPattern {
      */
     val lockedPattern by farmingSB.pattern(
         "locked",
-        "\\s*§cLocked.*",
+        " *§cLocked.*",
     )
 
     /**
@@ -295,7 +295,7 @@ object ScoreboardPattern {
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
-        "\\s*(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
+        " *(?:§.)*Cleanup(?:§.)*: (?:§.)*.*",
     )
 
     /**
@@ -304,7 +304,7 @@ object ScoreboardPattern {
      */
     val pastingPattern by farmingSB.pattern(
         "pasting",
-        "\\s*(?:§.)*(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
+        " *(?:§.)*(?:Barn )?Pasting§7: (?:§.)*[\\d,.]+%?",
     )
 
     /**
@@ -332,7 +332,7 @@ object ScoreboardPattern {
      */
     val plotPattern by farmingSB.pattern(
         "plot",
-        "\\s*§aPlot §7-.*",
+        " *§aPlot §7-.*",
     )
 
     // mining
@@ -361,7 +361,7 @@ object ScoreboardPattern {
      */
     val windCompassArrowPattern by miningSB.pattern(
         "windcompassarrow",
-        "\\s*(?:§.|[⋖⋗≈])+\\s*(?:§.|[⋖⋗≈])*\\s*",
+        " *(?:§.|[⋖⋗≈])+ *(?:§.|[⋖⋗≈])* *",
     )
 
     /**
@@ -569,7 +569,7 @@ object ScoreboardPattern {
      */
     val essencePattern by miscSB.pattern(
         "essence",
-        "\\s*.*Essence: §.(?<essence>-?\\d+(?::?,\\d{3})*(?:\\.\\d+)?)",
+        " *.*Essence: §.(?<essence>-?\\d+(?::?,\\d{3})*(?:\\.\\d+)?)",
     )
 
     /**
@@ -577,7 +577,7 @@ object ScoreboardPattern {
      */
     val redstonePattern by miscSB.pattern(
         "redstone",
-        "\\s*(?:§.)*⚡ §cRedstone: (?:§.)*\\d+%",
+        " *(?:§.)*⚡ §cRedstone: (?:§.)*\\d+%",
     )
 
     /**
@@ -585,7 +585,7 @@ object ScoreboardPattern {
      */
     val visitingPattern by miscSB.pattern(
         "visiting",
-        "\\s*§a✌ §7\\(§.\\d+(?:§.)?/\\d+(?:§.)?\\)",
+        " *§a✌ §7\\(§.\\d+(?:§.)?/\\d+(?:§.)?\\)",
     )
 
     /**
@@ -594,7 +594,7 @@ object ScoreboardPattern {
      */
     val flightDurationPattern by miscSB.pattern(
         "flightduration",
-        "\\s*Flight Duration: §a(?::?\\d{1,3})*",
+        " *Flight Duration: §a(?::?\\d{1,3})*",
     )
 
     /**
@@ -688,7 +688,7 @@ object ScoreboardPattern {
     @Suppress("MaxLineLength")
     val thirdObjectiveLinePattern by miscSB.pattern(
         "thirdobjectiveline",
-        "§eProtect Elle §7\\(§.\\d+%§7\\)|\\s*§.\\(§.[\\w,.]+§.\\/§.[\\w,.]+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]",
+        "§eProtect Elle §7\\(§.\\d+%§7\\)| *§.\\(§.[\\w,.]+§.\\/§.[\\w,.]+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]",
     )
 
     /**
@@ -795,7 +795,7 @@ object ScoreboardPattern {
      */
     val riftDimensionPattern by riftSB.pattern(
         "dimension",
-        "\\s*(?:§f)?Rift Dimension",
+        " *(?:§f)?Rift Dimension",
     )
     val riftHotDogTitlePattern by riftSB.pattern(
         "hotdogtitle",
@@ -862,7 +862,7 @@ object ScoreboardPattern {
      */
     val bigDamagePattern by riftSB.pattern(
         "bigdamage",
-        "\\s*Big damage in: §d[\\w\\s]+",
+        " *Big damage in: §d[\\w ]+",
     )
 
     private val carnivalSB = scoreboardGroup.group("carnival")
@@ -956,7 +956,7 @@ object ScoreboardPattern {
      */
     val hotfPattern by galateaSB.pattern(
         "hotf",
-        "\\s*§aHOTF§f: §a[\\w,.]+.*",
+        " *§aHOTF§f: §a[\\w,.]+.*",
     )
 
     /**
@@ -983,9 +983,9 @@ object ScoreboardPattern {
      */
     val brokenPatterns by group.list(
         "broken",
-        "\\s*§.§l⚡ §cRedston",
-        "\\s*§ce: §e§b\\d+%",
-        "\\s*Starting in: §a0 §c[\\d:]+",
+        " *§.§l⚡ §cRedston",
+        " *§ce: §e§b\\d+%",
+        " *Starting in: §a0 §c[\\d:]+",
         "(?:§.)*᠅ §.(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*",
     )
 
@@ -997,7 +997,7 @@ object ScoreboardPattern {
      */
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
-        "\\s+Ends In: (?<time>.*)",
+        " +Ends In: (?<time>.*)",
     )
 
     /**
@@ -1005,6 +1005,6 @@ object ScoreboardPattern {
      */
     val eventTimeStartsPattern by tablistGroup.pattern(
         "eventtimestarts",
-        "\\s+Starts In: (?<time>.*)",
+        " +Starts In: (?<time>.*)",
     )
 }

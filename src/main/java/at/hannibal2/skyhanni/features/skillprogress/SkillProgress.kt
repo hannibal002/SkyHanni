@@ -229,7 +229,7 @@ object SkillProgress {
         if (!config.hideInActionBar || !isDisplayEnabled()) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
-            msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")
+            msg = msg.replace(Regex(" *" + Regex.escape(line)), "")
         }
         msg = msg.trim()
 

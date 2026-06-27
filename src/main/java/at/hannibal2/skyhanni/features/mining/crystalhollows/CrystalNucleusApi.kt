@@ -29,7 +29,7 @@ object CrystalNucleusApi {
      */
     private val startPattern by patternGroup.pattern(
         "loot.start",
-        " \\s*§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE.*",
+        " *§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE.*",
     )
 
     /**

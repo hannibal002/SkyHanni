@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.ClickedBlockType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -91,7 +91,7 @@ object DungeonApi {
      */
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",
-        "\\s+(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
+        " +(?:Master Mode )?The Catacombs - (?:Floor [IV]{1,3}|Entrance)",
     )
 
     /**
@@ -123,7 +123,7 @@ object DungeonApi {
     @Suppress("MaxLineLength")
     val playerDungeonTeamPattern by patternGroup.pattern(
         "tablist.playerteam.colorless",
-        "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
+        "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+) ?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
     )
 
     enum class DungeonBlessings(var power: Int) {

@@ -100,7 +100,7 @@ object PestApi {
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
+        " *(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -108,7 +108,7 @@ object PestApi {
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.no-pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
+        " *(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
 
     /**
@@ -124,7 +124,7 @@ object PestApi {
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
         "tablist.infected-plots-no-color",
-        "\\sPlots: (?<plots>.*)",
+        " Plots: (?<plots>.*)",
     )
 
     /**

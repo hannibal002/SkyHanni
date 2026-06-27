@@ -37,7 +37,7 @@ object MotesSession {
      */
     private val lifetimeMotesPattern by patternGroup.pattern(
         "lifetime-nocolor",
-        "\\s+Lifetime Motes: (?<motes>[\\d,.]+)",
+        " +Lifetime Motes: (?<motes>[\\d,.]+)",
     )
 
     private const val MOTES_ACHIEVEMENT = "Mote Collector"

@@ -30,7 +30,7 @@ object KuudraApi {
     )
     private val completePattern by patternGroup.pattern(
         "chat.complete",
-        "§.\\s*(?:§.)*KUUDRA DOWN!",
+        "§. *(?:§.)*KUUDRA DOWN!",
     )
 
     /**

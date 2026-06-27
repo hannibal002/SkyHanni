@@ -60,7 +60,7 @@ object PestSpawn {
      */
     private val clickToTPPattern by patternGroup.pattern(
         "teleport.colorless",
-        "\\s*CLICK HERE to teleport to the plot!",
+        " *CLICK HERE to teleport to the plot!",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

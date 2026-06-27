@@ -71,7 +71,7 @@ object CurrentChatDisplay {
     @Suppress("MaxLineLength")
     private val openPrivateMessagePattern by patternGroup.pattern(
         "private.open",
-        "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes\\. Use §r§b\\/chat a§r§a to leave",
+        "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.| )*(?<player>.*)§r§a for the next 5 minutes\\. Use §r§b\\/chat a§r§a to leave",
     )
 
     @HandleEvent

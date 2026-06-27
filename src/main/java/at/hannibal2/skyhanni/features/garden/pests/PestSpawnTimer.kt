@@ -64,7 +64,7 @@ object PestSpawnTimer {
 
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldowntime-no-color",
-        "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+        " Cooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()

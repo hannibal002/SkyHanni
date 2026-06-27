@@ -45,7 +45,7 @@ object CrimsonIsleReputationHelper {
      */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputationhelper.tablist.quest-no-color",
-        "\\s*(?<status>[✖✔]) (?<name>.+?)(?: x(?<amount>\\d+))?$",
+        " *(?<status>[✖✔]) (?<name>.+?)(?: x(?<amount>\\d+))?$",
     )
 
     @HandleEvent

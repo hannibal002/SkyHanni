@@ -116,7 +116,7 @@ object GardenPlotApi {
      */
     private val plotSprayedTablistPattern by patternGroup.pattern(
         "tablist.spraytime-nocolor",
-        "Spray: (?<spray>[\\w\\s]+)(?:\\((?<time>.*)\\))?",
+        "Spray: (?<spray>[\\w ]+)(?:\\((?<time>.*)\\))?",
     )
     var plots = listOf<Plot>()
 

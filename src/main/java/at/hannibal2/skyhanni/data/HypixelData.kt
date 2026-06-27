@@ -56,7 +56,7 @@ object HypixelData {
      */
     private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
-        "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
+        " +§.✌ §.\\(§.(?<currentamount>\\d+)(?:§.)?/(?<maxamount>\\d+)(?:§.)?\\)",
     )
 
     /**
@@ -65,7 +65,7 @@ object HypixelData {
      */
     private val skyblockAreaPattern by patternGroup.pattern(
         "skyblock.area",
-        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
+        " *§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
     val connectedToHypixel get() = HypixelLocationApi.inHypixel

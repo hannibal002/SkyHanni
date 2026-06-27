@@ -16,7 +16,7 @@ object SlayerCocoonWarning {
      */
     private val slayerCocoonPattern by RepoPattern.pattern(
         "slayer.cocooned",
-        "\\s+§r§c§lYOU COCOONED YOUR SLAYER BOSS",
+        " +§r§c§lYOU COCOONED YOUR SLAYER BOSS",
     )
 
     private val config get() = SlayerApi.config

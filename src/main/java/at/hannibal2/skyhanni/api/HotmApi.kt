@@ -52,7 +52,7 @@ object HotmApi {
         )
         val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
-            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder",
+            " +§8- §.(?<powder>[\\d,]+) $displayName Powder",
         )
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern

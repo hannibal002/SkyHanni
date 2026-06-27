@@ -180,7 +180,7 @@ object CFDataLoader {
      */
     val upgradeTierPattern by CFApi.patternGroup.pattern(
         "upgradetier",
-        "(?<upgrade>.*)\\s(?<tier>[IVXLC]+)",
+        "(?<upgrade>.*) (?<tier>[IVXLC]+)",
     )
 
     /**

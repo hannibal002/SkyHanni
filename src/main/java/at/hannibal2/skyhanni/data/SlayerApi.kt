@@ -51,7 +51,7 @@ object SlayerApi {
      */
     private val questStartPattern by patternGroup.pattern(
         "quest.start",
-        "\\s*SLAYER QUEST STARTED!",
+        " *SLAYER QUEST STARTED!",
     )
 
     /**
@@ -59,7 +59,7 @@ object SlayerApi {
      */
     private val questCompletePattern by patternGroup.pattern(
         "quest.complete",
-        "\\s*SLAYER QUEST COMPLETE!",
+        " *SLAYER QUEST COMPLETE!",
     )
     // </editor-fold>
 

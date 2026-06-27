@@ -55,7 +55,7 @@ object MobFilter {
     private val patternGroup = RepoPattern.group("mob.detection")
 
     @Language("RegExp")
-    private val mobType = "(?<mobType>[^\\w\\s✯\\-]+ )?"
+    private val mobType = "(?<mobType>[^\\w ✯\\-]+ )?"
 
     @Language("RegExp")
     private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
@@ -99,7 +99,7 @@ object MobFilter {
     @Suppress("MaxLineLength")
     val dungeonNameFilter by patternGroup.pattern(
         "filter.dungeon",
-        "^$level$mobType(?:(?<star>✯)\\s)?(?:(?<attribute>${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?<name>[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$",
+        "^$level$mobType(?:(?<star>✯) )?(?:(?<attribute>${DungeonAttribute.toRegexLine}) )?(?:\\[[\\w\\d]+\\] )?(?<name>[^ᛤ]+)(?: ᛤ)? [^ ]+$",
     )
     val summonFilter by patternGroup.pattern(
         "filter.summon",

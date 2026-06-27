@@ -29,7 +29,7 @@ object SkyBlockXPApi {
     /**
      * REGEX-TEST: §3§l§m      §f§l§m                   §r §b24§3/§b100 §bXP
      */
-    private val xpPattern by group.pattern("xp", "[§\\w\\s]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
+    private val xpPattern by group.pattern("xp", "[§\\w ]+§b(?<xp>\\d+)§3\\/§b100 §bXP")
 
     val levelXPPair get() = storage?.toLevelXPPair()
 

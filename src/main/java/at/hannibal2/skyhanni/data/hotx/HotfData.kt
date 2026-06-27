@@ -371,7 +371,7 @@ enum class HotfData(
          */
         override val resetTokensPattern: Pattern by patternGroup.pattern(
             "inventory.reset.token",
-            "\\s*§8- §a(?<token>\\d+) §aToken of the Forest",
+            " *§8- §a(?<token>\\d+) §aToken of the Forest",
         )
 
         /**
@@ -379,7 +379,7 @@ enum class HotfData(
          */
         override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
-            "\\s*§7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset\\.",
+            " *§7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset\\.",
         )
 
         /**
@@ -395,7 +395,7 @@ enum class HotfData(
          */
         private val whisperResetPattern by patternGroup.pattern(
             "whisper.reset",
-            "\\s+§8- §.(?<whisper>[\\d,]*) Forest Whispers",
+            " +§8- §.(?<whisper>[\\d,]*) Forest Whispers",
         )
         // </editor-fold>
 

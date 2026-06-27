@@ -525,7 +525,7 @@ enum class HotmData(
          */
         override val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
-            "\\s+§8- §5(?<token>\\d+) Token of the Mountain",
+            " +§8- §5(?<token>\\d+) Token of the Mountain",
         )
 
         private val mayhemChatPattern by patternGroup.pattern(
@@ -539,7 +539,7 @@ enum class HotmData(
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder-nocolor",
-            "\\s*(?<type>\\w+): (?<amount>[\\d,.]+)",
+            " *(?<type>\\w+): (?<amount>[\\d,.]+)",
         )
         // </editor-fold>
 

@@ -59,7 +59,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "Profile: (?<profile>[\\w\\s]+)(?:[ ♲Ⓑ☀]+)?",
+        "Profile: (?<profile>[\\w ]+)(?:[ ♲Ⓑ☀]+)?",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -382,7 +382,7 @@ enum class TabWidget(
     ;
 
     /** The pattern for the first line of the widget*/
-    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), "\\s*(?:$pattern0)")
+    val pattern by repoGroup.pattern(name.replace("_", ".").lowercase(), " *(?:$pattern0)")
 
     /** The current active information from tab list.
      *

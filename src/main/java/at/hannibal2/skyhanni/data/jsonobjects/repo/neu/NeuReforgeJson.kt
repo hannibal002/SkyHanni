@@ -24,8 +24,8 @@ data class NeuReforgeJson(
 
     val nbtModifier: String by lazy {
         rawNbtModifier ?: reforgeName.lowercase()
-            .replace("[^a-z0-9\\s_-]".toRegex(), "")
-            .replace("[\\s-]".toRegex(), "_")
+            .replace("[^a-z0-9 _-]".toRegex(), "")
+            .replace("[ -]".toRegex(), "_")
     }
     @Suppress("UNCHECKED_CAST")
     val reforgeAbility: Map<LorenzRarity, String> by lazy {

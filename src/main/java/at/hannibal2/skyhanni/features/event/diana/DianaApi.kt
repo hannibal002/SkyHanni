@@ -60,7 +60,7 @@ object DianaApi {
      */
     private val rareDianaMobNamePattern by group.pattern(
         "rare-mob-name",
-        "(?:Minos Inquisitor|Sphinx|King Minos|Manticore)\\s*",
+        "(?:Minos Inquisitor|Sphinx|King Minos|Manticore) *",
     )
 
     @HandleEvent(onlyOnSkyblock = true)

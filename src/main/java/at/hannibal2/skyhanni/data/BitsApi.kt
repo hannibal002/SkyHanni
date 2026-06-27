@@ -92,7 +92,7 @@ object BitsApi {
      */
     private val fameRankUpPattern by bitsChatGroup.pattern(
         "rankup.rank",
-        "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)",
+        "[§\\w ]+FAME RANK UP (?:§.)+(?<rank>.*)",
     )
 
     /**
@@ -137,7 +137,7 @@ object BitsApi {
      */
     private val cookieDurationPattern by bitsGuiGroup.pattern(
         "cookieduration",
-        "\\s*§7Duration: §a(?<time>.*)",
+        " *§7Duration: §a(?<time>.*)",
     )
 
     private val noCookieActiveSBMenuPattern by bitsGuiGroup.pattern(

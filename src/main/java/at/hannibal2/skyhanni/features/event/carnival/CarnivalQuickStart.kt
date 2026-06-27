@@ -27,7 +27,7 @@ object CarnivalQuickStart {
     private val chatPattern by patternGroup.pattern(
         "select.option.chat-nocolor",
         // NOTE: Do not use .* here, it doesn't match newlines.
-        "Select an option:[\\s\\S]*",
+        "Select an option:[ \\S]*",
     )
     private val pirate by patternGroup.pattern("npcs.pirate", "Carnival Pirateman")
     private val fisher by patternGroup.pattern("npcs.fisher", "Carnival Fisherman")

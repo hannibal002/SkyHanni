@@ -24,7 +24,7 @@ object PetNametag {
      */
     private val petNametagPattern by RepoPattern.pattern(
         "pet.nametag",
-        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?",
+        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w ]+)(?<skin>§. ✦)?",
     )
 
     @HandleEvent

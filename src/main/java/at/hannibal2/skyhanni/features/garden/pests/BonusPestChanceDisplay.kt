@@ -30,7 +30,7 @@ object BonusPestChanceDisplay {
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget-no-color",
-        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
+        " +Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
     )
     private var display: Renderable? = null
 
