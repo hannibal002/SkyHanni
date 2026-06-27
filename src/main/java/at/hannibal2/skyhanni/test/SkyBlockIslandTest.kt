@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
