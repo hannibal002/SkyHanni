@@ -8,13 +8,13 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -56,19 +56,13 @@ object FastFairySoulsPathfinder {
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
+     * REGEX-TEST: SOUL! You found a Fairy Soul!
      * REGEX-TEST: You have already found that Fairy Soul!
      */
-    private val duplicatePattern by patternGroup.pattern(
-        "chat.duplicate.colorless",
-        "^You have already found that Fairy Soul!$",
-    )
-
-    /**
-     * REGEX-TEST: SOUL! You found a Fairy Soul!
-     */
-    private val newPattern by patternGroup.pattern(
-        "chat.new.colorless",
-        "^SOUL! You found a Fairy Soul!$",
+    private val foundPattern by patternGroup.list(
+        "chat.found.list",
+        "SOUL! You found a Fairy Soul!",
+        "You have already found that Fairy Soul!",
     )
 
     /**
@@ -76,7 +70,7 @@ object FastFairySoulsPathfinder {
      */
     private val loreSoulPattern by patternGroup.pattern(
         "new.colorless",
-        "Fairy Souls: (?<found>.*)\\/(?<total>.*)",
+        "Fairy Souls: (?<found>.+)/(?<total>.+)",
     )
 
     private class Data(
@@ -297,8 +291,8 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.cleanMessage) || newPattern.matches(event.cleanMessage)) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        foundPattern.matchMatchers(event.cleanMessage) {
             data?.foundNearby()
         }
     }

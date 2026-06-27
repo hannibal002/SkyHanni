@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.findAll
@@ -434,7 +434,7 @@ object StringUtils {
     /**
      * Applies a transformation on the message of a SystemMessageEvent if possible.
      */
-    fun SystemMessageEvent.Modify.applyIfPossible(
+    fun SkyHanniChatEvent.Modify.applyIfPossible(
         transformationReason: String? = null,
         transform: (String) -> String,
     ) {

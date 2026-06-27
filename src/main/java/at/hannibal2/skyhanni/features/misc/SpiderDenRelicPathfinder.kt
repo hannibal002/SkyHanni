@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -45,18 +45,14 @@ object SpiderDenRelicPathfinder {
 
     /**
      * REGEX-TEST: +10,000 Coins! (2/28 Relics)
-     */
-    private val foundPattern by patternGroup.pattern(
-        key = "chat.found",
-        fallback = "\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)",
-    )
-
-    /**
      * REGEX-TEST: You've already found this relic!
+     * REGEX-TEST: You've already found all the relics!
      */
-    private val duplicatePattern by patternGroup.pattern(
-        key = "chat.duplicate",
-        fallback = "You've already found this relic!|You've already found all the relics!",
+    private val foundPattern by patternGroup.list(
+        "chat.found.list",
+        "\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)",
+        "You've already found this relic!",
+        "You've already found all the relics!",
     )
 
     private class Data(
@@ -164,9 +160,9 @@ object SpiderDenRelicPathfinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN)
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.spiderRelicPathfinder) return
-        if (foundPattern.matches(event.chatComponent) || duplicatePattern.matches(event.chatComponent)) {
+        foundPattern.matchMatchers(event.cleanMessage) {
             data?.foundNearby()
         }
     }

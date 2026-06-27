@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -49,7 +49,7 @@ object FruitBowlFeatures {
      */
     private val chatClickedPlayerPattern by chatGroup.pattern(
         "chat-message.clicked-player",
-        "FRUIT BOWL! (?<player>.*) profile name is (?<profile>[a-zA-Z]*)!",
+        "FRUIT BOWL! (?<player>.+) profile name is (?<profile>[a-zA-Z]+)!",
     )
 
     /**
@@ -65,15 +65,15 @@ object FruitBowlFeatures {
      */
     private val chatFoundMissingPattern by chatGroup.pattern(
         "chat-message.found-missing",
-        "(?<profile>[a-zA-Z]*) has been added to the fruit bowl!",
+        "(?<profile>[a-zA-Z]+) has been added to the fruit bowl!",
     )
 
     /**
-     * REGEX-TEST: §2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!
+     * REGEX-TEST: FRUITALICIOUS! You completed your fruit bowl!
      */
     private val chatFoundAllPattern by chatGroup.pattern(
         "chat-message.found-all",
-        "§2§lFRUITALICIOUS! §r§aYou completed your fruit bowl!",
+        "FRUITALICIOUS! You completed your fruit bowl!",
     )
 
     /**
@@ -182,7 +182,7 @@ object FruitBowlFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inHand) return
 
         val message = event.cleanMessage

@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateAmount
@@ -62,27 +62,27 @@ object CFCustomReminder {
      */
     private val milestoneCostLorePattern by patternGroup.pattern(
         "milestone.cost",
-        "§cRequires (?<amount>.*) all-time Chocolate!",
+        "§cRequires (?<amount>.+) all-time Chocolate!",
     )
 
     /**
-     * REGEX-TEST: §cYou don't have enough Chocolate!
-     * REGEX-TEST: §cYou don't have the required items!
-     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
+     * REGEX-TEST: You don't have enough Chocolate!
+     * REGEX-TEST: You don't have the required items!
+     * REGEX-TEST: You must collect 300B all-time Chocolate!
      */
     private val chatMessagePattern by patternGroup.list(
         "chat.hide",
-        "§cYou don't have enough Chocolate!",
-        "§cYou don't have the required items!",
-        "§cYou must collect (.*) all-time Chocolate!",
+        "You don't have enough Chocolate!",
+        "You don't have the required items!",
+        "You must collect (.+) all-time Chocolate!",
     )
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         if (!CFApi.inChocolateFactory) return
         if (configReminder.hideChat) {
-            if (chatMessagePattern.matches(event.message)) {
+            if (chatMessagePattern.matches(event.cleanMessage)) {
                 event.blockedReason = "custom_reminder"
             }
         }

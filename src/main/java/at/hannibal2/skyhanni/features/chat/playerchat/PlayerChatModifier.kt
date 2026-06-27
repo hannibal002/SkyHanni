@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.chat.playerchat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.applyIfPossible
@@ -24,7 +24,7 @@ object PlayerChatModifier {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Modify) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         event.applyIfPossible("PLAYER_CHAT") { cutMessage(it) }
     }
 

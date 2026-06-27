@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -43,11 +43,11 @@ object FixIronman {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Modify) {
+    fun onChat(event: SkyHanniChatEvent.Modify) {
         // We don't need to always fix this
         if (!TimeUtils.isAprilFoolsDay) return
 
-        if (event.message.contains("Ironman")) {
+        if (event.cleanMessage.contains("Ironman")) {
             val newComponent = event.chatComponent.replace("Ironman", "Ironperson") ?: return
             event.replaceComponent(newComponent, "fix_ironman")
         }

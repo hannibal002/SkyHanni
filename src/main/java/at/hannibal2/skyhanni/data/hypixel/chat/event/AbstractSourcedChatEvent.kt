@@ -20,7 +20,7 @@ object AbstractSourcedChatEvent {
      * @param chatComponent The entire original chat component.
      * @param blockedReason The reason if the message should be blocked. null means not blocked.
      */
-    open class Allow(
+    abstract class Allow(
         val authorComponent: ComponentSpan,
         messageComponent: ComponentSpan,
         chatComponent: Component,
@@ -40,7 +40,7 @@ object AbstractSourcedChatEvent {
      * @param messageComponent The content of the actual message.
      * @param chatComponent The entire original chat component.
      */
-    open class Modify(
+    abstract class Modify(
         val authorComponent: ComponentSpan,
         messageComponent: ComponentSpan,
         chatComponent: Component,

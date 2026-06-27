@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -68,7 +67,7 @@ object RemainingSlayerKills {
      */
     private val comboExpiredPattern by patternGroup.pattern(
         "combo.expired",
-        "Your Kill Combo has expired! You reached a .* Kill Combo!",
+        "Your Kill Combo has expired! You reached a \\d+ Kill Combo!",
     )
 
     /**
@@ -140,14 +139,16 @@ object RemainingSlayerKills {
         update()
     }
 
-    @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
+    @HandleEvent(receiveCancelled = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
-        if (comboExpiredPattern.matches(message)) {
+        comboExpiredPattern.matchMatcher(message) {
             killComboWisdom = 0
+            return
         }
         killCombatWisdomPattern.matchMatcher(message) {
             killComboWisdom = group("wisdom").formatInt()
+            return
         }
         // TODO add to repo since Hypixel is planning to add more Wisdom to Grandma Wolf see
         // https://hypixel.net/threads/design-thread-magic-find.6015417/

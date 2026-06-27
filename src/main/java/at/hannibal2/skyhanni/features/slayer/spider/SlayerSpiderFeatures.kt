@@ -3,15 +3,18 @@ package at.hannibal2.skyhanni.features.slayer.spider
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobCategory
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.monster.spider.Spider
 
 @SkyHanniModule
@@ -21,6 +24,14 @@ object SlayerSpiderFeatures {
     private var lastClicked: Mob? = null
     val stuckMobs = mutableSetOf<Mob>()
 
+    /**
+     * REGEX-TEST: You need to kill the Broodfather's hatchlings before it can be damaged again!
+     */
+    private val killHatchlingsPattern by RepoPattern.pattern(
+        "slayer.spider.kill-hatchlings",
+        "You need to kill the Broodfather's hatchlings before it can be damaged again!",
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
@@ -29,7 +40,7 @@ object SlayerSpiderFeatures {
         }
     }
 
-    private fun Mob.isRightTier() = category == MobCategory.SLAYER && (levelOrTier in 3..5) && name == "Tarantula Broodfather"
+    private fun Mob.isRightTier() = category == MobCategory.SLAYER && (levelOrTier in 3..5) && name == SlayerType.TARANTULA.displayName
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClickEntity(event: EntityClickEvent) {
@@ -41,13 +52,13 @@ object SlayerSpiderFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
-        if (event.message != "§cYou need to kill the Broodfather's hatchlings before it can be damaged again!") return
-
-        val mob = lastClicked ?: return
-        mob.highlight(config.highlightInvincibleColor, condition = { config.highlightInvincible && mob in stuckMobs })
-        stuckMobs.add(mob)
-        EntityMovementData.addToTrack(mob)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        killHatchlingsPattern.matchMatcher(event.cleanMessage) {
+            val mob = lastClicked ?: return
+            mob.highlight(config.highlightInvincibleColor, condition = { config.highlightInvincible && mob in stuckMobs })
+            stuckMobs.add(mob)
+            EntityMovementData.addToTrack(mob)
+        }
     }
 
     @HandleEvent

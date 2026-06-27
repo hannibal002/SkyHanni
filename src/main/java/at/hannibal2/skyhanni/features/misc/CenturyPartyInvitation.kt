@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -44,7 +44,7 @@ object CenturyPartyInvitation {
      */
     private val playerRankColorPattern by chatGroup.pattern(
         "nametag.player-color",
-        ".*\\[§(?<color>.).*\\] .*",
+        ".*\\[§(?<color>.).+] .+",
     )
 
     /**
@@ -52,15 +52,15 @@ object CenturyPartyInvitation {
      */
     private val chatPartyAddPattern by chatGroup.pattern(
         "chat-message.party-add",
-        "§d§lPARTY! .* SkyBlock level color is .*\\[.*\\] - \\[.*\\] §r§(?<color>.).*§e!",
+        "§d§lPARTY! .+ SkyBlock level color is .*\\[.+] - \\[.+] §r§(?<color>.).+§e!",
     )
 
     /**
-     * REGEX-TEST: §aYou had already gained the bonus, so... at least everyone is now invited!
+     * REGEX-TEST: You had already gained the bonus, so... at least everyone is now invited!
      */
     private val chatFoundAllPattern by chatGroup.pattern(
         "chat-message.found-all",
-        "§aYou had already gained the bonus, so\\.\\.\\. at least everyone is now invited!",
+        "You had already gained the bonus, so\\.\\.\\. at least everyone is now invited!",
     )
 
     /**
@@ -78,7 +78,7 @@ object CenturyPartyInvitation {
      */
     private val itemMissingColorLinePattern by chatGroup.pattern(
         "item-lore.missing-color-line",
-        "§8\\[.*\\] - \\[.*\\] §(?<color>.).*",
+        "§8\\[.+] - \\[.+] §(?<color>.).+",
     )
 
     @HandleEvent
@@ -170,19 +170,19 @@ object CenturyPartyInvitation {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
-        val message = event.message
+        val messageWithColor = event.message
 
-        if (chatFoundAllPattern.matches(message) && inHand) {
+        if (chatFoundAllPattern.matches(event.cleanMessage) && inHand) {
             DelayedRun.runDelayed(500.milliseconds) {
                 colorsNeeded = updateColorsNeeded()
                 updateAllPlayers()
             }
         }
 
-        val colorCode = chatPartyAddPattern.matchMatcher(message) {
+        val colorCode = chatPartyAddPattern.matchMatcher(messageWithColor) {
             group("color")
         } ?: return
 
@@ -191,7 +191,7 @@ object CenturyPartyInvitation {
                 "Error reading rank color from chat",
                 "unknown color code detected",
                 "colorCode" to colorCode,
-                "message" to message,
+                "message" to messageWithColor,
             )
             return
         }
