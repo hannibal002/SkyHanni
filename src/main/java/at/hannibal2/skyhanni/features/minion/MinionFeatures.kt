@@ -216,7 +216,7 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        val inHub = SkyBlockUtils.currentIsland == IslandType.HUB
+        val inHub = IslandType.HUB.isInIsland()
         val inStorage = minions.contains(entity)
 
         if (!inStorage && !inHub) minions[entity] = ProfileSpecificStorage.MinionConfig().apply {

@@ -75,10 +75,6 @@ object HypixelData {
     val inLobby get() = HypixelLocationApi.inLobby
     val inLimbo get() = HypixelLocationApi.inLimbo
 
-    // TODO remove eventually
-    val skyBlock get() = SkyBlockLocationData.inSkyBlock
-    val skyBlockIsland get() = SkyBlockLocationData.currentIsland
-
     val serverId get() = HypixelLocationApi.serverId
 
     // Ironman, Stranded and Bingo

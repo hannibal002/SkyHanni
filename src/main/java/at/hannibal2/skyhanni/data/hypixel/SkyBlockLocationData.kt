@@ -33,9 +33,6 @@ object SkyBlockLocationData {
         "SK[YI]BLOCK(?: CO-OP| GUEST)?(?: [♲☀Ⓑ])?",
     )
 
-    val inSkyBlock get() = HypixelLocationApi.inSkyblock
-    val currentIsland get() = HypixelLocationApi.island
-
     private var scoreboardShowsSkyBlock = false
     private var scoreboardTitle: String? = null
 
@@ -65,9 +62,9 @@ object SkyBlockLocationData {
             "scoreboardShowsSkyBlock: $scoreboardShowsSkyBlock",
             "scoreboardTitle: $scoreboardTitle",
             "modApiIsland: ${HypixelLocationApi.island}",
-            "inSkyBlock: $inSkyBlock",
+            "inSkyBlock: ${HypixelLocationApi.inSkyblock}",
         )
-        if (inSkyBlock) {
+        if (HypixelLocationApi.inSkyblock) {
             event.addIrrelevant(list)
         } else {
             event.addData(list)
