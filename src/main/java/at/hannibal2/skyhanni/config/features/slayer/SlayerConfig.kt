@@ -184,10 +184,10 @@ class SlayerConfig {
             val oldPath = "slayer."
             event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
-            event.move(136, "${oldPath}remainingKills", "${remainingKillsPath}display")
-            event.move(136, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
-            event.move(136, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
-            event.move(136, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
+            event.move(138, "${oldPath}remainingKills", "${remainingKillsPath}display")
+            event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
+            event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
+            event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
         }
     }
 }
