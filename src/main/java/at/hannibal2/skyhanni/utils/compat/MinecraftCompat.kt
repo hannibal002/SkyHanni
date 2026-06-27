@@ -22,8 +22,10 @@ object MinecraftCompat {
 
     val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
 
-    // This class contains the local user information, such as the username and UUID.
-    // It will always be non-null, even if the player is not in a world / singleplayer.
+    /**
+     * This class contains the local user information, such as the username and UUID.
+     * It will always be non-null, even if the player is not in a world / singleplayer.
+     */
     val localUser get(): User = Minecraft.getInstance().user
 
     val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
