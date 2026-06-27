@@ -135,7 +135,7 @@ object HypixelData {
         if (serverId?.startsWith("mega") == true) {
             return IslandType.maxPlayersMega
         }
-        return SkyBlockLocationData.currentIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
+        return HypixelLocationApi.island.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     @HandleEvent
@@ -189,7 +189,7 @@ object HypixelData {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
-                    val area = LocationFixData.fixLocation(SkyBlockLocationData.currentIsland) ?: originalLocation
+                    val area = LocationFixData.fixLocation(HypixelLocationApi.island) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
                     if (area != skyBlockArea) {
                         val previousArea = skyBlockArea
@@ -207,7 +207,7 @@ object HypixelData {
 
         if (!event.isMod(5)) return
 
-        if (SkyBlockLocationData.inSkyBlock) {
+        if (HypixelLocationApi.inSkyblock) {
             checkSpecialModes()
         }
     }
@@ -274,7 +274,7 @@ object HypixelData {
     private fun checkIsland(event: WidgetUpdateEvent) {
         TabListData.fullyLoaded = !event.isClear()
 
-        if (SkyBlockLocationData.inSkyBlock && tabListDataDirty) {
+        if (HypixelLocationApi.inSkyblock && tabListDataDirty) {
             tabListDataDirty = false
             if (TabListData.fullyLoaded) {
                 TabWidget.reSendEvents()
