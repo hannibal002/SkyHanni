@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if >= 26.1 {
 import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -34,4 +33,3 @@ public abstract class MixinFluidStateModelSet {
         return LavaReplacement.getReplacementFluid(original.call(instance));
     }
 }
-//?}
