@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+// this is not unused
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -49,6 +50,7 @@ import kotlinx.coroutines.sync.withLock
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
+
 //?}
 
 // Most functions are taken from NotEnoughUpdates
@@ -363,7 +365,7 @@ object EnoughUpdatesManager {
         val directorySize = itemsFolder.listFiles()?.size ?: 0
 
         val status = when {
-            directorySize == 0 -> "§cNo items directory found!"
+            directorySize == 0 -> "§cNo item directory entries found!"
             loadedItems == 0 -> "§cNo items loaded!"
             loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
             loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"

@@ -31,7 +31,7 @@ object HellionShieldHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Hellion Shield")
         event.addIrrelevant {
             add("hellionShieldMobs: ${hellionShieldMobs.size}")

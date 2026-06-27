@@ -99,7 +99,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
                     "error properly logging something in SkyHanni",
-                    "trying to update an not running chat",
+                    "trying to update a chat that is not running",
                     "next step" to nextStep,
                 )
             }
@@ -119,7 +119,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
                     "error properly logging something in SkyHanni",
-                    "trying to end an not running chat",
+                    "trying to end a chat that is not running",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),
                 )
