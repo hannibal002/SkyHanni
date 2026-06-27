@@ -8,15 +8,10 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.world.phys.AABB
 
-internal interface SkyHanniIslandType {
-    fun isInIsland(): Boolean
-}
-
-enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
+enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
     THE_END("The End"),
@@ -123,7 +118,7 @@ enum class IslandType(private val nameFallback: String) : SkyHanniIslandType {
     }
 
     internal var inIsland: Boolean = false
-    override fun isInIsland() = inIsland
+    fun isInIsland() = inIsland
 }
 
 data class IslandData(
