@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -72,9 +73,6 @@ object HypixelLocationApi {
     val inLimbo get() = serverId == "limbo"
 
     var isGuest: Boolean = false
-        private set
-
-    var islandGeneration: Int = 0
         private set
 
     private val logger = SkyHanniLogger("debug/hypixel_api")
@@ -153,7 +151,7 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
-        islandGeneration++
+        SkyBlockUtils.islandGeneration++
 
         if (oldIsland != IslandType.NONE) {
             IslandLeaveEvent(oldIsland).post()
@@ -202,7 +200,7 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
-        islandGeneration++
+        SkyBlockUtils.islandGeneration++
     }
 
     private val debugData

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -95,9 +94,9 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
             if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastIslandGeneration != HypixelLocationApi.islandGeneration) {
+            if (lastIslandGeneration != SkyBlockUtils.islandGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastIslandGeneration = HypixelLocationApi.islandGeneration
+                lastIslandGeneration = SkyBlockUtils.islandGeneration
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }

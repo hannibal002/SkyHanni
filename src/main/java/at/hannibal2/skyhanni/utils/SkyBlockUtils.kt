@@ -25,6 +25,8 @@ object SkyBlockUtils {
      */
     val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelLocationApi.island
 
+    internal var islandGeneration: Int = 0
+
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea else null
 
