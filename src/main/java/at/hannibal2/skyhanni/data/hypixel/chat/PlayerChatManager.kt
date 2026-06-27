@@ -171,6 +171,7 @@ object PlayerChatManager {
             if (isGlobalChat(event)) return
         }
 
+        @Suppress("DEPRECATION")
         SystemMessageEvent.Allow(event.messageComponent, event.chatComponent).postChat(event)
     }
 
@@ -225,6 +226,7 @@ object PlayerChatManager {
             if (isGlobalChat(event)) return
         }
 
+        @Suppress("DEPRECATION")
         SystemMessageEvent.Modify(event.messageComponent, event.chatComponent).postChat(event)
     }
 
