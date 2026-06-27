@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -88,16 +88,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         @Suppress("JoinDeclarationAndAssignment")
         private val cachedPredicates: List<EventPredicate>
-        private var lastTick = -1
+        private var lastIslandGeneration = -1
         private var cachedPredicateValue = false
 
         private val predicates: List<EventPredicate>
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
             if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastTick != ClientEvents.totalTicks) {
+            if (lastIslandGeneration != HypixelLocationApi.islandGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastTick = ClientEvents.totalTicks
+                lastIslandGeneration = HypixelLocationApi.islandGeneration
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }

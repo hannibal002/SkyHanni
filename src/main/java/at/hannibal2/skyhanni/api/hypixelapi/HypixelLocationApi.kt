@@ -74,6 +74,9 @@ object HypixelLocationApi {
     var isGuest: Boolean = false
         private set
 
+    var islandGeneration: Int = 0
+        private set
+
     private val logger = SkyHanniLogger("debug/hypixel_api")
 
     private var sentIslandEvent = false
@@ -150,6 +153,7 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
+        islandGeneration++
 
         if (oldIsland != IslandType.NONE) {
             IslandLeaveEvent(oldIsland).post()
@@ -198,6 +202,7 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
+        islandGeneration++
     }
 
     private val debugData
