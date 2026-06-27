@@ -41,13 +41,14 @@ object ShowFishingItemName {
             val itemStack = entityItem.item.orNull() ?: continue
             var text = ""
 
-            val isBait = itemStack.isBait()
+            val isBait = itemStack.count == 1 && itemStack.isBait()
             if (isBait && !config.showBaits) continue
 
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name =
+                    itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.count

@@ -130,6 +130,14 @@ enum class GraphNodeTag(
         onlyIslands = IslandTypeTag.FISHING_HOTSPOT,
     ),
 
+    FISHING_WORMHOLE(
+        "fishing_wormhole",
+        LorenzColor.LIGHT_PURPLE,
+        "Fishing Wormhole",
+        "A wormhole where you can fish Reality Hopper.",
+        onlyIslands = IslandTypeTag.WORMHOLE,
+    ),
+
     FAIRY_SOUL(
         "fairy_soul",
         LorenzColor.DARK_PURPLE,

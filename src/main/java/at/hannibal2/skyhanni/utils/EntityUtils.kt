@@ -31,7 +31,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
@@ -134,14 +133,10 @@ object EntityUtils {
         return false
     }
 
-    fun Player.getSkinTexture(): String? {
-        val gameProfile = gameProfile ?: return null
-
-        return gameProfile.properties.entries()
-            .filter { it.key == "textures" }
-            .map { it.value }
-            .firstOrNull { it.name == "textures" }?.value
-    }
+    internal fun Player.getSkinTexture(): String? = gameProfile.properties.entries()
+        .filter { it.key == "textures" }
+        .map { it.value }
+        .firstOrNull { it.name == "textures" }?.value
 
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
@@ -170,9 +165,9 @@ object EntityUtils {
     fun ArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
     fun ArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
 
-    fun Player.isNpc() = !isRealPlayer()
+    internal fun Player.isNpc() = !isRealPlayer()
 
-    fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    fun LivingEntity.getArmorInventory(): Array<SafeItemStack?>? {
         if (this !is Player) return null
         return buildList {
             add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
@@ -195,7 +190,7 @@ object EntityUtils {
     // and then filters both for entity type and with the predicate for entities inside those chunks.
     inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
+        return world.getEntitiesOfClass(E::class.java, aabb, predicate)
     }
 
     @AllEntitiesGetter
@@ -210,9 +205,9 @@ object EntityUtils {
         val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
         val blockEntityTickers = world.blockEntityTickers.let {
             if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
-        }.asSequence().filterNotNull()
+        }.asSequence()
 
-        return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
+        return blockEntityTickers.mapNotNull { invoker -> world.getBlockEntity(invoker.pos) }
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {

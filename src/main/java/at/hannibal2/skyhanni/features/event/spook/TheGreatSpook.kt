@@ -4,12 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.Calculator
@@ -79,7 +75,7 @@ object TheGreatSpook {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isGreatSpookActive) return
 
         val fear = SkyblockStat.FEAR.lastKnownValue ?: 0.0
@@ -115,7 +111,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
             if (config.get()) {
@@ -135,7 +131,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         val currentTime = SimpleTimeMark.now()
         val timeRange = greatSpookTimeRange ?: run {
             isGreatSpookActive = false
@@ -146,7 +142,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) displayMobCooldown?.let {
@@ -223,7 +219,7 @@ object TheGreatSpook {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Great Spook")
 
         event.addIrrelevant {

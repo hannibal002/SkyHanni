@@ -75,6 +75,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Plays bark sound when 'woof' appears in chat.
 + Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 + Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
++ Added a chat message when you encounter a SkyHanni contributor for the first time. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 </details>
 <details open><summary>
@@ -316,6 +317,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
 + Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
   + Highlights completed categories in green.
++ Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 
 </details>
 <details open><summary>
@@ -488,6 +490,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Sea Creature Kill Time. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Sea Creature Lootshare Sphere. - Empa + Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5096)
 + Added Party Chat and Title Warning when an owned Sea Creature gets Cocooned. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5110)
++ Added a Fishing Bobber Timer that shows how long the bobber has been deployed. - hijiol (https://github.com/hannibal002/SkyHanni/pull/5569)
+  + Configurable to start on liquid touch or on cast.
++ Added automatic Wormhole locator. - FabiHBBBT. (https://github.com/hannibal002/SkyHanni/pull/5699)
 
 </details>
 <details open><summary>
@@ -943,6 +948,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added keybind to release all pests in a Pest Trap. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4675)
 + Added option to change the pest spawn sound. - Chissl (https://github.com/hannibal002/SkyHanni/pull/4580)
   + Modes are Default, Muted, Custom, and Plumber.
++ Added option to show crops instead of tools in Farming Toolkit menu. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5657)
 
 </details>
 <details open><summary>
@@ -1382,9 +1388,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + **/shcommands**
     + Show all commands in SkyHanni
-+ **/wiki <search term>** - using unofficial wiki instead of official wiki.
++ **/wiki <search term>** - using independent wiki instead of official wiki.
 + **/shmarkplayer <player>** - marking a player with yellow color.
-+ **/shtrackcollection <item>** - This tracks the number of items you collect, but it does not work with sacks.
 + **/shcropspeedmeter** - Helps calculate the real farming fortune with the formula crops broken per block.
 + **/shcroptime <amount> <item>** Displays the estimated time it will take to gather the requested quantity of a
   particular item based on the current crop speed.
@@ -1875,6 +1880,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Deployable Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/5506)
 + Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 + Added Lotus Atoll island support. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5745)
++ Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
 
 </details>
 <details open><summary>

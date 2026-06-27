@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.config.enums.SharePolicy
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroups
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -56,7 +58,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -124,9 +125,9 @@ object GardenNextJacobContest {
      * REGEX-TEST: ○ Cactus
      * REGEX-TEST: ☘ Carrot
      * REGEX-TEST: ○ Melon
-     * REGEX-TEST:  ☘ Mushroom
-     * REGEX-TEST:  ○ Pumpkin
-     * REGEX-TEST:  ○ Wheat
+     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
+     * WRAPPED-REGEX-TEST: " ○ Pumpkin"
+     * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
@@ -240,7 +241,7 @@ object GardenNextJacobContest {
         readCalendar(event.inventoryItems.values, year, month)
     }
 
-    private fun readCalendar(items: Collection<ItemStack>, year: Int, month: Int) {
+    private fun readCalendar(items: Collection<SafeItemStack>, year: Int, month: Int) {
         if (knownContests.isNotEmpty() && loadedContestsYear != year) {
             val endTime = knownContests.first().endTime
             val lastYear = endTime.toSkyBlockTime().year
@@ -300,6 +301,7 @@ object GardenNextJacobContest {
     private fun onHaveAllContests() {
         nextContestsAvailableAt = SkyBlockTime(SkyBlockTime.now().year + 1, 1, 2).toTimeMark()
         if (!isSendEnabled()) return
+        if (HypixelData.hypixelAlpha) return
         if (config.shareAutomatically == SharePolicy.ASK) {
             ChatUtils.clickableChat(
                 "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
@@ -353,7 +355,7 @@ object GardenNextJacobContest {
         }
 
         display = if (fetchingContestsMutex.isLocked) {
-            Renderable.text("§cFetching this years jacob contests...")
+            Renderable.text("§cFetching this year's Jacob contests...")
         } else {
             fetchContestsIfAble() // Will only run when needed/enabled
             drawDisplay()
@@ -461,6 +463,7 @@ object GardenNextJacobContest {
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
+
     @Suppress("DEPRECATION")
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())
@@ -504,7 +507,7 @@ object GardenNextJacobContest {
         if (!haveAllContests || isCloseToNewYear()) return
         CoroutineSettings("garden jacob contest send").withIOContext().withMutex(sendingContestsMutex).launchCoroutine {
             if (EliteDevApi.submitContests(knownContests)) {
-                ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
+                ChatUtils.chat("Successfully submitted this year's upcoming contests, thank you for helping everyone out!")
             } else ErrorManager.logErrorStateWithData(
                 "Something went wrong submitting upcoming contests!",
                 "submitContestsToElite not successful",
