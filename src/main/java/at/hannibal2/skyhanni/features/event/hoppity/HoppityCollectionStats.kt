@@ -102,11 +102,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     * WRAPPED-REGEX-TEST: "§2§l§m                          §e497§6/§e517"
      */
     private val rabbitsFoundPattern by patternGroup.pattern(
         "rabbits.found",
-        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
+        "§.§l§m[ §a-z]+ §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
     )
 
     /**
