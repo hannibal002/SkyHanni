@@ -3,11 +3,16 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave.snake
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures.FROZEN_WATER_PUNGI
+import at.hannibal2.skyhanni.features.rift.area.livingcave.LivingCaveSnakeFeatures.pickaxes
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
@@ -31,6 +36,14 @@ class LivingCaveSnake(
     val head get() = blocks.first()
     private val tail get() = blocks.last()
     private val config get() = RiftApi.config.area.livingCave.snakeHelper
+    private val breakandcalm by RecalculatingValue(1.seconds) {
+        val hotbar = InventoryUtils.getItemsInHotbar()
+
+        val hasBreak = hotbar.any { it.getInternalName() in pickaxes }
+        val hasCalm = hotbar.any { it.getInternalName() == FROZEN_WATER_PUNGI }
+
+        hasBreak && hasCalm
+    }
 
     fun invalidShape(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
         a.distance(b) > 3
@@ -53,24 +66,27 @@ class LivingCaveSnake(
         }
 
         val size = blocks.size
-        if ((size > 1 && state == State.CALM && currentRole == LivingCaveSnakeFeatures.Role.BREAK) && !config.solo) {
-            val location = lastBrokenBlock?.let {
-                LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
-            } ?: tail
-            event.renderBlock(location, state.chromaColor)
-        }
-        if ((currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) &&  !config.solo) {
-            val location = if (size > 1) {
-                LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
-            } else head
-            event.renderBlock(location, state.chromaColor)
-        }
-        if (config.solo) {
+        if (config.solo && breakandcalm) {
             if (size > 1) {
                 val tailLocation = lastBrokenBlock?.let {
                     LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
                 } ?: tail
                 event.renderBlock(tailLocation, LorenzColor.DARK_BLUE.toChromaColor())
+                }
+            }
+            else {
+                if (size > 1 && state == State.CALM && currentRole == LivingCaveSnakeFeatures.Role.BREAK) {
+                    val location = lastBrokenBlock?.let {
+                        LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+                    } ?: tail
+                    event.renderBlock(location, state.chromaColor)
+                }
+                if (currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) {
+                    val location = if (size > 1) {
+                        LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+                    } else head
+                    event.renderBlock(location, state.chromaColor)
+                }
             }
 
             val headLocation = if (size > 1) {
@@ -79,7 +95,7 @@ class LivingCaveSnake(
                 head
             }
             event.renderBlock(headLocation, state.chromaColor)
-        }
+
         LineDrawer.draw3D(event, lineWidth = 2, depth = true) {
             for (block in blocks) {
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {

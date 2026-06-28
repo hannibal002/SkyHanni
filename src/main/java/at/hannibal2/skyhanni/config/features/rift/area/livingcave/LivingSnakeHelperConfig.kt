@@ -20,9 +20,9 @@ class LivingSnakeHelperConfig {
     @Expose
     @ConfigOption(
         name = "Solo Mode",
-        desc = "Highlights both the head and tail, regardless of item in hand."
+        desc = "Highlights both the head and tail if both pickaxe and pungi are in hotbar."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var solo: Boolean = true
+    var solo: Boolean = false
 }
