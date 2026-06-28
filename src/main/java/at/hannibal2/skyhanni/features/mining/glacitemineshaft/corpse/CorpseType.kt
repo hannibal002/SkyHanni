@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointType
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import net.minecraft.world.entity.EquipmentSlot
+import net.minecraft.world.entity.decoration.ArmorStand
 
 enum class CorpseType(
     val type: String,
@@ -25,12 +28,14 @@ enum class CorpseType(
     override fun toString(): String = displayName
 
     companion object {
-        fun fromHelmetOrNull(internalName: NeuInternalName): CorpseType? {
-            return CorpseType.entries.firstOrNull { it.helmet == internalName }
+        fun fromEntityOrNull(entity: ArmorStand): CorpseType? {
+            val helmetInternalName = entity.equipment.items[EquipmentSlot.HEAD]?.getInternalName() ?: return null
+
+            return CorpseType.entries.firstOrNull { it.helmet == helmetInternalName }
         }
 
-        fun isHelmetForCorpse(internalName: NeuInternalName): Boolean {
-            return fromHelmetOrNull(internalName) != null
+        fun isValidHelmet(internalName: NeuInternalName): Boolean {
+            return CorpseType.entries.any { it.helmet == internalName }
         }
     }
 }
