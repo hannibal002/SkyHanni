@@ -25,8 +25,8 @@ object BonusPestChanceDisplay {
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
     /**
-     * REGEX-TEST:  Bonus Pest Chance: ൠ70
-     * REGEX-TEST:  Bonus Pest Chance: ൠ70
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: ൠ70"
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: ൠ70"
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget-no-color",

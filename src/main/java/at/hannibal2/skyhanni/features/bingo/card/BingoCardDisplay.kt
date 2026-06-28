@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -109,7 +110,17 @@ object BingoCardDisplay {
 
     // todo use RenderDisplayHelper
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         if (!isEnabled()) return
 
         if (dirty) {

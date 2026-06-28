@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant as KInstant
 
 @JvmInline
 value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark> {
@@ -30,9 +31,9 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun isInFuture() = timeUntil().isPositive()
 
-    fun isFarPast() = millis == FAR_PAST_MS
+    fun isFarPast() = millis <= FAR_PAST_MS
 
-    fun isFarFuture() = millis == FAR_FUTURE_MS
+    fun isFarFuture() = millis >= FAR_FUTURE_MS
 
     fun takeIfInitialized() = if (isFarPast() || isFarFuture()) null else this
 
@@ -71,17 +72,14 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
     fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
     companion object {
-
-        fun now() = SimpleTimeMark(timeProvider.currentTimeMillis())
+        fun now(): SimpleTimeMark = SimpleTimeMark(timeProvider.currentTimeMillis())
 
         private const val FAR_PAST_MS = 0L
-        private const val FAR_FUTURE_MS = Long.MAX_VALUE
+        private val FAR_FUTURE_MS = KInstant.DISTANT_FUTURE.toEpochMilliseconds()
 
         private val FAR_PAST = SimpleTimeMark(FAR_PAST_MS)
         private val FAR_FUTURE = SimpleTimeMark(FAR_FUTURE_MS)
 
-        @JvmStatic
-        @JvmName("farPast")
         fun farPast() = FAR_PAST
         fun farFuture() = FAR_FUTURE
 
