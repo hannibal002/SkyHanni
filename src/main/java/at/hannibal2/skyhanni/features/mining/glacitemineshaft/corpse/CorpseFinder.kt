@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
+import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
@@ -68,7 +70,12 @@ object CorpseFinder {
                 continue
             }
 
-            val corpseType = CorpseType.fromEntityOrNull(entity) ?: continue
+            val corpseType = CorpseType.fromEntityOrNull(entity) ?: ErrorManager.skyHanniError(
+                "Got CorpseType of null for entity in corpseEntities",
+                "event" to "EntityMoveEvent<LocalPlayer>",
+                "helmet" to entity.equipment.get(EquipmentSlot.HEAD).getInternalName(),
+                "location" to entity.getLorenzVec()
+            )
 
             if (corpseEntities.addOrPut(entity, 1) >= MARK_AS_FOUND_TICKS_THRESHOLD) {
                 CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
@@ -78,15 +85,20 @@ object CorpseFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onEntityClick(event: EntityClickEvent) {
-        val entityUuid = event.clickedEntity.uuid
-        val (entity, canBeSeenTicks) = corpseEntities.entries.firstOrNull { it.key.uuid == entityUuid } ?: return
+        val clickedEntityUuid = event.clickedEntity.uuid
+        val (entity, canBeSeenTicks) = corpseEntities.entries.firstOrNull { it.key.uuid == clickedEntityUuid } ?: return
 
-        if (canBeSeenTicks < MARK_AS_FOUND_TICKS_THRESHOLD) {
-            val corpseType = CorpseType.fromEntityOrNull(entity) ?: return
+        if (canBeSeenTicks >= MARK_AS_FOUND_TICKS_THRESHOLD) return
+        
+        val corpseType = CorpseType.fromEntityOrNull(entity) ?: ErrorManager.skyHanniError(
+            "Got CorpseType of null for entity in corpseEntities",
+            "event" to "EntityClickEvent",
+            "helmet" to entity.equipment.get(EquipmentSlot.HEAD).getInternalName(),
+            "location" to entity.getLorenzVec()
+        )
 
-            corpseEntities[entity] = MARK_AS_FOUND_TICKS_THRESHOLD
-            CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
-        }
+        corpseEntities[entity] = MARK_AS_FOUND_TICKS_THRESHOLD
+        CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
