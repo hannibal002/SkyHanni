@@ -131,12 +131,12 @@ object CrystalNucleusChatFilter {
     )
 
     /**
-     * REGEX-TEST:   §r§9FTX 3070
-     * REGEX-TEST:   §r§9Electron Transmitter
-     * REGEX-TEST:   §r§9Superlite Motor
-     * REGEX-TEST:   §r§9Synthetic Heart
-     * REGEX-TEST:   §r§9Control Switch
-     * REGEX-TEST:   §r§9Robotron Reflector
+     * WRAPPED-REGEX-TEST: "  §r§9FTX 3070"
+     * WRAPPED-REGEX-TEST: "  §r§9Electron Transmitter"
+     * WRAPPED-REGEX-TEST: "  §r§9Superlite Motor"
+     * WRAPPED-REGEX-TEST: "  §r§9Synthetic Heart"
+     * WRAPPED-REGEX-TEST: "  §r§9Control Switch"
+     * WRAPPED-REGEX-TEST: "  §r§9Robotron Reflector"
      */
     private val componentListPattern by patternGroup.pattern(
         "component.list",
