@@ -287,20 +287,23 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
-        if (trevorTexture != null && event.entity.getSkinTexture() == trevorTexture) {
-            trevorEntity = event.entity
-        }
+        if (trevorTexture != null && event.entity.getSkinTexture() == trevorTexture) trevorEntity = event.entity
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<RemotePlayer>) {
+        if (event.entity == trevorEntity) trevorEntity = null
     }
 
     private fun renderCooldown(event: SkyHanniRenderWorldEvent) {
-        trevorEntity?.let { entity ->
-            RenderLivingEntityHelper.setEntityColor(entity, currentStatus.color) {
-                config.cooldown
-            }
-            entity.getLorenzVec().let {
-                if (it.distanceToPlayer() < 15) {
-                    event.drawString(it.up(2.23), currentLabel)
-                }
+        val entity = trevorEntity ?: return
+
+        RenderLivingEntityHelper.setEntityColor(entity, currentStatus.color) {
+            config.cooldown
+        }
+        entity.getLorenzVec().let {
+            if (it.distanceToPlayer() < 15) {
+                event.drawString(it.up(2.23), currentLabel)
             }
         }
     }
