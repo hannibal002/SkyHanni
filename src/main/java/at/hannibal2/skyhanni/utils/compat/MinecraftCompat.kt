@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
+import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
@@ -37,6 +38,15 @@ object MinecraftCompat {
      */
     @JvmStatic
     val localWorldExists get(): Boolean = localWorldOrNull != null
+    // </editor-fold>
+
+
+    // <editor-fold desc="User">
+    /**
+     * The local user's information, such as the username and UUID.
+     * This is always non-null, even if the player is not in a world / singleplayer.
+     */
+    val localUser get(): User = Minecraft.getInstance().user
     // </editor-fold>
 
 

@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -31,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.roundedUpSeconds
 import net.minecraft.client.Minecraft
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -88,16 +89,16 @@ object TrevorFeatures {
         "Location: (?<zone>.*)",
     )
     private val mobDiedPattern by patternGroup.pattern(
-        "mob.died",
-        "§aReturn to the Trapper soon to get a new animal to hunt!",
+        "mob.died.colorless",
+        "Return to the Trapper soon to get a new animal to hunt!",
     )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
         "You ran out of time and the animal disappeared!",
     )
     private val clickOptionPattern by patternGroup.pattern(
-        "clickoption",
-        "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]",
+        "clickoption.colorless",
+        "Click an option: \\[YES] - \\[NO]",
     )
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
@@ -106,7 +107,8 @@ object TrevorFeatures {
     // </editor-fold>
 
     // TODO form to data class, use Resettable
-    private var timeUntilNextReady = 0
+    private var nextReadyTime = SimpleTimeMark.farPast()
+    private val timeUntilNextReady get() = nextReadyTime.timeUntil().roundedUpSeconds.coerceAtLeast(0)
     private var trapperReady: Boolean = true
     private var currentStatus = TrapperStatus.READY
     private var currentLabel = "§2Ready"
@@ -123,9 +125,13 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onTick() {
         updateTrapper()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
+    fun onSecondPassed() {
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
         if (config.solver && questActive) {
@@ -137,7 +143,7 @@ object TrevorFeatures {
     fun onChat(event: SkyHanniChatEvent.Allow) {
         val formattedMessage = event.cleanMessage
 
-        mobDiedPattern.matchMatcher(event.message) {
+        mobDiedPattern.matchMatcher(formattedMessage) {
             TrevorSolver.resetLocation()
             TalbotCircles.resetCircles()
             if (config.mobDiedMessage) {
@@ -147,7 +153,7 @@ object TrevorFeatures {
             }
             trapperReady = true
             TrevorSolver.mobLocation = TrapperMobArea.NONE
-            if (timeUntilNextReady <= 0) {
+            if (nextReadyTime.isInPast()) {
                 currentStatus = TrapperStatus.READY
                 currentLabel = "§2Ready"
             } else {
@@ -158,12 +164,11 @@ object TrevorFeatures {
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = 21
+            nextReadyTime = 20.seconds.fromNow()
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
             TrevorTracker.startQuest(this)
-            updateTrapper()
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
@@ -187,7 +192,7 @@ object TrevorFeatures {
             resetTrapper()
         }
 
-        clickOptionPattern.findMatcher(event.message) {
+        clickOptionPattern.findMatcher(formattedMessage) {
             for (sibling in event.chatComponent.siblings) {
                 val clickEvent = sibling.command ?: continue
 
@@ -239,7 +244,7 @@ object TrevorFeatures {
     fun onGuiRenderOverlay() {
         if (!config.cooldownGui) return
 
-        val cooldownMessage = if (timeUntilNextReady <= 0) "Trapper Ready"
+        val cooldownMessage = if (nextReadyTime.isInPast()) "Trapper Ready"
         else if (timeUntilNextReady == 1) "1 second left"
         else "$timeUntilNextReady seconds left"
 
@@ -248,14 +253,14 @@ object TrevorFeatures {
     }
 
     private fun updateTrapper() {
-        timeUntilNextReady -= 1
-        if (trapperReady && timeUntilNextReady > 0) {
+        if (trapperReady && nextReadyTime.isInFuture()) {
             currentStatus = TrapperStatus.WAITING
             currentLabel = if (timeUntilNextReady == 1) "§31 second left" else "§3$timeUntilNextReady seconds left"
         }
 
-        if (timeUntilNextReady <= 0 && trapperReady) {
-            if (timeUntilNextReady == 0) {
+        if (nextReadyTime.isInPast() && trapperReady) {
+            if (!nextReadyTime.isFarPast()) {
+                nextReadyTime = SimpleTimeMark.farPast()
                 if (config.readyTitle) {
                     lastTitle?.stop()
                     lastTitle = TitleManager.sendTitle("§2Trapper Ready")

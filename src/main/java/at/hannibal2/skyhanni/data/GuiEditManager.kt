@@ -30,9 +30,10 @@ object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
-    private val currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private val currentPositions = TimeLimitedCache<String, CurrentPosition>(15.seconds)
     private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
     private var lastMovedGui: String? = null
+    private var addingChestGuiPosition = false
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
@@ -71,7 +72,7 @@ object GuiEditManager {
         val name = position.getOrSetInternalName {
             if (posLabel == "none") "none ${StringUtils.generateRandomId()}" else posLabel
         }
-        currentPositions[name] = position
+        currentPositions[name] = CurrentPosition(position, addingChestGuiPosition)
         currentBorderSize[posLabel] = Pair(width, height)
     }
 
@@ -80,10 +81,12 @@ object GuiEditManager {
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
         SkyHanniMod.shouldCloseScreen = false
+        val positions = currentPositions.values.toList()
         SkyHanniMod.screenToOpen = GuiPositionEditor(
-            currentPositions.values.toList(),
+            positions.map { it.position },
             2,
             Minecraft.getInstance().screen as? SkyHanniGuiContainer,
+            positions.filter { it.isChestGuiOverlay }.map { it.position }.toSet(),
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
@@ -105,12 +108,29 @@ object GuiEditManager {
 
         RenderData.renderOverlay(context)
 
-        DrawContextUtils.pushPop {
-            GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
-        }
+        val editor = Minecraft.getInstance().screen as? GuiPositionEditor
+        editor?.renderWithOldScreenMetrics {
+            renderChestOverlay(context)
+        } ?: renderChestOverlay(context)
 
         DrawContextUtils.translate(0f, 0f)
         DrawContextUtils.clearContext()
+    }
+
+    private fun renderChestOverlay(context: GuiGraphicsExtractor) = DrawContextUtils.pushPop {
+        withChestGuiPosition {
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
+        }
+    }
+
+    fun withChestGuiPosition(action: () -> Unit) {
+        val wasAddingChestGuiPosition = addingChestGuiPosition
+        addingChestGuiPosition = true
+        try {
+            action()
+        } finally {
+            addingChestGuiPosition = wasAddingChestGuiPosition
+        }
     }
 
     fun isInGui() = Minecraft.getInstance().screen is GuiPositionEditor
@@ -129,6 +149,8 @@ object GuiEditManager {
         lastMovedGui = guiName
     }
 }
+
+private data class CurrentPosition(val position: Position, val isChestGuiOverlay: Boolean)
 
 // TODO remove
 class Vector2i(val x: Int, val y: Int)

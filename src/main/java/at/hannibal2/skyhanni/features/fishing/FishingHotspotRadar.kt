@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -47,18 +46,8 @@ object FishingHotspotRadar {
         if (event.count != 1 || event.speed != 0f) return
 
         lastParticle = SimpleTimeMark.now()
-        val currLoc = event.location
 
-        if (lastAbilityUse.passedSince() > 1.seconds) return
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(currLoc)
-            return
-        }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
-
-        if (distToLast == 0.0 || distToLast > 3.0) return
-
-        bezierFitter.addPoint(currLoc)
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, lastAbilityUse = lastAbilityUse)) return
 
         val guess = bezierFitter.solve() ?: return
         if (!SkyBlockUtils.currentIsland.isInBounds(guess)) {
@@ -102,7 +91,7 @@ object FishingHotspotRadar {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         val location = hotspotLocation ?: return
         if (!isUnknown || lastUpdate.passedSince() < 3.seconds) return
         IslandGraphs.reportLocation(
@@ -130,7 +119,7 @@ object FishingHotspotRadar {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return

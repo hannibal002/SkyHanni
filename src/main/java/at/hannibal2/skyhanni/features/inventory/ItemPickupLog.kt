@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
@@ -108,8 +109,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent
-    fun onGuiRender() {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
