@@ -28,8 +28,8 @@ object GardenCropTimeCommand {
         if (!itemName.removeColor().startsWith(searchName, ignoreCase = true)) return null
 
         val (baseId, baseAmount) = NeuItems.getPrimitiveMultiplier(internalName)
-        val baseName = baseId.repoItemName.removeColor()
-        val crop = CropType.getByName(baseName)
+        val baseName = baseId.repoItemName
+        val crop = CropType.getByName(baseName.removeColor())
 
         val fullAmount = baseAmount.toLong() * amount
         val text = if (baseAmount == 1) {
