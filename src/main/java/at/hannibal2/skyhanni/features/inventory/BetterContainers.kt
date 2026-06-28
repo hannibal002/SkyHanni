@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import com.mojang.blaze3d.platform.NativeImage
@@ -216,7 +217,7 @@ object BetterContainers {
         stack.count == 1 &&
         stack.hoverName.string.isEmpty() &&
         stack.getLoreComponent().isEmpty() &&
-        stack.getTooltipLines().isEmpty()
+        stack.getTooltip().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,
