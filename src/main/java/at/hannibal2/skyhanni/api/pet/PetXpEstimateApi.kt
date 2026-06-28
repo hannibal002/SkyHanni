@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.AccessoryBagUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -45,15 +44,6 @@ object PetXpEstimateApi {
     private val petLevelUpPattern by patternGroup.pattern(
         "chat.level-up.clean",
         "Your (?<pet>.+) leveled up to level (?<level>\\d+)!",
-    )
-
-    /**
-     * REGEX-TEST: Accessory Bag
-     * REGEX-TEST: Accessory Bag (1/2)
-     */
-    private val accessoryBagNamePattern by patternGroup.pattern(
-        "inventory.accessory-bag",
-        "Accessory Bag(?: \\(\\d+\\/\\d+\\))?",
     )
 
     /**
@@ -142,8 +132,7 @@ object PetXpEstimateApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!accessoryBagNamePattern.matches(event.inventoryName)) return
+    fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
         val bestBeastmasterMultiplier = event.inventoryItems.values
             .mapNotNull { it.readBeastmasterMultiplierOrNull() }
             .maxOrNull()

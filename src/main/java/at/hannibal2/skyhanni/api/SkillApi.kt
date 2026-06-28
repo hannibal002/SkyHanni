@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
+import at.hannibal2.skyhanni.events.AccessoryBagUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -82,15 +83,6 @@ object SkillApi {
     private val giftSkillXpPattern by patternGroup.pattern(
         "chat.gift.skillxp",
         "(?:COMMON|RARE|SWEET|SANTA(?: TIER)?|PARTY(?: TIER)?)! \\+(?<gained>[\\d,]+) (?<skillName>[\\w ]+) XP gift with .*!?",
-    )
-
-    /**
-     * REGEX-TEST: Accessory Bag
-     * REGEX-TEST: Accessory Bag (1/2)
-     */
-    private val accessoryBagNamePattern by patternGroup.pattern(
-        "inventory.accessory-bag",
-        "Accessory Bag(?: \\(\\d+\\/\\d+\\))?",
     )
 
     /**
@@ -311,13 +303,13 @@ object SkillApi {
         exactLevelingMap = levelArray.withIndex().associate { (index, xp) -> xp to (index + 1) }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
+        updateGiftTalismanBonus(event.inventoryItems.values)
+    }
+
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (accessoryBagNamePattern.matcher(event.inventoryName).matches()) {
-            updateGiftTalismanBonus(event.inventoryItems.values)
-            return
-        }
-
         if (event.inventoryName != "Your Skills") return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
