@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
@@ -20,6 +22,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegis
 
 @SkyHanniModule
 object RenderEvents {
+    private val config get() = SkyHanniMod.feature.gui
 
     init {
         HudElementRegistry.attachElementBefore(
@@ -44,7 +47,8 @@ object RenderEvents {
     }
 
     private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
-        if (Minecraft.getInstance().options.hideGui) return
+        if (MinecraftCompat.hideGui) return
+        if (MinecraftCompat.showDebugHud && config.hideGuiInDebugMenu) return
         RenderData.postRenderOverlay(context)
     }
 
