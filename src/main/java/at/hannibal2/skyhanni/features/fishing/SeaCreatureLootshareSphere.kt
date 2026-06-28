@@ -16,7 +16,7 @@ object SeaCreatureLootshareSphere {
 
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
 
-    private var spherePositions = mutableSetOf<LootshareUtils.Sphere>()
+    private val spherePositions = mutableSetOf<LootshareUtils.Sphere>()
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -27,34 +27,32 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
-        val sphereIterator = spherePositions.iterator()
-        while (sphereIterator.hasNext()) {
-            val lootshareSphere = sphereIterator.next()
-            event.drawSphereWireframeInWorld(lootshareSphere.color.toColor(), lootshareSphere.position, LootshareUtils.RANGE)
-            sphereIterator.remove()
+        for (entry in spherePositions) {
+            event.drawSphereWireframeInWorld(entry.color.toColor(), entry.position, LootshareUtils.RANGE)
+        }
+        spherePositions.clear()
+    }
+
+@HandleEvent(onlyOnSkyblock = true)
+fun onTick() {
+    if (!config.lootshareRange) return
+    for (seaCreature in seaCreatures) {
+        if (!seaCreature.exists()) continue
+        var otherNearbySpheres = 0
+        val pos = seaCreature.pos ?: continue
+        val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
+
+        for (lootshareSphere in spherePositions) {
+            val position = lootshareSphere.position
+            if (position.distance(pos) < 10) otherNearbySpheres++
+        }
+        if (otherNearbySpheres < 2) {
+            spherePositions.add(LootshareUtils.Sphere(pos, color))
         }
     }
+}
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
-        if (!config.lootshareRange) return
-        for (seaCreature in seaCreatures) {
-            if (!seaCreature.exists()) continue
-            var otherNearbySpheres = 0
-            val pos = seaCreature.pos ?: continue
-            val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
-
-            for (lootshareSphere in spherePositions) {
-                val position = lootshareSphere.position
-                if (position.distance(pos) < 10) otherNearbySpheres++
-            }
-            if (otherNearbySpheres < 2) {
-                spherePositions.add(LootshareUtils.Sphere(pos, color))
-            }
-        }
-    }
-
-    private fun addMob(seaCreature: LivingSeaCreatureData) {
-        if (SeaCreatureSettings.getConfig(seaCreature)?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
-    }
+private fun addMob(seaCreature: LivingSeaCreatureData) {
+    if (SeaCreatureSettings.getConfig(seaCreature)?.shouldRenderLootshare == true) seaCreatures.add(seaCreature)
+}
 }
