@@ -139,7 +139,7 @@ object SkillApi {
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
-    val storage get() = ProfileStorageData.profileSpecific?.skillData
+    val storage get() = ProfileStorageData.profileSpecific?.skills?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var levelArray = listOf<Int>()
@@ -170,9 +170,9 @@ object SkillApi {
     )
 
     private var giftTalismanBonus: Double
-        get() = ProfileStorageData.profileSpecific?.giftTalismanSkillXpBonus ?: 0.0
+        get() = ProfileStorageData.profileSpecific?.skills?.giftTalismanSkillXpBonus ?: 0.0
         set(value) {
-            ProfileStorageData.profileSpecific?.giftTalismanSkillXpBonus = value
+            ProfileStorageData.profileSpecific?.skills?.giftTalismanSkillXpBonus = value
         }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -572,6 +572,9 @@ object SkillApi {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.remove(113, "#profile.skillData.null")
+        event.move(138, "#profile.skillData", "#profile.skills.skillData")
+        event.move(138, "#profile.giftTalismanSkillXpBonus", "#profile.skills.giftTalismanSkillXpBonus")
+        event.remove(138, "#profile.skills.skillData.null")
     }
 
     @Suppress("ReturnCount")
