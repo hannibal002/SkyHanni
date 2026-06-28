@@ -361,8 +361,8 @@ tasks.withType<KotlinCompile> {
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
             // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
-            "-Xwarning-level=DEPRECATION:disabled"
-            "-Xnested-type-aliases",
+            "-Xwarning-level=DEPRECATION:disabled",
+            "-Xnested-type-aliases"
         )
     }
 }
