@@ -41,18 +41,10 @@ object PreciseGuessBurrow {
         if (event.count != 2) return
         if (event.speed != -0.5f) return
         lastLavaParticle = SimpleTimeMark.now()
-        val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         GriffinBurrowHelper.removeSpadeWarnTitle()
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(currLoc)
-            return
-        }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
 
-        if (distToLast == 0.0 || distToLast > 3.0) return
-
-        bezierFitter.addPoint(currLoc)
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0)) return
 
         if (bezierFitter.count() < 6) {
             val duration = (6 - bezierFitter.count()) * 100
@@ -82,7 +74,7 @@ object PreciseGuessBurrow {
     private var lastLavaParticle = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
