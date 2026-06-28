@@ -87,16 +87,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         @Suppress("JoinDeclarationAndAssignment")
         private val cachedPredicates: List<EventPredicate>
-        private var lastIslandGeneration = -1
+        private var lastCacheGeneration = -1
         private var cachedPredicateValue = false
 
         private val predicates: List<EventPredicate>
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
             if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastIslandGeneration != SkyBlockUtils.islandGeneration) {
+            if (lastCacheGeneration != eventCacheGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastIslandGeneration = SkyBlockUtils.islandGeneration
+                lastCacheGeneration = eventCacheGeneration
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }
@@ -130,6 +130,13 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 // Makes it possible to be able to add more predicates from other sources, such as other annotations
                 addAll(extraPredicates)
             }
+        }
+    }
+
+    companion object {
+        private var eventCacheGeneration = 0
+        fun markEventCacheDirty() {
+            eventCacheGeneration++
         }
     }
 

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.hypixelapi
 
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -151,7 +152,7 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
-        SkyBlockUtils.islandGeneration++
+        EventListeners.markEventCacheDirty()
 
         if (oldIsland != IslandType.NONE) {
             IslandLeaveEvent(oldIsland).post()
@@ -200,7 +201,7 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
-        SkyBlockUtils.islandGeneration++
+        EventListeners.markEventCacheDirty()
     }
 
     private val debugData
