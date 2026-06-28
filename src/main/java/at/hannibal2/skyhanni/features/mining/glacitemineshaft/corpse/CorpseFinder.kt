@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
@@ -11,15 +12,17 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.decoration.ArmorStand
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
 object CorpseFinder {
+
+    private const val MARK_AS_FOUND_TICKS_THRESHOLD = 10
 
     /**
      * WRAPPED-REGEX-TEST: " Lapis: NOT LOOTED"
@@ -36,34 +39,52 @@ object CorpseFinder {
         "\\s*(?<corpse>\\w+): (?:NOT )?LOOTED\\s*",
     )
 
-    // Map with the corpse entity as the key and whether it was found by the player as value
-    private val corpseEntities = mutableMapOf<ArmorStand, Boolean>()
+    // Map with the corpse entity as the key and the consecutive ticks count of passing canBeSeen checks as value
+    private val corpseEntities = mutableMapOf<ArmorStand, Int>()
     private var totalCorpseCount = 0
 
     private fun areAllCorpsesFound(): Boolean {
         return totalCorpseCount > 0 &&
             totalCorpseCount == corpseEntities.size &&
-            corpseEntities.all { it.value }
+            corpseEntities.all { it.value >= MARK_AS_FOUND_TICKS_THRESHOLD }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
         if (!event.isHead || event.newItemStack == null) return
-        if (!CorpseType.isHelmetForCorpse(event.newItemStack.getInternalName())) return
-        if (corpseEntities.any { it.key.getLorenzVec().distance(event.entity.getLorenzVec()) <= 3 }) return
+        if (!CorpseType.isValidHelmet(event.newItemStack.getInternalName())) return
+        if (corpseEntities.any { it.key.uuid == event.entity.uuid }) return
 
-        corpseEntities[event.entity] = false
+        corpseEntities[event.entity] = 0
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        for ((entity, found) in corpseEntities) {
-            // TODO: Maybe adjust the canBeSeen range; it kept marking corpses as seen when I did not see them.
-            if (found || !entity.getLorenzVec().canBeSeen(-1..3)) continue
-            val helmetInternalName = entity.equipment.items[EquipmentSlot.HEAD]?.getInternalName() ?: continue
-            val corpseType = CorpseType.fromHelmetOrNull(helmetInternalName) ?: continue
+        for ((entity, canBeSeenTicks) in corpseEntities) {
+            if (canBeSeenTicks >= MARK_AS_FOUND_TICKS_THRESHOLD) continue
 
-            corpseEntities[entity] = true
+            if (!entity.getLorenzVec().canBeSeen(-1..3)) {
+                corpseEntities[entity] = 0
+                continue
+            }
+
+            val corpseType = CorpseType.fromEntityOrNull(entity) ?: continue
+
+            if (corpseEntities.addOrPut(entity, 1) >= MARK_AS_FOUND_TICKS_THRESHOLD) {
+                CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onEntityClick(event: EntityClickEvent) {
+        val (entity, canBeSeenTicks) = corpseEntities.entries.firstOrNull { it.key.uuid == event.clickedEntity.uuid } ?: return
+
+        if (canBeSeenTicks < MARK_AS_FOUND_TICKS_THRESHOLD) {
+            corpseEntities[entity] = MARK_AS_FOUND_TICKS_THRESHOLD
+
+            val corpseType = CorpseType.fromEntityOrNull(entity) ?: return
+
             CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
         }
     }
