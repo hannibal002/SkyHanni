@@ -11,7 +11,7 @@ import java.util.EnumSet
 
 // TODO maybe rename this class to IslandTypeGroup
 /**
- * Each [IslandTypeTag] consists of one or more [IslandType]
+ * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
 enum class IslandTypeTag(vararg types: Any) {
 
