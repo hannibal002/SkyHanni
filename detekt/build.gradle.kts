@@ -1,6 +1,7 @@
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 
+
 plugins {
     kotlin("jvm")
     id("com.google.devtools.ksp")
