@@ -74,7 +74,7 @@ object CorpseFinder {
                 "Got CorpseType of null for entity in corpseEntities",
                 "event" to "EntityMoveEvent<LocalPlayer>",
                 "helmet" to entity.equipment.get(EquipmentSlot.HEAD).getInternalName(),
-                "location" to entity.getLorenzVec()
+                "location" to entity.getLorenzVec(),
             )
 
             if (corpseEntities.addOrPut(entity, 1) >= MARK_AS_FOUND_TICKS_THRESHOLD) {
@@ -89,12 +89,12 @@ object CorpseFinder {
         val (entity, canBeSeenTicks) = corpseEntities.entries.firstOrNull { it.key.uuid == clickedEntityUuid } ?: return
 
         if (canBeSeenTicks >= MARK_AS_FOUND_TICKS_THRESHOLD) return
-        
+
         val corpseType = CorpseType.fromEntityOrNull(entity) ?: ErrorManager.skyHanniError(
             "Got CorpseType of null for entity in corpseEntities",
             "event" to "EntityClickEvent",
             "helmet" to entity.equipment.get(EquipmentSlot.HEAD).getInternalName(),
-            "location" to entity.getLorenzVec()
+            "location" to entity.getLorenzVec(),
         )
 
         corpseEntities[entity] = MARK_AS_FOUND_TICKS_THRESHOLD
