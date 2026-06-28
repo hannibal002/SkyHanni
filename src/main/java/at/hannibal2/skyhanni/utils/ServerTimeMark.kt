@@ -7,7 +7,9 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant as KInstant
 
 /**
- * This is a Helper Class similar to [SimpleTimeMark], but for a rough estimate of Server Ticks instead of real time.
+ * This is a Helper Class similar to [SimpleTimeMark], 
+ * but for a time-based estimate using server tick rate as clock source
+ * instead of real time.
  *
  * This can provide a more accurate estimate of certain timers for ingame events, because some are based off of
  * the server's tps instead of real time, and therefore are affected by server lag.
