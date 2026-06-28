@@ -10,7 +10,6 @@ import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant as KInstant
 
 @JvmInline
@@ -72,7 +71,6 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toLocalDate(): LocalDate = toLocalDateTime().toLocalDate()
 
-    @OptIn(ExperimentalTime::class)
     companion object {
         fun now(): SimpleTimeMark = SimpleTimeMark(timeProvider.currentTimeMillis())
 

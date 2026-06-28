@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.MinecraftData
 import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant as KInstant
 
 /**
@@ -50,7 +49,6 @@ value class ServerTimeMark internal constructor(private val millis: Long) : Comp
         else -> "ServerTimeMark(millis=$millis, nowInTicks=${MinecraftData.totalServerTicks})"
     }
 
-    @OptIn(ExperimentalTime::class)
     companion object {
         fun now(): ServerTimeMark = ServerTimeMark(MinecraftData.totalServerTicks * 50L)
 
