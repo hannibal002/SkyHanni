@@ -60,7 +60,7 @@ private enum class FormattedTextSettings {
 
 private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
 
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextForChatCompat(): String {
     return unformattedTextCache.getOrPut(this) {
         computeUnformattedTextCompat()
@@ -74,12 +74,12 @@ private fun Component.computeUnformattedTextCompat(): String {
     return (this.contents as? PlainTextContents)?.text().orEmpty()
 }
 
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextCompat(): String =
     iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
 @JvmOverloads
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
     this ?: return ""
     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
@@ -88,15 +88,15 @@ fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite:
     }
 }
 
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 @Suppress("DEPRECATION")
 fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
 
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 @Suppress("DEPRECATION")
 fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
 
-@Deprecated("Use string unless you really need color codes", ReplaceWith("this.string"))
+@Deprecated("Use string unless you really need color codes")
 @Suppress("DEPRECATION")
 fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
     this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
