@@ -20,6 +20,14 @@ import kotlin.reflect.KProperty0
 
 object ConfigUtils {
 
+    private const val UNKNOWN_EDITOR_INDEX = -1
+
+    private val editorProviders = listOf<() -> MoulConfigEditor<*>>(
+        ConfigGuiManager::getEditorInstance,
+        PetDisplayConfigGuiManager::getEditorInstance,
+    )
+    private val editorIndexCache = mutableMapOf<Field, Int>()
+
     /**
      * Migrates a Boolean to an Enum Constant.
      *
@@ -65,17 +73,25 @@ object ConfigUtils {
     }
 
     fun canJumpToEditor(field: Field): Boolean =
-        editorInstances().any { it.getOptionFromField(field) != null }
+        field.findEditorIndex() != UNKNOWN_EDITOR_INDEX
 
-    fun jumpToEditor(field: Field): Boolean =
-        editorInstances().any { editor ->
-            val option = editor.getOptionFromField(field) ?: return@any false
-            editor.jumpToOption(option)
+    fun jumpToEditor(field: Field): Boolean {
+        val editor = field.findEditor() ?: return false
+        val option = editor.getOptionFromField(field) ?: return false
+        return editor.jumpToOption(option)
+    }
+
+    fun clearEditorCache() {
+        editorIndexCache.clear()
+    }
+
+    private fun Field.findEditor(): MoulConfigEditor<*>? =
+        editorProviders.getOrNull(findEditorIndex())?.invoke()
+
+    private fun Field.findEditorIndex(): Int = editorIndexCache.getOrPut(this) {
+        editorProviders.indexOfFirst { editorProvider ->
+            editorProvider().getOptionFromField(this) != null
         }
-
-    private fun editorInstances() = sequence {
-        yield(ConfigGuiManager.getEditorInstance())
-        yield(PetDisplayConfigGuiManager.getEditorInstance())
     }
 
     private fun MoulConfigEditor<*>.jumpToOption(option: ProcessedOption): Boolean {
