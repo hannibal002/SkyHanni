@@ -47,7 +47,7 @@ object RenderEvents {
 
     private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
         if (MinecraftCompat.hideGui) return
-        if (MinecraftCompat.showDebugHud && config.hideGuiInDebugMenu) return
+        if (config.hideGuiInDebugMenu && MinecraftCompat.showDebugHud) return
         RenderData.postRenderOverlay(context)
     }
 
