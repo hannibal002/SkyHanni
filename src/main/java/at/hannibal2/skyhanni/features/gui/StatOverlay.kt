@@ -21,7 +21,7 @@ object StatOverlay {
     private val config get() = SkyHanniMod.feature.gui.statDisplayer
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRender() {
+    fun onGuiRenderOverlay() {
         if (config.displayStats.isEmpty()) return
         config.displayStats.forEach { statToDisplay ->
             if (!statToDisplay.extraCondition()) return@forEach
