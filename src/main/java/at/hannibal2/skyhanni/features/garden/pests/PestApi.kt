@@ -442,7 +442,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenApi.inGarden()) {
