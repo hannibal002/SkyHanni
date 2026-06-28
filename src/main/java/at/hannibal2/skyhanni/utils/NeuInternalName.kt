@@ -46,6 +46,7 @@ value class NeuInternalName private constructor(private val internalName: String
                 val (name, level) = internalName.split(";", limit = 2)
                 "ENCHANTED_BOOK_${name}_$level"
             }
+
             else -> internalName
         }
 
