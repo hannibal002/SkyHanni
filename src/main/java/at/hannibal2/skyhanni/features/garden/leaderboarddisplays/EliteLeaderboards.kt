@@ -25,7 +25,7 @@ import kotlin.reflect.KClass
 enum class EliteLeaderboards(
     private val displayName: String,
     val display: EliteLeaderboardDisplayBase<*, *>,
-    val leaderboardType: KClass<out EliteLeaderboardType>
+    val leaderboardType: KClass<out EliteLeaderboardType>,
 ) {
     WEIGHT("Farming Weight", WeightDisplay(), EliteLeaderboardType.Weight::class),
     CROP("Crop Collection", CropDisplay(), EliteLeaderboardType.Crop::class),
@@ -86,7 +86,7 @@ enum class EliteLeaderboards(
             val pestConfigs = listOf(
                 pestConfig.rankGoals.useRankGoal,
                 pestConfig.rankGoals.rankGoalTypes,
-                pestConfig.gamemode
+                pestConfig.gamemode,
             )
 
             weightConfigs.forEach {
@@ -128,7 +128,11 @@ enum class EliteLeaderboards(
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            config.displayPositions = updateConfigPositionList(config.displayPositions, EliteLeaderboards.entries, "garden.eliteFarmersLeaderboards.displayPositions")
+            config.displayPositions = updateConfigPositionList(
+                config.displayPositions,
+                EliteLeaderboards.entries,
+                "garden.eliteFarmersLeaderboards.displayPositions",
+            )
         }
 
         @HandleEvent

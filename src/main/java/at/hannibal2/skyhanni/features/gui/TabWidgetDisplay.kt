@@ -2,13 +2,11 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -83,14 +81,15 @@ enum class TabWidgetDisplay(
                         subWidget.lines.map { Renderable.text(it) }
                     },
                     posLabel = "Display Widget: ${widget.name}",
-                    extraSpace = -2
+                    extraSpace = -2,
                 )
             }
         }
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            config.displayPositions = updateConfigPositionList(config.displayPositions, TabWidgetDisplay.entries, "gui.tabWidget.displayPositions")
+            config.displayPositions =
+                updateConfigPositionList(config.displayPositions, TabWidgetDisplay.entries, "gui.tabWidget.displayPositions")
         }
     }
 }

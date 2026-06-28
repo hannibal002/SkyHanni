@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import com.google.gson.JsonPrimitive
 
 @SkyHanniModule
 object StatOverlay {
@@ -45,10 +44,11 @@ object StatOverlay {
         val extraCondition: () -> Boolean = { true },
     ) {
         FEROCITY(SkyblockStat.FEROCITY, "Ferocity"),
-        FEAR(SkyblockStat.FEAR, "Fear", { isGreatSpookActive }) ,
+        FEAR(SkyblockStat.FEAR, "Fear", { isGreatSpookActive }),
         OVERBLOOM(SkyblockStat.OVERBLOOM, "Overbloom", { GardenApi.inGarden() }),
         BONUS_PEST_CHANCE(SkyblockStat.BONUS_PEST_CHANCE, "Bonus Pest Chance", { GardenApi.inGarden() }),
-        MAGIC_FIND(SkyblockStat.MAGIC_FIND, "Magic Find");
+        MAGIC_FIND(SkyblockStat.MAGIC_FIND, "Magic Find"),
+        ;
 
         val position get() = config.displayPositions[ordinal]
 
@@ -60,7 +60,8 @@ object StatOverlay {
         config.displayPositions = updateConfigPositionList(
             config.displayPositions,
             SkyblockStatUI.entries,
-            "gui.statDisplayer.displayPositions")
+            "gui.statDisplayer.displayPositions",
+        )
     }
 
     @HandleEvent
@@ -75,10 +76,11 @@ object StatOverlay {
             event.transform(138, "garden.pests.pestChanceDisplay") {
                 val oldMode = it.asJsonObject["pestChanceDisplay"].asString
                 when (oldMode) {
-                    "COMPACT" ->  {
+                    "COMPACT" -> {
                         shortenedStats.add(SkyblockStatUI.BONUS_PEST_CHANCE)
                         add(SkyblockStatUI.BONUS_PEST_CHANCE)
                     }
+
                     "FULL" -> add(SkyblockStatUI.BONUS_PEST_CHANCE)
                 }
                 it

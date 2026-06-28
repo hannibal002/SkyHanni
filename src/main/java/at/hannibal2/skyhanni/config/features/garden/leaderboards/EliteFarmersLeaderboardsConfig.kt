@@ -24,11 +24,11 @@ class EliteFarmersLeaderboardsConfig {
         name = "Leaderboards",
         desc = "Choose what leaderboards to enable.\n" +
             "Per-leaderboard settings below.\n" +
-            "Leaderboards provided by §eeliteskyblock.com"
+            "Leaderboards provided by §eeliteskyblock.com",
     )
     @ConfigEditorDraggableList
     val display: Property<MutableList<EliteLeaderboards>> = Property.of(
-        mutableListOf(EliteLeaderboards.CROP, EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT)
+        mutableListOf(EliteLeaderboards.CROP, EliteLeaderboards.PEST, EliteLeaderboards.WEIGHT),
     )
 
     @Expose
