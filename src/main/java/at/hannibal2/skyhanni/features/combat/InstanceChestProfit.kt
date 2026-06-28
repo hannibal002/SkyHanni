@@ -431,8 +431,8 @@ object InstanceChestProfit {
                 }
             } ?: 0.0
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onGuiRender() {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onChestGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {
