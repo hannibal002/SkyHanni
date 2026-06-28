@@ -97,7 +97,7 @@ open class IconConfig(
                 desc = "Positive values will rotate clockwise, negative values will rotate counter-clockwise."
             )
             @ConfigEditorInfoText
-            val note: Unit = Unit
+            val note: String = ""
 
             @Expose
             @ConfigOption(name = "Rotation Speed (X)", desc = "How many degrees per second the pet icon should rotate on the X axis.")
