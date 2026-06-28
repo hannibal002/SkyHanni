@@ -72,6 +72,7 @@ open class BezierFitter(private val degree: Int) {
         lastCurve = null
     }
 
+    @Suppress("ReturnCount")
     fun tryAdd(
         location: LorenzVec,
         maxDistanceToLast: Double,
