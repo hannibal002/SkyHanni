@@ -39,7 +39,9 @@ object RenderData {
             }
         }
 
-        GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
+        GuiEditManager.withChestGuiPosition {
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(DrawContextUtils.drawContext).post()
+        }
         GuiRenderEvent.GuiOnTopRenderEvent(DrawContextUtils.drawContext).post()
     }
 
