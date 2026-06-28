@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -49,8 +48,6 @@ object ClientEvents {
             if (!MinecraftCompat.localWorldExists) return@register
 
             SkyHanniTickEvent(++totalTicks).post()
-
-            DelayedRun.checkRuns()
         }
 
         // Disconnect event
