@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addsToMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -79,7 +78,7 @@ object CropMilestonesApi {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         if ((cropMilestoneCounter?.size ?: 0) == 0) inaccurateMilestone = true
     }
 
@@ -397,7 +396,7 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crop Milestones API")
         event.addIrrelevant {
             for (crop in cropMilestoneTierCache) {

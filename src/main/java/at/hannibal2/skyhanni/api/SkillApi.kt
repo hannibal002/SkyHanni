@@ -161,7 +161,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
@@ -236,7 +236,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Skills")
         val storage = storage
         if (storage == null) {
