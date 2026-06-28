@@ -26,7 +26,6 @@ plugins {
     id("net.fabricmc.fabric-loom") apply false
     kotlin("jvm")
     id("com.google.devtools.ksp")
-    kotlin("plugin.power-assert")
     `maven-publish`
     id("dev.detekt")
 }
