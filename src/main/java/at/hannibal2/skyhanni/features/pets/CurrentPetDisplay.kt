@@ -523,6 +523,7 @@ object CurrentPetDisplay {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(138, "misc.petDisplay", "misc.pets.display.general.enabled")
         event.move(138, "misc.pets.displayPos", "misc.pets.display.general.position")
     }
 
