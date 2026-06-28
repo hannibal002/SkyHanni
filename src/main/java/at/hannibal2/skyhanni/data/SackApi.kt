@@ -370,7 +370,7 @@ object SackApi {
         rebuildSackNameLists()
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onComponentsLoaded() {
         rebuildSackNameLists()
     }
