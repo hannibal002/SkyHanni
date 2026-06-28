@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.api.pet.PetStorageExpShare
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.pets.display.PetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.text.TextPetDisplayConfig
 import at.hannibal2.skyhanni.config.features.pets.display.visual.ExpSharePetOrganizationConfig
@@ -518,6 +519,11 @@ object CurrentPetDisplay {
             add("petItemScale: ${equippedVisualConfig.petItem.scale.get()}")
             add("petItemPlacement: ${equippedVisualConfig.petItem.placement.get()}")
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(138, "misc.pets.displayPos", "misc.pets.display.general.position")
     }
 
     private fun MutableList<String>.addIconDebug(label: String, icon: IconConfig) {
