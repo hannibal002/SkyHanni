@@ -129,7 +129,7 @@ object HuntingProfitTracker {
     }
 
     @HandleEvent
-    fun onItemChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         val isTool = isHuntingTool(event.newItem.getItemStackOrNull())
         if (isTool != hasHeldTool) {
             hasHeldTool = isTool

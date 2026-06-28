@@ -36,7 +36,7 @@ object NoBreak {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(136, "garden.noRodBreak", "garden.noBreakItems") { element ->
+        event.move(138, "garden.noRodBreak", "garden.noBreakItems") { element ->
             if (element.asBoolean) {
                 ConfigManager.gson.toJsonTree(NoBreakItem.entries)
             } else {
