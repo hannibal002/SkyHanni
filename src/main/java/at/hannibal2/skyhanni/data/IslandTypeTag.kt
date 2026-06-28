@@ -77,7 +77,7 @@ enum class IslandTypeTag(vararg types: Any) {
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+    fun isInIsland(): Boolean = contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
 
