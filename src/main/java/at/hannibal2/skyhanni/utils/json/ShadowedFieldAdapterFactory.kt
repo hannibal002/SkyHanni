@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken
  * a modified Gson instance that excludes them, so only the most-derived class's field is
  * used for serialization and deserialization.
  */
-object SubclassFieldDeduplicatingTypeAdapterFactory : TypeAdapterFactory {
+object ShadowedFieldAdapterFactory : TypeAdapterFactory {
 
     private val typesInProgress = ThreadLocal.withInitial<MutableSet<Class<*>>> { mutableSetOf() }
 
