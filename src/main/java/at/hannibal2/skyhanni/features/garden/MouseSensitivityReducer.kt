@@ -138,7 +138,7 @@ object MouseSensitivityReducer {
                 return
             }
 
-        if (config.lockOnMousemat)
+        if (config.lockOnMousemat && manualState != SensitivityState.LOCKED)
             mousematPattern.matchMatcher(event.cleanMessage) {
                 setManualState(
                     SensitivityState.LOCKED,
