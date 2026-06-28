@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
@@ -41,9 +40,8 @@ object CorpseFinder {
     private val corpseEntities = mutableMapOf<ArmorStand, Boolean>()
     private var totalCorpseCount = 0
 
-    fun areAllCorpsesFound(): Boolean {
-        return SkyBlockUtils.currentIsland == IslandType.MINESHAFT &&
-            totalCorpseCount > 0 &&
+    private fun areAllCorpsesFound(): Boolean {
+        return totalCorpseCount > 0 &&
             totalCorpseCount == corpseEntities.size &&
             corpseEntities.all { it.value }
     }

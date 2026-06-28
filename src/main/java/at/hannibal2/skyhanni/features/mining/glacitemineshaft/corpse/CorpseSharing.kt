@@ -74,7 +74,7 @@ object CorpseSharing {
     }
 
     private fun handleChatEvent(author: String, message: String) {
-        if (!config.enabled) return
+        if (!config.enabled || !IslandType.MINESHAFT.isInIsland()) return
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
