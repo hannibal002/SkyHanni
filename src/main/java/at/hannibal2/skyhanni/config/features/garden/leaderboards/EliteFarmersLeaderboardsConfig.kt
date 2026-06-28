@@ -33,7 +33,7 @@ class EliteFarmersLeaderboardsConfig {
 
     @Expose
     @ConfigLink(owner = EliteFarmersLeaderboardsConfig::class, field = "display")
-    var displayPositions: PositionList = PositionList(EliteLeaderboards.entries.size)
+    val displayPositions: PositionList = PositionList(EliteLeaderboards.entries.size)
 
     @Expose
     @ConfigOption(name = "Farming Weight Display", desc = "")

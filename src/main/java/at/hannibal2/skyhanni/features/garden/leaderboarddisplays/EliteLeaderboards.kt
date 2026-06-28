@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.json.fromJson
+import kotlinx.atomicfu.locks.synchronized
 import kotlin.reflect.KClass
 
 enum class EliteLeaderboards(
@@ -44,6 +45,7 @@ enum class EliteLeaderboards(
         private val cropConfig get() = config.cropCollectionLeaderboard
         private val pestConfig get() = config.pestKillsLeaderboard
         private val weightConfig get() = config.farmingWeightLeaderboard
+        private val displayPositionsLock = Any()
 
         fun getFromTypeOrNull(type: KClass<out EliteLeaderboardType>) = entries.firstOrNull {
             it.leaderboardType == type
@@ -57,14 +59,16 @@ enum class EliteLeaderboards(
 
         @HandleEvent
         fun onGuiRenderTop() {
-            if (config.displayPositions.isEmpty()) return
-            if (!config.enabled) return
-            if (InventoryUtils.inAnyInventory()) {
-                InventoryGuiScaleCompat.withOriginalHudScale {
+            synchronized(displayPositionsLock) {
+                if (config.displayPositions.isEmpty()) return
+                if (!config.enabled) return
+                if (InventoryUtils.inAnyInventory()) {
+                    InventoryGuiScaleCompat.withOriginalHudScale {
+                        renderDisplays()
+                    }
+                } else {
                     renderDisplays()
                 }
-            } else {
-                renderDisplays()
             }
         }
 
@@ -140,11 +144,17 @@ enum class EliteLeaderboards(
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            config.displayPositions = updateConfigPositionList(
-                config.displayPositions,
-                EliteLeaderboards.entries,
-                "garden.eliteFarmersLeaderboards.displayPositions",
-            )
+            synchronized(displayPositionsLock) {
+                with(config.displayPositions) {
+                    val newPositionList = updateConfigPositionList(
+                        this,
+                        EliteLeaderboards.entries,
+                        "garden.eliteFarmersLeaderboards.displayPositions",
+                    )
+                    clear()
+                    addAll(newPositionList)
+                }
+            }
         }
 
         @HandleEvent

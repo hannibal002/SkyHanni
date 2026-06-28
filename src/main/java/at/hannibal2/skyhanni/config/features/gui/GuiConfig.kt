@@ -225,6 +225,6 @@ class GuiConfig {
 
         @Expose
         @ConfigLink(owner = StatDisplay::class, field = "enabled")
-        var displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
+        val displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
     }
 }

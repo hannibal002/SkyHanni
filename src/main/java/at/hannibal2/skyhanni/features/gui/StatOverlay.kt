@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.core.config.PositionList.Companion.updateConfigPositionList
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 @SkyHanniModule
 object StatOverlay {
     private val config get() = SkyHanniMod.feature.gui.statDisplayer
+    private val displayPositionsLock = Any()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
@@ -32,8 +32,9 @@ object StatOverlay {
             val statNum = if (config.integerStats.contains(statToDisplay))
                 stat.displayValueInt else stat.displayValueDouble ?: return@forEach
             val displayText = "$statText $statNum"
-
-            statToDisplay.position.renderRenderable(Renderable.text(displayText), posLabel = "${statToDisplay.posLabel} Stat Display")
+            synchronized(displayPositionsLock) {
+                statToDisplay.position.renderRenderable(Renderable.text(displayText), posLabel = "${statToDisplay.posLabel} Stat Display")
+            }
         }
     }
 
@@ -57,18 +58,21 @@ object StatOverlay {
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        config.displayPositions = updateConfigPositionList(
-            config.displayPositions,
-            SkyblockStatUI.entries,
-            "gui.statDisplayer.displayPositions",
-        )
+        synchronized(displayPositionsLock) {
+            with(config.displayPositions) {
+                val updatedList = updateConfigPositionList(
+                    this,
+                    SkyblockStatUI.entries,
+                    "gui.statDisplayer.displayPositions",
+                )
+                clear()
+                addAll(updatedList)
+            }
+        }
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        while (config.displayPositions.size < SkyblockStatUI.entries.size) {
-            config.displayPositions.add(Position(10, 80))
-        }
         val shortenedStats: MutableList<SkyblockStatUI> = mutableListOf()
         val displayStats = buildList {
             if (event.oldBoolean("combat.ferocityDisplay.enabled")) add(SkyblockStatUI.FEROCITY)

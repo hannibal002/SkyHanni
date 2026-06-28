@@ -70,26 +70,38 @@ enum class TabWidgetDisplay(
 
         private val config get() = SkyHanniMod.feature.gui.tabWidget
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+        private val displayPositionsLock = Any()
 
         @HandleEvent
         fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
-            config.display.get().forEach { widget ->
-                widget.position.renderRenderables(
-                    widget.widgets.flatMap { subWidget ->
-                        subWidget.lines.map { Renderable.text(it) }
-                    },
-                    posLabel = "Display Widget: ${widget.name}",
-                    extraSpace = -2,
-                )
+            synchronized(displayPositionsLock) {
+                config.display.get().forEach { widget ->
+                    widget.position.renderRenderables(
+                        widget.widgets.flatMap { subWidget ->
+                            subWidget.lines.map { Renderable.text(it) }
+                        },
+                        posLabel = "Display Widget: ${widget.name}",
+                        extraSpace = -2,
+                    )
+                }
             }
         }
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            config.displayPositions =
-                updateConfigPositionList(config.displayPositions, TabWidgetDisplay.entries, "gui.tabWidget.displayPositions")
+            synchronized(displayPositionsLock) {
+                with(config.displayPositions) {
+                    val newPositionList = updateConfigPositionList(
+                        this,
+                        TabWidgetDisplay.entries,
+                        "gui.tabWidget.displayPositions",
+                    )
+                    clear()
+                    addAll(newPositionList)
+                }
+            }
         }
     }
 }
