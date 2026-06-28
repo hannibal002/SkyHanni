@@ -94,7 +94,7 @@ object CurrentPetApi {
     private fun wasRecentlyAsserted(source: PetDataAssertionSource): Boolean =
         lastAssertion[source]?.passedSince()?.let { it <= 5.seconds } ?: false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed() {
         val petData = pendingTabPetData ?: return
         if (shouldDelayTabAssertion()) return
