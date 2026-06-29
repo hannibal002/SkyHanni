@@ -333,7 +333,6 @@ object ContributorManager {
                     appendWithColor(username, ChatFormatting.AQUA)
                     appendWithColor(" for the first time!", ChatFormatting.GRAY)
                 }
-                append("contributor")
             }
         }
 
@@ -352,7 +351,7 @@ object ContributorManager {
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
 
     // Due to using PlayerUtils.getRawUuid(), this will only work if logged in
-// which is why it HAS to be a lazy-loaded value instead of being calculated on repo load
+    // which is why it HAS to be a lazy-loaded value instead of being calculated on repo load
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }
 
