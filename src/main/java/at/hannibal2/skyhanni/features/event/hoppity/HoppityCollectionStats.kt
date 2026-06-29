@@ -645,15 +645,15 @@ object HoppityCollectionStats {
         addResidentRabbitsInformationToHud(newList)
         addHotspotRabbitsInformationToHud(newList)
 
-        newList.addString("")
-
         val loggedRabbitCount = loggedRabbits.size
         val foundRabbitCount = getFoundRabbitsFromHypixel(event) ?: run {
+            newList.addString("")
             newList.addString("§cError: Failed to read rabbit progress from the inventory.")
             return newList
         }
 
         if (loggedRabbitCount < foundRabbitCount) {
+            newList.addString("")
             newList.add(
                 Renderable.wrappedText(
                     "§cPlease Scroll through \n" + "§call pages!",
