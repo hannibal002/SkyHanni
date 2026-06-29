@@ -61,7 +61,7 @@ fun setLabel(prNumber: String, hasFindings: Boolean) {
 }
 
 fun normalizePath(uri: String, workspace: String): String {
-    val path = uri.removePrefix("file://")
+    val path = runCatching { URI.create(uri).path }.getOrNull() ?: uri.removePrefix("file://")
     if (workspace.isNotEmpty() && path.startsWith(workspace)) return path.removePrefix(workspace).trimStart('/')
     val repoName = repo.substringAfter("/")
     if (repoName.isNotEmpty() && "$repoName/" in path) return path.substringAfter("$repoName/")
@@ -80,7 +80,8 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("@", "&#64;")
 
 fun buildBody(findings: List<Finding>, inlinePosted: Boolean): String = buildString {
-    appendLine("## Detekt found ${findings.size} issue(s)\n")
+    appendLine("## Detekt found ${findings.size} issue(s)")
+    appendLine("")
     when {
         inlinePosted && findings.size <= maxInline ->
             appendLine("All issues are shown as inline comments.")
@@ -179,7 +180,7 @@ val inlineComments = findings.take(maxInline)
     .groupBy { it.path to it.line }
     .map { (key, group) ->
         val (path, line) = key
-        val body = group.joinToString("\n") { "`${sanitize(it.ruleId)}`: ${sanitize(it.message)}" }
+        val body = group.sortedBy { it.ruleId }.joinToString("\n") { "`${sanitize(it.ruleId)}`: ${sanitize(it.message)}" }
         mapOf("path" to path, "line" to line, "side" to "RIGHT", "body" to body)
     }
 
