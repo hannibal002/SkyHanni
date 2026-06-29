@@ -365,7 +365,6 @@ tasks.withType<KotlinCompile> {
             "-Xbackend-threads=1",
             "-Xnested-type-aliases",
             "-Xintrinsic-const-evaluation",
-            "-Xcollection-literals",
         )
     }
 }
