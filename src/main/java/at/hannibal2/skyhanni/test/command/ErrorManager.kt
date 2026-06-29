@@ -26,6 +26,8 @@ import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
+import java.util.Collections
+import java.util.IdentityHashMap
 import kotlin.time.Duration.Companion.minutes
 
 /** Crashes if [value] is false and in developer environment */
@@ -209,10 +211,13 @@ object ErrorManager {
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
-    enum class ErrorState {
-        LOGGED,
-        BLOCKED_NOT_NEEDED,
-        BLOCKED_CAN_NOT_SHOW,
+    // This is intentionally not an enum, because unnecessary object allocation can be problematic
+    // if we're dealing with a stack overflow.
+    private typealias ErrorStateT = Int
+    private object ErrorState {
+        const val LOGGED = 0
+        const val BLOCKED_NOT_NEEDED = 1
+        const val BLOCKED_CAN_NOT_SHOW = 2
     }
 
     @Suppress("ReturnCount")
@@ -224,7 +229,7 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ): ErrorState {
+    ): ErrorStateT {
         if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
 
         // TODO add missing debug enabled check
@@ -285,7 +290,7 @@ object ErrorManager {
     // random id -> final message
     private val errorsToShowOnJoin = mutableMapOf<String, String>()
 
-    private fun ErrorState.crashIfNotYetOnAServer(): Boolean {
+    private fun ErrorStateT.crashIfNotYetOnAServer(): Boolean {
         if (this == ErrorState.BLOCKED_NOT_NEEDED) return false
 
         // TODO find way to properly do this before the config loads
@@ -419,7 +424,13 @@ object ErrorManager {
     private fun Throwable.getCustomStackTrace(
         fullStackTrace: Boolean,
         parent: List<String> = emptyList(),
+        seenThrowables: MutableSet<Throwable> = Collections.newSetFromMap(IdentityHashMap()),
     ): List<String> = buildList {
+        if (!seenThrowables.add(this@getCustomStackTrace)) {
+            add("<Infinite recurring causes>")
+            return@buildList
+        }
+
         add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 
         for (traceElement in stackTrace) {
@@ -447,13 +458,8 @@ object ErrorManager {
             add(visualText)
         }
 
-        if (this === cause) {
-            add("<Infinite recurring causes>")
-            return@buildList
-        }
-
         cause?.let {
-            addAll(it.getCustomStackTrace(fullStackTrace, this))
+            addAll(it.getCustomStackTrace(fullStackTrace, this, seenThrowables))
         }
     }
 
