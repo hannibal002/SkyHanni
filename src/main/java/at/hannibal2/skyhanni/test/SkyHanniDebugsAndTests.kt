@@ -560,7 +560,7 @@ object SkyHanniDebugsAndTests {
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
 
-        val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
+        val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTextureOrFallback("ALEX_SKIN_TEXTURE")
         val skullOwner = stack.getSkullOwner() ?: "unknown"
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
         val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"$skullOwner:$skullTexture\"]},"

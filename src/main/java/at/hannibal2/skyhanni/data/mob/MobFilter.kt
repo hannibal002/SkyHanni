@@ -162,11 +162,11 @@ object MobFilter {
         "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$",
     )
 
-    internal val RAT_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_RAT") }
-    private val HELLWISP_TENTACLE_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("HELLWISP_TENTACLE") }
-    private val RIFT_EYE_SKULL1_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_1") }
-    private val RIFT_EYE_SKULL2_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_2") }
-    internal val NPC_TURD_SKULL by lazy { SkullTextureHolder.getTexture("NPC_TURD") }
+    internal val RAT_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_RAT")
+    private val HELLWISP_TENTACLE_SKULL_TEXTURE by SkullTextureHolder.texture("HELLWISP_TENTACLE")
+    private val RIFT_EYE_SKULL1_TEXTURE by SkullTextureHolder.texture("RIFT_EYE_1")
+    private val RIFT_EYE_SKULL2_TEXTURE by SkullTextureHolder.texture("RIFT_EYE_2")
+    internal val NPC_TURD_SKULL by SkullTextureHolder.texture("NPC_TURD")
 
     const val MINION_MOB_PREFIX = "Minion Mob "
 
@@ -384,7 +384,8 @@ object MobFilter {
             baseEntity.firstPassenger is Player && MobUtils.getArmorStand(baseEntity, 2)
                 ?.wearingSkullTexture(RAT_SKULL_TEXTURE) ?: false -> return MobResult.illegal // Rat Morph
         }
-        when (armorStand.getStandHelmet()?.getSkullTexture()) {
+        val skullTexture = armorStand.getStandHelmet()?.getSkullTexture() ?: return null
+        when (skullTexture) {
             HELLWISP_TENTACLE_SKULL_TEXTURE -> return MobResult.illegal // Hellwisp Tentacle
             RIFT_EYE_SKULL1_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
             RIFT_EYE_SKULL2_TEXTURE -> return MobResult.found(MobFactories.special(baseEntity, "Rift Teleport Eye", armorStand))
