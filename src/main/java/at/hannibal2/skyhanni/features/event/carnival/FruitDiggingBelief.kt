@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalFruitDigging.Fruit
+import java.util.EnumMap
 import kotlin.random.Random
+
 internal class FruitDiggingBelief(
     private val openCells: List<Int>,
     private val pool: List<Fruit>,
@@ -47,7 +49,7 @@ internal class FruitDiggingBelief(
         val compiledClues = clues.map { it to slotsFor(it, slotOf) }
 
         val deal = pool.toTypedArray() // shuffled in place each attempt; deal[slot] = content at that cell
-        val hits = Array(openCells.size) { HashMap<Fruit, Int>() } // per slot: content -> times seen
+        val hits = Array(openCells.size) { EnumMap<Fruit, Int>(Fruit::class.java) } // per slot: content -> times seen
 
         var accepted = 0
         var attempts = 0

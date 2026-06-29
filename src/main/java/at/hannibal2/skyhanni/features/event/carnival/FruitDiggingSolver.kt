@@ -305,7 +305,7 @@ class FruitDiggingSolver(private val size: Int = 7) {
             // If a durian already halved our next dig, don't waste a high-value cell
             // on it — spend the penalty on the cheapest safe dig and save the good
             // cells for full value next turn (only worth it with digs to spare)
-            if (nextMultiplier < 1.0 && (MAX_DIGS - digsUsed) > 1) {
+            if (nextMultiplier < 1.0 && (CarnivalFruitDigging.MAX_DIGS - digsUsed) > 1) {
                 val absorber = candidates
                     .filter { bombChance(it) < 0.15 && rumChance(it) < 0.15 }
                     .minByOrNull { expectedPoints(it) }
@@ -326,8 +326,6 @@ class FruitDiggingSolver(private val size: Int = 7) {
     }
 
     private companion object {
-        const val MAX_DIGS = 15
-
         const val RISK_WEIGHT = 1.0 // cost of a wasted dig, scaled by P(bomb)+P(rum)
         const val DESTRUCTION_WEIGHT = 0.10 // extra penalty: fraction of neighbor fruit a bomb would destroy
         const val SETUP_WEIGHT = 0.5 // worth of the multiplier an ability cell sets up

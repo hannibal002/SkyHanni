@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
@@ -41,7 +40,7 @@ object CarnivalFruitDigging {
     private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
 
     private const val GRID_LENGTH = 7
-    private const val MAX_DIGS = 15
+    const val MAX_DIGS = 15
 
     private var isPlayingFruitDigging = false
     private var lastSquareDug: GamePos? = null
@@ -119,16 +118,13 @@ object CarnivalFruitDigging {
         COCONUT("Coconut", 200, 3, "CARNIVAL_COCONUT"),
         CHERRY("Cherry", 200, 2, "CARNIVAL_CHERRY"),
         DURIAN("Durian", 800, 2, "CARNIVAL_DURIAN"),
-        DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT"), ;
+        DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT"),
+        ;
 
         private val textureId: String by lazy {
             if (textureKey.isEmpty()) ""
             else StringUtils.decodeBase64(SkullTextureHolder.getTexture(textureKey)).substringAfterLast("/texture/").substringBefore("\"")
         }
-
-        fun allFruitsWorthMore(): List<Fruit> = entries.filter { it.isEdible && it.points > this.points }
-
-        fun allFruitsWorthLess(): List<Fruit> = entries.filter { it.isEdible && it.points < this.points }
 
         fun getAmountDugSoFar(): Int {
             return count - (remainingFruit[this] ?: 0)
@@ -214,16 +210,18 @@ object CarnivalFruitDigging {
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onGuiRenderOverlay() {
-        if (!isEnabled() || !config.remainingFruitDisplay) return
-        config.remainingFruitPosition.renderRenderables(buildRemainingFruitDisplay(), posLabel = "Remaining Fruit")
-    }
+        if (!isEnabled()) return
 
-    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onSolverOverlayRender() {
-        if (!isEnabled() || !config.displayBestDig) return
-        val display = buildSolverDisplay()
-        if (display.isEmpty()) return
-        config.bestDigPosition.renderRenderables(display, posLabel = "Fruit Digging Solver")
+        if (config.remainingFruitDisplay) {
+            config.remainingFruitPosition.renderRenderables(buildRemainingFruitDisplay(), posLabel = "Remaining Fruit")
+        }
+
+        if (config.displayBestDig) {
+            val display = buildSolverDisplay()
+            if (display.isNotEmpty()) {
+                config.bestDigPosition.renderRenderables(display, posLabel = "Fruit Digging Solver")
+            }
+        }
     }
 
     private fun buildSolverDisplay(): List<Renderable> {
@@ -346,12 +344,9 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
+    fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<ItemEntity>) {
         if (!isEnabled()) return
-        val entity = event.entity
-        if (entity is ItemEntity) {
-            handleAnchor(entity)
-        }
+        handleAnchor(event.entity)
     }
 
     private fun handleAnchor(entity: ItemEntity) {
@@ -495,18 +490,6 @@ object CarnivalFruitDigging {
         fun toLorenzVec() = LorenzVec(START_X + col, GRID_Y, START_Z + row)
 
         fun toBlockPos() = BlockPos((START_X + col).toInt(), GRID_Y.toInt(), (START_Z + row).toInt())
-
-        fun getAdjacent(): List<GamePos> {
-            val list = mutableListOf<GamePos>()
-            for (dr in -1..1) {
-                for (dc in -1..1) {
-                    if (dr == 0 && dc == 0) continue
-                    val pos = GamePos(row + dr, col + dc)
-                    if (pos.isValid()) list.add(pos)
-                }
-            }
-            return list
-        }
 
         companion object {
             const val START_X = -112.0
