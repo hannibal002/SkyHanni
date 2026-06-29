@@ -23,10 +23,8 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -170,10 +168,10 @@ object LoadoutApi {
         for (slot in slots.filter { it.isInCurrentPage() }) {
             val icon = itemsList[slot.inventorySlot]
 
-            if (icon?.isDye(DyeCompat.GRAY) == true){
+            if (icon?.isDye(DyeCompat.GRAY) == true) {
                 slot.getData()?.clear()
             }
-            if (icon?.isDye(DyeCompat.RED) == true){
+            if (icon?.isDye(DyeCompat.RED) == true) {
                 slot.getData()?.clear()
                 slot.locked = true
             }
