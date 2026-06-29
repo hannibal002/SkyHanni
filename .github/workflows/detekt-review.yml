@@ -5,6 +5,11 @@ on:
         workflows: [ "Detekt" ]
         types: [ completed ]
 
+
+concurrency:
+    group: detekt-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+    cancel-in-progress: true
+
 permissions:
     pull-requests: write
     issues: write
@@ -57,9 +62,10 @@ jobs:
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
             -   name: Post review and manage label
-                if: steps.download.outcome == 'success' && steps.pr.outputs.number != ''
+                if: steps.pr.outputs.number != ''
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
+                    HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
                 run: kotlinc -script .github/scripts/post_detekt_review.main.kts

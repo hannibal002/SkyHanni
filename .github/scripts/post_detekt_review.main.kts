@@ -22,6 +22,7 @@ val maxInline = 20
 val label = "Detekt"
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: run { System.err.println("GITHUB_REPOSITORY not set"); exitProcess(1) }
 val token: String = System.getenv("GH_TOKEN") ?: run { System.err.println("GH_TOKEN not set"); exitProcess(1) }
+val headSha: String? = System.getenv("HEAD_SHA")?.takeIf { it.isNotEmpty() }
 
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
@@ -105,10 +106,16 @@ fun buildBody(findings: List<Finding>, inlinePosted: Boolean): String = buildStr
     }
 }
 
-fun postReview(prNumber: String, body: String, comments: List<Map<String, Any>>? = null): Pair<Int, JsonElement> {
+fun postReview(
+    prNumber: String,
+    body: String,
+    comments: List<Map<String, Any>>? = null,
+    commitSha: String? = null
+): Pair<Int, JsonElement> {
     val payload = buildMap {
         put("body", body)
         put("event", "COMMENT")
+        if (commitSha != null) put("commit_id", commitSha)
         if (!comments.isNullOrEmpty()) put("comments", comments)
     }
     return ghRequest("POST", "/repos/$repo/pulls/$prNumber/reviews", payload)
@@ -121,7 +128,8 @@ val artifactDir = Path("detekt-artifact")
 val sarifFile = artifactDir / "main.sarif"
 
 if (!sarifFile.exists()) {
-    println("No SARIF found, skipping")
+    println("No SARIF found, removing label")
+    setLabel(prNumber, false)
     exitProcess(0)
 }
 
@@ -170,14 +178,14 @@ val inlineComments = findings.take(maxInline).map { f ->
     mapOf("path" to f.path, "line" to f.line, "side" to "RIGHT", "body" to "`${sanitize(f.ruleId)}`: ${sanitize(f.message)}")
 }
 
-val firstResult = postReview(prNumber, buildBody(findings, inlinePosted = true), inlineComments)
+val firstResult = postReview(prNumber, buildBody(findings, inlinePosted = true), inlineComments, headSha)
 var status = firstResult.first
 var resp = firstResult.second
 
 if (status == 422) {
     val msg = (resp as? JsonObject)?.get("message")?.asString ?: ""
     println("Inline comments rejected (HTTP 422: $msg), retrying body-only")
-    val retryResult = postReview(prNumber, buildBody(findings, inlinePosted = false))
+    val retryResult = postReview(prNumber, buildBody(findings, inlinePosted = false), commitSha = headSha)
     status = retryResult.first
     resp = retryResult.second
 }
