@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
+import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
@@ -21,6 +22,12 @@ object MinecraftCompat {
 
     val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
 
+    /**
+     * The local user's information, such as the username and UUID.
+     * This is always non-null, even if the player is not in a world / singleplayer.
+     */
+    val localUser get(): User = Minecraft.getInstance().user
+
     val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
 
     @JvmStatic
@@ -34,6 +41,8 @@ object MinecraftCompat {
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+
+    val hideGui get(): Boolean = Minecraft.getInstance().options.hideGui
 
     //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
