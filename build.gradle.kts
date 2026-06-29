@@ -283,7 +283,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.4"
+            languageVersion = "2.3"
         }
     }
 }
@@ -363,8 +363,7 @@ tasks.withType<KotlinCompile> {
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
-            // Allows the compiler to evaluate constant expressions such as Enum.name,
-            // lowercase(), uppercase(), trim(), etc.
+            "-Xnested-type-aliases",
             "-Xintrinsic-const-evaluation",
         )
     }
