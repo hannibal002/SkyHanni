@@ -232,7 +232,7 @@ object EntityUtils {
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
 
-    fun LivingEntity.hasVisibleEquipment() = EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
+    fun LivingEntity.hasVisibleEquipment(): Boolean = EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
 
-    fun Entity.isEmptyInvisibleArmorStand() = this is ArmorStand && isInvisible && !hasVisibleEquipment()
+    fun Entity.isEmptyInvisibleArmorStand(): Boolean = this is ArmorStand && isInvisible && !hasVisibleEquipment()
 }
