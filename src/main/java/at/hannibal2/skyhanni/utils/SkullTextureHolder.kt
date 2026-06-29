@@ -30,10 +30,4 @@ object SkullTextureHolder {
     }.also {
         cachedTextures.add(it)
     }
-
-    fun textureOrFallback(name: String): ReadOnlyProperty<Any?, String> = StableOrTransientValue(1.seconds) {
-        getTexture(name)?.let { StableOrTransientValue.stable(it) } ?: StableOrTransientValue.transient(ALEX_SKIN_TEXTURE)
-    }.also {
-        cachedTextures.add(it)
-    }
 }
