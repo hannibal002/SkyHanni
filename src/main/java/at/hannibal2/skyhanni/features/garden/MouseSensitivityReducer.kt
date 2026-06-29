@@ -103,13 +103,7 @@ object MouseSensitivityReducer {
     fun setManualState(state: SensitivityState?, message: String? = null, configDisableOption: KProperty0<*>? = null) {
         manualState = state
 
-        if (config.chatMessage) {
-            val message = message ?: when (state) {
-                null -> "Mouse rotation is now unlocked."
-                SensitivityState.LOCKED -> "Mouse rotation is now locked. Type /shmouselock to unlock your mouse."
-                SensitivityState.REDUCED -> "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity."
-            }
-
+        if (message != null && config.chatMessage) {
             if (configDisableOption != null) ChatUtils.notifyOrDisable(message, configDisableOption, messageId = MESSAGE_ID)
             else ChatUtils.chat(message, messageId = MESSAGE_ID)
         }
@@ -160,16 +154,16 @@ object MouseSensitivityReducer {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
             simpleCallback {
-                if (manualState != SensitivityState.LOCKED) setManualState(SensitivityState.LOCKED)
-                else setManualState(null)
+                if (manualState != SensitivityState.LOCKED) setManualState(SensitivityState.LOCKED, "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.")
+                else setManualState(null, "Mouse rotation is now unlocked.")
             }
         }
         event.registerBrigadier("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                if (manualState != SensitivityState.REDUCED) setManualState(SensitivityState.REDUCED)
-                else setManualState(null)
+                if (manualState != SensitivityState.REDUCED) setManualState(SensitivityState.REDUCED, "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
+                else setManualState(null, "Mouse rotation is now unlocked.")
             }
         }
     }
