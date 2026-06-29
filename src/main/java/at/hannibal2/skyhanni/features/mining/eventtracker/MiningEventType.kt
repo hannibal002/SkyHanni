@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
@@ -150,12 +149,12 @@ enum class MiningEventType(
         iconInput,
     )
 
-    private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
+    private val icon = Renderable.hoverTips(iconInput, listOf(eventName))
     private val compactText = Renderable.text("${color.getChatColor()}$shortName")
     private val normalText = Renderable.text("${color.getChatColor()}$eventName")
 
-    private var compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
-    private var normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
+    private val compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+    private val normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> compactTextWithIcon
