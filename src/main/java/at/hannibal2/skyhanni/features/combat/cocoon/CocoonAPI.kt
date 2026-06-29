@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.combat.CocoonChatMessageEvent
+import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
@@ -33,17 +34,16 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
-    val expectedLifetime = 6.4.seconds
     /*
     roughly where cocoon times landed across a few hundred logged cocoons.
     */
+    val expectedLifetime = 6.4.seconds
     var canCocoon: Boolean = false
         private set
 
@@ -59,9 +59,9 @@ object CocoonAPI {
      */
     private val cocoonChatMessage by patternGroup.pattern(
         "spawn",
-        "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!"
+        "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!",
     )
-    // Hypixel don't use an in this message but that's a spelling mistake on their end that might get fixed
+    // Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
 
     data class CocoonMob(
         val mob: Mob,
@@ -143,12 +143,11 @@ object CocoonAPI {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChatMessageRecieved(event: SkyHanniChatEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         cocoonChatMessage.matchMatcher(event.cleanMessage) {
-            CocoonChatMessageEvent(group("name")).post()
+            HypixelCocoonChatMessageEvent(group("name")).post()
         }
     }
-
 
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
         val nearbyMobs = skyblockMobs.filter { mob -> mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
