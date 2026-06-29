@@ -364,6 +364,7 @@ tasks.withType<KotlinCompile> {
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
             "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
         )
     }
 }
