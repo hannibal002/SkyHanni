@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
-import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
