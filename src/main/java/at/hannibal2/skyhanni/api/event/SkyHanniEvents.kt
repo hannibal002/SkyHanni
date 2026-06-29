@@ -87,7 +87,7 @@ object SkyHanniEvents {
     }
 
     private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
-        this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
+        handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
     @HandleEvent
