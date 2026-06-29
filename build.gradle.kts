@@ -363,7 +363,8 @@ tasks.withType<KotlinCompile> {
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
-            "-Xnested-type-aliases",
+            // Allows the compiler to evaluate constant expressions such as Enum.name,
+            // lowercase(), uppercase(), trim(), etc.
             "-Xintrinsic-const-evaluation",
         )
     }
