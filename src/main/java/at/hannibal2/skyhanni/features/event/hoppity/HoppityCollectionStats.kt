@@ -26,6 +26,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -102,11 +104,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     * WRAPPED-REGEX-TEST: "                          395/457"
      */
     private val rabbitsFoundPattern by patternGroup.pattern(
-        "rabbits.found",
-        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
+        "rabbits.found.colorless",
+        "\\s+(?<current>\\d+)/(?<total>\\d+)",
     )
 
     /**
@@ -644,14 +646,18 @@ object HoppityCollectionStats {
         addResidentRabbitsInformationToHud(newList)
         addHotspotRabbitsInformationToHud(newList)
 
-        val loggedRabbitCount = loggedRabbits.size
-        val foundRabbitCount = getFoundRabbitsFromHypixel(event)
+        newList.addString("")
 
-        if (loggedRabbitCount < foundRabbitCount) {
-            newList.addString("")
+        val loggedRabbitCount = loggedRabbits.size
+        val foundRabbitCount = getFoundRabbitsFromHypixel(event) ?: run {
+            newList.addString("§cError: Failed to read rabbit progress from the inventory.")
+            return newList
+        }
+
+         if (loggedRabbitCount < foundRabbitCount) {
             newList.add(
                 Renderable.wrappedText(
-                    "§cPlease Scroll through \n" + "§call pages!",
+                    "§cPlease scroll through\n§call pages!",
                     setWidth = 200,
                 ),
             )
@@ -774,9 +780,9 @@ object HoppityCollectionStats {
 
     // Gets the found rabbits according to the Hypixel progress bar
     // used to make sure that mod data is synchronized with Hypixel
-    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
-        return event.inventoryItems.firstNotNullOf {
-            rabbitsFoundPattern.firstMatcher(it.value.getLore()) {
+    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int? {
+        return event.inventoryItems.values.firstNotNullOfOrNull { item ->
+            rabbitsFoundPattern.firstMatcher(item.getLoreComponent().map { it.string.removeColor() }) {
                 group("current").formatInt()
             }
         }
