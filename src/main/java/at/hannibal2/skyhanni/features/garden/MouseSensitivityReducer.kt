@@ -118,6 +118,7 @@ object MouseSensitivityReducer {
     @HandleEvent
     fun onWorldChange() {
         manualState = null
+        autoState = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -127,18 +128,20 @@ object MouseSensitivityReducer {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (config.unlockOnTeleport != UnlockOnTeleport.NEVER && manualState != null)
+        if (config.unlockOnTeleport != UnlockOnTeleport.NEVER && manualState != null) {
             teleportPattern.matchMatchers(event.cleanMessage) {
-                if (config.unlockOnTeleport.condition(group("plot")))
+                if (config.unlockOnTeleport.condition(group("plot"))) {
                     setManualState(
                         null,
                         "Mouse rotation is now unlocked because you teleported.",
                         config::unlockOnTeleport,
                     )
+                }
                 return
             }
+        }
 
-        if (config.lockOnMousemat && manualState != SensitivityState.LOCKED)
+        if (config.lockOnMousemat && manualState != SensitivityState.LOCKED) {
             mousematPattern.matchMatcher(event.cleanMessage) {
                 setManualState(
                     SensitivityState.LOCKED,
@@ -147,6 +150,7 @@ object MouseSensitivityReducer {
                 )
                 return
             }
+        }
     }
 
     @HandleEvent
