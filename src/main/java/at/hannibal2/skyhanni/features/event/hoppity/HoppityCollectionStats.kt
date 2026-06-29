@@ -656,7 +656,7 @@ object HoppityCollectionStats {
         if (loggedRabbitCount < foundRabbitCount) {
             newList.add(
                 Renderable.wrappedText(
-                    "§cPlease scroll through\n§call pages!",
+                    "§cPlease Scroll through \n" + "§call pages!",
                     setWidth = 200,
                 ),
             )
