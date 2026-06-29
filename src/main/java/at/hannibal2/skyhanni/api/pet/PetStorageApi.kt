@@ -115,6 +115,11 @@ object PetStorageApi {
         this.heldItemInternalName = heldItemInternalName ?: this.heldItemInternalName
     }
 
+    private data class PetExpRead(
+        val value: Double,
+        val exact: Boolean,
+    )
+
     private val PetExpRead?.exactValue get() = this?.takeIf { it.exact }?.value
 
     private fun PetData.reconcileDisplayedExp(readExp: Double): Double {
@@ -126,12 +131,8 @@ object PetStorageApi {
     private fun String.isExactPetExpText() =
         !contains('k', ignoreCase = true) && !contains('m', ignoreCase = true)
 
-    fun isMainPetMenuName(inventoryName: String?) = PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
-
-    private data class PetExpRead(
-        val value: Double,
-        val exact: Boolean,
-    )
+    fun isMainPetMenuName(inventoryName: String?): Boolean =
+        PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
 
     private fun SafeItemStack.toVisiblePetDataOrNull(petInfo: PetInfo? = getPetInfo()): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchMatcher(hoverName.formattedTextCompat()) {
@@ -442,7 +443,9 @@ object PetStorageApi {
         val exactPetMenuUuids = event.readPetsMenuItems()
         event.readEquipmentPetData()
         event.readSelectedPetData(exactPetMenuUuids)
-        PetStorageExpShare.readInventory(event)
+        if (PetStorageExpShare.isInventory(event.inventoryName)) {
+            PetStorageExpShare.readInventory(event.inventoryItems)
+        }
     }
 
     private fun InventoryFullyOpenedEvent.readPetsMenuItems(): Set<UUID> {

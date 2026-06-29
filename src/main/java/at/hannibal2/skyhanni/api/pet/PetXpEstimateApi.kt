@@ -5,9 +5,11 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.AccessoryBagUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -75,6 +77,7 @@ object PetXpEstimateApi {
     private val recentSkillEstimates = mutableMapOf<SkillType, RecentSkillEstimate>()
     private val recentEstimatePetUuids = mutableMapOf<UUID, SimpleTimeMark>()
     private val recentGainQuanta = mutableMapOf<SkillType, MutableMap<Double, SimpleTimeMark>>()
+    private var beastmasterMultiplierCache: Double? = null
     private var pendingLevelUp: PendingPetLevelUp? = null
     private var pendingSpawnAutopetSwap: SpawnAutopetContext? = null
 
@@ -142,7 +145,18 @@ object PetXpEstimateApi {
         if (bestBeastmasterMultiplier <= (petStorage.beastmasterPetXpMultiplier ?: 1.0)) return
 
         petStorage.beastmasterPetXpMultiplier = bestBeastmasterMultiplier
+        clearBeastmasterMultiplierCache()
         PetStorageApi.markDirty()
+    }
+
+    @HandleEvent(OwnInventoryItemUpdateEvent::class)
+    fun onOwnInventoryItemUpdate() {
+        clearBeastmasterMultiplierCache()
+    }
+
+    @HandleEvent(SkyblockEquipmentDataUpdateEvent::class)
+    fun onSkyblockEquipmentDataUpdate() {
+        clearBeastmasterMultiplierCache()
     }
 
     @HandleEvent(ProfileJoinEvent::class)
@@ -158,6 +172,7 @@ object PetXpEstimateApi {
     private fun resetProfileState() {
         skillSamples.clear()
         recentGainQuanta.clear()
+        clearBeastmasterMultiplierCache()
         resetWorldState()
     }
 
@@ -454,12 +469,19 @@ object PetXpEstimateApi {
     }
 
     private fun getBeastmasterMultiplier(): Double =
+        beastmasterMultiplierCache ?: readBeastmasterMultiplier().also { beastmasterMultiplierCache = it }
+
+    private fun readBeastmasterMultiplier(): Double =
         (InventoryUtils.getItemsInOwnInventory() + EquipmentApi.getAll())
             .asSequence()
             .mapNotNull { it.readBeastmasterMultiplierOrNull() }
             .maxOrNull()
             ?: ProfileStorageData.petProfiles?.beastmasterPetXpMultiplier
             ?: 1.0
+
+    private fun clearBeastmasterMultiplierCache() {
+        beastmasterMultiplierCache = null
+    }
 
     private fun SafeItemStack.readBeastmasterMultiplierOrNull(): Double? {
         val internalName = getInternalNameOrNull()?.asString() ?: return null
