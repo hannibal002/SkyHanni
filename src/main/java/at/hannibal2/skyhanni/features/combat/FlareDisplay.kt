@@ -54,12 +54,11 @@ object FlareDisplay {
     private val FLARE_WARNING by SkullTextureHolder.texture("FLARE_WARNING")
     private val FLARE_ALERT by SkullTextureHolder.texture("FLARE_ALERT")
     private val FLARE_SOS by SkullTextureHolder.texture("FLARE_SOS")
-    private val flareSkins
-        get() = listOf(
-            FLARE_WARNING to FlareType.WARNING,
-            FLARE_ALERT to FlareType.ALERT,
-            FLARE_SOS to FlareType.SOS,
-        ).mapNotNull { (texture, type) -> texture?.let { it to type } }.toMap()
+    private val flareSkins = mapOf(
+        FlareType.WARNING to FLARE_WARNING,
+        FlareType.ALERT to FLARE_ALERT,
+        FlareType.SOS to FLARE_SOS,
+    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -149,7 +148,7 @@ object FlareDisplay {
     private fun getFlareForType(type: FlareType): Flare? = flares.firstOrNull { it.type == type }
 
     private fun getFlareTypeForTexture(entity: ArmorStand): FlareType? =
-        flareSkins.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
+        flareSkins.entries.firstOrNull { entity.hasSkullTexture(it.value) }?.key
 
     private fun isAlreadyKnownFlare(entity: ArmorStand): Boolean =
         flares.any { it.entity.id == entity.id }
