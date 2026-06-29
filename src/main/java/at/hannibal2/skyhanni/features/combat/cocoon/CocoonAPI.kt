@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
@@ -55,6 +55,10 @@ object CocoonAPI {
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
     private val patternGroup = RepoPattern.group("combat.cocoon")
 
+    /*
+     Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
+     The regex test for "an Enderman" was faked at the point of the original PR due to above comment.
+     */
     /**
      * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
      * REGEX-TEST: CAUGHT! You cocooned a Enderman!
@@ -64,8 +68,6 @@ object CocoonAPI {
         "spawn",
         "CAUGHT! You cocooned an? (?<name>[\\w ]+)!",
     )
-    // Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
-    // The regex test for "an Enderman" was faked at the point of the original PR due to above comment.
 
     data class CocoonMob(
         val mob: Mob,
