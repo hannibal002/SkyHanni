@@ -32,6 +32,7 @@ import java.util.concurrent.CompletableFuture
 
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 //?}
 
@@ -59,7 +60,7 @@ object ClientEvents {
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
             //? if >= 26.1
-            ComponentsLoadedEvent.post()
+            DelayedRun.runOrNextTick(ComponentsLoadedEvent::post)
         }
 
         // World change event
