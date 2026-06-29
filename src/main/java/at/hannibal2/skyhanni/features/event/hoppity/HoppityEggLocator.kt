@@ -163,20 +163,9 @@ object HoppityEggLocator {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return
         if (lastClick.passedSince() > 5.seconds) return
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-
-        if (pos.getEntitiesNearby<FishingHook>(0.3).any()) return
-
-        bezierFitter.addPoint(pos)
+        val endCondition: (LorenzVec) -> Boolean = { it.getEntitiesNearby<FishingHook>(0.3).any() }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, endCondition = endCondition)) return
 
         val guess = guessEggLocation() ?: return
         if (!SkyBlockUtils.currentIsland.isInBounds(guess)) return
