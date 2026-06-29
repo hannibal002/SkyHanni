@@ -127,7 +127,7 @@ fun upsertComment(prNumber: String, body: String) {
 val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
     ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
 
-val artifactDir = Path("detekt-artifact")
+val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
 val sarifFile = artifactDir / "main.sarif"
 
 if (!sarifFile.exists()) {

@@ -30,7 +30,7 @@ jobs:
                     name: detekt-output
                     run-id: ${{ github.event.workflow_run.id }}
                     github-token: ${{ secrets.GITHUB_TOKEN }}
-                    path: detekt-artifact/
+                    path: ${{ runner.temp }}/detekt-artifact/
                 continue-on-error: true
 
             -   name: Resolve PR number
@@ -66,4 +66,5 @@ jobs:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
+                    ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
                 run: kotlinc -script .github/scripts/post_detekt_review.main.kts
