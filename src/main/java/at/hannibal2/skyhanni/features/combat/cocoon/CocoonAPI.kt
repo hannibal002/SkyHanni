@@ -41,7 +41,9 @@ object CocoonAPI {
     private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     /*
-    roughly where cocoon times landed across a few hundred logged cocoons.
+    roughly where cocoon's time to hatch took during my testing.
+    the expected time between the cocoon entity being detected & spawning their contained mob.
+    this is used within the Cocoon Overlay feature to estimate when the cocoon will hatch.
     */
     val expectedLifetime = 6.4.seconds
     var canCocoon: Boolean = false
