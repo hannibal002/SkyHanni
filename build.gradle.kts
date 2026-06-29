@@ -364,6 +364,8 @@ tasks.withType<KotlinCompile> {
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
             "-Xnested-type-aliases",
+            "-Xintrinsic-const-evaluation",
+            "-Xcollection-literals",
         )
     }
 }

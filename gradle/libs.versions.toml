@@ -13,7 +13,7 @@ methanol = "1.8.3"
 
 shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
-kotlin = "2.3.20"
+kotlin = "2.4.0"
 ksp = "2.3.6"
 detekt = "2.0.0-alpha.2"
 
