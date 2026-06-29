@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -28,6 +30,7 @@ import net.minecraft.core.Vec3i
 import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 // TODO rename to something else to reduce confusion
 @SkyHanniModule
@@ -82,8 +85,24 @@ object MineshaftWaypoints {
         val article = if (corpseType == CorpseType.UMBER) "an" else "a"
         ChatUtils.chat("Found $article $corpseType Corpse§e and marked its location with a waypoint.")
 
-        val waypoint = MineshaftWaypoint(corpseType.waypointType, event.location, isCorpse = true)
-        waypoints.add(waypoint)
+        val existingWaypoint = waypoints.find { it.location.distance(event.location) <= 3 }
+
+        if (existingWaypoint != null) {
+            existingWaypoint.waypointType = corpseType.waypointType
+        } else {
+            waypoints.add(
+                MineshaftWaypoint(
+                    waypointType = corpseType.waypointType,
+                    location = event.location.up(),
+                    isCorpse = true
+                )
+            )
+        }
+
+        if (event.isLastCorpse && config.corpseLocator.allFoundAlert) {
+            TitleManager.sendTitle("§aAll Corpses Found", duration = 3.seconds)
+            SoundUtils.playBeepSound()
+        }
     }
 
     @HandleEvent
@@ -126,8 +145,9 @@ object MineshaftWaypoints {
                 (it.isCorpse && config.corpseLocator.enabled) || (!it.isCorpse && config.mineshaftWaypoints.enabled)
             }
             .forEach {
+                val maxAlpha = if (it.waypointType == MineshaftWaypointType.POTENTIAL) 0.2f else 0.33f
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true, maximumAlpha = maxAlpha)
-                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.display}", it.scale)
+                event.drawDynamicText(it.location, "${it.colorCode}${it.waypointType.display}", it.scale)
             }
     }
 

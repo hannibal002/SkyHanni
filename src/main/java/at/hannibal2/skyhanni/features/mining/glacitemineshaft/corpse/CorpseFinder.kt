@@ -8,6 +8,9 @@ import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoint
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointType
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -43,6 +46,7 @@ object CorpseFinder {
 
     // Map with the corpse entity as the key and the consecutive ticks count of passing canBeSeen checks as value
     private val corpseEntities = mutableMapOf<ArmorStand, Int>()
+    private val potentialWaypoints = mutableMapOf<MineshaftWaypoint, Int>()
     private var totalCorpseCount = 0
 
     private fun areAllCorpsesFound(): Boolean {
@@ -81,6 +85,20 @@ object CorpseFinder {
                 CorpseFoundEvent(corpseType, entity.getLorenzVec().up(), areAllCorpsesFound()).post()
             }
         }
+
+        MineshaftWaypoints.waypoints.removeIf { waypoint ->
+            if (waypoint.waypointType != MineshaftWaypointType.POTENTIAL) return@removeIf false
+            if (areAllCorpsesFound()) return@removeIf true
+
+            if (!waypoint.location.canBeSeen(-1..3)) {
+                potentialWaypoints[waypoint] = 0
+                return@removeIf false
+            }
+
+            if (potentialWaypoints.addOrPut(waypoint, 1) < MARK_AS_FOUND_TICKS_THRESHOLD) return@removeIf false
+
+            corpseEntities.none { waypoint.location.distance(it.key.getLorenzVec()) <= 3 }
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
@@ -110,6 +128,7 @@ object CorpseFinder {
     @HandleEvent
     fun onWorldChange() {
         corpseEntities.clear()
+        potentialWaypoints.clear()
         totalCorpseCount = 0
     }
 }
