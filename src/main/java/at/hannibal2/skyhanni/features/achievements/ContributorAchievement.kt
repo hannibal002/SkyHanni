@@ -33,7 +33,7 @@ object ContributorAchievement {
                 },
                 userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_ACHIEVEMENT
+            CONTRIBUTOR_ACHIEVEMENT,
         )
 
         event.register(
@@ -46,7 +46,7 @@ object ContributorAchievement {
                 },
                 userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_FRIEND_ACHIEVEMENT
+            CONTRIBUTOR_FRIEND_ACHIEVEMENT,
         )
 
         event.register(
@@ -59,7 +59,7 @@ object ContributorAchievement {
                 },
                 userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_NOBODY_ACHIEVEMENT
+            CONTRIBUTOR_NOBODY_ACHIEVEMENT,
         )
 
         event.register(
@@ -72,7 +72,7 @@ object ContributorAchievement {
                 },
                 userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_REJECTED_ACHIEVEMENT
+            CONTRIBUTOR_REJECTED_ACHIEVEMENT,
         )
     }
 
