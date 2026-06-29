@@ -154,7 +154,10 @@ object MouseSensitivityReducer {
             category = CommandCategory.USERS_ACTIVE
             aliases = listOf("shlockmouse")
             simpleCallback {
-                if (manualState != SensitivityState.LOCKED) setManualState(SensitivityState.LOCKED, "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.")
+                if (manualState != SensitivityState.LOCKED) setManualState(
+                    SensitivityState.LOCKED,
+                    "Mouse rotation is now locked. Type /shmouselock to unlock your mouse.",
+                )
                 else setManualState(null, "Mouse rotation is now unlocked.")
             }
         }
@@ -162,7 +165,10 @@ object MouseSensitivityReducer {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             category = CommandCategory.USERS_ACTIVE
             simpleCallback {
-                if (manualState != SensitivityState.REDUCED) setManualState(SensitivityState.REDUCED, "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.")
+                if (manualState != SensitivityState.REDUCED) setManualState(
+                    SensitivityState.REDUCED,
+                    "Mouse sensitivity is now lowered. Type /shsensreduce to restore your sensitivity.",
+                )
                 else setManualState(null, "Mouse rotation is now unlocked.")
             }
         }
