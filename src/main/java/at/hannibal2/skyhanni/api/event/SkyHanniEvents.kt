@@ -95,7 +95,6 @@ object SkyHanniEvents {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
-        EventListeners.markEventCacheDirty()
     }
 
     val seconds = listOf(10, 60, 60 * 5)
