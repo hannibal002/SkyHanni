@@ -71,12 +71,12 @@ object HypixelCommands {
         send("gardenlevels")
     }
 
-    fun setHome() {
-        send("sethome")
+    fun setSpawn() {
+        send("setspawn")
     }
 
     // Do not remove this deprecation tag, as we want to catch all wrong uses of /gfs in the future forever.
-    @Legacy("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
+    @Deprecated("do not send /gfs commands manually to hypixel", ReplaceWith("GetFromSackApi.getFromSack(internalName, amount)"))
     fun getFromSacks(internalName: NeuInternalName, amount: Int) {
         GetFromSackApi.getFromSack(internalName, amount)
     }

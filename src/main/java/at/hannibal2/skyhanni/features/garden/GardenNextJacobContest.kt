@@ -125,9 +125,9 @@ object GardenNextJacobContest {
      * REGEX-TEST: ○ Cactus
      * REGEX-TEST: ☘ Carrot
      * REGEX-TEST: ○ Melon
-     * REGEX-TEST:  ☘ Mushroom
-     * REGEX-TEST:  ○ Pumpkin
-     * REGEX-TEST:  ○ Wheat
+     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
+     * WRAPPED-REGEX-TEST: " ○ Pumpkin"
+     * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
@@ -463,6 +463,7 @@ object GardenNextJacobContest {
     }
 
     private fun sbEnabled() = SkyBlockUtils.inSkyBlock && (GardenApi.inGarden() || config.showOutsideGarden)
+
     @Suppress("DEPRECATION")
     private fun outsideSbEnabled() = OutsideSBFeature.NEXT_JACOB_CONTEST.isSelected() && !SkyBlockUtils.inSkyBlock
     private fun isEnabled() = config.display && (sbEnabled() || outsideSbEnabled())

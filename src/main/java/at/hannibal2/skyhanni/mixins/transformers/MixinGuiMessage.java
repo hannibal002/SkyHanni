@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GuiMessageData;
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
-import at.hannibal2.skyhanni.mixins.hooks.MessageIdStore;
-import at.hannibal2.skyhanni.utils.ChatUtils;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
@@ -20,24 +18,7 @@ import net.minecraft.network.chat.MessageSignature;
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 
 @Mixin(GuiMessage.class)
-public abstract class MixinGuiMessage implements GuiMessageData, MessageIdStore {
-
-    @Unique
-    private int skyhanni$messageId;
-
-    @Unique
-    @Override
-    public int skyhanni$getMessageId() {
-        return skyhanni$messageId;
-    }
-
-    //? if < 26.1 {
-    /*@Unique
-    @Override
-    public void skyhanni$setMessageId(int id) {
-        throw new UnsupportedOperationException("setMessageId is not supported on GuiMessage");
-    }
-    *///?}
+public abstract class MixinGuiMessage implements GuiMessageData {
 
     @Unique
     private Component skyhanni$fullComponent;
@@ -65,9 +46,10 @@ public abstract class MixinGuiMessage implements GuiMessageData, MessageIdStore 
         GuiMessageTag tag,
         CallbackInfo ci
     ) {
-        skyhanni$messageId = ChatUtils.getUniqueGuiMessageId();
-
         Component component = GuiChatHook.getCurrentComponent();
+        // Clear current component for compatibility with mods that inject messages into the chat
+        // history, such as Chat Patches' persistent history feature
+        GuiChatHook.setCurrentComponent(null);
         skyhanni$fullComponent = component == null ? content : component;
     }
 }

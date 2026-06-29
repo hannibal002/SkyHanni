@@ -41,12 +41,18 @@ object PlayerUtils {
 
     fun getUuid() = getRawUuid().toUnDashedUUID()
 
-    fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
+    fun getRawUuid(): UUID = MinecraftCompat.localUser.profileId
 
-    fun getName(): String = MinecraftCompat.localPlayer.plainTextName
+    fun getName(): String = MinecraftCompat.localUser.name
 
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
+
+    /** the player is not flying, not riding a vehicle, and not using an elytra */
+    fun hasNormalMovement(): Boolean =
+        !MinecraftCompat.localPlayer.abilities.flying &&
+            !MinecraftCompat.localPlayer.isPassenger &&
+            !MinecraftCompat.localPlayer.isFallFlying
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
 
