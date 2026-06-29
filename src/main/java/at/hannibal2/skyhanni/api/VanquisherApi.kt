@@ -65,7 +65,6 @@ object VanquisherApi {
     private var lastSoundTime = SimpleTimeMark.farPast()
 
     // This does not cause a memory leak due to onMobDeSpawn handling it
-    // Do not use weak references since the event needs the Mob object to be alive
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
         if (mob != null && data != null) data.postDespawn()
     }
