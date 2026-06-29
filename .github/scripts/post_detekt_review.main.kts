@@ -18,11 +18,10 @@ import kotlin.io.path.exists
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
-val maxInline = 20
 val label = "Detekt"
+val MARKER = "<!-- detekt-review -->"
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: run { System.err.println("GITHUB_REPOSITORY not set"); exitProcess(1) }
 val token: String = System.getenv("GH_TOKEN") ?: run { System.err.println("GH_TOKEN not set"); exitProcess(1) }
-val headSha: String? = System.getenv("HEAD_SHA")?.takeIf { it.isNotEmpty() }
 
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
@@ -79,48 +78,50 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace(">", "&gt;")
     .replace("@", "&#64;")
 
-fun buildBody(findings: List<Finding>, inlinePosted: Boolean): String = buildString {
+fun buildBody(findings: List<Finding>): String = buildString {
+    appendLine(MARKER)
+    if (findings.isEmpty()) {
+        appendLine("## No Detekt issues found ✅")
+        return@buildString
+    }
     appendLine("## Detekt found ${findings.size} issue(s)")
     appendLine("")
-    when {
-        inlinePosted && findings.size <= maxInline ->
-            appendLine("All issues are shown as inline comments.")
-
-        inlinePosted -> {
-            appendLine("The first $maxInline issues are shown as inline comments.")
-            val overflow = findings.drop(maxInline)
-            appendLine("\n<details><summary>${overflow.size} more issue(s)</summary>\n")
-            overflow.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
-            appendLine("\n</details>")
-        }
-
-        else -> {
-            appendLine("Inline review comments could not be created. Listing all findings below.\n")
-            findings.take(maxInline)
-                .forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
-            val overflow = findings.drop(maxInline)
-            if (overflow.isNotEmpty()) {
-                appendLine("\n<details><summary>${overflow.size} more issue(s)</summary>\n")
-                overflow.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
-                appendLine("\n</details>")
-            }
-        }
+    val direct = findings.take(20)
+    val overflow = findings.drop(20)
+    direct.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
+    if (overflow.isNotEmpty()) {
+        appendLine("\n<details><summary>${overflow.size} more issue(s)</summary>\n")
+        overflow.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
+        appendLine("\n</details>")
     }
 }
 
-fun postReview(
-    prNumber: String,
-    body: String,
-    comments: List<Map<String, Any>>? = null,
-    commitSha: String? = null
-): Pair<Int, JsonElement> {
-    val payload = buildMap {
-        put("body", body)
-        put("event", "COMMENT")
-        if (commitSha != null) put("commit_id", commitSha)
-        if (!comments.isNullOrEmpty()) put("comments", comments)
+fun findExistingComment(prNumber: String): Long? {
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/comments?per_page=100&page=$page")
+        if (status !in 200..299) return null
+        val arr = body as? JsonArray ?: return null
+        if (arr.size() == 0) return null
+        for (elem in arr) {
+            if (!elem.isJsonObject) continue
+            val bodyText = elem.asJsonObject.get("body")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            if (MARKER in bodyText) return elem.asJsonObject.get("id")?.takeIf { it.isJsonPrimitive }?.asLong
+        }
+        if (arr.size() < 100) return null
+        page++
     }
-    return ghRequest("POST", "/repos/$repo/pulls/$prNumber/reviews", payload)
+}
+
+fun upsertComment(prNumber: String, body: String) {
+    val existingId = findExistingComment(prNumber)
+    if (existingId != null) {
+        val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$existingId", mapOf("body" to body))
+        if (status !in 200..299) System.err.println("Warning: could not update comment (HTTP $status)")
+    } else {
+        val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
+        if (status !in 200..299) System.err.println("Warning: could not post comment (HTTP $status)")
+    }
 }
 
 val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
@@ -171,37 +172,12 @@ val findings = buildList {
 }
 
 if (findings.isEmpty()) {
-    println("No findings, removing label")
+    println("No findings, removing label and updating comment")
     setLabel(prNumber, false)
+    upsertComment(prNumber, buildBody(emptyList()))
     exitProcess(0)
 }
 
-val inlineComments = findings.take(maxInline)
-    .groupBy { it.path to it.line }
-    .map { (key, group) ->
-        val (path, line) = key
-        val body = group.sortedBy { it.ruleId }.joinToString("\n") { "`${sanitize(it.ruleId)}`: ${sanitize(it.message)}" }
-        mapOf("path" to path, "line" to line, "side" to "RIGHT", "body" to body)
-    }
-
-val firstResult = postReview(prNumber, buildBody(findings, inlinePosted = true), inlineComments, headSha)
-var status = firstResult.first
-var resp = firstResult.second
-
-if (status == 422) {
-    val msg = (resp as? JsonObject)?.get("message")?.asString ?: ""
-    println("Inline comments rejected (HTTP 422: $msg), retrying body-only")
-    val retryResult = postReview(prNumber, buildBody(findings, inlinePosted = false), commitSha = headSha)
-    status = retryResult.first
-    resp = retryResult.second
-}
-
-if (status !in 200..299) {
-    val msg = (resp as? JsonObject)?.get("message")?.asString ?: ""
-    System.err.println("Failed to post review: HTTP $status: $msg")
-    exitProcess(1)
-}
-
+upsertComment(prNumber, buildBody(findings))
 setLabel(prNumber, true)
-val overflow = maxOf(0, findings.size - maxInline)
-println("Done: ${minOf(findings.size, maxInline)} inline comment(s), $overflow in body spoiler")
+println("Done: ${findings.size} finding(s) posted")
