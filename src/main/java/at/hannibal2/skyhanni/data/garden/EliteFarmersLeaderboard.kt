@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
@@ -115,7 +114,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
         eliteLeaderboardData.forEach { lbType ->
             if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
@@ -529,7 +528,7 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {
