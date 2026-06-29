@@ -35,7 +35,7 @@ object HighlightCurrentPet {
         if (!inInventory) return
         val currentPetUuid = CurrentPetApi.currentPet?.uuid ?: return
         highlightSlot = event.inventoryItems.entries.firstOrNull {
-            it.value.getPetInfo()?.uniqueId == currentPetUuid
+            it.value.getPetInfo()?.ownedUuid == currentPetUuid
         }?.key
     }
 }

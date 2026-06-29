@@ -480,7 +480,7 @@ object CurrentPetDisplay {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.general.enabled.get()) return
-        PetStorageApi.petWidgetDisplayMessage?.let { lines ->
+        PetStorageApi.getPetWidgetDisplayMessage()?.let { lines ->
             invalidateRenderable()
             config.general.position.renderRenderable(
                 buildWidgetMessageRenderable(lines, config.text.equippedPet),

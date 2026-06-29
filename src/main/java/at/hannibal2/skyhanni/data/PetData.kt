@@ -47,7 +47,7 @@ data class PetData(
         petInfo.getSkinVariantIndex(),
         petInfo.heldItem,
         petInfo.exp,
-        petInfo.uniqueId ?: petInfo.uuid
+        petInfo.ownedUuid
     )
 
     private val tierBoosted get() = heldItemInternalName == TIER_BOOST && petInternalName.hasValidHigherTier()

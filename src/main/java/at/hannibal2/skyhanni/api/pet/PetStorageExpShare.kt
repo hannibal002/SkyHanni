@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.PetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.util.UUID
@@ -14,9 +13,8 @@ object PetStorageExpShare {
     private val expShareSlots = listOf(30, 31, 32)
     private const val EXP_SHARING_INVENTORY_NAME = "Exp Sharing"
 
-    private val PetInfo.ownedUuid: UUID? get() = uniqueId ?: uuid
-
-    fun readInventory(inventoryItems: Map<Int, SafeItemStack>) {
+    fun readInventory(inventoryName: String, inventoryItems: Map<Int, SafeItemStack>) {
+        if (!isInventory(inventoryName)) return
         val petStorage = petStorage ?: return
         petStorage.expSharePets.clear()
         petStorage.expSharePets.addAll(
