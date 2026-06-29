@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -167,14 +169,16 @@ enum class MiningEventType(
         CompressFormat.DEFAULT -> normalTextWithIcon
     }
 
-    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk
+    // TODO on 1.8 this used to make it darker, the shader we had for that is gone now so idk
     fun getRenderableAsPast(): Renderable = getRenderable()
 
+    @SkyHanniModule
     companion object {
+
         private val config get() = SkyHanniMod.feature.mining.miningEvent
 
-        // Because we don't want to hard-code the goblin texture, this gets called by SkullTextureHolder when the repository is loaded
-        fun fixGoblinItemStack() {
+        @HandleEvent
+        fun onComponentsLoaded() {
             val goblinItemStack = ItemUtils.createSkull(
                 "Goblin",
                 "32518c29-6127-3c71-b2a7-be4c3251e76f",

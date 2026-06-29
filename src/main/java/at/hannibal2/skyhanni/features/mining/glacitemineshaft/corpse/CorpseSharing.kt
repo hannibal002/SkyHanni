@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.glacitemineshaft
+package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -6,31 +6,18 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
-import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.toLorenzVec
-import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.entity.decoration.ArmorStand
-import kotlin.time.Duration.Companion.seconds
 
-// TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule
-object CorpseLocator {
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+object CorpseSharing {
 
     /**
      * REGEX-TEST: x: -164, y: 8, z: -154 | (Lapis Corpse)
@@ -115,6 +102,18 @@ object CorpseLocator {
             TitleManager.sendTitle("§aAll Corpses Found", duration = 3.seconds)
             SoundUtils.playBeepSound()
         }
+    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+
+    // This list only keeps track of already shared waypoints by anyone in the chat.
+    // They don't get rendered.
+    private val sharedWaypoints = mutableListOf<LorenzVec>()
+
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
+    fun onSecondPassed() {
+        if (!config.autoSendLocation) return
+        if (MineshaftWaypoints.waypoints.isEmpty()) return
+        if (PartyApi.partyMembers.isEmpty()) return
+        shareCorpse()
     }
 
     private fun shareCorpse() {
@@ -126,27 +125,10 @@ object CorpseLocator {
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val location = closestCorpse.location.toChatFormat()
-        val type = closestCorpse.waypointType.displayText
+        val type = closestCorpse.waypointType.display
 
         HypixelCommands.partyChat("$location | ($type)")
         closestCorpse.shared = true
-    }
-
-
-    @HandleEvent
-    fun onWorldChange() {
-        sharedWaypoints.clear()
-        corpseEntities.clear()
-        foundAllCorpses = false
-    }
-
-    @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
-        if (!config.autoSendLocation) return
-        if (MineshaftWaypoints.waypoints.isEmpty()) return
-        if (PartyApi.partyMembers.isEmpty()) return
-        shareCorpse()
     }
 
     @HandleEvent
@@ -159,8 +141,13 @@ object CorpseLocator {
         handleChatEvent(event.author, event.message)
     }
 
+    @HandleEvent
+    fun onWorldChange() {
+        sharedWaypoints.clear()
+    }
+
     private fun handleChatEvent(author: String, message: String) {
-        if (!isEnabled()) return
+        if (!config.enabled || !IslandType.MINESHAFT.isInIsland()) return
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
@@ -171,6 +158,4 @@ object CorpseLocator {
             sharedWaypoints.add(location)
         }
     }
-
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.enabled
 }
