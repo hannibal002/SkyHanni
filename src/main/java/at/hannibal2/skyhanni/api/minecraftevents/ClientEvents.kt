@@ -32,6 +32,7 @@ import java.util.concurrent.CompletableFuture
 
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 //?}
 
