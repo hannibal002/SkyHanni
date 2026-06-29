@@ -92,7 +92,8 @@ object DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val data = mutableMapOf<UUID, EntityData>()
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
+    // EntityData is owned by the field 'data', so we can use weak keys
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
 
     private var tarantulaFoundTime = SimpleTimeMark.farPast()
     private val tarantulaErrored = mutableSetOf<UUID>()

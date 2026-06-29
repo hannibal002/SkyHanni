@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -231,4 +232,7 @@ object EntityUtils {
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
 
+    fun LivingEntity.hasVisibleEquipment(): Boolean = EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
+
+    fun Entity.isEmptyInvisibleArmorStand(): Boolean = this is ArmorStand && isInvisible && !hasVisibleEquipment()
 }
