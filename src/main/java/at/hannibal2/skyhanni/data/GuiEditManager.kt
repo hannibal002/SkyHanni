@@ -20,6 +20,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import org.joml.Vector2i
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -151,6 +152,3 @@ object GuiEditManager {
 }
 
 private data class CurrentPosition(val position: Position, val isChestGuiOverlay: Boolean)
-
-// TODO remove
-class Vector2i(val x: Int, val y: Int)

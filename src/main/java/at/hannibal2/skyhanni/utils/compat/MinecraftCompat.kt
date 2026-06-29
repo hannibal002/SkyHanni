@@ -43,6 +43,9 @@ object MinecraftCompat {
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 
+    val hideGui get(): Boolean = Minecraft.getInstance().options.hideGui
+
+    //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
 
     @JvmStatic

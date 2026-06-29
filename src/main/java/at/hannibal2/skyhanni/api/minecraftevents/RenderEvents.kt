@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPostEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRoundedShapeRenderManager
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniItemRenderCoordinator
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniPipCoordinatorRenderer
@@ -12,12 +14,12 @@ import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegis
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements
 import net.minecraft.client.DeltaTracker
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
 @SkyHanniModule
 object RenderEvents {
+    private val config get() = SkyHanniMod.feature.gui
 
     init {
         HudElementRegistry.attachElementBefore(
@@ -44,7 +46,8 @@ object RenderEvents {
     // IntelliJ is wrong, the unused parameter is required to confirm to the HudElement interface
     @Suppress("unused")
     private fun postGui(context: GuiGraphicsExtractor, deltaTracker: DeltaTracker) {
-        if (Minecraft.getInstance().gui.hud.isHidden) return
+        if (MinecraftCompat.hideGui) return
+        if (config.hideGuiInDebugMenu && MinecraftCompat.showDebugHud) return
         RenderData.postRenderOverlay(context)
     }
 
