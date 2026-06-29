@@ -59,7 +59,7 @@ object CocoonAPI {
      */
     private val cocoonChatMessage by patternGroup.pattern(
         "spawn",
-        "CAUGHT! You cocooned an? (?<name>(\\w+| )+)!",
+        "CAUGHT! You cocooned an? (?<name>[\\w ]+)!",
     )
     // Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
 
