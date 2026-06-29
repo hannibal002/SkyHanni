@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.common.cache.RemovalCause
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.minutes
@@ -64,8 +65,9 @@ object VanquisherApi {
     private var lastSoundPos: LorenzVec? = null
     private var lastSoundTime = SimpleTimeMark.farPast()
 
-    private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes, useWeakKeys = true) { mob, data, _ ->
-        if (mob != null && data != null) data.postDespawn()
+    private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes, useWeakKeys = true) { mob, data, reason ->
+        if (mob == null && reason != RemovalCause.COLLECTED) return@TimeLimitedCache
+        data?.postDespawn()
     }
 
     private val vanquisherShortTimeout = 2.seconds
