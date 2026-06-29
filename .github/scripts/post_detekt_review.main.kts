@@ -52,18 +52,19 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
 fun setLabel(prNumber: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
-        if (status !in 200..201) System.err.println("Warning: could not add $label label (HTTP $status)")
+        if (status !in 200..299) System.err.println("Warning: could not add $label label (HTTP $status)")
     } else {
         val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8)
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
-        if (status !in 200..204 && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
+        if (status !in 200..299 && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
 }
 
 fun normalizePath(uri: String, workspace: String): String {
     val path = uri.removePrefix("file://")
     if (workspace.isNotEmpty() && path.startsWith(workspace)) return path.removePrefix(workspace).trimStart('/')
-    if ("SkyHanni/" in path) return path.substringAfter("SkyHanni/")
+    val repoName = repo.substringAfter("/")
+    if (repoName.isNotEmpty() && "$repoName/" in path) return path.substringAfter("$repoName/")
     return path
 }
 
@@ -93,7 +94,7 @@ fun buildBody(findings: List<Finding>, inlinePosted: Boolean): String = buildStr
         }
 
         else -> {
-            appendLine("Could not add inline comments (violations may be in unchanged code).\n")
+            appendLine("Inline review comments could not be created. Listing all findings below.\n")
             findings.take(maxInline)
                 .forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
             val overflow = findings.drop(maxInline)
@@ -174,9 +175,13 @@ if (findings.isEmpty()) {
     exitProcess(0)
 }
 
-val inlineComments = findings.take(maxInline).map { f ->
-    mapOf("path" to f.path, "line" to f.line, "side" to "RIGHT", "body" to "`${sanitize(f.ruleId)}`: ${sanitize(f.message)}")
-}
+val inlineComments = findings.take(maxInline)
+    .groupBy { it.path to it.line }
+    .map { (key, group) ->
+        val (path, line) = key
+        val body = group.joinToString("\n") { "`${sanitize(it.ruleId)}`: ${sanitize(it.message)}" }
+        mapOf("path" to path, "line" to line, "side" to "RIGHT", "body" to body)
+    }
 
 val firstResult = postReview(prNumber, buildBody(findings, inlinePosted = true), inlineComments, headSha)
 var status = firstResult.first
@@ -190,7 +195,7 @@ if (status == 422) {
     resp = retryResult.second
 }
 
-if (status !in 200..201) {
+if (status !in 200..299) {
     val msg = (resp as? JsonObject)?.get("message")?.asString ?: ""
     System.err.println("Failed to post review: HTTP $status: $msg")
     exitProcess(1)
