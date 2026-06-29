@@ -118,7 +118,7 @@ enum class IslandType(private val nameFallback: String) {
         }
     }
 
-    fun isInIsland() = SkyBlockUtils.currentIsland == this
+     fun isInIsland() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland == this
 }
 
 data class IslandData(
