@@ -56,12 +56,14 @@ object CocoonAPI {
     /**
      * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
      * REGEX-TEST: CAUGHT! You cocooned a Enderman!
+     * REGEX-TEST: CAUGHT! You cocooned an Enderman!
      */
     private val cocoonChatMessage by patternGroup.pattern(
         "spawn",
         "CAUGHT! You cocooned an? (?<name>[\\w ]+)!",
     )
     // Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
+    // The regex test for "an Enderman" was faked at the point of the original PR due to above comment.
 
     data class CocoonMob(
         val mob: Mob,
