@@ -22,11 +22,11 @@ jobs:
         if: github.event.workflow_run.event == 'pull_request'
         steps:
             -   name: Checkout
-                uses: actions/checkout@v6
+                uses: actions/checkout@v7
 
             -   name: Download detekt artifact
                 id: download
-                uses: actions/download-artifact@v4
+                uses: actions/download-artifact@v8
                 with:
                     name: detekt-output
                     run-id: ${{ github.event.workflow_run.id }}
@@ -48,16 +48,16 @@ jobs:
                     echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
 
             -   name: Cache Kotlin compiler
-                uses: actions/cache@v4
+                uses: actions/cache@v6
                 with:
                     path: ~/kotlinc
-                    key: kotlin-2.0.21
+                    key: kotlin-2.4.0
 
             -   name: Set up Kotlin
                 run: |
                     if [ ! -d "$HOME/kotlinc" ]; then
-                        curl -sLO "https://github.com/JetBrains/kotlin/releases/download/v2.0.21/kotlin-compiler-2.0.21.zip"
-                        unzip -q kotlin-compiler-2.0.21.zip -d "$HOME"
+                        curl -sLO "https://github.com/JetBrains/kotlin/releases/download/v2.4.0/kotlin-compiler-2.4.0.zip"
+                        unzip -q kotlin-compiler-2.4.0.zip -d "$HOME"
                     fi
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
