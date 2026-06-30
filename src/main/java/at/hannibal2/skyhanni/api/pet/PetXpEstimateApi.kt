@@ -136,15 +136,14 @@ object PetXpEstimateApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
-        val bestBeastmasterMultiplier = event.inventoryItems.values
+        val currentBeastmasterMultiplier = event.inventoryItems.values
             .mapNotNull { it.readBeastmasterMultiplierOrNull() }
             .maxOrNull()
-            ?: return
 
         val petStorage = ProfileStorageData.petProfiles ?: return
-        if (bestBeastmasterMultiplier <= (petStorage.beastmasterPetXpMultiplier ?: 1.0)) return
+        if (currentBeastmasterMultiplier == petStorage.beastmasterPetXpMultiplier) return
 
-        petStorage.beastmasterPetXpMultiplier = bestBeastmasterMultiplier
+        petStorage.beastmasterPetXpMultiplier = currentBeastmasterMultiplier
         clearBeastmasterMultiplierCache()
         PetStorageApi.markDirty()
     }
