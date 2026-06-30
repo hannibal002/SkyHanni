@@ -9,13 +9,14 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
@@ -60,14 +61,14 @@ object PurseApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryName = InventoryUtils.openInventoryName()
         val item = event.item ?: return
-        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        val itemName = item.cleanName()
 
-        if (inventoryName in setOf("Auction View", "BIN Auction View") && itemName == "§6Collect Auction") {
+        if (inventoryName.equalsOneOf("Auction View", "BIN Auction View") && itemName == "Collect Auction") {
             lastAuctionHouseCoinClaim = SimpleTimeMark.now()
             return
         }
 
-        if (inventoryName in setOf("Your Bids", "Manage Auctions") && itemName == "§aClaim All") {
+        if (inventoryName.equalsOneOf("Your Bids", "Manage Auctions") && itemName == "Claim All") {
             lastAuctionHouseCoinClaim = SimpleTimeMark.now()
             return
         }
