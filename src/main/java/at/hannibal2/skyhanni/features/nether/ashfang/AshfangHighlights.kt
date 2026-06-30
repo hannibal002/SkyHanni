@@ -28,8 +28,8 @@ object AshfangHighlights {
 
     private val config get() = AshfangManager.config
 
-    private val BLAZING_SOUL by lazy { SkullTextureHolder.getTexture("ASHFANG_BLAZING_SOUL") }
-    private val GRAVITY_ORB by lazy { SkullTextureHolder.getTexture("ASHFANG_GRAVITY_ORB") }
+    private val BLAZING_SOUL by SkullTextureHolder.texture("ASHFANG_BLAZING_SOUL")
+    private val GRAVITY_ORB by SkullTextureHolder.texture("ASHFANG_GRAVITY_ORB")
     private val blazingSouls = mutableSetOf<ArmorStand>()
     private val gravityOrbs = mutableSetOf<ArmorStand>()
     private const val MAX_DISTANCE = 15.0

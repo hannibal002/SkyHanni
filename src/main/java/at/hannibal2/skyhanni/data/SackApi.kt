@@ -149,6 +149,8 @@ object SackApi {
     var sackListNames = emptySet<String>()
         private set
 
+    private var uniqueSackItems: Set<NeuInternalName> = emptySet()
+
     var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
@@ -363,13 +365,21 @@ object SackApi {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
-        val uniqueSackItems = mutableSetOf<NeuInternalName>()
-
-        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
+        rebuildSackNameLists()
+    }
 
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onComponentsLoaded() {
+        rebuildSackNameLists()
+    }
+
+    private fun rebuildSackNameLists() {
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map {
+            it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
+        }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
