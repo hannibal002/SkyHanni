@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
@@ -43,6 +44,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.suggest
 import at.hannibal2.skyhanni.utils.inPartialHours
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -155,7 +157,17 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
     }
 
