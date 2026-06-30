@@ -157,14 +157,15 @@ object EntityUtils {
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
-    fun ArmorStand.hasSkullTexture(skin: String): Boolean {
+    fun ArmorStand.hasSkullTexture(skin: String?): Boolean {
+        skin ?: return false
         val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
     fun ArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
-    fun ArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
-    fun ArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
+    fun ArmorStand.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
+    fun ArmorStand.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
 
     internal fun Player.isNpc() = !isRealPlayer()
 

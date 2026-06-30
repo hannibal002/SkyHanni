@@ -121,7 +121,7 @@ object TrevorFeatures {
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
 
-    private var trevorTexture: String? = null
+    private val trevorTexture by SkullTextureHolder.texture("TREVOR")
     private var trevorEntity: RemotePlayer? = null
 
     var questActive = false
@@ -275,16 +275,6 @@ object TrevorFeatures {
             currentLabel = "§2Ready"
         }
     }
-
-    private fun loadTrevorTexture() {
-        trevorTexture = SkullTextureHolder.getTextureOrNull("TREVOR")
-    }
-
-    @HandleEvent
-    fun onRepoReload() = loadTrevorTexture()
-
-    @HandleEvent
-    fun onComponentsLoaded() = loadTrevorTexture()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {

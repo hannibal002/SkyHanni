@@ -385,6 +385,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 publishing.publications {
     create<MavenPublication>("maven") {
+        artifact(tasks.shadowJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
