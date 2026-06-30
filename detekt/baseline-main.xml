@@ -27,7 +27,6 @@
     <ID>BackingPropertyNaming:DiscordIPC.kt:DiscordIPC$@Volatile private var _connected = false</ID>
     <ID>BackingPropertyNaming:HolographicEntities.kt:HolographicEntities$private var _internalEntityHoloBases: Map&lt;KClass&lt;out LivingEntity&gt;, HolographicBase&lt;out LivingEntity&gt;&gt;? = null</ID>
     <ID>BackingPropertyNaming:LazyVar.kt:LazyVar$private var _value: T? = null</ID>
-    <ID>BackingPropertyNaming:SkyHanniRenderPipeline.kt:SkyHanniRenderPipeline$private val _pipe: RenderPipeline = RenderPipelines.register( RenderPipeline.builder(snippet) .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase())) .withVertexFormat(vFormat, vDrawMode).apply { // One or the other, never both blend?.let(this::withBlend) ?: withCull?.let(this::withCull) vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) } fragmentShaderPath?.let { withFragmentShader( Identifier.fromNamespaceAndPath( SkyHanniMod.MODID, it ) ) } sampler?.let(this::withSampler) uniforms.forEach(this::withUniform) withDepthWrite(depthWrite) withDepthTestFunction(depthTestFunction) }.build(), )</ID>
     <ID>BackingPropertyNaming:UpdateManager.kt:UpdateManager$private var _activePromise: CompletableFuture&lt;*&gt;? = null</ID>
     <ID>ChainWrapping:Renderable.kt:Renderable.Companion$||</ID>
     <ID>ComplexCondition:TextCompat.kt:chatStyle.isNotEmpty() &amp;&amp; (leadingWhite || (wasFormatted &amp;&amp; (sb.length != 2 || sb[0] != '§' || sb[1] != 'r')) || chatStyle != "§f")</ID>
@@ -57,7 +56,7 @@
     <ID>Kdoc:BitsApi.kt:BitsApi$/** * We can't increase [BitsApi.bits] here since that difference is alr accounted for, * if we do, it will be counted twice */</ID>
     <ID>Kdoc:BossType.kt:BossType$/** * TODO dungeon mini bosses * shadow assassin * lost adventurer * frozen adventurer * king midas * in blood room: bonzo, scarf, ?? * f7 blood room giants * */</ID>
     <ID>Kdoc:ComponentMatcherUtils.kt:/** * @author Linnea Gräf */</ID>
-    <ID>Kdoc:CorpseApi.kt:CorpseApi$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
+    <ID>Kdoc:CorpseLoot.kt:CorpseLoot$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
     <ID>Kdoc:CustomScoreboard.kt:/** * TODO LIST * - countdown events like fishing festival + fiesta when its not on tablist * - choose the amount of decimal places in shorten nums * - heavily optimize elements and events by only updating them when absolutely needed */</ID>
     <ID>Kdoc:ForagingTracker.kt:ForagingTracker$/** * this is a failsafe in the event of runes lacking sufficient NEU repo data to automagically * fetch their correct internal names, and thus translating their in-game names into internal * names literally */</ID>
     <ID>Kdoc:FossilExcavatorApi.kt:FossilExcavatorApi$/** * TODO fix the bug that readItemAmount produces two different outputs: * §r§fEnchanted Book -&gt; §fEnchanted * §fEnchanted Book §r§8x -&gt; §fEnchanted Book * * also maybe this is no bug, as enchanted book is no real item? */</ID>
@@ -84,17 +83,11 @@
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt:SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt:NavigationHelper$distances[node]!!</ID>
-    <ID>MaxLineLength:BestiaryData.kt:BestiaryData$val level = " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())?.groupValues?.get(1) ?: "0"</ID>
     <ID>MaxLineLength:CFStrayWarning.kt:CFStrayWarning$clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures</ID>
     <ID>MaxLineLength:ColoredBlockCompat.kt:ColoredBlockCompat.Companion$block.glassBlock == this.block || block.glassPaneBlock == this.block || block.woolBlock == this.block || block.clayBlock == this.block</ID>
-    <ID>MaxLineLength:EntityClickEvent.kt:EntityClickEvent$class</ID>
     <ID>MaxLineLength:EssenceShopHelper.kt:EssenceShopHelper$if</ID>
     <ID>MaxLineLength:EstimatedItemValueCalculator.kt:EstimatedItemValueCalculator$"Wrong item rarity detected in estimated item value for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}"</ID>
-    <ID>MaxLineLength:HoppityApi.kt:HoppityApi$if (sideDishNamePattern.matches(slot.item.hoverName.formattedTextCompatLeadingWhiteLessResets())) EggFoundEvent(SIDE_DISH, event.slotId).post()</ID>
     <ID>MaxLineLength:HoppityApi.kt:HoppityApi$it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value</ID>
-    <ID>MaxLineLength:HoppityCollectionStats.kt:HoppityCollectionStats$if</ID>
-    <ID>MaxLineLength:HoppityCollectionStats.kt:HoppityCollectionStats$stack.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() &amp;&amp; stack.isDye() &amp;&amp; (stack.isDye(8) || stack.isMilestoneRabbit())</ID>
-    <ID>MaxLineLength:InfernoMinionFeatures.kt:InfernoMinionFeatures$NeuInternalName.fromItemNameOrNull(event.container.getSlot(19).item.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds</ID>
     <ID>MaxLineLength:InfernoMinionFeatures.kt:InfernoMinionFeatures$val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds</ID>
     <ID>MaxLineLength:InvisibugHighlighter.kt:InvisibugHighlighter$val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox&lt;ArmorStand&gt;(aabb).minByOrNull { it.distanceTo(event.location) } ?: return</ID>
     <ID>MaxLineLength:IslandExceptions.kt:IslandExceptions$(armorStand.name.formattedTextCompatLessResets() == "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿" || armorStand.name.formattedTextCompatLessResets() == "§3§lWatchful Eye§r")</ID>
@@ -104,7 +97,6 @@
     <ID>MaxLineLength:MobFilter.kt:MobFilter$extraEntityList.lastOrNull()?.name.formattedTextCompatLessResets() == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿"</ID>
     <ID>MaxLineLength:RareDropMessages.kt:RareDropMessages$"(?&lt;start&gt;(?:§.)*⛃ (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?&lt;rarityColor&gt;.)(?&lt;petName&gt;[^§(.]+)(?&lt;end&gt;.*)"</ID>
     <ID>MaxLineLength:SackApi.kt:SackApi$if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = gem</ID>
-    <ID>MaxLineLength:ShowFishingItemName.kt:ShowFishingItemName$val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }</ID>
     <ID>MaxLineLength:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$ChatUtils.debug("Gemstone quality is null for item name().formattedTextCompatLeadingWhiteLessResets()§7: ('$key' = '$value')")</ID>
     <ID>MaxLineLength:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$ChatUtils.debug("Gemstone type is null for item name().formattedTextCompatLeadingWhiteLessResets()§7: ('$newKey' with '$key' = '$value')")</ID>
     <ID>MaxLineLength:SkyBlockXPApi.kt:SkyBlockXPApi$val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return</ID>
@@ -121,7 +113,6 @@
     <ID>MultilineLoop:TabWidget.kt:TabWidget.Companion$when { PLAYER_LIST.pattern.matches(header) -&gt; if (playerListFound) removeIndexes.add(index - removeIndexes.size) else playerListFound = true INFO.pattern.matches(header) -&gt; if (infoFound) removeIndexes.add(index - removeIndexes.size) else infoFound = true }</ID>
     <ID>NoNameShadowing:ChatManager.kt:ChatManager$reason</ID>
     <ID>NoNameShadowing:CommandUtils.kt:CommandUtils$start</ID>
-    <ID>NoNameShadowing:EnoughUpdatesManager.kt:EnoughUpdatesManager${ it.value.asComponent() }</ID>
     <ID>NoNameShadowing:FarmingWeightData.kt:FarmingWeightData$type</ID>
     <ID>NoNameShadowing:GuiOptionEditorUpdateCheck.kt:GuiOptionEditorUpdateCheck$width</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt:HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
@@ -142,7 +133,6 @@
     <ID>NoUnusedImports:FirstMinionTier.kt:at.hannibal2.skyhanni.features.bingo.FirstMinionTier.kt</ID>
     <ID>NoUnusedImports:GuiIngameHook.kt:at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook.kt</ID>
     <ID>NoUnusedImports:HitmanApi.kt:at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.kt</ID>
-    <ID>NoUnusedImports:PlayerTabComplete.kt:at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerTabComplete.kt</ID>
     <ID>NoUnusedImports:QuickCraftFeatures.kt:at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures.kt</ID>
     <ID>NoUnusedImports:RiftTimer.kt:at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer.kt</ID>
     <ID>NoUnusedImports:RngMeterInventory.kt:at.hannibal2.skyhanni.features.inventory.RngMeterInventory.kt</ID>
@@ -151,7 +141,6 @@
     <ID>NoUnusedImports:StatsTuning.kt:at.hannibal2.skyhanni.features.inventory.StatsTuning.kt</ID>
     <ID>PropertyName:FishingApi.kt:FishingApi$const val babySlugName = "Baby Magma Slug"</ID>
     <ID>PropertyName:FrozenTreasureHighlighter.kt:FrozenTreasureHighlighter$private const val yOffset = 2</ID>
-    <ID>PropertyName:GardenApi.kt:GardenApi$private const val gardenOverflowExp = 10000</ID>
     <ID>PropertyName:HideExCoopMembers.kt:HideExCoopMembers$private const val usage = "§c/shedithiddencoopmembers &lt;add|remove&gt; &lt;name&gt;"</ID>
     <ID>PropertyName:KingTalismanHelper.kt:KingTalismanHelper$var farDisplay_: String? = null</ID>
     <ID>PropertyName:LegionBobbinOverlay.kt:LegionBobbinOverlay$private var BOBBERS_DISTANCE = 30.0</ID>
@@ -163,12 +152,10 @@
     <ID>PropertyName:PestTrapApi.kt:PestTrapApi$var MAX_TRAPS = 3 private set</ID>
     <ID>PropertyName:QuiverApi.kt:QuiverApi$private var FLINT_ARROW_TYPE: ArrowType? = null</ID>
     <ID>PropertyName:QuiverApi.kt:QuiverApi$var NONE_ARROW_TYPE: ArrowType? = null</ID>
-    <ID>PropertyName:RepoPatternManager.kt:RepoPatternManager$// idk what this is for private const val insideTest = false</ID>
     <ID>PropertyName:ShiftClickBrewing.kt:ShiftClickBrewing$private const val closeButtonIndex = 49</ID>
     <ID>PropertyName:SpringBootsHelper.kt:SpringBootsHelper$private const val endSound = "entity.generic.eat"</ID>
     <ID>PropertyName:SpringBootsHelper.kt:SpringBootsHelper$private const val startSound = "entity.firework_rocket.launch"</ID>
     <ID>PropertyName:SpringBootsHelper.kt:SpringBootsHelper$private const val streakSound = "block.note_block.pling"</ID>
-    <ID>PropertyName:VersionConstants.kt:VersionConstants$// Do not use this mc version as its reflective of the compile time version // And might not be correct at run time // We use it for the auto updater only var MC_VERSION = "1.21.11" private set</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val legacyAABB = "net.minecraft.util.AxisAlignedBB"</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val legacyBlockPos = "net.minecraft.util.BlockPos"</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val modernAABB = "net.minecraft.util.math.Box"</ID>
@@ -213,8 +200,6 @@
     <ID>RepoPatternRegexTestMissing:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$by patternGroup.pattern( "main.scoreboard.halloween", "^§6Halloween \\d+$", )</ID>
     <ID>RepoPatternRegexTestMissing:HighlightPlaceableNpcs.kt:HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
     <ID>RepoPatternRegexTestMissing:HotmData.kt:HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
-    <ID>RepoPatternRegexTestMissing:HypixelData.kt:HypixelData$by patternGroup.pattern( "lobbytype", "(?&lt;lobbyType&gt;.*lobby)\\d+", )</ID>
-    <ID>RepoPatternRegexTestMissing:HypixelData.kt:HypixelData$by patternGroup.pattern( "servername.connection", "(?&lt;prefix&gt;.+\\.)?hypixel\\.net", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt:ItemAbilityCooldown$by patternGroup.pattern( "alignedother", "§eYou aligned §r§a.* §r§eother players?!", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt:ItemAbilityCooldown$by patternGroup.pattern( "buffedyourself", "§aYou buffed yourself for §r§c\\+\\d+❁ Strength", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAddManager.kt:ItemAddManager$by RepoPattern.pattern( "data.itemmanager.diceroll", "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?&lt;number&gt;.)§r§e! Bonus: §r§.(?&lt;hearts&gt;.*)❤", )</ID>
@@ -291,25 +276,14 @@
     <ID>SpacingAroundParens:ChestValue.kt:ChestValue$)</ID>
     <ID>SpacingAroundParens:GuiContainerHook.kt:GuiContainerHook$)</ID>
     <ID>SpacingAroundParens:IsFishingDetection.kt:IsFishingDetection$)</ID>
-    <ID>SpreadOperator:LimboPlaytime.kt:LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:TextHelper.kt:TextHelper$(*component.toTypedArray(), separator = separator)</ID>
-    <ID>StatementWrapping:CropDisplay.kt:CropDisplay${ cropStorage?.enum = value }</ID>
-    <ID>StatementWrapping:CropDisplay.kt:CropDisplay${ cropStorage?.mode = value }</ID>
-    <ID>StatementWrapping:CropFeverTracker.kt:CropFeverTracker${ addAll(rngDropList) }</ID>
-    <ID>StatementWrapping:CropFeverTracker.kt:CropFeverTracker${ drawItems(bucketData, { true }, this) }</ID>
-    <ID>StatementWrapping:CropFeverTracker.kt:CropFeverTracker${ lineMap[line]?.let { add(it) } }</ID>
     <ID>StatementWrapping:ItemTrackerData.kt:ItemTrackerData${ removalRunner(internalName) }</ID>
     <ID>StatementWrapping:ItemTrackerData.kt:ItemTrackerData${ timesGained++ }</ID>
     <ID>StatementWrapping:KuudraTier.kt:KuudraTier${ this.intDisplayItem = displayItem }</ID>
     <ID>StatementWrapping:KuudraTier.kt:KuudraTier${ this.intLocation = location }</ID>
     <ID>StatementWrapping:KuudraTier.kt:KuudraTier${ this.intTierNumber = tierNumber }</ID>
-    <ID>StatementWrapping:PestDisplay.kt:PestDisplay${ pestStorage?.enum = value }</ID>
-    <ID>StatementWrapping:PestDisplay.kt:PestDisplay${ pestStorage?.mode = value }</ID>
     <ID>StatementWrapping:PetData.kt:PetData${ specifiedRarity.oneAbove() ?: specifiedRarity }</ID>
-    <ID>StatementWrapping:PreciseGuessBurrow.kt:PreciseGuessBurrow${ return bezierFitter.count() }</ID>
     <ID>StatementWrapping:SkyHanniRealtimeItemSlot.kt:SkyHanniRealtimeItemSlot${ allocate(slotSize) }</ID>
-    <ID>StatementWrapping:WeightDisplay.kt:WeightDisplay${ weightStorage?.enum = value }</ID>
-    <ID>StatementWrapping:WeightDisplay.kt:WeightDisplay${ weightStorage?.mode = value }</ID>
     <ID>StorageVarOrVal:ChatSoundResponseConfig.kt:ChatSoundResponseConfig$@Expose @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.") @ConfigEditorDraggableList var soundResponses = SoundResponseTypes.entries.toMutableList()</ID>
     <ID>StorageVarOrVal:DiscordRPCConfig.kt:DiscordRPCConfig$@ConfigOption( name = "Image Credits", desc = "Hypixel Pack HQ (old images), @unfamiliartunes (Winter Island),\n" + "@next_g (Crystal Nucleus)", ) @ConfigEditorInfoText val credits = ""</ID>
     <ID>StorageVarOrVal:ForagingConfig.kt:ForagingConfig$@Expose @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.") @Accordion var moongladeBeacon = MoongladeBeaconConfig()</ID>
@@ -346,7 +320,6 @@
     <ID>TrailingCommaOnDeclarationSite:AnimatedItemStackRenderable.kt:AnimatedItemStackRenderable.Companion$( config: AnimatedItemRenderableConfig&lt;ItemStackAnimatedFrame&gt;.() -&gt; Unit = { } )</ID>
     <ID>TrailingCommaOnDeclarationSite:ApiInternalUtils.kt:ApiInternalUtils$( file: File, crossinline entityHandler: (HttpEntity?) -&gt; Long? = { it.readEntityToFile(file) }, crossinline requestFactory: ApiStaticPath.() -&gt; Req = { buildRequest { addHeader("Accept-Encoding", "gzip") } } )</ID>
     <ID>TrailingCommaOnDeclarationSite:ApiResponse.kt:JsonApiResponse$( override val success: Boolean, override val message: String? = null, override var data: T? = null )</ID>
-    <ID>TrailingCommaOnDeclarationSite:ArmorDropTracker.kt:ArmorDropTracker.Data$( @Expose var drops: MutableMap&lt;ArmorDropType, Int&gt; = mutableMapOf() )</ID>
     <ID>TrailingCommaOnDeclarationSite:BetterContainers.kt:BetterContainers$( backgroundStyle: LegacyBetterContainers.BackgroundStyle )</ID>
     <ID>TrailingCommaOnDeclarationSite:BetterContainers.kt:BetterContainers$( handlerInventory: Container, horizontalTexMult: Int, verticalTexMult: Int, bufferedImageNew: BufferedImage )</ID>
     <ID>TrailingCommaOnDeclarationSite:BlockStrengthGuide.kt:BlockStrengthGuide$DisplayOres</ID>
@@ -393,7 +366,6 @@
     <ID>TrailingCommaOnDeclarationSite:EffectDurationChangeEvent.kt:EffectDurationChangeType</ID>
     <ID>TrailingCommaOnDeclarationSite:EggFoundEvent.kt:EggFoundEvent$( val type: HoppityEggType, val slotIndex: Int? = null, val note: String? = null, val chatEvent: SkyHanniChatEvent.Allow? = null )</ID>
     <ID>TrailingCommaOnDeclarationSite:EliteDisplayGenericConfig.kt:EliteDisplayGenericConfig$LeaderboardTextEntry</ID>
-    <ID>TrailingCommaOnDeclarationSite:EliteLeaderboardData.kt:EliteLeaderboardData$( var lastUpdate: SimpleTimeMark = SimpleTimeMark.farPast(), var shouldRefresh: Boolean = true, var lastPlayer: EliteLeaderboardPlayer? = null, val nextPlayers: MutableList&lt;EliteLeaderboardPlayer&gt; = mutableListOf(), var apiData: EliteLeaderboard? = null, var isUnranked: Boolean = false, var rankGoal: Int? = null, val passedPlayers: MutableList&lt;String&gt; = mutableListOf() )</ID>
     <ID>TrailingCommaOnDeclarationSite:EliteLeaderboardGenericConfig.kt:Gamemode</ID>
     <ID>TrailingCommaOnDeclarationSite:EliteLeaderboards.kt:EliteLeaderboards</ID>
     <ID>TrailingCommaOnDeclarationSite:EliteLeaderboards.kt:EliteLeaderboards$( private val displayName: String, val display: EliteLeaderboardDisplayBase&lt;*, *&gt;, val leaderboardType: KClass&lt;out EliteLeaderboardType&gt; )</ID>
@@ -414,7 +386,6 @@
     <ID>TrailingCommaOnDeclarationSite:GenericIndividualTrackerConfig.kt:GenericIndividualTrackerConfig$( createType: () -&gt; Type )</ID>
     <ID>TrailingCommaOnDeclarationSite:GetFromSackApi.kt:GetFromSackApi$CommandResult</ID>
     <ID>TrailingCommaOnDeclarationSite:GriffinBurrowParticleFinder.kt:GriffinBurrowParticleFinder$ParticleType</ID>
-    <ID>TrailingCommaOnDeclarationSite:GuiIngameHook.kt:GuiIngameHook$( renderer: Font, drawContext: GuiGraphics, text: Component, x: Int, y: Int, color: Int, shadow: Boolean )</ID>
     <ID>TrailingCommaOnDeclarationSite:GuiRenderUtils.kt:GuiRenderUtils$( translateX: Float, translateY: Float, scale: Float )</ID>
     <ID>TrailingCommaOnDeclarationSite:GuideRenderablePage.kt:GuideRenderablePage$( val paddingX: Int = 0, val paddingY: Int = 0 )</ID>
     <ID>TrailingCommaOnDeclarationSite:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$SpawnParticles</ID>
@@ -437,9 +408,7 @@
     <ID>TrailingCommaOnDeclarationSite:LorenzColor.kt:LorenzColor</ID>
     <ID>TrailingCommaOnDeclarationSite:Matrix.kt:Matrix.Companion$( height: Int, width: Int, function: (row: Int, column: Int) -&gt; Double )</ID>
     <ID>TrailingCommaOnDeclarationSite:MessageSendToServerEvent.kt:MessageSendToServerEvent$( val message: String, val splitMessage: List&lt;String&gt;, val originatingModContainer: ModInstance? )</ID>
-    <ID>TrailingCommaOnDeclarationSite:MineshaftWaypoint.kt:MineshaftWaypoint$( val waypointType: MineshaftWaypointType, val location: LorenzVec, var shared: Boolean = false, var isCorpse: Boolean = false )</ID>
     <ID>TrailingCommaOnDeclarationSite:MineshaftWaypointType.kt:MineshaftWaypointType</ID>
-    <ID>TrailingCommaOnDeclarationSite:MineshaftWaypointType.kt:MineshaftWaypointType$( val displayText: String, val color: LorenzColor, itemName: String? = null )</ID>
     <ID>TrailingCommaOnDeclarationSite:MiningEventConfig.kt:MiningEventConfig$ShowType</ID>
     <ID>TrailingCommaOnDeclarationSite:MiningEventData.kt:EventData$( @Expose @SerializedName("starts_at_min") val startMin: Long, @Expose @SerializedName("starts_at_max") val startMax: Long, @Expose @SerializedName("ends_at_min") val endMin: Long, @Expose @SerializedName("ends_at_max") val endMax: Long, @Expose @SerializedName("lobby_count") val lobbyCount: Int )</ID>
     <ID>TrailingCommaOnDeclarationSite:MiningEventData.kt:MiningEventData$( @Expose @SerializedName("event_datas") val eventData: Map&lt;IslandType, Map&lt;MiningEventType, EventData&gt;&gt;, @Expose @SerializedName("running_events") val runningEvents: Map&lt;IslandType, List&lt;RunningEventType&gt;&gt;, @Expose @SerializedName("total_lobbys") val totalLobbies: Map&lt;IslandType, Int&gt;, @Expose @SerializedName("update_in") val updateIn: Long, @Expose @SerializedName("curr_time") val currentTime: Long )</ID>
@@ -464,7 +433,6 @@
     <ID>TrailingCommaOnDeclarationSite:PowderChestTimerConfig.kt:PowderChestTimerConfig$LineMode</ID>
     <ID>TrailingCommaOnDeclarationSite:PowderMiningConfig.kt:PowderMiningConfig$GoblinEggEntry</ID>
     <ID>TrailingCommaOnDeclarationSite:PowderMiningGemstoneConfig.kt:PowderMiningGemstoneConfig$GemstoneFilterEntry</ID>
-    <ID>TrailingCommaOnDeclarationSite:RareMobWaypointShare.kt:RareMobWaypointShare.SharedRareMob$( val fromPlayer: String, val playerDisplayName: String, val location: LorenzVec, val spawnTime: SimpleTimeMark, val mobName: String )</ID>
     <ID>TrailingCommaOnDeclarationSite:Relay.kt:Relay</ID>
     <ID>TrailingCommaOnDeclarationSite:RenderEntityOutlineEvent.kt:RenderEntityOutlineEvent$Type</ID>
     <ID>TrailingCommaOnDeclarationSite:ReputationHelperConfig.kt:ReputationHelperConfig$ShowLocationEntry</ID>
@@ -527,7 +495,6 @@
     <ID>UnsafeCallOnNullableType:FeatureToggleProcessor.kt:FeatureToggleProcessor$latestCategory!!</ID>
     <ID>UnsafeCallOnNullableType:GardenPlotIcon.kt:GardenPlotIcon$originalStack[index]!!</ID>
     <ID>UnsafeCallOnNullableType:IslandGraphs.kt:IslandGraphs$currentTarget!!</ID>
-    <ID>UnsafeCallOnNullableType:ItemBlink.kt:ItemBlink$offsets[item]!!</ID>
     <ID>UnsafeCallOnNullableType:ItemPickupLog.kt:ItemPickupLog$listToCheckAgainst[key]!!</ID>
     <ID>UnsafeCallOnNullableType:ItemPickupLog.kt:ItemPickupLog$listToCheckAgainst[key]?.second!!</ID>
     <ID>UnsafeCallOnNullableType:ItemUtils.kt:ItemUtils$itemAmountCache[input]!!</ID>
@@ -555,7 +522,6 @@
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$nextEntity: LivingEntity?</ID>
     <ID>UnusedParameter:ParticleUtils.kt:ParticleUtils$shouldError: Boolean = false</ID>
     <ID>UnusedParameter:RenderEvents.kt:RenderEvents$tick: DeltaTracker</ID>
-    <ID>UnusedParameter:ToolTipData.kt:ToolTipData$stack: ItemStack</ID>
     <ID>UnusedPrivateProperty:BetterContainers.kt:BetterContainers$private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")</ID>
     <ID>UnusedPrivateProperty:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"</ID>
     <ID>UnusedPrivateProperty:ReceiveParticleEvent.kt:ReceiveParticleEvent$private val particleArgs: IntArray? = null</ID>
