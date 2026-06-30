@@ -162,13 +162,19 @@ object FarmingProfitTrackerStats {
     private fun MutableList<Searchable>.addVisitorsLine(data: Data) {
         if (!data.isShowing(TrackedSource.VISITORS)) return
         val visitorsServed = data.visitorsServed
-        if (visitorsServed == 0L) return
+        val vinylSetsGiven = data.visitorVinylSetsGiven
+        if (visitorsServed == 0L && vinylSetsGiven == 0L) return
 
         val visitorItems = data.bucketedItems[TrackedSource.VISITORS].orEmpty()
         var netValue = 0.0
         val hoverTips = buildList {
             val costLines = mutableListOf<String>()
             val rewardLines = mutableListOf<String>()
+
+            if (vinylSetsGiven > 0L) {
+                add("§7Vinyl sets gifted: §e${vinylSetsGiven.addSeparators()}")
+                add("")
+            }
 
             visitorItems.entries.sortedBy { it.key.itemNameWithoutColor }.forEach { (internalName, item) ->
                 val amount = item.totalAmount
@@ -207,11 +213,18 @@ object FarmingProfitTrackerStats {
 
         add(
             Renderable.hoverTips(
-                "§7Visitors served: §a${visitorsServed.addSeparators()} §7(${signedCoinFormat(netValue)}§7)",
+                data.visitorLineText(visitorsServed, vinylSetsGiven, netValue),
                 hoverTips,
-            ).toSearchable("Visitors served"),
+            ).toSearchable("Visitor profit"),
         )
     }
+
+    private fun Data.visitorLineText(visitorsServed: Long, vinylSetsGiven: Long, netValue: Double): String =
+        if (visitorsServed > 0L) {
+            "§7Visitors served: §a${visitorsServed.addSeparators()} §7(${signedCoinFormat(netValue)}§7)"
+        } else {
+            "§7Visitor vinyl gifts: §a${vinylSetsGiven.addSeparators()} §7(${signedCoinFormat(netValue)}§7)"
+        }
 
     private fun signedCoinFormat(value: Double): String = when {
         value > 0.0 -> "§a+${value.shortFormat()}"

@@ -6,12 +6,14 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -38,6 +40,15 @@ object PurseApi {
     val piggyPattern by patternGroup.pattern(
         "piggy",
         "(?:§.)*Piggy: (?<coins>.*)",
+    )
+
+    /**
+     * REGEX-TEST: You collected 1,732,500 coins from selling [Lvl 18] Griffin to [VIP+] NottJeff in an auction!
+     * REGEX-FAIL: [YOUTUBE] Akinsoft collected an auction for 1,732,500 coins!
+     */
+    private val auctionHouseSaleClaimPattern by patternGroup.pattern(
+        "auctionhouse.saleclaim",
+        "^You collected [\\d,]+ coins from selling .+ in an auction!$",
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
@@ -69,6 +80,13 @@ object PurseApi {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (auctionHouseSaleClaimPattern.matches(event.cleanMessage)) {
+            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
+        }
     }
 
     @HandleEvent

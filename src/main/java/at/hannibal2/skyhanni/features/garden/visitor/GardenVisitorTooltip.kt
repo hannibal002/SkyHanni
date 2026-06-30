@@ -61,7 +61,10 @@ object GardenVisitorTooltip {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onVisitorOpen(event: VisitorOpenEvent) {
-        val visitor = event.visitor
+        refreshVisitorOffer(event.visitor)
+    }
+
+    fun refreshVisitorOffer(visitor: VisitorApi.Visitor) {
         val offerItem = visitor.offer?.offerItem ?: return
         val lore = offerItem.getLore()
 

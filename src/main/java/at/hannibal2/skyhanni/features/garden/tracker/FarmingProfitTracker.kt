@@ -10,6 +10,8 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -30,11 +32,14 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker.RareCropDropType
+import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorTooltip
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorPriceCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
@@ -57,6 +62,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
@@ -72,7 +78,6 @@ private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 private val seasoningInternalName = "SEASONING".toInternalName()
 private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
 private val carrotColoredVinylSet = "CARROT_COLORED_VINYL_SET".toInternalName()
-private val visitorGratitudes = setOf("VISITOR_GRATITUDE", "VISITORS_GRATITUDE").map { it.toInternalName() }
 private val bountifulCoinCauses = setOf(PurseChangeCause.GAIN_MOB_KILL, PurseChangeCause.GAIN_UNKNOWN)
 private val sackCompactionTimeout = 30.seconds
 private val farmingProfitTrackerPatternGroup = RepoPattern.group("garden.farming.profit.tracker")
@@ -81,6 +86,12 @@ private data class CropPrimitiveItem(
     val crop: CropType,
     val rawInternalName: NeuInternalName,
     val rawAmount: Long,
+)
+
+private data class PendingVisitorVinylGift(
+    val slotId: Int,
+    val visitorName: String,
+    val created: SimpleTimeMark,
 )
 
 data class ProfitAction(val amount: Long, val action: String, val plural: String)
@@ -96,6 +107,7 @@ private fun FarmingProfitTracker.Data.hasNoFarmingData(): Boolean =
         pestKills.isEmpty() &&
         spraysUsed.isEmpty() &&
         visitorsServed == 0L &&
+        visitorVinylSetsGiven == 0L &&
         visitorCopper == 0L &&
         toolExpCapsules == 0L &&
         bountifulCoins == 0L
@@ -154,6 +166,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     private val recentSpecialCropItems = mutableMapOf<NeuInternalName, Long>()
     private var lastFarmingActivity = SimpleTimeMark.farPast()
     private var lastVisitorAccept = SimpleTimeMark.farPast()
+    private var pendingVisitorVinylGift: PendingVisitorVinylGift? = null
     private var currentToolHasBountiful = false
 
     data class Data(
@@ -168,6 +181,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         @Expose var pestKills: MutableMap<PestType, Long> = EnumMap<PestType, Long>(PestType::class.java),
         @Expose var spraysUsed: MutableMap<SprayType, Long> = EnumMap<SprayType, Long>(SprayType::class.java),
         @Expose var visitorsServed: Long = 0L,
+        @Expose var visitorVinylSetsGiven: Long = 0L,
         @Expose var visitorCopper: Long = 0L,
         @Expose var toolExpCapsules: Long = 0L,
         @Expose var bountifulCoins: Long = 0L,
@@ -283,14 +297,14 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
                 TrackedSource.BLESSED -> ProfitAction(getTotalBlessedDrops(), "drop", "Drops")
                 TrackedSource.CROP_FEVER -> cropFeverProfitAction()
                 TrackedSource.BOUNTIFUL -> ProfitAction(bountifulCoins, "coin", "Coins")
-                TrackedSource.VISITORS -> ProfitAction(visitorsServed, "visitor", "Visitors")
+                TrackedSource.VISITORS -> visitorProfitAction()
                 null -> allSourceProfitAction()
             }
 
         private fun allSourceProfitAction(): ProfitAction = listOf(
             ProfitAction(getTotalCropAmount(), "crop", "Crops"),
             ProfitAction(getTotalToolExpCapsules(), "capsule", "Capsules"),
-            ProfitAction(visitorsServed, "visitor", "Visitors"),
+            visitorProfitAction(),
             ProfitAction(getTotalPestKills(), "kill", "Kills"),
             ProfitAction(getTotalCropFevers(), "fever", "Fevers"),
             ProfitAction(getTotalRareCropDrops(), "drop", "Drops"),
@@ -303,6 +317,11 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
             val cropFevers = getTotalCropFevers()
             return if (cropFevers > 0) ProfitAction(cropFevers, "fever", "Fevers")
             else ProfitAction(getTotalCropFeverDrops(), "drop", "Drops")
+        }
+
+        private fun visitorProfitAction(): ProfitAction {
+            val visitorActions = visitorsServed + visitorVinylSetsGiven
+            return ProfitAction(visitorActions, "visitor action", "Visitor Actions")
         }
     }
 
@@ -417,9 +436,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         for ((internalName, amount) in event.visitor.shoppingList) {
             addTrackedItem(TrackedSource.VISITORS, internalName, -amount.toLong(), message = false)
         }
-        if (event.visitor.allRewards.any { it in visitorGratitudes } && carrotColoredVinylSet !in event.visitor.shoppingList) {
-            addTrackedItem(TrackedSource.VISITORS, carrotColoredVinylSet, -1L, message = false)
-        }
         for (internalName in event.visitor.allRewards) {
             addTrackedItem(TrackedSource.VISITORS, internalName, 1L, message = false)
         }
@@ -437,6 +453,37 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
 
             else -> Unit
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!VisitorApi.inInventory) return
+        if (!shouldTrack(TrackedSource.VISITORS)) return
+        val item = event.item ?: return
+        if (!item.isCarrotColoredVinylSetGiveButton()) return
+        val visitor = VisitorApi.getVisitor(VisitorApi.lastClickedNpc) ?: return
+        val slotId = event.slot?.index ?: event.slotId
+        pendingVisitorVinylGift = PendingVisitorVinylGift(slotId, visitor.visitorName, SimpleTimeMark.now())
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        val pending = pendingVisitorVinylGift ?: return
+        if (!VisitorApi.inInventory || pending.created.passedSince() > 5.seconds) {
+            pendingVisitorVinylGift = null
+            return
+        }
+        val visitor = VisitorApi.getVisitor(VisitorApi.lastClickedNpc) ?: return
+        if (visitor.visitorName != pending.visitorName) return
+        val item = event.inventoryItems[pending.slotId] ?: return
+        if (!item.isCharmedVisitorButton()) return
+        if (!refreshVisitorOfferFromInventory(visitor, event)) return
+        pendingVisitorVinylGift = null
+        modify {
+            it.visitorVinylSetsGiven++
+        }
+        addTrackedItem(TrackedSource.VISITORS, carrotColoredVinylSet, -1L, message = false)
+        lastFarmingActivity = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.LOWEST)
@@ -665,6 +712,25 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
                 remaining -= chunk
             }
         }
+    }
+
+    private fun SafeItemStack.isCarrotColoredVinylSetGiveButton(): Boolean {
+        if (hoverName.string != "Gift Vinyl Set") return false
+        val lore = getLoreComponent().map { it.string }
+        return "Gifts a Full Carrot-Colored Vinyl Set" in lore && "Click to gift!" in lore
+    }
+
+    private fun SafeItemStack.isCharmedVisitorButton(): Boolean {
+        if (!hoverName.string.contains("This Visitor has been Charmed")) return false
+        return getLoreComponent().any { it.string.contains("They will bring more rewards") }
+    }
+
+    private fun refreshVisitorOfferFromInventory(visitor: VisitorApi.Visitor, event: InventoryUpdatedEvent): Boolean {
+        val offerItem = event.inventoryItems[VisitorApi.ACCEPT_SLOT] ?: return false
+        if (offerItem.hoverName.string != "Accept Offer") return false
+        visitor.offer = VisitorApi.VisitorOffer(offerItem)
+        GardenVisitorTooltip.refreshVisitorOffer(visitor)
+        return true
     }
 
     private fun Data.getTrackedCropItemAmount(internalName: NeuInternalName): Long =
