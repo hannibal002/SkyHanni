@@ -39,12 +39,13 @@ internal object PetStoragePatterns {
      * WRAPPED-REGEX-TEST: " [Lvl 100] Flying Fish"
      * WRAPPED-REGEX-TEST: " [Lvl 100] Chicken ✦"
      * WRAPPED-REGEX-TEST: " [Lvl 200] [122✦] Golden Dragon"
+     * WRAPPED-REGEX-TEST: " [Lvl 67] T-Rex"
      * WRAPPED-REGEX-FAIL: " No pet selected"
      */
     @Suppress("MaxLineLength")
     val petTabWidgetNamePattern by patternGroup.pattern(
         "tab.name",
-        " \\[Lvl (?<level>[\\d,]+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w ]+?)(?:(?<skin> ✦))?$",
+        " \\[Lvl (?<level>[\\d,]+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w -]+?)(?:(?<skin> ✦))?$",
     )
 
     /**
