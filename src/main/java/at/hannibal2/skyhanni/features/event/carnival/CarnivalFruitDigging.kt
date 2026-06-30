@@ -121,10 +121,22 @@ object CarnivalFruitDigging {
         DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT"),
         ;
 
-        private val textureId: String by lazy {
-            if (textureKey.isEmpty()) ""
-            else StringUtils.decodeBase64(SkullTextureHolder.getTexture(textureKey)).substringAfterLast("/texture/").substringBefore("\"")
-        }
+        private var cachedTextureId: String? = null
+
+        private val textureId: String
+            get() {
+                cachedTextureId?.let { return it }
+
+                if (textureKey.isEmpty()) return ""
+                val id = SkullTextureHolder.getTexture(textureKey)
+                    ?.let(StringUtils::decodeBase64)
+                    ?.substringAfterLast("/texture/")
+                    ?.substringBefore("\"")
+                    ?: return ""
+
+                cachedTextureId = id
+                return id
+            }
 
         fun getAmountDugSoFar(): Int {
             return count - (remainingFruit[this] ?: 0)
