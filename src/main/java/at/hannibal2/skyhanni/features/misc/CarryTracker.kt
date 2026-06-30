@@ -732,8 +732,8 @@ object CarryTracker {
     private data class KuudraCarryType(
         override val id: String,
         override val displayName: String,
-        override val shortName: String,
         val kuudraTier: KuudraTier,
+        override val shortName: String = displayName,
     ) : CarryType()
 
     private data class CrimsonMinibossCarryType(
@@ -755,7 +755,7 @@ object CarryTracker {
         for (i in 1..7) add(DungeonCarryType("f$i", "Floor $i", "F$i"))
         for (i in 1..7) add(DungeonCarryType("m$i", "Master Mode $i", "M$i"))
 
-        for (i in 1..5) add(KuudraCarryType("k$i", "${KuudraTier.entries[i - 1].displayName} Kuudra", "", KuudraTier.entries[i - 1]))
+        for (i in 1..5) add(KuudraCarryType("k$i", "${KuudraTier.entries[i - 1].displayName} Kuudra", KuudraTier.entries[i - 1]))
 
         add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL.displayName, "Bladesoul", CrimsonMiniBoss.BLADESOUL))
         add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW.displayName, "Mage Outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
