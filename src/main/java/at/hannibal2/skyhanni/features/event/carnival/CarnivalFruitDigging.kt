@@ -148,7 +148,8 @@ object CarnivalFruitDigging {
 
         companion object {
             fun fromTexture(texture: String?): Fruit? {
-                return Fruit.entries.find { texture != null && it.texture == texture }
+                texture ?: return null
+                return Fruit.entries.find { it.texture == texture }
             }
 
             fun fromName(name: String): Fruit? {
