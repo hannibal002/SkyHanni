@@ -26,6 +26,7 @@ class RepoPatternElement private constructor(
 
     companion object {
         private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
+        private val wrappedRegexFailPattern = "WRAPPED-REGEX-FAIL: \"(?<test>.*)\"".toPattern()
 
         fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
             val expression = this.expression as? KtDotQualifiedExpression ?: return null
@@ -60,16 +61,35 @@ class RepoPatternElement private constructor(
             val failingRegexTests = mutableListOf<String>()
 
             kDoc.getDefaultSection().getContent().lines().forEach { line ->
+                wrappedRegexTestPattern.matcher(line).let { matcher ->
+                    if (!matcher.find()) return@let
+                    val test = matcher.group("test") ?: return@let
+                    regexTests.add(test)
+                    return@forEach
+                }
+                wrappedRegexFailPattern.matcher(line).let { matcher ->
+                    if (!matcher.find()) return@let
+                    val test = matcher.group("test") ?: return@let
+                    failingRegexTests.add(test)
+                    return@forEach
+                }
                 if (line.contains("REGEX-TEST: ")) {
-                    regexTests.add(line.substringAfter("REGEX-TEST: "))
+                    val test = line.substringAfter("REGEX-TEST: ")
+                    require(test.trim() == test) {
+                        "Plain REGEX-TEST must not contain leading or trailing whitespace. If the whitespace is " +
+                            "intentional, use WRAPPED-REGEX-TEST instead."
+                    }
+                    regexTests.add(test)
+                    return@forEach
                 }
                 if (line.contains("REGEX-FAIL: ")) {
-                    failingRegexTests.add(line.substringAfter("REGEX-FAIL: "))
-                }
-                wrappedRegexTestPattern.matcher(line).let { matcher ->
-                    if (!matcher.find()) return@forEach
-                    val test = matcher.group("test") ?: return@forEach
-                    regexTests.add(test)
+                    val test = line.substringAfter("REGEX-FAIL: ")
+                    require(test.trim() == test) {
+                        "Plain REGEX-FAIL must not contain leading or trailing whitespace. If the whitespace is " +
+                            "intentional, use WRAPPED-REGEX-FAIL instead."
+                    }
+                    failingRegexTests.add(test)
+                    return@forEach
                 }
             }
             return regexTests to failingRegexTests

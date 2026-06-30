@@ -97,7 +97,7 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST:  Repellent: MAX (12s)
+     * WRAPPED-REGEX-TEST: " Repellent: MAX (12s)"
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
@@ -105,9 +105,9 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST:  Smoldering Polarization I: 58s
-     * REGEX-TEST:  Wisp's Ice-Flavored Water I: 29m
-     * REGEX-TEST:      Mushed Glowy Tonic I 43m
+     * WRAPPED-REGEX-TEST: " Smoldering Polarization I: 58s"
+     * WRAPPED-REGEX-TEST: " Wisp's Ice-Flavored Water I: 29m"
+     * WRAPPED-REGEX-TEST: "     Mushed Glowy Tonic I 43m"
      * REGEX-TEST: Wisp's Ice-Flavored Water I 10m
      */
     private val tabEffectPattern by RepoPattern.pattern(

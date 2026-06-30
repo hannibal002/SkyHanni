@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftEffigiesJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -90,7 +89,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Rift Blood Effigies")
 
         if (!isEnabled()) {
@@ -145,7 +144,7 @@ object RiftBloodEffigies {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (!isEnabled()) return
 
         eLoop@for (entity in LocationUtils.playerLocation().getEntitiesNearby<ArmorStand>(15.0)) {
