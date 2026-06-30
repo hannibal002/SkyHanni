@@ -50,11 +50,24 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (config.allowInstantNavigation && locations.size == 1) {
-            val (name, node) = locations.first()
-            node.pathFind(label = name, allowRerouting = true, condition = { true })
-            sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
-            return
+        if (config.allowInstantNavigation) {
+            val exactMatch = locations.firstOrNull { (name, _) ->
+                name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
+            }
+
+            if (exactMatch != null) {
+                val (name, node) = exactMatch
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
+                sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
+                return
+            }
+
+            if (locations.size == 1) {
+                val (name, node) = locations.first()
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
+                sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
+                return
+            }
         }
 
         TextHelper.displayPaginatedList(
