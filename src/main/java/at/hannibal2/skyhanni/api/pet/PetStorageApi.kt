@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.hoverTextLines
+import at.hannibal2.skyhanni.utils.ComponentMatcher
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.matchesItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -34,13 +36,18 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.network.chat.Component
+import net.minecraft.network.chat.Style
 import java.util.UUID
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
@@ -91,7 +98,64 @@ object PetStorageApi {
         return PetUtils.findPetSkinOrNull(petInternalName, skin)
     }
 
-    private fun Matcher.getRarityOrNull() = LorenzRarity.getByColorCode(group("rarity")[0])
+    private fun ComponentMatcher.getPetSkinOrNull(petInternalName: NeuInternalName): NeuItemJson? {
+        val skin = getPetSkinColorTagOrNull() ?: return null
+        return PetUtils.findPetSkinOrNull(petInternalName, skin)
+    }
+
+    private fun ComponentMatcher.getPetSkinTagOrNull(): String? =
+        getPetSkinColorTagOrNull()?.replace(" ", "")
+
+    private fun ComponentMatcher.getPetSkinColorTagOrNull(): String? =
+        component("skin")?.formattedTextForItemLookup()
+            ?: component("altskin")?.formattedTextForItemLookup()
+
+    private fun ComponentMatcher.petNameAndRarityOrNull(): Pair<String, LorenzRarity>? {
+        val petSpan = groupOrThrow("pet")
+        val petName = petSpan.getText().trim()
+        val rarity = petSpan.sampleStyleAtStart().toLorenzRarityOrNull() ?: return null
+        return petName to rarity
+    }
+
+    private fun Style.toLorenzRarityOrNull(): LorenzRarity? = when (color?.name) {
+        "dark_red" -> LorenzRarity.ULTIMATE
+        "red" -> LorenzRarity.SPECIAL
+        "aqua" -> LorenzRarity.DIVINE
+        "light_purple" -> LorenzRarity.MYTHIC
+        "gold" -> LorenzRarity.LEGENDARY
+        "dark_purple" -> LorenzRarity.EPIC
+        "blue" -> LorenzRarity.RARE
+        "green" -> LorenzRarity.UNCOMMON
+        "white" -> LorenzRarity.COMMON
+        else -> null
+    }
+
+    private inline fun <T> Iterable<Component>.firstStyledMatcher(
+        pattern: Pattern,
+        consumer: ComponentMatcher.() -> T,
+    ): T? {
+        for (component in this) {
+            pattern.matchStyledMatcher(component, consumer)?.let { return it }
+        }
+        return null
+    }
+
+    private fun Collection<Component>.toColorlessText(): List<String> =
+        map { it.string.removeColor() }
+
+    private fun Component.formattedTextForItemLookup(): String =
+        formattedTextCompatLessResets().removeResets().trim()
+
+    private fun Component.hoverTextComponents(): List<Component> = buildList {
+        addHoverTextComponents(this@hoverTextComponents)
+    }
+
+    private fun MutableList<Component>.addHoverTextComponents(component: Component) {
+        component.hover?.let { hover ->
+            addAll(TextHelper.split(hover, "\n") ?: listOf(hover))
+        }
+        component.siblings.forEach { addHoverTextComponents(it) }
+    }
 
     private fun MutableList<PetData>.addOrReplace(petData: PetData) {
         indexOfFirstOrNull { it.uuid == petData.uuid }?.let {
@@ -136,17 +200,18 @@ object PetStorageApi {
         PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
 
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
-        PetStoragePatterns.petMenuPetStackNamePattern.matchMatcher(hoverName.formattedTextCompat()) {
+        PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()
-            val level = group("level").formatInt()
-            val petName = groupOrNull("pet")?.trim() ?: return@matchMatcher null
+            val level = matcher.group("level").formatInt()
+            val petSpan = groupOrThrow("pet")
+            val petName = petSpan.getText().trim()
             val itemInternalName = getInternalNameOrNull()?.takeIf { PetUtils.getPetRarity(it) != null }
             val petInternalName = itemInternalName ?: run {
-                val rarity = getRarityOrNull() ?: return@matchMatcher null
+                val rarity = petSpan.sampleStyleAtStart().toLorenzRarityOrNull() ?: return@matchStyledMatcher null
                 PetUtils.petWithRarityToInternalName(petName, rarity)
             }
             val petSkin = getPetSkinOrNull(petInternalName)
-            val lore = getLore()
+            val lore = getLoreComponent().toColorlessText()
             val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(lore) {
                 val currentValue = group("current").formatDouble()
                 when (groupOrNull("next")) {
@@ -317,24 +382,25 @@ object PetStorageApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        PetStoragePatterns.petItemHeldMessagePattern.matchMatcher(event.message) {
-            val petHeldItem = resolveAppliedPetItemOrNull(group("item").removeResets().trim()) ?: return
+        PetStoragePatterns.petItemHeldMessagePattern.matchStyledMatcher(event.chatComponent) {
+            val petHeldItemName = componentOrThrow("item").formattedTextForItemLookup()
+            val petHeldItem = resolveAppliedPetItemOrNull(petHeldItemName) ?: return
             updateCurrentPetHeldItem(petHeldItem)
         }
 
-        PetStoragePatterns.autoPetMessagePattern.matchMatcher(event.message) {
+        PetStoragePatterns.autoPetMessagePattern.matchStyledMatcher(event.chatComponent) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
-            val petName = groupOrNull("pet") ?: return
-            val level = group("level").toInt()
-            val rarity = getRarityOrNull() ?: return
+            val (petName, rarity) = petNameAndRarityOrNull() ?: return
+            val level = matcher.group("level").toInt()
             val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
             val petSkin = getPetSkinOrNull(petInternalName)
-            val petSkinTag = (groupOrNull("skin") ?: groupOrNull("altskin"))?.replace(" ", "")
+            val petSkinTag = getPetSkinTagOrNull()
 
-            val hoverInfo = event.chatComponent.hoverTextLines()
-            val petHeldItemName = PetStoragePatterns.autoPetHoverHeldItemPattern.firstMatcher(hoverInfo.map { it.removeResets() }) {
-                group("item")
+            val hoverInfoComponents = event.chatComponent.hoverTextComponents()
+            val hoverInfo = hoverInfoComponents.toColorlessText()
+            val petHeldItemName = hoverInfoComponents.firstStyledMatcher(PetStoragePatterns.autoPetHoverHeldItemPattern) {
+                componentOrThrow("item").formattedTextForItemLookup()
             }?.trim()
             val petHeldItem = petHeldItemName?.let(PetUtils::resolvePetItemOrNull)
 
@@ -516,24 +582,24 @@ object PetStorageApi {
         }
         val currentPetItem = inventoryItems[petItemSlot] ?: return
         if (currentPetItem.readExactSelectedPetData()) return
-        val currentPetItemLore = currentPetItem.getLore().takeIfNotEmpty() ?: return
+        val currentPetItemLore = currentPetItem.getLoreComponent().takeIfNotEmpty() ?: return
 
-        PetStoragePatterns.petMenuSelectedPetNamePattern.firstMatcher(currentPetItemLore) {
+        currentPetItemLore.firstStyledMatcher(PetStoragePatterns.petMenuSelectedPetNamePattern) {
             readSelectedPetDataFromLore(currentPetItemLore, exactMenuPetUuids)
         }
     }
 
-    private fun Matcher.readSelectedPetDataFromLore(
-        currentPetItemLore: List<String>,
+    private fun ComponentMatcher.readSelectedPetDataFromLore(
+        currentPetItemLore: List<Component>,
         exactMenuPetUuids: Set<UUID>,
     ): Boolean {
-        val petName = groupOrNull("pet") ?: return false
-        val rarity = getRarityOrNull() ?: return false
+        val (petName, rarity) = petNameAndRarityOrNull() ?: return false
         val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
         val petSkin = getPetSkinOrNull(petInternalName)
-        val petSkinTag = groupOrNull("skin")?.replace(" ", "")
-        val level = readSelectedPetLevel(currentPetItemLore, petInternalName) ?: return false
-        val petExp = readSelectedPetExp(currentPetItemLore, level, petInternalName)
+        val petSkinTag = getPetSkinTagOrNull()
+        val colorlessLore = currentPetItemLore.toColorlessText()
+        val level = readSelectedPetLevel(colorlessLore, petInternalName) ?: return false
+        val petExp = readSelectedPetExp(colorlessLore, level, petInternalName)
         val currentPetData = findSelectedPetData(petName, rarity, level, petSkinTag, petInternalName, petSkin, petExp)
 
         val hasExactPetMenuRead = currentPetData.uuid?.let { it in exactMenuPetUuids } == true
@@ -632,7 +698,8 @@ object PetStorageApi {
         this.level <= level &&
         this.skinTag == skinTag
 
-    fun isAutopetMessage(message: String): Boolean = PetStoragePatterns.autoPetMessagePattern.matches(message)
+    fun isAutopetMessage(message: String): Boolean =
+        PetStoragePatterns.autoPetMessagePattern.matches(message.removeColor().removeResets())
 
     fun markDirty() {
         jsonNeedsSave = true

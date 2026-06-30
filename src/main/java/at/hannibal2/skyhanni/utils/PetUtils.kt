@@ -198,8 +198,14 @@ object PetUtils {
     fun getPetXpMultiplier(petInternalName: NeuInternalName): Double =
         customPetLeveling[petInternalName.getProperName()]?.xpMultiplier ?: 1.0
 
-    fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity) =
-        "${petName.uppercase().replace(" ", "_")};${rarity.id}".toInternalName()
+    fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity): NeuInternalName =
+        "${petName.toPetInternalNameBase()};${rarity.id}".toInternalName()
+
+    private fun String.toPetInternalNameBase(): String =
+        displayNameMap.entries.firstOrNull { (_, displayName) ->
+            displayName.equals(this, ignoreCase = true)
+        }?.key
+            ?: uppercase().replace(" ", "_")
 
     fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? = runCatching {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null

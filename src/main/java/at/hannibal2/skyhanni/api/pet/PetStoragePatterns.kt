@@ -21,14 +21,15 @@ internal object PetStoragePatterns {
     )
 
     /**
-     * REGEX-TEST: §7[Lvl 8] §6Squid
-     * REGEX-TEST: §7[Lvl 100] §dHermit Crab
-     * REGEX-TEST: §7[Lvl 200] §8[§6122§4✦§8] §6Golden Dragon
+     * REGEX-TEST: [Lvl 8] Squid
+     * REGEX-TEST: [Lvl 100] Hermit Crab
+     * REGEX-TEST: [Lvl 200] [122✦] Golden Dragon
+     * REGEX-TEST: [Lvl 67] T-Rex
      */
     @Suppress("MaxLineLength")
     val petMenuPetStackNamePattern by patternGroup.pattern(
         "menu.petstack.name",
-        "(?:§.)*\\[Lvl (?<level>[\\d,]+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+?)(?<skin>§. ✦)?",
+        "\\[Lvl (?<level>[\\d,]+)] (?:\\[\\d+(?<altskin>✦)] )?(?<pet>[\\w -]+?)(?<skin> ✦)?",
     )
 
     /**
@@ -62,50 +63,52 @@ internal object PetStoragePatterns {
     )
 
     /**
-     * REGEX-TEST: §7§7Selected pet: §6Chicken§5 ✦
-     * REGEX-TEST: §7§7Selected pet: §5Rift Ferret
-     * REGEX-TEST: §7§7Selected pet: §dEndermite
-     * REGEX-FAIL: §7§7Selected pet: §cNone
+     * REGEX-TEST: Selected pet: Chicken ✦
+     * REGEX-TEST: Selected pet: Rift Ferret
+     * REGEX-TEST: Selected pet: Endermite
+     * REGEX-TEST: Selected pet: T-Rex
+     * REGEX-FAIL: Selected pet: None
      */
     val petMenuSelectedPetNamePattern by patternGroup.pattern(
-        "menu.selected.name",
-        "(?:§.)+Selected pet: §(?<rarity>[^c])(?<pet>[\\w ]+)(?<skin>§. ✦)?",
+        "menu.selected.name.colorless",
+        "Selected pet: (?!None$)(?<pet>[\\w -]+)(?<skin> ✦)?",
     )
 
     /**
-     * REGEX-TEST: §7Progress to Level 52: §e29.7%
-     * REGEX-TEST: §7Progress to Level 2: §e0%
-     * REGEX-TEST: §7Progress to Level 69: §e18.9%
-     * REGEX-TEST: §b§lMAX LEVEL
+     * REGEX-TEST: Progress to Level 52: 29.7%
+     * REGEX-TEST: Progress to Level 2: 0%
+     * REGEX-TEST: Progress to Level 69: 18.9%
+     * REGEX-TEST: MAX LEVEL
      */
     val petMenuSelectedPetProgressPattern by patternGroup.pattern(
-        "menu.selected.progress",
-        "(?:§.)+(?:MAX LEVEL|Progress to Level (?<next>\\d+): (?:§.)+(?<percentage>[\\d.]+)%)",
+        "menu.selected.progress.colorless",
+        "(?:MAX LEVEL|Progress to Level (?<next>\\d+): (?<percentage>[\\d.]+)%)",
     )
 
     /**
-     * REGEX-TEST: §2§l§m        §f§l§m                 §r §e2,877.5§6/§e9.7k
-     * REGEX-TEST: §2§l§m     §f§l§m                    §r §e33,915§6/§e179.7k
-     * REGEX-TEST: §2§l§m                 §f§l§m        §r §e931,886.2§6/§e1.4M
-     * REGEX-TEST: §f§l§m                         §r §e0§6/§e660
-     * REGEX-TEST: §8▸ 25,353,248 XP
+     * WRAPPED-REGEX-TEST: "                          2,877.5/9.7k"
+     * WRAPPED-REGEX-TEST: "                          33,915/179.7k"
+     * WRAPPED-REGEX-TEST: "                          931,886.2/1.4M"
+     * WRAPPED-REGEX-TEST: "                          0/660"
+     * REGEX-TEST: ▸ 25,353,248 XP
      */
     val petMenuSelectedPetXpPattern by patternGroup.pattern(
-        "menu.selected.xp",
-        "(?:§.|▸| )+(?<current>[\\d,.kM]+)(?: XP|(?:§.|\\/)+(?<next>[\\d,.kM]+))",
+        "menu.selected.xp.colorless",
+        "(?:▸| )*(?<current>[\\d,.kM]+)(?: XP|(?:\\/)*(?<next>[\\d,.kM]+))",
     )
 
     /**
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dEnderman§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dRabbit§9 ✦§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §r§8[§r§6122§4✦] §r§6Golden Dragon§e! §a§lVIEW RULE
-     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 200] §8[§634§8§4✦§8] §6Golden Dragon§e! §a§lVIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 100] Enderman! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 100] Rabbit ✦! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] [122✦] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 200] [34✦] Golden Dragon! VIEW RULE
+     * REGEX-TEST: Autopet equipped your [Lvl 67] T-Rex! VIEW RULE
      */
     @Suppress("MaxLineLength")
     val autoPetMessagePattern by patternGroup.pattern(
-        "autopet.message",
-        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] (?:(?:§.)+\\[(?:§.)*\\d+(?:§.)*(?<altskin>§.✦)(?:§.)*\\] )?(?:§.)*§(?<rarity>.)(?<pet>[^§]+)(?<skin>§. ✦)?§e! §a§lVIEW RULE",
+        "autopet.message.colorless",
+        "Autopet equipped your \\[Lvl (?<level>\\d+)] (?:\\[\\d+(?<altskin>✦)\\] )?(?<pet>[\\w -]+)(?<skin> ✦)?! VIEW RULE",
     )
 
     /**
@@ -118,12 +121,12 @@ internal object PetStoragePatterns {
     )
 
     /**
-     * REGEX-TEST: §aYour pet is now holding §r§6Burnt Texts§r§a.
-     * REGEX-TEST: §aYour pet is now holding §r§9Combat Exp Boost§r§a.
+     * REGEX-TEST: Your pet is now holding Burnt Texts.
+     * REGEX-TEST: Your pet is now holding Combat Exp Boost.
      * REGEX-TEST: Your pet is now holding Burnt Texts.
      */
     val petItemHeldMessagePattern by patternGroup.pattern(
         "chat.helditem",
-        "(?:§a)?Your pet is now holding (?<item>.+?)(?:§r)?(?:§a)?\\.",
+        "Your pet is now holding (?<item>.+?)\\.",
     )
 }
