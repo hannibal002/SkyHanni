@@ -135,7 +135,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     companion object {
-        private var listenerCacheGeneration = AtomicInteger(0)
+        private val listenerCacheGeneration = AtomicInteger(0)
         fun markEventCacheDirty() {
             listenerCacheGeneration.incrementAndGet()
         }
