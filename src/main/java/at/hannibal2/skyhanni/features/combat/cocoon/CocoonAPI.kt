@@ -51,6 +51,11 @@ object CocoonAPI {
 
     const val COCOON_SIGHT_DISTANCE = 32
 
+    /*
+     roughly where cocoon times landed for me across a few hundred cocoons
+     Might require some sort of ping based tweaking?
+     */
+    // This does not leak Mob, ArmorStand references since it gets cleared on entity leave world and world change events.
     private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
     private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
     private val patternGroup = RepoPattern.group("combat.cocoon")

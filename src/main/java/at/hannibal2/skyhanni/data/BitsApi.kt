@@ -133,7 +133,7 @@ object BitsApi {
     )
 
     /**
-     * REGEX-TEST:  §7Duration: §a140d 8h 35m 36s
+     * WRAPPED-REGEX-TEST: " §7Duration: §a140d 8h 35m 36s"
      */
     private val cookieDurationPattern by bitsGuiGroup.pattern(
         "cookieduration",
@@ -423,7 +423,7 @@ object BitsApi {
     fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.isOnAlphaServer && profileStorage != null
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bits API")
         event.addIrrelevant {
             add("Bits: $bits")
