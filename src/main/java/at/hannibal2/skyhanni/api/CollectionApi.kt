@@ -38,7 +38,7 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST:                           43,649/50k
+     * WRAPPED-REGEX-TEST: "                          43,649/50k"
      * REGEX-TEST: Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(

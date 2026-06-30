@@ -44,8 +44,8 @@ object StockOfStonkFeature {
     )
 
     /**
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
+     * WRAPPED-REGEX-TEST: "   Minimum Bid: 2,400,002 Coins"
+     * WRAPPED-REGEX-TEST: "   Minimum Bid: 2,400,002 Coins"
      */
     private val bidPattern by patternGroup.pattern(
         "bid.new",

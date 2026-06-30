@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -76,11 +75,11 @@ object SackApi {
     )
 
     /**
-     * REGEX-TEST:  Rough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
-     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
-     * REGEX-TEST:  §7Amount: §a5,968
+     * WRAPPED-REGEX-TEST: " Rough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §fRough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §aFlawed: §e604 §8(48,320)"
+     * WRAPPED-REGEX-TEST: " §9Fine: §e35 §8(224,000)"
+     * WRAPPED-REGEX-TEST: " §7Amount: §a5,968"
      */
     @Suppress("MaxLineLength")
     private val gemstoneCountPattern by patternGroup.pattern(
@@ -150,11 +149,13 @@ object SackApi {
     var sackListNames = emptySet<String>()
         private set
 
+    private var uniqueSackItems: Set<NeuInternalName> = emptySet()
+
     var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         isRuneSack = false
         isGemstoneSack = false
         gemstoneStackFilter = null
@@ -364,13 +365,21 @@ object SackApi {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
-        val uniqueSackItems = mutableSetOf<NeuInternalName>()
-
-        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
+        rebuildSackNameLists()
+    }
 
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onComponentsLoaded() {
+        rebuildSackNameLists()
+    }
+
+    private fun rebuildSackNameLists() {
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map {
+            it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
+        }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
