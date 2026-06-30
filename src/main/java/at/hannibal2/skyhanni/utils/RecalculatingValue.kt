@@ -53,6 +53,45 @@ class ResettableValue<T>(private val calculation: () -> T) : ReadOnlyProperty<An
     }
 }
 
+class StableOrTransientValue<T>(
+    private val transientExpireTime: Duration,
+    private val calculation: () -> Result<T>,
+) : ReadOnlyProperty<Any?, T> {
+
+    private var currentValue: Any? = UNINITIALIZED_VALUE
+    private var lastCalculationTime = SimpleTimeMark.farPast()
+    private var stable = false
+
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = get()
+
+    fun get(): T {
+        if (currentValue === UNINITIALIZED_VALUE || (!stable && lastCalculationTime.passedSince() > transientExpireTime)) {
+            val result = calculation()
+            currentValue = result.value
+            stable = result.stable
+            lastCalculationTime = SimpleTimeMark.now()
+        }
+        @Suppress("UNCHECKED_CAST")
+        return currentValue as T
+    }
+
+    fun reset() {
+        currentValue = UNINITIALIZED_VALUE
+        lastCalculationTime = SimpleTimeMark.farPast()
+        stable = false
+    }
+
+    data class Result<T>(val value: T, val stable: Boolean)
+
+    companion object {
+        private val UNINITIALIZED_VALUE = Any()
+
+        fun <T> stable(value: T) = Result(value, stable = true)
+
+        fun <T> transient(value: T) = Result(value, stable = false)
+    }
+}
+
 class AutoUpdatingItemStack(internalName: NeuInternalName) : ReadOnlyProperty<Any?, SafeItemStack> {
 
     private val value: ResettableValue<SafeItemStack> = ResettableValue {

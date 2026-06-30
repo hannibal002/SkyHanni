@@ -23,7 +23,6 @@ object TabComplete {
 
     @Suppress("ReturnCount")
     private fun customTabComplete(fullCommand: String, command: String): List<String>? {
-        GetFromSacksTabComplete.handleTabComplete(command)?.let { return it }
         PlayerTabComplete.handleTabComplete(fullCommand)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
