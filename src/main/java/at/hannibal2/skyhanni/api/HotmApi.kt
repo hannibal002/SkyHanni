@@ -30,7 +30,7 @@ object HotmApi {
 
     private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
 
-    private val blueEggCache = TimeLimitedCache<SafeItemStack, Boolean>(10.0.seconds)
+    private val blueEggCache = TimeLimitedCache<SafeItemStack, Boolean>(10.0.seconds, useWeakKeys = true)
     val isBlueEggActive
         get() = InventoryUtils.getItemInHand()?.let {
             blueEggCache.getOrPut(it) {
