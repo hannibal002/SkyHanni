@@ -276,7 +276,7 @@ object RemainingSlayerKills {
         ChatUtils.debug("$fauxInternalName")
         val petInternalName = PetUtils.getPetProperName(fauxInternalName).orEmpty()
         val petRarity = PetUtils.getPetRarity(fauxInternalName) ?: LorenzRarity.DIVINE
-        ChatUtils.debug("Split Internal Name, ID = ${petInternalName}, rarity = $petRarity")
+        ChatUtils.debug("Split Internal Name, ID = $petInternalName, rarity = $petRarity")
         if (petInternalName.isEmpty() || petRarity == LorenzRarity.DIVINE) {
             multiplier *= additiveWithMultMultipliers
             return multiplier
