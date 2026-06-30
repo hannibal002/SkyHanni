@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,7 +32,7 @@ object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private val msPerTickList = SizeLimitedCache<Long, Double>(100)
+    private val msPerTickList = SizeLimitedCache<Int, Double>(100)
     val rawTps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
@@ -73,7 +73,7 @@ object TpsCounter {
         append("§eTPS: ")
         val currentTps = tps
         when {
-            LimboTimeTracker.inLimbo -> {
+            HypixelData.inLimbo -> {
                 append("§4N/A §7(Limbo)")
             }
 
@@ -90,6 +90,11 @@ object TpsCounter {
     }
 
     private fun tpsCommand() {
+        if (!SkyBlockUtils.onHypixel) {
+            ChatUtils.userError("This command only works on Hypixel!")
+            return
+        }
+
         val text = getTpsString()
         ChatUtils.chat(text)
 

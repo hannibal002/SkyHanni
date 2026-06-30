@@ -89,7 +89,7 @@ object PresentWaypoints {
 
     @HandleEvent
     fun onTick() {
-        if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
+        if (!isEnabled() && config.onlyClosest && HypixelData.lobbyName.isNotEmpty() && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
         if (notFoundPresents?.isEmpty() == true) return
         closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return

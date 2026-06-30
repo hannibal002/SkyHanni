@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
-import at.hannibal2.skyhanni.features.garden.sensitivity.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -293,11 +292,9 @@ object GardenPlotApi {
 
     fun getPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }
 
-    fun Plot.sendTeleportTo() {
-        if (isBarn()) HypixelCommands.teleportToPlot("barn")
-        else HypixelCommands.teleportToPlot(name)
-        LockMouseLook.unlockMouse()
-    }
+    val Plot.tpName get() = if (isBarn()) "barn" else name
+
+    fun Plot.sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
 
     init {
         val plotMap = listOf(

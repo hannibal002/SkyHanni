@@ -2,21 +2,31 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackApi.commands
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.eventWithNewMessage
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
+@SkyHanniModule
 object GetFromSacksTabComplete {
 
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
 
-    fun handleTabComplete(command: String): List<String>? {
-        if (!isEnabled()) return null
-        if (command !in commands) return null
+    @HandleEvent
+    fun onTabComplete(event: TabCompletionEvent) {
+        if (!isEnabled()) return
+        if (commands.none { event.isCommand(it) }) return
+        if (!event.leftOfCursor.contains(" ")) return
 
-        return SackApi.sackListNames.map { it.replace(" ", "_") }
+        val query = event.lastWord
+        val matching = SackApi.sackListNames
+            .filter { it.contains(query, ignoreCase = true) }
+            .map { it.replace(" ", "_") }
+        event.addSuggestionsUnchecked(matching)
     }
 
     // No subscribe since it needs to be called from the GetFromSackAPI

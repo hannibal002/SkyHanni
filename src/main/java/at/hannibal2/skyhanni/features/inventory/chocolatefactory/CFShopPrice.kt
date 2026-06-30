@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addStrikethrough
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -35,7 +36,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFShopPrice {
@@ -68,7 +68,7 @@ object CFShopPrice {
 
     var inInventory = false
     private var callUpdate = false
-    var inventoryItems = emptyMap<Int, ItemStack>()
+    var inventoryItems = emptyMap<Int, SafeItemStack>()
 
     private const val MILESTONE_INDEX = 50
     private var chocolateSpent = 0L

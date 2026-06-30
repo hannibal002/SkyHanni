@@ -19,11 +19,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MagicalPowerDisplay {
@@ -124,7 +124,7 @@ object MagicalPowerDisplay {
         else -> null
     }
 
-    private fun ItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
+    private fun SafeItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
         val category = this.getItemCategoryOrNull() ?: return null
         if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
         return this.getItemRarityOrNull()
