@@ -61,8 +61,7 @@ object CocoonAPI {
     private val patternGroup = RepoPattern.group("combat.cocoon")
 
     /*
-     Hypixel doesn't currently use an in this message but grammatical errors on their part should be accounted for in advance.
-     The regex test for "an Enderman" was faked at the point of the original PR due to above comment.
+     The "an Enderman" test is forward-proofing only, as Hypixel currently always sends "a".
      */
     /**
      * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
