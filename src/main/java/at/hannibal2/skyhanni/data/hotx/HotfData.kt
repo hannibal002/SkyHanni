@@ -445,7 +445,7 @@ enum class HotfData(
         override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
         @HandleEvent
-        fun onDebug(event: DebugDataCollectEvent) {
+        fun onDebugDataCollect(event: DebugDataCollectEvent) {
             event.title("HotF")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")

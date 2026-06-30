@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -61,13 +60,13 @@ object FarmingWeightData {
     private var shouldRecalculateWeight = false
 
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.GARDEN) return
         updateCollections()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         updateCollections()
     }
 
@@ -287,7 +286,7 @@ object FarmingWeightData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("farming weight")
         event.addIrrelevant {
             CropType.entries.forEach {
