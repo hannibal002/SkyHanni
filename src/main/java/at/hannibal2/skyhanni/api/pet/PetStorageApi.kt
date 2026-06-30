@@ -126,6 +126,12 @@ object PetStorageApi {
     private fun String.isExactPetExpText() =
         !contains('k', ignoreCase = true) && !contains('m', ignoreCase = true)
 
+    private fun PetData.hasMatchingSkinTag(skinTag: String?, skinTagKnown: Boolean): Boolean = when {
+        skinTag == null -> !skinTagKnown || this.skinTag == null
+        skinTagKnown -> this.skinTag == skinTag
+        else -> this.skinTag?.removeColor() == skinTag.removeColor()
+    }
+
     fun isMainPetMenuName(inventoryName: String?): Boolean =
         PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
 
@@ -292,7 +298,7 @@ object PetStorageApi {
             currentPet.cleanName == petName &&
                 currentPet.rarity == rarity &&
                 currentPet.level == level &&
-                (petSkinTag == null || currentPet.skinTag == petSkinTag)
+                currentPet.hasMatchingSkinTag(petSkinTag, petSkinTagKnown)
         }
         return resolvedPet ?: matchingCurrentPet ?: PetData(
             petInternalName = petInternalName,
@@ -647,7 +653,7 @@ object PetStorageApi {
                 it.cleanName == name &&
                 (rarity == null || it.rarity == rarity) &&
                 (heldItem == null || it.heldItemInternalName == heldItem) &&
-                ((!skinTagKnown && skinTag == null) || it.skinTag == skinTag) &&
+                it.hasMatchingSkinTag(skinTag, skinTagKnown) &&
                 (level == null || it.level == level)
         }
         ?.singleOrNull { it.hasMatchingExp(exp, expErrorFactor) }
