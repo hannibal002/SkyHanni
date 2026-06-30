@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
@@ -121,22 +120,7 @@ object CarnivalFruitDigging {
         DRAGON_FRUIT("Dragonfruit", 1200, 1, "CARNIVAL_DRAGON_FRUIT"),
         ;
 
-        private var cachedTextureId: String? = null
-
-        private val textureId: String
-            get() {
-                cachedTextureId?.let { return it }
-
-                if (textureKey.isEmpty()) return ""
-                val id = SkullTextureHolder.getTexture(textureKey)
-                    ?.let(StringUtils::decodeBase64)
-                    ?.substringAfterLast("/texture/")
-                    ?.substringBefore("\"")
-                    ?: return ""
-
-                cachedTextureId = id
-                return id
-            }
+        private val texture by SkullTextureHolder.texture(textureKey)
 
         fun getAmountDugSoFar(): Int {
             return count - (remainingFruit[this] ?: 0)
@@ -162,8 +146,9 @@ object CarnivalFruitDigging {
         }
 
         companion object {
-            fun fromTexture(texture: String): Fruit? {
-                return Fruit.entries.find { it.textureId.isNotEmpty() && texture.contains(it.textureId) }
+            fun fromTexture(texture: String?): Fruit? {
+                texture ?: return null
+                return Fruit.entries.find { it.texture == texture }
             }
 
             fun fromName(name: String): Fruit? {
@@ -367,11 +352,9 @@ object CarnivalFruitDigging {
         val dugCell = lastSquareDug?.let { gameGrid[it] } ?: return
 
         val itemStack = entity.item
-        val textureHash = itemStack.getSkullTexture()?.let {
-            runCatching { StringUtils.decodeBase64(it) }.getOrNull()
-        } ?: return
+        val texture = itemStack.getSkullTexture()
 
-        val fruit = Fruit.fromTexture(textureHash) ?: return
+        val fruit = Fruit.fromTexture(texture) ?: return
 
         var updated = false
         if (solvedCell.solvedFruit == Fruit.UNKNOWN) {
