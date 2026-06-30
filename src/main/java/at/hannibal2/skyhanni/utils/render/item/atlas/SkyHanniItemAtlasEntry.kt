@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.utils.render.atlas.SkyHanniAbstractAtlasEntry
+
 internal open class SkyHanniItemAtlasEntry(
-    open val x: Int,
-    open val y: Int,
-    open val u: Float,
-    open val v: Float,
-    open val pixelSize: Int,
-)
+    x: Int, y: Int, u: Float, v: Float, pixelSize: Int,
+) : SkyHanniAbstractAtlasEntry(x, y, u, v, pixelSize)
 
 internal data class SkyHanniAnimatedItemAtlasEntry(
     override val x: Int,

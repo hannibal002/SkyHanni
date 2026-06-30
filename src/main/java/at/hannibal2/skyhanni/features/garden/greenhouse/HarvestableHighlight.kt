@@ -22,7 +22,7 @@ object HarvestableHighlight {
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val slot = InventoryUtils.getSlotAtIndex(24) ?: return
         val beacon = slot.item ?: return
-        if (beacon.item != Items.BEACON) return
+        if (!beacon.`is`(Items.BEACON)) return
         var color = LorenzColor.RED
         for (component in beacon.getLoreComponent()) {
             val line = component.string
@@ -44,7 +44,7 @@ object HarvestableHighlight {
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val slot = InventoryUtils.getSlotAtIndex(21) ?: return
         val water = slot.item ?: return
-        if (water.item != Items.WATER_BUCKET) return
+        if (!water.`is`(Items.WATER_BUCKET)) return
         for (component in water.getLoreComponent()) {
             val line = component.string
             if (line == "This crop has enough water to" || line == "This crop doesn't need water!") {

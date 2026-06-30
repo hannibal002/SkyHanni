@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -36,7 +37,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -75,7 +75,7 @@ object DungeonApi {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
-    private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
+    private val WITHER_ESSENCE_TEXTURE by SkullTextureHolder.texture("WITHER_ESSENCE")
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -87,7 +87,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     * WRAPPED-REGEX-TEST: "                                 Master Mode The Catacombs - Floor V"
      */
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",
@@ -308,7 +308,7 @@ object DungeonApi {
 
     private fun readOneMaxCollection(
         bossCollections: MutableMap<DungeonFloor, Int>,
-        inventoryItems: Map<Int, ItemStack>,
+        inventoryItems: Map<Int, SafeItemStack>,
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
@@ -331,7 +331,7 @@ object DungeonApi {
 
     private fun readAllCollections(
         bossCollections: MutableMap<DungeonFloor, Int>,
-        inventoryItems: Map<Int, ItemStack>,
+        inventoryItems: Map<Int, SafeItemStack>,
     ) {
         nextItem@ for (stack in inventoryItems.values) {
             var name = ""
@@ -356,7 +356,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {
@@ -413,7 +413,7 @@ object DungeonApi {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBlockClick(event: BlockClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val position = event.position
         val blockType: ClickedBlockType = when (position.getBlockAt()) {
@@ -422,7 +422,7 @@ object DungeonApi {
             Blocks.LEVER -> ClickedBlockType.LEVER
             Blocks.PLAYER_HEAD -> {
                 val blockTexture = BlockUtils.getTextureFromSkull(position)
-                if (blockTexture == WITHER_ESSENCE_TEXTURE) {
+                if (WITHER_ESSENCE_TEXTURE != null && blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE
                 } else {
                     return

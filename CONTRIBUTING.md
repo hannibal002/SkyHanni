@@ -91,7 +91,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
+Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -191,6 +191,14 @@ Make sure such pull requests have a good explanation in the **What** section.
 ## Coding Styles and Conventions
 
 - Follow the [Hypixel Rules](https://hypixel.net/rules).
+- **Do not submit AI-generated content.**
+    - This includes code, pull requests, issues, and review comments generated
+      by tools such as GitHub Copilot, ChatGPT, Claude, or similar systems.
+    - All contributions must be written and understood by the person submitting them. Using AI tools to help you
+      *learn* something is fine, but the code and text you submit must be your own work.
+    - AI-generated content often introduces subtle bugs, hallucinated APIs, or misleading context that costs
+      reviewers significant time to identify. Contributors who repeatedly submit AI-generated content may be
+      blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - **My build is failing due to `detekt`, what do I do?**
@@ -198,7 +206,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline-main.xml` file,
+        - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
@@ -207,12 +215,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
-      the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
+    - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
+      after the first build.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -221,7 +230,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
     - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
-      When creating a new event, place it in the appropriate sub package.
+      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
+      file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
       See the `api/minecraftevents` package for examples.
@@ -275,7 +285,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more informations why the title just showed up, as the title should not be too long.
+    - Also we can include more information on why the title just showed up, as the title should not be too long.
 
 ## Additional Useful Development Tools
 
@@ -289,13 +299,6 @@ debugging in IntelliJ. This is very useful for coding live on Hypixel without th
 - Start Minecraft inside IntelliJ normally.
     - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
 
 ### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
 
@@ -356,8 +359,15 @@ It allows to easily modify methods in Minecraft itself, without conflicting with
 For more information, see https://github.com/SpongePowered/Mixin
 or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
-When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
-possible.
+When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
+The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
+
+### KSP (Kotlin Symbol Processing)
+
+SkyHanni uses KSP via the `annotation-processors` module to generate code at compile time.
+
+- `@SkyHanniModule`: Generates `LoadedModules.kt`, which registers all event handlers and repo patterns automatically.
+- Mixin registration: Scans for `@Mixin`-annotated classes and generates the mixin configuration. There is no manual mixin list to update.
 
 ### Repo
 

@@ -237,7 +237,7 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
         val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
@@ -450,7 +450,7 @@ object IslandGraphs {
         val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
-            ChatUtils.debug("Rerouting navigation..")
+            ChatUtils.debug("Rerouting navigation...")
             newTarget.pathFind(navigationLabel, pathColor, onFound, allowRerouting = true, condition = activeCondition)
         }
     }

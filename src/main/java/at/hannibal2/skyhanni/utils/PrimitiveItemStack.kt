@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int) {
 
-    fun createItem(): ItemStack = internalName.getItemStack().apply { count = amount }
+    fun createItem(): SafeItemStack = internalName.getItemStack().apply { count = amount }
 
     operator fun times(multiplier: Int): PrimitiveItemStack = PrimitiveItemStack(internalName, amount * multiplier)
 
@@ -22,6 +22,6 @@ data class PrimitiveItemStack(val internalName: NeuInternalName, val amount: Int
     companion object {
 
         fun NeuInternalName.makePrimitiveStack(amount: Int = 1) = PrimitiveItemStack(this, amount)
-        fun ItemStack.toPrimitiveStackOrNull() = getInternalNameOrNull()?.let { PrimitiveItemStack(it, count) }
+        fun SafeItemStack.toPrimitiveStackOrNull() = getInternalNameOrNull()?.let { PrimitiveItemStack(it, count) }
     }
 }

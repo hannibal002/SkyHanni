@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -29,6 +30,7 @@ object FarmingLaneApi {
     fun onCropClick(event: CropClickEvent) {
         val crop = event.crop
         if (!GardenApi.hasFarmingToolInHand()) return
+        if (GardenPlotApi.inGreenhouse()) return
 
         val lanes = lanes ?: return
         val lane = lanes[crop]
