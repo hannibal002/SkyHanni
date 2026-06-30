@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
@@ -93,9 +94,10 @@ class EventListeners private constructor(val name: String, private val isGeneric
         private val predicates: List<EventPredicate>
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
-            if (lastCacheGeneration != eventCacheGeneration) {
+            val generation = getListenerCacheGeneration()
+            if (generation != lastCacheGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastCacheGeneration = eventCacheGeneration
+                lastCacheGeneration = generation
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }
@@ -133,10 +135,12 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     companion object {
-        private var eventCacheGeneration = 0
+        private var listenerCacheGeneration = AtomicInteger(0)
         fun markEventCacheDirty() {
-            eventCacheGeneration++
+            listenerCacheGeneration.incrementAndGet()
         }
+
+        fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
     }
 
 }
