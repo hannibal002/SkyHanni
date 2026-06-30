@@ -227,4 +227,12 @@ class GuiConfig {
         @ConfigLink(owner = StatDisplay::class, field = "enabled")
         val displayPositions: PositionList = PositionList(SkyblockStatUI.entries.size)
     }
+
+    @Expose
+    @ConfigOption(
+        name = "Hide GUI in F3 menu",
+        desc = "Hide Skyhanni GUI elements in debug menu",
+    )
+    @ConfigEditorBoolean
+    var hideGuiInDebugMenu: Boolean = true
 }

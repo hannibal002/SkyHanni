@@ -356,6 +356,7 @@ tasks.withType<KotlinCompile> {
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "kotlin.time.ExperimentalTime"
         )
         freeCompilerArgs.addAll(
             // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
@@ -424,6 +425,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 publishing.publications {
     create<MavenPublication>("maven") {
         if (!isDeobf) artifact(tasks.named("remapJar"))
+        else artifact(tasks.shadowJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
