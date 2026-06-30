@@ -142,5 +142,4 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
     }
-
 }
