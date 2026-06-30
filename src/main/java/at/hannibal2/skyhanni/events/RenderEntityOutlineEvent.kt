@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.isEmptyInvisibleArmorStand
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.decoration.ItemFrame
 import java.awt.Color
 
@@ -98,9 +98,9 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
         entitiesToChooseFrom = HashSet(entities.size)
-        // Only consider entities that aren't invisible armorstands to increase FPS significantly
+        // Empty invisible armor stands are common and never render an outlineable model
         for (entity in entities) {
-            if (!(entity is ArmorStand && entity.isInvisible) && entity !is ItemFrame) {
+            if (!entity.isEmptyInvisibleArmorStand() && entity !is ItemFrame) {
                 entitiesToChooseFrom!!.add(entity)
             }
         }

@@ -50,7 +50,7 @@ object EndermanSlayerFeatures {
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = SkyHanniLogger("slayer/enderman")
 
-    private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
+    private val NUKEKUBI_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_NUKEKUBI")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
