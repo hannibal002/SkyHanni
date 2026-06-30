@@ -65,6 +65,7 @@ import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
@@ -371,6 +372,51 @@ object ItemUtils {
         return stack
     }
 
+    fun repoSkullProvider(
+        displayName: String,
+        uuid: String,
+        repoSkullId: String,
+        vararg lore: String,
+        extraOps: (SafeItemStack.() -> Unit)? = null,
+    ) = repoSkullProvider(displayName, uuid, repoSkullId, lore.toList(), extraOps)
+
+    fun repoSkullProvider(
+        displayName: String,
+        uuid: String,
+        repoSkullId: String,
+        lore: Collection<String>,
+        extraOps: (SafeItemStack.() -> Unit)? = null,
+    ) = AutoUpdatingRepoSkullItemStack(displayName, uuid, repoSkullId, lore.toList(), extraOps).also {
+        repoSkullProviders.add(it)
+    }
+
+    class AutoUpdatingRepoSkullItemStack internal constructor(
+        private val displayName: String,
+        private val uuid: String,
+        private val repoSkullId: String,
+        private val lore: List<String>,
+        private val extraOps: (SafeItemStack.() -> Unit)?,
+    ) : ItemStackProvider {
+
+        private val value = StableOrTransientValue(1.seconds) {
+            val texture = SkullTextureHolder.getTexture(repoSkullId)
+            val stack = ItemUtils.createSkull(
+                displayName,
+                uuid,
+                texture ?: SkullTextureHolder.getTextureOrFallback(repoSkullId),
+                lore,
+            )
+                .also { extraOps?.invoke(it) }
+            if (texture == null) StableOrTransientValue.transient(stack) else StableOrTransientValue.stable(stack)
+        }
+
+        override val stack: SafeItemStack get() = value.get()
+
+        fun reset() = value.reset()
+    }
+
+    private val repoSkullProviders = mutableListOf<AutoUpdatingRepoSkullItemStack>()
+
     fun createItemStack(item: Item, displayName: String, vararg lore: String): SafeItemStack {
         return createItemStack(item, displayName, lore.toList())
     }
@@ -667,6 +713,9 @@ object ItemUtils {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
+        repoSkullProviders.forEach { it.reset() }
+        coinSkullCache.clear()
+        transientCoinSkullCache.clear()
         // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
@@ -956,37 +1005,56 @@ object ItemUtils {
         return "$prefix§r$repoItemName"
     }
 
-    private val COIN_TEXTURE_1 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_1") }
-    private val COIN_TEXTURE_2 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_2") }
-    private val COIN_TEXTURE_3 by lazy { SkullTextureHolder.getTexture("COIN_ITEM_STACK_3") }
+    private val COIN_TEXTURE_1 by SkullTextureHolder.texture("COIN_ITEM_STACK_1")
+    private val COIN_TEXTURE_2 by SkullTextureHolder.texture("COIN_ITEM_STACK_2")
+    private val COIN_TEXTURE_3 by SkullTextureHolder.texture("COIN_ITEM_STACK_3")
     private val COIN_TEXTURE_UUIDS = listOf(
         "2070f6cb-f5db-367a-acd0-64d39a7e5d1b",
         "94fa2455-2881-31fe-bb4e-e3e24d58dbe3",
         "0af8df1f-098c-3b72-ac6b-65d65fd0b668",
     )
+    private val COIN_TEXTURE_IDS = listOf(
+        "COIN_ITEM_STACK_1",
+        "COIN_ITEM_STACK_2",
+        "COIN_ITEM_STACK_3",
+    )
 
-    private val coinSkulls by lazy {
-        listOf(COIN_TEXTURE_1, COIN_TEXTURE_2, COIN_TEXTURE_3).mapIndexed { index, texture ->
-            texture to createSkull("<placeholder>", COIN_TEXTURE_UUIDS[index], texture)
-        }.toMap()
-    }
-
+    private data class CoinTexture(val texture: String, val uuid: String, val fallback: Boolean)
     private val coinSkullCache = TimeLimitedCache<Number, SafeItemStack>(2.minutes)
+    private val transientCoinSkullCache = TimeLimitedCache<Number, SafeItemStack>(1.seconds)
 
     // Taken from NEU
-    fun getCoinItemStack(coinAmount: Number): SafeItemStack = coinSkullCache.getOrPut(coinAmount) {
-        ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
-        val amount = coinAmount.toDouble()
-        val skull = when {
-            amount >= 10000000 -> coinSkulls[COIN_TEXTURE_3]
-            amount >= 100000 -> coinSkulls[COIN_TEXTURE_2]
-            else -> coinSkulls[COIN_TEXTURE_1]
-        } ?: coinSkulls.entries.first().value
+    fun getCoinItemStack(coinAmount: Number): SafeItemStack {
+        val texture = getCoinTexture(coinAmount.toDouble())
+        val cache = if (texture.fallback) transientCoinSkullCache else coinSkullCache
+        return cache.getOrPut(coinAmount) {
+            createCoinItemStack(coinAmount, texture)
+        }
+    }
 
-        skull.copy().apply {
-            setCustomItemName(amount.formatCoin() + " Coins")
+    private fun createCoinItemStack(coinAmount: Number, texture: CoinTexture): SafeItemStack {
+        ChatUtils.debug("Generating coin skull for amount ${coinAmount.addSeparators()}")
+        val skull = createSkull("<placeholder>", texture.uuid, texture.texture)
+
+        return skull.apply {
+            setCustomItemName(coinAmount.toDouble().formatCoin() + " Coins")
             extraAttributes = extraAttributes.apply { putString("id", "SKYBLOCK_COIN") }
         }
+    }
+
+    private fun getCoinTexture(amount: Double): CoinTexture {
+        val index = when {
+            amount >= 10000000 -> 2
+            amount >= 100000 -> 1
+            else -> 0
+        }
+        val textures = listOf(COIN_TEXTURE_1, COIN_TEXTURE_2, COIN_TEXTURE_3)
+        val texture = textures[index]
+        return CoinTexture(
+            texture = texture ?: SkullTextureHolder.getTextureOrFallback(COIN_TEXTURE_IDS[index]),
+            uuid = COIN_TEXTURE_UUIDS[index],
+            fallback = texture == null,
+        )
     }
 
     fun SafeItemStack.isSkull(): Boolean {

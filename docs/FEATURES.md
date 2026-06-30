@@ -1149,6 +1149,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Hover over the message to see a detailed breakdown of all active multipliers.
 + Added Mineshaft Cave-in Timer. - Rain (https://github.com/hannibal002/SkyHanni/pull/5620)
     + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
++ Added option to mute treasure chest sounds. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5896)
 
 </details>
 <details open><summary>

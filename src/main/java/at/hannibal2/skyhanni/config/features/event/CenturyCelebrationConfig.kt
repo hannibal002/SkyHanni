@@ -8,9 +8,10 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class CenturyCelebrationConfig {
 
+    // TODO: Rename field to reflect that tasks are no longer daily
     @ConfigOption(
-        name = "Daily Highlight",
-        desc = "Highlights incomplete daily tasks.",
+        name = "Raffle Task Highlighter",
+        desc = "Highlights incomplete raffle tasks.",
     )
     @Expose
     @ConfigEditorBoolean

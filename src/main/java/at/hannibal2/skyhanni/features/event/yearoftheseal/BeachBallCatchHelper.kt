@@ -37,8 +37,8 @@ object BeachBallCatchHelper {
 
     private val predictors = mutableMapOf<Int, Predictor>()
 
-    private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
-//     private val GIANT_BEACH_BALL by lazy { SkullTextureHolder.getTexture("GIANT_BEACH_BALL") }
+    private val NORMAL_BEACH_BALL by SkullTextureHolder.texture("NORMAL_BEACH_BALL")
+//     private val GIANT_BEACH_BALL by SkullTextureHolder.texture("GIANT_BEACH_BALL")
 
     fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {

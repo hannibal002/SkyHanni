@@ -8,8 +8,11 @@ import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,7 +34,8 @@ import kotlin.time.Duration.Companion.milliseconds
 object MineshaftWaypoints {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft
 
-    private const val BLOCKS_FORWARD: Int = 7
+    private const val BLOCKS_FORWARD = 7
+    private const val BLOCKS_DOWN = -15
 
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
@@ -71,6 +75,18 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
+    fun onCorpseFound(event: CorpseFoundEvent) {
+        if (!config.mineshaftWaypoints.enabled || !config.corpseLocator.enabled) return
+
+        val corpseType = event.corpseType
+        val article = if (corpseType == CorpseType.UMBER) "an" else "a"
+        ChatUtils.chat("Found $article $corpseType Corpse§e and marked its location with a waypoint.")
+
+        val waypoint = MineshaftWaypoint(corpseType.waypointType, event.location, isCorpse = true)
+        waypoints.add(waypoint)
+    }
+
+    @HandleEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
         if (waypoints.isEmpty()) return
 
@@ -91,7 +107,7 @@ object MineshaftWaypoints {
 
         timeLastShared = SimpleTimeMark.now()
         val location = closestWaypoint.location.toChatFormat()
-        val type = closestWaypoint.waypointType.displayText
+        val type = closestWaypoint.waypointType.display
         val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
@@ -111,7 +127,7 @@ object MineshaftWaypoints {
             }
             .forEach {
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.displayText}", 1.0)
+                event.drawDynamicText(it.location, "§${if (it.isLootedCorpse) "a" else "e"}${it.waypointType.display}", 1.0)
             }
     }
 
@@ -128,12 +144,10 @@ object MineshaftWaypoints {
                 // Adjust 2 blocks to the right to be in the center of the ladder shaft
                 .add(x = direction.z * -2, z = direction.x * 2)
                 // Move 15 blocks down to be at the bottom of the ladder shaft
-                .add(y = -15)
+                .add(y = BLOCKS_DOWN)
 
             waypoints.removeIf { it.waypointType == MineshaftWaypointType.LADDER }
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.LADDER, location = ladderLocation))
         }
     }
-
-    fun isEnabled() = IslandType.MINESHAFT.isInIsland() && config.mineshaftWaypoints.enabled
 }
