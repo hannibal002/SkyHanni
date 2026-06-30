@@ -71,6 +71,8 @@ import kotlin.time.Duration.Companion.seconds
 private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 private val seasoningInternalName = "SEASONING".toInternalName()
 private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
+private val carrotColoredVinylSet = "CARROT_COLORED_VINYL_SET".toInternalName()
+private val visitorGratitudes = setOf("VISITOR_GRATITUDE", "VISITORS_GRATITUDE").map { it.toInternalName() }
 private val bountifulCoinCauses = setOf(PurseChangeCause.GAIN_MOB_KILL, PurseChangeCause.GAIN_UNKNOWN)
 private val sackCompactionTimeout = 30.seconds
 private val farmingProfitTrackerPatternGroup = RepoPattern.group("garden.farming.profit.tracker")
@@ -414,6 +416,9 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         }
         for ((internalName, amount) in event.visitor.shoppingList) {
             addTrackedItem(TrackedSource.VISITORS, internalName, -amount.toLong(), message = false)
+        }
+        if (event.visitor.allRewards.any { it in visitorGratitudes } && carrotColoredVinylSet !in event.visitor.shoppingList) {
+            addTrackedItem(TrackedSource.VISITORS, carrotColoredVinylSet, -1L, message = false)
         }
         for (internalName in event.visitor.allRewards) {
             addTrackedItem(TrackedSource.VISITORS, internalName, 1L, message = false)

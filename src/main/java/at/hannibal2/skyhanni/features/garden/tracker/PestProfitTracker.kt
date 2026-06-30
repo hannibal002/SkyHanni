@@ -201,6 +201,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         ) {
             val pest = PestType.getByItemInternalNameOrNull(event.internalName) ?: return
             addItem(pest, event.internalName, event.amount, false)
+            FarmingProfitTracker.addPestItem(event.internalName, event.amount, message = false)
         }
     }
 
@@ -279,7 +280,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
     private fun addPestItem(pest: PestType, internalName: NeuInternalName, amount: Int) {
         addItem(pest, internalName, amount, command = false)
-        FarmingProfitTracker.addPestItem(internalName, amount)
+        FarmingProfitTracker.addPestItem(internalName, amount, message = false)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -396,7 +397,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
 
         // Get a list of all that have been killed in the last 2 seconds, it will
         // want to be the most recent one that was killed.
-        val pest = lastPestKillTimes.minByOrNull { it.value }?.key ?: return
+        val (pest, killTime) = lastPestKillTimes.maxByOrNull { it.value } ?: return
+        if (killTime.passedSince() > 2.seconds) return
         val roundedCoins = coins.roundToInt()
         addCoins(pest, roundedCoins, command = false)
         FarmingProfitTracker.addPestCoins(roundedCoins)

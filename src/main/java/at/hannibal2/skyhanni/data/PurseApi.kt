@@ -1,15 +1,19 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
@@ -37,8 +41,30 @@ object PurseApi {
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
+    private var lastAuctionHouseCoinClaim = SimpleTimeMark.farPast()
     var currentPurse = 0.0
         private set
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        val inventoryName = InventoryUtils.openInventoryName()
+        val item = event.item ?: return
+        val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
+
+        if (inventoryName in setOf("Auction View", "BIN Auction View") && itemName == "§6Collect Auction") {
+            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
+            return
+        }
+
+        if (inventoryName in setOf("Your Bids", "Manage Auctions") && itemName == "§aClaim All") {
+            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
+            return
+        }
+
+        if (inventoryName == "Manage Auctions" && item.getLoreComponent().any { it.string == "Status: Sold!" }) {
+            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
+        }
+    }
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -67,6 +93,10 @@ object PurseApi {
             // TODO relic of coins support
             if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
+            }
+
+            if (lastAuctionHouseCoinClaim.passedSince() < 5.seconds) {
+                return PurseChangeCause.GAIN_AUCTION_HOUSE
             }
 
             if (Minecraft.getInstance().screen == null) {
