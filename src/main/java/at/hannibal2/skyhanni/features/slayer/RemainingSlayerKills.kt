@@ -194,7 +194,7 @@ object RemainingSlayerKills {
         ChatUtils.debug("$multiplicativeMultiplier multiplier for multiplicatives.")
         return mobs.map { mob ->
             var expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
-            val maxObtainableAtATime = ( totalQuestXP * 0.75 )
+            val maxObtainableAtATime = (totalQuestXP * 0.75)
             // The maximum amount of progress that a kill can contribute towards your Slayer Quest has been raised from 50% to 75%.
             // https://hypixel.net/threads/hypixel-skyblock-0-20-9-crimson-isle-qol.5809290/
             expectedXP = expectedXP.coerceAtMost(maxObtainableAtATime)
@@ -267,7 +267,7 @@ object RemainingSlayerKills {
 
         var additiveWithMultMultipliers = 0.0
 
-        val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) -1
+        val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) - 1
 
         additiveWithMultMultipliers += if (championLevel != -1) data?.champion[championLevel] ?: 0.0 else 0.0
 
