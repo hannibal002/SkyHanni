@@ -118,7 +118,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
                 options.onlyOnIslandTypeTag.takeIfNotEmpty()?.let { tags ->
                     add { _ -> tags.any { it.isInIsland() } }
                 }
-                add { _ -> SkyHanniEvents.isDisabledInvoker(name) }
+                add { _ -> !SkyHanniEvents.isDisabledInvoker(name) }
             }
             // These predicates can't be cached since they depend on info about the actual event
             predicates = buildList {
