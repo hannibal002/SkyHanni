@@ -348,7 +348,6 @@ object ItemUtils {
     fun SafeItemStack.getSkullTexture(): String? {
         if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
-
     }
 
     fun SafeItemStack.getSkullOwner(): String? {
