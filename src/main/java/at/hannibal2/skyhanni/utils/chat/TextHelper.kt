@@ -78,8 +78,8 @@ object TextHelper {
     fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
         val textWidth = this.width()
         val spaceWidth = SPACE.width().coerceAtLeast(1)
-        val padding = ((width - textWidth) / 2).coerceAtLeast(0)
-        return join(" ".repeat((padding / spaceWidth).coerceAtLeast(0)), this)
+        val padding = (width - textWidth).coerceAtLeast(0) / 2
+        return join(" ".repeat(padding / spaceWidth), this)
     }
 
     fun Component.send(id: Int = 0, bypassSelfMessages: Boolean = false) =

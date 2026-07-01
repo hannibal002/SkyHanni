@@ -55,17 +55,18 @@ object NavigationHelper {
                 name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
             }
 
-            if (exactMatch != null) {
-                val (name, node) = exactMatch
-                node.pathFind(label = name, allowRerouting = true, condition = { true })
-                sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
-                return
-            }
+            val target = exactMatch ?: locations.takeIf { it.size == 1 }?.first()
 
-            if (locations.size == 1) {
-                val (name, node) = locations.first()
+            if (target != null) {
+                val (name, node) = target
                 node.pathFind(label = name, allowRerouting = true, condition = { true })
-                sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
+
+                val message = if (exactMatch != null) {
+                    "§7Exact match found, navigating to §r$name"
+                } else {
+                    "§7Only one location found, navigating to §r$name"
+                }
+                sendNavigateMessageWithContent(message, goBack)
                 return
             }
         }
