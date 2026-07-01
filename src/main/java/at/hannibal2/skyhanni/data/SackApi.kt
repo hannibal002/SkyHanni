@@ -370,11 +370,6 @@ object SackApi {
         rebuildSackNameLists()
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onComponentsLoaded() {
-        rebuildSackNameLists()
-    }
-
     private fun rebuildSackNameLists() {
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map {
