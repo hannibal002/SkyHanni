@@ -41,7 +41,7 @@ object LotumHelper {
     @HandleEvent(onlyOnIsland = IslandType.LOTUS_ATOLL)
     fun onEntityClick(event: EntityClickEvent) {
         if (!config.enabled) return
-        trackedLotums += event.clickedEntity.findLotumNameTag() ?: return
+        trackedLotums += event.clickedEntity.findClickedLotumNameTag() ?: return
     }
 
     @HandleEvent(onlyOnIsland = IslandType.LOTUS_ATOLL)
@@ -101,8 +101,11 @@ object LotumHelper {
         if (highlightedLotums.remove(lotum)) RenderLivingEntityHelper.removeEntityColor(lotum)
     }
 
-    private fun Entity.findLotumNameTag(): ArmorStand? =
-        (this as? ArmorStand)?.takeIf { it.isLotumName() } ?: nearbyLotumNameTag()
+    private fun Entity.findClickedLotumNameTag(): ArmorStand? = when (this) {
+        is ArmorStand -> takeIf { it.isLotumName() }
+        is Frog -> findConfirmedLotumNameTag()
+        else -> null
+    }
 
     private fun ArmorStand.findLotumFrog(): Frog? {
         val nameTagLocation = getLorenzVec()
@@ -113,13 +116,19 @@ object LotumHelper {
         }.minByOrNull { it.distanceTo(this) }
     }
 
+    private fun Frog.findConfirmedLotumNameTag(): ArmorStand? =
+        nearbyLotumNameTags()
+            .filter { it.findLotumFrog() == this }
+            .minByOrNull { it.distanceTo(this) }
+
     private fun Frog.isConfirmedLotum(): Boolean =
-        isAlive && nearbyLotumNameTag()?.findLotumFrog() == this
+        isAlive && findConfirmedLotumNameTag() != null
 
     private fun Entity.nearbyLotumNameTag(): ArmorStand? =
-        getLorenzVec().getEntitiesNearby<ArmorStand>(LOTUM_NAME_TAG_RANGE)
-            .filter { it.isLotumName() }
-            .minByOrNull { it.distanceTo(this) }
+        nearbyLotumNameTags().minByOrNull { it.distanceTo(this) }
+
+    private fun Entity.nearbyLotumNameTags(): List<ArmorStand> =
+        getLorenzVec().getEntitiesNearby<ArmorStand>(LOTUM_NAME_TAG_RANGE) { it.isLotumName() }
 
     private fun Entity.isLotumName() = cleanName().contains(LOTUM_NAME)
 
