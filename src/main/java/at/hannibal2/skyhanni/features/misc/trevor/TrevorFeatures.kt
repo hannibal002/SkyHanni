@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -106,6 +105,10 @@ object TrevorFeatures {
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
         "Trapper's Den",
+    )
+    private val clickArmorStandPattern by patternGroup.pattern(
+        "click.armorstand",
+        "CLICK",
     )
     // </editor-fold>
 
@@ -355,7 +358,7 @@ object TrevorFeatures {
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
-        if (event.entity.name.formattedTextCompatLessResets() == "§e§lCLICK") event.cancel()
+        if (clickArmorStandPattern.matches(event.entity.name.string)) event.cancel()
     }
 
     private fun resetTrapper() {
