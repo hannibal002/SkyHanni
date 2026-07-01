@@ -70,10 +70,11 @@ object ContributorManager {
      * REGEX-TEST: skyhani contributor
      * REGEX-TEST: skyhanni devs are the best
      * REGEX-TEST: sh dev in the house
+     * REGEX-TEST: who is the skyhannu contrubiter?
      */
     private val contribMentionPattern by patternGroup.pattern(
         "mention",
-        """\b(?:skyhanni|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*)\b"""
+        """\b(?:skyhann[iu]|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*|contr[iu]b(?:ut|it)\w*)\b"""
     )
 
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
