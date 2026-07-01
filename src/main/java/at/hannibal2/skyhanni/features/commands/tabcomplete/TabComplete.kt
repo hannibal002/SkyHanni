@@ -29,12 +29,4 @@ object TabComplete {
 
         return null
     }
-
-    private fun buildResponse(arguments: List<String>, fullResponse: List<String>): List<String> {
-        if (arguments.size == 2) {
-            val start = arguments[1].lowercase()
-            return fullResponse.filter { it.lowercase().startsWith(start) }
-        }
-        return emptyList()
-    }
 }
