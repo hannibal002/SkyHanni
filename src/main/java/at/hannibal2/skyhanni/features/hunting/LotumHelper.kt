@@ -67,7 +67,7 @@ object LotumHelper {
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5)) return
         removeInvalidLotums()
-        highlightedLotums.removeIf { !it.isConfirmedLotum() }
+        removeInvalidHighlightedLotums()
         if (!config.highlightLotums) return
 
         getEntities<ArmorStand>()
@@ -85,6 +85,21 @@ object LotumHelper {
     }
 
     private fun removeInvalidLotums() = trackedLotums.removeIf { !it.isAlive || !it.isLotumName() }
+
+    private fun removeInvalidHighlightedLotums() {
+        val iterator = highlightedLotums.iterator()
+        while (iterator.hasNext()) {
+            val lotum = iterator.next()
+            if (!lotum.isConfirmedLotum()) {
+                iterator.remove()
+                RenderLivingEntityHelper.removeEntityColor(lotum)
+            }
+        }
+    }
+
+    private fun removeHighlightedLotum(lotum: Frog) {
+        if (highlightedLotums.remove(lotum)) RenderLivingEntityHelper.removeEntityColor(lotum)
+    }
 
     private fun Entity.findLotumNameTag(): ArmorStand? =
         (this as? ArmorStand)?.takeIf { it.isLotumName() } ?: nearbyLotumNameTag()
@@ -111,7 +126,7 @@ object LotumHelper {
     @HandleEvent(onlyOnIsland = IslandType.LOTUS_ATOLL)
     fun onEntityRemoved(event: EntityRemovedEvent<Entity>) {
         trackedLotums.remove(event.entity)
-        (event.entity as? Frog)?.let { highlightedLotums.remove(it) }
+        (event.entity as? Frog)?.let(::removeHighlightedLotum)
     }
 
     @HandleEvent(WorldChangeEvent::class)
