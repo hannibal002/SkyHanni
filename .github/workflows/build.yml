@@ -78,9 +78,28 @@ jobs:
         runs-on: ubuntu-latest
         name: Verify build results
         needs: build
-        if: always()
+        if: ${{ always() && !cancelled() && !contains(needs.*.result, 'cancelled') }}
         steps:
             -   name: Check matrix result
-                uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # release/v1
-                with:
-                    jobs: ${{ toJSON(needs) }}
+                env:
+                    REQUIRED_JOBS: ${{ toJSON(needs) }}
+                run: |
+                    python3 <<'PY'
+                    import json
+                    import os
+                    import sys
+
+                    jobs = json.loads(os.environ["REQUIRED_JOBS"])
+                    failed_jobs = []
+
+                    for name, job in jobs.items():
+                        result = job["result"]
+                        print(f"{name}: {result}")
+                        if result != "success":
+                            failed_jobs.append((name, result))
+
+                    for name, result in failed_jobs:
+                        print(f"::error title=Required job did not succeed::{name} finished with result '{result}'")
+
+                    sys.exit(1 if failed_jobs else 0)
+                    PY
