@@ -16,7 +16,8 @@ import net.minecraft.core.registries.BuiltInRegistries
  */
 object SafeItemStackUtils {
 
-    fun canBindComponents(item: Item): Boolean {
+    fun canBindComponents(item: Item?): Boolean {
+        item ?: return false
         //~ if < 26.1 'return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()' -> 'return true'
         return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()
     }
