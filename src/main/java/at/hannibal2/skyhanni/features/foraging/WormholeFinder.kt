@@ -348,7 +348,7 @@ object WormholeFinder {
         if (!wearingFroggles()) return
         if (event.soundName != "entity.enderman.teleport") return
         if (abs(event.pitch - DEPARTURE_SOUND_PITCH) > SOUND_PITCH_TOLERANCE) return
-        removeClosedWormhole()
+        removeClosedWormhole(event.location)
         if (!config.departureAlert) return
         if (lastDepartureAlert.passedSince() < 3.seconds) return
         lastDepartureAlert = SimpleTimeMark.now()
@@ -362,9 +362,13 @@ object WormholeFinder {
         removeClosedWormhole()
     }
 
-    private fun removeClosedWormhole() {
+    private fun removeClosedWormhole(referenceLocation: LorenzVec? = null) {
         if (lastCloseRemoval.passedSince() < CLOSE_EVENT_DEDUPE_TIMEOUT) return
-        val target = activeWormholes.keys.minByOrNull { it.position.distanceSqToPlayer() } ?: return
+        val target = if (referenceLocation != null) {
+            activeWormholes.keys.minByOrNull { it.position.distanceSq(referenceLocation) }
+        } else {
+            activeWormholes.keys.minByOrNull { it.position.distanceSqToPlayer() }
+        } ?: return
         lastCloseRemoval = SimpleTimeMark.now()
         removeWormhole(target)
         updateTarget()
