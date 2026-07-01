@@ -20,7 +20,7 @@ object PestSpawnSound {
     private var lastPestSpawnSound = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!event.isPestSpawnSound()) return
 
         when (config.soundMode) {

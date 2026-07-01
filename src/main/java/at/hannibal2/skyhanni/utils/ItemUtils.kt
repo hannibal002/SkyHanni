@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItem
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -890,7 +889,7 @@ object ItemUtils {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
         if (missingRepoItems.isNotEmpty()) {

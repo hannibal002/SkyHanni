@@ -423,7 +423,7 @@ object BitsApi {
     fun isEnabled() = SkyBlockUtils.inSkyBlock && !SkyBlockUtils.isOnAlphaServer && profileStorage != null
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bits API")
         event.addIrrelevant {
             add("Bits: $bits")
