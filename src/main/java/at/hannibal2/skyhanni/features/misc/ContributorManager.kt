@@ -74,7 +74,7 @@ object ContributorManager {
      */
     private val contribMentionPattern by patternGroup.pattern(
         "mention",
-        """\b(?:skyhann[iu]|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*|contr[iu]b(?:ut|it)\w*)\b"""
+        """\b(?:sh|skyhann?[iu])\b.*\b(?:dev\w*|contrib\w*|contrubit\w*)\b"""
     )
 
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
