@@ -344,14 +344,15 @@ object WormholeFinder {
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.enabled || !config.departureAlert) return
+        if (!config.enabled) return
         if (!wearingFroggles()) return
         if (event.soundName != "entity.enderman.teleport") return
         if (abs(event.pitch - DEPARTURE_SOUND_PITCH) > SOUND_PITCH_TOLERANCE) return
+        removeClosedWormhole()
+        if (!config.departureAlert) return
         if (lastDepartureAlert.passedSince() < 3.seconds) return
         lastDepartureAlert = SimpleTimeMark.now()
         TitleManager.sendTitle("§cWormhole closed!")
-        removeClosedWormhole()
     }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
