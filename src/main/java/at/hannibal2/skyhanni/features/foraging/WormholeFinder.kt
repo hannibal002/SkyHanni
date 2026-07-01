@@ -265,9 +265,7 @@ object WormholeFinder {
         if (reachedTarget != null && reached == null) reachedTarget = null
 
         val oldTarget = currentTarget
-        val newTarget = visibleWormholes
-            .filter { it != reached }
-            .minByOrNull { it.position.distanceSqToPlayer() }
+        val newTarget = guideTarget(visibleWormholes.filter { it != reached })
         currentTarget = newTarget
         if (newTarget == null || config.lineMode != LineMode.NAVIGATION) {
             stopNavigation(oldTarget)
@@ -336,11 +334,14 @@ object WormholeFinder {
         val candidates = visibleWormholes.filter {
             it.position.distanceSqToPlayer() > REACHED_TARGET_SUPPRESS_DISTANCE_SQ
         }
-        return candidates.minWithOrNull(
+        return guideTarget(candidates)
+    }
+
+    private fun guideTarget(candidates: Iterable<GraphNode>): GraphNode? =
+        candidates.minWithOrNull(
             compareByDescending<GraphNode> { it.isConfirmed() }
                 .thenBy { it.position.distanceSqToPlayer() },
         )
-    }
 
     @HandleEvent(onlyOnIslands = [IslandType.LOTUS_ATOLL, IslandType.CRIMSON_ISLE])
     fun onPlaySound(event: PlaySoundEvent) {
