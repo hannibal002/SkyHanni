@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import com.mojang.blaze3d.platform.NativeImage
@@ -211,9 +212,9 @@ object BetterContainers {
 
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
-    private fun isBlankStack(
-        stack: SafeItemStack,
-    ): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK)
+    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+        stack.count == 1 &&
+        stack.getTooltip().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,

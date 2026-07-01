@@ -58,8 +58,9 @@ class InventoryConfig {
     val chocolateFactory: CFConfig = CFConfig()
 
     @Expose
-    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @ConfigOption(name = "Improved SkyBlock Menus", desc = "")
     @Accordion
+    @SearchTag("better container sb")
     val improvedSBMenus: ImprovedSBMenusConfig = ImprovedSBMenusConfig()
 
     @Expose
