@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
@@ -216,7 +215,7 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        val inHub = SkyBlockUtils.currentIsland == IslandType.HUB
+        val inHub = IslandType.HUB.isInIsland()
         val inStorage = minions.contains(entity)
 
         if (!inStorage && !inHub) minions[entity] = ProfileSpecificStorage.MinionConfig().apply {

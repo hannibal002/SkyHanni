@@ -175,8 +175,8 @@ Internal changes that do not impact the end user. Examples include:
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
-- Minor performance improvements
-- Documentation changes to markdown files, e.g., in `/docs` or this file.
+- Minor performance improvements (noticeable performance improvements belong in Improvements)
+- Documentation changes to Markdown files, e.g., in `/docs` or this file.
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
