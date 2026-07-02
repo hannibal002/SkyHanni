@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.ContinuedBlockBreakEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
@@ -9,6 +10,9 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -16,7 +20,10 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -42,6 +49,7 @@ object CarnivalFruitDigging {
 
     private var isPlayingFruitDigging = false
     private var lastSquareDug: GamePos? = null
+    private var lastDigTime = ServerTimeMark.farPast()
     private var remainingFruit = Fruit.entries.associateWith { it.count }.toMutableMap()
 
     private val solver = FruitDiggingSolver(GRID_LENGTH)
@@ -49,13 +57,13 @@ object CarnivalFruitDigging {
     private var solverDirty = false
     private var digsUsed = 0
 
-    private val patternGroup = RepoPattern.group("event.carnival")
+    private val patternGroup = RepoPattern.group("event.carnival.fruitdigging")
 
     /**
      * REGEX-TEST: [NPC] Carnival Pirateman: Good luck, matey!
      */
     private val startPattern by patternGroup.pattern(
-        "fruitdigging.started",
+        "started",
         "^\\[NPC] Carnival Pirateman: Good luck, matey!$",
     )
 
@@ -63,8 +71,8 @@ object CarnivalFruitDigging {
      * WRAPPED-REGEX-TEST: "                               Fruit Digging"
      */
     private val endPattern by patternGroup.pattern(
-        "fruitdigging.end",
-        " {31}Fruit Digging",
+        "end",
+        " +Fruit Digging",
     )
 
     /**
@@ -72,7 +80,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: TREASURE! There is an Apple nearby.
      */
     private val treasurePattern by patternGroup.pattern(
-        "fruitdigging.treasure",
+        "treasure",
         "^TREASURE! There is an? (?<fruit>.*) nearby\\.$",
     )
 
@@ -81,7 +89,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: ANCHOR! There are no fruits nearby!
      */
     private val noFruitsNearbyPattern by patternGroup.pattern(
-        "fruitdigging.nofruitsnearby",
+        "nofruitsnearby",
         "^(?:TREASURE|ANCHOR)! There are no fruits nearby!$",
     )
 
@@ -90,7 +98,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: MINES! There are 2 bombs hidden nearby.
      */
     private val minesPattern by patternGroup.pattern(
-        "fruitdigging.mines",
+        "mines",
         "^MINES! There (?:is|are) (?<bombs>\\d+) bombs? hidden nearby\\.$",
     )
 
@@ -100,7 +108,7 @@ object CarnivalFruitDigging {
      * REGEX-TEST: Rum
      */
     private val revealFruitPattern by patternGroup.pattern(
-        "fruitdigging.reveal",
+        "reveal",
         "^(?<name>[A-Za-z ]+)(?: \\(\\+\\d+\\))?$",
     )
 
@@ -321,6 +329,14 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
+    fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
+        if (event.position.getBlockAt() != Blocks.SAND) return
+        GamePos.fromLorenzVec(event.position) ?: return
+
+        lastDigTime = ServerTimeMark.now()
+    }
+
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         val blockOld = event.oldState
         val blockNew = event.newState
@@ -330,9 +346,25 @@ object CarnivalFruitDigging {
         val cell = gameGrid[pos]
         cell.isDiggable = false
 
-        if (blockNew.block == Blocks.SANDSTONE) {
+        // Bomb: 20 ticks (1s)
+        // Watermelon: 10 ticks (500ms)
+        val isExplosion = gameGrid.getLastDug().equalsOneOf(Fruit.BOMB, Fruit.WATERMELON) &&
+            lastDigTime.passedSince() >= 10.ticks
+
+        if (blockNew.block == Blocks.SANDSTONE && !isExplosion) {
             lastSquareDug = pos
             digsUsed++
+            if (digsUsed >= MAX_DIGS) {
+                if (digsUsed > MAX_DIGS) {
+                    ErrorManager.logErrorStateWithData(
+                        "Fruit Digging solver encountered an invalid state",
+                        "digs used is higher than max digs",
+                        "digs used" to digsUsed,
+                        "max digs" to MAX_DIGS,
+                    )
+                }
+                resetData()
+            }
         } else if (blockNew.block == Blocks.SANDSTONE_STAIRS) {
             updateRemainingFruit(cell, cell.solvedFruit)
         }
