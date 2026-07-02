@@ -24,14 +24,14 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
+import net.minecraft.core.Direction
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
@@ -254,8 +254,7 @@ object CarnivalFruitDigging {
 
                 // indicate if not diggable
                 if (!cell.isDiggable) {
-                    val aabb = AABB(pos.toBlockPos()).expandTowards(0.0, 0.1, 0.0)
-                    event.drawFilledBoundingBox(aabb, Color.GRAY, seeThroughBlocks = false)
+                    event.fillFace(AABB(pos.toBlockPos()), Direction.UP, Color.GRAY)
                 }
 
                 val label = mutableListOf<Pair<String, Color>>()
@@ -300,8 +299,8 @@ object CarnivalFruitDigging {
             recommendation?.let { rec ->
                 val pos = GamePos(rec.targetRow, rec.targetCol)
                 if (gameGrid[pos].isDiggable) {
+                    event.fillFace(AABB(pos.toBlockPos()), Direction.UP, config.bestDigColor.toColor(), alpha = 0.35f)
                     val vec = pos.toLorenzVec()
-                    event.drawWaypointFilled(vec, config.bestDigColor.toColor(), seeThroughBlocks = true, minimumAlpha = 0.35f)
                     event.drawDynamicText(
                         vec.add(0.5, 1.35, 0.5),
                         "§aDig §cHERE §7with §8(§c${rec.shovel}§8) §7${rec.pBomb.formatPercentage()} bomb",
