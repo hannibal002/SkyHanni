@@ -341,6 +341,7 @@ object CarnivalFruitDigging {
         val cell = gameGrid[pos]
         cell.isDiggable = false
 
+        // Position check is to ensure Bomb & Watermelon explosions don't count as dug squares
         if (blockNew.block == Blocks.SANDSTONE && pos == lastSquareDigging) {
             lastSquareDug = pos
             digsUsed++
