@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
@@ -47,8 +46,8 @@ object CarnivalFruitDigging {
     const val MAX_DIGS = 15
 
     private var isPlayingFruitDigging = false
+    private var lastSquareDigging: GamePos? = null
     private var lastSquareDug: GamePos? = null
-    private var lastDigTime = ServerTimeMark.farPast()
     private var remainingFruit = Fruit.entries.associateWith { it.count }.toMutableMap()
 
     private val solver = FruitDiggingSolver(GRID_LENGTH)
@@ -328,10 +327,8 @@ object CarnivalFruitDigging {
 
     @HandleEvent
     fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
-        if (event.position.getBlockAt() != Blocks.SAND) return
-        GamePos.fromLorenzVec(event.position) ?: return
-
-        lastDigTime = ServerTimeMark.now()
+        lastSquareDigging =
+            if (event.position.getBlockAt() == Blocks.SAND) GamePos.fromLorenzVec(event.position) else null
     }
 
     @HandleEvent
@@ -344,12 +341,7 @@ object CarnivalFruitDigging {
         val cell = gameGrid[pos]
         cell.isDiggable = false
 
-        // Bomb: 20 ticks (1s)
-        // Watermelon: 10 ticks (500ms)
-        val isExplosion = gameGrid.getLastDug().equalsOneOf(Fruit.BOMB, Fruit.WATERMELON) &&
-            lastDigTime.passedSince() >= 10.ticks
-
-        if (blockNew.block == Blocks.SANDSTONE && !isExplosion) {
+        if (blockNew.block == Blocks.SANDSTONE && pos == lastSquareDigging) {
             lastSquareDug = pos
             digsUsed++
             if (digsUsed >= MAX_DIGS) {
