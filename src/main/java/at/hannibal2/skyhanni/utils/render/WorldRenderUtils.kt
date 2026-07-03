@@ -24,7 +24,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.Font
+import net.minecraft.client.gui.Font.DisplayMode
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
@@ -44,6 +44,13 @@ import kotlin.math.sqrt
 object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
+
+    private fun getDisplayMode(seeThrough: Boolean) =
+        // Yes, you read that right. On 26.2, SEE_THROUGH is *not* see-through.
+        //? if >= 26.2
+        if (seeThrough) DisplayMode.POLYGON_OFFSET else DisplayMode.SEE_THROUGH
+        //? else
+        //if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
 
     private inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
@@ -286,7 +293,7 @@ object WorldRenderUtils {
             0f,
             Component.literal(text).visualOrderText,
             shadow,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
+            getDisplayMode(seeThroughBlocks),
             15728880,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backGroundColor,
@@ -311,7 +318,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             bufferSource,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
+            getDisplayMode(seeThroughBlocks),
             backGroundColor,
             15728880,
         )
@@ -367,7 +374,7 @@ object WorldRenderUtils {
             0f,
             text.visualOrderText,
             shadow,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
+            getDisplayMode(seeThroughBlocks),
             15728880,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backGroundColor,
@@ -392,7 +399,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             bufferSource,
-            if (seeThroughBlocks) Font.DisplayMode.SEE_THROUGH else Font.DisplayMode.POLYGON_OFFSET,
+            getDisplayMode(seeThroughBlocks),
             backGroundColor,
             15728880,
         )
