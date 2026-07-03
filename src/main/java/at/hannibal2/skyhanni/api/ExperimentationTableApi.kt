@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -236,6 +237,16 @@ object ExperimentationTableApi {
     private var currentBottlesInInventory: Map<NeuInternalName, Int> = mapOf()
     var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
+
+    // "Endcap Upgrade" items per the Hypixel wiki — share the same Ultra Rare RNG meter cost
+    // (500,000 Experimental XP) as T7 enchant books, but produce no in-game "ULTRA-RARE" lore
+    // header at card-flip time, so tryFireRareBookUncovered() cannot detect them. Detection
+    // happens instead in processRewardOrNull() via the post-experiment summary screen.
+    private val ultraRareMiscItems = setOf(
+        "SEVERED_PINCER", "ENDSTONE_IDOL", "ENSNARED_SNAIL", "GOLDEN_BOUNTY",
+        "SEVERED_HAND", "GOLD_BOTTLE_CAP", "CHAIN_END_TIMES", "OCTOPUS_TENDRIL",
+        "TROUBLED_BUBBLE", "PESTHUNTING_GUIDE", "FATEFUL_STINGER", "VIBRANT_CORAL",
+    ).toInternalNames()
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
@@ -523,6 +534,10 @@ object ExperimentationTableApi {
 
         val internalName = NeuInternalName.fromItemNameOrNull(this)
             ?: return ChatUtils.debug("Could not read item name from $this")
+        // Only Superpairs drops can be Ultra Rare misc items; skip the check for other experiment types.
+        if (currentExperimentData.type == ExperimentationTaskType.SUPERPAIRS && internalName in ultraRareMiscItems) {
+            TableRareUncoverEvent(this, isBook = false).post()
+        }
         currentExperimentData.addReward(internalName, 1)
     }
 
