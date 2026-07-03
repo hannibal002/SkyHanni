@@ -24,15 +24,17 @@ import net.minecraft.client.gui.Hud
 @SkyHanniModule
 object MinecraftCompat {
 
+    private val mc = Minecraft.getInstance()
+
     val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
 
-    val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
+    val localPlayerOrNull get(): LocalPlayer? = mc.player
 
     /**
      * The local user's information, such as the username and UUID.
      * This is always non-null, even if the player is not in a world / singleplayer.
      */
-    val localUser get(): User = Minecraft.getInstance().user
+    val localUser get(): User = mc.user
 
     val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
 
@@ -41,23 +43,23 @@ object MinecraftCompat {
 
     val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("level is null")
 
-    val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
+    val localWorldOrNull get(): ClientLevel? = mc.level
 
     @JvmStatic
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
     //? if >= 26.2
-    val hud get(): Hud = Minecraft.getInstance().gui.hud
+    val hud get(): Hud = mc.gui.hud
     //? else
-    //val hud get(): Gui = Minecraft.getInstance().gui
+    //val hud get(): Gui = mc.gui
 
     val hideGui get(): Boolean =
         //? if >= 26.2
         hud.isHidden()
         //? else
-        //Minecraft.getInstance().options.hideGui
+        //mc.options.hideGui
 
-    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+    val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
 
     //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
@@ -69,10 +71,10 @@ object MinecraftCompat {
     @JvmStatic
     var screen: Screen?
         //~ if >= 26.2 'screen' -> 'gui.screen()'
-        get() = Minecraft.getInstance().gui.screen()
+        get() = mc.gui.screen()
         set(value) {
             //~ if >= 26.2 'setScreen' -> 'gui.setScreen'
-            Minecraft.getInstance().gui.setScreen(value)
+            mc.gui.setScreen(value)
         }
 
     @HandleEvent
