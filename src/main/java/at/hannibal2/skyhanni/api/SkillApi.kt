@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -131,7 +132,8 @@ object SkillApi {
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
-    val storage get() = ProfileStorageData.profileSpecific?.skills?.skillData
+    private val skillStorage get() = ProfileStorageData.profileSpecific?.skills
+    val storage get() = skillStorage?.skillData
     var exactLevelingMap = mapOf<Int, Int>()
     var levelingMap = mapOf<Int, Int>()
     var levelArray = listOf<Int>()
@@ -162,9 +164,9 @@ object SkillApi {
     )
 
     private var giftTalismanBonus: Double
-        get() = ProfileStorageData.profileSpecific?.skills?.giftTalismanSkillXpBonus ?: 0.0
+        get() = skillStorage?.giftTalismanSkillXpBonus ?: 0.0
         set(value) {
-            ProfileStorageData.profileSpecific?.skills?.giftTalismanSkillXpBonus = value
+            skillStorage?.giftTalismanSkillXpBonus = value
         }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -174,7 +176,6 @@ object SkillApi {
 
     @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
     fun onSecondPassed() {
-        updateGiftTalismanBonus(InventoryUtils.getItemsInOwnInventory())
         val activeSkill = activeSkill ?: return
         val info = skillXPInfoMap[activeSkill] ?: return
         if (!info.sessionTimerActive) return
@@ -262,7 +263,12 @@ object SkillApi {
         val skillType = SkillType.getByNameOrNull(skillName) ?: return
         val effectiveGain = gained * giftXpMultiplier(source)
         val totalXp = addChatSkillXp(skillType, effectiveGain)
-        SkillExpGainEvent(skillType, effectiveGain, totalXp, source = source).post()
+        SkillExpGainEvent(
+            skill = skillType,
+            gained = effectiveGain,
+            totalXp = totalXp,
+            source = source,
+        ).post()
 
         val skillXP = skillXPInfoMap.getOrPut(skillType, ::SkillXPInfo)
         activeSkill = skillType
@@ -308,6 +314,12 @@ object SkillApi {
         updateGiftTalismanBonus(event.inventoryItems.values)
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
+        val bonus = GIFT_TALISMAN_BONUSES[event.internalName] ?: return
+        updateGiftTalismanBonus(bonus)
+    }
+
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Your Skills") return
@@ -337,6 +349,11 @@ object SkillApi {
 
     private fun updateGiftTalismanBonus(items: Collection<SafeItemStack>) {
         val bestBonus = items.maxOfOrNull { GIFT_TALISMAN_BONUSES[it.getInternalName()] ?: 0.0 } ?: return
+        updateGiftTalismanBonus(bestBonus)
+    }
+
+    private fun updateGiftTalismanBonus(bestBonus: Double) {
+        // Item and accessory events can miss temporary inventory state, so never downgrade the best known bonus.
         if (bestBonus > giftTalismanBonus) giftTalismanBonus = bestBonus
     }
 
