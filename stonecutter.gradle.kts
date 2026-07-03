@@ -142,7 +142,6 @@ stonecutter parameters {
             replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
             replace("gui.hud.chat", "gui.chat")
             replace("gui.hud.guiTicks", "gui.guiTicks")
-            replace("gui.hud.isHidden", "options.hideGui")
             replace("gui.hud.tabList", "gui.tabList")
             replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
             replace(

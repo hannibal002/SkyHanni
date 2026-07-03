@@ -25,8 +25,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         }
         gizmos.submit(event.submitNodeStorage, event.cameraState, !depth)
         //?} else {
-        /*
-        val layer = SkyHanniRenderLayers.getLines(!depth)
+        /*val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.bufferSource.getBuffer(layer)
         val matrix = event.matrices.last()
 
