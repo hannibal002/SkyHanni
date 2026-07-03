@@ -29,6 +29,14 @@ object ExperimentsDryStreakDisplay {
     private var display = emptyList<String>()
     private var ignoreNextFinish = false
 
+    fun resetManually() {
+        val storage = storage ?: return
+        storage.attemptsSince = 0
+        storage.xpSince = 0
+        display = drawDisplay()
+        ChatUtils.chat("Dry-streak counter reset")
+    }
+
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled() || !ExperimentationTableApi.inTable) return
