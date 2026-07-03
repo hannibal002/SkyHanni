@@ -1,6 +1,6 @@
-package at.hannibal2.skyhanni.features.event.carnival
+package at.hannibal2.skyhanni.features.event.carnival.fruitdigging
 
-import at.hannibal2.skyhanni.features.event.carnival.CarnivalFruitDigging.Fruit
+import at.hannibal2.skyhanni.features.event.carnival.fruitdigging.CarnivalFruitDigging.Fruit
 import java.util.EnumMap
 import kotlin.random.Random
 
