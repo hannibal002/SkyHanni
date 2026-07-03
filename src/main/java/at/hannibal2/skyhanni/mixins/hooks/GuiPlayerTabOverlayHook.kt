@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.events.TabListLineRenderEvent
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.PlayerTabOverlay
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -9,7 +10,7 @@ import kotlin.reflect.KProperty
 fun <T> tabListGuarded(block: (PlayerTabOverlay) -> T): T {
     tabListGuard = true
     try {
-        return block(Minecraft.getInstance().gui.hud.tabList)
+        return block(MinecraftCompat.hud.tabList)
     } finally {
         tabListGuard = false
     }

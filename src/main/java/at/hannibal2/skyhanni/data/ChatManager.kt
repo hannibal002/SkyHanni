@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
@@ -250,8 +251,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.hud.chat
+        val chatGui = MinecraftCompat.hud.chat
 
         val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
             predicate(it.value)
@@ -302,7 +302,7 @@ object ChatManager {
             return@runOrNextTick
         }
         val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
-        val lines = newMessage.splitLines(mc.font, maxWidth)
+        val lines = newMessage.splitLines(Minecraft.getInstance().font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
             val newLine = GuiMessage.Line(message, line, endOfEntry)
@@ -326,8 +326,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.hud.chat
+        val chatGui = MinecraftCompat.hud.chat
 
         val iterator = chatGui.allMessages.iterator()
         var removed = 0
@@ -398,7 +397,7 @@ object ChatManager {
             description = "Force Minecraft to refresh chat lines"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                Minecraft.getInstance().gui.hud.chat.refreshTrimmedMessages()
+                MinecraftCompat.hud.chat.refreshTrimmedMessages()
                 ChatUtils.chat("Refreshed chat.")
             }
         }

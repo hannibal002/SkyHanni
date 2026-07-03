@@ -248,15 +248,15 @@ object ChestValue {
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
-        val mc = Minecraft.getInstance()
-        val spaceWidth = mc.font.width(char.toString())
+        val font = Minecraft.getInstance().font
+        val spaceWidth = font.width(char.toString())
 
         var currentString = this
-        var currentLength = mc.font.width(currentString)
+        var currentLength = font.width(currentString)
 
         while (currentLength > targetLength) {
             currentString = currentString.dropLast(1)
-            currentLength = mc.font.width(currentString)
+            currentLength = font.width(currentString)
         }
 
         val difference = targetLength - currentLength

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import net.minecraft.client.Minecraft
 import kotlin.math.max
 import kotlin.math.min
 
@@ -54,6 +55,7 @@ class DefaultConfigOptionGui(
         val isMouseInScrollArea =
             x in 0..xSize && mouseY in ((height - ySize) / 2) + barSize..((height + ySize) / 2 - barSize)
         var y = mouseY - ((height - ySize) / 2 + barSize) + currentScrollOffset
+        val font = Minecraft.getInstance().font
 
         DrawContextUtils.pushPop {
             DrawContextUtils.translate(width / 2F, (height - ySize) / 2F)
@@ -63,7 +65,7 @@ class DefaultConfigOptionGui(
             GuiRenderUtils.drawStringCenteredScaledMaxWidth(
                 guiTitle,
                 0F,
-                mc.font.lineHeight.toFloat(),
+                font.lineHeight.toFloat(),
                 false,
                 xSize / 2 - padding,
                 -1,
@@ -72,11 +74,11 @@ class DefaultConfigOptionGui(
 
         DrawContextUtils.translatedPushPopResult(
             x = (width - xSize) / 2F + padding,
-            y = (height + ySize) / 2F - mc.font.lineHeight * 2,
+            y = (height + ySize) / 2F - font.lineHeight * 2,
         ) {
             var i = 0
             fun button(title: String, tooltip: List<String>, func: () -> Unit) {
-                val width = mc.font.width(title)
+                val width = font.width(title)
                 var overMouse = false
                 if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
                     mouseY - (height + ySize) / 2 in -barSize..0

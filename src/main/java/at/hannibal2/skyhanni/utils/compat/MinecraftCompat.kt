@@ -12,6 +12,11 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
 
+//? if >= 26.2
+import net.minecraft.client.gui.Hud
+//? else
+//import net.minecraft.client.gui.Gui
+
 /**
  * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
  * This class should be used in utils/data/api classes and not in feature classes.
@@ -41,10 +46,18 @@ object MinecraftCompat {
     @JvmStatic
     val localWorldExists get(): Boolean = localWorldOrNull != null
 
-    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+    //? if >= 26.2
+    val hud get(): Hud = Minecraft.getInstance().gui.hud
+    //? else
+    //val hud get(): Gui = Minecraft.getInstance().gui
 
-    //~ if >= 26.2 'options.hideGui' -> 'gui.hud.isHidden()'
-    val hideGui get(): Boolean = Minecraft.getInstance().gui.hud.isHidden()
+    val hideGui get(): Boolean =
+        //? if >= 26.2
+        hud.isHidden()
+        //? else
+        //Minecraft.getInstance().options.hideGui
+
+    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 
     //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L

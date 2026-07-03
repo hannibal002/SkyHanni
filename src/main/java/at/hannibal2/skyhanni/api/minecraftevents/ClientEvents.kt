@@ -95,9 +95,8 @@ object ClientEvents {
 
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
-            val gui = Minecraft.getInstance().gui
-            val chatHudLine = GuiMessage(gui.hud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
-            gui.hud.chat.logChatMessage(chatHudLine)
+            val chatHudLine = GuiMessage(MinecraftCompat.hud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+            MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }
 
         // if we cancel then we don't allow the message

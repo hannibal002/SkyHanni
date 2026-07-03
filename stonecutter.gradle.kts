@@ -140,9 +140,6 @@ stonecutter parameters {
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
             replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
-            replace("gui.hud.chat", "gui.chat")
-            replace("gui.hud.guiTicks", "gui.guiTicks")
-            replace("gui.hud.tabList", "gui.tabList")
             replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
             replace(
                 "net.minecraft.world.entity.monster.cubemob.MagmaCube",

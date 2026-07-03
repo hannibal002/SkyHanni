@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.OrderedTextUtils
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import net.minecraft.client.Minecraft
@@ -60,9 +61,9 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.hud.chat ?: return null
+        val chatGui = MinecraftCompat.hud.chat ?: return null
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
-        chatGui.captureClickableText(finder, mc.window.guiScaledHeight, mc.gui.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
+        chatGui.captureClickableText(finder, mc.window.guiScaledHeight, MinecraftCompat.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
         return visibleLine.parent

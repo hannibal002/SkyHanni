@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.client.Minecraft
 
@@ -24,8 +25,7 @@ object BossbarData {
     @HandleEvent
     fun onTick() {
         var multipleBossBars = false
-        //~ if >= 26.2 'gui.bossOverlay' -> 'gui.hud.bossOverlay'
-        for (bossBar in Minecraft.getInstance().gui.hud.bossOverlay.events.values) {
+        for (bossBar in MinecraftCompat.hud.bossOverlay.events.values) {
             if (multipleBossBars) {
                 return
             }

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
@@ -267,7 +268,7 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        val chat = Minecraft.getInstance().gui.hud.chat
+        val chat = MinecraftCompat.hud.chat
         ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
         DelayedRun.runOrNextTick {
             chat.addMessage(
