@@ -47,6 +47,7 @@ object WorldRenderUtils {
 
     private fun getDisplayMode(seeThrough: Boolean) =
         // Yes, you read that right. On 26.2, SEE_THROUGH is *not* see-through.
+        // https://mojira.dev/MC-309555
         //? if >= 26.2
         if (seeThrough) DisplayMode.POLYGON_OFFSET else DisplayMode.SEE_THROUGH
         //? else
