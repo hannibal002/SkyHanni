@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class FruitDiggingConfig {
     @Expose
@@ -28,8 +29,9 @@ class FruitDiggingConfig {
     var foundColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Show Treasure/Anchor", desc = "Show nearby fruit clues from treasure and anchor dousing modes.")
+    @ConfigOption(name = "Show Treasure/Anchor", desc = "Show nearby fruit clues from Treasure and Anchor dowsing modes.")
     @ConfigEditorBoolean
+    @SearchTag("dousing")
     var displayAdjacentTreasure: Boolean = true
 
     @Expose
@@ -38,8 +40,9 @@ class FruitDiggingConfig {
     var adjacentColor: ChromaColour = LorenzColor.GOLD.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Show adjacent mine count", desc = "Show number of adjacent mines from mines dousing mode.")
+    @ConfigOption(name = "Show adjacent mine count", desc = "Show number of adjacent mines from Mines dowsing mode.")
     @ConfigEditorBoolean
+    @SearchTag("dousing")
     var displayAdjacentMines: Boolean = true
 
     @Expose
