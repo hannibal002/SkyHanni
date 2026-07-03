@@ -41,7 +41,7 @@ object TalbotCircles {
             val isAirOverNonAir = blockState.isAir && !blockStateUnder.isAir
             if (isFluid || isAirOverNonAir) {
                 val aabb = AABB(block.toBlockPos())
-                event.drawFilledBoundingBox(aabb, Color.GREEN, alphaMultiplier = .4f, seeThroughBlocks = true)
+                event.drawFilledBoundingBox(aabb, Color.GREEN, alphaMultiplier = 0.4f, seeThroughBlocks = true)
             }
         }
     }

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -49,6 +50,7 @@ import at.hannibal2.skyhanni.utils.roundedUpSeconds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.decoration.ArmorStand
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -183,22 +185,9 @@ object TrevorFeatures {
             lastChatPromptTime = SimpleTimeMark.farPast()
         }
 
-        talbotPatternAbove.matchMatcher(formattedMessage) {
-            val height = group("height").toInt()
-            val angle = group("angle").toInt()
-            val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
-            TrevorSolver.findMobHeight(height, true)
-            TalbotCircles.addResult(height, angle, playerPosition)
-            lastTheodoliteClickPosition = null
-        }
-        talbotPatternBelow.matchMatcher(formattedMessage) {
-            val height = group("height").toInt()
-            val angle = group("angle").toInt()
-            val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
-            TrevorSolver.findMobHeight(height, false)
-            TalbotCircles.addResult(-height, angle, playerPosition)
-            lastTheodoliteClickPosition = null
-        }
+        talbotPatternAbove.checkTalbot(formattedMessage, below = false)
+        talbotPatternBelow.checkTalbot(formattedMessage, below = true)
+
         talbotPatternAt.matchMatcher(formattedMessage) {
             TrevorSolver.averageHeight = (lastTheodoliteClickPosition ?: LocationUtils.playerLocation()).y
             lastTheodoliteClickPosition = null
@@ -366,8 +355,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onItemClick(event: ItemClickEvent) {
-        if (!config.talbotCircles && !config.solver) return
-
+        if (event.clickType != InteractClickType.RIGHT_CLICK || (!config.talbotCircles && !config.solver)) return
         if (event.itemInHand?.getInternalName() == NeuInternalName.TALBOTS_THEODOLITE) {
             lastTheodoliteClickPosition = LocationUtils.playerLocation()
         }
@@ -428,6 +416,20 @@ object TrevorFeatures {
             description = "Clears Talbot circles"
             category = CommandCategory.USERS_RESET
             simpleCallback { TalbotCircles.resetCircles() }
+        }
+    }
+
+    private fun Pattern.checkTalbot(formattedMessage: String, below: Boolean) {
+        this.matchMatcher(formattedMessage) {
+            val height = group("height").toInt().let {
+                if (below) return@let -it
+                return@let it
+            }
+            val angle = group("angle").toInt()
+            val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
+            TrevorSolver.findMobHeight(height, true)
+            TalbotCircles.addResult(height, angle, playerPosition)
+            lastTheodoliteClickPosition = null
         }
     }
 }
