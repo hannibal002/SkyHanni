@@ -27,7 +27,7 @@ pluginManagement {
         // Stonecutter
         maven("https://maven.kikugie.dev/snapshots") {
             content {
-                includeGroup("dev.kikugie")
+                includeGroupByRegex("dev.kikugie.*")
             }
         }
     }
@@ -45,7 +45,7 @@ plugins {
     // We can't use libs refs in settings, so these are not stored in `libs.versions.toml`
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("at.skyhanni.shared-variables")
-    id("dev.kikugie.stonecutter") version "0.9.6"
+    id("dev.kikugie.stonecutter") version "0.10-alpha.3"
 }
 
 include("annotation-processors")
