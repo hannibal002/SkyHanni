@@ -27,7 +27,7 @@ pluginManagement {
         // Stonecutter
         maven("https://maven.kikugie.dev/snapshots") {
             content {
-                includeGroup("dev.kikugie")
+                includeGroupByRegex("dev.kikugie.*")
             }
         }
     }
