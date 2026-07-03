@@ -191,5 +191,10 @@ potential-bugs:
         active: true
     UnreachableCode:
         active: false
-    IgnoredReturnValue: # plenty of valid reasons to do this
-        active: false
+    IgnoredReturnValue:
+        active: true
+        ignoreFunctionCall:
+            - 'java.util.concurrent.ConcurrentHashMap.put'
+            - 'java.util.concurrent.ConcurrentHashMap.remove'
+            - 'kotlin.collections.MutableMap.put'
+            - 'kotlin.collections.MutableMap.remove'
