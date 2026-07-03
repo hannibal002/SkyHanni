@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
-import net.minecraft.client.Minecraft
 
 @SkyHanniModule
 object BossbarData {

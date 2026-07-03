@@ -22,7 +22,6 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
@@ -95,7 +94,13 @@ object ClientEvents {
 
         if (cancel) {
             // the message doesn't get logged if we cancel it, so we do that ourselves
-            val chatHudLine = GuiMessage(MinecraftCompat.hud.guiTicks, message, null, GuiMessageSource.SYSTEM_CLIENT, GuiMessageTag.system())
+            val chatHudLine = GuiMessage(
+                MinecraftCompat.hud.guiTicks,
+                message,
+                null,
+                GuiMessageSource.SYSTEM_CLIENT,
+                GuiMessageTag.system(),
+            )
             MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }
 
