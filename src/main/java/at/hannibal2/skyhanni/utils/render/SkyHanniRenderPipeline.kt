@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.compat.IrisCompat
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.MATRICES_PROJECTION_SNIPPET
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNormal
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
@@ -19,8 +20,7 @@ import java.util.Optional
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
-//?} else
-//import at.hannibal2.skyhanni.compat.IrisCompat
+//?}
 
 //~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
 //~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {
@@ -35,23 +35,20 @@ enum class SkyHanniRenderPipeline(
     sampler: String? = null,
     uniforms: Map<String, UniformType> = emptyMap(),
     depthWrite: Boolean = true,
-    //? if < 26.2
-    //val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
+    val irisProgram: IrisCompat.IrisProgram = IrisCompat.IrisProgram.BASIC,
 ) {
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.LINES,
+        irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
         vDrawMode = PrimitiveTopology.LINES,
         depthWrite = false,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.LINES,
+        irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
@@ -102,8 +99,7 @@ enum class SkyHanniRenderPipeline(
         sampler = "textureSampler",
         uniforms = getCommonRoundedUniforms(),
         depthWrite = false,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_OUTLINE(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -147,8 +143,7 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "textured_chroma",
         sampler = "Sampler0",
         uniforms = commonChromaUniforms,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ROUNDED_RECT_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -178,8 +173,7 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "rounded_texture_deferred",
         sampler = "Sampler0",
         depthWrite = false,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     RADIAL_GRADIENT_CIRCLE_DEFERRED(
         snippet = MATRICES_PROJECTION_SNIPPET,
@@ -195,8 +189,7 @@ enum class SkyHanniRenderPipeline(
         vertexShaderPath = "gui_textured_translucent",
         sampler = "Sampler0",
         depthWrite = false,
-        //? if < 26.2
-        //irisProgram = IrisCompat.IrisProgram.TEXTURED,
+        irisProgram = IrisCompat.IrisProgram.TEXTURED,
     ),
     ;
 
@@ -245,7 +238,7 @@ private object SkyHanniRenderPipelineUtils {
     val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
         //? if >= 26.2
         RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-        //? if < 26.2
+        //? else
         //RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)

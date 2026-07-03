@@ -1,11 +1,6 @@
-@file:Suppress("NoEmptyFile")
-
 package at.hannibal2.skyhanni.compat
 
-// TODO 26.2
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
@@ -35,7 +30,7 @@ object IrisCompat {
     }
 
     @HandleEvent
-    fun onInitFinished(event: InitFinishedEvent) {
+    fun onInitFinished() {
         if (!isIrisLoaded) return
         try {
             val irisApiClass = Class.forName(IRIS_API_PATH)
@@ -61,4 +56,3 @@ object IrisCompat {
         }
     }
 }
-*///?}
