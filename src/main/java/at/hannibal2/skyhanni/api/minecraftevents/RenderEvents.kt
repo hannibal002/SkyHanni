@@ -28,7 +28,7 @@ object RenderEvents {
             RenderEvents::postGui,
         )
 
-        //~ if < 26.2 '_' -> 'ctx'
+        //~ if >= 26.2 'ctx' -> '_'
         PictureInPictureRendererRegistry.register { _ ->
             SkyHanniPipCoordinatorRenderer(
                 //? if < 26.2

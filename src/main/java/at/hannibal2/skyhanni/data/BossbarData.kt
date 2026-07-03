@@ -24,7 +24,7 @@ object BossbarData {
     @HandleEvent
     fun onTick() {
         var multipleBossBars = false
-        //~ if < 26.2 'gui.hud.bossOverlay' -> 'gui.bossOverlay'
+        //~ if >= 26.2 'gui.bossOverlay' -> 'gui.hud.bossOverlay'
         for (bossBar in Minecraft.getInstance().gui.hud.bossOverlay.events.values) {
             if (multipleBossBars) {
                 return

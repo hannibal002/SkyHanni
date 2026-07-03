@@ -22,8 +22,8 @@ import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
 //?}
 
-//~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
-//~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {
+//~ if >= 26.2 'VertexFormat.Mode' -> 'PrimitiveTopology' {
+//~ if >= 26.2 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' -> 'BindGroupLayouts.MATRICES_PROJECTION' {
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
@@ -196,7 +196,7 @@ enum class SkyHanniRenderPipeline(
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
-            //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
+            //~ if >= 26.2 'withVertexFormat(vFormat, vDrawMode)' -> 'withVertexBinding(0, vFormat)'
             .withVertexBinding(0, vFormat)
             //? if >= 26.2
             .withPrimitiveTopology(vDrawMode)

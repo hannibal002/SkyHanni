@@ -43,7 +43,7 @@ object MinecraftCompat {
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 
-    //~ if < 26.2 'gui.hud.isHidden()' -> 'options.hideGui'
+    //~ if >= 26.2 'options.hideGui' -> 'gui.hud.isHidden()'
     val hideGui get(): Boolean = Minecraft.getInstance().gui.hud.isHidden()
 
     //~ if < 26.1 'defaultClockTime' -> 'dayTime'
@@ -55,10 +55,10 @@ object MinecraftCompat {
 
     @JvmStatic
     var screen: Screen?
-        //~ if < 26.2 'gui.screen()' -> 'screen'
+        //~ if >= 26.2 'screen' -> 'gui.screen()'
         get() = Minecraft.getInstance().gui.screen()
         set(value) {
-            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
+            //~ if >= 26.2 'setScreen' -> 'gui.setScreen'
             Minecraft.getInstance().gui.setScreen(value)
         }
 

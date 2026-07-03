@@ -42,11 +42,11 @@ public abstract class MixinChatComponent {
 
     @WrapOperation(
         method = "deleteMessageOrDelay",
-        //~ if < 26.2 '/Hud' -> '/Gui'
+        //~ if >= 26.2 '/Gui' -> '/Hud'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"),
         require = 0
     )
-    //~ if < 26.2 'Hud' -> 'Gui'
+    //~ if >= 26.2 'Gui' -> 'Hud'
     private int clearChatHead(Hud instance, Operation<Integer> original) {
         return instance.getGuiTicks() + 90;
     }

@@ -7,10 +7,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 26.2 'extract.LevelExtractor' -> 'LevelRenderer'
+//~ if >= 26.2 'LevelRenderer' -> 'extract.LevelExtractor'
 import net.minecraft.client.renderer.extract.LevelExtractor;
 
-//~ if < 26.2 'LevelExtractor' -> 'LevelRenderer'
+//~ if >= 26.2 'LevelRenderer' -> 'LevelExtractor'
 @Mixin(LevelExtractor.class)
 public abstract class MixinLevelExtractor {
 

@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.rendertype.RenderType
 *///?}
 import net.minecraft.client.Minecraft
 
-//~ if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
+//~ if >= 26.2 'textures.TextureFormat' -> 'GpuFormat'
 import com.mojang.blaze3d.GpuFormat
 
 // The idea and implementation for this class was inspired by Skyblocker. This implementation has
@@ -65,7 +65,7 @@ object SkyHanniOutlineHook {
 
     private var customDepthAttachmentView: GpuTextureView? = null
 
-    //~ if < 26.2 'GpuFormat' -> 'TextureFormat'
+    //~ if >= 26.2 'TextureFormat' -> 'GpuFormat'
     private var customDepthAttachmentFormat: GpuFormat? = null
 
     //? if >= 26.2 {
@@ -153,7 +153,7 @@ object SkyHanniOutlineHook {
 
     @JvmStatic
     fun checkIfDepthAttachmentNeedsUpdating() {
-        //~ if < 26.2 'gameRenderer.mainRenderTarget()' -> 'mainRenderTarget'
+        //~ if >= 26.2 'mainRenderTarget' -> 'gameRenderer.mainRenderTarget()'
         val gpuTexture = Minecraft.getInstance().gameRenderer.mainRenderTarget().depthTexture ?: return
         val width = gpuTexture.getWidth(0)
         val height = gpuTexture.getHeight(0)
@@ -181,7 +181,7 @@ object SkyHanniOutlineHook {
         }
     }
 
-    //~ if < 26.2 'GpuFormat' -> 'TextureFormat'
+    //~ if >= 26.2 'TextureFormat' -> 'GpuFormat'
     private fun updateDepthAttachment(format: GpuFormat) {
         try {
             customDepthAttachment?.let {
