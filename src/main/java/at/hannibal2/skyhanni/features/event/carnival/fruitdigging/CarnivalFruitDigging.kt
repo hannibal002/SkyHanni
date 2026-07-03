@@ -319,7 +319,7 @@ object CarnivalFruitDigging {
                     event.fillFace(AABB(pos.toBlockPos()), Direction.UP, config.bestDigColor.toColor(), alpha = 0.35f)
                     val vec = pos.toLorenzVec()
                     val color = if (dowsingMode == rec.shovel) 'a' else 'c'
-                    val textPos = vec.add(0.5, 1.35, 0.5)
+                    val textPos = vec.add(y = 1.35)
                     event.drawDynamicText(
                         textPos,
                         "§eDig §8(§$color${rec.shovel}§8)",
