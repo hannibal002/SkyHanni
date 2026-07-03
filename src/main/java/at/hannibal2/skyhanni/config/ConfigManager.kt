@@ -318,7 +318,7 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
         }
 
         if (!isDev) {
-            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+            if (field.isAnnotationPresent(OnlyDevEnv::class.java)) {
                 return GuiOptionEditorHidden(default)
             }
         }
