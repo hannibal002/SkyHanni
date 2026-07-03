@@ -14,9 +14,9 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
     val cameraState: CameraRenderState,
-    //? if >= 26.2 {
+    //? if >= 26.2
     val submitNodeStorage: SubmitNodeStorage,
-    //?} else
+    //? else
     //val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,

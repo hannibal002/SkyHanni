@@ -55,15 +55,15 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @WrapOperation(
-        //? if >= 26.2 {
+        //? if >= 26.2
         method = "prepareOutlineSubmit",
-        //?} else
+        //? else
         //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.2 {
+            //? if >= 26.2
             target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-            //?} else
+            //? else
             //target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
         )
     )
@@ -95,9 +95,9 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @ModifyArg(
-        //? if >= 26.2 {
+        //? if >= 26.2
         method = "prepareOutlineSubmit",
-        //?} else
+        //? else
         //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"),
         index = 0
@@ -112,9 +112,9 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @ModifyExpressionValue(
-        //? if >= 26.2 {
+        //? if >= 26.2
         method = "prepareOutlineSubmit",
-        //?} else
+        //? else
         //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;")
     )

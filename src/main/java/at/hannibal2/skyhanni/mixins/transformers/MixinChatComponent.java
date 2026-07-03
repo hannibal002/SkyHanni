@@ -23,9 +23,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
 
-//? if >= 26.2 {
+//? if >= 26.2
 import net.minecraft.client.gui.Hud;
-//?} else
+//? else
 //import net.minecraft.client.gui.Gui;
 
 @Mixin(ChatComponent.class)

@@ -21,18 +21,18 @@ public class MixinRenderPipeline {
         if (!SkyHanniOutlineHook.getCurrentlyActive()) return original;
         return original != null
             ? new DepthStencilState(
-                //? if >= 26.2 {
+                //? if >= 26.2
                 CompareOp.GREATER_THAN_OR_EQUAL,
-                //?} else
+                //? else
                 //CompareOp.LESS_THAN_OR_EQUAL,
                 original.writeDepth(),
                 original.depthBiasScaleFactor(),
                 original.depthBiasConstant()
             )
             : new DepthStencilState(
-                //? if >= 26.2 {
+                //? if >= 26.2
                 CompareOp.GREATER_THAN_OR_EQUAL,
-                //?} else
+                //? else
                 //CompareOp.LESS_THAN_OR_EQUAL,
                 true
             );

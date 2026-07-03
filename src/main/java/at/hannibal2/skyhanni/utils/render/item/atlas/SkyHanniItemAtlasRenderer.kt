@@ -16,9 +16,9 @@ import com.mojang.blaze3d.textures.FilterMode
 import org.joml.Matrix4f
 import kotlin.math.roundToInt
 
-//? if >= 26.2 {
+//? if >= 26.2
 import net.minecraft.client.renderer.SubmitNodeStorage
-//?} else
+//? else
 //import net.minecraft.client.renderer.MultiBufferSource
 
 internal class SkyHanniItemAtlasRenderer(
@@ -48,9 +48,9 @@ internal class SkyHanniItemAtlasRenderer(
         slotX: Int,
         slotY: Int,
         pixelSize: Int,
-        //? if >= 26.2 {
+        //? if >= 26.2
         submitNodeStorage: SubmitNodeStorage,
-        //?} else
+        //? else
         //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
@@ -58,9 +58,9 @@ internal class SkyHanniItemAtlasRenderer(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
         shState.renderItemToTexture(
-            //? if >= 26.2 {
+            //? if >= 26.2
             submitNodeStorage,
-            //?} else
+            //? else
             //bufferSource,
             featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
@@ -103,9 +103,9 @@ internal class SkyHanniItemAtlasRenderer(
     fun clearSlot(x: Int, y: Int, size: Int) {
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture,
-            //? if >= 26.2 {
+            //? if >= 26.2
             GuiRenderer.CLEAR_COLOR,
-            //?} else
+            //? else
             //0,
             depthTexture,
             1.0,
