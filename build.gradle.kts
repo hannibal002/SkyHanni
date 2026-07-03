@@ -214,6 +214,7 @@ dependencies {
 
     target.modMenuVersion?.let {
         implementation("maven.modrinth:modmenu:$it")
+        "productionRuntimeMods"("maven.modrinth:modmenu:$it")
     }
 
     runtimeOnly(libs.devauth)
