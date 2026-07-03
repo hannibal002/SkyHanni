@@ -410,7 +410,7 @@ object CarnivalFruitDigging {
         SoundUtils.plingSound.playSound()
         TitleManager.sendTitle("§cWrong Mode!", duration = 1.seconds)
         ChatUtils.chat(
-            "§6Use §a$expectedMode §6mode for §b${diggingPos.label()}§6, not §c$mode §6mode.",
+            "§6Use §a$expectedMode §6mode to dig this square! (Current: §c$mode)",
             replaceSameMessage = true,
         )
     }
