@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.carnival.fruitdigging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ContinuedBlockBreakEvent
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,16 +14,22 @@ import at.hannibal2.skyhanni.features.event.carnival.CarnivalAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributeString
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
@@ -37,14 +44,17 @@ import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CarnivalFruitDigging {
 
-    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
-
     private const val GRID_LENGTH = 7
     const val MAX_DIGS = 15
+
+    private val CARNIVAL_SHOVEL = "CARNIVAL_SHOVEL".toInternalName()
+
+    private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
 
     private var isPlayingFruitDigging = false
     private var lastSquareDigging: GamePos? = null
@@ -330,6 +340,7 @@ object CarnivalFruitDigging {
     fun onContinuedBlockBreak(event: ContinuedBlockBreakEvent) {
         lastSquareDigging =
             if (event.position.getBlockAt() == Blocks.SAND) GamePos.fromLorenzVec(event.position) else null
+        checkShovelMode()
     }
 
     @HandleEvent
@@ -345,22 +356,58 @@ object CarnivalFruitDigging {
         // Position check is to ensure Bomb & Watermelon explosions don't count as dug squares
         if (blockNew.block == Blocks.SANDSTONE && pos == lastSquareDigging) {
             lastSquareDug = pos
-            digsUsed++
-            if (digsUsed >= MAX_DIGS) {
-                if (digsUsed > MAX_DIGS) {
-                    ErrorManager.logErrorStateWithData(
-                        "Fruit Digging solver encountered an invalid state",
-                        "digs used is higher than max digs",
-                        "digs used" to digsUsed,
-                        "max digs" to MAX_DIGS,
-                    )
-                }
-                resetData()
-            }
+            checkShovelMode()
+            incrementDigs()
         } else if (blockNew.block == Blocks.SANDSTONE_STAIRS) {
             updateRemainingFruit(cell, cell.solvedFruit)
         }
         solverDirty = true
+    }
+
+    private fun incrementDigs() {
+        digsUsed++
+        if (digsUsed >= MAX_DIGS) {
+            if (digsUsed > MAX_DIGS) {
+                ErrorManager.logErrorStateWithData(
+                    "Fruit Digging solver encountered an invalid state",
+                    "digs used is higher than max digs",
+                    "digs used" to digsUsed,
+                    "max digs" to MAX_DIGS,
+                )
+            }
+            resetData()
+        }
+    }
+
+    private fun checkShovelMode() {
+        if (!config.enabled) return
+        val diggingPos = lastSquareDigging ?: return
+        val rec = recommendation ?: return
+        val recommendedPos = GamePos(rec.targetRow, rec.targetCol)
+        if (diggingPos != recommendedPos) return
+
+        val itemInHand = InventoryUtils.getItemInHand() ?: return
+        if (itemInHand.getInternalName() != CARNIVAL_SHOVEL) return
+
+        // The initial state of the Carnival Shovel is always Mines, but it does not have the tag
+        val modeStr = itemInHand.getAttributeString("dowsing_mode") ?: "MINES"
+        val mode = DowsingMode.entries.firstOrNull { it.name == modeStr } ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Fruit Digging solver encountered an invalid state",
+                "unknown dowsing mode: $modeStr",
+            )
+            return
+        }
+
+        val expectedMode = rec.shovel
+        if (mode == expectedMode) return
+
+        SoundUtils.plingSound.playSound()
+        TitleManager.sendTitle("§cWrong Mode!", duration = 1.seconds)
+        ChatUtils.chat(
+            "§6Use §a$expectedMode §6mode for §b${diggingPos.label()}§6, not §c$mode §6mode.",
+            replaceSameMessage = true,
+        )
     }
 
     @HandleEvent
