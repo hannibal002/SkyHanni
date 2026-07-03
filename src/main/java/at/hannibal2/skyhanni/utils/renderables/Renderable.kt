@@ -59,11 +59,11 @@ interface Renderable {
     val verticalAlign: VerticalAlignment
 
     fun isHovered(mouseOffsetX: Int, mouseOffsetY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
+        x >= mouseOffsetX && x < mouseOffsetX + width && y >= mouseOffsetY && y < mouseOffsetY + height
     } ?: false
 
     fun isBoxHovered(mouseOffsetX: Int, width: Int, mouseOffsetY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
+        x >= mouseOffsetX && x < mouseOffsetX + width && y >= mouseOffsetY && y < mouseOffsetY + height
     } ?: false
 
     /**
