@@ -97,13 +97,13 @@ object SkyHanniEvents {
     fun markEventCacheDirty(type: DirtyReason) {
         when (type) {
             DirtyReason.REPO_RELOAD,
-            DirtyReason.OUT_SB_FEATURE,
+            DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
             -> listenerCacheGeneration.incrementAndGet()
 
-            DirtyReason.ISLAND ->
+            DirtyReason.LOCATION_CHANGED ->
                 currentStateIndex.set(EventHandler.getCurrentStateIndex())
 
-            DirtyReason.SERVER -> {
+            DirtyReason.SERVER_DISCONNECTED -> {
                 listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(EventHandler.OUTSIDE)
             }
@@ -114,9 +114,9 @@ object SkyHanniEvents {
     fun getCurrentStateIndex(): Int = currentStateIndex.get()
 
     enum class DirtyReason {
-        ISLAND,
-        OUT_SB_FEATURE,
-        SERVER,
+        LOCATION_CHANGED,
+        OUTSIDE_SB_FEATURE_CHANGED,
+        SERVER_DISCONNECTED,
         REPO_RELOAD,
     }
 
