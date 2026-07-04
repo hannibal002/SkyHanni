@@ -145,30 +145,6 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST: §d§kXX§5 ULTRA-RARE ITEM! §d§kXX
-     */
-    private val ultraRareItemPattern by patternGroup.pattern(
-        "ultrarareitem",
-        "§d§kXX§5 ULTRA-RARE ITEM! §d§kXX",
-    )
-
-    /**
-     * REGEX-TEST:  ULTRA-RARE BOOK!
-     */
-    private val ultraRareBookLabelPattern by patternGroup.pattern(
-        "ultrarare.label",
-        " ULTRA-RARE BOOK! ",
-    )
-
-    /**
-     * REGEX-TEST:  ULTRA-RARE ITEM!
-     */
-    private val ultraRareItemLabelPattern by patternGroup.pattern(
-        "ultrarareitem.label",
-        " ULTRA-RARE ITEM! ",
-    )
-
-    /**
      * REGEX-TEST: §9Smite VII
      */
     private val bookPattern by patternGroup.pattern(
@@ -265,11 +241,6 @@ object ExperimentationTableApi {
     // no in-game "ULTRA-RARE" lore header at flip time, so detected via processRewardOrNull() instead.
     var ultraRareMiscItems: List<NeuInternalName> = emptyList()
         private set
-
-    internal val ultraRareBookTitle: String get() = ultraRarePattern.pattern()
-    internal val ultraRareItemTitle: String get() = ultraRareItemPattern.pattern()
-    internal val ultraRareBookLabel: String get() = ultraRareBookLabelPattern.pattern()
-    internal val ultraRareItemLabel: String get() = ultraRareItemLabelPattern.pattern()
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
