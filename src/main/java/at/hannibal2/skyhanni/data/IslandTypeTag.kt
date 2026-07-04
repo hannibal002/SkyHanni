@@ -81,6 +81,8 @@ enum class IslandTypeTag(vararg types: Any) {
 
     operator fun contains(type: IslandType) = type in types
 
+    fun getTypes(): Set<IslandType> = types.toSet()
+
     @SkyHanniModule
     companion object {
 
