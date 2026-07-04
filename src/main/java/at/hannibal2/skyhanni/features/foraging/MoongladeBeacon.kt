@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
@@ -91,7 +92,7 @@ object MoongladeBeacon {
             private val itemToColorMap = entries.associateBy { it.item }
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
-                val stack = this.item
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
@@ -125,7 +126,7 @@ object MoongladeBeacon {
             }
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
-                val stack = this.item
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
@@ -151,7 +152,7 @@ object MoongladeBeacon {
         companion object {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
-                val stack = this.item
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }

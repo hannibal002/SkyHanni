@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -379,7 +380,7 @@ class ItemResolutionQuery {
         }
         val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getItem(bazaarSlot)
+        val stackInSlot = chest.getItem(bazaarSlot).takeUnlessEmpty() ?: return false
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()
