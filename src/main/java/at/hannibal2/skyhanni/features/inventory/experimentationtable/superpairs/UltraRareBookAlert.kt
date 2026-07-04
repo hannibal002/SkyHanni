@@ -36,7 +36,7 @@ object UltraRareBookAlert {
     private fun notification(enchantsName: String, isBook: Boolean) {
         lastNotificationTime = SimpleTimeMark.now()
         dragonSound.playSound()
-        val typeLabel = if (isBook) " ULTRA-RARE BOOK! " else " ULTRA-RARE ITEM! "
+        val typeLabel = if (isBook) ExperimentationTableApi.ultraRareBookLabel else ExperimentationTableApi.ultraRareItemLabel
         ChatUtils.chat(
             componentBuilder {
                 append("You have uncovered a ")
@@ -59,7 +59,7 @@ object UltraRareBookAlert {
         if (lastNotificationTime.passedSince() > 5.seconds) return
 
         TitleManager.sendTitle(
-            titleText = if (lastUncoveredWasBook) "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX" else "§d§kXX§5 ULTRA-RARE ITEM! §d§kXX",
+            titleText = if (lastUncoveredWasBook) ExperimentationTableApi.ultraRareBookTitle else ExperimentationTableApi.ultraRareItemTitle,
             duration = 2.seconds,
             location = TitleManager.TitleLocation.INVENTORY,
         )

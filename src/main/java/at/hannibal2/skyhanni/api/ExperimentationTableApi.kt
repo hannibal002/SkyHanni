@@ -146,6 +146,34 @@ object ExperimentationTableApi {
     )
 
     /**
+     * Not used for matching — provides the title string for non-book Ultra Rare drops,
+     * remotely editable via SkyHanni-Repo without a mod update.
+     * REGEX-TEST: §d§kXX§5 ULTRA-RARE ITEM! §d§kXX
+     */
+    private val ultraRareItemPattern by patternGroup.pattern(
+        "ultrarareitem",
+        "§d§kXX§5 ULTRA-RARE ITEM! §d§kXX",
+    )
+
+    /**
+     * Middle text for the chat message's componentBuilder — no obfuscated XX wrapper,
+     * since the builder constructs those separately around this string.
+     * REGEX-TEST:  ULTRA-RARE BOOK!
+     */
+    private val ultraRareBookLabelPattern by patternGroup.pattern(
+        "ultrarare.label",
+        " ULTRA-RARE BOOK! ",
+    )
+
+    /**
+     * REGEX-TEST:  ULTRA-RARE ITEM!
+     */
+    private val ultraRareItemLabelPattern by patternGroup.pattern(
+        "ultrarareitem.label",
+        " ULTRA-RARE ITEM! ",
+    )
+
+    /**
      * REGEX-TEST: §9Smite VII
      */
     private val bookPattern by patternGroup.pattern(
@@ -247,6 +275,12 @@ object ExperimentationTableApi {
         "SEVERED_HAND", "GOLD_BOTTLE_CAP", "CHAIN_END_TIMES", "OCTOPUS_TENDRIL",
         "TROUBLED_BUBBLE", "PESTHUNTING_GUIDE", "FATEFUL_STINGER", "VIBRANT_CORAL",
     ).toInternalNames()
+
+    // Accessors so callers don't need to call Java's Pattern.pattern() directly.
+    internal val ultraRareBookTitle: String get() = ultraRarePattern.pattern()
+    internal val ultraRareItemTitle: String get() = ultraRareItemPattern.pattern()
+    internal val ultraRareBookLabel: String get() = ultraRareBookLabelPattern.pattern()
+    internal val ultraRareItemLabel: String get() = ultraRareItemLabelPattern.pattern()
 
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
