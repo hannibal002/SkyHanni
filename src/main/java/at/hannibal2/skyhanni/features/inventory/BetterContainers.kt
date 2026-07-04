@@ -291,6 +291,7 @@ object BetterContainers {
 
         for (index in 0..<size) {
             val stack: SafeItemStack = handlerInventory.getItem(index)
+            if (stack.isEmpty) continue
             // Column and row index
             val cI = index % 9
             val rI = index / 9
