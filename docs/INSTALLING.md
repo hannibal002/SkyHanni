@@ -84,7 +84,7 @@ Prism Launcher can handle Fabric, the Fabric API, RAM, and Java all from one ins
 
 ## Option C: Modrinth App
 
-The Modrinth App can install Fabric and mods directly from Modrinth's own catalog, and lets you add SkyHanni from GitHub as an override.
+The Modrinth App can install Fabric and mods directly from Modrinth's own catalog.
 
 > **2: Install the Modrinth App**
 > Download it from the [official Modrinth site](https://modrinth.com/app).
