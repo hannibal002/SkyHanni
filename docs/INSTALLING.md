@@ -6,7 +6,7 @@ Follow this guide to install SkyHanni for the Fabric loader. Pick whichever laun
 
 > **1: Install Java**
 > To play with modern Fabric mods, you need a recent version of Java matching your Minecraft version (1.21.x: **Java 21**, 26.x: **Java 25**).
-> We recommend [Adoptium Temurin 25](https://adoptium.net/temurin/releases/?version=25).
+> We recommend [Adoptium Temurin](https://adoptium.net/temurin/releases/).
 > Download and run the installer for your operating system.
 
 ---
