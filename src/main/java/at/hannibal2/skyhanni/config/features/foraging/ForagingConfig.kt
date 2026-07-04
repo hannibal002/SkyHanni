@@ -40,6 +40,12 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Frog Pet Hop Timer", desc = "")
+    @SearchTag("foraging fortune jump frog pet")
+    @Accordion
+    val frogPetHop: FrogPetHopConfig = FrogPetHopConfig()
+
+    @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -51,5 +57,4 @@ class ForagingConfig {
     @FeatureToggle
     @SearchTag("box firework")
     var muteFusionMachine = true
-
 }
