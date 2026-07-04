@@ -1,6 +1,6 @@
 # Download and Install SkyHanni
 
-SkyHanni is a Fabric mod for **Minecraft 26.1+**.
+SkyHanni is a Fabric mod for **modern minecraft versions**.
 Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by SkyBlock or SkyHanni.
 Follow this guide to install SkyHanni for the Fabric loader. Pick whichever launcher section matches what you use.
 
@@ -13,7 +13,7 @@ Follow this guide to install SkyHanni for the Fabric loader. Pick whichever laun
 
 ## Option A: Prism Launcher
 
-Prism Launcher can handle Fabric, the Fabric API, RAM, and Java all from one instance setup screen, so it's the fastest option.
+Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one instance setup screen, so it's the fastest option.
 
 > **2: Install Prism Launcher**
 > Download it from the [Official Prism Launcher website](https://prismlauncher.org/download/) for your OS.
@@ -24,12 +24,11 @@ Prism Launcher can handle Fabric, the Fabric API, RAM, and Java all from one ins
 > 3. Under **Loader**, choose **Fabric** and select the latest compatible loader version.
 > 4. Click **Create Instance**.
 
-> **4: Add Fabric API and SkyHanni**
+> **4: Add SkyHanni**
 > 1. Right-click your new instance and select **Edit**.
 > 2. Select **Mods** category and click on **Download Mods** — this searches Modrinth's catalog directly inside Prism.
-> 3. Under Modrinth, Search for **Fabric API** and click it to add it straight to your instance.
-> 4. Search for **SkyHanni** and add it the same way.
-> 5. You can add many other skyblock mods with this way too!
+> 3. Under Modrinth, Search for **SkyHanni** and click it to add it straight to your instance.
+> 4. You can add many other skyblock mods with this way too!
 
 > **5: Setup RAM**
 > 1. Right-click the instance and select **Edit**.
@@ -49,9 +48,10 @@ Prism Launcher can handle Fabric, the Fabric API, RAM, and Java all from one ins
 > 2. Run the installer and select the Minecraft version you want (e.g., 1.21.11 or 26.1+).
 > 3. Click "Install" to create a new profile in your Minecraft Launcher.
 
-> **3: Download Fabric API**
-> Most Fabric mods, including SkyHanni, require the [Fabric API](https://modrinth.com/mod/fabric-api) to function.
-> Download the version corresponding to your Minecraft version and place it in your `.minecraft/mods` folder.
+> **3: Download SkyHanni Dependencies**
+> - [Fabric API](https://modrinth.com/mod/fabric-api)
+> - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
+> - [Hypixel Mod API](https://modrinth.com/mod/hypixel-mod-api)
 
 > **4: Download SkyHanni** 
 > SkyHanni official downloads:
@@ -67,7 +67,7 @@ Prism Launcher can handle Fabric, the Fabric API, RAM, and Java all from one ins
 
 > **6: Move mods into mods folder**
 > 1. Open the `mods` folder inside `.minecraft`. If it doesn't exist, create it.
-> 2. Move the SkyHanni `.jar` and the Fabric API `.jar` into this folder.
+> 2. Move the SkyHanni `.jar` and all the dependencies' `.jar` into this folder.
 > 3. Remove any older versions of SkyHanni before adding the new files.
 
 > **7: Setup RAM**
@@ -95,12 +95,10 @@ The Modrinth App can install Fabric and mods directly from Modrinth's own catalo
 > 3. Under **Mod Loader**, choose **Fabric** and select the latest compatible loader version.
 > 4. Click **Create**.
 
-> **4: Add Fabric API**
+> **4: Add SkyHanni**
 > 1. Open the instance and go to the **Mods** tab.
-> 2. Click **Add content**, search for **Fabric API**, and add it.
+> 2. Click **Add content**, search for **SkyHanni**, and add it.
 
-> **5: Add SkyHanni**
-> Back in the **Mods** tab, click **Add content**, search for **SkyHanni**, and add it the same way as Fabric API.
 
 > **6: Setup RAM**
 > 1. Click your instance to open its page, then click **Settings** on the left.
