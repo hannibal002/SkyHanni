@@ -25,8 +25,8 @@ object ContributorAchievement {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
             Achievement(
-                "EEEEKK!".asComponent(),
-                componentBuilder {
+                name = "EEEEKK!".asComponent(),
+                description = componentBuilder {
                     append("Be in the same lobby as a")
                     appendWithColor(" SkyHanni ", TextHelper.chromaStyle)
                     append("contributor")
@@ -38,8 +38,8 @@ object ContributorAchievement {
 
         event.register(
             Achievement(
-                "I Know a Guy".asComponent(),
-                componentBuilder {
+                name = "I Know a Guy".asComponent(),
+                description = componentBuilder {
                     append("Have a ")
                     appendWithColor("SkyHanni ", TextHelper.chromaStyle)
                     append("contributor as a friend")
@@ -51,8 +51,8 @@ object ContributorAchievement {
 
         event.register(
             Achievement(
-                "Notice Me Senpai".asComponent(),
-                componentBuilder {
+                name = "Notice Me Senpai".asComponent(),
+                description = componentBuilder {
                     append("Have your friend request ignored by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
                     append(" contributor")
@@ -64,8 +64,8 @@ object ContributorAchievement {
 
         event.register(
             Achievement(
-                "Rejected".asComponent(),
-                componentBuilder {
+                name = "Rejected".asComponent(),
+                description = componentBuilder {
                     append("Have your friend request declined by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
                     append(" contributor")

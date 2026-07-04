@@ -224,9 +224,10 @@ object ContributorManager {
             onClick = {
                 ChatUtils.chat {
                     append("Seen contributors (${seenContributors.size}):\n")
+                    val seenContributorText =
+                        seenContributors.keys.joinToString("\n") { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() }
                     appendWithColor(
-                        seenContributors.keys.joinToString("\n")
-                        { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() },
+                        seenContributorText,
                         ChatFormatting.AQUA,
                     )
                 }
