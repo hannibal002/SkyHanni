@@ -138,7 +138,7 @@ fun Style.chatStyle() = buildString {
     if (isObfuscated) append("§k")
 }
 
-fun Style.takeUnlessEmpty(): Style? = if (this.isEmpty) null else this
+fun Style.takeUnlessEmpty(): Style? = takeUnless { it.isEmpty }
 
 fun TextColor.toChatFormatting(): ChatFormatting? {
     return textColorLUT[this.value]
