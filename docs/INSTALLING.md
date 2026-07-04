@@ -5,7 +5,7 @@ Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by skybloc
 Follow this guide to install SkyHanni for the Fabric loader. Pick whichever launcher section matches what you use.
 
 > **1: Install Java**
-> To play with modern Fabric mods, you need **Java 21** or **Java 25**.
+> To play with modern Fabric mods, you need a recent version of Java matching your Minecraft version (1.21.x: **Java 21**, 26.x: **Java 25**).
 > We recommend [Adoptium Temurin 25](https://adoptium.net/temurin/releases/?version=25).
 > Download and run the installer for your operating system.
 
