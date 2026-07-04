@@ -94,7 +94,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
             val generation = SkyHanniEvents.getListenerCacheGeneration()
-            if (lastCacheGeneration != generation) {
+            if (generation != lastCacheGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
                 lastCacheGeneration = generation
             }
