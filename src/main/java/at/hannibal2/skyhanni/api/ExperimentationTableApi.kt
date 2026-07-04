@@ -333,7 +333,7 @@ object ExperimentationTableApi {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
         miscRepoRewards = experiments.miscRewards
-        ultraRareMiscItems = experiments.ultraRareRewards ?: emptyList()
+        ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
