@@ -286,6 +286,8 @@ Make sure such pull requests have a good explanation in the **What** section.
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
   readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
+  `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
