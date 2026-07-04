@@ -234,7 +234,7 @@ object EnoughUpdatesManager {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {
-            val freshStack = SafeItemStack(baseItem, countVal)
+            val freshStack = ItemStackTemplate(baseItem, countVal).create()
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
             var innerReplacements = emptyMap<String, String>()
             if (useReplacements) {
