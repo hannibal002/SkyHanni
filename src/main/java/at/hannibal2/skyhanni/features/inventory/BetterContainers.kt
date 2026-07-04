@@ -290,7 +290,7 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -309,7 +309,7 @@ object BetterContainers {
         }
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             val xi = index % 9
             val yi = index / 9
 

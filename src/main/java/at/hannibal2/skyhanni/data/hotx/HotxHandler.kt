@@ -79,7 +79,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     fun Slot.parse() {
-        val item = this.item ?: return
+        val item = this.item
 
         if (this.handleCurrency()) return
 
@@ -135,7 +135,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
      * @return True means it read an item, false means it did not.
      */
     protected fun Slot.handleCurrency(): Boolean {
-        val item = this.item ?: return false
+        val item = this.item
 
         val isHeartItem = when {
             heartItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> true

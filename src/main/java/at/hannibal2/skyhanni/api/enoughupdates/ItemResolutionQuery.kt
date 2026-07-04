@@ -379,7 +379,7 @@ class ItemResolutionQuery {
         }
         val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getItem(bazaarSlot) ?: return false
+        val stackInSlot = chest.getItem(bazaarSlot)
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()

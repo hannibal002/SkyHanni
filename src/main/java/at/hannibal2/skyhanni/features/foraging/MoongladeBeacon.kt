@@ -91,7 +91,7 @@ object MoongladeBeacon {
             private val itemToColorMap = entries.associateBy { it.item }
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
-                val stack = this.item ?: return null
+                val stack = this.item
                 return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
@@ -125,7 +125,7 @@ object MoongladeBeacon {
             }
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
-                val stack = this.item ?: return null
+                val stack = this.item
                 return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
@@ -151,7 +151,7 @@ object MoongladeBeacon {
         companion object {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
-                val stack = this.item ?: return null
+                val stack = this.item
                 return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
@@ -439,7 +439,7 @@ object MoongladeBeacon {
         val untilNextRefPitch get() = nextPitchPair.referenceUntil
         val untilNextOurPitch get() = nextPitchPair.oursUntil
 
-        fun handlePitch(pitch: BeaconPitch) = with(nextPitchPair) {
+        fun handlePitch(pitch: BeaconPitch): Unit = with(nextPitchPair) {
             if (isEnchanted && !upgradingStrength) return
             if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
             with(bufferPair[BeaconPieceTarget.REFERENCE]) {

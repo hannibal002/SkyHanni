@@ -178,7 +178,7 @@ object FriendApi {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {
-            val chatStyle = sibling.style ?: continue
+            val chatStyle = sibling.style
             val value = sibling.command ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
