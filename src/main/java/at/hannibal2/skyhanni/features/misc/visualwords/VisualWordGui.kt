@@ -136,6 +136,7 @@ object VisualWordGui {
                 screen.modifiedWords.mapIndexed { index, word -> buildWordRow(screen, index, word) },
                 height = 150,
                 scrollValue = screen.listScrollValue,
+                velocity = 4.0,
                 bypassChecks = true,
                 showScrollableTipsInList = false,
                 showScrollbar = true,
