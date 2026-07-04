@@ -1,7 +1,7 @@
 # Download and Install SkyHanni
 
 SkyHanni is a Fabric mod for **Minecraft 26.1+**.
-Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by skyblock or SkyHanni.
+Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by SkyBlock or SkyHanni.
 Follow this guide to install SkyHanni for the Fabric loader. Pick whichever launcher section matches what you use.
 
 > **1: Install Java**
