@@ -1,6 +1,6 @@
 # Download and Install SkyHanni
 
-SkyHanni is a Fabric mod for **modern minecraft versions**.
+SkyHanni is a Fabric mod for **modern Minecraft versions**.
 Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by SkyBlock or SkyHanni.
 Follow this guide to install SkyHanni for the Fabric loader. Pick whichever launcher section matches what you use.
 
@@ -26,9 +26,9 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 
 > **4: Add SkyHanni**
 > 1. Right-click your new instance and select **Edit**.
-> 2. Select **Mods** category and click on **Download Mods** — this searches Modrinth's catalog directly inside Prism.
+> 2. Select **Mods** category and click on **Download Mods** - this searches Modrinth's catalog directly inside Prism.
 > 3. Under Modrinth, Search for **SkyHanni** and click it to add it straight to your instance.
-> 4. You can add many other skyblock mods with this way too!
+> 4. You can add many other mods the same way.
 
 > **5: Setup RAM**
 > 1. Right-click the instance and select **Edit**.
@@ -100,12 +100,12 @@ The Modrinth App can install Fabric and mods directly from Modrinth's own catalo
 > 2. Click **Add content**, search for **SkyHanni**, and add it.
 
 
-> **6: Setup RAM**
+> **5: Setup RAM**
 > 1. Click your instance to open its page, then click **Settings** on the left.
 > 2. Select the **Java** tab.
 > 3. Toggle **Override global settings** to ON and set **Maximum memory allocation** to at least **4096 MB** (4GB).
 
-> **7: Launch**
+> **6: Launch**
 > Click the instance, then press **Play**.
 
 ---
