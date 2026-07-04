@@ -146,8 +146,6 @@ object ExperimentationTableApi {
     )
 
     /**
-     * Not used for matching — provides the title string for non-book Ultra Rare drops,
-     * remotely editable via SkyHanni-Repo without a mod update.
      * REGEX-TEST: §d§kXX§5 ULTRA-RARE ITEM! §d§kXX
      */
     private val ultraRareItemPattern by patternGroup.pattern(
@@ -156,8 +154,6 @@ object ExperimentationTableApi {
     )
 
     /**
-     * Middle text for the chat message's componentBuilder — no obfuscated XX wrapper,
-     * since the builder constructs those separately around this string.
      * REGEX-TEST:  ULTRA-RARE BOOK!
      */
     private val ultraRareBookLabelPattern by patternGroup.pattern(
@@ -266,17 +262,14 @@ object ExperimentationTableApi {
     var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
 
-    // "Endcap Upgrade" items per the Hypixel wiki — share the same Ultra Rare RNG meter cost
-    // (500,000 Experimental XP) as T7 enchant books, but produce no in-game "ULTRA-RARE" lore
-    // header at card-flip time, so tryFireRareBookUncovered() cannot detect them. Detection
-    // happens instead in processRewardOrNull() via the post-experiment summary screen.
+    // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
+    // no in-game "ULTRA-RARE" lore header at flip time, so detected via processRewardOrNull() instead.
     private val ultraRareMiscItems = setOf(
         "SEVERED_PINCER", "ENDSTONE_IDOL", "ENSNARED_SNAIL", "GOLDEN_BOUNTY",
         "SEVERED_HAND", "GOLD_BOTTLE_CAP", "CHAIN_END_TIMES", "OCTOPUS_TENDRIL",
         "TROUBLED_BUBBLE", "PESTHUNTING_GUIDE", "FATEFUL_STINGER", "VIBRANT_CORAL",
     ).toInternalNames()
 
-    // Accessors so callers don't need to call Java's Pattern.pattern() directly.
     internal val ultraRareBookTitle: String get() = ultraRarePattern.pattern()
     internal val ultraRareItemTitle: String get() = ultraRareItemPattern.pattern()
     internal val ultraRareBookLabel: String get() = ultraRareBookLabelPattern.pattern()
@@ -568,7 +561,6 @@ object ExperimentationTableApi {
 
         val internalName = NeuInternalName.fromItemNameOrNull(this)
             ?: return ChatUtils.debug("Could not read item name from $this")
-        // Only Superpairs drops can be Ultra Rare misc items; skip the check for other experiment types.
         if (currentExperimentData.type == ExperimentationTaskType.SUPERPAIRS && internalName in ultraRareMiscItems) {
             TableRareUncoverEvent(this, isBook = false).post()
         }
