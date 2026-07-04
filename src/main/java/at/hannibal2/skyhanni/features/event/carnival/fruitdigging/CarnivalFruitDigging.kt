@@ -390,7 +390,8 @@ object CarnivalFruitDigging {
                     "max digs" to MAX_DIGS,
                 )
             }
-            resetData()
+            // TODO uncomment once we are confident round detection has no issues
+            //resetData()
         }
     }
 
