@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemAliases
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getRepoItemNameFromJson
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,8 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
 import at.hannibal2.skyhanni.utils.StringUtils.removePrefix
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -67,8 +65,6 @@ object NeuItems {
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
         private set
 
-    private var waitingOnComponents = false
-
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
             SafeItemStack(Blocks.BARRIER).itemType,
@@ -85,24 +81,9 @@ object NeuItems {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    fun onNeuRepoReload() {
         multiplierCache.clear()
         itemIdCache.clear()
-        rebuildItemNameCachesWhenReady()
-    }
-
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onComponentsLoaded() {
-        if (!waitingOnComponents) return
-        rebuildItemNameCachesWhenReady()
-    }
-
-    private fun rebuildItemNameCachesWhenReady() {
-        if (!SafeItemStackUtils.componentsLoaded) {
-            waitingOnComponents = true
-            return
-        }
-        waitingOnComponents = false
         DelayedRun.runOrNextTick(::readAllNeuItems)
     }
 
@@ -111,18 +92,18 @@ object NeuItems {
         val tempAllItemCache = mutableMapOf<String, NeuInternalName>()
         val tempNoColor = TreeMap<String, NeuInternalName>()
 
-        allNeuRepoItems().keys.forEach { internalName ->
+        allNeuRepoItems().forEach { (internalName, itemInfo) ->
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
             if (internalName.startsWith("BUILDER_")) return@forEach
 
-            val stack = internalName.getItemStackOrNull()?.takeIf { it.isNotEmpty() } ?: run {
-                ChatUtils.debug("skipped `$this`from readAllNeuItems")
+            allInternalNames[internalName.asString()] = internalName
+            val cleanName = internalName.getRepoItemNameFromJson(itemInfo)?.lowercase()?.removePrefix(neuPetLevelRegex)?.takeIf {
+                it.isNotEmpty()
+            } ?: run {
+                ChatUtils.debug("skipped `$internalName` from readAllNeuItems")
                 return@forEach
             }
-            val cleanName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets().lowercase().removePrefix(neuPetLevelRegex).takeIf {
-                it.isNotEmpty()
-            } ?: return@forEach
 
             if (cleanName.contains("[lvl 1➡100]")) {
                 if (PlatformUtils.isDevEnvironment) error("wrong name: '$cleanName'")
@@ -133,7 +114,6 @@ object NeuItems {
 
             tempAllItemCache[newCleanName] = internalName
             tempNoColor[newCleanName.removeColor()] = internalName
-            allInternalNames[internalName.asString()] = internalName
         }
         itemNamesWithoutColor = tempNoColor
         allItemsCache = tempAllItemCache
