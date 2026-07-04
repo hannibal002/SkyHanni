@@ -50,7 +50,7 @@ for "Gradle JVM") is set to a Java 25 JDK.
 
 </details>
 
-Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -71,7 +71,7 @@ We want to set the project structure to use Java 25.
 
 </details>
 
-Finally, we then want to reload gradle which can be done from the gradle tab from earlier.
+Finally, we then want to reload Gradle which can be done from the Gradle tab from earlier.
 
 <details>
 
@@ -82,7 +82,7 @@ Finally, we then want to reload gradle which can be done from the gradle tab fro
 </details>
 
 After all importing is done (which should be much quicker this time), you should find a new IntelliJ run
-configuration. If not, you can restart intellij and reload the gradle project again.
+configuration. If not, you can restart IntelliJ and reload the Gradle project again.
 
 <details>
 <summary>🖼️Show run configuration selection image</summary>
@@ -203,6 +203,8 @@ Make sure such pull requests have a good explanation in the **What** section.
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
+    - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
+      the PR listing the affected files, line numbers, and rule names.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
@@ -289,7 +291,7 @@ Make sure such pull requests have a good explanation in the **What** section.
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more information on why the title just showed up, as the title should not be too long.
+    - Also, we can include more information on why the title just showed up, as the title should not be too long.
 
 ## Additional Useful Development Tools
 
@@ -340,7 +342,7 @@ and recipes. NEU is not a dependency of SkyHanni.
 
 ### Config
 
-SkyHanni stores the config (settings and user data) as a json object in a single text file.
+SkyHanni stores the config (settings and user data) as a JSON object in a single text file.
 For rendering the /sh config (categories, toggles, search, etc.),
 SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, the same config system as NotEnoughUpdates.
 
@@ -349,7 +351,7 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for some farming
 features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience. Features that upload
+This includes features relating to Farming Weight, as well as syncing Jacob contests amongst players for convenience. Features that upload
 data to the Elite API are optional and opt-in. All requests to the Elite API are subject to
 its [privacy policy](https://eliteskyblock.com/privacy).
 
@@ -403,14 +405,34 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
+### Automated Detekt Review
+
+Detekt runs automatically on every pull request. When findings are present, they are posted as a comment on the PR and the `Detekt`
+label is applied.
+
+The setup uses a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions:
+
+- `.github/workflows/detekt.yml`: Triggered by `pull_request`. Runs with `contents: read` only. Runs `detektMain` and uploads the
+  [SARIF](https://docs.github.com/en/code-security/reference/code-scanning/sarif-files/sarif-support)
+  output as an artifact named `detekt-output`. Fork code never executes with write access.
+- `.github/workflows/detekt-review.yml`: Triggered by `workflow_run` on completion of `detekt.yml`. Always uses the version from the
+  base branch, so a fork PR cannot modify it. Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the
+  artifact to `runner.temp` (outside the workspace) and runs the review script. The script only reads the pre-generated SARIF, so fork
+  code has no influence over what runs here.
+- `.github/scripts/post_detekt_review.main.kts`: Kotlin script that parses the SARIF, formats the findings into a PR comment, and
+  manages the `Detekt` label.
+
+The PR number is not stored in the artifact. `detekt-review.yml` resolves it at runtime by querying the GitHub API for open pull requests
+matching the head repository and branch from the triggering workflow run.
+
 ## Access Wideners
 
-You may want to use private minecraft methods or fields, this is where access wideners come in.
+You may want to use private Minecraft methods or fields, this is where access wideners come in.
 Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or
 field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
 To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and
 select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom
 of `src/main/resources/skyhanni.classtweaker`.
-Then you need to reload gradle for the changes to apply.
+Then you need to reload Gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.
