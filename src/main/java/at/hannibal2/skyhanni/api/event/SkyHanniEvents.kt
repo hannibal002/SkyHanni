@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import java.lang.reflect.Method
+import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
@@ -90,12 +91,41 @@ object SkyHanniEvents {
         handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
+    private val listenerCacheGeneration = AtomicInteger(0)
+    private val currentStateIndex = AtomicInteger(EventHandler.OUTSIDE)
+
+    fun markEventCacheDirty(type: DirtyReason) {
+        when (type) {
+            DirtyReason.REPO_RELOAD,
+            DirtyReason.OUT_SB_FEATURE,
+            -> listenerCacheGeneration.incrementAndGet()
+
+            DirtyReason.ISLAND ->
+                currentStateIndex.set(EventHandler.getCurrentStateIndex())
+
+            DirtyReason.SERVER -> {
+                listenerCacheGeneration.incrementAndGet()
+                currentStateIndex.set(EventHandler.OUTSIDE)
+            }
+        }
+    }
+
+    fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
+    fun getCurrentStateIndex(): Int = currentStateIndex.get()
+
+    enum class DirtyReason {
+        ISLAND,
+        OUT_SB_FEATURE,
+        SERVER,
+        REPO_RELOAD,
+    }
+
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
-        EventListeners.markEventCacheDirty()
+        markEventCacheDirty(DirtyReason.REPO_RELOAD)
     }
 
     val seconds = listOf(10, 60, 60 * 5)

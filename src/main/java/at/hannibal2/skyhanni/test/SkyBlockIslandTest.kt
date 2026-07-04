@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
@@ -18,7 +18,7 @@ object SkyBlockIslandTest {
     var testIsland: IslandType? = null
         set(value) {
             field = value
-            EventListeners.markEventCacheDirty()
+            SkyHanniEvents.markEventCacheDirty(SkyHanniEvents.DirtyReason.ISLAND)
         }
 
     @HandleEvent

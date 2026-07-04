@@ -2,7 +2,7 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventListeners
+import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
@@ -51,6 +51,7 @@ object ClientEvents {
 
         // Disconnect event
         ClientPlayConnectionEvents.DISCONNECT.register { _, _ ->
+            SkyHanniEvents.markEventCacheDirty(SkyHanniEvents.DirtyReason.SERVER)
             ClientDisconnectEvent.post()
         }
 
@@ -62,7 +63,6 @@ object ClientEvents {
         // World change event
         //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
-            EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 
