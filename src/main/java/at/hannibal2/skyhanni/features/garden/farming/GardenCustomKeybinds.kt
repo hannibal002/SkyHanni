@@ -30,11 +30,6 @@ object GardenCustomKeybinds {
     private val pressedToggleKeys = mutableMapOf<KeyMapping, Int>()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
     private var wasActive = false
-    private var mappingsApplied = false
-
-    // False while a GUI is open: grabMouse() will call KeyMapping.setAll(), which handles
-    // key state refresh. onMouseGrabRestoringKeyState resets this to true once the mouse is grabbed.
-    private var refreshStateOnNextApply = true
 
     @JvmStatic
     fun isKeyDown(keyBinding: KeyMapping, isDown: Boolean, cir: CallbackInfoReturnable<Boolean>) {
