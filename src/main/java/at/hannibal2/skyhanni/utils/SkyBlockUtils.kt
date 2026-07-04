@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
@@ -15,14 +16,14 @@ object SkyBlockUtils {
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
     @JvmStatic
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = onHypixel && HypixelLocationApi.inSkyblock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 
     /**
      * Consider using [IslandType.isInIsland] instead
      */
-    val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
+    val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelLocationApi.island
 
     // almost always prefer this over scoreboardArea
     val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea else null

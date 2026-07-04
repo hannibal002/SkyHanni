@@ -11,9 +11,9 @@ import java.util.EnumSet
 
 // TODO maybe rename this class to IslandTypeGroup
 /**
- * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
+ * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
-enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
+enum class IslandTypeTag(vararg types: Any) {
 
     PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
@@ -77,7 +77,7 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+    fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
 
