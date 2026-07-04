@@ -123,5 +123,5 @@ The Modrinth App can install Fabric and mods directly from Modrinth's own catalo
 *If you have any other questions about the mod, please read our #faq before asking in #support for help.*
 
 > **Important note**
-> Never run files sent to you via Discord or other messaging apps. Only download from official sources like Modrinth or GitHub
+> Never run files sent to you via Discord or other messaging apps. Only download from official sources like Modrinth or GitHub. Be careful with GitHub, especially less popular repositories.
 *This guide was last updated on July 4th, 2026.*
