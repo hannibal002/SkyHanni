@@ -5,6 +5,10 @@ import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.ActionBarConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.HeldItemTooltipConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.HotbarConfig
+import at.hannibal2.skyhanni.config.features.gui.moveablehud.XPBarConfig
 import at.hannibal2.skyhanni.config.features.markedplayer.MarkedPlayerConfig
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.CompactTabListConfig
@@ -194,4 +198,12 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Hide GUI in F3 menu",
+        desc = "Hide Skyhanni GUI elements in debug menu",
+    )
+    @ConfigEditorBoolean
+    var hideGuiInDebugMenu: Boolean = true
 }

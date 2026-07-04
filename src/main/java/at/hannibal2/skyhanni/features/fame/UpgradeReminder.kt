@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStained
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,7 +102,7 @@ object UpgradeReminder {
         handleItems(event.inventoryItems)
     }
 
-    private fun handleItems(items: Map<Int, ItemStack>) {
+    private fun handleItems(items: Map<Int, SafeItemStack>) {
         val hasProfileUpgrade = foundActiveUpgrade(items, 27..35)
         if (!hasProfileUpgrade && currentProfileUpgrade != null) {
             ChatUtils.chat("§eRemoved invalid Profile Upgrade information.")
@@ -116,7 +116,7 @@ object UpgradeReminder {
         }
     }
 
-    private fun foundActiveUpgrade(items: Map<Int, ItemStack>, slots: IntRange): Boolean {
+    private fun foundActiveUpgrade(items: Map<Int, SafeItemStack>, slots: IntRange): Boolean {
         for (slot in slots) {
             val item = items[slot] ?: continue
             val lore = item.getLore()
@@ -210,7 +210,7 @@ object UpgradeReminder {
         }
 
         companion object {
-            fun fromItem(item: ItemStack): CommunityShopUpgrade? {
+            fun fromItem(item: SafeItemStack): CommunityShopUpgrade? {
                 val name = item.hoverName.formattedTextCompatLeadingWhiteLessResets()
                 val lore = item.getLore()
                 val upgrade = CommunityShopUpgrade(name)
@@ -230,7 +230,7 @@ object UpgradeReminder {
         ;
 
         companion object {
-            fun fromItem(item: ItemStack): UpgradeType? {
+            fun fromItem(item: SafeItemStack): UpgradeType? {
                 val lore = item.getLore()
                 return when {
                     accountUpgradePattern.anyMatches(lore) -> ACCOUNT

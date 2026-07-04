@@ -17,6 +17,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
+private const val EVOLVING_ITEMS_SEARCH_TAG =
+    "Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck, Rosewater Flask"
+
 class InventoryConfig {
     @Expose
     @Category(name = "SkyBlock Guide", desc = "Help find stuff to do in SkyBlock.")
@@ -55,8 +58,9 @@ class InventoryConfig {
     val chocolateFactory: CFConfig = CFConfig()
 
     @Expose
-    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @ConfigOption(name = "Improved SkyBlock Menus", desc = "")
     @Accordion
+    @SearchTag("better container sb")
     val improvedSBMenus: ImprovedSBMenusConfig = ImprovedSBMenusConfig()
 
     @Expose
@@ -170,7 +174,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(name = "Evolving Items", desc = "")
     @Accordion
-    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
+    @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
     val evolvingItems: EvolvingItemsConfig = EvolvingItemsConfig()
 
     @Expose
@@ -179,9 +183,9 @@ class InventoryConfig {
     val trade: TradeConfig = TradeConfig()
 
     @Expose
-    @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
+    @ConfigOption(name = "Item Number", desc = "Show the item number as a stack size for these items.")
     @ConfigEditorDraggableList
-    @SearchTag("Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck")
+    @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
     val itemNumberAsStackSize: MutableList<ItemNumberEntry> = mutableListOf(
         ItemNumberEntry.NEW_YEAR_CAKE,
         ItemNumberEntry.RANCHERS_BOOTS_SPEED,
@@ -228,9 +232,10 @@ class InventoryConfig {
     @Expose
     @ConfigOption(
         name = "Quick Craft Confirmation",
-        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-            "(e.g. armor, weapons, accessories). Sack items can be crafted normally.",
+        desc = "Require Ctrl+Click (Cmd+Click on macOS) to craft items that aren't often quick " +
+            "crafted (e.g. armor, weapons, accessories). Sack items can be crafted normally.",
     )
+    @SearchTag("command control")
     @ConfigEditorBoolean
     @FeatureToggle
     var quickCraftingConfirmation: Boolean = false

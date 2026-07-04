@@ -41,7 +41,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.LocalPlayer
 import java.awt.Color
@@ -56,7 +56,7 @@ import kotlin.time.Duration.Companion.seconds
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
  * 	death location
- * 	% of island discvovered (every node was most closest node at least once)
+ * 	% of island discovered (every node was most closest node at least once)
  * hub:
  * 	diana
  * farming:
@@ -69,7 +69,7 @@ import kotlin.time.Duration.Companion.seconds
  * 	relicts + throw spot
  * dwarven mines:
  * 	emissary
- * 	commssion areas
+ * 	commission areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
  * 	path to the bottom (Rhys NPC) (replace in DeepCavernsGuide.kt)
@@ -92,9 +92,9 @@ import kotlin.time.Duration.Companion.seconds
  *  support cross island paths (have a list of all node names in all islands)
  *
  * Changes in graph editor:
- * 	toggle distance to node by node path lengh, instead of eye of sight lenght
+ * 	toggle distance to node by node path length, instead of eye of sight length
  * 	press test button again to enable "true test mode", with hiding other stuff
- * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
+ * 	option to compare two graphs, and store multiple graphs in the edit mode in parallel
  */
 
 @SkyHanniModule
@@ -197,7 +197,7 @@ object IslandGraphs {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandType.DWARVEN_MINES.isCurrent()) {
+        if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
         }
@@ -237,10 +237,10 @@ object IslandGraphs {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Graphs")
         val islandType = SkyBlockUtils.currentIsland.name
-        val isPersonal = IslandTypeTags.PERSONAL_ISLAND.inAny()
+        val isPersonal = IslandTypeTag.PERSONAL_ISLAND.isInIsland()
         val important = SkyBlockUtils.inSkyBlock && lastLoadedIslandType != islandType && !isPersonal
         val list = buildList {
             add("")
@@ -278,9 +278,9 @@ object IslandGraphs {
     private fun reloadFromJson(islandName: String) {
         lastLoadedIslandType = islandName
         lastLoadedTime = SimpleTimeMark.now()
-        CoroutineConfig("load island graph data for $islandName").launchCoroutine {
+        CoroutineSettings("load island graph data for $islandName").launchCoroutine {
             try {
-                val graph = SkyHanniRepoManager.getRepoData<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
+                val graph = SkyHanniRepoManager.getRepoDataAsync<Graph>("constants/island_graphs", islandName, gson = Graph.gson)
                 IslandAreaFeatures.display = null
                 DelayedRun.runNextTick {
                     setNewGraph(graph)
@@ -392,7 +392,7 @@ object IslandGraphs {
         val nodeDistance = first?.distanceToPlayer() ?: 0.0
         if (first != null && second != null) {
             val direct = second.distanceToPlayer()
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 applyPath(Graph(path.drop(1)) to (distance - firstPath + direct))
@@ -450,7 +450,7 @@ object IslandGraphs {
         val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
-            ChatUtils.debug("Rerouting navigation..")
+            ChatUtils.debug("Rerouting navigation...")
             newTarget.pathFind(navigationLabel, pathColor, onFound, allowRerouting = true, condition = activeCondition)
         }
     }
@@ -519,8 +519,11 @@ object IslandGraphs {
 
     private fun getGraph(): Graph = currentIslandGraph ?: error("current island graph is not loaded")
 
+    fun nodeOrNull(nodeName: String, nodeTag: GraphNodeTag): GraphNode? =
+        getGraph().getClosestNode(nodeName, nodeTag)
+
     fun node(nodeName: String, nodeTag: GraphNodeTag): GraphNode =
-        getGraph().getClosestNode(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
+        nodeOrNull(nodeName, nodeTag) ?: error("node not found: name: '$nodeName', tag: '$nodeTag'")
 
     fun nodes(nodeName: String, nodeTag: GraphNodeTag): List<GraphNode> =
         getGraph().getNodesWithNameAndTags(nodeName, nodeTag)

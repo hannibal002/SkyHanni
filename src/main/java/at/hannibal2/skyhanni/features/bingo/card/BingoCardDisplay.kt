@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.bingo.BingoCardUpdateEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
@@ -25,6 +24,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -82,8 +82,8 @@ object BingoCardDisplay {
         if (hasHiddenPersonalGoals) dirty = true
     }
 
-    @HandleEvent
-    fun onBingoCardUpdate(event: BingoCardUpdateEvent) {
+    @HandleEvent(BingoCardUpdateEvent::class)
+    fun onBingoCardUpdate() {
         if (!isEnabled()) return
         dirty = true
     }
@@ -110,7 +110,17 @@ object BingoCardDisplay {
 
     // todo use RenderDisplayHelper
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRenderTop() {
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         if (!isEnabled()) return
 
         if (dirty) {
@@ -266,6 +276,7 @@ object BingoCardDisplay {
     }
 
     private var lastSneak = false
+
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "bingo", "event.bingo")

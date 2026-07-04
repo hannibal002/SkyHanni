@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
@@ -176,7 +176,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
-        // TODO merge patterns together. Just because old ones are designed poorly doesnt mean new ones need to be poor as well
+        // TODO merge patterns together. Just because old ones are designed poorly doesn't mean new ones need to be poor as well
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
         "§b§lRARE DROP! §r§7\\(§r§f§r§7(.*)x §r§f§r§9Foul Flesh§r§7\\) (.*)".toPattern(),
@@ -310,6 +310,7 @@ object ChatFilter {
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
         "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
+        "§e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
     private val skymallMessages = listOf(
@@ -460,6 +461,16 @@ object ChatFilter {
         "§4This Teleport Pad does not have a destination set!",
     )
 
+    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
+    private val MasterChefPatterns = listOf(
+        "§e\\[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
+    )
+
+    // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
+    private val MasterChefMessages = listOf(
+        "§e[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.",
+    )
+
     /**
      ** REGEX-TEST: §eYou haven't claimed your §r§6Summer Rewards §r§eyet!
      ** REGEX-TEST: §eTalk to the §r§bSummer Sloth §r§ein the §r§aHub§r§e!
@@ -542,6 +553,7 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
+        "masterchef" to MasterChefPatterns,
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -573,6 +585,7 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
+        "masterchef" to MasterChefMessages,
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
@@ -616,6 +629,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
@@ -633,14 +647,14 @@ object ChatFilter {
         config.hoppityBegun && message.isPresent("hoppity_begin") -> "hoppity_begin"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
         generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
-        generalConfig.hideSkyMall && !IslandTypeTags.MINING.inAny() && message.isPresent("skymall") -> "skymall"
-        generalConfig.hideLottery && !IslandTypeTags.FORAGING.inAny() && message.isPresent("lottery") -> "lottery"
+        generalConfig.hideSkyMall && !IslandTypeTag.MINING.isInIsland() && message.isPresent("skymall") -> "skymall"
+        generalConfig.hideLottery && !IslandTypeTag.FORAGING.isInIsland() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
         dungeonConfig.soloClass && DungeonApi.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonApi.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonApi.inDungeon() && message.isPresent("fairy") -> "fairy"
-        foragingConfig.unmineable && IslandTypeTags.FORAGING_CUSTOM_TREES.inAny() && message.isPresent("unmineable_tree") -> "unmineable_tree"
-        huntingConfig.redundantComments && IslandType.GALATEA.isCurrent() && message.isPresent("redundant_hunting") -> "redundant_hunting"
+        foragingConfig.unmineable && IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() && message.isPresent("unmineable_tree") -> "unmineable_tree"
+        huntingConfig.redundantComments && IslandType.GALATEA.isInIsland() && message.isPresent("redundant_hunting") -> "redundant_hunting"
         huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"

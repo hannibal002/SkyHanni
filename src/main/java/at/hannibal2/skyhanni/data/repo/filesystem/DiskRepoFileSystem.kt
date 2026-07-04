@@ -16,7 +16,8 @@ class DiskRepoFileSystem(
     }
 
     override fun deleteRecursively(path: String) {
-        File(root, path).deleteRecursively()
+        if (path.isEmpty()) root.listFiles()?.forEach { if (it != logger.logsDir) it.deleteRecursively() }
+        else File(root, path).deleteRecursively()
     }
 
     override fun list(path: String) = root.resolve(path).listFiles { file ->
@@ -26,7 +27,7 @@ class DiskRepoFileSystem(
     override fun validatePath(relativePath: String) {
         val outPath = root.toPath().resolve(relativePath).normalize()
         if (!outPath.startsWith(root.toPath())) throw RuntimeException(
-            "SkyHanni detected an invalid zip file. This is a potential security risk, " +
+            "SkyHanni detected an invalid tar.gz file. This is a potential security risk, " +
                 "please report this on the SkyHanni discord.",
         )
     }

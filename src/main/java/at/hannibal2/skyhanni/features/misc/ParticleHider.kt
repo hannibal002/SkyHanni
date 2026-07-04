@@ -41,7 +41,7 @@ object ParticleHider {
         val config = config.blockBreakParticle
         return when {
             !config.hide -> false
-            config.onlyInGarden -> IslandType.GARDEN.isCurrent()
+            config.onlyInGarden -> IslandType.GARDEN.isInIsland()
             else -> true
         }
     }
@@ -51,6 +51,9 @@ object ParticleHider {
 
     @JvmStatic
     fun shouldHideBlazeParticles() = MinecraftCompat.localWorldExists && config.hideBlazeParticles
+
+    @JvmStatic
+    fun shouldHideFireballParticles() = MinecraftCompat.localWorldExists && config.hideFireballParticles
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -73,14 +73,14 @@ object PigFeaturesApi {
     )
 
     /**
-     * REGEX-TEST: SHINY! You extracted Shiny Shard and Blood God Crest from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Shard and +1,185,000 Coins from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Shard and +1,000 Foraging XP from the piglet's orb!
-     * REGEX-TEST: SHINY! You extracted Shiny Shard and 16x Enchanted Potato from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Token and Blood God Crest from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Token and +1,185,000 Coins from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Token and +1,000 Foraging XP from the piglet's orb!
+     * REGEX-TEST: SHINY! You extracted Shiny Token and 16x Enchanted Potato from the piglet's orb!
      */
     private val orbLootedChatPattern by patternGroup.pattern(
         "chat.orb.looted",
-        "SHINY! You extracted Shiny Shard and (?<reward>.+) from the piglet's orb!",
+        "SHINY! You extracted Shiny Token and (?<reward>.+) from the piglet's orb!",
     )
 
     /**
@@ -139,7 +139,7 @@ object PigFeaturesApi {
         }
     }
 
-    private val ORB_SKULL by lazy { SkullTextureHolder.getTexture("SHINY_PIG_ORB") }
+    private val ORB_SKULL by SkullTextureHolder.texture("SHINY_PIG_ORB")
 
     private fun tryFindOrb(location: LorenzVec): ArmorStand? {
         val nearbyStands = location.getEntitiesNearby<ArmorStand>(5.0).toList()

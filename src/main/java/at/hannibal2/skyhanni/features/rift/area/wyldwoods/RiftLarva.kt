@@ -25,7 +25,7 @@ object RiftLarva {
     private val config get() = RiftApi.config.area.wyldWoods.larvas
     private var hasHookInHand = false
 
-    private val LARVA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
+    private val LARVA_SKULL_TEXTURE by SkullTextureHolder.texture("RIFT_LARVA")
 
     private val LARVA_HOOK = "LARVA_HOOK".toInternalName()
 
@@ -60,5 +60,5 @@ object RiftLarva {
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.highlight.get()
+    private fun isEnabled() = RiftApi.inRift() && config.highlight.get()
 }

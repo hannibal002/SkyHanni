@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
@@ -39,7 +40,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.days
 
@@ -153,7 +153,7 @@ object CroesusChestTracker {
         kismetAmountCache = getKismetAmount()
     }
 
-    private fun checkChests(inventory: Map<Int, ItemStack?>) {
+    private fun checkChests(inventory: Map<Int, SafeItemStack?>) {
         for ((run, item) in inventory.mapNotNull { (key, value) -> runSlots(key, value) }) {
             if (item == null) {
                 run.setValuesNull()
@@ -178,7 +178,7 @@ object CroesusChestTracker {
         inCroesusInventory = true
         pageSwitchable = true
         croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets())
-        if (event.inventoryItems[BACK_ARROW_SLOT]?.item != Items.ARROW) {
+        if (event.inventoryItems[BACK_ARROW_SLOT]?.`is`(Items.ARROW) != true) {
             currentPage = 0
         }
     }
@@ -249,7 +249,7 @@ object CroesusChestTracker {
     }
 
     // TODO Replace y > 103 check with a better "is actively playing Cata/Kuudra" heuristic
-    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isCurrent() && LocationUtils.playerLocation().y > 103.0
+    private fun isInDH(): Boolean = IslandType.DUNGEON_HUB.isInIsland() && LocationUtils.playerLocation().y > 103.0
 
     init {
         RenderDisplayHelper(
@@ -289,6 +289,7 @@ object CroesusChestTracker {
             val next = iterator.next()
             if (next.floor == null) {
                 iterator.remove()
+                continue
             }
             if (next.runTime == null) {
                 next.runTime = SimpleTimeMark.now()
@@ -296,6 +297,7 @@ object CroesusChestTracker {
             val sinceRun = next.runTime?.passedSince() ?: 0.days // purely exists for pre-addition runs
             if (sinceRun > 3.days) {
                 iterator.remove()
+                continue
             }
             if (next.openState == OpenedState.UNOPENED) unopenedChests++
         }
@@ -331,7 +333,7 @@ object CroesusChestTracker {
         else -> null
     }?.let { it + currentPage * 28 }
 
-    private fun ItemStack.isArrow() = this.item == Items.ARROW
+    private fun SafeItemStack.isArrow() = this.`is`(Items.ARROW)
 
     private inline fun <reified T> runSlots(slotId: Int, any: T) =
         croesusSlotMapToRun(slotId)?.getRun()?.let { it to any }

@@ -13,7 +13,7 @@ object MuteTreeSounds {
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.creaking.death" && config.muteBreaking) {
-            if (IslandType.GALATEA.isCurrent() && !config.muteBreakingOnGalatea) return
+            if (IslandType.GALATEA.isInIsland() && !config.muteBreakingOnGalatea) return
             event.cancel()
         }
     }

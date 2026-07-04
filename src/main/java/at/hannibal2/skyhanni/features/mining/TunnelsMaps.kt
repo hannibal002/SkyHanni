@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
@@ -221,7 +221,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         event.slot ?: return
         clickTranslate[event.slot.containerSlot]?.let {
-            event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
+            event.toolTip.add("§e§lRight Click §r§efor Tunnel Maps.")
         }
     }
 
@@ -237,7 +237,7 @@ object TunnelsMaps {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS")
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -413,7 +413,7 @@ object TunnelsMaps {
         val nodeDistance = first?.let { playerPosition.distance(it.position) } ?: 0.0
         if (first != null && second != null) {
             val direct = playerPosition.distance(second.position)
-            val firstPath = first.neighbours[second] ?: 0.0
+            val firstPath = first.neighbors[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
                 this.path = Graph(path.drop(1)) to (distance - firstPath + direct)
@@ -495,7 +495,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
         nextSpot()
     }
@@ -538,6 +538,6 @@ object TunnelsMaps {
     private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isCurrent() && config.enable &&
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable &&
             (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
 }

@@ -12,15 +12,15 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditorIO {
 
-    private val copyGraphCoroutine = CoroutineConfig("copy-graph").withIOContext()
-    private val bridgeGraphNetworksCoroutine = CoroutineConfig("bridge-graph-networks")
-    private val mergeJsonCoroutine = CoroutineConfig("merge-json").withIOContext()
+    private val copyGraphCoroutine = CoroutineSettings("copy-graph").withIOContext()
+    private val bridgeGraphNetworksCoroutine = CoroutineSettings("bridge-graph-networks")
+    private val mergeJsonCoroutine = CoroutineSettings("merge-json").withIOContext()
 
     private val state get() = GraphEditor.state
     private val nodes get() = state.nodes
@@ -37,7 +37,7 @@ object GraphEditorIO {
         val compiledNodeMap = filteredNodes.associate { node ->
             node.id to GraphNode(
                 node.id,
-                node.position,
+                node.position.roundTo(0),
                 node.name,
                 node.tags.map { it.internalName },
                 node.extraWeight,
@@ -52,7 +52,7 @@ object GraphEditorIO {
             val compiledNode = compiledNodeMap[node.id] ?: continue
             val nodeEdges = edgesByNode[node].orEmpty()
 
-            compiledNode.neighbours = nodeEdges.map { edge ->
+            compiledNode.neighbors = nodeEdges.map { edge ->
                 val otherNode = edge.getOther(node)
                 val compiledOther = compiledNodeMap[otherNode.id]
                     ?: error("Invalid node ID ${otherNode.id} referenced in edge")
@@ -176,7 +176,7 @@ object GraphEditorIO {
         }
         val translation = graph.zip(importedNodes).toMap()
         val rawEdges = graph.flatMap { node ->
-            node.neighbours.mapNotNull { (neighbor, _) ->
+            node.neighbors.mapNotNull { (neighbor, _) ->
                 val node1 = translation[node] ?: error("Invalid node in translation: ${node.id}")
                 val node2 = translation[neighbor] ?: error("Invalid neighbor in translation: ${neighbor.id}")
                 GraphingEdge(node1, node2, EdgeDirection.ONE_TO_TWO)

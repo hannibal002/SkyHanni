@@ -7,10 +7,7 @@ import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -29,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -51,7 +49,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.WrappedStringRenderable.Companion.wrappedText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
 import kotlin.math.ceil
@@ -61,9 +58,9 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object BlockStrengthGuide {
 
-    private enum class DisplayOres(private val iconDel: () -> ItemStack, val oreBlocks: Set<OreBlock>) {
+    private enum class DisplayOres(private val iconDel: () -> SafeItemStack, val oreBlocks: Set<OreBlock>) {
         VANILLA_ORES(
-            { ItemStack(Blocks.REDSTONE_BLOCK) },
+            { SafeItemStack(Blocks.REDSTONE_BLOCK) },
             setOf(
                 OreBlock.COAL_ORE,
                 OreBlock.IRON_ORE,
@@ -76,7 +73,7 @@ object BlockStrengthGuide {
             ),
         ),
         PURE_ORES(
-            { ItemStack(Blocks.GOLD_BLOCK) },
+            { SafeItemStack(Blocks.GOLD_BLOCK) },
             setOf(
                 OreBlock.PURE_COAL,
                 OreBlock.PURE_IRON,
@@ -97,7 +94,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.LOW_TIER_MITHRIL),
         ),
         GREEN_MITHRIL(
-            { ItemStack(Blocks.PRISMARINE) },
+            { SafeItemStack(Blocks.PRISMARINE) },
             setOf(OreBlock.MID_TIER_MITHRIL),
         ),
         BLUE_MITHRIL(
@@ -105,7 +102,7 @@ object BlockStrengthGuide {
             setOf(OreBlock.HIGH_TIER_MITHRIL),
         ),
         TUNGSTEN_UMBER(
-            { ItemStack(Blocks.CLAY) },
+            { SafeItemStack(Blocks.CLAY) },
             setOf(
                 OreBlock.LOW_TIER_UMBER,
                 OreBlock.MID_TIER_UMBER,
@@ -116,11 +113,11 @@ object BlockStrengthGuide {
             ),
         ),
         GLACITE(
-            { ItemStack(Blocks.PACKED_ICE) },
+            { SafeItemStack(Blocks.PACKED_ICE) },
             setOf(OreBlock.GLACITE),
         ),
         OBSIDIAN(
-            { ItemStack(Blocks.OBSIDIAN) },
+            { SafeItemStack(Blocks.OBSIDIAN) },
             setOf(OreBlock.OBSIDIAN),
         ),
         RUBY(
@@ -148,27 +145,27 @@ object BlockStrengthGuide {
             setOf(OreBlock.ONYX, OreBlock.PERIDOT, OreBlock.CITRINE, OreBlock.AQUAMARINE),
         ),
         HARD_STONE(
-            { ItemStack(Blocks.STONE) },
+            { SafeItemStack(Blocks.STONE) },
             setOf(OreBlock.HARD_STONE_HOLLOWS, OreBlock.HARD_STONE_TUNNELS, OreBlock.HARD_STONE_MINESHAFT),
         ),
         COBBLE_STONE(
-            { ItemStack(Blocks.COBBLESTONE) },
+            { SafeItemStack(Blocks.COBBLESTONE) },
             setOf(OreBlock.COBBLESTONE),
         ),
         STONE(
-            { ItemStack(Blocks.STONE) },
+            { SafeItemStack(Blocks.STONE) },
             setOf(OreBlock.STONE),
         ),
         SULPHUR(
-            { ItemStack(Blocks.SPONGE) },
+            { SafeItemStack(Blocks.SPONGE) },
             setOf(OreBlock.SULPHUR),
         ),
         NETHERRACK(
-            { ItemStack(Blocks.NETHERRACK) },
+            { SafeItemStack(Blocks.NETHERRACK) },
             setOf(OreBlock.NETHERRACK),
         ),
         END_STONE(
-            { ItemStack(Blocks.END_STONE) },
+            { SafeItemStack(Blocks.END_STONE) },
             setOf(OreBlock.END_STONE),
         );
 
@@ -241,7 +238,7 @@ object BlockStrengthGuide {
 
                     if (!showExtraInfos) {
                         add(Renderable.placeholder(0, 5))
-                        addString("§eHold control-key to show extra infos!")
+                        addString("§eHold ${KeyboardManager.getModifierKeyName()} key to show extra infos!")
                     }
                 },
             )
@@ -513,7 +510,7 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent(SkyHanniTickEvent::class)
+    @HandleEvent
     fun onTick() {
         val now = KeyboardManager.isModifierKeyDown()
         if (showExtraInfos != now) {
@@ -522,14 +519,14 @@ object BlockStrengthGuide {
         }
     }
 
-    @HandleEvent(InventoryCloseEvent::class)
+    @HandleEvent
     fun onInventoryClose() {
         if (!statsOpened) return
         shouldBlockSHMenu = false
     }
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    @HandleEvent
+    fun onWorldChange() {
         shouldBlockSHMenu = false
     }
 

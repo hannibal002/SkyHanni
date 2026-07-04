@@ -26,8 +26,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.addStrikethorugh
+import at.hannibal2.skyhanni.utils.StringUtils.addStrikethrough
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
@@ -35,7 +36,6 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CFShopPrice {
@@ -68,7 +68,7 @@ object CFShopPrice {
 
     var inInventory = false
     private var callUpdate = false
-    var inventoryItems = emptyMap<Int, ItemStack>()
+    var inventoryItems = emptyMap<Int, SafeItemStack>()
 
     private const val MILESTONE_INDEX = 50
     private var chocolateSpent = 0L
@@ -159,7 +159,7 @@ object CFShopPrice {
             }
             table.add(
                 DisplayTableEntry(
-                    product.name.addStrikethorugh(!product.canBeBought).asComponent(),
+                    product.name.addStrikethrough(!product.canBeBought).asComponent(),
                     "§6§l$perFormat".asComponent(),
                     factor,
                     product.item,

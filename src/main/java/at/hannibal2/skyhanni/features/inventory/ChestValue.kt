@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ChestValue {
@@ -149,7 +149,6 @@ object ChestValue {
     private fun sortedList(values: Collection<ChestItem>): List<ChestItem> = when (config.sortingType) {
         SortingTypeEntry.DESCENDING -> values.sortedByDescending { it.total }
         SortingTypeEntry.ASCENDING -> values.sortedBy { it.total }
-        else -> values.sortedByDescending { it.total }
     }
 
     private fun MutableList<Renderable>.addButton() {
@@ -203,7 +202,7 @@ object ChestValue {
         chestItems = createItems(stacks)
     }
 
-    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
+    fun createItems(stacks: Map<Int, SafeItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -224,11 +223,8 @@ object ChestValue {
 
     private fun Double.formatPrice(): String {
         return when (config.formatType) {
-            NumberFormatEntry.SHORT -> if (this > 1_000_000_000) this.shortFormat(true) else this
-                .shortFormat()
-
+            NumberFormatEntry.SHORT -> this.shortFormat(preciseBillions = this > 1_000_000_000)
             NumberFormatEntry.LONG -> this.addSeparators()
-            else -> "0"
         }
     }
 
@@ -246,7 +242,7 @@ object ChestValue {
             return true
         }
 
-        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isCurrent()
+        val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this
         return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
@@ -277,7 +273,7 @@ object ChestValue {
     data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
-        val stack: ItemStack,
+        val stack: SafeItemStack,
         var total: Double,
         val tips: List<String>,
     )

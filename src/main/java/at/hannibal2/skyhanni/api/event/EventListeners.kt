@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.ReflectionUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
 typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
@@ -87,16 +88,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         @Suppress("JoinDeclarationAndAssignment")
         private val cachedPredicates: List<EventPredicate>
-        private var lastTick = -1
+        private var lastCacheGeneration = -1
         private var cachedPredicateValue = false
 
         private val predicates: List<EventPredicate>
 
         fun shouldInvoke(event: SkyHanniEvent): Boolean {
-            if (SkyHanniEvents.isDisabledInvoker(name)) return false
-            if (lastTick != ClientEvents.totalTicks) {
+            val generation = getListenerCacheGeneration()
+            if (generation != lastCacheGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }
-                lastTick = ClientEvents.totalTicks
+                lastCacheGeneration = generation
             }
             return cachedPredicateValue && predicates.all { it(event) }
         }
@@ -104,18 +105,22 @@ class EventListeners private constructor(val name: String, private val isGeneric
         init {
             cachedPredicates = buildList {
                 if (options.onlyOnSkyblock) add { _ -> SkyBlockUtils.inSkyBlock }
-
-                if (options.onlyOnIsland != IslandType.ANY) {
-                    val island = options.onlyOnIsland
-                    add { _ -> island.isCurrent() }
+                options.onlyOnSkyblockOrFeatures.takeIfNotEmpty()?.let { features ->
+                    @Suppress("DEPRECATION")
+                    add { _ -> SkyBlockUtils.inSkyBlock || features.any { it.isSelected() } }
                 }
-
-                if (options.onlyOnIslands.isNotEmpty()) {
-                    val set = options.onlyOnIslands.toSet()
-                    add { _ -> SkyBlockUtils.inAnyIsland(set) }
+                options.onlyOnIsland.takeIf { it != IslandType.ANY }?.let { island ->
+                    add { _ -> island.isInIsland() }
                 }
+                options.onlyOnIslands.takeIfNotEmpty()?.let { islands ->
+                    add { _ -> islands.any { it.isInIsland() } }
+                }
+                options.onlyOnIslandTypeTag.takeIfNotEmpty()?.let { tags ->
+                    add { _ -> tags.any { it.isInIsland() } }
+                }
+                add { _ -> !SkyHanniEvents.isDisabledInvoker(name) }
             }
-            // These predicates cant be cached since they depend on info about the actual event
+            // These predicates can't be cached since they depend on info about the actual event
             predicates = buildList {
                 if (!receiveCancelled) add { event -> !event.isCancelled }
 
@@ -130,4 +135,12 @@ class EventListeners private constructor(val name: String, private val isGeneric
         }
     }
 
+    companion object {
+        private val listenerCacheGeneration = AtomicInteger(0)
+        fun markEventCacheDirty() {
+            listenerCacheGeneration.incrementAndGet()
+        }
+
+        fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
+    }
 }

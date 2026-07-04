@@ -24,15 +24,12 @@ import kotlin.time.Duration.Companion.milliseconds
 object ShowFishingItemName {
 
     private val config get() = SkyHanniMod.feature.fishing.fishedItemName
-    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(750.milliseconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(750.milliseconds, useWeakKeys = true)
 
     // Textures taken from Skytils - moved to REPO
-    private val cheapCoins by lazy {
-        setOf(
-            SkullTextureHolder.getTexture("COINS_1"),
-            SkullTextureHolder.getTexture("COINS_2"),
-        )
-    }
+    private val CHEAP_COINS_1 by SkullTextureHolder.texture("COINS_1")
+    private val CHEAP_COINS_2 by SkullTextureHolder.texture("COINS_2")
+    private val cheapCoins get() = setOfNotNull(CHEAP_COINS_1, CHEAP_COINS_2)
 
     @HandleEvent
     fun onTick() {
@@ -41,13 +38,14 @@ object ShowFishingItemName {
             val itemStack = entityItem.item.orNull() ?: continue
             var text = ""
 
-            val isBait = itemStack.isBait()
+            val isBait = itemStack.count == 1 && itemStack.isBait()
             if (isBait && !config.showBaits) continue
 
             if (itemStack.getSkullTexture() in cheapCoins) {
                 text = "§6Coins"
             } else {
-                val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
+                val name =
+                    itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets().transformIf({ isBait }) { "§7" + this.removeColor() }
                 text += if (isBait) "§c§l- §r" else "§a§l+ §r"
 
                 val size = itemStack.count
@@ -70,13 +68,13 @@ object ShowFishingItemName {
     }
 
     private fun inCorrectArea(): Boolean {
-        if (IslandType.HUB.isCurrent()) {
+        if (IslandType.HUB.isInIsland()) {
             SkyBlockUtils.graphArea?.let {
                 if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
                 if (it == "Fashion Shop" || it == "Shen's Auction") return false
             }
         }
-        return !(IslandType.THE_END.isCurrent())
+        return !(IslandType.THE_END.isInIsland())
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && FishingApi.holdingRod && inCorrectArea()

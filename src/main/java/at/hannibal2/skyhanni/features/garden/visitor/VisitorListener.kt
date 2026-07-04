@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -36,6 +36,9 @@ import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
+//? if >= 26.1
+import net.minecraft.network.protocol.game.ServerboundAttackPacket
+
 @SkyHanniModule
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
@@ -45,7 +48,7 @@ object VisitorListener {
 
     private val config get() = VisitorApi.config
 
-    private val logger = LorenzLogger("garden/visitors/listener")
+    private val logger = SkyHanniLogger("garden/visitors/listener")
 
     @HandleEvent(ProfileJoinEvent::class)
     fun onProfileJoin() {
@@ -55,10 +58,14 @@ object VisitorListener {
     // TODO make event
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
-        val packet = event.packet
-        if (packet !is ServerboundInteractPacket) return
+        val packetEntityId = when (val packet = event.packet) {
+            is ServerboundInteractPacket -> packet.entityId
+            //? if >= 26.1
+            is ServerboundAttackPacket -> packet.entityId
+            else -> return
+        }
 
-        val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
+        val entity = MinecraftCompat.localWorld.getEntity(packetEntityId) ?: return
         val entityId = entity.id
 
         lastClickedNpc = entityId

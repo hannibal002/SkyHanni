@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.FarmingWeight
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -61,13 +60,13 @@ object FarmingWeightData {
     private var shouldRecalculateWeight = false
 
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.GARDEN) return
         updateCollections()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         updateCollections()
     }
 
@@ -100,9 +99,7 @@ object FarmingWeightData {
     fun getWeight(leaderboardMode: EliteLeaderboardMode, override: Boolean = false, cropWeightOnly: Boolean = false): Double? {
         if (weightMap[leaderboardMode] == null || override) {
             when (leaderboardMode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we only update collections on garden join
-                }
+                EliteLeaderboardMode.ALL_TIME -> {}
 
                 EliteLeaderboardMode.MONTHLY ->
                     getLeaderboardPosition(EliteLeaderboardType.Weight(FarmingWeight.FARMING_WEIGHT, leaderboardMode))
@@ -227,7 +224,7 @@ object FarmingWeightData {
         if (value != 0.0) return value else error("Crop $this weight factor is 0!")
     }
 
-    // still needed when first joining garden and if they cant make https requests
+    // still needed when first joining garden and if they can't make https requests
     private val backupCropWeights = mapOf(
         CropType.WHEAT to 100_000.0,
         CropType.CARROT to 300_000.0,
@@ -289,7 +286,7 @@ object FarmingWeightData {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("farming weight")
         event.addIrrelevant {
             CropType.entries.forEach {

@@ -15,20 +15,21 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     internal fun drawQueuedLines() {
         if (queuedLines.isEmpty()) return
 
-        val layer = SkyHanniRenderLayers.getLines(lineWidth.toDouble(), !depth)
+        val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.vertexConsumers.getBuffer(layer)
         val matrix = event.matrices.last()
 
+        // Todo reshape to avoid code duplication
         for (line in queuedLines) {
             buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
                 .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
+                .setLineWidth(lineWidth.toFloat())
 
             buf.addVertex(matrix.pose(), line.p2.x.toFloat(), line.p2.y.toFloat(), line.p2.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())
                 .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
-            /*? if > 1.21.10 {*//*.setLineWidth(lineWidth.toFloat()) *//*?}*/
+                .setLineWidth(lineWidth.toFloat())
         }
 
         queuedLines.clear()
@@ -80,7 +81,7 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     }
 
     fun drawEdges(axisAlignedBB: AABB, color: Color) {
-        // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+        // TODO add cache. maybe on the caller site, since we can't add a lazy member in AxisAlignedBB
         for ((p1, p2) in axisAlignedBB.calculateEdges()) {
             draw3DLine(p1, p2, color)
         }

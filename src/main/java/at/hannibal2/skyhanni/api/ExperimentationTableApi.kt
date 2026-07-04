@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ExperimentsJson
@@ -61,7 +61,7 @@ object ExperimentationTableApi {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val EXPERIMENTATION_TABLE_SKULL by SkullTextureHolder.texture("EXPERIMENTATION_TABLE")
     private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -81,10 +81,10 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST:  §r§8+§r§5Metaphysical Serum
-     * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§5Metaphysical Serum"
+     * WRAPPED-REGEX-TEST: " §r§8+§r§3149k Enchanting Exp"
      * REGEX-TEST: §8 +§r§3400k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§327k Enchanting Exp"
      * REGEX-TEST: §r§8+§r§7[Lvl 1] §r§5Guardian
      */
     private val experimentsDropPattern by patternGroup.pattern(
@@ -419,7 +419,7 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onClick(event: WorldClickEvent) {
         if (!inDistanceToTable(15.0)) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         event.itemInHand?.getInternalNameOrNull()?.takeIf {
             experienceBottlePattern.matches(it.asString())
@@ -430,7 +430,7 @@ object ExperimentationTableApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
         event.tryFireRareBookUncovered()

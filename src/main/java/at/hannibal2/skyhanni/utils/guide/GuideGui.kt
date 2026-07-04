@@ -3,15 +3,16 @@ package at.hannibal2.skyhanni.utils.guide
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 
 abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniBaseScreen() {
     companion object {
+        // Todo use chroma color instead of magic number(s)
         const val SELECTED_COLOR = 0x50000000
         const val NOT_SELECTED_COLOR = 0x50303030
         const val TAB_SPACING = 5
@@ -31,20 +32,20 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniB
             field = value
         }
 
-    val lastVerticalTabWrapper = object : tabWrapper {
+    val lastVerticalTabWrapper = object : TabWrapper {
         override var tab: GuideTab? = null
     }
-    val lastHorizontalTabWrapper = object : tabWrapper {
+    val lastHorizontalTabWrapper = object : TabWrapper {
         override var tab: GuideTab? = null
     }
 
-    fun hTab(item: ItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
+    fun hTab(item: SafeItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
         GuideTab(item, tip, false, lastHorizontalTabWrapper, onClick)
 
-    fun vTab(item: ItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
+    fun vTab(item: SafeItemStack, tip: Renderable, onClick: (GuideTab) -> Unit) =
         GuideTab(item, tip, true, lastVerticalTabWrapper, onClick)
 
-    interface tabWrapper {
+    interface TabWrapper {
         var tab: GuideTab?
     }
 
@@ -76,41 +77,43 @@ abstract class GuideGui<pageEnum : Enum<*>>(defaultScreen: pageEnum) : SkyHanniB
         DrawContextUtils.translate(-offset.first, -offset.second)
     }
 
-    override fun onDrawScreen(originalMouseX: Int, originalMouseY: Int, partialTicks: Float) = try {
-        drawDefaultBackground(originalMouseX, originalMouseY, partialTicks)
+    override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        drawDefaultBackground(mouseX, mouseY, partialTicks)
         val guiLeft = (width - sizeX) / 2
         val guiTop = (height - sizeY) / 2
 
-        val relativeMouseX = originalMouseX - guiLeft
-        val relativeMouseY = originalMouseY - guiTop
+        val relativeMouseX = mouseX - guiLeft
+        val relativeMouseY = mouseY - guiTop
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(guiLeft.toFloat(), guiTop.toFloat())
-        GuiRenderUtils.drawRect(0, 0, sizeX, sizeY, 0x50000000)
+        DrawContextUtils.translatedPushPopResult(
+            x = guiLeft.toFloat(),
+            y = guiTop.toFloat(),
+            onError = { e ->
+                ErrorManager.logErrorWithData(
+                    e, "Something broke in GuideGUI",
+                    "Guide" to this.javaClass.typeName,
+                    "Page" to currentPage.name,
+                )
+                Unit
+            }
+        ) {
+            GuiRenderUtils.drawRect(0, 0, sizeX, sizeY, 0x50000000)
 
-        Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
-            renderHorizontalTabs()
-            renderVerticalTabs()
+            Renderable.withMousePosition(relativeMouseX, relativeMouseY) {
+                renderHorizontalTabs()
+                renderVerticalTabs()
 
-            Renderable.text(
-                "§7SkyHanni ",
-                horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
-                verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
-            ).renderXYAligned(0, 0, sizeX, sizeY)
+                Renderable.text(
+                    "§7SkyHanni ",
+                    horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
+                    verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
+                ).renderXYAligned(0, 0, sizeX, sizeY)
 
-            val page = pageList[currentPage]
-            page?.drawPage(relativeMouseX, relativeMouseY)
+                val page = pageList[currentPage]
+                page?.drawPage(relativeMouseX, relativeMouseY)
 
-            DrawContextUtils.translate(-guiLeft.toFloat(), -guiTop.toFloat())
+                DrawContextUtils.translate(-guiLeft.toFloat(), -guiTop.toFloat())
+            }
         }
-        DrawContextUtils.popMatrix()
-    } catch (e: Exception) {
-        DrawContextUtils.popMatrix()
-        ErrorManager.logErrorWithData(
-            e, "Something broke in GuideGUI",
-            "Guide" to this.javaClass.typeName,
-            "Page" to currentPage.name,
-        )
-        Unit
     }
 }

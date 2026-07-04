@@ -20,13 +20,14 @@ import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.features.slayer.SlayerDataJson
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -146,7 +147,7 @@ object SlayerApi {
         }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Slayer")
 
         if (!hasActiveQuest()) {
@@ -191,7 +192,7 @@ object SlayerApi {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
-        val lines = getSlayerLines()
+        val (lines, source) = getSlayerLines()
 
         val slayerQuest = lines.getOrNull(1).orEmpty()
         val slayerProgress = lines.getOrNull(2).orEmpty()
@@ -201,8 +202,12 @@ object SlayerApi {
         if (slayerQuest != latestCategory) {
             val old = latestCategory
             latestCategory = slayerQuest
-            tier = slayerQuest.split(" ").lastOrNull()?.romanToDecimalIfNecessary()
-                ?: error(("latestCategory does not contain roman number or int: '$slayerQuest'"))
+            tier = slayerQuest.split(" ").lastOrNull()?.romanToDecimalIfNecessaryOrNull()
+                ?: ErrorManager.skyHanniError(
+                    "latestCategory does not contain roman number or int: '$slayerQuest'",
+                    "lines" to lines,
+                    "source" to source.name,
+                )
             SlayerChangeEvent(old, latestCategory).post()
         }
 
@@ -222,12 +227,18 @@ object SlayerApi {
         }
     }
 
-    private fun getSlayerLines(): List<String> =
-        ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }
-            .ifEmpty { TabWidget.SLAYER.lines.map { it.string } }.map { it.trim() }
+    private fun getSlayerLines(): Pair<List<String>, SlayerLinesSource> {
+        val scoreboardLines = ScoreboardData.sidebarLinesFormatted.dropWhile { it != "Slayer Quest" }.map { it.trim() }
+        if (scoreboardLines.isNotEmpty()) return scoreboardLines to SlayerLinesSource.SCOREBOARD
+
+        val tabLines = TabWidget.SLAYER.lines.map { it.string.trim() }
+        if (tabLines.isNotEmpty()) return tabLines to SlayerLinesSource.TAB
+
+        return emptyList<String>() to SlayerLinesSource.NONE
+    }
 
     private fun updateSlayerState() {
-        val lines = getSlayerLines()
+        val (lines, _) = getSlayerLines()
 
         val slayerType = lines.getOrNull(1)
         val type = slayerType?.let { Type.getByName(it) }
@@ -303,7 +314,7 @@ object SlayerApi {
 
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isCurrent()) Type.REVENANT else null
+        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
         "Revenant Cave" -> Type.REVENANT
 
         "Spider Mound",
@@ -322,8 +333,8 @@ object SlayerApi {
         "Zealot Bruiser Hideout",
         -> Type.VOID
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
-        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isCurrent()) Type.VOID else null
+        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
+        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
         "Stronghold",
         "The Wasteland", // TODO check if we can remove this
@@ -335,5 +346,11 @@ object SlayerApi {
         -> Type.VAMPIRE
 
         else -> null
+    }
+
+    private enum class SlayerLinesSource {
+        NONE,
+        SCOREBOARD,
+        TAB,
     }
 }

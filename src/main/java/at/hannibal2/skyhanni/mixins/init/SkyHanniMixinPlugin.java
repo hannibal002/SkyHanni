@@ -6,12 +6,14 @@ import org.spongepowered.asm.mixin.injection.InjectionPoint;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -19,9 +21,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class SkyHanniMixinPlugin implements IMixinConfigPlugin {
+    public static final List<SkyHanniMixinPlugin> instances = new ArrayList<>();
+
+    public String mixinPackage;
+
     @Override
     public void onLoad(String mixinPackage) {
-
+        instances.add(this);
+        this.mixinPackage = mixinPackage;
     }
 
     @Override
@@ -43,16 +50,17 @@ public class SkyHanniMixinPlugin implements IMixinConfigPlugin {
         String string = classUrl.toString();
         if (classUrl.getProtocol().equals("jar")) {
             try {
-                return new URL(string.substring(4, string.lastIndexOf('!')));
-            } catch (MalformedURLException e) {
+                return new URI(string.substring(4, string.lastIndexOf('!'))).toURL();
+            } catch (URISyntaxException | MalformedURLException e) {
                 throw new RuntimeException(e);
             }
         }
         if (string.endsWith(".class")) {
             try {
-                return new URL(string.replace("\\", "/")
-                    .replace(getClass().getCanonicalName().replace(".", "/") + ".class", ""));
-            } catch (MalformedURLException e) {
+                return new URI(string.replace("\\", "/")
+                    .replace(getClass().getCanonicalName().replace(".", "/") + ".class", ""))
+                    .toURL();
+            } catch (URISyntaxException | MalformedURLException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -63,6 +71,12 @@ public class SkyHanniMixinPlugin implements IMixinConfigPlugin {
     String mixinBaseDir = mixinBasePackage.replace(".", "/");
 
     List<String> mixins = null;
+
+    private final List<String> appliedMixins = new ArrayList<>();
+
+    public Set<String> getAppliedMixins() {
+        return new HashSet<>(appliedMixins);
+    }
 
     public void tryAddMixinClass(String className) {
         String norm = (className.endsWith(".class") ? className.substring(0, className.length() - ".class".length()) : className)
@@ -127,5 +141,6 @@ public class SkyHanniMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, org.objectweb.asm.tree.ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
+        appliedMixins.add(mixinClassName);
     }
 }

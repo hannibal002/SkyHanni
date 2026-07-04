@@ -24,7 +24,7 @@ import net.minecraft.world.entity.decoration.ArmorStand
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
-    private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
+    private val THUNDER_SPARK_TEXTURE by SkullTextureHolder.texture("THUNDER_SPARK")
     private val sparks = mutableSetOf<ArmorStand>()
 
     @HandleEvent
@@ -65,7 +65,7 @@ object ThunderSparksHighlight {
     }
 
     private fun isEnabled() =
-        (IslandType.CRIMSON_ISLE.isCurrent() || SkyBlockUtils.isStrandedProfile) && config.highlight
+        (IslandType.CRIMSON_ISLE.isInIsland() || SkyBlockUtils.isStrandedProfile) && config.highlight
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

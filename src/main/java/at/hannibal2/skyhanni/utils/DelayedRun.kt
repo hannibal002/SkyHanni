@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.drainTo
 import net.minecraft.client.Minecraft
@@ -7,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.time.Duration
 
 // TODO add names for runs
+@SkyHanniModule
 object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
@@ -41,14 +44,15 @@ object DelayedRun {
      */
     fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
 
-    fun checkRuns() {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTick() {
         tasks.removeIf { (runnable, time) ->
             val inPast = time.isInPast()
             if (inPast) {
                 try {
                     runnable()
                 } catch (e: Exception) {
-                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing")
+                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing: ${e.message}")
                 }
             }
             inPast

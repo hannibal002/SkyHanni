@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.insert
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.splitCamelCase
 import at.hannibal2.skyhanni.utils.compat.getDoubleOrDefault
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -23,8 +23,9 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import net.minecraft.world.item.ItemStack
-import java.util.TreeSet
+
+private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
+private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
 
 open class Enchant : Comparable<Enchant> {
 
@@ -48,12 +49,12 @@ open class Enchant : Comparable<Enchant> {
     val config by lazy { SkyHanniMod.feature.inventory.enchantParsing }
     val advanced by lazy { config.advancedEnchantColors }
 
-    open fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
+    open fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean = false): Component {
         val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
         return Component.literal(text).setStyle(getStyle(level, itemStack))
     }
 
-    open fun getStyle(level: Int, itemStack: ItemStack? = null): Style {
+    open fun getStyle(level: Int, itemStack: SafeItemStack? = null): Style {
         val colorProperty: Property<out Any> = when {
             level >= maxLevel -> if (advanced.useAdvancedPerfectColor.get()) advanced.advancedPerfectColor else config.perfectEnchantColor
             level > goodLevel -> if (advanced.useAdvancedGreatColor.get()) advanced.advancedGreatColor else config.greatEnchantColor
@@ -66,7 +67,8 @@ open class Enchant : Comparable<Enchant> {
 
         if (colorProperty.get() is LorenzColor &&
             colorProperty.get() == LorenzColor.CHROMA && // If enchant color is chroma
-            !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) { // and chroma is disabled
+            !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)
+        ) { // and chroma is disabled
             return Style.EMPTY.withColor(ChatFormatting.GOLD).withBold(true) // return bold gold color
         }
 
@@ -88,57 +90,57 @@ open class Enchant : Comparable<Enchant> {
      * Method to check for certain or unique exceptions that need to be handled explicitly.
      *
      * *(There isn't much of a convention to adding exceptions, except try to include relevant exceptions under
-     * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
-     * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
+     * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant, e.g.
+     * Efficiency exceptions should be within the `"efficiency"` conditional.)*
      *
      * @param level The level of the enchant currently being parsed
-     * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
+     * @param itemStack The SafeItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
-    private fun checkExceptions(level: Int, itemStack: ItemStack?): Style? {
-        val itemCategory = itemStack?.getItemCategoryOrNull()
+    private fun checkExceptions(level: Int, itemStack: SafeItemStack?): Style? {
         val internalName = itemStack?.getInternalNameOrNull()
-        val itemName = internalName?.repoItemName?.removeColor()
+        val itemCategory = itemStack?.getItemCategoryOrNull()
 
-        if (this.nbtName == "efficiency") {
-            // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
-            // color the enchant as max
-            if (itemName == "Stonk" ||
-                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
-            ) {
-                var style = if (advanced.useAdvancedPerfectColor.get()) {
-                    Style.EMPTY.withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
-                } else {
-                    if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
-                        Style.EMPTY.withColor(TextColor(0xFFFFFF, "chroma"))
-                    else
-                        Style.EMPTY.withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
-                }
-
-                if (config.boldPerfectEnchant.get()) style = style.withBold(true)
-
-                return style
+        return when (nbtName) {
+            "efficiency" -> {
+                // If the item is a Stonk, or a non-mining tool with Efficiency 5
+                // (whilst not being a Promising Shovel), color the enchant as max
+                if (internalName == STONK_PICKAXE ||
+                    (level == 5 &&
+                        itemCategory !in ItemCategory.miningTools &&
+                        internalName != PROMISING_SHOVEL)
+                ) {
+                    with(Style.EMPTY) {
+                        if (advanced.useAdvancedPerfectColor.get()) {
+                            withColor(advanced.advancedPerfectColor.get().getEffectiveColourRGB())
+                        } else {
+                            if (config.perfectEnchantColor.get() == LorenzColor.CHROMA)
+                                withColor(TextColor(0xFFFFFF, "chroma"))
+                            else
+                                withColor(config.perfectEnchantColor.get().toChromaColor().getEffectiveColourRGB())
+                        }
+                    }.let { if (config.boldPerfectEnchant.get()) it.withBold(true) else it }
+                } else null
             }
+            else -> null
         }
-
-        return null
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"
 
     override fun compareTo(other: Enchant): Int {
-        if (this.isUltimate() == other.isUltimate()) {
-            if (this.isStacking() == other.isStacking()) {
-                return this.loreName.compareTo(other.loreName)
+        if (isUltimate() == other.isUltimate()) {
+            if (isStacking() == other.isStacking()) {
+                return loreName.compareTo(other.loreName)
             }
-            return if (this.isStacking()) -1 else 1
+            return if (isStacking()) -1 else 1
         }
-        return if (this.isUltimate()) -1 else 1
+        return if (isUltimate()) -1 else 1
     }
 
     class Normal : Enchant()
 
     class Ultimate : Enchant() {
-        override fun getStyle(level: Int, itemStack: ItemStack?): Style {
+        override fun getStyle(level: Int, itemStack: SafeItemStack?): Style {
             return if (advanced.useAdvancedUltimateColor.get()) {
                 Style.EMPTY.withColor(advanced.advancedUltimateColor.get().getEffectiveColourRGB()).withBold(true)
             } else {
@@ -152,24 +154,21 @@ open class Enchant : Comparable<Enchant> {
 
     class Stacking : Enchant() {
         @Expose
-        private val nbtNum: String? = null
+        val nbtNum: String = ""
 
         @Expose
-        @Suppress("UnusedPrivateProperty")
-        private val statLabel: String? = null
+        private val statLabel: String = ""
 
         @Expose
-        private val stackLevel: TreeSet<Int>? = null
+        val stackLevel: List<Int> = emptyList()
 
         override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
 
-        fun progressString(item: ItemStack): String {
-            val nbtKey = nbtNum ?: return ""
-            val levels = stackLevel ?: return ""
-            val label = statLabel?.splitCamelCase()?.replaceFirstChar { it.uppercase() }?.replace("Xp", "XP") ?: return ""
-            val progress = item.extraAttributes.getDoubleOrDefault(nbtKey).roundTo(0).toInt()
+        fun progressString(item: SafeItemStack): String {
+            val label = statLabel.splitCamelCase().replaceFirstChar { it.uppercase() }.replace("Xp", "XP")
+            val progress = item.extraAttributes.getDoubleOrDefault(nbtNum).roundTo(0).toInt()
             if (progress == 0) return ""
-            val nextLevel = levels.higher(progress)
+            val nextLevel = stackLevel.filter { it > progress }.minOrNull()
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
             return "§7$label: §c${progress.shortFormat()} §7$tail"
         }
@@ -183,7 +182,7 @@ open class Enchant : Comparable<Enchant> {
 
         // Ensures enchants not yet in repo stay as vanilla formatting
         // (instead of that stupid dark red lowercase formatting *cough* sba *cough*)
-        override fun getComponent(level: Int, itemStack: ItemStack?, isRoman: Boolean, appendNewline: Boolean): Component {
+        override fun getComponent(level: Int, itemStack: SafeItemStack?, isRoman: Boolean, appendNewline: Boolean): Component {
             val text = "$loreName ${if (isRoman) level.toRoman() else level}${if (appendNewline) "\n" else ""}"
             return Component.literal(text).withColor(ChatFormatting.BLUE)
         }

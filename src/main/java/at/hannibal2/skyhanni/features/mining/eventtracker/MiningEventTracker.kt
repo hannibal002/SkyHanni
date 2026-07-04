@@ -132,9 +132,10 @@ object MiningEventTracker {
     private fun sendData(eventName: String, time: String?) {
         // Option to opt out of data sending
         if (!config.allowDataSharing) return
+        if (HypixelData.hypixelAlpha) return
 
         // we now ignore mineshaft events.
-        if (IslandType.MINESHAFT.isCurrent()) return
+        if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
@@ -150,7 +151,7 @@ object MiningEventTracker {
             return
         }
 
-        if (!IslandType.DWARVEN_MINES.isCurrent() && eventType.dwarvenSpecific) return
+        if (!IslandType.DWARVEN_MINES.isInIsland() && eventType.dwarvenSpecific) return
 
         if (lastSentEvent == eventType) return
         lastSentEvent = eventType
@@ -235,5 +236,5 @@ object MiningEventTracker {
     }
 
     // ignoring mineshaft here is intentional
-    fun isMiningIsland() = IslandType.DWARVEN_MINES.isCurrent() || IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    fun isMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

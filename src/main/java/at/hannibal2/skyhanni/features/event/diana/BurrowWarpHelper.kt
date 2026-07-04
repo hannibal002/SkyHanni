@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpLocationData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WarpsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -56,7 +55,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.burrowNearestWarp) return
         if (!DianaApi.isDoingDiana()) return
         val warp = currentWarp ?: return
@@ -123,7 +122,7 @@ object BurrowWarpHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 
         if (!DianaApi.isDoingDiana()) {
@@ -232,35 +231,38 @@ object BurrowWarpHelper {
         TAYLOR,
         ;
 
-        val displayName: String get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return entry.value.displayName
+        val displayName: String
+            get() {
+                val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+                for (entry in locationData) {
+                    if (entry.key.equals(this.name, true)) {
+                        return entry.value.displayName
+                    }
                 }
+                ErrorManager.skyHanniError("repo invalid for diana warp")
             }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
-        }
 
-        val location: LorenzVec get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return LorenzVec(entry.value.x, entry.value.y, entry.value.z)
+        val location: LorenzVec
+            get() {
+                val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+                for (entry in locationData) {
+                    if (entry.key.equals(this.name, true)) {
+                        return LorenzVec(entry.value.x, entry.value.y, entry.value.z)
+                    }
                 }
+                ErrorManager.skyHanniError("repo invalid for diana warp")
             }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
-        }
 
-        private val extraBlocks: Int get() {
-            val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
-            for (entry in locationData) {
-                if (entry.key.equals(this.name, true)) {
-                    return entry.value.extraDianaWarpBlocks
+        private val extraBlocks: Int
+            get() {
+                val locationData = warpLocationData ?: ErrorManager.skyHanniError("repo invalid for diana warp")
+                for (entry in locationData) {
+                    if (entry.key.equals(this.name, true)) {
+                        return entry.value.extraDianaWarpBlocks
+                    }
                 }
+                ErrorManager.skyHanniError("repo invalid for diana warp")
             }
-            ErrorManager.skyHanniError("repo invalid for diana warp")
-        }
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks
 

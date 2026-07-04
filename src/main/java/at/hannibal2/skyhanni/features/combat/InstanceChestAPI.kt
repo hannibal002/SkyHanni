@@ -17,9 +17,9 @@ object InstanceChestAPI {
      * REGEX-TEST: §fFree Chest
      * REGEX-TEST: §fFree
      */
-    /* Dungeon chests are just the chest Type for example just 'Emerald', Kuudra CURRENTLY has them as Free Chest/Paid Chest in the same UI
-    if the Croesus main UI shows just Paid/Free this regex pattern should be removable mainly
-    if the Croesus UI starts showing like "Emerald Chest" as the Chest Name the Regex should include all the cata chest names too then. */
+    /* Dungeon chests are just the chest Type for example just 'Emerald', Kuudra CURRENTLY has them as Free Chest/Paid Chest in the same UI.
+    If the Croesus main UI shows just Paid/Free this regex pattern should be removable mainly.
+    If the Croesus UI starts showing like "Emerald Chest" as the Chest Name the Regex should include all the cata chest names too then. */
     private val chestFutureProofing by patternGroup.pattern(
         "kuudrachest",
         "(?<chestname>§.(?:Free|Paid))(?: Chest)?",

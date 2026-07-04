@@ -21,7 +21,7 @@ object GardenCropsInCommand {
 
     private fun onCommand(args: Array<String>) {
         if (!config.display) {
-            ChatUtils.userError("shcropsin requires 'Show money per Hour' feature to be enabled to work!")
+            ChatUtils.userError("Command /shcropsin requires 'Show money per Hour' feature to be enabled to work!")
             return
         }
 

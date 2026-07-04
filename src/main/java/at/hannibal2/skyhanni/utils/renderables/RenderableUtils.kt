@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.putAt
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -29,6 +30,9 @@ import kotlin.reflect.KMutableProperty0
 
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
+
+    fun deferredItemRenderable(stackFactory: () -> SafeItemStack): Renderable =
+        Renderable.item(stackFactory) { xSpacing = 0 }
 
     /** Calculates the relative x position of the columns in a table*/
     fun calculateTableX(content: Collection<List<Renderable?>>, xPadding: Int): List<Int> {
@@ -169,7 +173,7 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    fun renderString(
+    internal fun renderString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
@@ -182,7 +186,7 @@ internal object RenderableUtils {
         DrawContextUtils.translate(-1.0, -1.0)
     }
 
-    fun renderString(
+    internal fun renderString(
         text: Component,
         scale: Double = 1.0,
         color: Color = Color.WHITE,

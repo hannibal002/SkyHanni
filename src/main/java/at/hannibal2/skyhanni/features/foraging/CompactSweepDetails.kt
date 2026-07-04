@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -38,12 +38,12 @@ object CompactSweepDetails {
     )
 
     /**
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§a18.13 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§a18.19 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.19 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs
-     * REGEX-TEST:   §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs
-     * REGEX-TEST:   §r§7Dark Oak Tree Toughness: §r§60 §r§a35 Logs
+     * WRAPPED-REGEX-TEST: "  §r§7Fig Tree Toughness: §r§63.5 §r§a18.13 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Fig Tree Toughness: §r§63.5 §r§a18.19 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Fig Tree Toughness: §r§63.5 §r§818.19 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Fig Tree Toughness: §r§63.5 §r§818.04 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Fig Tree Toughness: §r§63.5 §r§818 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Dark Oak Tree Toughness: §r§60 §r§a35 Logs"
      */
     @Suppress("MaxLineLength")
     private val sweepToughnessLogsPattern by patternGroup.pattern(
@@ -52,12 +52,12 @@ object CompactSweepDetails {
     )
 
     /**
-     * REGEX-TEST:   §r§7Axe throw: §r§c-50% Sweep §r§a9.02 Logs
-     * REGEX-TEST:   §r§7Axe throw: §r§c-50% Sweep §r§89.02 Logs
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a9.1 Logs §r§cCut the trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a4.51 Logs §r§cCut the trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §c-50% Sweep §a2.38 Logs §cCut branches and trunk first!!
-     * REGEX-TEST:   §r§7Wrong Style: §r§c-50% Sweep §r§a2.38 Logs §r§cCut branches and trunk first!!
+     * WRAPPED-REGEX-TEST: "  §r§7Axe throw: §r§c-50% Sweep §r§a9.02 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Axe throw: §r§c-50% Sweep §r§89.02 Logs"
+     * WRAPPED-REGEX-TEST: "  §r§7Wrong Style: §r§c-50% Sweep §r§a9.1 Logs §r§cCut the trunk first!!"
+     * WRAPPED-REGEX-TEST: "  §r§7Wrong Style: §r§c-50% Sweep §r§a4.51 Logs §r§cCut the trunk first!!"
+     * WRAPPED-REGEX-TEST: "  §r§7Wrong Style: §c-50% Sweep §a2.38 Logs §cCut branches and trunk first!!"
+     * WRAPPED-REGEX-TEST: "  §r§7Wrong Style: §r§c-50% Sweep §r§a2.38 Logs §r§cCut branches and trunk first!!"
      */
     @Suppress("MaxLineLength")
     private val penaltyPattern by patternGroup.pattern(
@@ -182,9 +182,11 @@ object CompactSweepDetails {
         val chatComponent = chatText.asComponent()
 
         chatComponent.hover = hoverText.asComponent()
-        chatComponent.onClick(onClick = {
-            HypixelCommands.treeGifts()
-        })
+        chatComponent.onClick(
+            onClick = {
+                HypixelCommands.treeGifts()
+            },
+        )
 
         ChatUtils.chat(chatComponent, prefix = false)
         resetSweepDetailsVariables()
@@ -202,5 +204,5 @@ object CompactSweepDetails {
 
     private fun isFinalCalculation(regexGroup: String): Boolean = regexGroup == "§a"
 
-    private fun isInIsland(): Boolean = IslandTypeTags.FORAGING.inAny() || IslandType.HUB.isCurrent()
+    private fun isInIsland(): Boolean = IslandTypeTag.FORAGING.isInIsland() || IslandType.HUB.isInIsland()
 }

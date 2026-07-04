@@ -62,23 +62,21 @@ object PetStorageApi {
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Pets
-     * REGEX-TEST: Pets (1/3)
-     * REGEX-TEST: Pets: "a"
-     * REGEX-TEST: Pets: "e" (1/2)
+     * REGEX-TEST: (1/3) Pets
      */
     val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
-        "Pets(?:: \"(?<search>.*)\")?(?: \\((?<currentpage>\\d+)\\/(?<maxpage>\\d+)\\))? ?",
+        "(?:\\(\\d+/\\d+\\) )?Pets",
     )
 
     /**
-     * REGEX-TEST:  [Lvl 100] Hedgehog
-     * REGEX-TEST:  [Lvl 68] Blaze
-     * REGEX-TEST:  [Lvl 51] Kuudra
-     * REGEX-TEST:  [Lvl 100] Flying Fish
-     * REGEX-TEST:  [Lvl 100] Chicken ✦
-     * REGEX-TEST:  [Lvl 200] [122✦] Golden Dragon
-     * REGEX-FAIL:  No pet selected
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Hedgehog"
+     * WRAPPED-REGEX-TEST: " [Lvl 68] Blaze"
+     * WRAPPED-REGEX-TEST: " [Lvl 51] Kuudra"
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Flying Fish"
+     * WRAPPED-REGEX-TEST: " [Lvl 100] Chicken ✦"
+     * WRAPPED-REGEX-TEST: " [Lvl 200] [122✦] Golden Dragon"
+     * WRAPPED-REGEX-FAIL: " No pet selected"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetNamePattern by patternGroup.pattern(
@@ -87,13 +85,13 @@ object PetStorageApi {
     )
 
     /**
-     * REGEX-TEST:  +163,119,730.2 XP
-     * REGEX-TEST:  33,915/179.7k XP (18.9%)
-     * REGEX-TEST:  2,877.5/9.7k XP (29.7%)
-     * REGEX-TEST:  931,886.2/1.4M XP (67.2%)
-     * REGEX-TEST:  251,016.4/561.7k XP (44.7%)
-     * REGEX-TEST:  3,138.4/9.7k XP (32.4%)
-     * REGEX-TEST:  MAX LEVEL
+     * WRAPPED-REGEX-TEST: " +163,119,730.2 XP"
+     * WRAPPED-REGEX-TEST: " 33,915/179.7k XP (18.9%)"
+     * WRAPPED-REGEX-TEST: " 2,877.5/9.7k XP (29.7%)"
+     * WRAPPED-REGEX-TEST: " 931,886.2/1.4M XP (67.2%)"
+     * WRAPPED-REGEX-TEST: " 251,016.4/561.7k XP (44.7%)"
+     * WRAPPED-REGEX-TEST: " 3,138.4/9.7k XP (32.4%)"
+     * WRAPPED-REGEX-TEST: " MAX LEVEL"
      */
     @Suppress("MaxLineLength")
     private val petTabWidgetXpPattern by patternGroup.pattern(
@@ -182,7 +180,7 @@ object PetStorageApi {
             petTabWidgetNamePattern.matchMatcher(component.string) {
                 val petName = groupOrNull("pet") ?: return@matchMatcher false
                 val level = group("level").toInt()
-                // lets hope they dont add a multi colored pet
+                // let's hope they don't add a multicolored pet
                 val rarity: LorenzRarity =
                     LorenzRarity.getByComponent(component, group("pet")) ?: return@matchMatcher false
                 val petHeldItem = event.lines.firstNotNullOfOrNull { line ->
@@ -451,7 +449,7 @@ object PetStorageApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         fun PetData.formatForDebug() = fauxInternalName.asString() + ":<lvl$level>:" + uuid.toString()
         event.title("Pet Storage API")
         event.addIrrelevant {

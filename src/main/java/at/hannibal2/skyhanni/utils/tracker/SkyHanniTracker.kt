@@ -119,14 +119,6 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    fun modifyEachMode(modifyFunction: (Data) -> Unit) {
-        val sharedTracker = getSharedTracker() ?: return
-        DisplayMode.entries.forEach { mode ->
-            sharedTracker.tryModify(mode, modifyFunction)
-        }
-        update()
-    }
-
     // used for Item tracker
     open fun hideInEstimatedItemValue() = false
     open fun hideOutsideInventory() = false
@@ -196,7 +188,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         update()
     }
 
-    private fun getDisplayModeTracker(dispMode: DisplayMode? = displayMode) = dispMode?.let { getSharedTracker()?.get(it) }
+    private fun getDisplayModeTracker(mode: DisplayMode? = displayMode) = mode?.let { getSharedTracker()?.get(it) }
 
     fun getTotalUptime(): Duration? = getDisplayModeTracker()?.getTotalUptime()
 
@@ -418,6 +410,8 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
         override fun toString(): String = displayName
     }
 
+    // False positive
+    @Suppress("unused")
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {
         TOTAL("Total", DisplayMode.TOTAL),
         SESSION("This Session", DisplayMode.SESSION),

@@ -107,5 +107,5 @@ object ArachneSpawnTimer {
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isCurrent() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isInIsland() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
 }

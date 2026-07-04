@@ -4,9 +4,13 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
+import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
+import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.math.max
 
@@ -26,9 +30,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val nextVersion = UpdateManager.getNextVersion()
 
         button.text = when (UpdateManager.updateState) {
-            UpdateManager.UpdateState.AVAILABLE -> "Download update"
-            UpdateManager.UpdateState.QUEUED -> "Downloading..."
-            UpdateManager.UpdateState.DOWNLOADED -> "Downloaded"
+            UpdateManager.UpdateState.AVAILABLE -> "Manually download"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
         button.width = button.getWidth(context)
@@ -41,22 +43,12 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
 
-        if (UpdateManager.updateState == UpdateManager.UpdateState.DOWNLOADED) {
-            context.drawStringCenteredScaledMaxWidth(
-                "§aThe update will be installed after your next restart.".asStructuredText(),
-                fr,
-                widthRemaining / 2F,
-                40F,
-                true,
-                widthRemaining,
-                -1,
-            )
-        }
-
         context.scale(2F, 2F)
-        val sameVersion = currentVersion.equals(nextVersion, ignoreCase = true)
+        val hasNewerVersion = nextVersion?.let {
+            SkyHanniMod.modVersion < ModVersion.fromString(it)
+        } == true
         val versionText = "${if (UpdateManager.updateState == UpdateManager.UpdateState.NONE) "§a" else "§c"}$currentVersion" +
-            if (nextVersion != null && !sameVersion) "➜ §a$nextVersion" else ""
+            if (hasNewerVersion) "➜ §a$nextVersion" else ""
 
         context.drawStringCenteredScaledMaxWidth(
             versionText.asStructuredText(),
@@ -77,7 +69,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         return 55
     }
 
-    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
+    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, mouseEvent: MouseEvent): Boolean {
         fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
             val inX = (mouseX - width - x) in (0..def.width)
             val inY = (mouseY - height - y) in (0..def.height)
@@ -86,10 +78,11 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
         if (isInside(getButtonPosition(width - 20), height = 10, button)) {
             when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
-                UpdateManager.UpdateState.QUEUED -> {}
-                UpdateManager.UpdateState.DOWNLOADED -> {}
-                UpdateManager.UpdateState.NONE -> UpdateManager.checkUpdate()
+                UpdateManager.UpdateState.AVAILABLE ->
+                    UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
+
+                UpdateManager.UpdateState.NONE ->
+                    UpdateManager.checkUpdate()
             }
             return true
         }
@@ -106,7 +99,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         return true
     }
 
-    override fun keyboardInput(): Boolean {
+    override fun keyboardInput(event: KeyboardEvent): Boolean {
         return false
     }
 

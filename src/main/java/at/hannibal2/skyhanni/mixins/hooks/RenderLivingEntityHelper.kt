@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.compat.deceased
 import net.minecraft.world.entity.Entity
@@ -37,7 +38,7 @@ object RenderLivingEntityHelper {
     @JvmStatic
     fun getEntityGlowColor(entity: Entity): Int? {
         val livingEntity = entity as? LivingEntity ?: return null
-        if (livingEntity.isInvisible) return null
+        if (livingEntity.isInvisible && !livingEntity.hasVisibleEquipment()) return null
         val color = internalSetColorMultiplier(livingEntity, 0)
         if (color == 0) {
             val eventColor = isEntityInGlowEvent(entity)

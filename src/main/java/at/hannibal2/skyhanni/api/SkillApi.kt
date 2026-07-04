@@ -63,7 +63,7 @@ object SkillApi {
 
     // TODO find out whats going on here
     /**
-     * REGEX-TEST:  Farming 35: 12.4%
+     * WRAPPED-REGEX-TEST: " Farming 35: 12.4%"
      */
     private val skillTabPattern by patternGroup.pattern(
         "skill.tab.colorless",
@@ -71,8 +71,8 @@ object SkillApi {
     )
 
     /**
-     * REGEX-TEST:  Farming 60: MAX
-     * REGEX-TEST:  Mining 60: MAX
+     * WRAPPED-REGEX-TEST: " Farming 60: MAX"
+     * WRAPPED-REGEX-TEST: " Mining 60: MAX"
      */
     private val maxSkillTabPattern by patternGroup.pattern(
         "skill.tab.max.colorless",
@@ -80,8 +80,8 @@ object SkillApi {
     )
 
     /**
-     * REGEX-TEST:  Mining 14: 22,922/75k
-     * REGEX-TEST:  Combat 49: 7,678/4M
+     * WRAPPED-REGEX-TEST: " Mining 14: 22,922/75k"
+     * WRAPPED-REGEX-TEST: " Combat 49: 7,678/4M"
      */
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent.colorless",
@@ -161,7 +161,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NeuSkillLevelJson>("leveling")
 
         levelArray = data.levelingXP
@@ -236,7 +236,7 @@ object SkillApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Skills")
         val storage = storage
         if (storage == null) {
@@ -363,7 +363,7 @@ object SkillApi {
         val currentXP = matcher.group("current").formatLong()
         val maxXP = matcher.group("needed").formatLong()
 
-        // when at overflow, we dont need to subtract one level in the logic below
+        // when at overflow, we don't need to subtract one level in the logic below
         val minus = if (maxXP == 0L) 0 else 1
         val level = getLevelExact(maxXP) - minus
 

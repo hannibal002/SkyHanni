@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboardConfigApi.getRankGoalIfValid
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.achievements.Achievement
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
-import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getFactor
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
@@ -20,20 +21,31 @@ import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardPlayer
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteLeaderboardType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.crop
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.chat.TextHelper
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.command
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.withColor
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
@@ -102,18 +114,41 @@ object EliteFarmersLeaderboard {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSecondPassed(event: SecondPassedEvent) {
+    fun onSecondPassed() {
         if (lastPassedMessage.passedSince() < 30.seconds) return
-        eliteLeaderboardData.forEach { lbtype ->
-            if (!getLeaderboardConfig(lbtype.key).showLbChange) return@forEach
-            val list = lbtype.value.passedPlayers
+        eliteLeaderboardData.forEach { lbType ->
+            if (!getLeaderboardConfig(lbType.key).showLbChange) return@forEach
+            val list = lbType.value.passedPlayers
             if (list.isEmpty()) return@forEach
             if (list.size < 3) {
                 list.forEach { name ->
-                    farmingChatMessage("You passed §b$name §ein the §6${lbtype.key} §eLeaderboard!")
+                    farmingChatMessage(
+                        componentBuilder {
+                            append("You passed ")
+                            append(name) {
+                                withColor(ChatFormatting.AQUA)
+                            }
+                            val contribUUID = ContributorManager.getUUIDFromDisplayName(name)
+                            if (contribUUID != null) {
+                                AchievementManager.completeAchievement(BETTER_THAN_DEV_ACHIEVEMENT)
+                                ContributorManager.getSuffix(contribUUID)?.let {
+                                    append(" ")
+                                    append(it) {
+                                        withColor(ChatFormatting.WHITE)
+                                    }
+                                }
+                            }
+                            append(" in the ")
+                            append("${lbType.key}") {
+                                withColor(ChatFormatting.GOLD)
+                            }
+                            append(" Leaderboard!")
+                            withColor(ChatFormatting.YELLOW)
+                        }
+                    )
                 }
             } else {
-                farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbtype.key} §eLeaderboard!")
+                farmingChatMessage("You recently passed §b${list.size.addSeparators()} players §ein the §6${lbType.key} §eLeaderboard!")
             }
             list.clear()
         }
@@ -326,6 +361,7 @@ object EliteFarmersLeaderboard {
 
         if (apiData.rank <= 0) { // api returns -1 for unranked players
             lbData.isUnranked = true
+            lbData.lastApiAmount = null
             // correct wrong data
             leaderboardAmountMap?.remove(leaderboardType)
             leaderboardPosMap?.remove(leaderboardType)
@@ -338,7 +374,7 @@ object EliteFarmersLeaderboard {
         }
         lbData.isUnranked = false
         if (shouldUpdateData) handleDiff(leaderboardType, apiData)
-        handleUpcomingPlayers(leaderboardType, apiData)
+        handleUpcomingPlayers(leaderboardType, apiData, shouldUpdateData)
         // prefer our lb pos
         return if (!shouldUpdateData && currentPos != Int.MAX_VALUE) currentPos else apiData.rank
     }
@@ -374,77 +410,64 @@ object EliteFarmersLeaderboard {
     // only update data if api data has changed since last request
     private fun shouldUpdateData(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard): Boolean {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
-        val oldApiData = lbData.apiData ?: return true
-        val amountDiff = oldApiData.amount != apiData.amount
-        return amountDiff
+        val lastApiAmount = lbData.lastApiAmount ?: return true
+        return apiData.amount > lastApiAmount
     }
 
     private fun handleDiff(leaderboardType: EliteLeaderboardType, apiData: EliteLeaderboard) {
         if (apiData.rank == -1) return // no lb rank means amount is invalid
-        val diff = apiData.amount - (getAmount(leaderboardType) ?: 0.0)
         when (leaderboardType) {
-            is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData, diff)
-            is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData, diff)
-            is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData, diff)
+            is EliteLeaderboardType.Weight -> handleWeightDiff(leaderboardType, apiData)
+            is EliteLeaderboardType.Crop -> handleCollectionDiff(leaderboardType, apiData)
+            is EliteLeaderboardType.Pest -> handlePestDiff(leaderboardType, apiData)
+        }
+        eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }.apply {
+            lastApiAmount = apiData.amount
+            passedPlayers.clear()
         }
     }
 
     private fun handleWeightDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
-        if (diff >= 0.5 || abs(diff) >= 100) {
-            when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we handle all-time weight in the farmingweight class
-                    // we only update collections on garden join
-                }
-
-                EliteLeaderboardMode.MONTHLY -> setWeight(leaderboardType.mode, apiData.amount)
-            }
-        }
+        setWeight(leaderboardType.mode, apiData.amount)
     }
 
     private fun handleCollectionDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
         val crop = leaderboardType.crop ?: return
-        val diffWeight = diff / crop.getFactor()
-        if (diffWeight >= 0.5 || abs(diffWeight) >= 100) {
-            when (leaderboardType.mode) {
-                EliteLeaderboardMode.ALL_TIME -> {
-                    // we handle all-time collections in the farming weight class
-                    // we only update collections on garden join
-                }
-
-                EliteLeaderboardMode.MONTHLY ->
-                    leaderboardAmountMap?.set(leaderboardType, apiData.amount)
-            }
+        when (leaderboardType.mode) {
+            EliteLeaderboardMode.ALL_TIME -> crop.setCollectionCounter(apiData.amount.toLong())
+            EliteLeaderboardMode.MONTHLY -> leaderboardAmountMap?.set(leaderboardType, apiData.amount)
         }
     }
 
     private fun handlePestDiff(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
-        diff: Double,
     ) {
-        if (diff >= 1 || abs(diff) >= 150) {
-            leaderboardAmountMap?.set(leaderboardType, apiData.amount)
-        }
+        leaderboardAmountMap?.set(leaderboardType, apiData.amount)
     }
 
     private fun handleUpcomingPlayers(
         leaderboardType: EliteLeaderboardType,
         apiData: EliteLeaderboard,
+        updatedAmount: Boolean,
     ) {
         val lbData = eliteLeaderboardData.getOrPut(leaderboardType) { EliteLeaderboardData() }
-        lbData.lastPlayer = apiData.previous?.firstOrNull()
+        val currentAmount = getAmount(leaderboardType) ?: apiData.amount
+        val previousPlayer = apiData.previous?.firstOrNull()
+        if (updatedAmount || lbData.lastPlayer == null) {
+            lbData.lastPlayer = previousPlayer
+        } else if (previousPlayer != null && currentAmount >= previousPlayer.amount) {
+            lbData.lastPlayer = previousPlayer
+        }
         lbData.nextPlayers.clear()
         apiData.upcomingPlayers.forEach {
-            if (apiData.rank != 1) lbData.nextPlayers.add(it)
+            if (apiData.rank != 1 && it.amount > currentAmount) lbData.nextPlayers.add(it)
         }
     }
 
@@ -489,23 +512,45 @@ object EliteFarmersLeaderboard {
     }
 
     private fun farmingChatMessage(message: String) {
-        ChatUtils.hoverableChat(
-            message,
-            listOf(
-                "§eClick to open your Farming Weight",
-                "§eprofile on §c${EliteDevApi.ELITE_DOMAIN}",
-            ),
-            "/shfarmingprofile ${PlayerUtils.getName()}",
-        )
+        farmingChatMessage(message.asComponent())
+    }
+
+    private fun farmingChatMessage(message: Component) {
+        ChatUtils.chat {
+            append(message)
+            hover = componentBuilder {
+                append("§eClick to open your Farming Weight")
+                append("\n")
+                append("§eprofile on §c${EliteDevApi.ELITE_DOMAIN}")
+            }
+            command = "/shfarmingprofile ${PlayerUtils.getName()}"
+        }
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("elite leaderboard")
         event.addIrrelevant {
             eliteLeaderboardData.forEach {
                 add(it.value.apiData.toString())
             }
         }
+    }
+
+    private const val BETTER_THAN_DEV_ACHIEVEMENT = "Better Than Dev Achievement"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "Better than the devs".asComponent(),
+            componentBuilder {
+                append("Pass one of the")
+                append(" SkyHanni ") {
+                    withColor(TextHelper.chromaStyle)
+                }
+                append("contributors in the farming leaderboards")
+            }
+        )
+        event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }
 }

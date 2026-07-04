@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.Monster
 import net.minecraft.world.entity.player.Player
+import java.util.function.IntConsumer
 
 /**
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.
@@ -53,36 +54,27 @@ object FixGhostEntities {
                 recentlySpawnedEntities.addLast(packet.id)
             }
 
-            is ClientboundRemoveEntitiesPacket -> {
-                for (entityID in packet.entityIds) {
-                    // ignore entities that got properly spawned and then removed
+            is ClientboundRemoveEntitiesPacket -> packet.entityIds.forEach(
+                IntConsumer { entityID ->
                     if (entityID !in recentlySpawnedEntities) {
                         recentlyRemovedEntities.addLast(entityID)
-                        if (recentlyRemovedEntities.size == 10) {
-                            recentlyRemovedEntities.removeFirst()
-                        }
+                        if (recentlyRemovedEntities.size == 10) recentlyRemovedEntities.removeFirst()
                     }
                     hiddenEntityIds.remove(entityID)
-                }
-            }
+                },
+            )
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (config.hideTemporaryArmorStands && event.entity is ArmorStand) {
-            with(event.entity) {
-                if (tickCount < 10 && isDefaultValue() && getAllEquipment().all { it == null }) {
-                    event.cancel()
-                }
+        if (config.hideTemporaryArmorStands) {
+            (event.entity as? ArmorStand)?.let { stand ->
+                if (stand.tickCount < 10 && stand.isDefaultValue() && stand.getAllEquipment().all { it == null }) event.cancel()
             }
         }
         if (config.fixGhostEntities && (event.entity is Monster || event.entity is Player)) {
-            with(event.entity) {
-                if (hiddenEntityIds.contains(id)) {
-                    event.cancel()
-                }
-            }
+            if (event.entity.id in hiddenEntityIds) event.cancel()
         }
     }
 

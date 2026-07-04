@@ -9,6 +9,7 @@ var renderingChat: Boolean = false
 private val textColor = TextColor(0xFFFFFF, "chroma")
 private val textColorOffWhite = TextColor(0xFFFFFE, "chroma")
 var glyphIsChroma = false
+
 // Unicode private use area character used to preview SkyHanni's chroma,
 // avoids the 'z' color code to stop other mods styling our preview text.
 const val CHROMA_PREVIEW_COLOR_CODE = '\uE002'
@@ -59,7 +60,7 @@ fun isNotActuallyEqualBecauseOfChroma(
     (textColor.name == "chroma" || testObject.name == "chroma") &&
     textColor.getTextColorName() != testObject.getTextColorName()
 
-// the get name inside of text colour does a string format and is very bad for performance
+// the get name inside of text color does a string format and is very bad for performance
 private fun TextColor.getTextColorName(): String? {
     return if (name != null) name else value.toString()
 }

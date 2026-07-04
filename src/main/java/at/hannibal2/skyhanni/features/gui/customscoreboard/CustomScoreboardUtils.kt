@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Compan
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -68,7 +67,6 @@ object CustomScoreboardUtils {
     internal fun formatNumber(number: Number): String = when (displayConfig.numberFormat) {
         DisplayConfig.NumberFormat.SHORT -> number.shortFormat()
         DisplayConfig.NumberFormat.LONG -> number.addSeparators()
-        else -> "0"
     }
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
@@ -89,17 +87,19 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper") ?: "0"
+    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper")
+        ?: TabWidget.COPPER.matchMatcherFirstLine { group("copper") }
+        ?: "0"
 
     internal fun getSowdust() = getGroup(ScoreboardPattern.sowdustPattern, getSBLines(), "sowdust")
-        ?: ScoreboardPattern.sowdustPattern.firstMatcher(TabWidget.GARDEN_LEVEL.lines.map { it.formattedTextCompat() }) { group("sowdust") }
+        ?: TabWidget.SOWDUST.matchMatcherFirstLine { group("sowdust") }
         ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
     internal fun getHeat() = MiningApi.heatDisplay
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSBLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(ScoreboardPattern.northStarsPattern, getSBLines(), "northStars") ?: "0"
 
     internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSBLines(), "symbol").orEmpty()
 

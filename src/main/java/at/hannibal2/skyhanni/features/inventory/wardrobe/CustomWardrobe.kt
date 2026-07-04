@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
@@ -43,7 +44,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -110,16 +110,13 @@ object CustomWardrobe {
                 .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
-        DrawContextUtils.pushMatrix()
-        DrawContextUtils.translate(0f, 0f)
-
-        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
-
-        if (EstimatedItemValue.config.enabled) {
-            DrawContextUtils.translate(0f, 0f)
-            EstimatedItemValue.tryRendering()
+        DrawContextUtils.translatedPushPopResult(0f, 0f) {
+            position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+            if (EstimatedItemValue.config.enabled) {
+                DrawContextUtils.translate(0f, 0f)
+                EstimatedItemValue.tryRendering()
+            }
         }
-        DrawContextUtils.popMatrix()
         event.cancel()
     }
 
@@ -181,8 +178,8 @@ object CustomWardrobe {
             return true
         }
         val previousActiveScale = activeScale
-        val unscaledRenderableWidth = renderable.first / activeScale
-        val unscaledRenderableHeight = renderable.second / activeScale
+        val unscaledRenderableWidth = renderable.first / activeScale.toDouble()
+        val unscaledRenderableHeight = renderable.second / activeScale.toDouble()
         val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
         val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
@@ -253,7 +250,7 @@ object CustomWardrobe {
         return Renderable.vertical(loreList, spacing = 1)
     }
 
-    private fun getToolTip(stack: ItemStack, slot: WardrobeSlot): List<Component>? {
+    private fun getToolTip(stack: SafeItemStack, slot: WardrobeSlot): List<Component>? {
         try {
             // Get tooltip from minecraft and other mods
             val toolTips = stack.getTooltip(Minecraft.getInstance().options.advancedItemTooltips)
@@ -284,7 +281,7 @@ object CustomWardrobe {
             val armorOrdinal = equipment.ordinal - 2
             if (armorOrdinal !in 0..3) continue
             var stack = slot.armor.reversed()[armorOrdinal]?.copy()?.removeEnchants()
-            if (stack == null) stack = ItemStack.EMPTY
+            if (stack == null) stack = SafeItemStack.EMPTY
             fakePlayer.equipment.set(equipment, stack)
         }
 
@@ -365,7 +362,12 @@ object CustomWardrobe {
 
                 val playerRenderable = createFakePlayerRenderable(slot, playerWidth, containerHeight, containerWidth)
 
-                Renderable.doubleLayered(playerBackground, playerRenderable, false)
+                Renderable.doubleLayered(
+                    playerBackground,
+                    playerRenderable,
+                    blockBottomHover = false,
+                    forceBottomRenderFirst = true
+                )
             }
             Renderable.horizontal(slotsRenderables, horizontalSpacing)
         }

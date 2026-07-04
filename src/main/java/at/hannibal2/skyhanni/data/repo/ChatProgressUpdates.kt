@@ -4,17 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.darkRectButton
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
@@ -43,7 +44,6 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     var currentText: ProgressText? = null
 
     data class ProgressText(val text: String, val hoverText: String)
-    private val logger = LorenzLogger("debug/mc_console/filtered")
 
     init {
         updates.add(this)
@@ -100,7 +100,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
                     "error properly logging something in SkyHanni",
-                    "trying to update an not running chat",
+                    "trying to update a chat that is not running",
                     "next step" to nextStep,
                 )
             }
@@ -120,7 +120,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             if (!currentlyRunning) {
                 ErrorManager.logErrorStateWithData(
                     "error properly logging something in SkyHanni",
-                    "trying to end an not running chat",
+                    "trying to end a chat that is not running",
                     "next step" to nextStep,
                     "last step" to currentStep?.lastOrNull(),
                 )
@@ -189,7 +189,7 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
     class ChatProgressCategory(val categoryName: String) {
         val updates = mutableListOf<ChatProgressUpdates>()
         var enabled = false
-        private val logger = LorenzLogger("debug/chat_progress_updates/$categoryName")
+        private val logger = SkyHanniLogger("debug/chat_progress_updates/$categoryName")
 
         fun start(label: String): ChatProgressUpdates {
             val progress = ChatProgressUpdates(this)
@@ -293,8 +293,18 @@ class ChatProgressUpdates private constructor(val category: ChatProgressCategory
             return updates
         }
 
-        @HandleEvent(GuiRenderEvent::class)
-        fun onRenderOverlay() {
+        @HandleEvent
+        fun onGuiRenderTop() {
+            if (InventoryUtils.inAnyInventory()) {
+                InventoryGuiScaleCompat.withOriginalHudScale {
+                    renderDisplay()
+                }
+            } else {
+                renderDisplay()
+            }
+        }
+
+        private fun renderDisplay() {
             display?.let {
                 config.chatProgressPosition.renderRenderable(it, "Chat Progress Updates")
             }

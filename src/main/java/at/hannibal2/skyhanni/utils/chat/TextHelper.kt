@@ -27,6 +27,7 @@ object TextHelper {
     val HYPHEN = "-".asComponent()
     val SPACE = " ".asComponent()
     val EMPTY = "".asComponent()
+    val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
 
     fun text(text: String, init: MutableComponent.() -> Unit = {}) = text.asComponent(init)
     fun String.asComponent(init: MutableComponent.() -> Unit = {}): MutableComponent =
@@ -76,8 +77,8 @@ object TextHelper {
 
     fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
         val textWidth = this.width()
-        val spaceWidth = SPACE.width()
-        val padding = (width - textWidth) / 2
+        val spaceWidth = SPACE.width().coerceAtLeast(1)
+        val padding = (width - textWidth).coerceAtLeast(0) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
@@ -199,26 +200,23 @@ object TextHelper {
         return text
     }
 
-    private val chromaStyle by lazy { TextColor(0xFFFFFE, "chroma") }
-
-    fun getChromaColorStyle(): TextColor {
-        return chromaStyle
-    }
-
     fun matcher(component: Component, match: String): Component? {
         var index = 0
         var newComponent: Component = Component.empty()
         var currentString = ""
+        var done = false
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
+        component.forEachNonEmpty { style, string ->
+            fun String.newText() = asComponent().withStyle(style)
+            if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
-                    if (!currentString.isEmpty()) {
-                        newComponent.append(Component.literal(currentString).withStyle(style))
+                    if (currentString.isNotEmpty()) {
+                        newComponent.append(currentString.newText())
                     }
                     currentString = ""
-                    return@visit Optional.of(newComponent)
+                    done = true
+                    return@forEachNonEmpty
                 }
                 if (c == match[index]) {
                     currentString += c
@@ -229,49 +227,67 @@ object TextHelper {
                     index = 0
                 }
             }
-            if (!currentString.isEmpty()) {
-                newComponent.append(Component.literal(currentString).withStyle(style))
+            if (currentString.isNotEmpty()) {
+                newComponent.append(currentString.newText())
             }
             currentString = ""
-
-            Optional.empty()
-        }, Style.EMPTY)
-        if (newComponent.string.isEmpty()) return null
-        return newComponent
+        }
+        return newComponent.takeIf { it.string.isNotEmpty() }
     }
 
     fun split(component: Component, delimiter: String): List<Component>? {
         val newComponents = mutableListOf<MutableComponent>()
         var currentComponent = Component.empty()
 
-        component.visit({ style: Style?, string: String? ->
-            if (string.isNullOrEmpty()) return@visit Optional.empty()
+        component.forEachNonEmpty { style, string ->
+            fun String.toStyledComponent() = this.asComponent().withStyle(style)
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
-                currentComponent.append(Component.literal(string).withStyle(style))
+                currentComponent.append(string.toStyledComponent())
             } else {
-                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                currentComponent.append(split.first().toStyledComponent())
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
                 for ((index, str) in split.withIndex()) {
                     if (index == 0) continue
-                    currentComponent.append(Component.literal(str).withStyle(style))
+                    currentComponent.append(str.toStyledComponent())
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
                 }
             }
-
-            Optional.empty<Component>()
-        }, Style.EMPTY)
+        }
 
         if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
-        if (newComponents.isEmpty()) return null
-        return newComponents
+        return newComponents.takeIf { it.isNotEmpty() }
     }
 
     fun createAtlasSprite(sprite: String, atlas: String = "gui", namespace: String = "skyhanni"): Component {
         val atlasId = Identifier.withDefaultNamespace(atlas)
         val texture = Identifier.fromNamespaceAndPath(namespace, sprite)
         return Component.`object`(AtlasSprite(atlasId, texture)).withColor(ChatFormatting.WHITE)
+    }
+
+    private fun Component.forEachNonEmpty(visitor: (Style, String) -> Unit) {
+        visitNonEmpty { style, string ->
+            visitor(style, string)
+            Optional.empty()
+        }
+    }
+
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit(
+        { style, string ->
+            if (string.isEmpty()) Optional.empty()
+            else visitor(style, string)
+        },
+        Style.EMPTY,
+    )
+
+    fun List<Component>.merge(): MutableComponent {
+        val component = "".asComponent()
+        for ((index, item) in withIndex()) {
+            component.append(item)
+            if (index < size - 1) component.append(" ")
+        }
+        return component
     }
 }

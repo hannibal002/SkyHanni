@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -47,11 +47,12 @@ object FastFairySoulsPathfinder {
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
-    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
+    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
+        ?: mutableMapOf()
 
     private var data: Data? = null
 
-    private val soulPathFindConfig = CoroutineConfig("fairy souls pathfind")
+    private val soulPathFindConfig = CoroutineSettings("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
@@ -222,7 +223,7 @@ object FastFairySoulsPathfinder {
                 }
             } ?: continue
 
-            if (island.isCurrent()) {
+            if (island.isInIsland()) {
                 data?.checkHaveAll()
             }
             totalFound[island] = found
@@ -297,7 +298,7 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
+        if (duplicatePattern.matches(event.cleanMessage) || newPattern.matches(event.cleanMessage)) {
             data?.foundNearby()
         }
     }
@@ -309,7 +310,7 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Fairy Souls Pathfinder")
 
         if (!isEnabled()) return event.addIrrelevant("disabled")

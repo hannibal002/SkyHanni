@@ -24,7 +24,7 @@ object PlayerUtils {
 
     fun isThirdPersonView(): Boolean {
         val perspective = Minecraft.getInstance().options.cameraType
-        // for some reason they make you check the other 2 bools instead of giving you a third one
+        // for some reason they make you check the other 2 booleans instead of giving you a third one
         return !perspective.isMirrored && !perspective.isFirstPerson
     }
 
@@ -41,12 +41,18 @@ object PlayerUtils {
 
     fun getUuid() = getRawUuid().toUnDashedUUID()
 
-    fun getRawUuid(): UUID = MinecraftCompat.localPlayer.uuid
+    fun getRawUuid(): UUID = MinecraftCompat.localUser.profileId
 
-    fun getName(): String = MinecraftCompat.localPlayer.plainTextName
+    fun getName(): String = MinecraftCompat.localUser.name
 
     fun onGround(): Boolean = MinecraftCompat.localPlayer.onGround()
     fun inAir(): Boolean = !onGround()
+
+    /** the player is not flying, not riding a vehicle, and not using an elytra */
+    fun hasNormalMovement(): Boolean =
+        !MinecraftCompat.localPlayer.abilities.flying &&
+            !MinecraftCompat.localPlayer.isPassenger &&
+            !MinecraftCompat.localPlayer.isFallFlying
 
     fun blockPosition() = MinecraftCompat.localPlayer.blockPosition().toLorenzVec()
 

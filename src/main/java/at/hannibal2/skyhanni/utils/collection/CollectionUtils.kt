@@ -332,6 +332,8 @@ object CollectionUtils {
         return list
     }
 
+    fun <T> Array<T>.takeIfNotEmpty(): Array<T>? = takeIf { it.isNotEmpty() }
+
     fun <T, C : Collection<T>> C.takeIfNotEmpty(): C? = takeIf { it.isNotEmpty() }
 
     fun <K, V> Map<K, V>.takeIfNotEmpty(): Map<K, V>? = takeIf { it.isNotEmpty() }
@@ -560,12 +562,6 @@ object CollectionUtils {
     fun <T> MutableList<T>.keepOnlyIn(sequence: Sequence<T>) {
         retainAll(sequence.toSet())
     }
-
-    @Deprecated(
-        "Use the built-in ifEmpty function with emptySet() instead",
-        ReplaceWith("this.ifEmpty { emptySet() }"),
-    )
-    fun <T> Set<T>.optionalEmpty(): Set<T> = ifEmpty { emptySet() }
 
     inline fun <T, K, V> Iterable<T>.associateNotNull(transform: (T) -> Pair<K, V>?): Map<K, V> =
         mapNotNull(transform).toMap()

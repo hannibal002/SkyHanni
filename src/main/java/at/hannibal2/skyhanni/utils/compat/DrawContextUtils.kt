@@ -1,15 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 
 /**
  * Utils methods related to DrawContext, also known on 1.8 as GLStateManager
  */
 object DrawContextUtils {
 
-    private var _drawContext: GuiGraphics? = null
+    private var _drawContext: GuiGraphicsExtractor? = null
 
     /**
      * This is used to track the depth of the render context stack.
@@ -19,15 +20,16 @@ object DrawContextUtils {
      */
     private var renderDepth = 0
 
-    val drawContext: GuiGraphics
+    val drawContext: GuiGraphicsExtractor
         get() = _drawContext ?: run {
             ErrorManager.crashInDevEnv("drawContext is null")
             ErrorManager.skyHanniError("drawContext is null")
         }
 
-    fun drawItem(item: ItemStack, x: Int, y: Int) = drawContext.renderItem(item, x, y)
+    //~ if < 26.1 '.item' -> '.renderItem'
+    fun drawItem(item: SafeItemStack, x: Int, y: Int) = drawContext.item(item, x, y)
 
-    fun setContext(context: GuiGraphics) {
+    fun setContext(context: GuiGraphicsExtractor) {
         renderDepth++
         if (_drawContext != null) {
             return
@@ -85,10 +87,15 @@ object DrawContextUtils {
      * Push and pop the matrix stack, running the action in between, and returning the result of the action.
      */
     @Suppress("DEPRECATION")
-    inline fun <T> pushPopResult(action: () -> T): T {
+    inline fun <T> pushPopResult(
+        onError: (Exception) -> T = { throw it },
+        action: () -> T,
+    ): T {
         pushMatrix()
-        try {
-            return action()
+        return try {
+            action()
+        } catch (e: Exception) {
+            onError(e)
         } finally {
             popMatrix()
         }
@@ -111,8 +118,9 @@ object DrawContextUtils {
         x: Number = 0,
         y: Number = 0,
         postTranslateScale: Float? = null,
+        onError: (Exception) -> T = { throw it },
         action: () -> T,
-    ): T = pushPopResult {
+    ): T = pushPopResult(onError) {
         translate(x.toFloat(), y.toFloat())
         postTranslateScale?.let { scale(it, it) }
         return action()
@@ -130,5 +138,10 @@ object DrawContextUtils {
 
     fun loadIdentity() {
         drawContext.pose().identity()
+    }
+
+    fun addGuiElement(state: GuiElementRenderState) {
+        //~ if < 26.1 'addGuiElement' -> 'submitGuiElement'
+        drawContext.guiRenderState.addGuiElement(state)
     }
 }
