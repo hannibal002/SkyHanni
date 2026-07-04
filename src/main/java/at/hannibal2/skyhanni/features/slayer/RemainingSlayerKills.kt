@@ -280,14 +280,14 @@ object RemainingSlayerKills {
         val currentPet = CurrentPetApi.currentPet ?: return additiveWithMultMultipliers
         val fauxInternalName = currentPet.fauxInternalName
         ChatUtils.debug("$fauxInternalName", associatedDebugToggle = debugToggle)
-        val petInternalName = PetUtils.getPetProperName(fauxInternalName).orEmpty()
+        val petProperName = PetUtils.getPetProperName(fauxInternalName).orEmpty()
         val petRarity = PetUtils.getPetRarity(fauxInternalName) ?: return additiveWithMultMultipliers
-        ChatUtils.debug("Split Internal Name, ID = $petInternalName, rarity = $petRarity", associatedDebugToggle = debugToggle)
-        if (petInternalName.isEmpty()) return additiveWithMultMultipliers
+        ChatUtils.debug("Split Internal Name, ID = $petProperName, rarity = $petRarity", associatedDebugToggle = debugToggle)
+        if (petProperName.isEmpty()) return additiveWithMultMultipliers
         data?.let { data ->
             val slayerPetData = data.pets[SlayerApi.activeType]
             val levellingData = slayerPetData?.firstNotNullOfOrNull { slayerPet ->
-                slayerPet.value.takeIf { it.properPetNames?.contains(petInternalName) ?: return additiveWithMultMultipliers }
+                slayerPet.value.takeIf { it.properPetNames?.contains(petProperName) ?: return additiveWithMultMultipliers }
             } ?: return additiveWithMultMultipliers
 
             additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level) + 1
