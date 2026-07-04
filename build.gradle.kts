@@ -282,7 +282,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.2"
+            languageVersion = "2.3"
         }
     }
 }
@@ -362,7 +362,8 @@ tasks.withType<KotlinCompile> {
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
-            "-Xnested-type-aliases",
+            "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
         )
     }
 }

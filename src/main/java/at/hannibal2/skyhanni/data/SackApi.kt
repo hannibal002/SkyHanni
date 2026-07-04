@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -367,12 +368,7 @@ object SackApi {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
         uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
-        rebuildSackNameLists()
-    }
-
-    @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onComponentsLoaded() {
-        rebuildSackNameLists()
+        DelayedRun.runOrNextTick(::rebuildSackNameLists)
     }
 
     private fun rebuildSackNameLists() {

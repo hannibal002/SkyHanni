@@ -97,6 +97,9 @@ object PetUtils {
 
     fun isKnownPetInternalName(internalName: NeuInternalName) = internalName in petInternalNames
 
+    fun isNeuRepoPetItem(itemData: NeuItemJson): Boolean =
+        neuPetLorePattern.firstMatcher(itemData.lore) { true } == true
+
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: PET_SKIN_ENDERMAN
@@ -297,9 +300,7 @@ object PetUtils {
                 val properPetName = group("pet") ?: return@matchMatcher
                 rawPetSkins.getOrPut(properPetName) { mutableListOf() }.add(itemData)
             }
-            neuPetLorePattern.firstMatcher(itemData.lore) {
-                rawPetInternalNames.add(internalName)
-            }
+            if (isNeuRepoPetItem(itemData)) rawPetInternalNames.add(internalName)
         }
         petInternalNames = rawPetInternalNames
         petSkins = rawPetSkins
