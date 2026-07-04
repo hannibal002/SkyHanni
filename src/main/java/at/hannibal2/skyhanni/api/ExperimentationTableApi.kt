@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -264,11 +263,8 @@ object ExperimentationTableApi {
 
     // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
     // no in-game "ULTRA-RARE" lore header at flip time, so detected via processRewardOrNull() instead.
-    private val ultraRareMiscItems = setOf(
-        "SEVERED_PINCER", "ENDSTONE_IDOL", "ENSNARED_SNAIL", "GOLDEN_BOUNTY",
-        "SEVERED_HAND", "GOLD_BOTTLE_CAP", "CHAIN_END_TIMES", "OCTOPUS_TENDRIL",
-        "TROUBLED_BUBBLE", "PESTHUNTING_GUIDE", "FATEFUL_STINGER", "VIBRANT_CORAL",
-    ).toInternalNames()
+    var ultraRareMiscItems: List<NeuInternalName> = emptyList()
+        private set
 
     internal val ultraRareBookTitle: String get() = ultraRarePattern.pattern()
     internal val ultraRareItemTitle: String get() = ultraRareItemPattern.pattern()
@@ -364,7 +360,9 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRepoRewards = event.getConstant<ExperimentsJson>("ExperimentationTable").miscRewards
+        val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
+        miscRepoRewards = experiments.miscRewards
+        ultraRareMiscItems = experiments.ultraRareRewards ?: emptyList()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
