@@ -12,7 +12,7 @@ import kotlin.time.Duration
 @SkyHanniModule
 object DelayedRun {
 
-    private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
+    private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
     fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
