@@ -38,13 +38,13 @@ import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import net.minecraft.nbt.StringTag
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.DeferredItemStack

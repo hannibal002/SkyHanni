@@ -4,12 +4,10 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.client.renderer.block.BlockStateModelSet
-import net.minecraft.world.level.block.state.BlockState
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
-
 //~ if < 26.1 'dispatch.BlockStateModel' -> 'model.BlockStateModel'
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel
-
+import net.minecraft.world.level.block.state.BlockState
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 fun modifyGetModelFromBlockState(
     modelSet: BlockStateModelSet,
     state: BlockState?,
