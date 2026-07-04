@@ -12,6 +12,7 @@ concurrency:
 
 permissions:
     issues: write
+    pull-requests: write
     actions: read
 
 jobs:
@@ -61,7 +62,7 @@ jobs:
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
             -   name: Post review and manage label
-                if: steps.pr.outputs.number != ''
+                if: steps.pr.outputs.number != '' && steps.download.outcome == 'success'
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
