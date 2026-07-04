@@ -10,7 +10,7 @@ import kotlin.time.Duration
 
 // TODO add names for runs
 @SkyHanniModule
-object DelayedRun  {
+object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
@@ -24,7 +24,7 @@ object DelayedRun  {
     fun <T> runDelayedReturning(duration: Duration, run: () -> T): Pair<SimpleTimeMark, () -> T> {
         val time = SimpleTimeMark.now() + duration
         val runnable = { run() }
-        @Suppress ("UNCHECKED_CAST")
+        @Suppress("UNCHECKED_CAST")
         futureTasks.add((runnable as () -> Any) to time)
         return time to runnable
     }
