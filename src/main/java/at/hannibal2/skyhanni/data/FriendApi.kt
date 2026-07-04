@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -178,7 +179,7 @@ object FriendApi {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {
-            val chatStyle = sibling.style.takeUnless { it.isEmpty } ?: continue
+            val chatStyle = sibling.style.takeUnlessEmpty() ?: continue
             val value = sibling.command ?: continue
             if (!value.startsWith("/viewprofile")) continue
 
