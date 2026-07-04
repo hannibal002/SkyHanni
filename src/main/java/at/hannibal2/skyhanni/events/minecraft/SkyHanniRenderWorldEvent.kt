@@ -20,4 +20,8 @@ class SkyHanniRenderWorldEvent(
     //val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
-) : SkyHanniEvent()
+) : SkyHanniEvent() {
+
+    //? if >= 26.2
+    internal var skyHanniTextSubmitOrder = 0
+}

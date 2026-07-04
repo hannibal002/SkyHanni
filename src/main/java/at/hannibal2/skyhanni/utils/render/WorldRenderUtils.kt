@@ -29,6 +29,7 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
@@ -45,13 +46,11 @@ object WorldRenderUtils {
 
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
+    //? if >= 26.2
+    private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
+
     private fun getDisplayMode(seeThrough: Boolean) =
-        // Yes, you read that right. On 26.2, SEE_THROUGH is *not* see-through.
-        // https://mojira.dev/MC-309555
-        //? if >= 26.2
-        if (seeThrough) DisplayMode.POLYGON_OFFSET else DisplayMode.SEE_THROUGH
-        //? else
-        //if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
+        if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
 
     private inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
@@ -63,6 +62,34 @@ object WorldRenderUtils {
         /*render(bufferSource.getBuffer(layer))
         *///?}
     }
+
+    //? if >= 26.2 {
+    private fun SkyHanniRenderWorldEvent.submitOrderedText(
+        x: Float,
+        y: Float,
+        text: FormattedCharSequence,
+        shadow: Boolean,
+        displayMode: DisplayMode,
+        light: Int,
+        color: Int,
+        backgroundColor: Int,
+        outlineColor: Int,
+    ) {
+        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
+        submitNodeStorage.order(order).submitText(
+            matrices,
+            x,
+            y,
+            text,
+            shadow,
+            displayMode,
+            light,
+            color,
+            backgroundColor,
+            outlineColor,
+        )
+    }
+    //?}
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -288,8 +315,7 @@ object WorldRenderUtils {
         matrices.mulPose(cameraState.orientation)
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
-        submitNodeStorage.submitText(
-            matrices,
+        submitOrderedText(
             x,
             0f,
             Component.literal(text).visualOrderText,
@@ -369,8 +395,7 @@ object WorldRenderUtils {
         matrices.mulPose(cameraState.orientation)
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
-        submitNodeStorage.submitText(
-            matrices,
+        submitOrderedText(
             x,
             0f,
             text.visualOrderText,
