@@ -36,16 +36,27 @@ class ReplaceItemEvent(val inventory: Container, val originalItem: SafeItemStack
     }
 
     companion object {
+        private val postDepth = ThreadLocal.withInitial { 0 }
+
         @JvmStatic
         fun postEvent(
             inventory: Container,
             originalItem: SafeItemStack,
             slot: Int,
         ): SafeItemStack {
-            val event = ReplaceItemEvent(inventory, originalItem, slot)
-            event.post()
-            return if (event.shouldRemove) SafeItemStack.EMPTY
-            else event.replacement ?: originalItem
+            if (postDepth.get() > 0) return originalItem
+
+            postDepth.set(postDepth.get() + 1)
+            try {
+                val event = ReplaceItemEvent(inventory, originalItem, slot)
+                event.post()
+                return if (event.shouldRemove) SafeItemStack.EMPTY
+                else event.replacement ?: originalItem
+            } finally {
+                val depth = postDepth.get() - 1
+                if (depth == 0) postDepth.remove()
+                else postDepth.set(depth)
+            }
         }
     }
 }
