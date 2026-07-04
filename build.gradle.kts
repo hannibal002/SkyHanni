@@ -283,7 +283,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.2"
+            languageVersion = "2.3"
         }
     }
 }
@@ -363,7 +363,8 @@ tasks.withType<KotlinCompile> {
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
-            "-Xnested-type-aliases",
+            "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
         )
     }
 }
@@ -425,6 +426,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 publishing.publications {
     create<MavenPublication>("maven") {
         if (!isDeobf) artifact(tasks.named("remapJar"))
+        else artifact(tasks.shadowJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")

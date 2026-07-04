@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
-import at.hannibal2.skyhanni.data.hypixel.SkyBlockLocationData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -35,7 +34,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 /**
  * This class handles "am I on hypixel", and similar states.
- * For "am I in SkyBlock" and "what SkyBlock island am I on" checks see [SkyBlockLocationData].
+ * For "am I in SkyBlock" and "what SkyBlock island am I on" checks see [HypixelLocationApi].
  */
 @SkyHanniModule
 object HypixelData {
@@ -74,10 +73,6 @@ object HypixelData {
     val hypixelAlpha get() = connectedToHypixel && HypixelLocationApi.inAlpha
     val inLobby get() = HypixelLocationApi.inLobby
     val inLimbo get() = HypixelLocationApi.inLimbo
-
-    // TODO remove eventually
-    val skyBlock get() = SkyBlockLocationData.inSkyBlock
-    val skyBlockIsland get() = SkyBlockLocationData.currentIsland
 
     val serverId get() = HypixelLocationApi.serverId
 
@@ -139,7 +134,7 @@ object HypixelData {
         if (serverId?.startsWith("mega") == true) {
             return IslandType.maxPlayersMega
         }
-        return SkyBlockLocationData.currentIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
+        return HypixelLocationApi.island.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     @HandleEvent
@@ -193,7 +188,7 @@ object HypixelData {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
-                    val area = LocationFixData.fixLocation(SkyBlockLocationData.currentIsland) ?: originalLocation
+                    val area = LocationFixData.fixLocation(HypixelLocationApi.island) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
                     if (area != skyBlockArea) {
                         val previousArea = skyBlockArea
@@ -211,7 +206,7 @@ object HypixelData {
 
         if (!event.isMod(5)) return
 
-        if (SkyBlockLocationData.inSkyBlock) {
+        if (HypixelLocationApi.inSkyblock) {
             checkSpecialModes()
         }
     }
@@ -278,7 +273,7 @@ object HypixelData {
     private fun checkIsland(event: WidgetUpdateEvent) {
         TabListData.fullyLoaded = !event.isClear()
 
-        if (SkyBlockLocationData.inSkyBlock && tabListDataDirty) {
+        if (HypixelLocationApi.inSkyblock && tabListDataDirty) {
             tabListDataDirty = false
             if (TabListData.fullyLoaded) {
                 TabWidget.reSendEvents()
