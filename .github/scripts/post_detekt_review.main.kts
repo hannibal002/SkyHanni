@@ -84,13 +84,13 @@ fun buildBody(findings: List<Finding>): String = buildString {
         appendLine("## No Detekt issues found ✅")
         return@buildString
     }
-    appendLine("## Detekt found ${findings.size} issue(s)")
+    appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(20)
     val overflow = findings.drop(20)
     direct.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
     if (overflow.isNotEmpty()) {
-        appendLine("\n<details><summary>${overflow.size} more issue(s)</summary>\n")
+        appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
         overflow.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
         appendLine("\n</details>")
     }
@@ -172,9 +172,8 @@ val findings = buildList {
 }
 
 if (findings.isEmpty()) {
-    println("No findings, removing label and updating comment")
+    println("No findings, removing label")
     setLabel(prNumber, false)
-    upsertComment(prNumber, buildBody(emptyList()))
     exitProcess(0)
 }
 
