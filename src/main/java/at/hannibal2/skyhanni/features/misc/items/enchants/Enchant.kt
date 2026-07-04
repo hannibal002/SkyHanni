@@ -23,7 +23,6 @@ import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import net.minecraft.network.chat.TextColor
-import java.util.TreeSet
 
 private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()
 private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()
@@ -169,7 +168,7 @@ open class Enchant : Comparable<Enchant> {
             val label = statLabel.splitCamelCase().replaceFirstChar { it.uppercase() }.replace("Xp", "XP")
             val progress = item.extraAttributes.getDoubleOrDefault(nbtNum).roundTo(0).toInt()
             if (progress == 0) return ""
-            val nextLevel = stackLevel.minByOrNull { it > progress }
+            val nextLevel = stackLevel.filter { it > progress }.minOrNull()
             val tail = nextLevel?.shortFormat()?.insert(0, "/ ") ?: "(Maxed)"
             return "§7$label: §c${progress.shortFormat()} §7$tail"
         }

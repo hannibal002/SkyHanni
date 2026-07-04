@@ -1,4 +1,4 @@
-@file:Suppress("AnnotationOnSameLine")
+@file:Suppress("AnnotationOnSameLine", "AnnotationOnSeparateLine")
 
 package at.hannibal2.skyhanni.utils
 
@@ -51,7 +51,6 @@ enum class ItemCategory {
     @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
-    FISHING_BAIT,
     POTION,
     RIFT_TIMECHARM,
     COSMETIC,

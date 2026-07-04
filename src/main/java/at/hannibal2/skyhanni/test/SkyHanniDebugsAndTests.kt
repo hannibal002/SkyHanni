@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvents
 import at.hannibal2.skyhanni.config.ConfigFileType
@@ -57,7 +58,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -66,6 +66,7 @@ import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addStrin
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.stackUnderCursor
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -106,7 +107,7 @@ object SkyHanniDebugsAndTests {
 
         // TODO can we rename this to ore_block?
         registerDebugScreenEntry("targeted_oreblock", SkyBlockUtils::inSkyBlock) {
-            BlockUtils.getTargetedBlockAtDistance(50.0)?.let { pos ->
+            BlockUtils.getTargetedBlockAtDistance(50.0).let { pos ->
                 OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
                     add("[SkyHanni] Looking at: ${ore.name} (${pos.toCleanString()})")
                 }
@@ -218,7 +219,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun testCommand(args: Array<String>) {
-        SkyHanniMod.launchCoroutine("shtest command") {
+        CoroutineSettings("shtest command").launchCoroutine {
             asyncTest(args)
         }
     }
@@ -555,13 +556,14 @@ object SkyHanniDebugsAndTests {
         if (!debugConfig.copyCosmeticsSkullData.isKeyHeld()) return
         val stack = stackUnderCursor() ?: return
         if (!stack.`is`(Items.PLAYER_HEAD)) return
-        if (skinId == null) return
+        val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
 
-        val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
-        val skullOwner = stack.getSkullOwner()
+        val skullTexture = stack.getSkullTexture()
+        val skullOwner = stack.getSkullOwner() ?: "unknown"
+        val skull = if (skullTexture != null) "\"$skullOwner:$skullTexture\"" else ""
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
-        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"${skullOwner}:${skullTexture}\"]},"
+        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [$skull]},"
 
         OSUtils.copyToClipboard(formatted)
         ChatUtils.chat("§eCopied cosmetic data to the clipboard!")

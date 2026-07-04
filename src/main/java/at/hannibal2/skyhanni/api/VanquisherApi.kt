@@ -64,6 +64,7 @@ object VanquisherApi {
     private var lastSoundPos: LorenzVec? = null
     private var lastSoundTime = SimpleTimeMark.farPast()
 
+    // This does not cause a memory leak due to onMobDeSpawn handling it
     private val vanquishers = TimeLimitedCache<Mob, VanquisherData>(6.minutes) { mob, data, _ ->
         if (mob != null && data != null) data.postDespawn()
     }
@@ -81,7 +82,7 @@ object VanquisherApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName != "entity.wither.spawn" || event.pitch != 1f || event.volume != 2f) return
         lastSoundPos = event.location
         lastSoundTime = SimpleTimeMark.now()
@@ -166,7 +167,7 @@ object VanquisherApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("VanquisherAPI")
         event.addIrrelevant {
             addAll(

@@ -91,7 +91,7 @@ configuration. If not, you can restart intellij and reload the gradle project ag
 
 </details>
 
-Select an appropriate Java 25 JDK (preferably [DCEVM](#hot-swap), but any Java 25 JDK will do).
+Select an appropriate Java 25 JDK (preferably [Adoptium](https://adoptium.net/), but any Java 25 JDK will do).
 
 <details>
 <summary>🖼️Show run configuration image</summary>
@@ -169,8 +169,8 @@ Internal changes that do not impact the end user. Examples include:
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
-- Minor performance improvements
-- Documentation changes to markdown files, e.g., in `/docs` or this file.
+- Minor performance improvements (noticeable performance improvements belong in Improvements)
+- Documentation changes to Markdown files, e.g., in `/docs` or this file.
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
@@ -215,12 +215,13 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
+    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
-    - In the background, this will generate `LoadedModules.kt` during compilation. Until the project is compiled for the first time,
-      the IDE will show a red error in `SkyHanniMod.kt` — this is expected and resolves after the first build.
+    - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
+      after the first build.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -229,7 +230,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
     - Custom SkyHanni events are located in the `events` package, organized into sub packages by category.
-      When creating a new event, place it in the appropriate sub package.
+      When creating a new event, place it in the appropriate sub package. Thematically related events can be placed together in a single
+      file.
     - To expand the event system, you can create a new event that is called from a Mixin,
       or you can subscribe to a Fabric event and then post a SkyHanni event from that.
       See the `api/minecraftevents` package for examples.
@@ -249,6 +251,10 @@ Make sure such pull requests have a good explanation in the **What** section.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
   See the `api/minecraftevents` package for examples.
+- Every event class must have a KDoc comment that describes: what the event represents,
+  when it is fired, what each parameter means, and optionally, when to use or not use it.
+    - For new events, the KDoc is required in the same PR.
+    - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
@@ -277,7 +283,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
@@ -297,13 +303,6 @@ debugging in IntelliJ. This is very useful for coding live on Hypixel without th
 - Start Minecraft inside IntelliJ normally.
     - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
-
-### Hot Swap
-
-Hot Swap allows reloading edited code while debugging, removing the need to restart the whole game every time.
-
-We use [dcevm](https://dcevm.github.io/) and the IntelliJ
-Plugin [HotSwap Agent](https://plugins.jetbrains.com/plugin/9552-hotswapagent) to quickly reload code changes.
 
 ### [Live Plugin](https://plugins.jetbrains.com/plugin/7282-liveplugin)
 
@@ -364,18 +363,30 @@ It allows to easily modify methods in Minecraft itself, without conflicting with
 For more information, see https://github.com/SpongePowered/Mixin
 or [our existing mixins](https://github.com/hannibal002/SkyHanni/tree/beta/src/main/java/at/hannibal2/skyhanni/mixins/transformers).
 
-When creating new Mixins, try to keep the code inside the mixin as small as possible, and calling a hook as soon as
-possible.
+When creating new Mixins, try to keep the code inside the mixin as small as possible, and call a hook as soon as possible.
+The mixin method itself should ideally contain only a single call to a Kotlin function. All logic belongs in Kotlin, not in the Java mixin.
+
+### KSP (Kotlin Symbol Processing)
+
+SkyHanni uses KSP via the `annotation-processors` module to generate code at compile time.
+
+- `@SkyHanniModule`: Generates `LoadedModules.kt`, which registers all event handlers and repo patterns automatically.
+- Mixin registration: Scans for `@Mixin`-annotated classes and generates the mixin configuration. There is no manual mixin list to update.
 
 ### Repo
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-If you add stuff to the repo make sure it gets serialised. See
+If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
+
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+repository as well.
+Keep the main mod PR as a draft until the repo PR is ready.
+Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 ### Discord IPC
 
