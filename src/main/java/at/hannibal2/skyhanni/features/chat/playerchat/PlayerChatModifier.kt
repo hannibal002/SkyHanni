@@ -33,7 +33,6 @@ object PlayerChatModifier {
             findClickableTexts(sibling, clickEvents)
         }
         val clickEvent = chatComponent.style.clickEvent ?: return
-        if (!clickEvent.action().isAllowedFromServer) return
         if (clickEvents.any { it.value() == clickEvent.value() }) return
         clickEvents.add(clickEvent)
     }
@@ -43,7 +42,6 @@ object PlayerChatModifier {
             findHoverTexts(sibling, hoverEvents)
         }
         val hoverEvent = chatComponent.style.hoverEvent ?: return
-        if (!hoverEvent.action().isAllowedFromServer) return
         if (hoverEvents.any { it.value() == hoverEvent.value() }) return
         hoverEvents.add(hoverEvent)
     }
