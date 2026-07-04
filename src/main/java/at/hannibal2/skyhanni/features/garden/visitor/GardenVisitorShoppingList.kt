@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -14,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -258,7 +259,7 @@ object GardenVisitorShoppingList {
                 return
             }
             if (items.isEmpty()) {
-                if (repoVisitor.unknownRewards == true) {
+                if (repoVisitor.unknownRewards) {
                     list.addString(" §7(§fUnknown§7)")
                 } else {
                     list.addString(" §7(§fAny§7)")
@@ -309,12 +310,17 @@ object GardenVisitorShoppingList {
         visitorMissingItemsWarnTime.removeIf { it.value.passedSince() > 10.minutes }
     }
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onGuiRender() {
+    @HandleEvent
+    fun onGuiRenderTop() {
         if (!config.enabled) return
-        if (Minecraft.getInstance().screen is SignEditScreen) return
 
-        renderDisplay()
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

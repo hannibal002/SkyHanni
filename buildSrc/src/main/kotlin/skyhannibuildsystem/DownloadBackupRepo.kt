@@ -31,7 +31,9 @@ abstract class DownloadBackupRepo : DefaultTask() {
 
     @TaskAction
     fun downloadRepo() {
-        val downloadUrl = URI.create("https://github.com/$user/$repo/archive/refs/heads/$branch.zip").toURL()
+        val downloadUrl = URI.create("https://github.com/$user/$repo/archive/refs/heads/$branch.tar.gz").toURL()
+        val outputDir = outputDirectory.get().asFile
+        if (outputDir.exists()) outputDir.deleteRecursively()
         val file = repoFile
         file.parentFile.mkdirs()
         file.outputStream().use { out ->

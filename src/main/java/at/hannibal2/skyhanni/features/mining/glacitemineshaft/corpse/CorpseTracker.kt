@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.glacitemineshaft
+package at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker.drawDisplay
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
