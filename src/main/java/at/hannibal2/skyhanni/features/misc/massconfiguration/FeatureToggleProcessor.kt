@@ -43,7 +43,7 @@ class FeatureToggleProcessor : ConfigStructureReader {
         pathStack.pop()
     }
 
-    // Suppress is needed to unbox java.lang.Boolean (NOT kotlin.Boolean) from a Property<*>
+    // java.lang.Boolean required: generic type arguments are always boxed, so kotlin.Boolean would not match here
     @Suppress("UNCHECKED_CAST", "PLATFORM_CLASS_MAPPED_TO_KOTLIN")
     override fun emitOption(baseObject: Any, field: Field, option: ConfigOption) {
         val featureToggle = field.getAnnotation(FeatureToggle::class.java) ?: return
