@@ -281,7 +281,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.2"
+            languageVersion = "2.3"
         }
     }
 }
@@ -363,7 +363,8 @@ tasks.withType<KotlinCompile> {
             "-Xbackend-threads=1",
             // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
             "-Xwarning-level=DEPRECATION:disabled",
-            "-Xnested-type-aliases"
+            "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
         )
     }
 }

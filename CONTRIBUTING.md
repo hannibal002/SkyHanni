@@ -169,8 +169,8 @@ Internal changes that do not impact the end user. Examples include:
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
-- Minor performance improvements
-- Documentation changes to markdown files, e.g., in `/docs` or this file.
+- Minor performance improvements (noticeable performance improvements belong in Improvements)
+- Documentation changes to Markdown files, e.g., in `/docs` or this file.
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
@@ -251,6 +251,10 @@ Make sure such pull requests have a good explanation in the **What** section.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
   See the `api/minecraftevents` package for examples.
+- Every event class must have a KDoc comment that describes: what the event represents,
+  when it is fired, what each parameter means, and optionally, when to use or not use it.
+    - For new events, the KDoc is required in the same PR.
+    - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
@@ -373,11 +377,16 @@ SkyHanni uses KSP via the `annotation-processors` module to generate code at com
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-If you add stuff to the repo make sure it gets serialised. See
+If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
+
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+repository as well.
+Keep the main mod PR as a draft until the repo PR is ready.
+Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 ### Discord IPC
 
