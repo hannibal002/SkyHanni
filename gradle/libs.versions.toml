@@ -24,7 +24,6 @@ commons-net = "3.11.1"
 keval = "1.1.1"
 httpclient = "4.5.14"
 detektrules-neu = "1.0.0"
-kotest = "5.9.1"
 
 [libraries]
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
@@ -53,13 +52,11 @@ detektrules-ktlint = { module = "dev.detekt:detekt-rules-ktlint-wrapper", versio
 detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
 detektrules-neu = { module = "org.notenoughupdates:detektrules", version.ref = "detektrules-neu" }
 detektrules-authors = { module = "dev.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }
