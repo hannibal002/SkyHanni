@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
@@ -15,9 +16,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 object SkyBlockIslandTest {
 
     var testIsland: IslandType? = null
+        set(value) {
+            field = value
+            EventListeners.markEventCacheDirty()
+        }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Test")
         testIsland?.let {
             event.addData {

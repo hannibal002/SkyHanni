@@ -22,8 +22,8 @@ abstract class ScrollInput(
         }
         get() = scrollValue.getValue()
 
-    fun atMinimum() = asInt() == minValue
-    fun atMaximum() = asInt() == maxValue
+    fun atMinimum() = scroll <= minValue
+    fun atMaximum() = scroll >= maxValue
     fun asInt() = scroll.toInt()
     fun asDouble() = scroll
     fun asDirection() =
@@ -44,7 +44,8 @@ abstract class ScrollInput(
             scroll = scroll.coerceIn(minValue.toDouble(), maxValue.toDouble())
         }
 
-    protected fun isMouseEventValid(): Boolean = scrollValue.isMouseEventValid()
+    protected fun consumeMouseMoveEvent(): Boolean = scrollValue.consumeMouseMoveEvent()
+    protected fun consumeScrollEvent(): Boolean = scrollValue.consumeScrollEvent()
     protected fun isPureScrollEvent() = scrollValue.isPureScrollEvent()
 
     abstract fun update(isValid: Boolean)
@@ -61,13 +62,22 @@ abstract class ScrollInput(
         ) : ScrollInput(scrollValue, minHeight, maxHeight, velocity, dragScrollMouseButton, startValue) {
             override fun update(isValid: Boolean) {
                 if (maxValue < minValue) return
-                if (!isValid || !isMouseEventValid()) return
-                if (dragScrollMouseButton != null && MouseCompat.isButtonDown(dragScrollMouseButton)) {
+                if (!isValid) return
+                var changed = false
+                if (
+                    dragScrollMouseButton != null &&
+                    MouseCompat.isButtonDown(dragScrollMouseButton) &&
+                    consumeMouseMoveEvent()
+                ) {
                     scroll += MouseCompat.getEventDY() * velocity
+                    changed = true
                 }
-                val deltaWheel = MouseCompat.getScrollDelta()
-                scroll += -deltaWheel.coerceIn(-1, 1) * 2.5 * velocity
-                coerceInLimit()
+                if (consumeScrollEvent()) {
+                    val deltaWheel = MouseCompat.getPreciseScrollDelta()
+                    scroll += -deltaWheel * 2.5 * velocity
+                    changed = true
+                }
+                if (changed) coerceInLimit()
             }
         }
 
@@ -99,7 +109,8 @@ abstract class ScrollInput(
 
 class ScrollValue {
     private var field: Double? = null
-    private var mouseEventTime = 0L
+    private var lastMouseMoveEventId = 0L
+    private var lastScrollEventId = 0L
     private var lastMouseX = 0
     private var lastMouseY = 0
 
@@ -115,17 +126,26 @@ class ScrollValue {
         field = value
     }
 
-    fun isMouseEventValid(): Boolean {
-        val mouseEvent = MouseCompat.getEventNanoseconds()
-        val mouseEventsValid = mouseEvent - mouseEventTime > 20L
-        mouseEventTime = mouseEvent
-        return mouseEventsValid
+    fun isMouseEventValid(): Boolean = consumeScrollEvent()
+
+    fun consumeMouseMoveEvent(): Boolean {
+        val eventId = MouseCompat.getMouseMoveEventId()
+        if (eventId == lastMouseMoveEventId) return false
+        lastMouseMoveEventId = eventId
+        return true
+    }
+
+    fun consumeScrollEvent(): Boolean {
+        val eventId = MouseCompat.getScrollEventId()
+        if (eventId == lastScrollEventId || !MouseCompat.hasScrollDelta()) return false
+        lastScrollEventId = eventId
+        return true
     }
 
     fun isPureScrollEvent(): Boolean {
         val mouseX = MouseCompat.getEventX()
         val mouseY = MouseCompat.getEventY()
-        val isScrollEvent = MouseCompat.getScrollDelta() != 0
+        val isScrollEvent = MouseCompat.hasScrollDelta()
         val hasMouseMoved = mouseX != lastMouseX || mouseY != lastMouseY
 
         // Update last mouse position

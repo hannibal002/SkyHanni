@@ -198,4 +198,12 @@ class GuiConfig {
     @ConfigOption(name = "Legion/Bobbin Overlay", desc = "")
     @Accordion
     val legionBobbinOverlay: LegionBobbinOverlayConfig = LegionBobbinOverlayConfig()
+
+    @Expose
+    @ConfigOption(
+        name = "Hide GUI in F3 menu",
+        desc = "Hide Skyhanni GUI elements in debug menu",
+    )
+    @ConfigEditorBoolean
+    var hideGuiInDebugMenu: Boolean = true
 }
