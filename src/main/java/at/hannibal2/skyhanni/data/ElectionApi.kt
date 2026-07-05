@@ -346,10 +346,10 @@ object ElectionApi {
     fun getAllActivePerks(
         includeMayor: Boolean = true,
         includeMinister: Boolean = true,
-        includeRepoPerk: Boolean = true
+        includeRepoPerk: Boolean = true,
     ): List<Perk> = buildList {
-        if (includeMayor) addAll(currentMayor?.activePerks ?: emptyList())
-        if (includeMinister) addAll(currentMinister?.activePerks ?: emptyList())
-        if (includeRepoPerk) addAll(repoPerks ?: emptyList())
+        if (includeMayor) addAll(currentMayor?.activePerks.orEmpty())
+        if (includeMinister) addAll(currentMinister?.activePerks.orEmpty())
+        if (includeRepoPerk) addAll(repoPerks.orEmpty())
     }
 }

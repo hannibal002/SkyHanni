@@ -291,7 +291,10 @@ object RemainingSlayerKills {
             } ?: return additiveWithMultMultipliers
 
             additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level) + 1
-            ChatUtils.debug("$additiveWithMultMultipliers Pet & Champion Multiplier, ${currentPet.level} is Pet Level.", associatedDebugToggle = debugToggle)
+            ChatUtils.debug(
+                "$additiveWithMultMultipliers Pet & Champion Multiplier, ${currentPet.level} is Pet Level.",
+                associatedDebugToggle = debugToggle,
+            )
         }
         return additiveWithMultMultipliers
     }
