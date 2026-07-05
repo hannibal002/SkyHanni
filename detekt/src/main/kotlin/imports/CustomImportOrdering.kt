@@ -20,34 +20,70 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
             this.startsWith("//#")
     }
 
-    private fun String.isImportLine(): Boolean {
-        return this.startsWith("import ")
-    }
-
     private fun getBlocks(importList: KtImportList): List<List<KtImportDirective>> {
-        val blocks = mutableListOf<MutableList<KtImportDirective>>()
-        val rawLines = importList.text.lines()
-        val imports = importList.imports.toMutableList()
+        val blocks = mutableListOf<List<KtImportDirective>>()
+        val imports = ArrayDeque(importList.imports)
+        val currentBlock = mutableListOf<KtImportDirective>()
 
-        var currentBlock = mutableListOf<KtImportDirective>()
+        var inIfBlock = false
+        var nextImportIsStandalone = false
 
-        for (rawLine in rawLines) {
+        fun flushCurrentBlock() {
+            if (currentBlock.isNotEmpty()) {
+                blocks += currentBlock.toList()
+                currentBlock.clear()
+            }
+        }
+
+        for (rawLine in importList.text.lines()) {
             val line = rawLine.trim()
 
-            if (line.isLineBlockSeparator()) {
-                if (currentBlock.isNotEmpty()) {
-                    blocks.add(currentBlock)
-                    currentBlock = mutableListOf()
+            when {
+                // Start of //? if block
+                line.contains(PreprocessingPattern.IF.asComment) -> {
+                    flushCurrentBlock()
+                    inIfBlock = true
                 }
-            } else if (line.isImportLine()) {
-                if (imports.isNotEmpty()) {
-                    currentBlock.add(imports.removeAt(0))
+
+                // End of //? if block
+                line.contains(PreprocessingPattern.ENDIF.asComment) -> {
+                    flushCurrentBlock()
+                    inIfBlock = false
+                }
+
+                // Single-import directives.
+                line.startsWith("//~") || line.startsWith("//#") -> {
+                    flushCurrentBlock()
+                    nextImportIsStandalone = true
+                }
+
+                line.startsWith("import ") -> {
+                    val import = imports.removeFirst()
+
+                    when {
+                        inIfBlock -> {
+                            currentBlock += import
+                        }
+
+                        nextImportIsStandalone -> {
+                            blocks += listOf(import)
+                            nextImportIsStandalone = false
+                        }
+
+                        else -> {
+                            currentBlock += import
+                        }
+                    }
+                }
+
+                line.isBlank() -> {
+                    flushCurrentBlock()
                 }
             }
         }
-        if (currentBlock.isNotEmpty()) {
-            blocks.add(currentBlock)
-        }
+
+        flushCurrentBlock()
+
         return blocks
     }
 
