@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -119,11 +120,13 @@ object MoongladeBeacon {
             private val itemToColorMap = entries.associateBy { it.item }
 
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
-            fun Slot.getLoreColorOrNull(): BeaconColor? =
-                beaconCurrentColorPattern.firstMatcher(this.item.getLoreComponent().map { it.string }) {
+            fun Slot.getLoreColorOrNull(): BeaconColor? {
+                val stack = this.item.takeUnlessEmpty() ?: return null
+                return beaconCurrentColorPattern.firstMatcher(stack.getLoreComponent().map { it.string }) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
                 }
+            }
         }
     }
 
@@ -152,7 +155,7 @@ object MoongladeBeacon {
             }
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
-                val stack = this.item ?: return null
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return beaconCurrentSpeedPattern.firstMatcher(stack.getLoreComponent().map { it.string }) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
@@ -178,7 +181,7 @@ object MoongladeBeacon {
         companion object {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
-                val stack = this.item ?: return null
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return beaconCurrentPitchPattern.firstMatcher(stack.getLoreComponent().map { it.string }) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
@@ -465,7 +468,7 @@ object MoongladeBeacon {
         val untilNextRefPitch get() = nextPitchPair.referenceUntil
         val untilNextOurPitch get() = nextPitchPair.oursUntil
 
-        fun handlePitch(pitch: BeaconPitch) = with(nextPitchPair) {
+        fun handlePitch(pitch: BeaconPitch): Unit = with(nextPitchPair) {
             if (isEnchanted && !upgradingStrength) return
             if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
             with(bufferPair[BeaconPieceTarget.REFERENCE]) {
