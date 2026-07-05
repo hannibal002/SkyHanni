@@ -88,7 +88,15 @@ class ProfileSpecificStorage(
 ) {
     // api
     @Expose
-    var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+    var skills: SkillStorage = SkillStorage()
+
+    class SkillStorage {
+        @Expose
+        var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+
+        @Expose
+        var giftTalismanSkillXpBonus: Double = 0.0
+    }
 
     @Expose
     var totalSkyBlockXP: Int? = null
