@@ -23,7 +23,6 @@ object SoundUtils {
     private val clickSound by lazy { createSound("ui.button.click", 1f) }
     private val errorSound by lazy { createSound("entity.enderman.teleport", 0f) }
     val plingSound by lazy { createSound("block.note_block.pling", 1f) }
-    val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun SoundInstance.playSound() {
         DelayedRun.runOrNextTick {
