@@ -141,7 +141,8 @@ for the dependency, or `- <url>` for REPO dependencies.
 
 ### Changelog Builder
 
-The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder).
+The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder). Do not manually
+edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files are maintained by the project maintainer.
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
@@ -233,7 +234,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.

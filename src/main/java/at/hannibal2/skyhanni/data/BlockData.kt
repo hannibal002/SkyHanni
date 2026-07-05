@@ -18,8 +18,8 @@ object BlockData {
         if (!MinecraftCompat.localWorldExists) return
 
         if (event.packet is ClientboundBlockUpdatePacket) {
-            val blockPos = event.packet.pos ?: return
-            val blockState = event.packet.blockState ?: return
+            val blockPos = event.packet.pos
+            val blockState = event.packet.blockState
             ServerBlockChangeEvent(blockPos, blockState).post()
         } else if (event.packet is ClientboundSectionBlocksUpdatePacket) {
             event.packet.runUpdates { pos, state ->

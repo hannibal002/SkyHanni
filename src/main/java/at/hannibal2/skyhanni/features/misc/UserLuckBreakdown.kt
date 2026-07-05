@@ -327,7 +327,7 @@ object UserLuckBreakdown {
     }
 
     private fun calcSkillLuck() {
-        val storage = ProfileStorageData.profileSpecific?.skillData ?: return
+        val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return
         skillOverflowLuck.clear()
         for ((skillType, skillInfo) in storage) {
             val level = skillInfo.level

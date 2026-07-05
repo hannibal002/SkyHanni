@@ -43,17 +43,17 @@ apply(plugin = "net.fabricmc.fabric-loom")
 // plugins applied in the plugins block. Since both loom plugins are declared with
 // apply false, no accessors are auto-generated, so we define them explicitly.
 val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
+fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
 fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
 fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
-fun DependencyHandler.include(dep: Any): Dependency? = add("include", dep)
-fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dep)
+fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
+fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modImplementation", dep).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dep)
+    add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
 fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modCompileOnly", dep).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dep)
-
+    add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -280,9 +280,7 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
-
-    add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+    add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
 }
 
 afterEvaluate {
@@ -396,6 +394,8 @@ tasks.withType<KotlinCompile> {
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
+            // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
+            "-Xwarning-level=DEPRECATION:disabled",
             "-Xintrinsic-const-evaluation",
             "-Xcontext-sensitive-resolution"
         )

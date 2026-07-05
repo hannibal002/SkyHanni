@@ -730,6 +730,13 @@ object ItemUtils {
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
+    fun NeuInternalName.matchesItemName(itemName: String): Boolean = when {
+        itemName.contains('§') -> repoItemName == itemName
+        else ->
+            itemNameWithoutColor == itemName ||
+                asString().replace("_", " ").equals(itemName, ignoreCase = true)
+    }
+
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
 
@@ -1108,4 +1115,6 @@ object ItemUtils {
             }
         }
     }
+
+    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty() }
 }

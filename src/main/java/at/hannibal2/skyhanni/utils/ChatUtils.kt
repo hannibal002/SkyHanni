@@ -47,6 +47,15 @@ object ChatUtils {
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
+    fun Component.hoverTextLines(): List<String> = buildList {
+        addHoverTextLines(this@hoverTextLines)
+    }
+
+    private fun MutableList<String>.addHoverTextLines(component: Component) {
+        component.hover?.formattedTextCompat()?.split("\n")?.let(::addAll)
+        component.siblings.forEach { addHoverTextLines(it) }
+    }
+
     /**
      * Sends a debug message to the chat and the console.
      * This is only sent if the debug feature is enabled.
