@@ -1,6 +1,6 @@
 package imports
 
-import PreprocessingPattern.Companion.containsPreprocessingPattern
+import PreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtImportDirective
