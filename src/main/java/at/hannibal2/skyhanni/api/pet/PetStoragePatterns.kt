@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.api.pet
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 internal object PetStoragePatterns {
 
     private val patternGroup = RepoPattern.group("misc.pet.storage")
