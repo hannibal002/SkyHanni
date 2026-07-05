@@ -53,7 +53,7 @@ import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
@@ -88,7 +88,15 @@ class ProfileSpecificStorage(
 ) {
     // api
     @Expose
-    var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+    var skills: SkillStorage = SkillStorage()
+
+    class SkillStorage {
+        @Expose
+        var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+
+        @Expose
+        var giftTalismanSkillXpBonus: Double = 0.0
+    }
 
     @Expose
     var totalSkyBlockXP: Int? = null
@@ -501,6 +509,9 @@ class ProfileSpecificStorage(
 
         @Expose
         var uniqueVisitors: Int = 0
+
+        @Expose
+        var ignoredVisitors: MutableSet<String> = mutableSetOf()
 
         @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()

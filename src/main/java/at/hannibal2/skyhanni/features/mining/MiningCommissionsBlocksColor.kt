@@ -146,7 +146,7 @@ object MiningCommissionsBlocksColor {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining Commissions Blocks Color")
         if (!enabled) {
             event.addIrrelevant("not enabled")

@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.hover
 object NavigationHelper {
     private val config get() = SkyHanniMod.feature.misc.navigation
 
-    private val messageId = ChatUtils.getUniqueCustomMessageId()
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
         GraphNodeTag.NPC,
@@ -50,11 +50,25 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (config.allowInstantNavigation && locations.size == 1) {
-            val (name, node) = locations.first()
-            node.pathFind(label = name, allowRerouting = true, condition = { true })
-            sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
-            return
+        if (config.allowInstantNavigation) {
+            val exactMatch = locations.firstOrNull { (name, _) ->
+                name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
+            }
+
+            val target = exactMatch ?: locations.takeIf { it.size == 1 }?.first()
+
+            if (target != null) {
+                val (name, node) = target
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
+
+                val message = if (exactMatch != null) {
+                    "§7Exact match found, navigating to §r$name"
+                } else {
+                    "§7Only one location found, navigating to §r$name"
+                }
+                sendNavigateMessageWithContent(message, goBack)
+                return
+            }
         }
 
         TextHelper.displayPaginatedList(

@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -43,7 +42,7 @@ object PreventEarlyCommands {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.preventEarlyExecution) return
         if (!SkyBlockUtils.onHypixel) return
-        if (!event.isCommand) return
+        if (!event.isAnyCommand) return
         if (event.senderIsSkyhanni()) return
         val command = event.message.removePrefix("/").lowercase()
         lastCommand = command

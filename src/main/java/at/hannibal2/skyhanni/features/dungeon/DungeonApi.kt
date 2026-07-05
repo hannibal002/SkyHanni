@@ -75,7 +75,7 @@ object DungeonApi {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
-    private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
+    private val WITHER_ESSENCE_TEXTURE by SkullTextureHolder.texture("WITHER_ESSENCE")
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -87,7 +87,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST:                                  Master Mode The Catacombs - Floor V
+     * WRAPPED-REGEX-TEST: "                                 Master Mode The Catacombs - Floor V"
      */
     private val dungeonComplete by patternGroup.pattern(
         "completecolorless",
@@ -356,7 +356,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {
@@ -422,7 +422,7 @@ object DungeonApi {
             Blocks.LEVER -> ClickedBlockType.LEVER
             Blocks.PLAYER_HEAD -> {
                 val blockTexture = BlockUtils.getTextureFromSkull(position)
-                if (blockTexture == WITHER_ESSENCE_TEXTURE) {
+                if (WITHER_ESSENCE_TEXTURE != null && blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE
                 } else {
                     return

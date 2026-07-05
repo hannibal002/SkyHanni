@@ -178,8 +178,8 @@ object CustomWardrobe {
             return true
         }
         val previousActiveScale = activeScale
-        val unscaledRenderableWidth = renderable.first / activeScale
-        val unscaledRenderableHeight = renderable.second / activeScale
+        val unscaledRenderableWidth = renderable.first / activeScale.toDouble()
+        val unscaledRenderableHeight = renderable.second / activeScale.toDouble()
         val autoScaleWidth = 0.95 * gui.first / unscaledRenderableWidth
         val autoScaleHeight = 0.95 * gui.second / unscaledRenderableHeight
         val maxScale = min(autoScaleWidth, autoScaleHeight).toInt()
