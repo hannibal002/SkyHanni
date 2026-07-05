@@ -804,7 +804,6 @@
 + Removed dead code, fixed KDoc formatting, and removed unused imports. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5972)
 + Replaced deprecated `formattedTextCompatLessResets()` with `Component.string` in `TrevorFeatures`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5972)
 + Reworked Glacite Mineshaft corpse finding logic. - Piggered & hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5916)
-+ Updated docs/INSTALLING.md for the latest Minecraft version. - protocol4 (https://github.com/hannibal002/SkyHanni/pull/5984)
 
 ### Removed Features
 
