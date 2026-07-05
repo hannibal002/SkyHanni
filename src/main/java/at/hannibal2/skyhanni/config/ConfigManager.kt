@@ -240,6 +240,11 @@ class ConfigManager {
         disableSaving = true
     }
 
+    /**
+     * Rebuilds the MoulConfig editor and processor only. Config objects (SkyHanniMod.feature and
+     * all nested objects) are not recreated here; they are created once in firstLoad() and remain
+     * the same instances for the entire session.
+     */
     fun recreateConfig() {
         ConfigGuiManager.editor = null
         PetDisplayConfigGuiManager.invalidate()
