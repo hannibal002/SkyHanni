@@ -124,7 +124,7 @@ object FossilSolver {
 
     private val solvingMutex = Mutex()
 
-    suspend fun findTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?) = solvingMutex.withLock {
+    suspend fun findTile(fossilLocations: Set<Int>, dirtLocations: Set<Int>, percentage: String?): Unit = solvingMutex.withLock {
         val invalidPositions: MutableSet<FossilTile> = mutableSetOf()
         for (i in 0..53) {
             if (i !in fossilLocations && i !in dirtLocations) {

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.world.item.Items
@@ -21,7 +22,7 @@ object HarvestableHighlight {
         if (!config.highlightHarvestableStatus) return
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val slot = InventoryUtils.getSlotAtIndex(24) ?: return
-        val beacon = slot.item ?: return
+        val beacon = slot.item.takeUnlessEmpty() ?: return
         if (!beacon.`is`(Items.BEACON)) return
         var color = LorenzColor.RED
         for (component in beacon.getLoreComponent()) {
@@ -43,7 +44,7 @@ object HarvestableHighlight {
         if (!config.highlightWaterStatus) return
         if (!GreenhouseUtils.cropDiagnosticInventory.isInside()) return
         val slot = InventoryUtils.getSlotAtIndex(21) ?: return
-        val water = slot.item ?: return
+        val water = slot.item.takeUnlessEmpty() ?: return
         if (!water.`is`(Items.WATER_BUCKET)) return
         for (component in water.getLoreComponent()) {
             val line = component.string
