@@ -28,8 +28,6 @@ object DelayedRun {
         @Suppress("UNCHECKED_CAST")
         futureTasks.add((runnable as () -> Any) to time)
 
-        e
-
         return time to runnable
     }
 
@@ -52,7 +50,7 @@ object DelayedRun {
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
         tasks.removeIf { (runnable, time) ->
-            val inPast = time.isInPast()
+            val inPast =  time.isInPast()
             if (inPast) {
                 try {
                     runnable()
