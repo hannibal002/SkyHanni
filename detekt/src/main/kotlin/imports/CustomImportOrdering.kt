@@ -37,6 +37,10 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
                     flushCurrentBlock()
                     inIfBlock = false
                 }
+                line.contains(PreprocessingPattern.ELSE.asComment) || line.contains(PreprocessingPattern.ELSEIF.asComment) -> {
+                    flushCurrentBlock()
+                    require(inIfBlock) { "Found #else or #elseif without a preceding #if" }
+                }
                 line.startsWith("//~") || line.startsWith("//#") -> {
                     flushCurrentBlock()
                     nextImportIsStandalone = true
