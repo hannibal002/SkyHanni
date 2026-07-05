@@ -1,6 +1,6 @@
 package imports
 
-import PreprocessingPattern
+import PreprocessingPattern.Companion.containsPreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtImportDirective
@@ -11,118 +11,55 @@ import org.jetbrains.kotlin.psi.KtImportList
  */
 class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
-    private fun getBlocks(importList: KtImportList): List<List<KtImportDirective>> {
-        val blocks = mutableListOf<List<KtImportDirective>>()
-        val imports = ArrayDeque(importList.imports)
-        val currentBlock = mutableListOf<KtImportDirective>()
+    private fun isImportsCorrectlyOrdered(imports: List<KtImportDirective>, rawText: List<String>): Boolean {
+        if (rawText.any { it.isBlank() }) {
+            return false
+        }
 
-        var inIfBlock = false
-        var nextImportIsStandalone = false
+        var inPreprocess = false
+        val linesToIgnore = mutableListOf<String>()
 
-        fun flushCurrentBlock() {
-            if (currentBlock.isNotEmpty()) {
-                blocks += currentBlock.toList()
-                currentBlock.clear()
+        for (line in rawText) {
+            if (line.contains(PreprocessingPattern.IF.asComment)) {
+                inPreprocess = true
+                continue
+            }
+            if (line.contains(PreprocessingPattern.ENDIF.asComment)) {
+                inPreprocess = false
+                continue
+            }
+            if (line.contains(PreprocessingPattern.DOLLAR_DOLLAR.asComment)) {
+                continue
+            }
+            if (inPreprocess) {
+                linesToIgnore.add(line)
             }
         }
 
-        for (rawLine in importList.text.lines()) {
-            val line = rawLine.trim()
-            when {
-                line.contains(PreprocessingPattern.IF.asComment) -> {
-                    flushCurrentBlock()
-                    inIfBlock = true
-                }
-                line.contains(PreprocessingPattern.ENDIF.asComment) -> {
-                    flushCurrentBlock()
-                    inIfBlock = false
-                }
-                line.contains(PreprocessingPattern.ELSE.asComment) || line.contains(PreprocessingPattern.ELSEIF.asComment) -> {
-                    flushCurrentBlock()
-                    require(inIfBlock) { "Found #else or #elseif without a preceding #if" }
-                }
-                line.startsWith("//~") || line.startsWith("//#") -> {
-                    flushCurrentBlock()
-                    nextImportIsStandalone = true
-                }
-                line.startsWith("import ") -> {
-                    val import = imports.removeFirst()
+        val originalImports = rawText.filter { !it.containsPreprocessingPattern() && !linesToIgnore.contains(it) }
+        val formattedOriginal = originalImports.joinToString("\n") { it }
 
-                    when {
-                        inIfBlock -> {
-                            currentBlock += import
-                        }
-                        nextImportIsStandalone -> {
-                            blocks += listOf(import)
-                            nextImportIsStandalone = false
-                        }
-                        else -> {
-                            currentBlock += import
-                        }
-                    }
-                }
+        val expectedImports = imports.sortedWith(ImportOrdering.getOrdering()).map { "import ${it.importPath}" }
+        val formattedExpected = expectedImports.filter { !linesToIgnore.contains(it) }.joinToString("\n")
 
-                line.isBlank() -> flushCurrentBlock()
-            }
-        }
-        flushCurrentBlock()
-        return blocks
-    }
-
-    private fun checkEmptyLines(importList: KtImportList): KtImportDirective? {
-        val rawLines = importList.text.lines()
-        val imports = importList.imports.iterator()
-
-        var inStandardBlock = false
-        var seenEmptyLine = false
-
-        for (line in rawLines) {
-            val trimmed = line.trim()
-            when {
-                trimmed.startsWith("import ") -> {
-                    val current = imports.next()
-                    if (inStandardBlock && seenEmptyLine) return current
-                    inStandardBlock = true
-                    seenEmptyLine = false
-                }
-                trimmed.isBlank() -> if (inStandardBlock) seenEmptyLine = true
-                // Any other line (preprocessor/comment) resets the block state
-                else -> {
-                    inStandardBlock = false
-                    seenEmptyLine = false
-                }
-            }
-        }
-        return null
-    }
-
-    private fun checkSorting(blocks: List<List<KtImportDirective>>): KtImportDirective? {
-        for (block in blocks) {
-            val sortedBlock = block.sortedWith(ImportOrdering.getOrdering())
-            for (i in block.indices) {
-                if (block[i].importPath != sortedBlock[i].importPath) {
-                    return block[i]
-                }
-            }
-        }
-        return null
+        return formattedOriginal == formattedExpected
     }
 
     override fun visitImportList(importList: KtImportList) {
-        val blocks = getBlocks(importList)
-
-        val sortingViolation = checkSorting(blocks)
-        if (sortingViolation != null) {
-            sortingViolation.reportIssue("Import is not in lexicographical order.")
+        val rawText = importList.text.trim()
+        if (rawText.isBlank()) {
             return
         }
 
-        val emptyLineViolation = checkEmptyLines(importList)
-        if (emptyLineViolation != null) {
-            emptyLineViolation.reportIssue("Illegal empty line before this import.")
-            return
-        }
+        val importsCorrect = isImportsCorrectlyOrdered(importList.imports, rawText.lines())
 
+        if (!importsCorrect) {
+            importList.reportIssue(
+                "Imports must be ordered in lexicographic order without any empty lines in-between " +
+                    "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
+                    "pre-processed imports.",
+            )
+        }
         super.visitImportList(importList)
     }
 }
