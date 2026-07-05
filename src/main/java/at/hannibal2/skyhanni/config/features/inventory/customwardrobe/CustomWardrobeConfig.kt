@@ -67,12 +67,12 @@ class CustomWardrobeConfig {
     @Expose
     @ConfigOption(name = "Colors", desc = "Change the color settings.")
     @Accordion
-    var color: ColorConfig = ColorConfig()
+    val color: ColorConfig = ColorConfig()
 
     @Expose
     @ConfigOption(name = "Spacing", desc = "")
     @Accordion
-    var spacing: SpacingConfig = SpacingConfig()
+    val spacing: SpacingConfig = SpacingConfig()
 
     @Expose
     @ConfigOption(name = "Keybinds", desc = "")
