@@ -517,6 +517,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
     @ConfigEditorBoolean
+    @SearchTag("century cake slice")
     @FeatureToggle
     var giftCleanDisplay: Boolean = false
 }
