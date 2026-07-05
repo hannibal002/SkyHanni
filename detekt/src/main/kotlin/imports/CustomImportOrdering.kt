@@ -11,100 +11,106 @@ import org.jetbrains.kotlin.psi.KtImportList
  */
 class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
-    private fun isLineBlockSeparator(line: String): Boolean {
-        val trimmed = line.trim()
-        // Supports custom patterns as well as standard Stonecutter & preprocessor directives
-        return trimmed.containsPreprocessingPattern() ||
-            trimmed.startsWith("//?") ||
-            trimmed.startsWith("//~") ||
-            trimmed.startsWith("//#")
+    private fun String.isLineBlockSeparator(): Boolean {
+        if (this.isEmpty()) return true
+
+        return this.containsPreprocessingPattern() ||
+            this.startsWith("//?") ||
+            this.startsWith("//~") ||
+            this.startsWith("//#")
     }
 
-    private fun isImportsCorrectlyOrdered(imports: List<KtImportDirective>, rawText: List<String>): Boolean {
-        // 1. Group contiguous imports into logical blocks
-        val blocks = mutableListOf<List<String>>()
-        var currentBlock = mutableListOf<String>()
+    private fun String.isImportLine(): Boolean {
+        return this.startsWith("import ")
+    }
 
-        for (line in rawText) {
-            val trimmed = line.trim()
+    private fun getBlocks(importList: KtImportList): List<List<KtImportDirective>> {
+        val blocks = mutableListOf<MutableList<KtImportDirective>>()
+        val rawLines = importList.text.lines()
+        val imports = importList.imports.toMutableList()
 
-            // A preprocessor comment or an empty line safely terminates the current block
-            if (trimmed.isEmpty() || isLineBlockSeparator(line)) {
+        var currentBlock = mutableListOf<KtImportDirective>()
+
+        for (rawLine in rawLines) {
+            val line = rawLine.trim()
+
+            if (line.isLineBlockSeparator()) {
                 if (currentBlock.isNotEmpty()) {
                     blocks.add(currentBlock)
                     currentBlock = mutableListOf()
                 }
-            } else if (trimmed.startsWith("import ")) {
-                currentBlock.add(line)
+            } else if (line.isImportLine()) {
+                if (imports.isNotEmpty()) {
+                    currentBlock.add(imports.removeAt(0))
+                }
             }
         }
         if (currentBlock.isNotEmpty()) {
             blocks.add(currentBlock)
         }
+        return blocks
+    }
 
-        // 2. Ensure each block is internally lexicographically sorted
-        var importIndex = 0
-        for (blockText in blocks) {
-            val blockImports = mutableListOf<KtImportDirective>()
-            for (i in blockText.indices) {
-                if (importIndex < imports.size) {
-                    blockImports.add(imports[importIndex])
+    private fun checkSorting(blocks: List<List<KtImportDirective>>): KtImportDirective? {
+        for (block in blocks) {
+            val sortedBlock = block.sortedWith(ImportOrdering.getOrdering())
+            for (i in block.indices) {
+                if (block[i].importPath != sortedBlock[i].importPath) {
+                    return block[i]
                 }
-                importIndex++
-            }
-
-            val expectedBlockImports = blockImports
-                .sortedWith(ImportOrdering.getOrdering())
-                .map { "import ${it.importPath}" }
-
-            val formattedOriginal = blockText.joinToString("\n")
-            val formattedExpected = expectedBlockImports.joinToString("\n")
-
-            if (formattedOriginal != formattedExpected) {
-                return false
             }
         }
+        return null
+    }
 
-        // 3. Prevent arbitrary empty lines between standard imports
-        // (Empty lines are only legal if they separate pre-processed blocks)
-        var previousLineWasImport = false
+    private fun checkEmptyLines(importList: KtImportList): KtImportDirective? {
+        val rawLines = importList.text.lines()
+        val imports = importList.imports.iterator()
+
+        var inBlock = false
         var seenEmptyLine = false
 
-        for (line in rawText) {
-            val trimmed = line.trim()
-            if (trimmed.startsWith("import ")) {
-                if (previousLineWasImport && seenEmptyLine) {
-                    return false // Illegal empty line splitting standard imports
+        for (rawLine in rawLines) {
+            val line = rawLine.trim()
+            if (line.startsWith("import ")) {
+                if (!imports.hasNext()) break
+                val current = imports.next()
+
+                // If we hit an import, and we've already seen an empty line
+                // while in a block, this is an illegal break.
+                if (inBlock && seenEmptyLine) {
+                    return current
                 }
-                previousLineWasImport = true
+
+                inBlock = true
                 seenEmptyLine = false
-            } else if (trimmed.isEmpty()) {
-                seenEmptyLine = true
-            } else if (isLineBlockSeparator(line)) {
-                // Hitting a valid separator resets the rule, allowing the prior empty line
-                previousLineWasImport = false
+            } else if (line.isEmpty()) {
+                if (inBlock) seenEmptyLine = true
+            } else if (line.isLineBlockSeparator()) {
+                // Preprocessor separators reset the block, so empty lines before them
+                // were valid boundaries.
+                inBlock = false
                 seenEmptyLine = false
             }
         }
-
-        return true
+        return null
     }
 
     override fun visitImportList(importList: KtImportList) {
-        val rawText = importList.text.trim()
-        if (rawText.isBlank()) {
+        val blocks = getBlocks(importList)
+
+        val sortingViolation = checkSorting(blocks)
+        if (sortingViolation != null) {
+            sortingViolation.reportIssue("Import is not in lexicographical order.")
             return
         }
 
-        val importsCorrect = isImportsCorrectlyOrdered(importList.imports, rawText.lines())
-
-        if (!importsCorrect) {
-            importList.reportIssue(
-                "Imports must be ordered in lexicographic order without any empty lines in-between " +
-                    "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
-                    "pre-processed imports.",
-            )
+        val emptyLineViolation = checkEmptyLines(importList)
+        if (emptyLineViolation != null) {
+            emptyLineViolation.reportIssue("Illegal empty line between standard imports.")
+            return
         }
+
         super.visitImportList(importList)
     }
 }
