@@ -1,0 +1,82 @@
+name: Build Review
+
+on:
+    workflow_run:
+        workflows: [ "Build" ]
+        types: [ completed ]
+
+concurrency:
+    group: build-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+    cancel-in-progress: true
+
+permissions:
+    issues: write
+    pull-requests: write
+    actions: read
+
+jobs:
+    review:
+        name: Post build failure comment
+        runs-on: ubuntu-latest
+        if: github.event.workflow_run.event == 'pull_request'
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+
+            -   name: Download build failure artifact (1.21.11)
+                id: download_1
+                uses: actions/download-artifact@v8
+                with:
+                    name: build-failure-output-1.21.11
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/build-failure-1.21.11/
+                continue-on-error: true
+
+            -   name: Download build failure artifact (26.1)
+                id: download_2
+                uses: actions/download-artifact@v8
+                with:
+                    name: build-failure-output-26.1
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/build-failure-26.1/
+                continue-on-error: true
+
+            -   name: Resolve PR number
+                id: pr
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    HEAD_REPO: ${{ github.event.workflow_run.head_repository.full_name }}
+                    HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+                    TARGET_REPO: ${{ github.repository }}
+                run: |
+                    PR_NUMBER=$(gh api --paginate "repos/$TARGET_REPO/pulls?state=open" \
+                    | jq -s --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
+                    'add | map(select(.head.repo.full_name == $repo and .head.ref == $branch)) | .[0].number // empty')
+                    echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+
+            -   name: Cache Kotlin compiler
+                uses: actions/cache@v6
+                with:
+                    path: ~/kotlinc
+                    key: kotlin-2.4.0
+
+            -   name: Set up Kotlin
+                run: |
+                    if [ ! -d "$HOME/kotlinc" ]; then
+                        curl -sLO "https://github.com/JetBrains/kotlin/releases/download/v2.4.0/kotlin-compiler-2.4.0.zip"
+                        unzip -q kotlin-compiler-2.4.0.zip -d "$HOME"
+                    fi
+                    echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
+
+            -   name: Post build failure comment
+                if: steps.pr.outputs.number != ''
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                    PR_NUMBER: ${{ steps.pr.outputs.number }}
+                    ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-1.21.11
+                    ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.1
+                    MODE: build
+                run: kotlinc -script .github/scripts/post_pr_review.main.kts
