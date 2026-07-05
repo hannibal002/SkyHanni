@@ -1,14 +1,13 @@
-# Execution context: base branch code, called by Detekt workflow
-name: Detekt Review
+# Execution context: base branch code, called by Build workflow
+name: Build Review
 
 on:
     workflow_run:
-        workflows: [ "Detekt" ]
+        workflows: [ "Build" ]
         types: [ completed ]
 
-
 concurrency:
-    group: detekt-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+    group: build-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
     cancel-in-progress: true
 
 permissions:
@@ -18,21 +17,31 @@ permissions:
 
 jobs:
     review:
-        name: Post Detekt review
+        name: Post build failure comment
         runs-on: ubuntu-latest
         if: github.event.workflow_run.event == 'pull_request'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7
 
-            -   name: Download detekt artifact
-                id: download
+            -   name: Download build failure artifact (1.21.11)
+                id: download_1
                 uses: actions/download-artifact@v8
                 with:
-                    name: detekt-output
+                    name: build-failure-output-1.21.11
                     run-id: ${{ github.event.workflow_run.id }}
                     github-token: ${{ secrets.GITHUB_TOKEN }}
-                    path: ${{ runner.temp }}/detekt-artifact/
+                    path: ${{ runner.temp }}/build-failure-1.21.11/
+                continue-on-error: true
+
+            -   name: Download build failure artifact (26.1)
+                id: download_2
+                uses: actions/download-artifact@v8
+                with:
+                    name: build-failure-output-26.1
+                    run-id: ${{ github.event.workflow_run.id }}
+                    github-token: ${{ secrets.GITHUB_TOKEN }}
+                    path: ${{ runner.temp }}/build-failure-26.1/
                 continue-on-error: true
 
             -   name: Resolve PR number
@@ -62,12 +71,13 @@ jobs:
                     fi
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
-            -   name: Post review and manage label
-                if: steps.pr.outputs.number != '' && steps.download.outcome == 'success'
+            -   name: Post build failure comment
+                if: steps.pr.outputs.number != ''
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
-                    ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
-                    MODE: detekt
+                    ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-1.21.11
+                    ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.1
+                    MODE: build
                 run: kotlinc -script .github/scripts/post_pr_review.main.kts
