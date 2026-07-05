@@ -98,6 +98,11 @@ class FishingConfig {
     val cocoonSettings: FishingCocoonConfig = FishingCocoonConfig()
 
     @Expose
+    @ConfigOption(name = "Common Sea Creature Hider", desc = "")
+    @Accordion
+    val commonSeaCreatureHider: CommonSeaCreatureHiderConfig = CommonSeaCreatureHiderConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
