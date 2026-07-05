@@ -19,7 +19,7 @@ jobs:
     review:
         name: Post build failure comment
         runs-on: ubuntu-latest
-        if: github.event.workflow_run.event == 'pull_request'
+        if: github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'push'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7
