@@ -390,14 +390,15 @@ object PetStorageApi {
             updateCurrentPetHeldItem(petHeldItem)
         }
 
-        PetStoragePatterns.autoPetMessagePattern.matchStyledMatcher(event.chatComponent) {
+        PetStoragePatterns.autoPetMessagePattern.matchMatcher(event.message.removeResets()) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
-            val (petName, rarity) = petNameAndRarityOrNull() ?: return
-            val level = matcher.group("level").toInt()
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: return@matchMatcher
+            val petName = group("pet").trim()
+            val level = group("level").toInt()
             val petInternalName = PetUtils.petWithRarityToInternalName(petName, rarity)
-            val petSkin = getPetSkinOrNull(petInternalName)
-            val petSkinTag = getPetSkinTagOrNull()
+            val petSkinTag = groupOrNull("skin")?.replace(" ", "")
+            val petSkin = petSkinTag?.let { PetUtils.findPetSkinOrNull(petInternalName, it) }
 
             val hoverInfoComponents = event.chatComponent.hoverTextComponents()
             val hoverInfo = hoverInfoComponents.toColorlessText()
@@ -701,7 +702,7 @@ object PetStorageApi {
         this.skinTag == skinTag
 
     fun isAutopetMessage(message: String): Boolean =
-        PetStoragePatterns.autoPetMessagePattern.matches(message.removeColor().removeResets())
+        PetStoragePatterns.autoPetMessageColorlessPattern.matches(message.removeColor().removeResets())
 
     fun markDirty() {
         jsonNeedsSave = true
