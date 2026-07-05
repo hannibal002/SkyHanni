@@ -242,8 +242,13 @@ dependencies {
     runtimeOnly(target.hypixelModApiFabricVersion)
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    "minecraftTestClientRuntimeLibraries"(libs.roughlyenoughitems) {
+    val roughlyEnoughItemsVersion = when (target) {
+        ProjectTarget.MODERN_26200 -> "26.2.820"
+        ProjectTarget.MODERN_26100 -> libs.versions.roughlyenoughitems.get()
+    }
+    val roughlyEnoughItemsApi = "me.shedaniel:RoughlyEnoughItems-api-fabric:$roughlyEnoughItemsVersion"
+    compileOnly(roughlyEnoughItemsApi) { exclude(group = "net.fabricmc.fabric-api") }
+    "minecraftTestClientRuntimeLibraries"(roughlyEnoughItemsApi) {
         exclude(group = "net.fabricmc")
         exclude(group = "net.fabricmc.fabric-api")
     }
