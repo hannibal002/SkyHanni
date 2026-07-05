@@ -33,6 +33,7 @@ import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
+import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
@@ -943,10 +944,7 @@ object WorldRenderUtils {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
             listOf(
-                this.exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle
-                    .toLorenzVec()
-                    /* .rotateXZ(-Math.PI / 72.0) */
-                    .times(2),
+                exactPlayerCrosshairLocation(),
             )
         } else {
             emptyList()
@@ -1077,8 +1075,10 @@ object WorldRenderUtils {
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
-        exactPlayerEyeLocation() + MinecraftCompat.localPlayer.lookAngle.toLorenzVec().times(2)
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
+        val look = Vector3f(0f, 0f, -1f).rotate(cameraState.orientation)
+        return cameraState.pos.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
+    }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox

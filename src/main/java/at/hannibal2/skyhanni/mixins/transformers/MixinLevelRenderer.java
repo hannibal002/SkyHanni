@@ -78,6 +78,38 @@ public abstract class MixinLevelRenderer {
         skyhanni$currentDeltaTracker = deltaTracker;
     }
 
+    //? if >= 26.2 {
+    @Inject(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;"
+        )
+    )
+    private void postRenderWorldBeforePrepareFeatures(
+        GraphicsResourceAllocator resourceAllocator,
+        DeltaTracker deltaTracker,
+        boolean renderOutline,
+        CameraRenderState cameraState,
+        Matrix4fc modelViewMatrix,
+        GpuBufferSlice terrainFog,
+        Vector4f fogColor,
+        boolean shouldRenderSky,
+        CallbackInfo ci
+    ) {
+        SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
+            new PoseStack(),
+            cameraState,
+            submitNodeStorage,
+            deltaTracker.getGameTimeDeltaPartialTick(true),
+            true
+        );
+        event.post();
+    }
+    //?}
+
+    //? if < 26.2 {
+    /*
     @WrapOperation(
         method = "lambda$addMainPass$0",
         slice = @Slice(
@@ -113,6 +145,7 @@ public abstract class MixinLevelRenderer {
         );
         event.post();
     }
+    *///?}
 
     @Inject(
         method = "lambda$addMainPass$0",
