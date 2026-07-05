@@ -24,9 +24,9 @@ object DonExpressoFeedingReminder {
      */
     private val fullPattern by patternGroup.pattern(
         "full",
-        "\\[NPC] Don Expresso: I DON'T FEEL SO GOOD\\.\\.\\."
+        "\\[NPC] Don Expresso: I DON'T FEEL SO GOOD\\.\\.\\.",
     )
-    
+
     private val TASTY_MITHRIL = "MITHRIL_GOURMAND".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
