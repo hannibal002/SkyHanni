@@ -266,8 +266,8 @@ object RemainingSlayerKills {
     }
 
     /**
-    According to the Independent Wiki Stacking Enchants (Toxo/Champ) Are Additive with the Pet Bonuses but nothing else.
-    https://hypixelskyblock.minecraft.wiki/w/Combat_Wisdom#Notes
+     * According to the Independent Wiki Stacking Enchants (Toxo/Champ) Are Additive with the Pet Bonuses but nothing else.
+     * https://hypixelskyblock.minecraft.wiki/w/Combat_Wisdom#Notes
      */
     private fun getAdditivelyMultiplicativeValues(): Double {
 
