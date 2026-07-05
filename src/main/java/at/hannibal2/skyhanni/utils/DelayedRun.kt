@@ -10,7 +10,7 @@ import kotlin.time.Duration
 
 // TODO add names for runs
 @SkyHanniModule
-object DelayedRun{
+object DelayedRun {
 
 //     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
@@ -33,12 +33,12 @@ object DelayedRun{
     /**
      * Runs in the next game tick (up to 50ms delay), always on the main thread.
      */
-    fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
+    fun runNextTick(run: () -> Unit) =  Minecraft.getInstance().schedule(run)
 
     /**
      * I'm not sure why, but this acts different to the above one
      */
-    fun runNextTickOld(run: () -> Unit) = futureTasks.add(run to SimpleTimeMark.farPast())
+    fun runNextTickOld(run: () -> Unit) =  futureTasks.add(run to SimpleTimeMark.farPast())
 
     /**
      * Runs now if we are on the main thread, otherwise queues it for the next tick.
@@ -49,8 +49,7 @@ object DelayedRun{
     fun onTick() {
         tasks.removeIf { (runnable, time) ->
             val inPast = time.isInPast()
-            if (inPast) {
-                try {
+            if (inPast) { try {
                     runnable()
                 } catch (e: Exception) {
                     ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing: ${e.message}")
