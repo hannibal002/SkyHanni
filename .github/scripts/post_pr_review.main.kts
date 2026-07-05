@@ -75,7 +75,7 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
         if (status.isHttpError) System.err.println("Warning: could not add $label label (HTTP $status)")
     } else {
-        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8)
+        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8).replace("+", "%20")
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
         if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
