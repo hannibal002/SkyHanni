@@ -122,6 +122,7 @@
   + This is just to make sure we have the highest possible particle quality just in case.
 + Improved Bingo event time detection by fetching from the Hypixel API, supporting Extreme and Secret Bingos. - Luna (https://github.com/hannibal002/SkyHanni/pull/5508)
 + Added per-mob toggles to rare Diana mobs in waypoint sharing. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5501)
++ Improved Gift Clean Display to also apply to Century Cake Slices. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/5989)
 
 #### Farming
 
@@ -172,6 +173,8 @@
 + Added mineshaft types to /shtestisland. - Rain. (https://github.com/hannibal002/SkyHanni/pull/5625)
 + Enabled Better Wiki for everyone. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5893)
 + Added search tags to Improved SkyBlock Menus option to make it easier to find. - Luna (https://github.com/hannibal002/SkyHanni/pull/5930)
++ Improved island detection for better performance. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5951)
++ Improved scrolling in the /shwords editor: faster and smoother. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
 
 #### Garden
 
@@ -192,6 +195,7 @@
 + Added Tel Kar Garden Visitor to Dialoge Showing Exception list. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5850)
 + Added Lock Mouse when snapping to Squeaky Mousemat. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5939)
 + Added Reduce Sensitivity with Sun's Grasp active. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5939)
++ Improved Garden Shopping List to ignore any Visitor. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5661)
 
 #### Combat
 
@@ -210,6 +214,8 @@
 #### Inventory
 
 + Added support for Turbo-Crop VI and VII in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5666)
++ Added a `/shresetdrystreak` command to reset the Experimentation Table's dry-streak counter. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
++ Added a manual reset button for the Experimentation Table's Dry-Streak Display. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 
 #### Fishing
 
@@ -317,6 +323,7 @@
 + Fixed error with SkyBlock Profile Viewer for players that have no selected Crimson Isle faction. - Luna (https://github.com/hannibal002/SkyHanni/pull/5593)
 + Fixed Slayer Boss warning title never appearing. - iLLuMiiNaTy (https://github.com/hannibal002/SkyHanni/pull/5838)
 + Fixed Custom Wardrobe appearing off-screen at high GUI scales. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5926)
++ Fixed some GUI features incorrectly detecting two objects as being hovered at once. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
 
 #### Item Ability
 
@@ -408,6 +415,9 @@
 + Fixed some HUD overlays moving or resizing when opening inventories with a separate inventory GUI scale. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5851)
 + Fixed Improved SkyBlock Menus treating all black stained glass pane items as filler menu items. - Luna (https://github.com/hannibal002/SkyHanni/pull/5930)
 + Fixed Stacking Enchant Progress always displaying progress out of 0. - BonkersTurnip (https://github.com/hannibal002/SkyHanni/pull/5800)
++ Fixed a very important typo in the ULTRA-RARE Book alert feature. - Stella (https://github.com/hannibal002/SkyHanni/pull/5986)
++ Fixed the Experimentation Table dry-streak tracker not resetting when finding a non-book Ultra-Rare item (e.g. Severed Pincer or End Stone Idol). - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
++ Reduced the number of random errors happening in inventories. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5977)
 
 #### Misc
 
@@ -506,6 +516,10 @@
 + Fixed Notice Me Senpai Achievement description. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5947)
 + Fixed memory leaks caused by caches keeping unused objects alive. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5934)
 + Fixed Trevor highlight & cooldown status above Trevor not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5891)
++ Fixed memory leak and out-of-memory errors caused by the item cache never getting cleared on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5971)
++ Fixed rare IllegalStateException in ServerBlockChangeEvent errors when joining Hypixel or switching lobbies. - Luna (https://github.com/hannibal002/SkyHanni/pull/5979)
++ Fixed SkyHanni causing the game to freeze for multiple seconds on the Loading Terrain screen on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5971)
+    + This would mainly happen the first time you joined a world (e.g. by connecting to Hypixel) after a game restart, but could also happen later.
 
 #### Commands
 
@@ -804,6 +818,17 @@
 + Removed dead code, fixed KDoc formatting, and removed unused imports. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5972)
 + Replaced deprecated `formattedTextCompatLessResets()` with `Component.string` in `TrevorFeatures`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5972)
 + Reworked Glacite Mineshaft corpse finding logic. - Piggered & hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5916)
++ Added `detekt-review.yml` workflow to post Detekt findings as inline PR review comments. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5905)
+    + Used a workflow_run two-workflow split so fork PRs are handled securely without running fork-controlled code with write permissions.
+    + Managed a "Detekt" label on the PR based on whether violations are found.
++ Added `post_detekt_review.main.kts` Kotlin script for parsing SARIF output and calling the GitHub review API. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5905)
++ Bumped Kotlin version to 2.4.0. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5959)
++ Fixed REI transitive dependencies not being properly excluded, leading to a bunch of log spam at compile time from Loom remap warnings. - Luna (https://github.com/hannibal002/SkyHanni/pull/5940)
++ Resolved all compilation warnings. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5940)
++ Suppressed deprecation warnings in build process. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5940)
++ Updated `detekt.yml` to save the SARIF output as a workflow artifact. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5905)
++ Updated INSTALLING.md with installation instructions for modern Fabric-based Minecraft versions. - protocol4 (https://github.com/hannibal002/SkyHanni/pull/5984)
+
 
 ### Removed Features
 
@@ -812,6 +837,8 @@
 + Removed /shtrackcollection. - Luna (https://github.com/hannibal002/SkyHanni/pull/5764)
   + This feature has been bugged and unmaintained for a really long time.
   + If you think you can do better, feel free to open a pull request.
++ Removed the toggle of ignoring Spaceman in the Shopping List. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5661)
+    + Can now be done by clicking on the Visitor name in the Shopping List.
 
 ## Version 7.0.0
 

@@ -110,7 +110,7 @@ object GardenVisitorChat {
      * Determines if a chat message should be hidden.
      * Hides messages from visitors but keeps messages from permanent NPCs like Jacob.
      */
-    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+    private fun hideVisitorMessage(message: String): Boolean = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 
