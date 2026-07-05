@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.changeColor
+import at.hannibal2.skyhanni.utils.compat.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -258,7 +259,7 @@ object PlayerNameFormatter {
         removeColor: String,
         rankColor: String,
     ): ComponentSpan {
-        val style = name.sampleStyleAtStart() ?: error("style is null")
+        val style = name.sampleStyleAtStart().takeUnlessEmpty() ?: error("style is empty")
         return when {
             MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
                 (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
