@@ -28,6 +28,7 @@ object HotmAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (AchievementManager.isCompleted(PICKAXE_ABILITY_ACHIEVEMENT)) return
         if (!hotmDetector.isInside()) return
         var count = 0
         for (ability in HotmData.abilities) {

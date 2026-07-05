@@ -8,7 +8,7 @@ import kotlin.reflect.KProperty
  * @param shares declares if the sub key space is allowed to be used by other [RepoPatternKeyOwner]
  * @param parent the [RepoPatternKeyOwner] that gives the permission to use a sub key from it sub key space that is locked, as [shares] is false for that[RepoPatternKeyOwner]
  * @param transient declares if it is just a ghost how can be replaced at any time in the [RepoPatternManager.exclusivity]
- * */
+ */
 data class RepoPatternKeyOwner(
     val ownerClass: Class<*>?,
     val property: KProperty<*>?,

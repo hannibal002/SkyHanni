@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.renderables.container
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -9,7 +10,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
-import net.minecraft.world.item.ItemStack
 import kotlin.math.ceil
 
 object RenderableInventory {
@@ -81,7 +81,7 @@ object RenderableInventory {
     }
 
     fun Renderable.Companion.fakeInventory(
-        items: List<ItemStack?>,
+        items: List<SafeItemStack?>,
         maxRowSize: Int,
         scale: Double,
         horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,

@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDrillUpgrades
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
@@ -30,7 +30,7 @@ object HotmApi {
 
     private val blueGoblinEgg = "GOBLIN_OMELETTE_BLUE_CHEESE".toInternalName()
 
-    private val blueEggCache = TimeLimitedCache<ItemStack, Boolean>(10.0.seconds)
+    private val blueEggCache = TimeLimitedCache<SafeItemStack, Boolean>(10.0.seconds, useWeakKeys = true)
     val isBlueEggActive
         get() = InventoryUtils.getItemInHand()?.let {
             blueEggCache.getOrPut(it) {
@@ -109,8 +109,8 @@ object HotmApi {
 
     enum class SkymallPerk(
         override val perkDescription: String,
-        @Language("RegExp") val chatFallback: String,
-        @Language("RegExp") val itemFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
             perkDescription = "§6+100⸕ Mining Speed",
@@ -150,7 +150,7 @@ object HotmApi {
     }
 
     enum class MayhemPerk(
-        @Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
     ) {
         SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
         MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),

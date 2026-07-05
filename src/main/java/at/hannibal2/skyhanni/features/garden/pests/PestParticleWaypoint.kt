@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -44,7 +44,7 @@ object PestParticleWaypoint {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !PestApi.hasVacuumInHand()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (PlayerUtils.isSneaking()) return
         reset()
         lastPestTrackerUse = SimpleTimeMark.now()
@@ -68,18 +68,9 @@ object PestParticleWaypoint {
         if (config.hideParticles) event.cancel()
 
         lastParticle = SimpleTimeMark.now()
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            if (pos.distance(LocationUtils.playerLocation()) > 5) return
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-        bezierFitter.addPoint(pos)
+        val emptyCondition: (LorenzVec) -> Boolean = { it.distance(LocationUtils.playerLocation()) > 5 }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, emptyCondition = emptyCondition)) return
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved

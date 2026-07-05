@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotxTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -26,11 +25,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 import java.util.regex.Matcher
 import kotlin.math.pow
 
@@ -414,7 +413,7 @@ enum class HotmData(
 
     override var slot: Slot? = null
 
-    override var item: ItemStack? = null
+    override var item: SafeItemStack? = null
 
     override val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
@@ -522,7 +521,7 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:   §8- §54 Token of the Mountain
+         * WRAPPED-REGEX-TEST: "  §8- §54 Token of the Mountain"
          */
         override val resetTokensPattern by patternGroup.pattern(
             "inventory.reset.token",
@@ -535,8 +534,8 @@ enum class HotmData(
         )
 
         /**
-         * REGEX-TEST:  Mithril: 99,918
-         * REGEX-TEST:  Gemstone: 37,670
+         * WRAPPED-REGEX-TEST: " Mithril: 99,918"
+         * WRAPPED-REGEX-TEST: " Gemstone: 37,670"
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder-nocolor",
@@ -669,14 +668,14 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onIslandChange(event: IslandChangeEvent) {
+        fun onIslandChange() {
             if (HotmApi.mineshaftMayhem == null) return
             HotmApi.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
         @HandleEvent
-        fun onDebug(event: DebugDataCollectEvent) {
+        fun onDebugDataCollect(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
