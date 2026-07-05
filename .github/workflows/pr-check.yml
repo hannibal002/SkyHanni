@@ -22,7 +22,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.sha }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace
+            -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
@@ -35,7 +35,7 @@ jobs:
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry
+                uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: checkPrDescription
             -   name: Run ChangeLog verification w/retry

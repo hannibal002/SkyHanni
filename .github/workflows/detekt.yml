@@ -31,14 +31,14 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace
+            -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry
+                uses: ./.github/actions/gradle-retry
                 continue-on-error: true
                 with:
                     gradle-command: detektMain --stacktrace
