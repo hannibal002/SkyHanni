@@ -145,9 +145,11 @@ fun getCommentBody(commentId: Long): String? {
 fun markCommentAsStale(commentId: Long) {
     val oldBody = getCommentBody(commentId) ?: error("Error: comment body was null for comment $commentId, aborting")
     val staleBody = buildString {
-        appendLine("<details><summary>⚠️  Outdated — superseded by newer comment</summary>")
+        appendLine(staleMarker)
+        appendLine("### Outdated Detekt issues")
+        appendLine("<details><summary>Click here to show old findings</summary>")
         appendLine()
-        appendLine(oldBody.replace(marker, staleMarker))
+        appendLine(oldBody.replace(marker, ""))
         appendLine()
         append("</details>")
     }
