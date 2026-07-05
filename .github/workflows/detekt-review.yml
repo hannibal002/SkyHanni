@@ -1,3 +1,4 @@
+# Execution context: base branch code, called by Detekt workflow
 name: Detekt Review
 
 on:
