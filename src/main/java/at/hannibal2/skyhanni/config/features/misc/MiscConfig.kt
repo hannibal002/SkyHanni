@@ -520,6 +520,15 @@ class MiscConfig {
     var achievementMessages: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Mute Stereo Pants",
+        desc = "Mutes music played by Stereo Pants."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteStereoPants: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
     @SearchTag("century cake slice")
     @ConfigEditorBoolean
