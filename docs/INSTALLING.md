@@ -27,7 +27,7 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 > **4: Add SkyHanni**
 > 1. Right-click your new instance and select **Edit**.
 > 2. Select **Mods** category and click on **Download Mods** - this searches Modrinth's catalog directly inside Prism.
-> 3. Under Modrinth, Search for **SkyHanni** and click it to add it straight to your instance.
+> 3. Under Modrinth, search for **SkyHanni** and click it to add it straight to your instance.
 > 4. You can add many other mods the same way.
 
 > **5: Setup RAM**
@@ -53,9 +53,9 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 > - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
 > - [Hypixel Mod API](https://modrinth.com/mod/hypixel-mod-api)
 
-> **4: Download SkyHanni** 
-> SkyHanni official downloads:
-> - [Github](https://github.com/hannibal002/SkyHanni/releases).
+> **4: Download SkyHanni**
+> SkyHanni Official Downloads:
+> - [GitHub](https://github.com/hannibal002/SkyHanni/releases).
 > - [Modrinth](https://modrinth.com/mod/skyhanni/).
 
 
@@ -87,7 +87,7 @@ Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one i
 The Modrinth App can install Fabric and mods directly from Modrinth's own catalog.
 
 > **2: Install the Modrinth App**
-> Download it from the [official Modrinth site](https://modrinth.com/app).
+> Download it from the [Official Modrinth website](https://modrinth.com/app).
 
 > **3: Create a new instance**
 > 1. Click **Create Instance**.
@@ -97,13 +97,13 @@ The Modrinth App can install Fabric and mods directly from Modrinth's own catalo
 
 > **4: Add SkyHanni**
 > 1. Open the instance and go to the **Mods** tab.
-> 2. Click **Add content**, search for **SkyHanni**, and add it.
+> 2. Click **Add Content**, search for **SkyHanni**, and add it.
 
 
 > **5: Setup RAM**
 > 1. Click your instance to open its page, then click **Settings** on the left.
 > 2. Select the **Java** tab.
-> 3. Toggle **Override global settings** to ON and set **Maximum memory allocation** to at least **4096 MB** (4GB).
+> 3. Toggle **Override global settings** to ON and set **Maximum Memory Allocation** to at least **4096 MB** (4GB).
 
 > **6: Launch**
 > Click the instance, then press **Play**.
