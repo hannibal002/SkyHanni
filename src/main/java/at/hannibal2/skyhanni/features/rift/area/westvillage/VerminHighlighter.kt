@@ -29,8 +29,8 @@ object VerminHighlighter {
     private val config get() = RiftApi.config.area.westVillage.verminHighlight
 
     private val TURBOMAX_VACUUM = "TURBOMAX_VACUUM".toInternalName()
-    private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
-    private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
+    private val VERMIN_FLY_TEXTURE by SkullTextureHolder.texture("VERMIN_FLY")
+    private val VERMIN_SPIDER_TEXTURE by SkullTextureHolder.texture("VERMIN_SPIDER")
 
     @HandleEvent
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {

@@ -25,7 +25,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null) {
         invokeLog.invokeCount++
-        if (this.listeners.isEmpty()) return
+        if (listeners.isEmpty()) return
 
         if (SkyHanniEvents.isDisabledHandler(name)) return
 

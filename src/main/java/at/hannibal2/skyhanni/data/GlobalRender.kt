@@ -40,7 +40,7 @@ object GlobalRender {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Global Render")
         if (enabled) {
             event.addIrrelevant("normal enabled")
