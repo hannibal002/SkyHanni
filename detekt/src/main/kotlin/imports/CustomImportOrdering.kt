@@ -65,6 +65,33 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
         return blocks
     }
 
+    private fun checkEmptyLines(importList: KtImportList): KtImportDirective? {
+        val rawLines = importList.text.lines()
+        val imports = importList.imports.iterator()
+
+        var inStandardBlock = false
+        var seenEmptyLine = false
+
+        for (line in rawLines) {
+            val trimmed = line.trim()
+            when {
+                trimmed.startsWith("import ") -> {
+                    val current = imports.next()
+                    if (inStandardBlock && seenEmptyLine) return current
+                    inStandardBlock = true
+                    seenEmptyLine = false
+                }
+                trimmed.isBlank() -> if (inStandardBlock) seenEmptyLine = true
+                // Any other line (preprocessor/comment) resets the block state
+                else -> {
+                    inStandardBlock = false
+                    seenEmptyLine = false
+                }
+            }
+        }
+        return null
+    }
+
     private fun checkSorting(blocks: List<List<KtImportDirective>>): KtImportDirective? {
         for (block in blocks) {
             val sortedBlock = block.sortedWith(ImportOrdering.getOrdering())
@@ -83,6 +110,11 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
         val sortingViolation = checkSorting(blocks)
         if (sortingViolation != null) {
             sortingViolation.reportIssue("Import is not in lexicographical order.")
+            return
+        }
+
+        if (checkEmptyLines(importList) != null) {
+            importList.imports.first().reportIssue("There should be no empty lines between imports.")
             return
         }
 
