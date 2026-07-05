@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils.skyhanniCreated
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
-import net.minecraft.client.GuiMessageTag
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
@@ -19,13 +22,17 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
-import net.minecraft.world.item.ItemStack
 import java.net.URI
 import java.util.Optional
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
+
+//? if >= 26.1 {
+import net.minecraft.world.item.ItemStackTemplate
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
 
@@ -53,6 +60,7 @@ private enum class FormattedTextSettings {
 
 private data class TextCacheKey(val settings: FormattedTextSettings, val component: Component)
 
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextForChatCompat(): String {
     return unformattedTextCache.getOrPut(this) {
         computeUnformattedTextCompat()
@@ -66,17 +74,12 @@ private fun Component.computeUnformattedTextCompat(): String {
     return (this.contents as? PlainTextContents)?.text().orEmpty()
 }
 
+@Deprecated("Use string unless you really need color codes")
 fun Component.unformattedTextCompat(): String =
     iterator().joinToString(separator = "") { it.unformattedTextForChatCompat() }
 
-// has to be a separate function for pattern mappings
-fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
-fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
-fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
-    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
-
 @JvmOverloads
-@Suppress("unused")
+@Deprecated("Use string unless you really need color codes")
 fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite: Boolean = false): String {
     this ?: return ""
     val cacheKey = TextCacheKey(FormattedTextSettings.getByArgs(noExtraResets, leadingWhite), this)
@@ -84,6 +87,19 @@ fun Component?.formattedTextCompat(noExtraResets: Boolean = false, leadingWhite:
         computeFormattedTextCompat(noExtraResets, leadingWhite)
     }
 }
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLessResets(): String = this.formattedTextCompat(noExtraResets = true)
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhite(): String = this.formattedTextCompat(leadingWhite = true)
+
+@Deprecated("Use string unless you really need color codes")
+@Suppress("DEPRECATION")
+fun Component?.formattedTextCompatLeadingWhiteLessResets(): String =
+    this.formattedTextCompat(noExtraResets = true, leadingWhite = true)
 
 private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadingWhite: Boolean): String {
     this ?: return ""
@@ -122,12 +138,15 @@ fun Style.chatStyle() = buildString {
     if (isObfuscated) append("§k")
 }
 
+fun Style.takeUnlessEmpty(): Style? = takeUnless { it.isEmpty }
+
 fun TextColor.toChatFormatting(): ChatFormatting? {
     return textColorLUT[this.value]
 }
 
 fun Component.iterator(): Sequence<Component> {
-    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
+    // TODO: in theory we want to properly inherit styles here
+    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() }
 }
 
 fun MutableComponent.withColor(formatting: ChatFormatting): MutableComponent {
@@ -163,12 +182,20 @@ var Component.hover: Component?
         value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } }
     }
 
-var Component.stackHover: ItemStack?
+var Component.stackHover: SafeItemStack?
     get() = this.style.hoverEvent?.takeIf {
         it.action() == HoverEvent.Action.SHOW_ITEM
-    }?.let { (it as HoverEvent.ShowItem).item }
+    }?.let {
+        //~ if < 26.1 '.item.create()' -> '.item'
+        (it as HoverEvent.ShowItem).item.create()
+    }
     set(value) {
-        value?.let { new -> this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowItem(new)) } }
+        value?.let { new ->
+            this.copyIfNeeded().withStyle {
+                //~ if < 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -> 'new'
+                it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new)))
+            }
+        }
     }
 
 var Component.command: String?
@@ -230,7 +257,7 @@ fun Style.setClickRunCommand(text: String): Style {
 }
 
 fun Style.setHoverShowText(text: String): Style {
-    return this.withHoverEvent(HoverEvent.ShowText(Component.literal(text)))
+    return this.withHoverEvent(HoverEvent.ShowText(text.asComponent()))
 }
 
 fun Style.setHoverShowText(text: Component): Style {
@@ -239,15 +266,26 @@ fun Style.setHoverShowText(text: Component): Style {
 
 fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) message.skyhanniCreated = true
-    DelayedRun.runOrNextTick { Minecraft.getInstance().player?.displayClientMessage(message, false) }
+    DelayedRun.runOrNextTick {
+        //~ if < 26.1 'sendSystemMessage(message)' -> 'displayClientMessage(message, false)'
+        Minecraft.getInstance().player?.sendSystemMessage(message)
+    }
 }
 
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
         val chat = Minecraft.getInstance().gui.chat
-        chat.deleteMessage(idToMessageSignature(id))
-        chat.addMessage(component, idToMessageSignature(id), GuiMessageTag.system())
+        ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
+        DelayedRun.runOrNextTick {
+            chat.addMessage(
+                component,
+                idToMessageSignature(id),
+                //? if >= 26.1
+                GuiMessageSource.SYSTEM_CLIENT,
+                GuiMessageTag.system(),
+            )
+        }
     }
 }
 
@@ -285,13 +323,11 @@ fun ClickEvent.value(): String {
 
 }
 
-fun HoverEvent.value(): Component {
-    return when (this.action()) {
-        HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
-        HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.hoverName
-        HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
-        else -> Component.empty()
-    }
+fun HoverEvent.value(): Component = when (action()) {
+    HoverEvent.Action.SHOW_TEXT -> (this as HoverEvent.ShowText).value
+    //~ if < 26.1 '.item.create().hoverName' -> '.item.hoverName'
+    HoverEvent.Action.SHOW_ITEM -> (this as HoverEvent.ShowItem).item.create().hoverName
+    HoverEvent.Action.SHOW_ENTITY -> (this as HoverEvent.ShowEntity).entity.name.getOrNull() ?: Component.empty()
 }
 
 fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): HoverEvent? = when (action) {
@@ -320,13 +356,13 @@ val formattingPattern = Regex("§.(?:§.)?")
 fun Component.append(newText: String): MutableComponent {
     val mutableText = this.copyIfNeeded()
     if (mutableText.string.matches(formattingPattern)) {
-        return Component.literal(mutableText.string + newText)
+        return (mutableText.string + newText).asComponent()
     }
     return mutableText.append(newText)
 }
 
 fun MutableComponent.append(string: String = "", init: MutableComponent.() -> Unit): MutableComponent {
-    return this.append(Component.literal(string).also(init))
+    return this.append(string.asComponent().also(init))
 }
 
 fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit): MutableComponent {
@@ -334,7 +370,7 @@ fun MutableComponent.append(comp: Component, init: MutableComponent.() -> Unit):
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -342,7 +378,7 @@ fun MutableComponent.appendWithColor(comp: Component, color: Int, init: MutableC
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -350,7 +386,7 @@ fun MutableComponent.appendWithColor(comp: Component, color: ChatFormatting, ini
 }
 
 fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
-    return this.append(Component.literal(string).withColor(color).also(init))
+    return this.append(string.asComponent().withColor(color).also(init))
 }
 
 fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
@@ -361,7 +397,7 @@ fun List<Any>.mapToComponents(): List<Component> {
     val newList = mutableListOf<Component>()
     for (entry in this) {
         when (entry) {
-            is String -> newList.add(Component.literal(entry))
+            is String -> newList.add(entry.asComponent())
             is Component -> newList.add(entry)
             else -> throw IllegalArgumentException("$entry is not String or Component")
         }

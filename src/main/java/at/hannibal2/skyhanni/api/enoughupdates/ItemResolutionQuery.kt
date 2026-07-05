@@ -11,12 +11,14 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -24,6 +26,8 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.ensureComponentsBound
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
@@ -34,7 +38,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 // Code taken from NotEnoughUpdates
@@ -178,9 +181,10 @@ class ItemResolutionQuery {
         }
     }
 
-    fun withItemStack(stack: ItemStack): ItemResolutionQuery {
-        this.itemType = stack.item
-        this.compound = stack.components
+    fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
+        stack.ensureComponentsBound()
+        this.itemType = stack.itemType
+        this.compound = stack.immutableComponents()
         return this
     }
 
@@ -207,6 +211,7 @@ class ItemResolutionQuery {
             "POTION" -> resolvePotionName()
             "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
             "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
+            "CAKE_HAT_2026" -> resolveCakeHatName()
             else -> resolvedName
         }
     }
@@ -295,6 +300,12 @@ class ItemResolutionQuery {
         return rawInternalName.toInternalName()
     }
 
+    private fun resolveCakeHatName(): NeuInternalName {
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
+        val rawInternalName = "CAKE_HAT_2026_" + color.uppercase()
+        return rawInternalName.toInternalName()
+    }
+
     private fun resolveItemInCatacombsRngMeter(): NeuInternalName? {
         val lore = compound.getLore()
         if (lore.size > 16) {
@@ -369,7 +380,7 @@ class ItemResolutionQuery {
         }
         val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getItem(bazaarSlot) ?: return false
+        val stackInSlot = chest.getItem(bazaarSlot).takeUnlessEmpty() ?: return false
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()
@@ -389,7 +400,7 @@ class ItemResolutionQuery {
         return EnoughUpdatesManager.getItemById(internalName)
     }
 
-    fun resolveToItemStack(): ItemStack? {
+    fun resolveToItemStack(): SafeItemStack? {
         val neuItem = resolveToItemJson() ?: return null
         return EnoughUpdatesManager.neuItemToStack(neuItem)
     }

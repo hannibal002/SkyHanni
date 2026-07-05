@@ -22,4 +22,5 @@ data class SeaCreatureInfo(
     @Expose val rare: Boolean = false,
     @Expose val rarity: LorenzRarity,
     @Expose val lootshareSphereOverride: Boolean? = null,
+    @Expose @SerializedName("old_names") val oldNames: List<String>?,
 )

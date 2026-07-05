@@ -141,8 +141,8 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 21: 29,614/40,000
-     * REGEX-TEST:  Ghost 15: 12,449/12,500
+     * WRAPPED-REGEX-TEST: " Ghost 21: 29,614/40,000"
+     * WRAPPED-REGEX-TEST: " Ghost 15: 12,449/12,500"
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary-no-color",
@@ -150,7 +150,7 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 25: MAX
+     * WRAPPED-REGEX-TEST: " Ghost 25: MAX"
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax-no-color",

@@ -28,7 +28,7 @@ object UtilsPatterns {
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line.colorless",
-        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: DUNGEON)? ?(?<itemCategory>[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$",
+        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>$rarities)(?: DUNGEON)? ?(?<itemCategory>[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$",
     )
 
     /**
@@ -88,7 +88,7 @@ object UtilsPatterns {
 
     /**
      * REGEX-TEST: 8x Enchanted Pork
-     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     * WRAPPED-REGEX-TEST: "  §810x §r§bGlacite Jewel"
      */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
