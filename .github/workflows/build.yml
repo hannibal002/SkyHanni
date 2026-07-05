@@ -1,3 +1,4 @@
+# Execution context: PR branch code
 name: Build
 
 on:
@@ -37,7 +38,7 @@ jobs:
                     ref: ${{ github.event.pull_request.head.ref }}
                     repository: ${{ github.event.pull_request.head.repo.full_name }}
 
-            -   uses: hannibal002/SkyHanni/.github/actions/setup-normal-workspace@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+            -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
@@ -45,7 +46,7 @@ jobs:
                 id: assemble_main
                 if: github.repository == 'hannibal002/SkyHanni'
                 continue-on-error: true
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
             -   name: Build with Gradle w/retry
@@ -74,7 +75,7 @@ jobs:
                     archive: false
             -   name: Test with Gradle w/retry
                 if: github.repository == 'hannibal002/SkyHanni'
-                uses: hannibal002/SkyHanni/.github/actions/gradle-retry@e388c92aa45686b53f706cda54e7cfa6f3be1dfb # beta
+                uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: ${{ matrix.minecraft_version }}:test
             -   name: Test with Gradle w/retry

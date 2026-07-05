@@ -1,3 +1,5 @@
+# Execution context: base branch code (push to beta / pull_request_target)
+
 name: "Merge Conflict Label"
 on:
     # So that PRs touching the same files as the push are updated

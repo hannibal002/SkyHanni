@@ -1,3 +1,4 @@
+# Execution context: base branch code, called by Detekt workflow
 name: Detekt Review
 
 on:
@@ -19,7 +20,7 @@ jobs:
     review:
         name: Post Detekt review
         runs-on: ubuntu-latest
-        if: github.event.workflow_run.event == 'pull_request'
+        if: github.event.workflow_run.event == 'pull_request' || github.event.workflow_run.event == 'push'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7

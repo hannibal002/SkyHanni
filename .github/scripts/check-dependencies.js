@@ -1,3 +1,5 @@
+// Execution context: base branch, called from check_dependencies.yml
+
 module.exports = async ({github, context, core}) => {
     const labelName = "Waiting on Dependency PR";
     const pr = context.payload.pull_request;
