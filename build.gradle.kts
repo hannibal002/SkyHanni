@@ -28,7 +28,6 @@ plugins {
     id("net.fabricmc.fabric-loom") apply false
     kotlin("jvm")
     id("com.google.devtools.ksp")
-    kotlin("plugin.power-assert")
     `maven-publish`
     id("dev.detekt")
 }
@@ -317,7 +316,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.3"
+            languageVersion = "2.4"
         }
     }
 }
@@ -390,7 +389,7 @@ tasks.withType<KotlinCompile> {
             "kotlin.time.ExperimentalTime",
         )
         freeCompilerArgs.addAll(
-            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.4.x,
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
@@ -415,11 +414,13 @@ tasks.withType<GradleJar> {
 tasks.shadowJar {
     destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
     archiveClassifier.set("")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = buildList {
         add(shadowImpl)
         add(shadowOnly)
     }
     exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
