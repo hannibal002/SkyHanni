@@ -99,9 +99,10 @@ object CenturyPartyInvitation {
         val hand = InventoryUtils.getItemInHand() ?: return emptySet()
         if (hand.getInternalNameOrNull() != CENTURY_PARTY_INVITATION) return emptySet()
 
+        val lore = hand.getLore()
         return buildSet {
-            for (line in hand.getLore().drop(
-                hand.getLore().indexOfFirst { itemMissingLineSeparatorPattern.matches(it) } + 1
+            for (line in lore.drop(
+                lore.indexOfFirst { itemMissingLineSeparatorPattern.matches(it) } + 1
             )) {
                 readLine(line, hand)?.let(::add)
             }
