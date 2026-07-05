@@ -62,8 +62,9 @@ object GardenVisitorShoppingList {
     private fun drawDisplay() = buildList {
         if (!config.enabled) return@buildList
         val (shoppingList, activeVisitors) = prepareDrawingData()
-        val newVisitors = activeVisitors.filter { it.shoppingList.isEmpty() }
-        val knownVisitors = activeVisitors.filter { it.shoppingList.isNotEmpty() }
+        val (newVisitors, knownVisitors) = activeVisitors.partition { visitor ->
+            visitor.shoppingList.isEmpty()
+        }
 
         drawShoppingList(shoppingList)
         drawVisitorSection(
