@@ -64,7 +64,7 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return null
+        val chatGui = mc.gui.chat
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
         //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, mc.gui.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
