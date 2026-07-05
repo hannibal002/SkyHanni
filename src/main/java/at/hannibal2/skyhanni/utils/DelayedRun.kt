@@ -44,6 +44,7 @@ object DelayedRun {
     fun runNextTickOld(run: () -> Unit) = futureTasks.add(run to SimpleTimeMark.farPast())
 
     /**
+     *
      * Runs now if we are on the main thread, otherwise queues it for the next tick.
      */
     fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
