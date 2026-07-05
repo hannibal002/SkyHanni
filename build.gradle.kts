@@ -280,7 +280,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.3"
+            languageVersion = "2.4"
         }
     }
 }
@@ -356,7 +356,7 @@ tasks.withType<KotlinCompile> {
             "kotlin.time.ExperimentalTime"
         )
         freeCompilerArgs.addAll(
-            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
+            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.4.x,
             // leaving corrupt .class files that break subsequent incremental builds.
             // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
@@ -396,12 +396,14 @@ tasks.shadowJar {
         destinationDirectory.set(layout.buildDirectory.dir("badjars"))
         archiveClassifier.set("all-dev")
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = buildList {
         add(shadowImpl)
         if (!isDeobf) add(shadowModImpl)
         if (isDeobf) add(shadowOnly)
     }
     exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
