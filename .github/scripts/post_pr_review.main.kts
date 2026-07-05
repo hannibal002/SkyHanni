@@ -21,7 +21,8 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
-val label = "Detekt"
+val detektLabel = "Detekt"
+val buildLabel = "Fails Multi-Version"
 val marker = "<!-- detekt-review -->"
 val staleMarker = "<!-- detekt-review-stale -->"
 val buildMarker = "<!-- build-failure-review -->"
@@ -69,7 +70,7 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     return response.statusCode() to body
 }
 
-fun setLabel(prNumber: String, hasFindings: Boolean) {
+fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
         if (status.isHttpError) System.err.println("Warning: could not add $label label (HTTP $status)")
@@ -172,9 +173,13 @@ fun readBuildLog(artifactDirPath: String?): String? {
     }.getOrNull()
 }
 
-fun parseOneLiner(logContent: String): String? =
-    logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
+fun parseOneLiner(logContent: String): String? {
+    val workspace = System.getenv("GITHUB_WORKSPACE")
+    val line = logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
         ?: logContent.lines().firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
+    if (line == null || workspace.isNullOrEmpty()) return line
+    return line.replace("file://$workspace/", "")
+}
 
 fun parseStackTrace(logContent: String): String {
     val startIndex = logContent.indexOf("FAILURE: Build failed with an exception")
@@ -209,8 +214,8 @@ fun runDetektMode(prNumber: String) {
     val sarifFile = artifactDir / "main.sarif"
 
     if (!sarifFile.exists()) {
-        println("No SARIF found, removing label")
-        setLabel(prNumber, false)
+        println("No SARIF found, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
@@ -249,14 +254,14 @@ fun runDetektMode(prNumber: String) {
     }
 
     if (findings.isEmpty()) {
-        println("No findings, removing label")
-        setLabel(prNumber, false)
+        println("No findings, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildDetektBody(findings)))
     postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
-    setLabel(prNumber, true)
+    setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
 }
 
@@ -267,7 +272,7 @@ fun runBuildMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, buildMarker)
 
     if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
-        println("No build failures found")
+        println("No build failures found, removing build label")
         if (existingId != null) markCommentAsStale(
             existingId,
             buildMarker,
@@ -275,6 +280,7 @@ fun runBuildMode(prNumber: String) {
             "Outdated build failure",
             "click to show old output"
         )
+        setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
@@ -289,7 +295,8 @@ fun runBuildMode(prNumber: String) {
     val versions = listOf("1.21.11" to log1, "26.1" to log2)
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBuildFailureBody(versions)))
     postStatus.requireSuccess("Error: could not post build failure comment (HTTP $postStatus)")
-    println("Done: build failure comment posted")
+    setLabel(prNumber, buildLabel, true)
+    println("Done: build failure comment posted, added label")
 }
 
 val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
