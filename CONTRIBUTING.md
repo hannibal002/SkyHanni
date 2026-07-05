@@ -411,7 +411,8 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 ### Automated Detekt Review
 
 Detekt runs automatically on every pull request. When findings are present, they are posted as a comment on the PR and the `Detekt`
-label is applied.
+label is applied. When the same PR is updated, the previous comment is collapsed into a `<details>` spoiler and a new comment is posted
+at the bottom of the conversation.
 
 The setup uses a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions:
 
@@ -422,11 +423,31 @@ The setup uses a two-workflow split to allow write-operations on fork PRs withou
   base branch, so a fork PR cannot modify it. Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the
   artifact to `runner.temp` (outside the workspace) and runs the review script. The script only reads the pre-generated SARIF, so fork
   code has no influence over what runs here.
-- `.github/scripts/post_detekt_review.main.kts`: Kotlin script that parses the SARIF, formats the findings into a PR comment, and
-  manages the `Detekt` label.
+- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=detekt`): Parses the SARIF, formats findings into a PR comment,
+  manages the `Detekt` label, and handles the stale-comment logic.
 
-The PR number is not stored in the artifact. `detekt-review.yml` resolves it at runtime by querying the GitHub API for open pull requests
-matching the head repository and branch from the triggering workflow run.
+The PR number is not stored in the artifact. `detekt-review.yml` resolves it at runtime by querying the GitHub API for open pull
+requests matching the head repository and branch from the triggering workflow run.
+
+### Build Failure Notification
+
+When the multi-version build fails on a pull request, the stack trace is posted as a comment on the PR and the `Fails Multi-Version`
+label is applied. The same stale-comment pattern as Detekt is used: an existing build failure comment is collapsed into a spoiler
+before a new one is posted.
+
+- `.github/workflows/build.yml`: Triggered by `pull_request` and `push` to beta. On assemble failure, captures the Gradle output via
+  `tee` inside `.github/actions/gradle-retry/action.yml`, saves it as a log file, and uploads it as an artifact named
+  `build-failure-output-<version>` (one per matrix version). Uses `continue-on-error: true` on the assemble step so the artifact is
+  uploaded before the job fails.
+- `.github/workflows/build-review.yml`: Triggered by `workflow_run` on completion of `build.yml`. Always uses base branch code. Runs
+  with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads both version artifacts (`1.21.11` and `26.1`) with
+  `continue-on-error: true`, resolves the PR number by branch name, and runs the review script.
+- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=build`): Reads the log files, extracts a one-liner (first `e:`
+  compiler error line) and the stack trace starting from `FAILURE: Build failed with an exception` (capped at 10,000 characters).
+  Posts the result as a PR comment and manages the `Fails Multi-Version` label.
+
+The PR number is resolved by branch name at runtime. If no open PR matches the branch (e.g. for a direct push to beta), the script
+exits without posting a comment.
 
 ## Access Wideners
 
