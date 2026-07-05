@@ -27,6 +27,9 @@ object DelayedRun {
         val runnable = { run() }
         @Suppress("UNCHECKED_CAST")
         futureTasks.add((runnable as () -> Any) to time)
+
+        e
+
         return time to runnable
     }
 
