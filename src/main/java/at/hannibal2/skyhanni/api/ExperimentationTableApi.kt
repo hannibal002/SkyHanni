@@ -530,6 +530,11 @@ object ExperimentationTableApi {
 
         val internalName = NeuInternalName.fromItemNameOrNull(this)
             ?: return ChatUtils.debug("Could not read item name from $this")
+        // Intentionally fires later than the book detection path (tryFireRareBookUncovered runs at
+        // card-flip time). Non-book Ultra Rares show no "ULTRA-RARE" lore text at flip time — unlike
+        // books — so lore-based flip-time detection is impossible. Whether their identity is readable
+        // at flip time some other way is unconfirmed; these drops are too rare to test live. The
+        // post-experiment summary is used instead because it is confirmed to work reliably.
         if (currentExperimentData.type == ExperimentationTaskType.SUPERPAIRS && internalName in ultraRareMiscItems) {
             TableRareUncoverEvent(this, isBook = false).post()
         }
