@@ -61,7 +61,7 @@ object ExperimentationTableApi {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val EXPERIMENTATION_TABLE_SKULL by SkullTextureHolder.texture("EXPERIMENTATION_TABLE")
     private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -81,10 +81,10 @@ object ExperimentationTableApi {
     )
 
     /**
-     * REGEX-TEST:  §r§8+§r§5Metaphysical Serum
-     * REGEX-TEST:  §r§8+§r§3149k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§5Metaphysical Serum"
+     * WRAPPED-REGEX-TEST: " §r§8+§r§3149k Enchanting Exp"
      * REGEX-TEST: §8 +§r§3400k Enchanting Exp
-     * REGEX-TEST:  §r§8+§r§327k Enchanting Exp
+     * WRAPPED-REGEX-TEST: " §r§8+§r§327k Enchanting Exp"
      * REGEX-TEST: §r§8+§r§7[Lvl 1] §r§5Guardian
      */
     private val experimentsDropPattern by patternGroup.pattern(

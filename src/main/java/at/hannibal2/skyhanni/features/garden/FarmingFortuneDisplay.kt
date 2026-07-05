@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
@@ -54,7 +56,7 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
 
     /**
-     * REGEX-TEST:  Farming Fortune: ☘1234
+     * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
@@ -96,10 +98,10 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEST:  Bonus: INACTIVE
-     * REGEX-TEST:  Bonus: +200☘ 29m
-     * REGEX-TEST:  Bonus: +200☘ 5m 2s
-     * REGEX-TEST:  Bonus: +200☘ 8s
+     * WRAPPED-REGEX-TEST: " Bonus: INACTIVE"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 29m"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 5m 2s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 8s"
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
@@ -199,7 +201,17 @@ object FarmingFortuneDisplay {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return

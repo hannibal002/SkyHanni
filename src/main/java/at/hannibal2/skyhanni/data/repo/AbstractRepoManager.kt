@@ -226,7 +226,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false): Unit = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) logger.chat("$commonShortNameCased repo settings are already on default!")
             return

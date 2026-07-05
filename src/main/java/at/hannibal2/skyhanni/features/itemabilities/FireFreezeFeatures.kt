@@ -79,7 +79,7 @@ object FireFreezeFeatures {
         }
     }
 
-    private val ARMORSTAND_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("FIRE_FREEZE_SKULLS") }
+    private val ARMORSTAND_SKULL_TEXTURE by SkullTextureHolder.texture("FIRE_FREEZE_SKULLS")
 
     private val affectedMobs = ConcurrentHashMap<Mob, ServerTimeMark>()
     private val fireFreezes = ConcurrentHashMap<LorenzVec, FireFreezeArea>()

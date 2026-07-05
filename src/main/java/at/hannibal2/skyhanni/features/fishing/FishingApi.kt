@@ -23,11 +23,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -98,6 +100,17 @@ object FishingApi {
         "fishing.bait.inventory",
         "Bait Remaining: (?<amount>[\\d,]+)",
     )
+
+    private val obfuscatedBaits = setOf(
+        "OBFUSCATED_FISH_1_BRONZE",
+        "OBFUSCATED_FISH_1_SILVER",
+        "OBFUSCATED_FISH_1_GOLD",
+        "OBFUSCATED_FISH_1_DIAMOND",
+        "OBFUSCATED_FISH_2_BRONZE",
+        "OBFUSCATED_FISH_2_SILVER",
+        "OBFUSCATED_FISH_2_GOLD",
+        "OBFUSCATED_FISH_2_DIAMOND",
+    ).toInternalNames()
 
     const val babySlugName = "Baby Magma Slug"
 
@@ -207,8 +220,7 @@ object FishingApi {
     }
 
     private fun extractAndPostBaitUpdate(stack: SafeItemStack) {
-        val category = stack.getItemCategoryOrNull()
-        if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
+        if (!stack.isBait()) {
             postEmptyBaitUpdate()
             return
         }
@@ -265,7 +277,12 @@ object FishingApi {
         return rodPartName.toInternalName()
     }
 
-    fun SafeItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun SafeItemStack.isBait(): Boolean {
+        val category = getItemCategoryOrNull() ?: return false
+        if (category == ItemCategory.BAIT) return true
+        val internalName = getInternalNameOrNull() ?: return false
+        return internalName in obfuscatedBaits
+    }
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {

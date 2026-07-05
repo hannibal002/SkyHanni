@@ -13,11 +13,7 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title
     val inventorySize: Int get() = inventory.slotCount
-    val inventoryItems: Map<Int, SafeItemStack> = run {
-        val items = inventory.items
-        items.entries.removeIf { !it.value.isNotEmpty() }
-        items
-    }
+    val inventoryItems: Map<Int, SafeItemStack> = inventory.items.filterValues { it.isNotEmpty() }
     val inventoryItemsWithNull: Map<Int, SafeItemStack?> by lazy {
         (0 until inventorySize).associateWith { inventoryItems[it] }
     }

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.chat.ShortenCoins.formatChatCoins
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -26,17 +27,21 @@ object BazaarCancelledBuyOrderClipboard {
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
     /**
-     * REGEX-TEST: §6§7from §a50§7x §7missing items.
-     * REGEX-TEST: §7§a22§7x §7missing items.
-     * REGEX-TEST: §6coins §7from §a2,000§7x §7missing items.
+     * REGEX-TEST: from 50x missing items.
+     * REGEX-TEST: 22x missing items.
+     * REGEX-TEST: coins from 2,000x missing items.
      */
     private val lastAmountPattern by patternGroup.pattern(
-        "lastamount",
-        "(?:§6coins §7from |§6§7from |§7)§a(?<amount>.*)§7x §7missing items\\.",
+        "lastamount.colorless",
+        "(?:coins from |from |)(?<amount>.*)x missing items\\.",
     )
+
+    /**
+     * REGEX-TEST: [Bazaar] Cancelled! Refunded 12,345 coins from cancelling Buy Order!
+     */
     private val cancelledMessagePattern by patternGroup.pattern(
-        "cancelledmessage",
-        "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?<coins>.*) coins §r§7from cancelling Buy Order!",
+        "cancelledmessage.colorless",
+        "\\[Bazaar] Cancelled! Refunded (?<coins>.*) coins from cancelling Buy Order!"
     )
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventorytitle",
@@ -52,14 +57,14 @@ object BazaarCancelledBuyOrderClipboard {
         val stack = event.inventoryItems[11] ?: return
         if (!stack.hoverName.string.contains("Cancel Order")) return
 
-        val lore = stack.getLore()
+        val lore = stack.getLoreComponent().map { it.string.removeColor() }
         lastAmountPattern.firstMatcher(lore) {
             latestAmount = group("amount").formatInt()
             return
         }
 
         // nothing to cancel
-        if (lore.firstOrNull() == "§7Cannot cancel order while there are") {
+        if (lore.firstOrNull() == "Cannot cancel order while there are") {
             return
         }
 
@@ -73,7 +78,7 @@ object BazaarCancelledBuyOrderClipboard {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        val coins = cancelledMessagePattern.matchMatcher(event.message) {
+        val coins = cancelledMessagePattern.matchMatcher(event.cleanMessage) {
             group("coins").formatDouble()
         } ?: return
 
