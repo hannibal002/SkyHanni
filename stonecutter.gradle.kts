@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.loom) apply false
     alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.powerAssert) apply false
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.detekt) apply false
     id("dev.kikugie.stonecutter")

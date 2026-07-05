@@ -19,12 +19,29 @@ import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
 val label = "Detekt"
-val MARKER = "<!-- detekt-review -->"
-val repo: String = System.getenv("GITHUB_REPOSITORY") ?: run { System.err.println("GITHUB_REPOSITORY not set"); exitProcess(1) }
-val token: String = System.getenv("GH_TOKEN") ?: run { System.err.println("GH_TOKEN not set"); exitProcess(1) }
+val marker = "<!-- detekt-review -->"
+val staleMarker = "<!-- detekt-review-stale -->"
+val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
+val token: String = System.getenv("GH_TOKEN") ?: error("GH_TOKEN not set")
+val mode: String = System.getenv("MODE") ?: error("MODE not set")
+
+val maxDirectFindings = 8
+
+if (mode != "detekt") error("Unsupported MODE: $mode")
 
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
+
+fun error(message: String): Nothing {
+    System.err.println(message)
+    exitProcess(1)
+}
+
+val Int.isHttpError: Boolean get() = this !in 200..299
+
+fun Int.requireSuccess(message: String) {
+    if (isHttpError) error(message)
+}
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
 
@@ -51,11 +68,11 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
 fun setLabel(prNumber: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
-        if (status !in 200..299) System.err.println("Warning: could not add $label label (HTTP $status)")
+        if (status.isHttpError) System.err.println("Warning: could not add $label label (HTTP $status)")
     } else {
         val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8)
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
-        if (status !in 200..299 && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
+        if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
 }
 
@@ -79,19 +96,25 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("@", "&#64;")
 
 fun buildBody(findings: List<Finding>): String = buildString {
-    appendLine(MARKER)
-    if (findings.isEmpty()) {
-        appendLine("## No Detekt issues found ✅")
-        return@buildString
-    }
+    appendLine(marker)
     appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
-    val direct = findings.take(20)
-    val overflow = findings.drop(20)
-    direct.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
+    val direct = findings.take(maxDirectFindings)
+    val overflow = findings.drop(maxDirectFindings)
+    direct.forEach {
+        val fileName = it.path.substringAfterLast('/')
+        appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
+        appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
+    }
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        overflow.forEach { appendLine("- **`${sanitize(it.path)}`**:${it.line} `${sanitize(it.ruleId)}`: ${sanitize(it.message)}") }
+    }
+    overflow.forEach {
+        val fileName = it.path.substringAfterLast('/')
+        appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
+        appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
+    }
+    if (overflow.isNotEmpty()) {
         appendLine("\n</details>")
     }
 }
@@ -100,28 +123,36 @@ fun findExistingComment(prNumber: String): Long? {
     var page = 1
     while (true) {
         val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/comments?per_page=100&page=$page")
-        if (status !in 200..299) return null
-        val arr = body as? JsonArray ?: return null
-        if (arr.size() == 0) return null
-        for (elem in arr) {
-            if (!elem.isJsonObject) continue
-            val bodyText = elem.asJsonObject.get("body")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-            if (MARKER in bodyText) return elem.asJsonObject.get("id")?.takeIf { it.isJsonPrimitive }?.asLong
+        status.requireSuccess("Error: could not fetch PR comments (HTTP $status), aborting")
+        val array = body as? JsonArray ?: error("Error: unexpected response format for PR comments, aborting")
+        if (array.size() == 0) return null
+        for (element in array) {
+            if (!element.isJsonObject) continue
+            val bodyText = element.asJsonObject.get("body")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            if (marker in bodyText) return element.asJsonObject.get("id")?.takeIf { it.isJsonPrimitive }?.asLong
         }
-        if (arr.size() < 100) return null
+        if (array.size() < 100) return null
         page++
     }
 }
 
-fun upsertComment(prNumber: String, body: String) {
-    val existingId = findExistingComment(prNumber)
-    if (existingId != null) {
-        val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$existingId", mapOf("body" to body))
-        if (status !in 200..299) System.err.println("Warning: could not update comment (HTTP $status)")
-    } else {
-        val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
-        if (status !in 200..299) System.err.println("Warning: could not post comment (HTTP $status)")
+fun getCommentBody(commentId: Long): String? {
+    val (status, body) = ghRequest("GET", "/repos/$repo/issues/comments/$commentId")
+    status.requireSuccess("Error: could not fetch comment body (HTTP $status), aborting")
+    return (body as? JsonObject)?.get("body")?.takeIf { it.isJsonPrimitive }?.asString
+}
+
+fun markCommentAsStale(commentId: Long) {
+    val oldBody = getCommentBody(commentId) ?: error("Error: comment body was null for comment $commentId, aborting")
+    val staleBody = buildString {
+        appendLine("<details><summary>⚠️  Outdated — superseded by newer comment</summary>")
+        appendLine()
+        appendLine(oldBody.replace(marker, staleMarker))
+        appendLine()
+        append("</details>")
     }
+    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
+    status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
 }
 
 val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
@@ -129,6 +160,9 @@ val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
 val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
 val sarifFile = artifactDir / "main.sarif"
+
+val existingId = findExistingComment(prNumber)
+if (existingId != null) markCommentAsStale(existingId)
 
 if (!sarifFile.exists()) {
     println("No SARIF found, removing label")
@@ -138,8 +172,7 @@ if (!sarifFile.exists()) {
 
 val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
 val sarif: JsonObject = runCatching { JsonParser.parseString(sarifFile.readText()).asJsonObject }.getOrElse {
-    System.err.println("Failed to parse SARIF: ${it.message}")
-    exitProcess(1)
+    error("Failed to parse SARIF: ${it.message}")
 }
 
 val findings = buildList {
@@ -177,6 +210,7 @@ if (findings.isEmpty()) {
     exitProcess(0)
 }
 
-upsertComment(prNumber, buildBody(findings))
+val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBody(findings)))
+postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
 setLabel(prNumber, true)
 println("Done: ${findings.size} finding(s) posted")

@@ -68,4 +68,5 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
-                run: kotlinc -script .github/scripts/post_detekt_review.main.kts
+                    MODE: detekt
+                run: kotlinc -script .github/scripts/post_pr_review.main.kts
