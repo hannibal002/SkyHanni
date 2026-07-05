@@ -113,8 +113,9 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
             return
         }
 
-        if (checkEmptyLines(importList) != null) {
-            importList.imports.first().reportIssue("There should be no empty lines between imports.")
+        val emptyLineViolation = checkEmptyLines(importList)
+        if (emptyLineViolation != null) {
+            emptyLineViolation.reportIssue("Illegal empty line before this import.")
             return
         }
 
