@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import com.google.gson.JsonObject
 import kotlin.time.Duration.Companion.minutes
@@ -35,6 +35,7 @@ object PetUtils {
     private var petSkins = mutableMapOf<String, MutableList<NeuItemJson>>()
     private var basePetLeveling: List<Int> = listOf()
     private var customPetLeveling: Map<String, NeuPetData> = mapOf()
+    private var petTypes: Map<String, String> = mapOf()
     private var animatedPetSkins: Map<String, AnimatedSkinJson> = mapOf()
     private var displayNameMap: Map<String, String> = mapOf()
     private var petSkinVariants: Map<NeuInternalName, List<String>> = mapOf()
@@ -88,9 +89,14 @@ object PetUtils {
 
     fun resolvePetItemOrNull(itemName: String): NeuInternalName? {
         petItemResolutionCache[itemName]?.let { return it }
-        val result = petItemResolution[itemName] ?: NeuInternalName.fromItemNameOrNull(itemName)?.takeIf {
+        val cleanItemName = itemName.removeColor()
+        fun NeuInternalName?.takeIfPetItem() = this?.takeIf {
             !it.isPet && it.getItemStackOrNull()?.getItemCategoryOrNull() == ItemCategory.PET_ITEM
         }
+        val result = petItemResolution[itemName]
+            ?: petItemResolution[cleanItemName]
+            ?: NeuInternalName.fromItemNameOrNull(itemName).takeIfPetItem()
+            ?: NeuInternalName.fromItemNameOrNull(cleanItemName).takeIfPetItem()
         if (result != null) petItemResolutionCache[itemName] = result
         return result
     }
@@ -189,14 +195,28 @@ object PetUtils {
     fun getMaxLevel(petInternalName: NeuInternalName): Int =
         customPetLeveling[petInternalName.getProperName()]?.maxLevel ?: 100
 
-    fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity) =
-        "${petName.uppercase().replace(" ", "_")};${rarity.id}".toInternalName()
+    fun getPetType(petInternalName: NeuInternalName): String? =
+        petTypes[petInternalName.getProperName()]
+
+    fun getPetXpMultiplier(petInternalName: NeuInternalName): Double =
+        customPetLeveling[petInternalName.getProperName()]?.xpMultiplier ?: 1.0
+
+    fun petWithRarityToInternalName(petName: String, rarity: LorenzRarity): NeuInternalName =
+        "${petName.toPetInternalNameBase()};${rarity.id}".toInternalName()
+
+    private fun String.toPetInternalNameBase(): String =
+        displayNameMap.entries.firstOrNull { (_, displayName) ->
+            displayName.equals(this, ignoreCase = true)
+        }?.key
+            ?: uppercase().replace(" ", "_")
 
     fun levelToXp(level: Int, petInternalName: NeuInternalName): Double? = runCatching {
         val rarityOffset = getRarityOffset(petInternalName) ?: return null
         if (level < 0 || level > getMaxLevel(petInternalName)) return null
+        if (level <= 1) return 0.0
         val levelTree = getFullLevelingTree(petInternalName)
-        if ((rarityOffset + level - 1) > levelTree.size) {
+        val levelsToSum = level - 1
+        if (rarityOffset + levelsToSum > levelTree.size) {
             ErrorManager.logErrorWithData(
                 IndexOutOfBoundsException("offset:$rarityOffset, level:$level, size:${levelTree.size}"),
                 "§cFailed to load pet levels from NEU repo. " +
@@ -204,7 +224,7 @@ object PetUtils {
             )
             return null
         }
-        return levelTree.sublistAfter(rarityOffset).sumOf { it.toDouble() }
+        return levelTree.drop(rarityOffset).take(levelsToSum).sumOf { it.toDouble() }
     }.getOrElse {
         ErrorManager.logErrorWithData(
             it,
@@ -285,6 +305,7 @@ object PetUtils {
         val petData = event.getConstant<NeuPetsJson>("pets")
         basePetLeveling = petData.basePetLeveling
         customPetLeveling = petData.customPetLeveling
+        petTypes = petData.petTypes
         petItemResolution = petData.petItemResolution
         displayNameMap = petData.displayNameMap
 

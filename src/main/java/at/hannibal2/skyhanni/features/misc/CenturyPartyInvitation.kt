@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -75,10 +74,11 @@ object CenturyPartyInvitation {
     /**
      * REGEX-TEST: §8[§e80§8] - [§e119§8] §eYellow
      * REGEX-TEST: §8[§c440§8] - [§c479§8] §cRed
+     * REGEX-TEST: §8[§4480§8]+ §4Dark Red
      */
     private val itemMissingColorLinePattern by chatGroup.pattern(
         "item-lore.missing-color-line",
-        "§8\\[.*\\] - \\[.*\\] §(?<color>.).*",
+        "§8\\[.*]\\+?(?: - \\[.*])? §(?<color>.).*",
     )
 
     @HandleEvent
@@ -99,8 +99,11 @@ object CenturyPartyInvitation {
         val hand = InventoryUtils.getItemInHand() ?: return emptySet()
         if (hand.getInternalNameOrNull() != CENTURY_PARTY_INVITATION) return emptySet()
 
+        val lore = hand.getLore()
         return buildSet {
-            for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
+            for (line in lore.drop(
+                lore.indexOfFirst { itemMissingLineSeparatorPattern.matches(it) } + 1
+            )) {
                 readLine(line, hand)?.let(::add)
             }
         }
@@ -113,7 +116,7 @@ object CenturyPartyInvitation {
 
         return colorCode.toCharArray().first().toLorenzColor() ?: run {
             ErrorManager.logErrorStateWithData(
-                "Error reading Cenutry Party Invitation colors missing",
+                "Error reading Century Party Invitation colors missing",
                 "unknown color code detected",
                 "colorCode" to colorCode,
                 "line" to line,
@@ -146,7 +149,7 @@ object CenturyPartyInvitation {
     }
 
     private fun addPlayer(mob: Mob) {
-        val displayName = mob.baseEntity.name.formattedTextCompatLessResets()
+        val displayName = mob.baseEntity.displayName.formattedTextCompatLessResets()
         val colorCode = playerRankColorPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
