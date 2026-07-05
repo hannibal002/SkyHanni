@@ -40,4 +40,21 @@ class SpiderConfig {
     )
     @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
     var slayerLineWidth: Int = 3
+
+    @Expose
+    @ConfigOption(
+        name = "Highlight Egg Sacs",
+        desc = "Highlight the Egg Sacs spawned by the Tarantula Broodfather.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var highlightEggSacs: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Egg Sac Color",
+        desc = "Color used to highlight Tarantula Broodfather Egg Sacs.",
+    )
+    @ConfigEditorColour
+    var eggSacHighlightColor: ChromaColour = ChromaColour.fromStaticRGB(255, 255, 0, 120)
 }

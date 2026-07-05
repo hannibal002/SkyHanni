@@ -2,6 +2,7 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
@@ -30,11 +31,8 @@ import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
-import at.hannibal2.skyhanni.utils.DelayedRun
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?}
 
 @SkyHanniModule
 object ClientEvents {
@@ -59,13 +57,12 @@ object ClientEvents {
         // Connect event
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
-            //? if >= 26.1
-            DelayedRun.runOrNextTick(ComponentsLoadedEvent::post)
         }
 
         // World change event
         //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
+            EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 

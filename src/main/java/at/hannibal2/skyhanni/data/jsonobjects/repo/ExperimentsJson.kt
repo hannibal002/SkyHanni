@@ -5,5 +5,6 @@ import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 data class ExperimentsJson(
-    @Expose @SerializedName("misc_rewards") val miscRewards: List<NeuInternalName>
+    @Expose @SerializedName("misc_rewards") val miscRewards: List<NeuInternalName>,
+    @Expose @SerializedName("ultra_rare_rewards") val ultraRareRewards: List<NeuInternalName>? = null,
 )

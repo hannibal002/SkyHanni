@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.compat.MouseCompat;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.player.LocalPlayer;
@@ -42,14 +41,6 @@ public class MixinMouse {
     @Inject(method = "onButton", at = @At("HEAD"))
     private void onMouseButton(long window, MouseButtonInfo input, int action, CallbackInfo ci) {
         MouseCompat.INSTANCE.handleMouseButton(input, action);
-    }
-
-    @Inject(
-        method = "handleAccumulatedMovement",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;isWindowActive()Z")
-    )
-    private void onMouseButtonHead(CallbackInfo ci, @Local(ordinal = 0) double timeDelta) {
-        MouseCompat.INSTANCE.setTimeDelta(timeDelta * 10000);
     }
 
     @WrapOperation(
