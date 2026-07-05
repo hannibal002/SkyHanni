@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -238,8 +240,15 @@ class ConfigManager {
         disableSaving = true
     }
 
+    /**
+     * Rebuilds the MoulConfig editor and processor only. Config objects (SkyHanniMod.feature and
+     * all nested objects) are not recreated here; they are created once in firstLoad() and remain
+     * the same instances for the entire session.
+     */
     fun recreateConfig() {
         ConfigGuiManager.editor = null
+        PetDisplayConfigGuiManager.invalidate()
+        ConfigUtils.clearEditorCache()
         val features = SkyHanniMod.feature
         processor = BlockingMoulConfigProcessor()
         BuiltinMoulConfigGuis.addProcessors(processor)
