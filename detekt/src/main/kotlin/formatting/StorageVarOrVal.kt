@@ -46,6 +46,7 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
 
     override fun visitProperty(property: KtProperty) {
         if (!property.doWeNeedToCheckConfigProp()) return
+        if (property.annotationEntries.any { it.shortName?.asString() == "ConfigEditorInfoText" }) return
 
         val shouldBeVar = analyze(property) {
             val type = property.returnType
