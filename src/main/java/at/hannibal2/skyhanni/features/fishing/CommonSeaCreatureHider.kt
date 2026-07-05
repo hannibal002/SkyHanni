@@ -30,5 +30,5 @@ object CommonSeaCreatureHider {
         }
     }
 
-    fun isEnabled() = config.enabled && FishingApi.isFishing() && (!config.onlyWhileHoldingRod || FishingApi.holdingRod)
+    fun isEnabled() = config.enabled && FishingApi.isFishing(checkRodInHand = false) && (!config.onlyWhileHoldingRod || FishingApi.holdingRod)
 }
