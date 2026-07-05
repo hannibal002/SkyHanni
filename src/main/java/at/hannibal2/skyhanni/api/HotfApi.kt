@@ -13,8 +13,8 @@ object HotfApi {
 
     enum class LotteryPerk(
         override val perkDescription: String,
-        @Language("RegExp") val chatFallback: String,
-        @Language("RegExp") val itemFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         SWEEP(
             perkDescription = "§a+5% §r§2∮ Sweep",
