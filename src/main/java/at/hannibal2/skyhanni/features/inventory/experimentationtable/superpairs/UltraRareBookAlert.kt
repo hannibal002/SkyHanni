@@ -35,7 +35,7 @@ object UltraRareBookAlert {
         dragonSound.playSound()
         ChatUtils.chat(
             componentBuilder {
-                append("You have uncovered a ")
+                append("You have uncovered an ")
                 appendWithColor("XX", ChatFormatting.LIGHT_PURPLE) {
                     obfuscated = true
                 }
