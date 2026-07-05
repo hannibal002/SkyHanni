@@ -128,7 +128,6 @@ class MiscConfig {
     val enchantedClock: EnchantedClockConfig = EnchantedClockConfig()
 
     @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
-    @SearchTag("century cake slice")
     @Accordion
     @Expose
     val centuryPartyInvitation: CenturyPartyInvitationConfig = CenturyPartyInvitationConfig()
@@ -517,6 +516,7 @@ class MiscConfig {
 
     @Expose
     @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @SearchTag("century cake slice")
     @ConfigEditorBoolean
     @FeatureToggle
     var giftCleanDisplay: Boolean = false
