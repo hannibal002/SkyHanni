@@ -68,18 +68,9 @@ object PestParticleWaypoint {
         if (config.hideParticles) event.cancel()
 
         lastParticle = SimpleTimeMark.now()
-        val pos = event.location
 
-        if (bezierFitter.isEmpty()) {
-            if (pos.distance(LocationUtils.playerLocation()) > 5) return
-            bezierFitter.addPoint(pos)
-            return
-        }
-
-        val lastPoint = bezierFitter.getLastPoint() ?: return
-        val dist = lastPoint.distance(pos)
-        if (dist == 0.0 || dist > 3.0) return
-        bezierFitter.addPoint(pos)
+        val emptyCondition: (LorenzVec) -> Boolean = { it.distance(LocationUtils.playerLocation()) > 5 }
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0, emptyCondition = emptyCondition)) return
 
         val solved = bezierFitter.solve() ?: return
         guessPosition = solved

@@ -75,6 +75,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Plays bark sound when 'woof' appears in chat.
 + Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 + Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
++ Added a chat message when you encounter a SkyHanni contributor for the first time. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 </details>
 <details open><summary>
@@ -316,6 +317,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Supercrafting menu quantity preset overlay. - HyperKids (https://github.com/hannibal002/SkyHanni/pull/5296)
 + Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
   + Highlights completed categories in green.
++ Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 
 </details>
 <details open><summary>
@@ -1147,6 +1149,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Hover over the message to see a detailed breakdown of all active multipliers.
 + Added Mineshaft Cave-in Timer. - Rain (https://github.com/hannibal002/SkyHanni/pull/5620)
     + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
++ Added option to mute treasure chest sounds. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5896)
 
 </details>
 <details open><summary>
@@ -1353,6 +1356,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Zombie Shootout QoL improvements for the Carnival. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2497)
     + Colored hitboxes.
     + Lamp timer + line.
++ Added Carnival Fruit Game Solver. - YoGoUrT_20 (https://github.com/hannibal002/SkyHanni/pull/5938)
+    + Highlights the best square to dig next, estimating bomb/rum risk and expected fruit points from the dowsing clues, and recommends which shovel to use.
+    + Optionally displays remaining fruit, guessed fruit per square, adjacent treasure/mines, and already found fruit.
 
 ### The Great Spook
 
