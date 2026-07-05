@@ -26,7 +26,7 @@ object DelayedRun {
         val time = SimpleTimeMark.now() + duration
         val runnable = { run() }
         @Suppress("UNCHECKED_CAST")
-        futureTasks.add((runnable as () -> Any) to time)
+        futureTasks.add((runnable as () -> Any) to  time)
 
         e
 
