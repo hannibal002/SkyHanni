@@ -253,7 +253,7 @@ object SkillApi {
             }
 
             lilySplosionSkillXpPattern.matchMatcher(message) {
-                if (lastLilySplosion.passedSince() > 5.seconds) return
+                if (lastLilySplosion.passedSince() > 5.seconds) return@matchMatcher
                 postChatSkillXp(group("skillName"), group("gained").formatLong(), LILY_SPLOSION_SOURCE)
             }
         }

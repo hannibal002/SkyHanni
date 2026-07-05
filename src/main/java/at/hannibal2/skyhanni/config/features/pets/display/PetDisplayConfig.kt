@@ -41,7 +41,7 @@ class PetDisplayConfig : Config() {
                 "SkyHanni estimates live XP between widget updates. For maxed pets, enable Pet widget overflow XP too."
         )
         @ConfigEditorInfoText
-        var xpAccuracyWarning: String = ""
+        val xpAccuracyWarning: String = ""
 
         @Expose
         @ConfigLink(owner = GeneralPetDisplayConfig::class, field = "enabled")

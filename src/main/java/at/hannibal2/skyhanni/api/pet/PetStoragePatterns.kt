@@ -117,7 +117,7 @@ internal object PetStoragePatterns {
      * REGEX-TEST: Equip: [Lvl 200] Rose Dragon Held Item: Poignant Lucky Clover
      */
     val autoPetHoverHeldItemPattern by patternGroup.pattern(
-        "autopet.hover.helditem.clean",
+        "autopet.hover.helditem.colorless",
         ".*Held Item: (?<item>.*)",
     )
 
