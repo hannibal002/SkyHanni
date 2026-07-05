@@ -2,7 +2,7 @@
 libautoupdate = "1.3.1"
 moulconfig = "4.7.0"
 jbAnnotations = "24.1.0"
-fabricLanguageKotlin = "1.13.11+kotlin.2.3.21"
+fabricLanguageKotlin = "1.13.12+kotlin.2.4.0"
 roughlyenoughitems = "19.0.806"
 autoservice-ksp = "1.1.0"
 autoservice-annotations = "1.1.1"
@@ -13,8 +13,8 @@ methanol = "1.8.3"
 
 shadow = "9.3.1"
 loom = "1.15-SNAPSHOT"
-kotlin = "2.3.20"
-ksp = "2.3.6"
+kotlin = "2.4.0"
+ksp = "2.3.9"
 detekt = "2.0.0-alpha.2"
 
 devauth = "1.2.1"
@@ -24,7 +24,6 @@ commons-net = "3.11.1"
 keval = "1.1.1"
 httpclient = "4.5.14"
 detektrules-neu = "1.0.0"
-kotest = "5.9.1"
 
 [libraries]
 libautoupdate = { module = "moe.nea:libautoupdate", version.ref = "libautoupdate" }
@@ -53,13 +52,11 @@ detektrules-ktlint = { module = "dev.detekt:detekt-rules-ktlint-wrapper", versio
 detekt-test = { module = "dev.detekt:detekt-test", version.ref = "detekt" }
 detektrules-neu = { module = "org.notenoughupdates:detektrules", version.ref = "detektrules-neu" }
 detektrules-authors = { module = "dev.detekt:detekt-rules-ruleauthors", version.ref = "detekt" }
-kotest-assertions = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
 loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-powerAssert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 detekt = { id = "dev.detekt", version.ref = "detekt" }

@@ -50,7 +50,7 @@ for "Gradle JVM") is set to a Java 25 JDK.
 
 </details>
 
-Now that gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
+Now that Gradle is done importing (which might take a few minutes the first time you download the project) we want to set up the java
 version for the project.
 
 To do this we press `(CTRL+ALT+SHIFT+S)` in IntelliJ, or go to `File` → `Project Structure...`.
@@ -71,7 +71,7 @@ We want to set the project structure to use Java 25.
 
 </details>
 
-Finally, we then want to reload gradle which can be done from the gradle tab from earlier.
+Finally, we then want to reload Gradle which can be done from the Gradle tab from earlier.
 
 <details>
 
@@ -82,7 +82,7 @@ Finally, we then want to reload gradle which can be done from the gradle tab fro
 </details>
 
 After all importing is done (which should be much quicker this time), you should find a new IntelliJ run
-configuration. If not, you can restart intellij and reload the gradle project again.
+configuration. If not, you can restart IntelliJ and reload the Gradle project again.
 
 <details>
 <summary>🖼️Show run configuration selection image</summary>
@@ -135,7 +135,8 @@ for the dependency, or `- <url>` for REPO dependencies.
 
 ### Changelog Builder
 
-The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder).
+The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder). Do not manually
+edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files are maintained by the project maintainer.
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
@@ -169,8 +170,8 @@ Internal changes that do not impact the end user. Examples include:
 - Refactoring (renaming or moving members, functions, classes, files or packages)
 - Typos in object names (which the end user will not see)
 - API updates
-- Minor performance improvements
-- Documentation changes to markdown files, e.g., in `/docs` or this file.
+- Minor performance improvements (noticeable performance improvements belong in Improvements)
+- Documentation changes to Markdown files, e.g., in `/docs` or this file.
 
 Try to avoid using this when the main goal of the PR is a user facing change, and the included backend change is related to that change.
 We mostly only need standalone changes or big/relevant backend changes marked as Technical Details,
@@ -203,6 +204,8 @@ Make sure such pull requests have a good explanation in the **What** section.
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
+    - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
+      the PR listing the affected files, line numbers, and rule names.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can
       check `build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
@@ -225,7 +228,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin.
 - Config files should be made in **Kotlin**.
     - There may be legacy config files left as Java files, however they will all be ported eventually.
 - Please use the existing event system, or expand on it.
@@ -251,6 +254,10 @@ Make sure such pull requests have a good explanation in the **What** section.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
   See the `api/minecraftevents` package for examples.
+- Every event class must have a KDoc comment that describes: what the event represents,
+  when it is fired, what each parameter means, and optionally, when to use or not use it.
+    - For new events, the KDoc is required in the same PR.
+    - For existing events, add the KDoc the next time the event is touched or newly used in a PR.
 - Please use existing utils methods.
 - Never use  `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
@@ -279,13 +286,15 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
+  `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
     - Use all-uppercase for two-letter acronyms (e.g., `XP`).
     - Treat three or more letter acronyms as regular words with only the first letter capitalized (e.g., `Api`).
 - Always combine title messages with chat message.
     - This way users know what feature and what mod sends the title, if they want to disable it.
-    - Also we can include more information on why the title just showed up, as the title should not be too long.
+    - Also, we can include more information on why the title just showed up, as the title should not be too long.
 
 ## Additional Useful Development Tools
 
@@ -336,7 +345,7 @@ and recipes. NEU is not a dependency of SkyHanni.
 
 ### Config
 
-SkyHanni stores the config (settings and user data) as a json object in a single text file.
+SkyHanni stores the config (settings and user data) as a JSON object in a single text file.
 For rendering the /sh config (categories, toggles, search, etc.),
 SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, the same config system as NotEnoughUpdates.
 
@@ -345,7 +354,7 @@ SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, 
 SkyHanni utilizes the [Elite API](https://api.eliteskyblock.com/) (view the [public site here](https://eliteskyblock.com)) for some farming
 features and for LBIN price data.
 
-This includes features relating to Farming Weight, as well as syncing jacob contests amongst players for convenience. Features that upload
+This includes features relating to Farming Weight, as well as syncing Jacob contests amongst players for convenience. Features that upload
 data to the Elite API are optional and opt-in. All requests to the Elite API are subject to
 its [privacy policy](https://eliteskyblock.com/privacy).
 
@@ -373,11 +382,16 @@ SkyHanni uses KSP via the `annotation-processors` module to generate code at com
 
 SkyHanni uses a repo system to easily change static variables without the need for a mod update.
 The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
-A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
+A copy of all JSON files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
-If you add stuff to the repo make sure it gets serialised. See
+If you add stuff to the repo make sure it gets serialized. See
 the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
+
+If your PR adds or changes data in the repo, open a separate PR on the [SkyHanni-REPO](https://github.com/hannibal002/SkyHanni-REPO)
+repository as well.
+Keep the main mod PR as a draft until the repo PR is ready.
+Link the repo PR URL in the `## Dependencies` section of the mod PR.
 
 ### Discord IPC
 
@@ -394,14 +408,34 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
+### Automated Detekt Review
+
+Detekt runs automatically on every pull request. When findings are present, they are posted as a comment on the PR and the `Detekt`
+label is applied.
+
+The setup uses a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions:
+
+- `.github/workflows/detekt.yml`: Triggered by `pull_request`. Runs with `contents: read` only. Runs `detektMain` and uploads the
+  [SARIF](https://docs.github.com/en/code-security/reference/code-scanning/sarif-files/sarif-support)
+  output as an artifact named `detekt-output`. Fork code never executes with write access.
+- `.github/workflows/detekt-review.yml`: Triggered by `workflow_run` on completion of `detekt.yml`. Always uses the version from the
+  base branch, so a fork PR cannot modify it. Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the
+  artifact to `runner.temp` (outside the workspace) and runs the review script. The script only reads the pre-generated SARIF, so fork
+  code has no influence over what runs here.
+- `.github/scripts/post_detekt_review.main.kts`: Kotlin script that parses the SARIF, formats the findings into a PR comment, and
+  manages the `Detekt` label.
+
+The PR number is not stored in the artifact. `detekt-review.yml` resolves it at runtime by querying the GitHub API for open pull requests
+matching the head repository and branch from the triggering workflow run.
+
 ## Access Wideners
 
-You may want to use private minecraft methods or fields, this is where access wideners come in.
+You may want to use private Minecraft methods or fields, this is where access wideners come in.
 Access wideners are a way to access private methods and fields in Minecraft classes. They are used to modify the access level of a method or
 field and allow it to be accessed from other classes. This is an easier alternative to using mixins and making an accessor.
 To get an access widener entry, you can use the Minecraft Development plugin for IntelliJ. Then you can right-click on a method or field and
 select `Copy / Paste Special` -> `AW Entry` and paste this into the bottom
 of `src/main/resources/skyhanni.classtweaker`.
-Then you need to reload gradle for the changes to apply.
+Then you need to reload Gradle for the changes to apply.
 
 This requires you to have the Minecraft Development plugin installed as mentioned earlier.

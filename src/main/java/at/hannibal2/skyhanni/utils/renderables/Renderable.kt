@@ -46,6 +46,7 @@ import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import java.awt.Color
+import kotlin.math.floor
 import kotlin.math.max
 
 @Suppress("TooManyFunctions")
@@ -58,11 +59,11 @@ interface Renderable {
     val verticalAlign: VerticalAlignment
 
     fun isHovered(mouseOffsetX: Int, mouseOffsetY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
+        x >= mouseOffsetX && x < mouseOffsetX + width && y >= mouseOffsetY && y < mouseOffsetY + height
     } ?: false
 
     fun isBoxHovered(mouseOffsetX: Int, width: Int, mouseOffsetY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (mouseOffsetX..mouseOffsetX + width) && y in (mouseOffsetY..mouseOffsetY + height)
+        x >= mouseOffsetX && x < mouseOffsetX + width && y >= mouseOffsetY && y < mouseOffsetY + height
     } ?: false
 
     /**
@@ -933,59 +934,45 @@ interface Renderable {
             scrollbarTrackColor: ChromaColour = Companion.scrollbarTrackColor,
             scrollbarThumbColor: ChromaColour = Companion.scrollbarThumbColor,
         ) {
-            val end = scroll.asInt() + height + 1
+            val topTipHeight = if (showScrollableTipsInList && !scroll.atMinimum()) scrollUpTip.height else 0
+            val bottomTipHeight = if (showScrollableTipsInList && !scroll.atMaximum()) scrollDownTip.height else 0
+            val contentBottom = (height - bottomTipHeight).coerceAtLeast(topTipHeight)
+            val contentHeight = contentBottom - topTipHeight
 
-            var renderY = 0
-            var virtualY = 0
-            var found = false
+            if (topTipHeight > 0) renderAtY(scrollUpTip, mouseOffsetX, mouseOffsetY, width, 0.0)
 
-            var negativeSpace1 = 0
-            var negativeSpace2 = 0
+            if (contentHeight > 0) {
+                GuiRenderUtils.enableScissor(0, topTipHeight, width, contentBottom)
+                try {
+                    val scrollOffset = scroll.asDouble()
+                    val visibleEnd = scrollOffset + contentHeight
+                    var virtualY = 0
 
-            // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
-            // there are more items above
-            if (showScrollableTipsInList && !scroll.atMinimum()) {
-                scrollUpTip.renderXAligned(mouseOffsetX, mouseOffsetY, width)
-                DrawContextUtils.translate(0f, scrollUpTip.height.toFloat())
-                renderY += scrollUpTip.height
-                negativeSpace1 -= scrollUpTip.height
-            }
-
-            val atScrollEnd = scroll.atMaximum()
-            if (!atScrollEnd) {
-                negativeSpace2 -= scrollDownTip.height
-            }
-
-            val window = scroll.asInt()..(end + negativeSpace1 + negativeSpace2)
-
-            for (renderable in list) {
-                if ((virtualY..virtualY + renderable.height) in window) {
-                    renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                    DrawContextUtils.translate(0f, renderable.height.toFloat())
-                    renderY += renderable.height
-                    found = true
-                } else if (found) {
-                    if (renderY + renderable.height <= height + negativeSpace2) {
-                        renderable.renderXAligned(mouseOffsetX, mouseOffsetY + renderY, width)
-                        DrawContextUtils.translate(0f, renderable.height.toFloat())
-                        renderY += renderable.height
+                    for (renderable in list) {
+                        val renderableEnd = virtualY + renderable.height
+                        if (renderableEnd >= scrollOffset && virtualY <= visibleEnd) {
+                            val renderY = topTipHeight + virtualY - scrollOffset
+                            renderAtY(renderable, mouseOffsetX, mouseOffsetY, width, renderY)
+                        }
+                        if (virtualY > visibleEnd) {
+                            break
+                        }
+                        virtualY = renderableEnd
                     }
-                    break
+                } finally {
+                    GuiRenderUtils.disableScissor()
                 }
-                virtualY += renderable.height
             }
 
-            // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
-            // there are more items below
-            if (showScrollableTipsInList && !atScrollEnd) {
-                scrollDownTip.renderXAligned(mouseOffsetX, mouseOffsetY + height - scrollDownTip.height, width)
+            if (bottomTipHeight > 0) {
+                renderAtY(scrollDownTip, mouseOffsetX, mouseOffsetY, width, (height - bottomTipHeight).toDouble())
             }
-
-            DrawContextUtils.translate(0f, -renderY.toFloat())
 
             if (showScrollbar && virtualHeight > height) {
                 val barX = width - 4
-                val maxScroll = (virtualHeight - height).coerceAtLeast(1).toFloat()
+                val maxScroll = (virtualHeight - height + if (showScrollableTipsInList) scrollUpTip.height else 0)
+                    .coerceAtLeast(1)
+                    .toFloat()
                 val thumbRatio = height.toFloat() / virtualHeight
                 val thumbHeight = (thumbRatio * height).toInt().coerceAtLeast(8)
                 val thumbY = ((scroll.asDouble() / maxScroll) * (height - thumbHeight)).toInt()
@@ -994,6 +981,18 @@ interface Renderable {
                 ShaderRenderUtils.drawRoundRectDeferred(barX, 0, 4, height, trackRgb, 2, 1f)
                 ShaderRenderUtils.drawRoundRectDeferred(barX, thumbY, 4, thumbHeight, thumbRgb, 2, 1f)
             }
+        }
+
+        private fun renderAtY(
+            renderable: Renderable,
+            mouseOffsetX: Int,
+            mouseOffsetY: Int,
+            width: Int,
+            y: Double,
+        ) {
+            DrawContextUtils.translate(0f, y.toFloat())
+            renderable.renderXAligned(mouseOffsetX, mouseOffsetY + floor(y).toInt(), width)
+            DrawContextUtils.translate(0f, -y.toFloat())
         }
 
         fun filterList(content: Map<Renderable, String?>, textBox: String) =

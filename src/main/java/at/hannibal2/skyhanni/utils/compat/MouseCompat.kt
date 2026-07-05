@@ -5,24 +5,35 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
+import kotlin.math.sign
 
 object MouseCompat {
+
     private const val NUMBER_OF_MOUSE_BUTTONS = 6
 
-    private val buttonStates = BooleanArray(NUMBER_OF_MOUSE_BUTTONS)
+    @JvmStatic
+    var deltaMouseX = 0.0
 
     @JvmStatic
     var deltaMouseY = 0.0
-    @JvmStatic
-    var deltaMouseX = 0.0
+        set(value) {
+            field = value
+            mouseMoveEventId++
+        }
+
     @JvmStatic
     var scroll = 0.0
-    @JvmStatic
-    var timeDelta = 0.0
+        set(value) {
+            field = value
+            if (value != 0.0) scrollEventId++
+        }
 
-    private val mouse by lazy {
-        Minecraft.getInstance().mouseHandler
-    }
+    private var mouseMoveEventId = 0L
+    private var scrollEventId = 0L
+
+    private val buttonStates = BooleanArray(NUMBER_OF_MOUSE_BUTTONS)
+
+    private val mouse by lazy { Minecraft.getInstance().mouseHandler }
 
     fun isButtonDown(button: Int): Boolean {
         if (button in 0..5) return buttonStates[button]
@@ -36,10 +47,22 @@ object MouseCompat {
     }
 
     fun getScrollDelta(): Int {
+        return (getPreciseScrollDelta() * 120).toInt()
+    }
+
+    fun getPreciseScrollDelta(): Double {
         val delta = scroll
         DelayedRun.runNextTickEnd { scroll = 0.0 }
-        return delta.toInt() * 120
+        val options = Minecraft.getInstance().options
+        val scrollAmount = if (options.discreteMouseScroll().get()) delta.sign else delta
+        return scrollAmount * options.mouseWheelSensitivity().get()
     }
+
+    fun hasScrollDelta(): Boolean = scroll != 0.0
+
+    fun getMouseMoveEventId(): Long = mouseMoveEventId
+
+    fun getScrollEventId(): Long = scrollEventId
 
     fun getX(): Int {
         return mouse.xpos().toInt()
@@ -50,7 +73,6 @@ object MouseCompat {
     }
 
     fun getEventButtonState(): Boolean = buttonStates.any { it }
-    fun getEventNanoseconds(): Long = timeDelta.toLong()
 
     fun getEventDY(): Int {
         return deltaMouseY.toInt()

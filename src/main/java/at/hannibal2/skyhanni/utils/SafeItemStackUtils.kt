@@ -2,34 +2,31 @@
 
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import net.minecraft.world.item.Item
+
+//? if >= 26.1
+import net.minecraft.core.registries.BuiltInRegistries
 
 /**
- * Tracks whether Minecraft's item component data has been fully bound.
+ * Central compatibility helpers for Minecraft item component binding.
  *
- * [componentsLoaded] lets callers avoid direct [net.minecraft.world.item.ItemStack]
- * work until the "Components not bound yet" crash introduced in 26.1 can no longer occur.
+ * Minecraft 26.1 can expose item registry holders before their default components are bound.
+ * Callers that need component reads should go through these helpers instead of checking
+ * version-specific registry state locally.
  */
-@SkyHanniModule
 object SafeItemStackUtils {
 
-    /**
-     * `true` once [ComponentsLoadedEvent] has fired, meaning it is safe to
-     * construct [net.minecraft.world.item.ItemStack] instances from vanilla items.
-     *
-     */
-    var componentsLoaded: Boolean = false
-        private set
-
-    init {
-        //? if < 26.1
-        //componentsLoaded = true
+    fun canBindComponents(item: Item?): Boolean {
+        item ?: return false
+        //~ if < 26.1 'return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()' -> 'return true'
+        return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()
     }
 
-    @HandleEvent
-    fun onComponentsLoaded() {
-        componentsLoaded = true
-    }
+    fun canReadComponents(stack: SafeItemStack): Boolean = canBindComponents(stack.itemType)
+}
+
+fun SafeItemStack.ensureComponentsBound(): SafeItemStack {
+    //? if >= 26.1
+    (this as? DeferredItemStack)?.bindComponentsIfReady()
+    return this
 }
