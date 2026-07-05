@@ -11,15 +11,6 @@ import org.jetbrains.kotlin.psi.KtImportList
  */
 class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
-    private fun String.isLineBlockSeparator(): Boolean {
-        if (this.isEmpty()) return true
-
-        return this.containsPreprocessingPattern() ||
-            this.startsWith("//?") ||
-            this.startsWith("//~") ||
-            this.startsWith("//#")
-    }
-
     private fun getBlocks(importList: KtImportList): List<List<KtImportDirective>> {
         val blocks = mutableListOf<List<KtImportDirective>>()
         val imports = ArrayDeque(importList.imports)
@@ -99,51 +90,12 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
         return null
     }
 
-    private fun checkEmptyLines(importList: KtImportList): KtImportDirective? {
-        val rawLines = importList.text.lines()
-        val imports = importList.imports.iterator()
-
-        var inBlock = false
-        var seenEmptyLine = false
-
-        for (rawLine in rawLines) {
-            val line = rawLine.trim()
-            if (line.startsWith("import ")) {
-                if (!imports.hasNext()) break
-                val current = imports.next()
-
-                // If we hit an import, and we've already seen an empty line
-                // while in a block, this is an illegal break.
-                if (inBlock && seenEmptyLine) {
-                    return current
-                }
-
-                inBlock = true
-                seenEmptyLine = false
-            } else if (line.isEmpty()) {
-                if (inBlock) seenEmptyLine = true
-            } else if (line.isLineBlockSeparator()) {
-                // Preprocessor separators reset the block, so empty lines before them
-                // were valid boundaries.
-                inBlock = false
-                seenEmptyLine = false
-            }
-        }
-        return null
-    }
-
     override fun visitImportList(importList: KtImportList) {
         val blocks = getBlocks(importList)
 
         val sortingViolation = checkSorting(blocks)
         if (sortingViolation != null) {
             sortingViolation.reportIssue("Import is not in lexicographical order.")
-            return
-        }
-
-        val emptyLineViolation = checkEmptyLines(importList)
-        if (emptyLineViolation != null) {
-            emptyLineViolation.reportIssue("Illegal empty line between standard imports.")
             return
         }
 
