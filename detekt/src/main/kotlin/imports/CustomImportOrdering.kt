@@ -28,26 +28,19 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
 
         for (rawLine in importList.text.lines()) {
             val line = rawLine.trim()
-
             when {
-                // Start of //? if block
                 line.contains(PreprocessingPattern.IF.asComment) -> {
                     flushCurrentBlock()
                     inIfBlock = true
                 }
-
-                // End of //? if block
                 line.contains(PreprocessingPattern.ENDIF.asComment) -> {
                     flushCurrentBlock()
                     inIfBlock = false
                 }
-
-                // Single-import directives.
                 line.startsWith("//~") || line.startsWith("//#") -> {
                     flushCurrentBlock()
                     nextImportIsStandalone = true
                 }
-
                 line.startsWith("import ") -> {
                     val import = imports.removeFirst()
 
@@ -55,26 +48,20 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
                         inIfBlock -> {
                             currentBlock += import
                         }
-
                         nextImportIsStandalone -> {
                             blocks += listOf(import)
                             nextImportIsStandalone = false
                         }
-
                         else -> {
                             currentBlock += import
                         }
                     }
                 }
 
-                line.isBlank() -> {
-                    flushCurrentBlock()
-                }
+                line.isBlank() -> flushCurrentBlock()
             }
         }
-
         flushCurrentBlock()
-
         return blocks
     }
 
