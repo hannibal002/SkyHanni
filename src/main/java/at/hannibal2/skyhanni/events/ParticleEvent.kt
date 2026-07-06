@@ -1,13 +1,11 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent.Cancellable
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
-import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
  * Shared particle packet payload used by the particle detection and handling events.
@@ -22,13 +20,13 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  */
 sealed class ParticleEvent(
     val type: ParticleType<*>,
-    open val location: LorenzVec,
+    override val location: LorenzVec,
     val count: Int,
     val speed: Float,
     val offset: LorenzVec,
     val longDistance: Boolean,
     val particleArgs: IntArray? = null,
-) : SkyHanniEvent() {
+) : CancellableWorldEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
@@ -44,7 +42,6 @@ sealed class ParticleEvent(
  *
  * Use this for detection, tracking, and other read-only reactions.
  */
-@PrimaryFunction("onParticleDetected")
 class ParticleDetectedEvent(
     type: ParticleType<*>,
     override val location: LorenzVec,
@@ -60,7 +57,6 @@ class ParticleDetectedEvent(
  *
  * Listeners may call [cancel] to stop the particle packet from being processed.
  */
-@PrimaryFunction("onParticleReceived")
 class ParticleReceivedEvent(
     type: ParticleType<*>,
     override val location: LorenzVec,
@@ -69,6 +65,6 @@ class ParticleReceivedEvent(
     offset: LorenzVec,
     longDistance: Boolean,
     particleArgs: IntArray? = null,
-) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs), Cancellable
+) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs)
 
 

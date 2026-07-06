@@ -1,3 +1,3 @@
 package at.hannibal2.skyhanni.events
 
-typealias ReceiveParticleEvent = ParticleReceivedEvent
+typealias ReceiveParticleEvent = ParticleDetectedEvent
