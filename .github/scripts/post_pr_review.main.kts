@@ -418,24 +418,26 @@ fun runChangelogMode(prNumber: String) {
     val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
     val existingId = findExistingComment(prNumber, changelogMarker)
 
-    if (errors.isNullOrBlank()) {
-        println("No changelog errors found")
-        if (existingId != null) markCommentAsStale(
-            existingId,
+    fun markCommentAsStale() {
+        val id = existingId ?: return
+        markCommentAsStale(
+            id,
             changelogMarker,
             changelogStaleMarker,
             "Show previous issues",
         )
+    }
+
+    if (errors == null) error("Artifact missing - changelog step likely failed before artifact upload")
+
+    if (errors.isBlank()) {
+        println("No changelog errors found")
+        markCommentAsStale()
         setLabel(prNumber, changelogLabel, false)
         exitProcess(0)
     }
 
-    if (existingId != null) markCommentAsStale(
-        existingId,
-        changelogMarker,
-        changelogStaleMarker,
-        "Show previous issues",
-    )
+    markCommentAsStale()
 
     val (postStatus, _) = ghRequest(
         "POST",
