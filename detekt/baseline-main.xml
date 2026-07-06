@@ -524,7 +524,7 @@
     <ID>UnusedParameter:RenderEvents.kt:RenderEvents$tick: DeltaTracker</ID>
     <ID>UnusedPrivateProperty:BetterContainers.kt:BetterContainers$private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")</ID>
     <ID>UnusedPrivateProperty:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"</ID>
-    <ID>UnusedPrivateProperty:ParticleDetectedEvent.kt:ParticleDetectedEvent$private val particleArgs: IntArray? = null</ID>
+    <ID>UnusedPrivateProperty:ParticleEvent.kt:ParticleEvent$private val particleArgs: IntArray? = null</ID>
     <ID>UnusedVariable:MobFinder.kt:MobFinder$val entity = mob.baseEntity</ID>
     <ID>UseOrEmpty:EquipmentApi.kt:EquipmentApi$equipment?.filterNotNull() ?: emptyList()</ID>
     <ID>UseOrEmpty:ItemUtils.kt:ItemUtils$lore ?: emptyList()</ID>
