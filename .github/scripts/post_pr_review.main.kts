@@ -47,15 +47,27 @@ val mode: String = System.getenv("MODE") ?: error("MODE not set")
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
 
-fun error(message: String): Nothing {
+var errorCommentPosted = false
+
+fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
+    if (commentError && !errorCommentPosted) {
+        val comment = buildString {
+            appendLine("❌ Workflow failed: $mode")
+            appendLine()
+            appendLine("'$message'")
+        }
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
+        postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
+        errorCommentPosted = true
+    }
     exitProcess(1)
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299
 
-fun Int.requireSuccess(message: String) {
-    if (isHttpError) error(message)
+fun Int.requireSuccess(message: String, commentError: Boolean = true) {
+    if (isHttpError) error(message, commentError)
 }
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
