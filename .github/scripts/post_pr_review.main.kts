@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
-// Execution context: base branch, called from detekt-review.yml, build-review.yml, and label-merge-conflict.yml
+// Execution context: base branch, called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, and changelog-review.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -32,6 +32,11 @@ val buildStaleMarker = "<!-- build-failure-review-stale -->"
 val conflictLabel = "Merge Conflicts"
 val conflictMarker = "<!-- merge-conflict-review -->"
 val conflictStaleMarker = "<!-- merge-conflict-review-stale -->"
+
+val changelogLabel = "Wrong Title/Changelog"
+val changelogMarker = "<!-- changelog-check-review -->"
+val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
+
 val maxDirectFindings = 8
 val maxLogChars = 10_000
 
@@ -279,7 +284,13 @@ fun runMergeConflictMode(prNumber: String) {
 
 fun runDetektMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, detektMarker)
-    if (existingId != null) markCommentAsStale(existingId, detektMarker, detektStaleMarker, "Outdated Detekt issues", "click to show old warnings")
+    if (existingId != null) markCommentAsStale(
+        existingId,
+        detektMarker,
+        detektStaleMarker,
+        "Outdated Detekt issues",
+        "click to show old warnings"
+    )
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
     val sarifFile = artifactDir / "main.sarif"
@@ -370,6 +381,56 @@ fun runBuildMode(prNumber: String) {
     println("Done: build failure comment posted, added label")
 }
 
+fun readChangelogErrors(artifactDirPath: String?): String? {
+    if (artifactDirPath == null) return null
+    return runCatching {
+        val file = Path(artifactDirPath) / "changelog_errors.txt"
+        if (file.exists()) file.readText().takeIf { it.isNotBlank() } else null
+    }.getOrNull()
+}
+
+fun buildChangelogBody(errors: String): String = buildString {
+    appendLine(changelogMarker)
+    appendLine("### Changelog verification failed")
+    appendLine()
+    append(errors.trimEnd())
+}
+
+fun runChangelogMode(prNumber: String) {
+    val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
+    val existingId = findExistingComment(prNumber, changelogMarker)
+
+    if (errors.isNullOrBlank()) {
+        println("No changelog errors found")
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            changelogMarker,
+            changelogStaleMarker,
+            "Outdated changelog issues",
+            "click to show old issues",
+        )
+        setLabel(prNumber, changelogLabel, false)
+        exitProcess(0)
+    }
+
+    if (existingId != null) markCommentAsStale(
+        existingId,
+        changelogMarker,
+        changelogStaleMarker,
+        "Outdated changelog issues",
+        "click to show old issues",
+    )
+
+    val (postStatus, _) = ghRequest(
+        "POST",
+        "/repos/$repo/issues/$prNumber/comments",
+        mapOf("body" to buildChangelogBody(errors)),
+    )
+    postStatus.requireSuccess("Error: could not post changelog comment (HTTP $postStatus)")
+    setLabel(prNumber, changelogLabel, true)
+    println("Done: changelog check comment posted")
+}
+
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
 if (mode == "mergeconflict") {
@@ -387,6 +448,7 @@ val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping
 when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
+    "changelog" -> runChangelogMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
 

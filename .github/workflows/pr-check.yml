@@ -30,8 +30,11 @@ jobs:
             -   name: Grant execute permission for gradlew
                 run: chmod +x gradlew
 
+
             -   name: Run ChangeLog verification w/retry
+                id: check_main
                 if: github.repository == 'hannibal002/SkyHanni'
+                continue-on-error: true
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
@@ -39,10 +42,24 @@ jobs:
                 with:
                     gradle-command: checkPrDescription
             -   name: Run ChangeLog verification w/retry
+                id: check_fork
                 if: github.repository != 'hannibal002/SkyHanni'
+                continue-on-error: true
                 env:
                     PR_TITLE: ${{ github.event.pull_request.title }}
                     PR_BODY: ${{ github.event.pull_request.body }}
                 uses: ./.github/actions/gradle-retry
                 with:
                     gradle-command: checkPrDescription
+
+            -   name: Upload changelog check failure artifact
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                uses: actions/upload-artifact@v7
+                with:
+                    name: changelog-check-failure
+                    path: build/changelog_errors.txt
+                    if-no-files-found: warn
+
+            -   name: Fail job if changelog check failed
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                run: exit 1
