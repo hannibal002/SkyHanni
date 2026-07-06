@@ -8,7 +8,7 @@ autoservice-ksp = "1.1.0"
 autoservice-annotations = "1.1.1"
 gson = "2.13.1"
 guava = "33.2.1-jre"
-changelog-builder = "1.1.5"
+changelog-builder = "1.1.6"
 methanol = "1.8.3"
 
 shadow = "9.3.1"
