@@ -23,8 +23,8 @@ import kotlin.system.exitProcess
 
 val detektLabel = "Detekt"
 val buildLabel = "Fails Multi-Version"
-val marker = "<!-- detekt-review -->"
-val staleMarker = "<!-- detekt-review-stale -->"
+val detektMarker = "<!-- detekt-review -->"
+val detektStaleMarker = "<!-- detekt-review-stale -->"
 val buildMarker = "<!-- build-failure-review -->"
 val buildStaleMarker = "<!-- build-failure-review-stale -->"
 val maxDirectFindings = 8
@@ -101,7 +101,7 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("@", "&#64;")
 
 fun buildDetektBody(findings: List<Finding>): String = buildString {
-    appendLine(marker)
+    appendLine(detektMarker)
     appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(maxDirectFindings)
@@ -207,8 +207,8 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
 }
 
 fun runDetektMode(prNumber: String) {
-    val existingId = findExistingComment(prNumber, marker)
-    if (existingId != null) markCommentAsStale(existingId, marker, staleMarker, "Outdated Detekt issues", "click to show old warnings")
+    val existingId = findExistingComment(prNumber, detektMarker)
+    if (existingId != null) markCommentAsStale(existingId, detektMarker, detektStaleMarker, "Outdated Detekt issues", "click to show old warnings")
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
     val sarifFile = artifactDir / "main.sarif"
