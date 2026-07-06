@@ -59,9 +59,8 @@ object ChatUtils {
     fun debug(
         message: String,
         replaceSameMessage: Boolean = false,
-        associatedDebugToggle: Boolean = true,
     ) {
-        if (SkyBlockUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage) && associatedDebugToggle) {
+        if (SkyBlockUtils.debug && internalChat(DEBUG_PREFIX + message, replaceSameMessage)) {
             consoleLog("[Debug] $message")
         }
     }

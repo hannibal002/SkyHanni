@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -40,6 +41,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object RemainingSlayerKills {
@@ -87,7 +89,7 @@ object RemainingSlayerKills {
         val equipments: Map<SlayerType, Map<NeuInternalName, Int>>,
 
         @Expose
-        val pets: Map<SlayerType, Map<String, PetData>>,
+        val pets: Map<SlayerType, Map<String, SlayerSpecificPetData>>,
 
         @Expose
         val champion: List<Double>,
@@ -99,7 +101,7 @@ object RemainingSlayerKills {
         @Expose @SerializedName("arbitrary_multiplier") val arbitraryMultiplier: Double,
     )
 
-    data class PetData(
+    data class SlayerSpecificPetData(
         // These are only the first halves of a pet's Internal Name, this is the name used within PetData/PetUtils for these.
         @Expose @SerializedName("proper_pet_names") val properPetNames: List<String>? = null,
         @Expose @SerializedName("scaling") val perLevelMultiplier: List<Float>,
@@ -186,16 +188,16 @@ object RemainingSlayerKills {
         val mobs = getMobs() ?: return listOf()
 
         val combatWisdomMultiplier = getCombatWisdomMultiplier()
-        ChatUtils.debug("$combatWisdomMultiplier multiplier for Combat Wisdom .", associatedDebugToggle = debugToggle)
+        debugMessage("$combatWisdomMultiplier multiplier for Combat Wisdom .")
         val multiplicativeMultiplier = getMultiplicativeMultiplier()
-        ChatUtils.debug("$multiplicativeMultiplier multiplier for multiplicatives.", associatedDebugToggle = debugToggle)
+        debugMessage("$multiplicativeMultiplier multiplier for multiplicatives.")
         return mobs.map { mob ->
             var expectedXP = (mob.xp * combatWisdomMultiplier * multiplicativeMultiplier)
             val maxObtainableAtATime = (totalQuestXP * 0.75)
             // The maximum amount of progress that a kill can contribute towards your Slayer Quest has been raised from 50% to 75%.
             // https://hypixel.net/threads/hypixel-skyblock-0-20-9-crimson-isle-qol.5809290/
             expectedXP = expectedXP.coerceAtMost(maxObtainableAtATime)
-            ChatUtils.debug("Base Mob XP: ${mob.xp}, Post Multiplier XP = $expectedXP", associatedDebugToggle = debugToggle)
+            debugMessage("Base Mob XP: ${mob.xp}, Post Multiplier XP = $expectedXP")
             val timesNeeded = missing / expectedXP
             val kills = "§e${ceil(timesNeeded).addSeparators()}x"
             " §7- $kills ${mob.names(expectedXP, totalQuestXP)}" to timesNeeded
@@ -217,13 +219,17 @@ object RemainingSlayerKills {
 
     private fun getCombatWisdomMultiplier(): Double {
         var combatWisdom = 1.0
-        val baseCombatWisdom = SkyblockStat.COMBAT_WISDOM.lastKnownValue ?: 0.0
-
-        combatWisdom += (baseCombatWisdom)
-        ChatUtils.debug("Combat Wisdom in /eq is $baseCombatWisdom", associatedDebugToggle = debugToggle)
+        val baseCombatWisdom = SkyblockStat.COMBAT_WISDOM.lastKnownValue
+        if (baseCombatWisdom == null) {
+            remindToUpdateCombatWisdom()
+        }
+        else {
+            combatWisdom += (baseCombatWisdom)
+            debugMessage("Combat Wisdom in /eq is $baseCombatWisdom")
+        }
 
         combatWisdom += killComboWisdom
-        ChatUtils.debug("kill combo wisdom is $killComboWisdom", associatedDebugToggle = debugToggle)
+        debugMessage("kill combo wisdom is $killComboWisdom")
 
         data?.let { data ->
             data.weapons[SlayerApi.activeType]?.get(InventoryUtils.itemInHandId)?.let { wisdom ->
@@ -249,16 +255,18 @@ object RemainingSlayerKills {
 
     private fun getMultiplicativeMultiplier(): Double {
         var multiplier = 1.0
+        val data = data ?: return 1.0
 
-        for (perk in ElectionApi.getAllActivePerks()) {
-            multiplier *= data?.multiplicativeMayors?.get(perk.toString()) ?: 1.0
-        }
-        multiplier *= data?.arbitraryMultiplier ?: 1.0
+        ElectionApi.getAllActivePerks().onEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
+
+        multiplier *= data.arbitraryMultiplier
         // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
 
         // Do not add multiplicative bonuses here from Seasonal buffs without checking fully
         // They are not implemented but can be added using the "arbitrary_multiplier" field in repo to remote update functionally.
         // They have historically not worked on slayer spawn entirely.
+
+        // TODO Automatic Raffle Boost Detection as the 50% is the only "Seasonal" boost known to work on slayer spawn.
 
         multiplier *= getAdditivelyMultiplicativeValues()
 
@@ -279,10 +287,10 @@ object RemainingSlayerKills {
 
         val currentPet = CurrentPetApi.currentPet
         val fauxInternalName = currentPet?.fauxInternalName ?: return additiveWithMultMultipliers
-        ChatUtils.debug("$fauxInternalName", associatedDebugToggle = debugToggle)
+        debugMessage("$fauxInternalName")
         val petProperName = PetUtils.getPetProperName(fauxInternalName).orEmpty()
         val petRarity = PetUtils.getPetRarity(fauxInternalName) ?: return additiveWithMultMultipliers
-        ChatUtils.debug("Split Internal Name, ID = $petProperName, rarity = $petRarity", associatedDebugToggle = debugToggle)
+        debugMessage("Split Internal Name, ID = $petProperName, rarity = $petRarity")
         if (petProperName.isEmpty()) return additiveWithMultMultipliers
         data?.let { data ->
             val slayerPetData = data.pets[SlayerApi.activeType]
@@ -290,10 +298,9 @@ object RemainingSlayerKills {
                 slayerPet.value.takeIf { (it.properPetNames != null && it.properPetNames.contains(petProperName)) }
             } ?: return additiveWithMultMultipliers
 
-            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level) + 1
-            ChatUtils.debug(
+            additiveWithMultMultipliers += (levellingData.perLevelMultiplier[petRarity.id] * currentPet.level)
+            debugMessage(
                 "$additiveWithMultMultipliers Pet & Champion Multiplier, ${currentPet.level} is Pet Level.",
-                associatedDebugToggle = debugToggle,
             )
         }
 
@@ -337,6 +344,24 @@ object RemainingSlayerKills {
         }
     }
 
+    private fun debugMessage(message: String) {
+        if (debugToggle) ChatUtils.debug(message)
+    }
+
+    private fun remindToUpdateCombatWisdom() {
+        if (lastReminder.passedSince() < 5.minutes) return
+
+        lastReminder = SimpleTimeMark.now()
+        ChatUtils.clickToActionOrDisable(
+            "Remaining Slayer Kills feature needs to know your combat wisdom to work.",
+            config::display,
+            actionName = "open stats menu",
+            action = {
+                HypixelCommands.stats()
+            },
+        )
+    }
+
     init {
         RenderDisplayHelper(
             outsideInventory = true,
@@ -347,6 +372,7 @@ object RemainingSlayerKills {
             },
         )
     }
+
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.display
 }
