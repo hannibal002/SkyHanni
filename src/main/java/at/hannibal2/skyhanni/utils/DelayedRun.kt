@@ -40,15 +40,13 @@ object DelayedRun {
     /**
      * I'm not sure why, but this acts different to the above one
      */
-
-
     fun runNextTickOld(run: () -> Unit) = futureTasks.add(run to SimpleTimeMark.farPast())
 
     /**
      *
      * Runs now if we are on the main thread, otherwise queues it for the next tick.
      */
-    fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
+    fun runOrNextTick (run: () -> Unit) = Minecraft.getInstance().execute(run)
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
