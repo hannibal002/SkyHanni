@@ -250,6 +250,36 @@ fun parseStackTrace(logContent: String): String {
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
+
+fun isStonecutterOneLiner(oneLiner: String): Boolean {
+    if (!oneLiner.startsWith("e: ")) return false
+    val path = oneLiner.removePrefix("e: ").substringBefore(" ")
+    return "stonecutter" in path
+}
+
+fun normalizeOneLiner(oneLiner: String): String {
+    if (!oneLiner.startsWith("e: ")) return oneLiner
+    val rest = oneLiner.removePrefix("e: ")
+    val fileAndPosition = rest.substringBefore(" ").substringAfterLast("/")
+    val message = rest.substringAfter(" ", missingDelimiterValue = "")
+    return if (message.isEmpty()) "e: $fileAndPosition" else "e: $fileAndPosition $message"
+}
+
+fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pair<String, String?>> {
+    val nonEmpty = versions.filter { !it.second.isNullOrBlank() }
+    if (nonEmpty.size != 2) return versions
+    val oneLiners = nonEmpty.map { parseOneLiner(it.second!!) }
+    if (oneLiners.any { it == null }) return versions
+    val (ol1, ol2) = oneLiners.requireNoNulls()
+    if (normalizeOneLiner(ol1) != normalizeOneLiner(ol2)) return versions
+    if (!isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) return versions
+    return versions.filter { (_, log) ->
+        if (log.isNullOrBlank()) return@filter true
+        val ol = parseOneLiner(log) ?: return@filter true
+        !isStonecutterOneLiner(ol)
+    }
+}
+
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
     appendLine(buildMarker)
     for ((version, logContent) in versions) {
@@ -421,7 +451,7 @@ fun runBuildMode(prNumber: String) {
         "Show previous errors"
     )
 
-    val versions = listOf("1.21.11" to log1, "26.1" to log2)
+    val versions = filterStonecutterDuplicates(listOf("1.21.11" to log1, "26.1" to log2))
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBuildFailureBody(versions)))
     postStatus.requireSuccess("Error: could not post build failure comment (HTTP $postStatus)")
     setLabel(prNumber, buildLabel, true)
