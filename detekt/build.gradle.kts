@@ -13,7 +13,6 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
     implementation(libs.detektrules.ktlint)
-    testImplementation(libs.kotest.assertions)
     testImplementation(libs.detekt.test)
     detektPlugins(libs.detektrules.authors)
     detektPlugins(libs.detektrules.ktlint)

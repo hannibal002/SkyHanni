@@ -26,7 +26,7 @@ object GuiScreenUtils {
         get() = mc.window.height
 
     val scaleFactor: Int
-        get() = screenMetricsOverride?.scaleFactor ?: mc.window.guiScale.toInt()
+        get() = screenMetricsOverride?.scaleFactor ?: mc.window.guiScale
 
     private val globalMouseX get() = MouseCompat.getX()
     private val globalMouseY get() = MouseCompat.getY()

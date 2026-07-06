@@ -48,6 +48,15 @@ object ChatUtils {
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
 
+    fun Component.hoverTextLines(): List<String> = buildList {
+        addHoverTextLines(this@hoverTextLines)
+    }
+
+    private fun MutableList<String>.addHoverTextLines(component: Component) {
+        component.hover?.formattedTextCompat()?.split("\n")?.let(::addAll)
+        component.siblings.forEach { addHoverTextLines(it) }
+    }
+
     /**
      * Sends a debug message to the chat and the console.
      * This is only sent if the debug feature is enabled.
@@ -398,18 +407,6 @@ object ChatUtils {
     }
 
     private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
-
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
-        it.isNotEmpty()
-    }?.get(0) == commandWithSlash
-
-    fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
-
-    fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.id == "skyhanni"
-
-    fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
-        MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 
     fun chatAndOpenConfig(message: String, property: KProperty0<*>) {
         clickableChat(

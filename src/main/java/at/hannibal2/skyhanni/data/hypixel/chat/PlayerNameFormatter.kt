@@ -258,7 +258,7 @@ object PlayerNameFormatter {
         removeColor: String,
         rankColor: String,
     ): ComponentSpan {
-        val style = name.sampleStyleAtStart() ?: error("style is null")
+        val style = name.sampleStyleAtStart()
         return when {
             MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
                 (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
