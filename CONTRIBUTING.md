@@ -409,13 +409,24 @@ We use the [auto update library](https://github.com/nea89o/libautoupdate) from n
 While not directly part of the Minecraft mod, it is useful to know that we have
 a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with small tasks related to PRs.
 
-### Automated Detekt Review
+### Automated GitHub Workflows
+
+Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
+All workflows use `.github/scripts/post_pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
+
+When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. If issues still exist, a new
+comment is posted at the bottom of the conversation. When all issues are resolved, the label is removed and no new comment is posted.
+
+Most workflows use a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions.
+The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
+triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
+`pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
+the head branch of the triggering workflow run. The Merge Conflict Comment and Dependency Label sections do not use this split.
+
+#### Automated Detekt Review
 
 Detekt runs automatically on every pull request. When findings are present, they are posted as a comment on the PR and the `Detekt`
-label is applied. When the same PR is updated, the previous comment is collapsed into a `<details>` spoiler and a new comment is posted
-at the bottom of the conversation.
-
-The setup uses a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions:
+label is applied.
 
 - `.github/workflows/detekt.yml`: Triggered by `pull_request`. Runs with `contents: read` only. Runs `detektMain` and uploads the
   [SARIF](https://docs.github.com/en/code-security/reference/code-scanning/sarif-files/sarif-support)
@@ -427,14 +438,10 @@ The setup uses a two-workflow split to allow write-operations on fork PRs withou
 - `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=detekt`): Parses the SARIF, formats findings into a PR comment,
   manages the `Detekt` label, and handles the stale-comment logic.
 
-The PR number is not stored in the artifact. `detekt-review.yml` resolves it at runtime by querying the GitHub API for open pull
-requests matching the head repository and branch from the triggering workflow run.
-
-### Build Failure Notification
+#### Build Failure Notification
 
 When the multi-version build fails on a pull request, the stack trace is posted as a comment on the PR and the `Fails Multi-Version`
-label is applied. The same stale-comment pattern as Detekt is used: an existing build failure comment is collapsed into a spoiler
-before a new one is posted.
+label is applied.
 
 - `.github/workflows/build.yml`: Triggered by `pull_request` and `push` to beta. On assemble failure, captures the Gradle output via
   `tee` inside `.github/actions/gradle-retry/action.yml`, saves it as a log file, and uploads it as an artifact named
@@ -447,14 +454,12 @@ before a new one is posted.
   compiler error line) and the stack trace starting from `FAILURE: Build failed with an exception` (capped at 10,000 characters).
   Posts the result as a PR comment and manages the `Fails Multi-Version` label.
 
-The PR number is resolved by branch name at runtime. If no open PR matches the branch (e.g. for a direct push to beta), the script
-exits without posting a comment.
+If no open PR matches the branch (e.g. for a direct push to beta), the script exits without posting a comment.
 
-### Merge Conflict Comment
+#### Merge Conflict Comment
 
 When a pull request has merge conflicts with the base branch, the `Merge Conflicts` label is applied and a comment is posted. When
-conflicts are resolved, the comment is collapsed into a `<details>` spoiler and the label is removed without posting a new comment. The
-same stale-comment pattern as Detekt and build failures is used.
+conflicts are resolved, the comment is collapsed into a `<details>` spoiler and the label is removed without posting a new comment.
 
 - `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
   beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
@@ -464,11 +469,11 @@ same stale-comment pattern as Detekt and build failures is used.
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
 
-### Changelog Check Comment
+#### Changelog Check Comment
 
 When a pull request has changelog or title issues detected by the `checkPrDescription` Gradle task, the `Wrong Title/Changelog` label is
 applied and a comment is posted with the list of issues. When the issues are resolved, the comment is collapsed into a `<details>` spoiler
-and the label is removed. The same stale-comment pattern as Detekt and build failures is used.
+and the label is removed.
 
 The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/changelog-verification/` on failure. The comment
 content is read directly from this file without additional parsing.
@@ -484,7 +489,7 @@ content is read directly from this file without additional parsing.
   If the file is present, it stales any existing comment and posts a new one, then adds the label. If the file is absent (check passed), it
   stales any existing comment and removes the label.
 
-### Dependency Label
+#### Dependency Label
 
 When a pull request declares dependencies in its `## Dependencies` section, the `Waiting on Dependency PR` label is automatically added or
 removed based on whether any listed dependencies are still open.
@@ -498,14 +503,12 @@ Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the ope
 release unit.
 
 The check runs on every `opened`, `edited`, and `closed` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
-label are re-evaluated. When a dependent PR lists the closed PR as a direct dependency, a notification comment is posted on it. If the
-dependency was merged, the comment states how many open dependencies remain. If it was closed without merging, the comment advises the
-author to re-evaluate. The label is updated for all affected PRs regardless.
+label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
-Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=dependencies`).
+Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/check-dependencies.js`.
 
 ## Access Wideners
 
