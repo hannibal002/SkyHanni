@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleDetectedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.blockhighlight.SkyHanniBlockHighlighter
@@ -29,7 +29,7 @@ object GlowingMushroomHighlighter {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.ENTITY_EFFECT) return
 

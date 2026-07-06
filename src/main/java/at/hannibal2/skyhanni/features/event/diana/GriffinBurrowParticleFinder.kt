@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
@@ -59,7 +58,7 @@ object GriffinBurrowParticleFinder {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         if (!config.guess) return
 
@@ -100,7 +99,7 @@ object GriffinBurrowParticleFinder {
 
     // TODO move to ParticleUtils or similar
     // TODO remove the roundTo calls as they are only workarounds
-    private enum class ParticleType(val check: ReceiveParticleEvent.() -> Boolean) {
+    private enum class ParticleType(val check: ParticleDetectedEvent.() -> Boolean) {
         EMPTY(
             { type == ParticleTypes.ENCHANTED_HIT && count == 4 && speed == 0.01f && offset.roundTo(2) == LorenzVec(0.5, 0.1, 0.5) },
         ),
