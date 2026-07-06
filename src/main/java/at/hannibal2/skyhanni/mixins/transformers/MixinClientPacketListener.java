@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.ParticleChangeEvent;
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent;
+import at.hannibal2.skyhanni.events.ParticleReceivedEvent;
 import at.hannibal2.skyhanni.features.misc.CurrentPing;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = ClientPacketListener.class, priority = 0)
+@Mixin(ClientPacketListener.class)
 public class MixinClientPacketListener {
 
     @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/DebugScreenOverlay;showNetworkCharts()Z"))
@@ -35,7 +35,7 @@ public class MixinClientPacketListener {
     )
     public void postParticleEvent(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
         if (
-            new ReceiveParticleEvent(
+            new ParticleReceivedEvent(
                 packet.getParticle().getType(),
                 new LorenzVec(packet.getX(), packet.getY(), packet.getZ()),
                 packet.getCount(),
