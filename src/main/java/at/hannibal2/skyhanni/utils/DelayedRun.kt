@@ -22,6 +22,8 @@ object DelayedRun {
     fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
         val time = SimpleTimeMark.now() + duration
         futureTasks.add(run to time)
+
+        var a = 3
         return time
     }
 
