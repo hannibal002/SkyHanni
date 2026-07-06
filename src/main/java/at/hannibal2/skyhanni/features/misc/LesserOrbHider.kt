@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
+import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -41,7 +41,7 @@ object LesserOrbHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onReceiveParticle(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.DUST) return
 
