@@ -50,10 +50,10 @@ abstract class ChangelogVerification : DefaultTask() {
             errorFile.appendText("Detected issues with the pull request description:\n\n")
 
             if (bodyErrors.isNotEmpty()) {
-                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n") { it.formatLine() }}\n\n")
+                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n", prefix = "- ") { it.formatLine() }}\n\n")
             }
             if (titleErrors.isNotEmpty()) {
-                errorFile.appendText("Title issues:\n${titleErrors.joinToString("\n") { it.message }}\n\n")
+                errorFile.appendText("Title issues:\n${titleErrors.joinToString("\n", prefix = "- ") { it.message }}\n\n")
             }
 
             errorFile.appendText("Please fix these issues. For the correct format, refer to the [pull request template]($templateLocation).")
