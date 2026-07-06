@@ -112,6 +112,15 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     }
 }
 
+fun getPrLabels(prNumber: String): Set<String> {
+    val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/labels")
+    if (status.isHttpError) return emptySet()
+    val array = body as? JsonArray ?: return emptySet()
+    return array.mapNotNull {
+        (it as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    }.toSet()
+}
+
 fun normalizePath(uri: String, workspace: String): String {
     val path = runCatching { URI.create(uri).path }.getOrNull() ?: uri.removePrefix("file://")
     if (workspace.isNotEmpty() && path.startsWith(workspace)) return path.removePrefix(workspace).trimStart('/')
@@ -558,8 +567,13 @@ fun checkPrDependencies(issueNumber: String) {
         return
     }
 
-    val hasOpen = deps.any { isDependencyOpen(it) }
+    val openDeps = deps.filter { isDependencyOpen(it) }
+    val hasOpen = openDeps.isNotEmpty()
+    val wasAlreadyLabeled = dependencyLabel in getPrLabels(issueNumber)
     setLabel(issueNumber, dependencyLabel, hasOpen)
+    if (hasOpen && !wasAlreadyLabeled) {
+        postDependencyWaitingComment(issueNumber, openDeps)
+    }
     println("PR #$issueNumber: ${if (hasOpen) "has open dependencies" else "all dependencies resolved"}")
 }
 
@@ -582,6 +596,27 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
         page++
     }
     return result
+}
+
+fun buildDependencyWaitingComment(deps: List<Dependency>): String = buildString {
+    if (deps.size == 1) {
+        val dep = deps.first()
+        val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
+        appendLine("This PR is now waiting on [#${dep.pullNumber}]($link).")
+    } else {
+        appendLine("This PR is now waiting on the following dependencies:")
+        for (dep in deps) {
+            val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
+            appendLine("- [#${dep.pullNumber}]($link)")
+        }
+    }
+}
+
+fun postDependencyWaitingComment(prNum: String, openDeps: List<Dependency>) {
+    val message = buildDependencyWaitingComment(openDeps)
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    if (status.isHttpError) System.err.println("Warning: could not post dependency waiting comment on PR #$prNum (HTTP $status)")
+    else println("PR #$prNum: posted dependency waiting comment")
 }
 
 fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
