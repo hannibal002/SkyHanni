@@ -23,7 +23,6 @@ object DelayedRun {
         val time = SimpleTimeMark.now() + duration
         futureTasks.add(run to time)
 
-        var a = 3
         return time
     }
 
@@ -39,7 +38,7 @@ object DelayedRun {
     /**
      * Runs in the next game tick (up to 50ms delay), always on the main thread.
      */
-    fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
+    fn runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
 
     /**
      * I'm not sure why, but this acts different to the above one
