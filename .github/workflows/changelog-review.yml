@@ -82,5 +82,6 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR: ${{ runner.temp }}/changelog-check-failure
+                    WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
                     MODE: changelog
                 run: kotlinc -script .github/scripts/post_pr_review.main.kts
