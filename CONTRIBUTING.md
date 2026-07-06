@@ -478,7 +478,7 @@ and the label is removed.
 The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/changelog-verification/` on failure. The comment
 content is read directly from this file without additional parsing.
 
-- `.github/workflows/pr-check.yml`: Triggered by `pull_request` on `opened`, `edited`, and `ready_for_review` events. The
+- `.github/workflows/pr-check.yml`: Triggered by `pull_request` on `opened`, `edited`, `ready_for_review`, and `synchronize` events. The
   `checkPrDescription` steps run with `continue-on-error: true` and upload `build/changelog-verification/changelog_errors.txt` as
   the `changelog-check-failure` artifact on failure. A separate step at the end fails the job so the overall check result is still a
   failure.
@@ -502,7 +502,7 @@ Two dependency formats are supported:
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
-The check runs on every `opened`, `edited`, and `closed` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
+The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
 label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the

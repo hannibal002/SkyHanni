@@ -3,7 +3,7 @@ name: "PR Changelog Verification"
 
 on:
     pull_request:
-        types: [ opened, edited, ready_for_review ]
+        types: [ opened, edited, ready_for_review, synchronize ]
 
 permissions:
     contents: read
