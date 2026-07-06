@@ -164,20 +164,39 @@ fun markCommentAsStale(
     commentId: Long,
     activeMarker: String,
     staleMarker: String,
-    staleHeading: String,
     expandLabel: String,
 ) {
-    val oldBody = getCommentBody(commentId) ?: error("Error: comment body was null for comment $commentId, aborting")
+    val oldBody = getCommentBody(commentId)
+        ?: error("Error: comment body was null for comment $commentId, aborting")
+
+    val cleanedOld = oldBody
+        .replace(activeMarker, "")
+        .trim()
+
+    val header = cleanedOld
+        .lineSequence()
+        .firstOrNull { it.startsWith("### ") }
+        ?.removePrefix("### ")
+        ?.trim()
+        ?: "Unknown"
+
     val staleBody = buildString {
         appendLine(staleMarker)
-        appendLine("### $staleHeading")
+        appendLine("### ~~$header~~")
+        appendLine()
         appendLine("<details><summary>$expandLabel</summary>")
         appendLine()
-        appendLine(oldBody.replace(activeMarker, ""))
+        appendLine(cleanedOld)
         appendLine()
-        append("</details>")
+        appendLine("</details>")
     }
-    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
+
+    val (status, _) = ghRequest(
+        "PATCH",
+        "/repos/$repo/issues/comments/$commentId",
+        mapOf("body" to staleBody)
+    )
+
     status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
 }
 
@@ -267,8 +286,7 @@ fun runMergeConflictMode(prNumber: String) {
             existingId,
             conflictMarker,
             conflictStaleMarker,
-            "Outdated merge conflict notice",
-            "click to show old notice",
+            "Show previous conflicts",
         )
         val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
         postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
@@ -279,8 +297,7 @@ fun runMergeConflictMode(prNumber: String) {
             existingId,
             conflictMarker,
             conflictStaleMarker,
-            "Outdated merge conflict notice",
-            "click to show old notice",
+            "Show previous conflicts",
         )
         setLabel(prNumber, conflictLabel, false)
         println("PR #$prNumber: no conflicts")
@@ -293,8 +310,7 @@ fun runDetektMode(prNumber: String) {
         existingId,
         detektMarker,
         detektStaleMarker,
-        "Outdated Detekt issues",
-        "click to show old warnings"
+        "Show previous warnings"
     )
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
@@ -363,8 +379,7 @@ fun runBuildMode(prNumber: String) {
             existingId,
             buildMarker,
             buildStaleMarker,
-            "Outdated build failure",
-            "click to show old output"
+            "Show previous errors"
         )
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
@@ -374,8 +389,7 @@ fun runBuildMode(prNumber: String) {
         existingId,
         buildMarker,
         buildStaleMarker,
-        "Outdated build failure",
-        "click to show old output"
+        "Show previous errors"
     )
 
     val versions = listOf("1.21.11" to log1, "26.1" to log2)
@@ -410,8 +424,7 @@ fun runChangelogMode(prNumber: String) {
             existingId,
             changelogMarker,
             changelogStaleMarker,
-            "Outdated changelog issues",
-            "click to show old issues",
+            "Show previous issues",
         )
         setLabel(prNumber, changelogLabel, false)
         exitProcess(0)
@@ -421,8 +434,7 @@ fun runChangelogMode(prNumber: String) {
         existingId,
         changelogMarker,
         changelogStaleMarker,
-        "Outdated changelog issues",
-        "click to show old issues",
+        "Show previous issues",
     )
 
     val (postStatus, _) = ghRequest(
