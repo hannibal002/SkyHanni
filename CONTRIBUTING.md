@@ -498,12 +498,14 @@ Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the ope
 release unit.
 
 The check runs on every `opened`, `edited`, and `closed` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
-label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
+label are re-evaluated. When a dependent PR lists the closed PR as a direct dependency, a notification comment is posted on it. If the
+dependency was merged, the comment states how many open dependencies remain. If it was closed without merging, the comment advises the
+author to re-evaluate. The label is updated for all affected PRs regardless.
 
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
-Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/check-dependencies.js`.
+Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=dependencies`).
 
 ## Access Wideners
 
