@@ -132,9 +132,11 @@ tasks.register<ClientProductionRunTask>("prodClient") {
 
 if (target == primaryTarget) {
     tasks.register("checkPrDescription", ChangelogVerification::class) {
-        this.outputDirectory.set(layout.buildDirectory)
         this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
         this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+        this.outputDirectory.set(
+            layout.buildDirectory.dir("changelog-verification")
+        )
     }
 }
 

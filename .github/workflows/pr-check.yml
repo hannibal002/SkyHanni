@@ -57,8 +57,8 @@ jobs:
                 uses: actions/upload-artifact@v7
                 with:
                     name: changelog-check-failure
-                    path: build/changelog_errors.txt
-                    if-no-files-found: warn
+                    path: "**/changelog-verification/changelog_errors.txt"
+                    if-no-files-found: error
 
             -   name: Fail job if changelog check failed
                 if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
