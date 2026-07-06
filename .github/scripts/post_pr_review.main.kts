@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
-// Execution context: base branch, called from detekt-review.yml and build-review.yml
+// Execution context: base branch, called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, and changelog-review.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -21,11 +21,28 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
-val label = "Detekt"
-val marker = "<!-- detekt-review -->"
-val staleMarker = "<!-- detekt-review-stale -->"
+val workflowFailedMarker = "<!-- workflow-failed -->"
+
+val detektLabel = "Detekt"
+val detektMarker = "<!-- detekt-review -->"
+val detektStaleMarker = "<!-- detekt-review-stale -->"
+
+val buildLabel = "Fails Multi-Version"
 val buildMarker = "<!-- build-failure-review -->"
 val buildStaleMarker = "<!-- build-failure-review-stale -->"
+
+val conflictLabel = "Merge Conflicts"
+val conflictMarker = "<!-- merge-conflict-review -->"
+val conflictStaleMarker = "<!-- merge-conflict-review-stale -->"
+
+val changelogLabel = "Wrong Title/Changelog"
+val changelogMarker = "<!-- changelog-check-review -->"
+val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
+
+val dependencyLabel = "Waiting on Dependency PR"
+
+val warningIcon = "⚠\uFE0F"
+
 val maxDirectFindings = 8
 val maxLogChars = 10_000
 
@@ -36,18 +53,33 @@ val mode: String = System.getenv("MODE") ?: error("MODE not set")
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
 
-fun error(message: String): Nothing {
+var errorCommentPosted = false
+
+fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
+    if (commentError && !errorCommentPosted) {
+        val comment = buildString {
+            appendLine(workflowFailedMarker)
+            appendLine("❌ Workflow failed: $mode")
+            appendLine()
+            appendLine(message)
+        }
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
+        postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
+        errorCommentPosted = true
+    }
     exitProcess(1)
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299
 
-fun Int.requireSuccess(message: String) {
-    if (isHttpError) error(message)
+fun Int.requireSuccess(message: String, commentError: Boolean = true) {
+    if (isHttpError) error(message, commentError)
 }
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
+
+data class Dependency(val owner: String, val repoName: String, val pullNumber: Int)
 
 fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
     val bodyPublisher = if (payload != null)
@@ -69,12 +101,12 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     return response.statusCode() to body
 }
 
-fun setLabel(prNumber: String, hasFindings: Boolean) {
+fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
         if (status.isHttpError) System.err.println("Warning: could not add $label label (HTTP $status)")
     } else {
-        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8)
+        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8).replace("+", "%20")
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
         if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
@@ -99,25 +131,34 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace(">", "&gt;")
     .replace("@", "&#64;")
 
+fun StringBuilder.appendWarningTitle(title: String) {
+    appendLine("### $warningIcon $title $warningIcon")
+}
+
 fun buildDetektBody(findings: List<Finding>): String = buildString {
-    appendLine(marker)
-    appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
+    appendLine(detektMarker)
+    appendWarningTitle("Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    direct.forEach {
-        val fileName = it.path.substringAfterLast('/')
-        appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-        appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-    }
+    appendAll(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        overflow.forEach {
-            val fileName = it.path.substringAfterLast('/')
-            appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-            appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-        }
+        appendAll(overflow)
         appendLine("\n</details>")
+    }
+}
+
+fun StringBuilder.appendAll(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val ruleId = sanitize(finding.ruleId)
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        val path = sanitize(finding.path)
+        appendLine("- ```$className``` at line $line: $message")
+        appendLine("  rule: `$ruleId`, path: `$path`")
     }
 }
 
@@ -148,20 +189,40 @@ fun markCommentAsStale(
     commentId: Long,
     activeMarker: String,
     staleMarker: String,
-    staleHeading: String,
     expandLabel: String,
 ) {
-    val oldBody = getCommentBody(commentId) ?: error("Error: comment body was null for comment $commentId, aborting")
+    val oldBody = getCommentBody(commentId)
+        ?: error("Error: comment body was null for comment $commentId, aborting")
+
+    val cleanedOld = oldBody
+        .replace(activeMarker, "")
+        .trim()
+
+    val header = cleanedOld
+        .lineSequence()
+        .firstOrNull { it.startsWith("### ") }
+        ?.removePrefix("### ")
+        ?.replace(" $warningIcon", "")
+        ?.trim()
+        ?: "Unknown"
+
     val staleBody = buildString {
         appendLine(staleMarker)
-        appendLine("### $staleHeading")
+        appendLine("### ~~$header~~")
+        appendLine()
         appendLine("<details><summary>$expandLabel</summary>")
         appendLine()
-        appendLine(oldBody.replace(activeMarker, ""))
+        appendLine(cleanedOld)
         appendLine()
-        append("</details>")
+        appendLine("</details>")
     }
-    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
+
+    val (status, _) = ghRequest(
+        "PATCH",
+        "/repos/$repo/issues/comments/$commentId",
+        mapOf("body" to staleBody)
+    )
+
     status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
 }
 
@@ -172,9 +233,16 @@ fun readBuildLog(artifactDirPath: String?): String? {
     }.getOrNull()
 }
 
-fun parseOneLiner(logContent: String): String? =
-    logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
-        ?: logContent.lines().firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
+fun parseOneLiner(logContent: String): String? {
+    val workspace = System.getenv("GITHUB_WORKSPACE")
+    val lines = logContent.lines()
+    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") }
+        ?: lines.firstOrNull { "Received status code" in it }
+        ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
+        ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
+    if (line == null || workspace.isNullOrEmpty()) return line
+    return line.replace("file://$workspace/", "")
+}
 
 fun parseStackTrace(logContent: String): String {
     val startIndex = logContent.indexOf("FAILURE: Build failed with an exception")
@@ -186,8 +254,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     appendLine(buildMarker)
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
-        appendLine()
-        appendLine("### Build failed: $version")
+        appendWarningTitle("Build failed: $version")
         val oneLiner = parseOneLiner(logContent)
         if (oneLiner != null) appendLine("`${oneLiner.trim().take(300)}`")
         appendLine()
@@ -198,19 +265,89 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         appendLine("~~~")
         appendLine()
         appendLine("</details>")
+        appendLine()
+    }
+}
+
+fun getMergeableState(prNumber: String): Boolean? {
+    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$prNumber")
+    status.requireSuccess("Error: could not fetch PR mergeable state (HTTP $status), aborting")
+    val mergeableElement = (body as? JsonObject)?.get("mergeable") ?: return null
+    if (mergeableElement.isJsonNull) return null
+    return mergeableElement.asBoolean
+}
+
+fun getAllOpenPRNumbers(): List<String> {
+    val numbers = mutableListOf<String>()
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/pulls?state=open&per_page=100&page=$page")
+        status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting")
+        val array = body as? JsonArray ?: error("Error: unexpected response format for open PRs, aborting")
+        for (element in array) {
+            if (!element.isJsonObject) continue
+            val number = element.asJsonObject.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            numbers.add(number)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return numbers
+}
+
+fun buildConflictBody(): String = buildString {
+    appendLine(conflictMarker)
+    appendWarningTitle("Merge conflicts detected")
+    append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
+}
+
+fun runMergeConflictMode(prNumber: String) {
+    val mergeableState = getMergeableState(prNumber)
+    if (mergeableState == null) {
+        println("PR #$prNumber: mergeable is null, skipping")
+        return
+    }
+
+    val existingId = findExistingComment(prNumber, conflictMarker)
+
+    if (!mergeableState) {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Show previous conflicts",
+        )
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
+        postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
+        setLabel(prNumber, conflictLabel, true)
+        println("PR #$prNumber: conflicts found, comment posted")
+    } else {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Show previous conflicts",
+        )
+        setLabel(prNumber, conflictLabel, false)
+        println("PR #$prNumber: no conflicts")
     }
 }
 
 fun runDetektMode(prNumber: String) {
-    val existingId = findExistingComment(prNumber, marker)
-    if (existingId != null) markCommentAsStale(existingId, marker, staleMarker, "Outdated Detekt issues", "click to show old warnings")
+    val existingId = findExistingComment(prNumber, detektMarker)
+    if (existingId != null) markCommentAsStale(
+        existingId,
+        detektMarker,
+        detektStaleMarker,
+        "Show previous warnings"
+    )
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
     val sarifFile = artifactDir / "main.sarif"
 
     if (!sarifFile.exists()) {
-        println("No SARIF found, removing label")
-        setLabel(prNumber, false)
+        println("No SARIF found, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
@@ -219,45 +356,44 @@ fun runDetektMode(prNumber: String) {
         error("Failed to parse SARIF: ${it.message}")
     }
 
-    val findings = buildList {
-        for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
-            if (!run.isJsonObject) continue
-            for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
-                if (!result.isJsonObject) continue
-                val resultObj = result.asJsonObject
-                for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
-                    if (!loc.isJsonObject) continue
-                    val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
-                    val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
-                        ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-                    val region = phys.getAsJsonObject("region") ?: JsonObject()
-                    add(
-                        Finding(
-                            path = normalizePath(uri, workspace),
-                            line = region.get("startLine")
-                                ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
-                                ?.asInt?.takeIf { it > 0 } ?: 1,
-                            ruleId = resultObj.get("ruleId")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown",
-                            message = resultObj.getAsJsonObject("message")?.get("text")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "",
-                        )
-                    )
-                }
-            }
-        }
-    }
+    val findings = parseSarifFindings(sarif, workspace)
 
     if (findings.isEmpty()) {
-        println("No findings, removing label")
-        setLabel(prNumber, false)
+        println("No findings, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildDetektBody(findings)))
     postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
-    setLabel(prNumber, true)
+    setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
+}
+
+fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = buildList {
+    for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
+        if (!run.isJsonObject) continue
+        for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
+            if (!result.isJsonObject) continue
+            val resultObj = result.asJsonObject
+            for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
+                if (!loc.isJsonObject) continue
+                val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
+                val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+                val region = phys.getAsJsonObject("region") ?: JsonObject()
+                val line = region.get("startLine")
+                    ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+                    ?.asInt?.takeIf { it > 0 } ?: 1
+                val ruleId = resultObj.get("ruleId")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown"
+                val message = resultObj.getAsJsonObject("message")?.get("text")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: ""
+                val path = normalizePath(uri, workspace)
+                add(Finding(path, line, ruleId, message))
+            }
+        }
+    }
 }
 
 fun runBuildMode(prNumber: String) {
@@ -267,14 +403,14 @@ fun runBuildMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, buildMarker)
 
     if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
-        println("No build failures found")
+        println("No build failures found, removing build label")
         if (existingId != null) markCommentAsStale(
             existingId,
             buildMarker,
             buildStaleMarker,
-            "Outdated build failure",
-            "click to show old output"
+            "Show previous errors"
         )
+        setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
@@ -282,21 +418,219 @@ fun runBuildMode(prNumber: String) {
         existingId,
         buildMarker,
         buildStaleMarker,
-        "Outdated build failure",
-        "click to show old output"
+        "Show previous errors"
     )
 
     val versions = listOf("1.21.11" to log1, "26.1" to log2)
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBuildFailureBody(versions)))
     postStatus.requireSuccess("Error: could not post build failure comment (HTTP $postStatus)")
-    println("Done: build failure comment posted")
+    setLabel(prNumber, buildLabel, true)
+    println("Done: build failure comment posted, added label")
 }
 
-val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
-    ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+fun readChangelogErrors(artifactDirPath: String?): String? {
+    if (artifactDirPath == null) return null
+    return runCatching {
+        Path(artifactDirPath).toFile().walkTopDown()
+            .firstOrNull { it.isFile && it.name == "changelog_errors.txt" }
+            ?.readText()?.takeIf { it.isNotBlank() }
+    }.getOrNull()
+}
+
+fun buildChangelogBody(errors: String): String = buildString {
+    appendLine(changelogMarker)
+    appendWarningTitle("Changelog verification failed")
+    appendLine()
+    append(errors.trimEnd())
+}
+
+fun runChangelogMode(prNumber: String) {
+    val workflowConclusion = System.getenv("WORKFLOW_CONCLUSION") ?: ""
+    val existingId = findExistingComment(prNumber, changelogMarker)
+
+    fun staleExisting() {
+        val id = existingId ?: return
+        markCommentAsStale(id, changelogMarker, changelogStaleMarker, "Show previous issues")
+    }
+
+    if (workflowConclusion == "success") {
+        println("Changelog check passed, cleaning up")
+        staleExisting()
+        setLabel(prNumber, changelogLabel, false)
+        exitProcess(0)
+    }
+
+    val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
+        ?: error("Artifact missing - changelog step likely failed before artifact upload")
+
+    staleExisting()
+
+    val (postStatus, _) = ghRequest(
+        "POST",
+        "/repos/$repo/issues/$prNumber/comments",
+        mapOf("body" to buildChangelogBody(errors)),
+    )
+    postStatus.requireSuccess("Error: could not post changelog comment (HTTP $postStatus)")
+    setLabel(prNumber, changelogLabel, true)
+    println("Done: changelog check comment posted")
+}
+
+fun parseDependencies(body: String): List<Dependency> {
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+    val deps = mutableListOf<Dependency>()
+
+    val urlRegex = Regex("""- https://github\.com/([\w-]+)/([\w-]+)/pull/(\d+)""")
+    for (match in urlRegex.findAll(body)) {
+        val depOwner = match.groupValues[1]
+        val depRepo = match.groupValues[2]
+        val depNum = match.groupValues[3].toInt()
+        if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+        deps.add(Dependency(depOwner, depRepo, depNum))
+    }
+
+    val prRegex = Regex("""- #(\d+)""")
+    for (match in prRegex.findAll(body)) {
+        deps.add(Dependency(repoOwner, repoName, match.groupValues[1].toInt()))
+    }
+
+    return deps
+}
+
+fun isDependencyOpen(dep: Dependency): Boolean {
+    val (status, body) = ghRequest("GET", "/repos/${dep.owner}/${dep.repoName}/pulls/${dep.pullNumber}")
+    if (status == 404) {
+        System.err.println("Warning: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} not found, skipping")
+        return false
+    }
+    if (status.isHttpError) {
+        error("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
+    }
+    val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
+    return state == "open"
+}
+
+fun checkPrDependencies(issueNumber: String) {
+    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$issueNumber")
+    if (status.isHttpError) {
+        error("Error: could not fetch PR #$issueNumber (HTTP $status)")
+    }
+    val prBody = (body as? JsonObject)?.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
+    if ("## Dependencies" !in prBody) {
+        println("PR #$issueNumber: no Dependencies section, skipping")
+        return
+    }
+
+    val deps = parseDependencies(prBody)
+    if (deps.isEmpty()) {
+        println("PR #$issueNumber: no dependency links found, skipping")
+        return
+    }
+
+    val hasOpen = deps.any { isDependencyOpen(it) }
+    setLabel(issueNumber, dependencyLabel, hasOpen)
+    println("PR #$issueNumber: ${if (hasOpen) "has open dependencies" else "all dependencies resolved"}")
+}
+
+fun fetchAllLabeledOpenPRs(): List<JsonObject> {
+    val result = mutableListOf<JsonObject>()
+    val encoded = URLEncoder.encode(dependencyLabel, StandardCharsets.UTF_8).replace("+", "%20")
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/issues?labels=$encoded&state=open&per_page=100&page=$page")
+        if (status.isHttpError) {
+            error("Error: could not fetch labeled PRs (HTTP $status)")
+        }
+        val array = body as? JsonArray ?: break
+        for (element in array) {
+            val obj = element as? JsonObject ?: continue
+            if (obj.get("pull_request") == null) continue
+            result.add(obj)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return result
+}
+
+fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
+    val message = buildDependencyNotificationMessage(closedPrNum, merged, remainingOpen)
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    if (status.isHttpError) System.err.println("Warning: could not post notification on PR #$prNum (HTTP $status)")
+    else println("PR #$prNum: posted dependency notification")
+}
+
+fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remainingOpen: Int): String = buildString {
+    val closedLink = "https://github.com/$repo/pull/$closedPrNum"
+    if (merged) {
+        append("[PR #$closedPrNum]($closedLink) was merged.")
+        when (remainingOpen) {
+            0 -> append(" This PR now has all dependencies resolved.")
+            1 -> append(" This PR still has 1 open dependency.")
+            else -> append(" This PR still has $remainingOpen open dependencies.")
+        }
+    } else {
+        append("[PR #$closedPrNum]($closedLink) was closed without merging.")
+        append(" You may need to re-evaluate this PR's dependencies.")
+    }
+}
+
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+    if (prState != "closed") {
+        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
+        checkPrDependencies(num)
+        return
+    }
+
+    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
+    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event")
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+
+    for (pr in fetchAllLabeledOpenPRs()) {
+        val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+        val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
+        if ("## Dependencies" !in body) continue
+
+        val deps = parseDependencies(body)
+        if (deps.isEmpty()) continue
+
+        val isDirectDep = deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum }
+        val remainingDeps = deps.filter { !(it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum) }
+        val openRemainingCount = remainingDeps.count { isDependencyOpen(it) }
+
+        if (isDirectDep) postDependencyNotification(num, closedPrNum, merged, openRemainingCount)
+        setLabel(num, dependencyLabel, openRemainingCount > 0)
+    }
+}
+
+val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
+
+if (mode == "mergeconflict") {
+    if (prNumberEnv != null) {
+        runMergeConflictMode(prNumberEnv)
+    } else {
+        println("No PR_NUMBER set, rechecking all open PRs")
+        getAllOpenPRNumbers().forEach { runMergeConflictMode(it) }
+    }
+    exitProcess(0)
+}
+
+val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+
+if (mode == "dependencies") {
+    val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
+    val prMerged = System.getenv("PR_MERGED") == "true"
+    runDependenciesMode(prState, prNumberEnv, prMerged)
+    exitProcess(0)
+}
 
 when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
+    "changelog" -> runChangelogMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
+
