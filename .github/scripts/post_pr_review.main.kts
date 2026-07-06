@@ -21,6 +21,8 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
+val workflowFailedMarker = "<!-- workflow-failed -->"
+
 val detektLabel = "Detekt"
 val detektMarker = "<!-- detekt-review -->"
 val detektStaleMarker = "<!-- detekt-review-stale -->"
@@ -47,15 +49,28 @@ val mode: String = System.getenv("MODE") ?: error("MODE not set")
 val httpClient: HttpClient = HttpClient.newHttpClient()
 val gson = Gson()
 
-fun error(message: String): Nothing {
+var errorCommentPosted = false
+
+fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
+    if (commentError && !errorCommentPosted) {
+        val comment = buildString {
+            appendLine(workflowFailedMarker)
+            appendLine("❌ Workflow failed: $mode")
+            appendLine()
+            appendLine(message)
+        }
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
+        postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
+        errorCommentPosted = true
+    }
     exitProcess(1)
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299
 
-fun Int.requireSuccess(message: String) {
-    if (isHttpError) error(message)
+fun Int.requireSuccess(message: String, commentError: Boolean = true) {
+    if (isHttpError) error(message, commentError)
 }
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
@@ -116,19 +131,24 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    direct.forEach {
-        val fileName = it.path.substringAfterLast('/')
-        appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-        appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-    }
+    appendAll(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        overflow.forEach {
-            val fileName = it.path.substringAfterLast('/')
-            appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-            appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-        }
+        appendAll(overflow)
         appendLine("\n</details>")
+    }
+}
+
+fun StringBuilder.appendAll(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val ruleId = sanitize(finding.ruleId)
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        val path = sanitize(finding.path)
+        appendLine("- ```$className``` at line $line: $message")
+        appendLine("  rule: `$ruleId`, path: `$path`")
     }
 }
 
@@ -159,20 +179,39 @@ fun markCommentAsStale(
     commentId: Long,
     activeMarker: String,
     staleMarker: String,
-    staleHeading: String,
     expandLabel: String,
 ) {
-    val oldBody = getCommentBody(commentId) ?: error("Error: comment body was null for comment $commentId, aborting")
+    val oldBody = getCommentBody(commentId)
+        ?: error("Error: comment body was null for comment $commentId, aborting")
+
+    val cleanedOld = oldBody
+        .replace(activeMarker, "")
+        .trim()
+
+    val header = cleanedOld
+        .lineSequence()
+        .firstOrNull { it.startsWith("### ") }
+        ?.removePrefix("### ")
+        ?.trim()
+        ?: "Unknown"
+
     val staleBody = buildString {
         appendLine(staleMarker)
-        appendLine("### $staleHeading")
+        appendLine("### ~~$header~~")
+        appendLine()
         appendLine("<details><summary>$expandLabel</summary>")
         appendLine()
-        appendLine(oldBody.replace(activeMarker, ""))
+        appendLine(cleanedOld)
         appendLine()
-        append("</details>")
+        appendLine("</details>")
     }
-    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
+
+    val (status, _) = ghRequest(
+        "PATCH",
+        "/repos/$repo/issues/comments/$commentId",
+        mapOf("body" to staleBody)
+    )
+
     status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
 }
 
@@ -262,8 +301,7 @@ fun runMergeConflictMode(prNumber: String) {
             existingId,
             conflictMarker,
             conflictStaleMarker,
-            "Outdated merge conflict notice",
-            "click to show old notice",
+            "Show previous conflicts",
         )
         val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
         postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
@@ -274,8 +312,7 @@ fun runMergeConflictMode(prNumber: String) {
             existingId,
             conflictMarker,
             conflictStaleMarker,
-            "Outdated merge conflict notice",
-            "click to show old notice",
+            "Show previous conflicts",
         )
         setLabel(prNumber, conflictLabel, false)
         println("PR #$prNumber: no conflicts")
@@ -288,8 +325,7 @@ fun runDetektMode(prNumber: String) {
         existingId,
         detektMarker,
         detektStaleMarker,
-        "Outdated Detekt issues",
-        "click to show old warnings"
+        "Show previous warnings"
     )
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
@@ -306,34 +342,7 @@ fun runDetektMode(prNumber: String) {
         error("Failed to parse SARIF: ${it.message}")
     }
 
-    val findings = buildList {
-        for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
-            if (!run.isJsonObject) continue
-            for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
-                if (!result.isJsonObject) continue
-                val resultObj = result.asJsonObject
-                for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
-                    if (!loc.isJsonObject) continue
-                    val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
-                    val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
-                        ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-                    val region = phys.getAsJsonObject("region") ?: JsonObject()
-                    add(
-                        Finding(
-                            path = normalizePath(uri, workspace),
-                            line = region.get("startLine")
-                                ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
-                                ?.asInt?.takeIf { it > 0 } ?: 1,
-                            ruleId = resultObj.get("ruleId")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown",
-                            message = resultObj.getAsJsonObject("message")?.get("text")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "",
-                        )
-                    )
-                }
-            }
-        }
-    }
+    val findings = parseSarifFindings(sarif, workspace)
 
     if (findings.isEmpty()) {
         println("No findings, removing detekt label")
@@ -345,6 +354,32 @@ fun runDetektMode(prNumber: String) {
     postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
     setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
+}
+
+fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = buildList {
+    for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
+        if (!run.isJsonObject) continue
+        for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
+            if (!result.isJsonObject) continue
+            val resultObj = result.asJsonObject
+            for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
+                if (!loc.isJsonObject) continue
+                val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
+                val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+                val region = phys.getAsJsonObject("region") ?: JsonObject()
+                val line = region.get("startLine")
+                    ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+                    ?.asInt?.takeIf { it > 0 } ?: 1
+                val ruleId = resultObj.get("ruleId")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown"
+                val message = resultObj.getAsJsonObject("message")?.get("text")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: ""
+                val path = normalizePath(uri, workspace)
+                add(Finding(path, line, ruleId, message))
+            }
+        }
+    }
 }
 
 fun runBuildMode(prNumber: String) {
@@ -359,8 +394,7 @@ fun runBuildMode(prNumber: String) {
             existingId,
             buildMarker,
             buildStaleMarker,
-            "Outdated build failure",
-            "click to show old output"
+            "Show previous errors"
         )
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
@@ -370,8 +404,7 @@ fun runBuildMode(prNumber: String) {
         existingId,
         buildMarker,
         buildStaleMarker,
-        "Outdated build failure",
-        "click to show old output"
+        "Show previous errors"
     )
 
     val versions = listOf("1.21.11" to log1, "26.1" to log2)
@@ -400,26 +433,26 @@ fun runChangelogMode(prNumber: String) {
     val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
     val existingId = findExistingComment(prNumber, changelogMarker)
 
-    if (errors.isNullOrBlank()) {
-        println("No changelog errors found")
-        if (existingId != null) markCommentAsStale(
-            existingId,
+    fun markCommentAsStale() {
+        val id = existingId ?: return
+        markCommentAsStale(
+            id,
             changelogMarker,
             changelogStaleMarker,
-            "Outdated changelog issues",
-            "click to show old issues",
+            "Show previous issues",
         )
+    }
+
+    if (errors == null) error("Artifact missing - changelog step likely failed before artifact upload")
+
+    if (errors.isBlank()) {
+        println("No changelog errors found")
+        markCommentAsStale()
         setLabel(prNumber, changelogLabel, false)
         exitProcess(0)
     }
 
-    if (existingId != null) markCommentAsStale(
-        existingId,
-        changelogMarker,
-        changelogStaleMarker,
-        "Outdated changelog issues",
-        "click to show old issues",
-    )
+    markCommentAsStale()
 
     val (postStatus, _) = ghRequest(
         "POST",
