@@ -412,7 +412,7 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 ### Automated GitHub Workflows
 
 Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
-All workflows use `.github/scripts/post_pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
+All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
 
 When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. If issues still exist, a new
 comment is posted at the bottom of the conversation. When all issues are resolved, the label is removed and no new comment is posted.
@@ -435,7 +435,7 @@ label is applied.
   base branch, so a fork PR cannot modify it. Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the
   artifact to `runner.temp` (outside the workspace) and runs the review script. The script only reads the pre-generated SARIF, so fork
   code has no influence over what runs here.
-- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=detekt`): Parses the SARIF, formats findings into a PR comment,
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=detekt`): Parses the SARIF, formats findings into a PR comment,
   manages the `Detekt` label, and handles the stale-comment logic.
 
 #### Build Failure Notification
@@ -450,7 +450,7 @@ label is applied.
 - `.github/workflows/build-review.yml`: Triggered by `workflow_run` on completion of `build.yml`. Always uses base branch code. Runs
   with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads both version artifacts (`1.21.11` and `26.1`) with
   `continue-on-error: true`, resolves the PR number by branch name, and runs the review script.
-- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=build`): Reads the log files, extracts a one-liner (first `e:`
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=build`): Reads the log files, extracts a one-liner (first `e:`
   compiler error line) and the stack trace starting from `FAILURE: Build failed with an exception` (capped at 10,000 characters).
   Posts the result as a PR comment and manages the `Fails Multi-Version` label.
 
@@ -464,7 +464,7 @@ conflicts are resolved, the comment is collapsed into a `<details>` spoiler and 
 - `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
   beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
   provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
-- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
   the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
@@ -485,7 +485,7 @@ content is read directly from this file without additional parsing.
 - `.github/workflows/changelog-review.yml`: Triggered by `workflow_run` on completion of `pr-check.yml`. Always uses base branch code.
   Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the artifact, resolves the PR number by branch name,
   and runs the review script.
-- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=changelog`): Reads `changelog_errors.txt` from the artifact directory.
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=changelog`): Reads `changelog_errors.txt` from the artifact directory.
   If the file is present, it stales any existing comment and posts a new one, then adds the label. If the file is absent (check passed), it
   stales any existing comment and removes the label.
 

@@ -28,4 +28,4 @@ jobs:
                     PR_NUMBER: ${{ github.event.pull_request.number }}
                     PR_STATE: ${{ github.event.pull_request.state }}
                     PR_MERGED: ${{ github.event.pull_request.merged }}
-                run: kotlinc -script .github/scripts/post_pr_review.main.kts
+                run: kotlinc -script .github/scripts/pr_review.main.kts

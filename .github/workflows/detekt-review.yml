@@ -82,4 +82,4 @@ jobs:
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
                     MODE: detekt
-                run: kotlinc -script .github/scripts/post_pr_review.main.kts
+                run: kotlinc -script .github/scripts/pr_review.main.kts

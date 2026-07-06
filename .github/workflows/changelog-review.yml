@@ -84,4 +84,4 @@ jobs:
                     ARTIFACT_DIR: ${{ runner.temp }}/changelog-check-failure
                     WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
                     MODE: changelog
-                run: kotlinc -script .github/scripts/post_pr_review.main.kts
+                run: kotlinc -script .github/scripts/pr_review.main.kts
