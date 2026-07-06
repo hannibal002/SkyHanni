@@ -504,8 +504,7 @@ fun isDependencyOpen(dep: Dependency): Boolean {
         return false
     }
     if (status.isHttpError) {
-        System.err.println("Warning: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}, treating as open")
-        return true
+        error("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
     return state == "open"
@@ -514,8 +513,7 @@ fun isDependencyOpen(dep: Dependency): Boolean {
 fun checkPrDependencies(issueNumber: String) {
     val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$issueNumber")
     if (status.isHttpError) {
-        System.err.println("Warning: could not fetch PR #$issueNumber (HTTP $status), skipping")
-        return
+        error("Error: could not fetch PR #$issueNumber (HTTP $status)")
     }
     val prBody = (body as? JsonObject)?.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
 
@@ -542,8 +540,7 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     while (true) {
         val (status, body) = ghRequest("GET", "/repos/$repo/issues?labels=$encoded&state=open&per_page=100&page=$page")
         if (status.isHttpError) {
-            System.err.println("Error fetching labeled PRs (HTTP $status)")
-            break
+            error("Error: could not fetch labeled PRs (HTTP $status)")
         }
         val array = body as? JsonArray ?: break
         for (element in array) {
@@ -582,13 +579,13 @@ if (mode == "mergeconflict") {
     exitProcess(0)
 }
 
+val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+
 if (mode == "dependencies") {
     val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
     runDependenciesMode(prState, prNumberEnv)
     exitProcess(0)
 }
-
-val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
 
 when (mode) {
     "detekt" -> runDetektMode(prNumber)
