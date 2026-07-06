@@ -46,7 +46,7 @@ object DelayedRun {
      *
      * Runs now if we are on the main thread, otherwise queues it for the next tick.
      */
-    fun runOrNextTick (run: () -> Unit) = Minecraft.getInstance().execute(run)
+    fun runOrNextTick(run: () -> Unit) = Minecraft.getInstance().execute(run)
 
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
