@@ -417,8 +417,9 @@ fun runBuildMode(prNumber: String) {
 fun readChangelogErrors(artifactDirPath: String?): String? {
     if (artifactDirPath == null) return null
     return runCatching {
-        val file = Path(artifactDirPath) / "changelog_errors.txt"
-        if (file.exists()) file.readText().takeIf { it.isNotBlank() } else null
+        Path(artifactDirPath).toFile().walkTopDown()
+            .firstOrNull { it.isFile && it.name == "changelog_errors.txt" }
+            ?.readText()?.takeIf { it.isNotBlank() }
     }.getOrNull()
 }
 
@@ -430,29 +431,25 @@ fun buildChangelogBody(errors: String): String = buildString {
 }
 
 fun runChangelogMode(prNumber: String) {
-    val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
+    val workflowConclusion = System.getenv("WORKFLOW_CONCLUSION") ?: ""
     val existingId = findExistingComment(prNumber, changelogMarker)
 
-    fun markCommentAsStale() {
+    fun staleExisting() {
         val id = existingId ?: return
-        markCommentAsStale(
-            id,
-            changelogMarker,
-            changelogStaleMarker,
-            "Show previous issues",
-        )
+        markCommentAsStale(id, changelogMarker, changelogStaleMarker, "Show previous issues")
     }
 
-    if (errors == null) error("Artifact missing - changelog step likely failed before artifact upload")
-
-    if (errors.isBlank()) {
-        println("No changelog errors found")
-        markCommentAsStale()
+    if (workflowConclusion == "success") {
+        println("Changelog check passed, cleaning up")
+        staleExisting()
         setLabel(prNumber, changelogLabel, false)
         exitProcess(0)
     }
 
-    markCommentAsStale()
+    val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
+        ?: error("Artifact missing - changelog step likely failed before artifact upload")
+
+    staleExisting()
 
     val (postStatus, _) = ghRequest(
         "POST",
