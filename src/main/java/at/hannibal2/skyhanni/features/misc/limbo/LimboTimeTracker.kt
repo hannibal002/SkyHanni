@@ -153,7 +153,7 @@ object LimboTimeTracker {
     }
 
     private fun leaveLimbo() {
-        val passedSince = limboJoinTime.passedSince()
+        val passedSince = limboJoinTime.takeIfInitialized()?.passedSince() ?: return
         val duration = passedSince.format()
         val currentPB = (storage?.personalBest ?: 0).seconds
         val oldLuck = storage?.userLuck ?: 0f
