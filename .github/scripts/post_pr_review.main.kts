@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
-// Execution context: base branch, called from detekt-review.yml and build-review.yml
+// Execution context: base branch, called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, and changelog-review.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -21,11 +21,22 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
-val label = "Detekt"
-val marker = "<!-- detekt-review -->"
-val staleMarker = "<!-- detekt-review-stale -->"
+val detektLabel = "Detekt"
+val detektMarker = "<!-- detekt-review -->"
+val detektStaleMarker = "<!-- detekt-review-stale -->"
+
+val buildLabel = "Fails Multi-Version"
 val buildMarker = "<!-- build-failure-review -->"
 val buildStaleMarker = "<!-- build-failure-review-stale -->"
+
+val conflictLabel = "Merge Conflicts"
+val conflictMarker = "<!-- merge-conflict-review -->"
+val conflictStaleMarker = "<!-- merge-conflict-review-stale -->"
+
+val changelogLabel = "Wrong Title/Changelog"
+val changelogMarker = "<!-- changelog-check-review -->"
+val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
+
 val maxDirectFindings = 8
 val maxLogChars = 10_000
 
@@ -69,12 +80,12 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     return response.statusCode() to body
 }
 
-fun setLabel(prNumber: String, hasFindings: Boolean) {
+fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
         if (status.isHttpError) System.err.println("Warning: could not add $label label (HTTP $status)")
     } else {
-        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8)
+        val encoded = URLEncoder.encode(label, StandardCharsets.UTF_8).replace("+", "%20")
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
         if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
@@ -100,7 +111,7 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace("@", "&#64;")
 
 fun buildDetektBody(findings: List<Finding>): String = buildString {
-    appendLine(marker)
+    appendLine(detektMarker)
     appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(maxDirectFindings)
@@ -172,9 +183,13 @@ fun readBuildLog(artifactDirPath: String?): String? {
     }.getOrNull()
 }
 
-fun parseOneLiner(logContent: String): String? =
-    logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
+fun parseOneLiner(logContent: String): String? {
+    val workspace = System.getenv("GITHUB_WORKSPACE")
+    val line = logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
         ?: logContent.lines().firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
+    if (line == null || workspace.isNullOrEmpty()) return line
+    return line.replace("file://$workspace/", "")
+}
 
 fun parseStackTrace(logContent: String): String {
     val startIndex = logContent.indexOf("FAILURE: Build failed with an exception")
@@ -201,16 +216,88 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     }
 }
 
+fun getMergeableState(prNumber: String): Boolean? {
+    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$prNumber")
+    status.requireSuccess("Error: could not fetch PR mergeable state (HTTP $status), aborting")
+    val mergeableElement = (body as? JsonObject)?.get("mergeable") ?: return null
+    if (mergeableElement.isJsonNull) return null
+    return mergeableElement.asBoolean
+}
+
+fun getAllOpenPRNumbers(): List<String> {
+    val numbers = mutableListOf<String>()
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/pulls?state=open&per_page=100&page=$page")
+        status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting")
+        val array = body as? JsonArray ?: error("Error: unexpected response format for open PRs, aborting")
+        for (element in array) {
+            if (!element.isJsonObject) continue
+            val number = element.asJsonObject.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            numbers.add(number)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return numbers
+}
+
+fun buildConflictBody(): String = buildString {
+    appendLine(conflictMarker)
+    appendLine("### Merge conflicts detected")
+    append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
+}
+
+fun runMergeConflictMode(prNumber: String) {
+    val mergeableState = getMergeableState(prNumber)
+    if (mergeableState == null) {
+        println("PR #$prNumber: mergeable is null, skipping")
+        return
+    }
+
+    val existingId = findExistingComment(prNumber, conflictMarker)
+
+    if (!mergeableState) {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Outdated merge conflict notice",
+            "click to show old notice",
+        )
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
+        postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
+        setLabel(prNumber, conflictLabel, true)
+        println("PR #$prNumber: conflicts found, comment posted")
+    } else {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Outdated merge conflict notice",
+            "click to show old notice",
+        )
+        setLabel(prNumber, conflictLabel, false)
+        println("PR #$prNumber: no conflicts")
+    }
+}
+
 fun runDetektMode(prNumber: String) {
-    val existingId = findExistingComment(prNumber, marker)
-    if (existingId != null) markCommentAsStale(existingId, marker, staleMarker, "Outdated Detekt issues", "click to show old warnings")
+    val existingId = findExistingComment(prNumber, detektMarker)
+    if (existingId != null) markCommentAsStale(
+        existingId,
+        detektMarker,
+        detektStaleMarker,
+        "Outdated Detekt issues",
+        "click to show old warnings"
+    )
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
     val sarifFile = artifactDir / "main.sarif"
 
     if (!sarifFile.exists()) {
-        println("No SARIF found, removing label")
-        setLabel(prNumber, false)
+        println("No SARIF found, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
@@ -249,14 +336,14 @@ fun runDetektMode(prNumber: String) {
     }
 
     if (findings.isEmpty()) {
-        println("No findings, removing label")
-        setLabel(prNumber, false)
+        println("No findings, removing detekt label")
+        setLabel(prNumber, detektLabel, false)
         exitProcess(0)
     }
 
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildDetektBody(findings)))
     postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
-    setLabel(prNumber, true)
+    setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
 }
 
@@ -267,7 +354,7 @@ fun runBuildMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, buildMarker)
 
     if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
-        println("No build failures found")
+        println("No build failures found, removing build label")
         if (existingId != null) markCommentAsStale(
             existingId,
             buildMarker,
@@ -275,6 +362,7 @@ fun runBuildMode(prNumber: String) {
             "Outdated build failure",
             "click to show old output"
         )
+        setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
@@ -289,14 +377,78 @@ fun runBuildMode(prNumber: String) {
     val versions = listOf("1.21.11" to log1, "26.1" to log2)
     val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBuildFailureBody(versions)))
     postStatus.requireSuccess("Error: could not post build failure comment (HTTP $postStatus)")
-    println("Done: build failure comment posted")
+    setLabel(prNumber, buildLabel, true)
+    println("Done: build failure comment posted, added label")
 }
 
-val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
-    ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+fun readChangelogErrors(artifactDirPath: String?): String? {
+    if (artifactDirPath == null) return null
+    return runCatching {
+        val file = Path(artifactDirPath) / "changelog_errors.txt"
+        if (file.exists()) file.readText().takeIf { it.isNotBlank() } else null
+    }.getOrNull()
+}
+
+fun buildChangelogBody(errors: String): String = buildString {
+    appendLine(changelogMarker)
+    appendLine("### Changelog verification failed")
+    appendLine()
+    append(errors.trimEnd())
+}
+
+fun runChangelogMode(prNumber: String) {
+    val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
+    val existingId = findExistingComment(prNumber, changelogMarker)
+
+    if (errors.isNullOrBlank()) {
+        println("No changelog errors found")
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            changelogMarker,
+            changelogStaleMarker,
+            "Outdated changelog issues",
+            "click to show old issues",
+        )
+        setLabel(prNumber, changelogLabel, false)
+        exitProcess(0)
+    }
+
+    if (existingId != null) markCommentAsStale(
+        existingId,
+        changelogMarker,
+        changelogStaleMarker,
+        "Outdated changelog issues",
+        "click to show old issues",
+    )
+
+    val (postStatus, _) = ghRequest(
+        "POST",
+        "/repos/$repo/issues/$prNumber/comments",
+        mapOf("body" to buildChangelogBody(errors)),
+    )
+    postStatus.requireSuccess("Error: could not post changelog comment (HTTP $postStatus)")
+    setLabel(prNumber, changelogLabel, true)
+    println("Done: changelog check comment posted")
+}
+
+val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
+
+if (mode == "mergeconflict") {
+    if (prNumberEnv != null) {
+        runMergeConflictMode(prNumberEnv)
+    } else {
+        println("No PR_NUMBER set, rechecking all open PRs")
+        getAllOpenPRNumbers().forEach { runMergeConflictMode(it) }
+    }
+    exitProcess(0)
+}
+
+val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
 
 when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
+    "changelog" -> runChangelogMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
+

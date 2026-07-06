@@ -463,6 +463,25 @@ same stale-comment pattern as Detekt and build failures is used.
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
 
+### Changelog Check Comment
+
+When a pull request has changelog or title issues detected by the `checkPrDescription` Gradle task, the `Wrong Title/Changelog` label is
+applied and a comment is posted with the list of issues. When the issues are resolved, the comment is collapsed into a `<details>` spoiler
+and the label is removed. The same stale-comment pattern as Detekt and build failures is used.
+
+The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/` on failure. The comment content is read directly from
+this file without additional parsing.
+
+- `.github/workflows/pr-check.yml`: Triggered by `pull_request` on `opened`, `edited`, and `ready_for_review` events. The
+  `checkPrDescription` steps run with `continue-on-error: true` and upload `build/changelog_errors.txt` as the `changelog-check-failure`
+  artifact on failure. A separate step at the end fails the job so the overall check result is still a failure.
+- `.github/workflows/changelog-review.yml`: Triggered by `workflow_run` on completion of `pr-check.yml`. Always uses base branch code.
+  Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the artifact, resolves the PR number by branch name,
+  and runs the review script.
+- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=changelog`): Reads `changelog_errors.txt` from the artifact directory.
+  If the file is present, it stales any existing comment and posts a new one, then adds the label. If the file is absent (check passed), it
+  stales any existing comment and removes the label.
+
 ### Dependency Label
 
 When a pull request declares dependencies in its `## Dependencies` section, the `Waiting on Dependency PR` label is automatically added or
