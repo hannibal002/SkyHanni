@@ -311,34 +311,7 @@ fun runDetektMode(prNumber: String) {
         error("Failed to parse SARIF: ${it.message}")
     }
 
-    val findings = buildList {
-        for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
-            if (!run.isJsonObject) continue
-            for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
-                if (!result.isJsonObject) continue
-                val resultObj = result.asJsonObject
-                for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
-                    if (!loc.isJsonObject) continue
-                    val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
-                    val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
-                        ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-                    val region = phys.getAsJsonObject("region") ?: JsonObject()
-                    add(
-                        Finding(
-                            path = normalizePath(uri, workspace),
-                            line = region.get("startLine")
-                                ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
-                                ?.asInt?.takeIf { it > 0 } ?: 1,
-                            ruleId = resultObj.get("ruleId")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown",
-                            message = resultObj.getAsJsonObject("message")?.get("text")
-                                ?.takeIf { it.isJsonPrimitive }?.asString ?: "",
-                        )
-                    )
-                }
-            }
-        }
-    }
+    val findings = parseSarifFindings(sarif, workspace)
 
     if (findings.isEmpty()) {
         println("No findings, removing detekt label")
@@ -350,6 +323,32 @@ fun runDetektMode(prNumber: String) {
     postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
     setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
+}
+
+fun parseSarifFindings(sarif: JsonObject, workspace: String): List<Finding> = buildList {
+    for (run in sarif.getAsJsonArray("runs") ?: JsonArray()) {
+        if (!run.isJsonObject) continue
+        for (result in run.asJsonObject.getAsJsonArray("results") ?: JsonArray()) {
+            if (!result.isJsonObject) continue
+            val resultObj = result.asJsonObject
+            for (loc in resultObj.getAsJsonArray("locations") ?: JsonArray()) {
+                if (!loc.isJsonObject) continue
+                val phys = loc.asJsonObject.getAsJsonObject("physicalLocation") ?: continue
+                val uri = phys.getAsJsonObject("artifactLocation")?.get("uri")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+                val region = phys.getAsJsonObject("region") ?: JsonObject()
+                val line = region.get("startLine")
+                    ?.takeIf { it.isJsonPrimitive && it.asJsonPrimitive.isNumber }
+                    ?.asInt?.takeIf { it > 0 } ?: 1
+                val ruleId = resultObj.get("ruleId")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: "Unknown"
+                val message = resultObj.getAsJsonObject("message")?.get("text")
+                    ?.takeIf { it.isJsonPrimitive }?.asString ?: ""
+                val path = normalizePath(uri, workspace)
+                add(Finding(path, line, ruleId, message))
+            }
+        }
+    }
 }
 
 fun runBuildMode(prNumber: String) {
