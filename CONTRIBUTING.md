@@ -135,8 +135,9 @@ for the dependency, or `- <url>` for REPO dependencies.
 
 ### Changelog Builder
 
-The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder). Do not manually
-edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files are maintained by the project maintainer.
+The PR description is processed by our [ChangeLog Builder](https://github.com/SkyHanniStudios/SkyHanniChangelogBuilder), which is included
+as a build dependency of the SkyHanni project. The `ChangelogVerification` Gradle task in `buildSrc/` uses it to validate PR descriptions in
+CI. Do not manually edit `docs/CHANGELOG.md` or `docs/FEATURES.md`. These files are maintained by the project maintainer.
 
 - Follow the format examples from the template and remove the categories that do not apply to your PR.
 - A PR might include multiple changelog categories simultaneously.
