@@ -469,12 +469,13 @@ When a pull request has changelog or title issues detected by the `checkPrDescri
 applied and a comment is posted with the list of issues. When the issues are resolved, the comment is collapsed into a `<details>` spoiler
 and the label is removed. The same stale-comment pattern as Detekt and build failures is used.
 
-The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/` on failure. The comment content is read directly from
-this file without additional parsing.
+The `checkPrDescription` task writes a formatted `changelog_errors.txt` to `build/changelog-verification/` on failure. The comment
+content is read directly from this file without additional parsing.
 
 - `.github/workflows/pr-check.yml`: Triggered by `pull_request` on `opened`, `edited`, and `ready_for_review` events. The
-  `checkPrDescription` steps run with `continue-on-error: true` and upload `build/changelog_errors.txt` as the `changelog-check-failure`
-  artifact on failure. A separate step at the end fails the job so the overall check result is still a failure.
+  `checkPrDescription` steps run with `continue-on-error: true` and upload `build/changelog-verification/changelog_errors.txt` as
+  the `changelog-check-failure` artifact on failure. A separate step at the end fails the job so the overall check result is still a
+  failure.
 - `.github/workflows/changelog-review.yml`: Triggered by `workflow_run` on completion of `pr-check.yml`. Always uses base branch code.
   Runs with `issues: write`, `pull-requests: write`, and `actions: read`. Downloads the artifact, resolves the PR number by branch name,
   and runs the review script.
