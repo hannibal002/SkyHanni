@@ -508,7 +508,7 @@ label are re-evaluated so the label is removed from dependent PRs when their dep
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
-Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/check-dependencies.js`.
+Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_review.main.kts`.
 
 ## Access Wideners
 

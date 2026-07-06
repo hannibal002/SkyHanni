@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
-
-// Execution context: base branch, called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, and changelog-review.yml
+// Execution context: base branch
+// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, and check_dependencies.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
