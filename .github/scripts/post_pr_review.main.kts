@@ -116,19 +116,24 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    direct.forEach {
-        val fileName = it.path.substringAfterLast('/')
-        appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-        appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-    }
+    appendAll(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        overflow.forEach {
-            val fileName = it.path.substringAfterLast('/')
-            appendLine("- ${sanitize(it.message)} (`${sanitize(it.ruleId)}`)")
-            appendLine("  `${sanitize(fileName)}`:${it.line} (`${sanitize(it.path)}`)")
-        }
+        appendAll(overflow)
         appendLine("\n</details>")
+    }
+}
+
+fun StringBuilder.appendAll(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val ruleId = sanitize(finding.ruleId)
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        val path = sanitize(finding.path)
+        appendLine("- ```$className``` at line $line: $message")
+        appendLine("  rule: `$ruleId`, path: `$path`")
     }
 }
 
