@@ -600,6 +600,43 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     return result
 }
 
+
+fun fetchAllOpenPRs(): List<JsonObject> {
+    val result = mutableListOf<JsonObject>()
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/issues?state=open&per_page=100&page=$page")
+        if (status.isHttpError) {
+            error("Error: could not fetch open PRs (HTTP $status)", commentError = false)
+        }
+        val array = body as? JsonArray ?: break
+        for (element in array) {
+            val obj = element as? JsonObject ?: continue
+            if (obj.get("pull_request") == null) continue
+            result.add(obj)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return result
+}
+
+fun recheckPRsDependingOn(targetPrNum: Int) {
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+    println("Rechecking all open PRs that depend on #$targetPrNum")
+    for (pr in fetchAllOpenPRs()) {
+        val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+        if (num.toIntOrNull() == targetPrNum) continue
+        val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+        if ("## Dependencies" !in body) continue
+        val deps = parseDependencies(body)
+        if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
+            checkPrDependencies(num)
+        }
+    }
+}
+
 fun buildDependencyWaitingComment(deps: List<Dependency>): String = buildString {
     if (deps.size == 1) {
         val dep = deps.first()
@@ -646,7 +683,13 @@ fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remain
 fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean): Boolean {
     if (prState != "closed") {
         val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return false }
-        return checkPrDependencies(num)
+        val hasOpenDeps = checkPrDependencies(num)
+        val prAction = System.getenv("PR_ACTION") ?: ""
+        if (prAction == "reopened") {
+            val targetPrNum = num.toIntOrNull()
+            if (targetPrNum != null) recheckPRsDependingOn(targetPrNum)
+        }
+        return hasOpenDeps
     }
 
     println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
