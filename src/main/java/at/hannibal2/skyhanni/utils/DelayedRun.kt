@@ -13,6 +13,7 @@ import kotlin.time.Duration
 object DelayedRun {
 
     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>()
+
     //     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
@@ -50,12 +51,12 @@ object DelayedRun {
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick() {
         tasks.removeIf { (runnable, time) ->
-            val inPast =  time.isInPast()
+            val inPast = time.isInPast()
             if (inPast) {
                 try {
                     runnable()
                 } catch (e: Exception) {
-                     ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing: ${e.message}")
+                    ErrorManager.logErrorWithData(e, "DelayedRun task crashed while executing: ${e.message}")
                 }
             }
             inPast
