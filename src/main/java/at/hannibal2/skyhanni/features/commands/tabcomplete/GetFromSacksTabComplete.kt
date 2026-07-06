@@ -1,14 +1,13 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackApi.commands
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils.eventWithNewMessage
-import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
 @SkyHanniModule
@@ -19,7 +18,7 @@ object GetFromSacksTabComplete {
     @HandleEvent
     fun onTabComplete(event: TabCompletionEvent) {
         if (!isEnabled()) return
-        if (commands.none { event.isCommand(it) }) return
+        if (GetFromSackApi.commands.none { event.isCommand(it) }) return
         if (!event.leftOfCursor.contains(" ")) return
 
         val query = event.lastWord
@@ -29,8 +28,24 @@ object GetFromSacksTabComplete {
         event.addSuggestionsUnchecked(matching)
     }
 
-    // No subscribe since it needs to be called from the GetFromSackAPI
-    fun handleUnderlineReplace(event: MessageSendToServerEvent): MessageSendToServerEvent {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onMessageToServer(event: MessageSendToServerEvent) {
+        if (SkyBlockUtils.isOnAlphaServer) return
+        if (!event.isCommand(GetFromSackApi.commandsWithSlash)) return
+        val replacedEvent = handleUnderlineReplace(event)
+        GetFromSackApi.queuedHandler(replacedEvent)
+        GetFromSackApi.bazaarHandler(replacedEvent)
+        if (replacedEvent.isCancelled) {
+            event.cancel()
+            return
+        }
+        if (replacedEvent !== event) {
+            event.cancel()
+            ChatUtils.sendMessageToServer(replacedEvent.message)
+        }
+    }
+
+    private fun handleUnderlineReplace(event: MessageSendToServerEvent): MessageSendToServerEvent {
         if (!isEnabled()) return event
 
         if (event.senderIsSkyhanni()) return event
@@ -44,5 +59,5 @@ object GetFromSacksTabComplete {
         return event.eventWithNewMessage(event.message.replace(rawName, realName))
     }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && config.gfsSack
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.gfsSack
 }

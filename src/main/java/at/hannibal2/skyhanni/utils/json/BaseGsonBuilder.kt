@@ -12,6 +12,7 @@ object BaseGsonBuilder {
         .setPrettyPrinting()
         .excludeFieldsWithoutExposeAnnotation()
         .serializeSpecialFloatingPointValues()
+        .registerTypeAdapterFactory(ShadowedFieldAdapterFactory)
         .registerTypeAdapterFactory(PropertyTypeAdapterFactory())
         .registerTypeAdapterFactory(KotlinTypeAdapterFactory())
         .registerTypeAdapter(ChromaColour::class.java, LegacyStringChromaColourTypeAdapter(true).nullSafe())
