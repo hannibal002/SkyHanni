@@ -38,7 +38,7 @@ object DelayedRun {
     /**
      * Runs in the next game tick (up to 50ms delay), always on the main thread.
      */
-    fn runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
+    fun runNextTick(run: () -> Unit) = Minecraft.getInstance().schedule(run)
 
     /**
      * I'm not sure why, but this acts different to the above one
