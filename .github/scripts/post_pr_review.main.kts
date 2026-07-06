@@ -21,6 +21,8 @@ import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
+val workflowFailedMarker = "<!-- workflow-failed -->"
+
 val detektLabel = "Detekt"
 val detektMarker = "<!-- detekt-review -->"
 val detektStaleMarker = "<!-- detekt-review-stale -->"
@@ -53,6 +55,7 @@ fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
         val comment = buildString {
+            appendLine(workflowFailedMarker)
             appendLine("❌ Workflow failed: $mode")
             appendLine()
             appendLine("'$message'")
