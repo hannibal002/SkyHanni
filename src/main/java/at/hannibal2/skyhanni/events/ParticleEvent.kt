@@ -26,7 +26,7 @@ sealed class ParticleEvent(
     val offset: LorenzVec,
     val longDistance: Boolean,
     val particleArgs: IntArray? = null,
-) : CancellableWorldEvent() {
+) : WorldEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
@@ -65,6 +65,6 @@ class ParticleReceivedEvent(
     offset: LorenzVec,
     longDistance: Boolean,
     particleArgs: IntArray? = null,
-) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs)
+) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs), Cancellable
 
 

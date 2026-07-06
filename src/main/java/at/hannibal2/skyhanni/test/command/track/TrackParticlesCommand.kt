@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.LiteralCommandBuilder
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ParticleDetectedEvent
 import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -21,7 +22,7 @@ import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 
 @SkyHanniModule
-object TrackParticlesCommand : TrackWorldCommand<ParticleReceivedEvent, Identifier>(commonName = "particle") {
+object TrackParticlesCommand : TrackWorldCommand<ParticleDetectedEvent, Identifier>(commonName = "particle") {
 
     override val config get() = DevApi.config.debug.trackParticle
 
@@ -32,22 +33,22 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleReceivedEvent, Identifi
         }
     }
 
-    override fun ParticleReceivedEvent.getTypeIdentifier(): Identifier = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
+    override fun ParticleDetectedEvent.getTypeIdentifier(): Identifier = BuiltInRegistries.PARTICLE_TYPE.getKey(type)
         ?: throw IllegalStateException("Particle type $type is not registered in the registry")
 
-    override fun ParticleReceivedEvent.formatForDisplay() = Renderable.text("§3${getTypeIdentifier()} §8c:$count §7s:$speed")
+    override fun ParticleDetectedEvent.formatForDisplay() = Renderable.text("§3${getTypeIdentifier()} §8c:$count §7s:$speed")
 
-    override fun ParticleReceivedEvent.formatForWorldRender() = "§7C: §e$count §7S: §a${speed.roundTo(2)}"
+    override fun ParticleDetectedEvent.formatForWorldRender() = "§7C: §e$count §7S: §a${speed.roundTo(2)}"
 
     // No explicit filtering for particles, all particles are tracked in this context.
-    override fun ParticleReceivedEvent.shouldAcceptTrackableEvent(): Boolean = true
+    override fun ParticleDetectedEvent.shouldAcceptTrackableEvent(): Boolean = true
 
     private val allParticleIds: List<String> by lazy {
         BuiltInRegistries.PARTICLE_TYPE.keySet().map { it.toString() }.sorted()
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
-    fun onParticleReceive(event: ParticleReceivedEvent) = super.onTrackableEvent(event)
+    fun onParticleReceive(event: ParticleDetectedEvent) = super.onTrackableEvent(event)
 
     // TODO for DavidArthurCole, this whole structure seems unnecessary.
     //  We're defining event handlers that defer to inherits, in the same shape
