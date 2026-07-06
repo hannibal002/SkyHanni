@@ -64,16 +64,15 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        //? if >= 26.1 {
         val chatGui = MinecraftCompat.hud.chat
+        //? if >= 26.1 {
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, MinecraftCompat.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
         return visibleLine.parent
         //?} else {
-        /*val chatGui = mc.gui.hud.chat ?: return null
-        val chatLineY = screenToChatY(mouseY.toDouble())
+        /*val chatLineY = screenToChatY(mouseY.toDouble())
         val chatLineX = screenToChatX(mouseX.toDouble())
         val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
 
@@ -103,14 +102,13 @@ object CopyChat {
 
     //? if < 26.1 {
     /*fun screenToChatX(d: Double): Double {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.hud.chat ?: return 0.0
+        val chatGui = MinecraftCompat.hud.chat
         return d / chatGui.scale - 4.0
     }
 
     fun screenToChatY(d: Double): Double {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.hud.chat ?: return 0.0
+        val chatGui = MinecraftCompat.hud.chat
         val e = mc.window.guiScaledHeight - d - 40.0
         return e / (chatGui.scale * chatGui.lineHeight)
     }
