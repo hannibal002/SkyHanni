@@ -201,8 +201,8 @@ fun markCommentAsStale(
     val header = cleanedOld
         .lineSequence()
         .firstOrNull { it.startsWith("### ") }
-        ?.removePrefix("### ")
-        ?.replace(" $warningIcon", "")
+        ?.removePrefix("###")
+        ?.replace(warningIcon, "")
         ?.trim()
         ?: "Unknown"
 
