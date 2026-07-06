@@ -13,8 +13,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayerGroup;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -36,6 +34,14 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 *///?}
 
+//? if >= 26.1 {
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import org.joml.Matrix4fc;
+//?} else {
+/*import net.minecraft.client.Camera;
+import org.joml.Matrix4f;
+*///?}
+
 // Adapted from Fabric API implementation
 // The Fabric API event makes our lines render strange
 @Mixin(LevelRenderer.class)
@@ -53,7 +59,13 @@ public abstract class MixinLevelRenderer {
     private SubmitNodeStorage submitNodeStorage;
     //?}
 
+    //? if < 26.1 {
+    /*@Unique
+    PoseStack skyhanni$contextPoseStack;
+    *///?}
+
     @Unique
+    //~ if < 26.1 'CameraRenderState ' -> 'Camera '
     CameraRenderState skyhanni$currentCameraState;
 
     @Unique
@@ -65,12 +77,19 @@ public abstract class MixinLevelRenderer {
         GraphicsResourceAllocator resourceAllocator,
         DeltaTracker deltaTracker,
         boolean renderOutline,
+        //~ if < 26.1 'CameraRenderState' -> 'Camera'
         CameraRenderState cameraState,
+        //? if >= 26.1 {
         Matrix4fc modelViewMatrix,
+        //?} else {
+        /*Matrix4f positionMatrix,
+        Matrix4f matrix4f,
+        Matrix4f projectionMatrix,
+        *///?}
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
-        //? if < 26.2
+        //? if = 26.1
         //ChunkSectionsToRender chunkSectionsToRender,
         CallbackInfo ci
     ) {
@@ -116,6 +135,7 @@ public abstract class MixinLevelRenderer {
             from = @At(
                 value = "INVOKE_STRING",
                 target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
+                //~ if < 26.1 'translucentTerrain' -> 'translucent'
                 args = "ldc=translucentTerrain"
             )
         ),

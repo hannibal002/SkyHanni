@@ -41,10 +41,17 @@ import kotlin.math.sqrt
 
 //? if < 26.2
 //import org.joml.Matrix4f
+//? if >= 26.1 {
+import at.hannibal2.skyhanni.utils.compat.position
+//? if < 26.2 {
+/*import at.hannibal2.skyhanni.utils.compat.rotation
+*///?}
+//?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
+    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     //? if >= 26.2
@@ -107,10 +114,13 @@ object WorldRenderUtils {
         rgb: Int,
     ) {
         matrices.pushPose()
-        matrices.translate(x - cameraState.pos.x, y - cameraState.pos.y, z - cameraState.pos.z)
+        matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            /*? if < 26.2 {*//*Minecraft.getInstance().gameRenderer.featureRenderDispatcher().*//*?}*/submitNodeStorage,
+            //? if >= 26.2
+            submitNodeStorage,
+            //? if < 26.2
+            //Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -301,7 +311,7 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = cameraState.pos
+        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -334,7 +344,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(cameraState.orientation)
+        ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -381,7 +391,7 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = cameraState.pos
+        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -414,7 +424,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(cameraState.orientation)
+        ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -1076,8 +1086,13 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
+        //? if >= 26.1 {
         val look = Vector3f(0f, 0f, -1f).rotate(cameraState.orientation)
         return cameraState.pos.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
+        //?} else {
+        /*val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
+        return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
+        *///?}
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {

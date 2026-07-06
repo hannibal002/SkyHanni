@@ -46,6 +46,7 @@ object SkyHanniRoundedShapeRenderManager {
      * Call once per frame, before the GUI render pass.
      */
     fun preRenderAtlas() {
+        atlas.preRenderShapes(pendingKeys)
         pendingKeys.clear()
     }
 

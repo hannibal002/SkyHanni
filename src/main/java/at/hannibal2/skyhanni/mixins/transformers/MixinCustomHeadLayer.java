@@ -21,10 +21,15 @@ public class MixinCustomHeadLayer {
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V",
         at = @At(
             value = "INVOKE",
+            //~ if < 26.1 'submitSkull(' -> 'submitSkull(Lnet/minecraft/core/Direction;F'
             target = "Lnet/minecraft/client/renderer/blockentity/SkullBlockRenderer;submitSkull(FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/model/object/skull/SkullModelBase;Lnet/minecraft/client/renderer/rendertype/RenderType;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"
         )
     )
     private boolean onRenderArmor(
+        //? if < 26.1 {
+        /*Direction direction,
+        float rot,
+        *///?}
         float animationValue,
         PoseStack matrices,
         SubmitNodeCollector submitNodeCollector,

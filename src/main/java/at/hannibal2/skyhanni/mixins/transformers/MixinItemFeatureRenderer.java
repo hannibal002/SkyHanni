@@ -41,7 +41,13 @@ public abstract class MixinItemFeatureRenderer {
         QuadInstance instance,
         int color,
         Operation<Void> original,
-        @Local(argsOnly = true, name = "submit") ItemFeatureRenderer.Submit submit
+        //~ if < 26.1 '"submit"' -> '"itemSubmit"'
+        @Local(
+            //? if >= 26.1
+            argsOnly = true,
+            //~ if < 26.1 'submit' -> 'itemSubmit'
+            name = "submit"
+        ) ItemFeatureRenderer.Submit submit
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
@@ -94,11 +100,13 @@ public abstract class MixinItemFeatureRenderer {
         return original.call(instance, renderType);
     }
 
+    //? if >= 26.1 {
     @ModifyArg(
-        //? if >= 26.2
+        //? if >= 26.2 {
         method = "prepareOutlineSubmit",
-        //? else
-        //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        //?} else {
+        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        *///?}
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"),
         index = 0
     )
@@ -112,10 +120,11 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @ModifyExpressionValue(
-        //? if >= 26.2
+        //? if >= 26.2 {
         method = "prepareOutlineSubmit",
-        //? else
-        //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        //?} else {
+        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        *///?}
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;")
     )
     private RenderType modifyRenderLayer(RenderType layer) {
@@ -123,4 +132,5 @@ public abstract class MixinItemFeatureRenderer {
         if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;
         return RenderTypes.glintTranslucent();
     }
+    //?}
 }

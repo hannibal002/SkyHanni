@@ -4,6 +4,7 @@ enum class ProjectTarget(
     val projectName: String,
     val minecraftVersion: MinecraftVersion,
     val mappingDependency: String,
+    val mappingStyle: MappingStyle,
     val fabricLoaderVersion: String,
     val fabricApiVersion: String,
     val hypixelModApiVersion: String,
@@ -11,10 +12,23 @@ enum class ProjectTarget(
     val modMenuVersion: String,
     val modrinthInfo: ModrinthInfo,
 ) {
+    MODERN_12111(
+        "1.21.11",
+        MinecraftVersion.MC12111,
+        "official",
+        MappingStyle.SEARGE,
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.141.4+1.21.11",
+        hypixelModApiVersion = "net.hypixel:mod-api:1.0.1",
+        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21",
+        modMenuVersion = "17.0.0",
+        modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
+    ),
     MODERN_26100(
         "26.1",
         MinecraftVersion.MC26100,
         "official",
+        MappingStyle.NONE,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
         // 0.154.0 bundles fabric-screen-api-v1 5.1.0, whose char events currently crash with
         // Architectury's synthetic REI input delegate screens.
@@ -28,6 +42,7 @@ enum class ProjectTarget(
         "26.2",
         MinecraftVersion.MC26200,
         "official",
+        MappingStyle.NONE,
         fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
         // 0.154.0 bundles fabric-screen-api-v1 5.1.0, whose char events currently crash with
         // Architectury's synthetic REI input delegate screens.

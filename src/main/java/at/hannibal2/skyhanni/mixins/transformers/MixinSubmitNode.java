@@ -11,10 +11,14 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 //import net.minecraft.client.renderer.SubmitNodeStorage;
 
 @Mixin({
+    //? if >= 26.2 {
     ItemFeatureRenderer.Submit.class,
     ModelFeatureRenderer.Submit.class,
-    //? if < 26.2
-    //SubmitNodeStorage.ModelPartSubmit.class,
+    //?} else {
+    /*SubmitNodeStorage.ItemSubmit.class,
+    SubmitNodeStorage.ModelPartSubmit.class,
+    SubmitNodeStorage.ModelSubmit.class,
+    *///?}
 })
 public class MixinSubmitNode implements GlowingStateStore {
 

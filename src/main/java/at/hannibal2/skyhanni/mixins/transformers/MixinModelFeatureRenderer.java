@@ -75,6 +75,7 @@ public abstract class MixinModelFeatureRenderer {
         OutlineBufferSource outlineBufferSource,
         int color,
         Operation<Void> original,
+        //~ if < 26.1 '"submit"' -> '"modelSubmit"'
         @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
     ) {
         if (skyhanni$usesCustomOutline(submit)) {
@@ -95,6 +96,7 @@ public abstract class MixinModelFeatureRenderer {
         OutlineBufferSource outlineBufferSource,
         RenderType renderType,
         Operation<VertexConsumer> original,
+        //~ if < 26.1 '"submit"' -> '"modelSubmit"'
         @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
     ) {
         if (skyhanni$usesCustomOutline(submit)) {

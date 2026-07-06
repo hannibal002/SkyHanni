@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.data.model
 
 import net.minecraft.world.level.block.state.StateDefinition
@@ -26,3 +27,4 @@ abstract class OpaqueWaterFluid : WaterFluid() {
         override fun isSource(fluidState: FluidState): Boolean = true
     }
 }
+//?}

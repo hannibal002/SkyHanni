@@ -1,3 +1,4 @@
+//~ if < 26.1 'ClientLevelEvents' -> 'ClientWorldEvents' {
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -23,6 +24,7 @@ import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.multiplayer.chat.GuiMessage
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
@@ -56,11 +58,13 @@ object ClientEvents {
         }
 
         // World change event
+        //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 
+        //~ if < 26.1 'registerReloadListener' -> 'registerReloader'
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
@@ -98,8 +102,11 @@ object ClientEvents {
                 MinecraftCompat.hud.guiTicks,
                 message,
                 null,
+                //? if >= 26.1 {
                 GuiMessageSource.SYSTEM_CLIENT,
                 GuiMessageTag.system(),
+                //?} else
+                //GuiMessageTag.system(),
             )
             MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }
@@ -162,3 +169,4 @@ object ClientEvents {
     fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
 
 }
+//~}

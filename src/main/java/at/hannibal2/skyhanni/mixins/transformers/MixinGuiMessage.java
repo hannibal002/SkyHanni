@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import at.hannibal2.skyhanni.mixins.hooks.GuiMessageData;
 import at.hannibal2.skyhanni.utils.ChatUtils;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
@@ -40,6 +41,7 @@ public abstract class MixinGuiMessage implements GuiMessageData {
         int addedTime,
         Component content,
         MessageSignature signature,
+        //? if >= 26.1
         GuiMessageSource source,
         GuiMessageTag tag,
         CallbackInfo ci

@@ -132,13 +132,20 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.2") {
+            replace(".gameRenderer.featureRenderDispatcher()", ".gameRenderer.getFeatureRenderDispatcher()")
+            replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
+            replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
+            replace("CompareOp.GREATER_THAN_OR_EQUAL", "CompareOp.LESS_THAN_OR_EQUAL")
+            replace(".gui.hud.isHidden", ".options.hideGui")
             replace(".mainCamera()", ".mainCamera")
             replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
             replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
             replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
             replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
-            replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
             replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
+            replace("gui.hud.chat", "gui.chat")
+            replace("gui.hud.guiTicks", "gui.guiTicks")
+            replace("gui.hud.tabList", "gui.tabList")
             replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
             replace(
                 "net.minecraft.world.entity.monster.cubemob.MagmaCube",
@@ -171,6 +178,26 @@ stonecutter parameters {
                 replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
                 replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
             }
+        }
+
+        string(current.parsed < "26.1") {
+            replace(";extractRenderState(", ";render(")
+            replace(";text(", ";drawString(")
+            replace("ContainerInput", "ClickType")
+            replace("GuiGraphicsExtractor", "GuiGraphics")
+            replace("InteractClickType", "InteractClickType") // prevent replacement
+            replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
+            replace("\"extractSlot\"", "\"renderSlot\"")
+            replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
+            replace("classTweaker v1 official", "classTweaker v1 named")
+            replace("drawContext.text", "drawContext.drawString")
+            replace("extractContents", "renderContents")
+            replace("extractSlotHighlight", "renderSlotHighlight")
+            replace("lambda\$addMainPass\$0", "method_62214")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessageSource", "net.minecraft.client.multiplayer.chat.GuiMessageSource")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
+            replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
+            replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
         }
     }
 

@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.FluidModelTransparencyOverride;
@@ -32,3 +33,4 @@ public abstract class MixinFluidModel implements FluidModelTransparencyOverride 
         return original;
     }
 }
+//?}

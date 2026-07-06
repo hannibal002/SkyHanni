@@ -26,6 +26,7 @@ object DrawContextUtils {
             ErrorManager.skyHanniError("drawContext is null")
         }
 
+    //~ if < 26.1 '.item' -> '.renderItem'
     fun drawItem(item: SafeItemStack, x: Int, y: Int) = drawContext.item(item, x, y)
 
     fun setContext(context: GuiGraphicsExtractor) {
@@ -140,6 +141,7 @@ object DrawContextUtils {
     }
 
     fun addGuiElement(state: GuiElementRenderState) {
+        //~ if < 26.1 'addGuiElement' -> 'submitGuiElement'
         drawContext.guiRenderState.addGuiElement(state)
     }
 }

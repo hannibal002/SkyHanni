@@ -21,6 +21,9 @@ import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.renderer.state.gui.GuiTextRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
+//? if < 26.1 {
+/*import net.minecraft.util.Mth
+*///?}
 import org.joml.Matrix3x2f
 
 object CopyChat {
@@ -61,13 +64,57 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
+        //? if >= 26.1 {
         val chatGui = MinecraftCompat.hud.chat
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, MinecraftCompat.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
 
         return visibleLine.parent
+        //?} else {
+        /*val chatGui = mc.gui.hud.chat ?: return null
+        val chatLineY = screenToChatY(mouseY.toDouble())
+        val chatLineX = screenToChatX(mouseX.toDouble())
+        val lineIndex = (chatGui.chatScrollbarPos + chatLineY).toInt()
+
+        if (chatLineX < -4.0 || chatLineX > Mth.floor(chatGui.width.toDouble() / chatGui.scale).toDouble()) return null
+
+        if (lineIndex < 0) return null
+        val visibleLines = chatGui.trimmedMessages
+        if (lineIndex > visibleLines.size) return null
+        val visibleLine = visibleLines[lineIndex]
+
+        val matchingLines = chatGui.allMessages.filter {
+            it.addedTime() == visibleLine.addedTime() && it.content.formattedTextCompat().isNotBlank()
+        }
+
+        return when {
+            matchingLines.isEmpty() -> null
+            matchingLines.size == 1 -> matchingLines.first()
+            else -> {
+                matchingLines.firstOrNull {
+                    it.content.string.removeColor()
+                        .contains(OrderedTextUtils.orderedTextToLegacyString(visibleLine.content).removeColor())
+                } ?: matchingLines.first()
+            }
+        }
+        *///?}
     }
+
+    //? if < 26.1 {
+    /*fun screenToChatX(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.hud.chat ?: return 0.0
+        return d / chatGui.scale - 4.0
+    }
+
+    fun screenToChatY(d: Double): Double {
+        val mc = Minecraft.getInstance()
+        val chatGui = mc.gui.hud.chat ?: return 0.0
+        val e = mc.window.guiScaledHeight - d - 40.0
+        return e / (chatGui.scale * chatGui.lineHeight)
+    }
+    *///?}
 
     private class HoveredTextFinder(
         private val font: Font,

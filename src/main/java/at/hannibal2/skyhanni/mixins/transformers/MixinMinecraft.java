@@ -87,6 +87,7 @@ public abstract class MixinMinecraft {
         at = @At(value = "HEAD"),
         method = "continueAttack",
         argsOnly = true,
+        //~ if < 26.1 'down' -> 'bl'
         name = "down"
     )
     public boolean handleBlockClick(boolean down) {

@@ -28,7 +28,14 @@ import com.mojang.blaze3d.textures.FilterMode
 
 object RoundedShapeDrawer {
 
-    val projectionMatrix = ProjectionMatrixBuffer("SkyHanni Rounded Shapes")
+    val projectionMatrix = ProjectionMatrixBuffer(
+        "SkyHanni Rounded Shapes",
+        //? if < 26.1 {
+        /*1000.0f,
+        11000.0f,
+        true,
+        *///?}
+    )
     var roundedUniform = SkyHanniRoundedUniform()
     var roundedOutlineUniform = SkyHanniRoundedOutlineUniform()
     var circleUniform = SkyHanniCircleUniform()
@@ -67,13 +74,14 @@ object RoundedShapeDrawer {
             }
 
             // Need to back up current projection matrix and set current to an orthographic
-            // projection matrix, since orthographic GUI elements in 1.21.7 are now deferred
-            // so we just set the correct matrix here and restore the perspective one afterwards
+            // projection matrix, since orthographic gui elements in 1.21.7 are now deferred
+            // so we just set the correct matrix here are restore the perspective one afterwards
             val window = Minecraft.getInstance().window
             RenderSystem.backupProjectionMatrix()
             val w = window.width.toFloat() / window.guiScale.toFloat()
             val h = window.height.toFloat() / window.guiScale.toFloat()
             RenderSystem.setProjectionMatrix(
+                //~ if < 26.1 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)' -> 'w, h'
                 projectionMatrix.getBuffer(Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)),
                 ProjectionType.ORTHOGRAPHIC,
             )

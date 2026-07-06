@@ -32,6 +32,8 @@ public abstract class MixinGameRenderer {
     /*@Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
+    //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"' {
+    //~ if < 26.1 'graphics' -> 'guiGraphics'
     @ModifyVariable(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At("STORE"), name = "graphics")
     private GuiGraphicsExtractor skyhanni$captureGuiGraphicsExtractor(GuiGraphicsExtractor graphics) {
         skyhanni$guiGraphics = graphics;
@@ -42,12 +44,17 @@ public abstract class MixinGameRenderer {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
         at = @At(
             value = "INVOKE",
+            //? if >= 26.1 {
             target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+            //?} else {
+            /^target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
+            ^///?}
         )
     )
     private void skyhanni$onRenderStartPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
+        //? if >= 26.1
         boolean resourcesLoaded,
         CallbackInfo ci
     ) {
@@ -58,12 +65,14 @@ public abstract class MixinGameRenderer {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
         at = @At(
             value = "INVOKE",
+            //~ if < 26.1 'extractSavingIndicator' -> 'renderSavingIndicator'
             target = "Lnet/minecraft/client/gui/Gui;extractSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
         )
     )
     private void skyhanni$onRenderEndPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
+        //? if >= 26.1
         boolean resourcesLoaded,
         CallbackInfo ci
     ) {
@@ -81,10 +90,12 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderTail(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
+        //? if >= 26.1
         boolean resourcesLoaded,
         CallbackInfo ci
     ) {
         GuiEditManager.renderLast(skyhanni$guiGraphics);
     }
+    //~}
     *///?}
 }

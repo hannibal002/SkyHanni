@@ -43,6 +43,7 @@ public abstract class MixinHud {
         }
     }
 
+    //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postHotbarLayerEventPre(graphics)) {
@@ -54,8 +55,10 @@ public abstract class MixinHud {
     public void renderHotbarTail(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postHotbarLayerEventPost(graphics);
     }
+    //~}
 
     @WrapOperation(
+        //~ if < 26.1 'extractTabList' -> 'renderTabList'
         method = "extractTabList",
         at = @At(
             value = "INVOKE",
@@ -134,14 +137,20 @@ public abstract class MixinHud {
     }
 
     @ModifyArg(
+        //~ if < 26.1 'extractChat' -> 'renderChat'
         method = "extractChat",
         at = @At(
             value = "INVOKE",
+            //? if >= 26.1 {
             target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;Z)V"
+            //?} else
+            //target = "Lnet/minecraft/client/gui/components/ChatComponent;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;IIIZZ)V"
         ),
         index = 5
     )
+    //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
     private ChatComponent.DisplayMode modifyRenderText(ChatComponent.DisplayMode mode) {
+        //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         if (ChatPeek.peek()) return ChatComponent.DisplayMode.FOREGROUND;
         return mode;
     }
@@ -162,6 +171,7 @@ public abstract class MixinHud {
         }
     }
 
+    //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (RenderEvents.postHeldItemTooltipLayerEventPre(graphics)) {
@@ -173,7 +183,9 @@ public abstract class MixinHud {
     public void renderSelectedItemNamePost(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         RenderEvents.postHeldItemTooltipLayerEventPost(graphics);
     }
+    //~}
 
+    //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postActionBarLayerEventPre(graphics)) {
@@ -185,4 +197,5 @@ public abstract class MixinHud {
     public void renderOverlayMessagePost(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(graphics);
     }
+    //~}
 }

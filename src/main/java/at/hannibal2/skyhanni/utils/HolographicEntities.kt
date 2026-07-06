@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
+//? if >= 26.2
+import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
@@ -27,10 +29,10 @@ import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
 
 //? if >= 26.2 {
-import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.util.LightCoordsUtil
-//?} else
-//import net.minecraft.client.renderer.LevelRenderer
+//?} else {
+/*import net.minecraft.client.renderer.LevelRenderer
+*///?}
 
 /**
  * Utility for creating fake entities without an associated world to avoid contaminating the world state.
@@ -187,16 +189,31 @@ object HolographicEntities {
         val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
-        val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+        val cameraRenderState =
+            //? if >= 26.2
+            gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+            //? if < 26.2 && >= 26.1
+            //gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+            //? if < 26.1
+            //gameRenderer.getLevelRenderState().cameraRenderState
         val cameraPos = cameraRenderState.pos
-        //~ if >= 26.2 'gameRenderer.featureRenderDispatcher.submitNodeStorage' -> 'SubmitNodeStorage()'
-        val submitNodeStorage = SubmitNodeStorage()
+        val submitNodeCollector =
+            //? if >= 26.2
+            SubmitNodeStorage()
+            //? if < 26.2
+            //gameRenderer.featureRenderDispatcher().submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
         client.level?.let { level ->
-            //~ if >= 26.2 'LevelRenderer' -> 'LightCoordsUtil'
-            entityRenderState.lightCoords = LightCoordsUtil.getLightCoords(level, mobPosition.toBlockPos())
+            val blockPos = mobPosition.toBlockPos()
+            entityRenderState.lightCoords =
+                //? if >= 26.2
+                LightCoordsUtil.getLightCoords(level, blockPos)
+                //? elif >= 26.1
+                //LevelRenderer.getLightCoords(level, blockPos)
+                //? else
+                //LevelRenderer.getLightColor(level, blockPos)
         }
 
         activeHolographicEntities.add(entity)
@@ -209,10 +226,10 @@ object HolographicEntities {
                     mobPosition.y - cameraPos.y,
                     mobPosition.z - cameraPos.z,
                     matrices,
-                    submitNodeStorage,
+                    submitNodeCollector,
                 )
                 //? if >= 26.2
-                gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeStorage)
+                gameRenderer.featureRenderDispatcher().renderAllFeatures(submitNodeCollector)
             }
         } finally {
             activeHolographicEntities.remove(entity)

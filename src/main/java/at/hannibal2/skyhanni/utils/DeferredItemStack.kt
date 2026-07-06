@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 @file:Suppress("VanillaItemStackImport")
 
 package at.hannibal2.skyhanni.utils
@@ -133,3 +134,4 @@ private fun DataComponentPatch.Builder.setUnchecked(type: DataComponentType<*>, 
 private fun DataComponentPatch.Builder.removeUnchecked(type: DataComponentType<*>) {
     remove(type as DataComponentType<Any>)
 }
+//?}

@@ -1,10 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -13,21 +11,30 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//? if >= 26.1 {
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.network.chat.Component;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
+import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
+//?} else
+//import net.minecraft.client.renderer.state.CameraRenderState;
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {
 
     @Inject(
+        //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
+        //?} else
+        //method = "submitNameTag",
         at = @At("HEAD"),
         cancellable = true
     )
@@ -47,7 +54,10 @@ public abstract class MixinEntityRenderer {
     }
 
     @Inject(
+        //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
+        //?} else
+        //method = "submitNameTag",
         at = @At("TAIL")
     )
     public void onRenderLabelTail(
@@ -74,6 +84,7 @@ public abstract class MixinEntityRenderer {
         Minecraft client,
         Entity entity,
         Operation<Boolean> original,
+        //~ if < 26.1 '"state"' -> '"entityRenderState"'
         @Local(argsOnly = true, name = "state") EntityRenderState state
     ) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
@@ -102,6 +113,7 @@ public abstract class MixinEntityRenderer {
     }
 
     // See modifyRenderLabelIfPresentArgs in MixinPlayerEntityRenderer.
+    //? if >= 26.1 {
     @ModifyArg(
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;I)V",
         at = @At(
@@ -120,4 +132,5 @@ public abstract class MixinEntityRenderer {
         }
         return text;
     }
+    //?}
 }

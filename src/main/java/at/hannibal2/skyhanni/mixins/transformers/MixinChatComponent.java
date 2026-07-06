@@ -9,6 +9,11 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
+//? if < 26.1 {
+/*import net.minecraft.client.GuiMessage;
+import net.minecraft.util.FormattedCharSequence;
+*///?}
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
@@ -38,7 +43,7 @@ public abstract class MixinChatComponent {
 
     @Shadow
     @Final
-    private Minecraft minecraft;
+    /*? if >= 26.1 {*/private /*?}*/Minecraft minecraft;
 
     @WrapOperation(
         method = "deleteMessageOrDelay",
@@ -63,11 +68,16 @@ public abstract class MixinChatComponent {
         }
     }
 
+    //? if >= 26.1 {
     @WrapMethod(method = "extractRenderState(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IILnet/minecraft/client/gui/components/ChatComponent$DisplayMode;)V")
+    //?} else {
+    /*@WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V")
+    *///?}
     private void wrapRender(
         ChatComponent.ChatGraphicsAccess graphics,
         int screenHeight,
         int ticks,
+        //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
         ChatComponent.DisplayMode displayMode,
         Operation<Void> original
     ) {
@@ -85,14 +95,38 @@ public abstract class MixinChatComponent {
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
 
+    //~ if < 26.1 'addMessage' -> 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V'
     @Inject(method = "addMessage", at = @At("HEAD"))
     private void setChatLine(
         Component contents,
         MessageSignature signature,
+        //? if >= 26.1
         GuiMessageSource source,
         GuiMessageTag tag,
         CallbackInfo ci
     ) {
         GuiChatHook.setCurrentComponent(contents);
     }
+
+    //? if < 26.1 {
+    /*@WrapOperation(
+        method = "addMessageToDisplayQueue",
+        at = @At(
+            value = "NEW",
+            target = "net/minecraft/client/GuiMessage$Line"
+        )
+    )
+    private GuiMessage.Line addMessageId(
+        int addedTime,
+        FormattedCharSequence content,
+        GuiMessageTag tag,
+        boolean endOfEntry,
+        Operation<GuiMessage.Line> original,
+        GuiMessage message
+    ) {
+        GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
+        line.skyhanni$setMessageId(message.skyhanni$getMessageId());
+        return line;
+    }
+    *///?}
 }

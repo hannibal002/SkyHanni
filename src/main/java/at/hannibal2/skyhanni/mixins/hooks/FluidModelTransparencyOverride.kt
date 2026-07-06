@@ -1,3 +1,4 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.hooks
 
 import com.mojang.blaze3d.platform.Transparency
@@ -23,3 +24,4 @@ interface FluidModelTransparencyOverride {
             }
     }
 }
+//?}
