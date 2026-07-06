@@ -347,9 +347,13 @@ fun runMergeConflictMode(prNumber: String) {
         return
     }
 
-    val existingId = findExistingComment(prNumber, conflictMarker)
-
     if (!mergeableState) {
+        val alreadyLabeled = conflictLabel in getPrLabels(prNumber)
+        if (alreadyLabeled) {
+            println("PR #$prNumber: conflicts found, already labeled, skipping")
+            return
+        }
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
@@ -361,6 +365,7 @@ fun runMergeConflictMode(prNumber: String) {
         setLabel(prNumber, conflictLabel, true)
         println("PR #$prNumber: conflicts found, comment posted")
     } else {
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
