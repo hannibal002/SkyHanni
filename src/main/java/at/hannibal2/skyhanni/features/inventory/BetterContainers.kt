@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -18,7 +19,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.container
+import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import com.mojang.blaze3d.platform.NativeImage
@@ -138,7 +141,7 @@ object BetterContainers {
         lastInvHashcode = inventory.hashCode()
         hasItem = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
-            stack != null
+            stack.isNotEmpty()
         }
         hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
@@ -211,9 +214,9 @@ object BetterContainers {
 
     private fun getClickedSlot(): Int = if (clickedSlotAt.passedSince() <= 500.milliseconds) clickedSlot else -1
 
-    private fun isBlankStack(
-        stack: SafeItemStack,
-    ): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK)
+    private fun isBlankStack(stack: SafeItemStack): Boolean = stack.isStainedGlassPane(ColoredBlockCompat.BLACK) &&
+        stack.count == 1 &&
+        stack.getTooltip().isEmpty()
 
     private fun isButtonStack(
         stack: SafeItemStack?,
@@ -288,7 +291,7 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index).takeUnlessEmpty() ?: continue
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -307,7 +310,7 @@ object BetterContainers {
         }
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            val stack: SafeItemStack = handlerInventory.getItem(index).takeUnlessEmpty() ?: continue
             val xi = index % 9
             val yi = index / 9
 
