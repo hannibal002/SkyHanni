@@ -554,16 +554,55 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     return result
 }
 
-fun runDependenciesMode(prState: String, prNum: String?) {
-    if (prState == "closed") {
-        println("PR ${prNum ?: "unknown"} closed, rechecking all open PRs with label \"$dependencyLabel\"")
-        for (pr in fetchAllLabeledOpenPRs()) {
-            val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-            checkPrDependencies(num)
+fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
+    val message = buildDependencyNotificationMessage(closedPrNum, merged, remainingOpen)
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    if (status.isHttpError) System.err.println("Warning: could not post notification on PR #$prNum (HTTP $status)")
+    else println("PR #$prNum: posted dependency notification")
+}
+
+fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remainingOpen: Int): String = buildString {
+    val closedLink = "https://github.com/$repo/pull/$closedPrNum"
+    if (merged) {
+        append("[PR #$closedPrNum]($closedLink) was merged.")
+        when (remainingOpen) {
+            0 -> append(" This PR now has all dependencies resolved.")
+            1 -> append(" This PR still has 1 open dependency.")
+            else -> append(" This PR still has $remainingOpen open dependencies.")
         }
     } else {
+        append("[PR #$closedPrNum]($closedLink) was closed without merging.")
+        append(" You may need to re-evaluate this PR's dependencies.")
+    }
+}
+
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+    if (prState != "closed") {
         val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
         checkPrDependencies(num)
+        return
+    }
+
+    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
+    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event")
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+
+    for (pr in fetchAllLabeledOpenPRs()) {
+        val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+        val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
+        if ("## Dependencies" !in body) continue
+
+        val deps = parseDependencies(body)
+        if (deps.isEmpty()) continue
+
+        val isDirectDep = deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum }
+        val remainingDeps = deps.filter { !(it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum) }
+        val openRemainingCount = remainingDeps.count { isDependencyOpen(it) }
+
+        if (isDirectDep) postDependencyNotification(num, closedPrNum, merged, openRemainingCount)
+        setLabel(num, dependencyLabel, openRemainingCount > 0)
     }
 }
 
@@ -583,7 +622,8 @@ val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping
 
 if (mode == "dependencies") {
     val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
-    runDependenciesMode(prState, prNumberEnv)
+    val prMerged = System.getenv("PR_MERGED") == "true"
+    runDependenciesMode(prState, prNumberEnv, prMerged)
     exitProcess(0)
 }
 
