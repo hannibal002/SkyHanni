@@ -156,7 +156,7 @@ object ComputerTimeOffset {
     fun onProfileJoin() = DelayedRun.runDelayed(5.seconds, ::tryCheckOffset)
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Computer Time Offset")
 
         if (state != State.NORMAL) {

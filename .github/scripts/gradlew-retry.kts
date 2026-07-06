@@ -1,5 +1,7 @@
 #!/usr/bin/env kotlin
 
+// Execution context: PR branch, called via gradle-retry action
+
 import kotlin.system.exitProcess
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.toJavaDuration
