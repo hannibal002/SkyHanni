@@ -39,6 +39,8 @@ val changelogLabel = "Wrong Title/Changelog"
 val changelogMarker = "<!-- changelog-check-review -->"
 val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
 
+val warningIcon = "⚠\uFE0F"
+
 val maxDirectFindings = 8
 val maxLogChars = 10_000
 
@@ -125,9 +127,13 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace(">", "&gt;")
     .replace("@", "&#64;")
 
+fun StringBuilder.appendWarningTitle(title: String) {
+    appendLine("### $warningIcon $title $warningIcon")
+}
+
 fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine(detektMarker)
-    appendLine("### Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
+    appendWarningTitle("Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
@@ -192,6 +198,7 @@ fun markCommentAsStale(
         .lineSequence()
         .firstOrNull { it.startsWith("### ") }
         ?.removePrefix("### ")
+        ?.replace(" $warningIcon", "")
         ?.trim()
         ?: "Unknown"
 
@@ -243,8 +250,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     appendLine(buildMarker)
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
-        appendLine()
-        appendLine("### Build failed: $version")
+        appendWarningTitle("Build failed: $version")
         val oneLiner = parseOneLiner(logContent)
         if (oneLiner != null) appendLine("`${oneLiner.trim().take(300)}`")
         appendLine()
@@ -255,6 +261,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         appendLine("~~~")
         appendLine()
         appendLine("</details>")
+        appendLine()
     }
 }
 
@@ -286,7 +293,7 @@ fun getAllOpenPRNumbers(): List<String> {
 
 fun buildConflictBody(): String = buildString {
     appendLine(conflictMarker)
-    appendLine("### Merge conflicts detected")
+    appendWarningTitle("Merge conflicts detected")
     append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
 }
 
@@ -428,7 +435,7 @@ fun readChangelogErrors(artifactDirPath: String?): String? {
 
 fun buildChangelogBody(errors: String): String = buildString {
     appendLine(changelogMarker)
-    appendLine("### Changelog verification failed")
+    appendWarningTitle("Changelog verification failed")
     appendLine()
     append(errors.trimEnd())
 }
