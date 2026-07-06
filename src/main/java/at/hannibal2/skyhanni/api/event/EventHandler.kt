@@ -89,10 +89,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         private val BUCKET_COUNT = IslandType.entries.size + ISLAND_OFFSET
 
         fun getCurrentStateIndex(): Int {
-            val island = SkyBlockUtils.currentIsland.ordinal
-            val isSkyblock = SkyBlockUtils.inSkyBlock
-            if (!isSkyblock) return OUTSIDE
-            return island + ISLAND_OFFSET
+            if (!SkyBlockUtils.inSkyBlock) return OUTSIDE
+            return SkyBlockUtils.currentIsland.ordinal + ISLAND_OFFSET
         }
 
         fun createListenerIndices(options: HandleEvent): List<Int> {
