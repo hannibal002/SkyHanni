@@ -17,6 +17,8 @@ object DelayedRun {
     //     private val tasks = mutableListOf<Pair<() -> Any, SimpleTimeMark>>
     private val futureTasks = ConcurrentLinkedQueue<Pair<() -> Any, SimpleTimeMark>>()
 
+    var test = 3
+
     fun runDelayed(duration: Duration, run: () -> Unit): SimpleTimeMark {
         val time = SimpleTimeMark.now() + duration
         futureTasks.add(run to time)
