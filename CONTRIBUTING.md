@@ -449,6 +449,20 @@ before a new one is posted.
 The PR number is resolved by branch name at runtime. If no open PR matches the branch (e.g. for a direct push to beta), the script
 exits without posting a comment.
 
+### Merge Conflict Comment
+
+When a pull request has merge conflicts with the base branch, the `Merge Conflicts` label is applied and a comment is posted. When
+conflicts are resolved, the comment is collapsed into a `<details>` spoiler and the label is removed without posting a new comment. The
+same stale-comment pattern as Detekt and build failures is used.
+
+- `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
+  beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
+  provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
+- `.github/scripts/post_pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
+  the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
+  comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
+  removed.
+
 ### Dependency Label
 
 When a pull request declares dependencies in its `## Dependencies` section, the `Waiting on Dependency PR` label is automatically added or

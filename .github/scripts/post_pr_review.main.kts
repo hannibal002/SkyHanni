@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 
-// Execution context: base branch, called from detekt-review.yml and build-review.yml
+// Execution context: base branch, called from detekt-review.yml, build-review.yml, and label-merge-conflict.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -22,11 +22,16 @@ import kotlin.io.path.readText
 import kotlin.system.exitProcess
 
 val detektLabel = "Detekt"
-val buildLabel = "Fails Multi-Version"
 val detektMarker = "<!-- detekt-review -->"
 val detektStaleMarker = "<!-- detekt-review-stale -->"
+
+val buildLabel = "Fails Multi-Version"
 val buildMarker = "<!-- build-failure-review -->"
 val buildStaleMarker = "<!-- build-failure-review-stale -->"
+
+val conflictLabel = "Merge Conflicts"
+val conflictMarker = "<!-- merge-conflict-review -->"
+val conflictStaleMarker = "<!-- merge-conflict-review-stale -->"
 val maxDirectFindings = 8
 val maxLogChars = 10_000
 
@@ -206,6 +211,72 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     }
 }
 
+fun getMergeableState(prNumber: String): Boolean? {
+    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$prNumber")
+    status.requireSuccess("Error: could not fetch PR mergeable state (HTTP $status), aborting")
+    val mergeableElement = (body as? JsonObject)?.get("mergeable") ?: return null
+    if (mergeableElement.isJsonNull) return null
+    return mergeableElement.asBoolean
+}
+
+fun getAllOpenPRNumbers(): List<String> {
+    val numbers = mutableListOf<String>()
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/pulls?state=open&per_page=100&page=$page")
+        status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting")
+        val array = body as? JsonArray ?: error("Error: unexpected response format for open PRs, aborting")
+        for (element in array) {
+            if (!element.isJsonObject) continue
+            val number = element.asJsonObject.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            numbers.add(number)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return numbers
+}
+
+fun buildConflictBody(): String = buildString {
+    appendLine(conflictMarker)
+    appendLine("### Merge conflicts detected")
+    append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
+}
+
+fun runMergeConflictMode(prNumber: String) {
+    val mergeableState = getMergeableState(prNumber)
+    if (mergeableState == null) {
+        println("PR #$prNumber: mergeable is null, skipping")
+        return
+    }
+
+    val existingId = findExistingComment(prNumber, conflictMarker)
+
+    if (!mergeableState) {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Outdated merge conflict notice",
+            "click to show old notice",
+        )
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
+        postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
+        setLabel(prNumber, conflictLabel, true)
+        println("PR #$prNumber: conflicts found, comment posted")
+    } else {
+        if (existingId != null) markCommentAsStale(
+            existingId,
+            conflictMarker,
+            conflictStaleMarker,
+            "Outdated merge conflict notice",
+            "click to show old notice",
+        )
+        setLabel(prNumber, conflictLabel, false)
+        println("PR #$prNumber: no conflicts")
+    }
+}
+
 fun runDetektMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, detektMarker)
     if (existingId != null) markCommentAsStale(existingId, detektMarker, detektStaleMarker, "Outdated Detekt issues", "click to show old warnings")
@@ -299,11 +370,23 @@ fun runBuildMode(prNumber: String) {
     println("Done: build failure comment posted, added label")
 }
 
-val prNumber: String = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
-    ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
+
+if (mode == "mergeconflict") {
+    if (prNumberEnv != null) {
+        runMergeConflictMode(prNumberEnv)
+    } else {
+        println("No PR_NUMBER set, rechecking all open PRs")
+        getAllOpenPRNumbers().forEach { runMergeConflictMode(it) }
+    }
+    exitProcess(0)
+}
+
+val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
 
 when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
+
