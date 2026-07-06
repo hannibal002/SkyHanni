@@ -16,14 +16,16 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             -   name: Check out the repository
-                uses: actions/checkout@v6
+                uses: actions/checkout@v7
                 with:
                     persist-credentials: false
 
             -   name: Evaluate dependency PRs
-                uses: actions/github-script@v7
-                with:
-                    github-token: ${{ secrets.GITHUB_TOKEN }}
-                    script: |
-                        const check = require('./.github/scripts/check-dependencies.js');
-                        await check({ github, context, core });
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                    MODE: dependencies
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                    PR_STATE: ${{ github.event.pull_request.state }}
+                    PR_MERGED: ${{ github.event.pull_request.merged }}
+                run: kotlinc -script .github/scripts/post_pr_review.main.kts
