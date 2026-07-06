@@ -449,6 +449,27 @@ before a new one is posted.
 The PR number is resolved by branch name at runtime. If no open PR matches the branch (e.g. for a direct push to beta), the script
 exits without posting a comment.
 
+### Dependency Label
+
+When a pull request declares dependencies in its `## Dependencies` section, the `Waiting on Dependency PR` label is automatically added or
+removed based on whether any listed dependencies are still open.
+
+Two dependency formats are supported:
+
+- `- #<pr number>` for same-repository PRs
+- `- <url>` for external repository PRs
+
+Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
+release unit.
+
+The check runs on every `opened`, `edited`, and `closed` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
+label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
+
+Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
+dependent PR remains until the PR itself is edited or another supported event occurs.
+
+Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/check-dependencies.js`.
+
 ## Access Wideners
 
 You may want to use private Minecraft methods or fields, this is where access wideners come in.
