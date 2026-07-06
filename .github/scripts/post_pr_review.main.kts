@@ -224,8 +224,11 @@ fun readBuildLog(artifactDirPath: String?): String? {
 
 fun parseOneLiner(logContent: String): String? {
     val workspace = System.getenv("GITHUB_WORKSPACE")
-    val line = logContent.lines().firstOrNull { it.trimStart().startsWith("e: ") }
-        ?: logContent.lines().firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
+    val lines = logContent.lines()
+    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") }
+        ?: lines.firstOrNull { "Received status code" in it }
+        ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
+        ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
     if (line == null || workspace.isNullOrEmpty()) return line
     return line.replace("file://$workspace/", "")
 }
