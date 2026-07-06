@@ -39,6 +39,8 @@ val changelogLabel = "Wrong Title/Changelog"
 val changelogMarker = "<!-- changelog-check-review -->"
 val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
 
+val dependencyLabel = "Waiting on Dependency PR"
+
 val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 8
@@ -76,6 +78,8 @@ fun Int.requireSuccess(message: String, commentError: Boolean = true) {
 }
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
+
+data class Dependency(val owner: String, val repoName: String, val pullNumber: Int)
 
 fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
     val bodyPublisher = if (payload != null)
@@ -471,6 +475,137 @@ fun runChangelogMode(prNumber: String) {
     println("Done: changelog check comment posted")
 }
 
+fun parseDependencies(body: String): List<Dependency> {
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+    val deps = mutableListOf<Dependency>()
+
+    val urlRegex = Regex("""- https://github\.com/([\w-]+)/([\w-]+)/pull/(\d+)""")
+    for (match in urlRegex.findAll(body)) {
+        val depOwner = match.groupValues[1]
+        val depRepo = match.groupValues[2]
+        val depNum = match.groupValues[3].toInt()
+        if (depOwner == "hannibal002" && depRepo == "SkyHanni-REPO") continue
+        deps.add(Dependency(depOwner, depRepo, depNum))
+    }
+
+    val prRegex = Regex("""- #(\d+)""")
+    for (match in prRegex.findAll(body)) {
+        deps.add(Dependency(repoOwner, repoName, match.groupValues[1].toInt()))
+    }
+
+    return deps
+}
+
+fun isDependencyOpen(dep: Dependency): Boolean {
+    val (status, body) = ghRequest("GET", "/repos/${dep.owner}/${dep.repoName}/pulls/${dep.pullNumber}")
+    if (status == 404) {
+        System.err.println("Warning: dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber} not found, skipping")
+        return false
+    }
+    if (status.isHttpError) {
+        error("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
+    }
+    val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
+    return state == "open"
+}
+
+fun checkPrDependencies(issueNumber: String) {
+    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$issueNumber")
+    if (status.isHttpError) {
+        error("Error: could not fetch PR #$issueNumber (HTTP $status)")
+    }
+    val prBody = (body as? JsonObject)?.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
+    if ("## Dependencies" !in prBody) {
+        println("PR #$issueNumber: no Dependencies section, skipping")
+        return
+    }
+
+    val deps = parseDependencies(prBody)
+    if (deps.isEmpty()) {
+        println("PR #$issueNumber: no dependency links found, skipping")
+        return
+    }
+
+    val hasOpen = deps.any { isDependencyOpen(it) }
+    setLabel(issueNumber, dependencyLabel, hasOpen)
+    println("PR #$issueNumber: ${if (hasOpen) "has open dependencies" else "all dependencies resolved"}")
+}
+
+fun fetchAllLabeledOpenPRs(): List<JsonObject> {
+    val result = mutableListOf<JsonObject>()
+    val encoded = URLEncoder.encode(dependencyLabel, StandardCharsets.UTF_8).replace("+", "%20")
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/issues?labels=$encoded&state=open&per_page=100&page=$page")
+        if (status.isHttpError) {
+            error("Error: could not fetch labeled PRs (HTTP $status)")
+        }
+        val array = body as? JsonArray ?: break
+        for (element in array) {
+            val obj = element as? JsonObject ?: continue
+            if (obj.get("pull_request") == null) continue
+            result.add(obj)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return result
+}
+
+fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
+    val message = buildDependencyNotificationMessage(closedPrNum, merged, remainingOpen)
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    if (status.isHttpError) System.err.println("Warning: could not post notification on PR #$prNum (HTTP $status)")
+    else println("PR #$prNum: posted dependency notification")
+}
+
+fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remainingOpen: Int): String = buildString {
+    val closedLink = "https://github.com/$repo/pull/$closedPrNum"
+    if (merged) {
+        append("[PR #$closedPrNum]($closedLink) was merged.")
+        when (remainingOpen) {
+            0 -> append(" This PR now has all dependencies resolved.")
+            1 -> append(" This PR still has 1 open dependency.")
+            else -> append(" This PR still has $remainingOpen open dependencies.")
+        }
+    } else {
+        append("[PR #$closedPrNum]($closedLink) was closed without merging.")
+        append(" You may need to re-evaluate this PR's dependencies.")
+    }
+}
+
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+    if (prState != "closed") {
+        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
+        checkPrDependencies(num)
+        return
+    }
+
+    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
+    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event")
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+
+    for (pr in fetchAllLabeledOpenPRs()) {
+        val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+        val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
+        if ("## Dependencies" !in body) continue
+
+        val deps = parseDependencies(body)
+        if (deps.isEmpty()) continue
+
+        val isDirectDep = deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum }
+        val remainingDeps = deps.filter { !(it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum) }
+        val openRemainingCount = remainingDeps.count { isDependencyOpen(it) }
+
+        if (isDirectDep) postDependencyNotification(num, closedPrNum, merged, openRemainingCount)
+        setLabel(num, dependencyLabel, openRemainingCount > 0)
+    }
+}
+
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
 if (mode == "mergeconflict") {
@@ -484,6 +619,13 @@ if (mode == "mergeconflict") {
 }
 
 val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping"); exitProcess(0) }
+
+if (mode == "dependencies") {
+    val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
+    val prMerged = System.getenv("PR_MERGED") == "true"
+    runDependenciesMode(prState, prNumberEnv, prMerged)
+    exitProcess(0)
+}
 
 when (mode) {
     "detekt" -> runDetektMode(prNumber)

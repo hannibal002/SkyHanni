@@ -43,4 +43,4 @@ jobs:
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ github.event.pull_request.number }}
                     MODE: mergeconflict
-                run: kotlinc -script .github/scripts/post_pr_review.main.kts
+                run: kotlinc -script .github/scripts/pr_review.main.kts

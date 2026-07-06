@@ -93,4 +93,4 @@ jobs:
                     ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-1.21.11
                     ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.1
                     MODE: build
-                run: kotlinc -script .github/scripts/post_pr_review.main.kts
+                run: kotlinc -script .github/scripts/pr_review.main.kts
