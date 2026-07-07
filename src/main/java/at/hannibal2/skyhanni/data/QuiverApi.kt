@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.BowItem
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.util.regex.Matcher
 
 @SkyHanniModule

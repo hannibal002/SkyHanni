@@ -10,22 +10,20 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
@@ -34,6 +32,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 
 /**
  * Constructs the full Renderable display for [VisualWordScreen].

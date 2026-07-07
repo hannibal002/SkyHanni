@@ -223,7 +223,7 @@ object FarmingFortuneDisplay {
             ChatUtils.clickToActionOrDisable(
                 "§cPest fortune buff has expired!",
                 config::bonusFortuneChat,
-                "call Phillip",
+                if (config.callPhillip) "call Phillip" else "teleport to the barn",
                 action = {
                     if (config.callPhillip) {
                         HypixelCommands.call("Phillip")
