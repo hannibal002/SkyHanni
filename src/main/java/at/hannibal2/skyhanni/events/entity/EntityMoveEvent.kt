@@ -6,10 +6,10 @@ import net.minecraft.world.entity.LivingEntity
 
 /**
  * This event is fired each tick that an entity of the specified type moved.
- * @param entity repreesnts the entity being tracked in the given move event
- * @param oldLocation is the entity's location in the prior tick
- * @param newLocation is the entity's current location as of the tick the event fired
- * @param distance is the amount of distance the entity moved between oldLocation and newLocation
+ * @param entity Entity being tracked in the given move event.
+ * @param oldLocation Entity's location in the prior tick to the event being fired.
+ * @param newLocation Entity's current location as the event is being fired.
+ * @param distance Amount of distance the entity moved between oldLocation and newLocation.
  */
 class EntityMoveEvent<T : LivingEntity>(
     val entity: T,
