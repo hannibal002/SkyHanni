@@ -316,7 +316,7 @@ object SlayerRngMeterDisplay {
         val slayerType = SlayerApi.activeType ?: return null
         val spawnCost = slayerType.calculateSpawnCost(SlayerApi.tier) ?: return null
 
-        val profitPerBoss = SlayerRngMeterToolTipFeatures.calculateProfitPerBoss( bossesNeeded, spawnCost, itemPrice)
+        val profitPerBoss = SlayerRngMeterToolTipFeatures.calculateProfitPerBoss(bossesNeeded, spawnCost, itemPrice)
 
         return StringRenderable("§7Coins/Boss: $profitPerBoss")
     }
