@@ -173,6 +173,11 @@ class SlayerConfig {
     var hideIrrelevantMobsTransparency: Int = 40
 
     @Expose
+    @ConfigOption(name = "Hide Irrelevant Nametags", desc = "Hide the nametags of irrelevant mobs.")
+    @ConfigEditorBoolean
+    var hideIrrelevantMobsNametags: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonTitle: Boolean = false

@@ -22,6 +22,11 @@ class ActiveBossTransparencyConfig {
     var transparencyLevel: Int = 35
 
     @Expose
+    @ConfigOption(name = "Hide Nametags", desc = "Hide the nametags of transparent mobs.")
+    @ConfigEditorBoolean
+    var hideNametags: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Other Players", desc = "Also change the transparency for other players.")
     @ConfigEditorBoolean
     var applyToPlayers: Boolean = false
