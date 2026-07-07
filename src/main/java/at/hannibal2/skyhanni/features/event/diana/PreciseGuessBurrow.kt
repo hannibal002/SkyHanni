@@ -33,7 +33,7 @@ object PreciseGuessBurrow {
         bezierFitter.reset()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onReceiveParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val type = event.type

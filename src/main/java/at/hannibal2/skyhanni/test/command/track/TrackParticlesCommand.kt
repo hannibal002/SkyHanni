@@ -27,7 +27,7 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleDetectedEvent, Identifi
 
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
         argCallback("name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { allParticleIds }) {
-            val type = ParticleUtils.getParticleTypeByName(it, shouldError = true) ?: return@argCallback
+            val type = ParticleUtils.getParticleTypeByName(it, shouldError = true)
             handleIgnorable(type)
         }
     }
@@ -46,7 +46,7 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleDetectedEvent, Identifi
         BuiltInRegistries.PARTICLE_TYPE.keySet().map { it.toString() }.sorted()
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onParticleReceive(event: ParticleDetectedEvent) = super.onTrackableEvent(event)
 
     // TODO for DavidArthurCole, this whole structure seems unnecessary.

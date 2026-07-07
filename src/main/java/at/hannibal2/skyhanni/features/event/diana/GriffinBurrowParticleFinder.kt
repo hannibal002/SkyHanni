@@ -58,7 +58,7 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW)
     fun onReceiveParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         if (!config.guess) return

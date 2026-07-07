@@ -39,7 +39,7 @@ object ArrowGuessBurrow {
 
     private var failures = 0
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onReceiveParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
 

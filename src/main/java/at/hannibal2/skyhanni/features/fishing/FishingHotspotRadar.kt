@@ -38,7 +38,7 @@ object FishingHotspotRadar {
     private var lastUpdate = SimpleTimeMark.farPast()
     private var isUnknown = false
 
-    @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val type = event.type
