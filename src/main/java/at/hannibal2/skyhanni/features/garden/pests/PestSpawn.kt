@@ -39,7 +39,7 @@ object PestSpawn {
     /**
      * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in Plot - 14!
      * REGEX-TEST: YUCK! 4 ൠ Pest have spawned in The Barn!
-     * REGEX-TEST: [SkyHanni] YUCK! 4 ൠ Pest have spawned in Plot - 14!
+     * REGEX-FAIL: [SkyHanni] YUCK! 4 ൠ Pest have spawned in Plot - 14!
      * REGEX-FAIL: From [MVP+] ThePleader: YUCK! 6 ൠ Pest have spawned in Plot - 7!
      */
     private val multiplePestsPattern by patternGroup.list(
