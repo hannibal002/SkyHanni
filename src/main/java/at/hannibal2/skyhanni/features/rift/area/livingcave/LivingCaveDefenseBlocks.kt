@@ -41,7 +41,7 @@ object LivingCaveDefenseBlocks {
         staticBlocks = staticBlocks.editCopy { removeIf { it.entity.deceased } }
     }
 
-    @HandleEvent
+    @HandleEvent(receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 

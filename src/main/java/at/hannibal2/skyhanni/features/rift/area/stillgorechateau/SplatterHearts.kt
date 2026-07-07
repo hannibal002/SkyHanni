@@ -21,7 +21,7 @@ object SplatterHearts {
     private var shownHearts = setOf<LorenzVec>()
     private val currentHearts = mutableSetOf<LorenzVec>()
 
-    @HandleEvent
+    @HandleEvent(receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.HEART) return

@@ -158,7 +158,7 @@ object HoppityEggLocator {
 
     private val bezierFitter = ParticlePathBezierFitter(3)
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!event.isVillagerParticle()) return

@@ -123,7 +123,7 @@ object FireFreezeFeatures {
         return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return

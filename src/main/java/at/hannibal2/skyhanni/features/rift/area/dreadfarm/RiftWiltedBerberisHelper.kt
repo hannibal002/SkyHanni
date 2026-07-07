@@ -159,7 +159,7 @@ object RiftWiltedBerberisHelper {
             .filter { it.distanceIgnoreY(location) < maxDistance }
             .minByOrNull { it.distanceIgnoreY(location) }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return

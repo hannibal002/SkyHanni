@@ -26,7 +26,7 @@ object PrecisionMiningHighlight {
     private var lookingAtParticle: Boolean = false
     private var deleteTime: SimpleTimeMark? = null
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == ParticleTypes.CRIT || event.type == ParticleTypes.HAPPY_VILLAGER) ||
