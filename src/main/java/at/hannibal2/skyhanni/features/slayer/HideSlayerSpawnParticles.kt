@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -21,7 +21,7 @@ object HideSlayerSpawnParticles {
     private var mobRecentDeaths = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticleReceived(event: ParticleReceivedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!SlayerApi.hasActiveQuest() || !SlayerApi.isInCorrectArea) return
         val distance = event.location.distanceToNearestDeadMob() ?: return
         if (distance >= 5) return

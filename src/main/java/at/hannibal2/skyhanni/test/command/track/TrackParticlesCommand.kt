@@ -46,7 +46,7 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleEvent, Identifier>(comm
         BuiltInRegistries.PARTICLE_TYPE.keySet().map { it.toString() }.sorted()
     }
 
-    @HandleEvent(priority = HandleEvent.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST, receiveCancelled = true)
     fun onParticle(event: ParticleEvent) = super.onTrackableEvent(event)
 
     // TODO for DavidArthurCole, this whole structure seems unnecessary.

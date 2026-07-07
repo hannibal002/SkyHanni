@@ -6,9 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
@@ -52,15 +50,23 @@ object PestParticleWaypoint {
         lastPestTrackerUse = SimpleTimeMark.now()
     }
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnIsland = IslandType.GARDEN)
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
+
+        if (config.hideParticles && event.type == ParticleTypes.FIREWORK) event.cancel()
 
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
         when {
-            event.isEnchantmentTable() -> return
+            event.isEnchantmentTable() -> {
+                if (config.hideParticles) event.cancel()
+                return
+            }
+
             !event.isVillagerAngry() -> return
         }
+        if (config.hideParticles) event.cancel()
+
         lastParticle = SimpleTimeMark.now()
 
         val emptyCondition: (LorenzVec) -> Boolean = { it.distance(LocationUtils.playerLocation()) > 5 }
@@ -71,17 +77,6 @@ object PestParticleWaypoint {
         isGuessPlotMiddle = GardenPlotApi.getPlot(solved)?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
-    @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
-    fun onParticleReceived(event: ParticleReceivedEvent) {
-        if (!isEnabled() || !config.hideParticles) return
-
-        if (event.type == ParticleTypes.FIREWORK) event.cancel()
-        if (lastPestTrackerUse.passedSince() > 5.seconds) return
-        when {
-            event.isEnchantmentTable() -> event.cancel()
-            event.isVillagerAngry() -> event.cancel()
-        }
-    }
 
     private fun ParticleEvent.isEnchantmentTable(): Boolean =
         type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()

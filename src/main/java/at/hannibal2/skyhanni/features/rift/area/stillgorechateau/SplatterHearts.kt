@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.stillgorechateau
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +22,7 @@ object SplatterHearts {
     private val currentHearts = mutableSetOf<LorenzVec>()
 
     @HandleEvent
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.HEART) return
         if (event.count != 3 || event.speed != 0f) return

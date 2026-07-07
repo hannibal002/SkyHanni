@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -38,8 +38,8 @@ object FishingHotspotRadar {
     private var lastUpdate = SimpleTimeMark.farPast()
     private var isUnknown = false
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.FLAME) return

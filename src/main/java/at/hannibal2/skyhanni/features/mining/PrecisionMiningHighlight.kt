@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
@@ -27,7 +27,7 @@ object PrecisionMiningHighlight {
     private var deleteTime: SimpleTimeMark? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == ParticleTypes.CRIT || event.type == ParticleTypes.HAPPY_VILLAGER) ||
             !Minecraft.getInstance().options.keyAttack.isDown

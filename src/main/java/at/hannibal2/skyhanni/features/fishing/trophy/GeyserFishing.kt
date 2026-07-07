@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,10 +24,12 @@ object GeyserFishing {
     private var geyser: LorenzVec? = null
     private var geyserBox: AABB? = null
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (!shouldProcessParticles()) return
-        if (!isGeyserParticle(event)) return
+        with(event) {
+            if (type != ParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
+        }
         geyser = event.location
         val potentialGeyser = geyser ?: return
 
@@ -37,12 +37,7 @@ object GeyserFishing {
             potentialGeyser.x - 2, 118.0 - 0.1, potentialGeyser.z - 2,
             potentialGeyser.x + 2, 118.0 - 0.09, potentialGeyser.z + 2,
         )
-    }
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onParticleReceived(event: ParticleReceivedEvent) {
-        if (!shouldProcessParticles()) return
-        if (!isGeyserParticle(event)) return
         if (config.hideParticles && FishingApi.bobber != null) {
             hideGeyserParticles(event)
         }
@@ -70,7 +65,7 @@ object GeyserFishing {
         return event.type == ParticleTypes.CLOUD && event.count == 15 && event.speed == 0.05f && event.offset == geyserOffset
     }
 
-    private fun hideGeyserParticles(event: ParticleReceivedEvent) {
+    private fun hideGeyserParticles(event: ParticleEvent) {
         val bobber = FishingApi.bobber ?: return
         val geyser = geyser ?: return
 

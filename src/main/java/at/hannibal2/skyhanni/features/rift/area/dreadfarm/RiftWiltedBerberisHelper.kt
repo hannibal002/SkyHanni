@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.WiltedBerberisLocationsJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
@@ -160,7 +160,7 @@ object RiftWiltedBerberisHelper {
             .minByOrNull { it.distanceIgnoreY(location) }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onParticleReceived(event: ParticleReceivedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 

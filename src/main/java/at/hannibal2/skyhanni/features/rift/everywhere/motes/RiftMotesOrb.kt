@@ -3,8 +3,7 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -47,27 +46,24 @@ object RiftMotesOrb {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onParticleDetected(event: ParticleDetectedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!enabled) return
-        if (event.type != ParticleTypes.ENTITY_EFFECT) return
         val location = event.location.add(-0.5, 0.0, -0.5)
-        val orb = motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
-            motesOrbs = motesOrbs.editCopy { add(it) }
+
+        if (event.type == ParticleTypes.ENTITY_EFFECT) {
+            val orb =
+                motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
+                    motesOrbs = motesOrbs.editCopy { add(it) }
+                }
+
+            orb.location = location
+            orb.lastTime = System.currentTimeMillis()
+            orb.counter++
+            orb.pickedUp = false
+            if (config.hideParticles && orb.isOrb) {
+                event.cancel()
+            }
         }
-
-        orb.location = location
-        orb.lastTime = System.currentTimeMillis()
-        orb.counter++
-        orb.pickedUp = false
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onParticleReceived(event: ParticleReceivedEvent) {
-        if (!enabled || !config.hideParticles) return
-        if (event.type != ParticleTypes.ENTITY_EFFECT) return
-        val location = event.location.add(-0.5, 0.0, -0.5)
-        motesOrbs.find { it.location.distance(location) < 3 } ?: return
-        event.cancel()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

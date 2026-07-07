@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.ParticleDetectedEvent
 import at.hannibal2.skyhanni.events.ParticleEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.resources.Identifier
@@ -17,14 +15,25 @@ object ParticleUtils {
     }
 
     @JvmStatic
-    fun postParticleEvent(packet: ClientboundLevelParticlesPacket): Boolean {
-        return ParticleEvent(
+    fun postParticleEvent(packet: ClientboundLevelParticlesPacket) {
+        if(ParticleEvent(
             type = packet.particle.type,
             location = packet.toLorenzVec(),
             count = packet.count,
             speed = packet.maxSpeed,
             offset = packet.toOffset(),
             longDistance = packet.isOverrideLimiter,
-        ).post()
+        ).post()) {
+            cancelled.set(true)
+        }
+    }
+
+    private val cancelled = ThreadLocal.withInitial { false }
+
+    @JvmStatic
+    fun eventHasGotCancelled(): Boolean {
+        val wasCancelled = cancelled.get()
+        cancelled.set(false)
+        return wasCancelled
     }
 }
