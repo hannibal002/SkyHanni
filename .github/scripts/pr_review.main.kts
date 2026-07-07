@@ -326,20 +326,17 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
             val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
             appendLine("`$displayLine`")
             if ("warnings found and -Werror specified" in logContent) {
+                appendLine()
                 appendLine("_Warning elevated to error by `-Werror`_")
             }
         }
+        appendLine()
         val versionParts = version.split(" and ").map { it.trim() }
-        val logLinkLines = versionParts.mapNotNull { part ->
-            val jobId = jobIds[part] ?: return@mapNotNull null
+        versionParts.forEach { part ->
+            val jobId = jobIds[part] ?: error("no job id for $part")
             val jobUrl = "https://github.com/$repo/actions/runs/$workflowRunId/job/$jobId"
             val rawUrl = "https://github.com/$repo/commit/$headSha/checks/$jobId/logs"
-            "[$part] \\[[job]($jobUrl)\\] \\[[raw log]($rawUrl)\\]"
-        }
-        if (logLinkLines.isNotEmpty()) {
-            logLinkLines.forEach { appendLine(it) }
-        } else {
-            appendLine("[View build run](https://github.com/$repo/actions/runs/$workflowRunId)")
+            appendLine("[$part] \\[[job]($jobUrl)\\] \\[[raw log]($rawUrl)\\]")
         }
         appendLine()
         appendLine("<details><summary>Excerpt</summary>")
