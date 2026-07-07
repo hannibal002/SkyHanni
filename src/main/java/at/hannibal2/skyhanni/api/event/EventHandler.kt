@@ -16,14 +16,20 @@ import net.minecraft.ChatFormatting
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
     listeners: List<Listener>,
-    private val canReceiveCancelled: Boolean,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
-    private val buckets: Array<Array<Listener>?>
+
+    @Suppress("ArrayInDataClass")
+    private data class Bucket(
+        val listeners: Array<Listener>,
+        val nextCancelled: IntArray,
+    )
+    private val buckets: Array<Bucket?>
 
     init {
         val localBuckets = arrayOfNulls<MutableList<Listener>>(BUCKET_COUNT)
+
         listeners.forEach { listener ->
             listener.indices.forEach { index ->
                 val bucket = localBuckets[index]
@@ -34,39 +40,69 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
             }
         }
+
         buckets = Array(BUCKET_COUNT) { index ->
-            localBuckets[index]?.toTypedArray()
+            val bucketListeners = localBuckets[index] ?: return@Array null
+            val listenerArray = bucketListeners.toTypedArray()
+
+            val nextCancelled = IntArray(listenerArray.size) { -1 }
+
+            var nextCancelledIndex = -1
+            for (i in listenerArray.lastIndex downTo 0) {
+                nextCancelled[i] = nextCancelledIndex
+
+                if (listenerArray[i].receiveCancelled) {
+                    nextCancelledIndex = i
+                }
+            }
+
+            Bucket(
+                listeners = listenerArray,
+                nextCancelled = nextCancelled,
+            )
         }
     }
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
         listeners.sortedBy { it.priority },
-        listeners.any { it.receiveCancelled },
     )
 
+    // FIXME: this assumes the current event is not cancelled when it is posted
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
         invokeLog.invokeCount++
-        val listeners = buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex()) ?: return false
+        val bucket = buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex()) ?: return false
         if (SkyHanniEvents.isDisabledHandler(name)) return false
 
         var errors = 0
-        for (listener in listeners) {
-            if (!listener.shouldInvoke(event)) continue
-            try {
-                listener.invoker.accept(event)
-            } catch (originalThrowable: Throwable) {
-                val throwable = originalThrowable.maybeSkipError()
-                errors++
-                if (errors <= 3) {
-                    val errorName = throwable::class.simpleName ?: "error"
-                    val aOrAn = StringUtils.optionalAn(errorName)
-                    val message = "Caught $aOrAn $errorName in ${listener.name} at $name: ${throwable.message}"
-                    ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
+        var index = 0
+
+        while (index >= 0 && index < bucket.listeners.size) {
+            val listener = bucket.listeners[index]
+
+            if (listener.shouldInvoke(event)) {
+                try {
+                    listener.invoker.accept(event)
+                } catch (originalThrowable: Throwable) {
+                    val throwable = originalThrowable.maybeSkipError()
+                    errors++
+
+                    if (errors <= 3) {
+                        val errorName = throwable::class.simpleName ?: "error"
+                        val aOrAn = StringUtils.optionalAn(errorName)
+                        val message = "Caught $aOrAn $errorName in ${listener.name} at $name: ${throwable.message}"
+                        ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
+                    }
+
+                    onError?.invoke(throwable)
                 }
-                onError?.invoke(throwable)
             }
-            if (event.isCancelled && !canReceiveCancelled) break
+
+            index = if (event.isCancelled) {
+                bucket.nextCancelled[index]
+            } else {
+                index + 1
+            }
         }
 
         if (errors > 3) {
