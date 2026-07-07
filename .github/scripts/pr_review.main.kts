@@ -334,7 +334,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
             val jobId = jobIds[part] ?: return@mapNotNull null
             val jobUrl = "https://github.com/$repo/actions/runs/$workflowRunId/job/$jobId"
             val rawUrl = "https://github.com/$repo/commit/$headSha/checks/$jobId/logs"
-            "$part: [job]($jobUrl) [raw log]($rawUrl)"
+            "[$part] \\[[job]($jobUrl)\\] \\[[raw log]($rawUrl)\\]"
         }
         if (logLinkLines.isNotEmpty()) {
             logLinkLines.forEach { appendLine(it) }
