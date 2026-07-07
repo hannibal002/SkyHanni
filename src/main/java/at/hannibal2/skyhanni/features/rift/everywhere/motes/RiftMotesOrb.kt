@@ -50,19 +50,18 @@ object RiftMotesOrb {
         if (!enabled) return
         val location = event.location.add(-0.5, 0.0, -0.5)
 
-        if (event.type == ParticleTypes.ENTITY_EFFECT) {
-            val orb =
-                motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
-                    motesOrbs = motesOrbs.editCopy { add(it) }
-                }
-
-            orb.location = location
-            orb.lastTime = System.currentTimeMillis()
-            orb.counter++
-            orb.pickedUp = false
-            if (config.hideParticles && orb.isOrb) {
-                event.cancel()
+        if (event.type != ParticleTypes.ENTITY_EFFECT) return
+        val orb =
+            motesOrbs.find { it.location.distance(location) < 3 } ?: MotesOrb(location).also {
+                motesOrbs = motesOrbs.editCopy { add(it) }
             }
+
+        orb.location = location
+        orb.lastTime = System.currentTimeMillis()
+        orb.counter++
+        orb.pickedUp = false
+        if (config.hideParticles && orb.isOrb) {
+            event.cancel()
         }
     }
 
