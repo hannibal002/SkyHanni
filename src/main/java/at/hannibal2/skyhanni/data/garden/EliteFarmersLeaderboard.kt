@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
-import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
@@ -50,7 +50,6 @@ import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {

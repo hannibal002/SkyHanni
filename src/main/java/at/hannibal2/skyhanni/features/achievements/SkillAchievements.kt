@@ -75,7 +75,7 @@ object SkillAchievements {
         val lore = event.inventoryItems[petSlot]?.getLoreComponent()
         if (skillDetector.isInside()) {
             DelayedRun.runNextTick {
-                val storage = ProfileStorageData.profileSpecific?.skillData ?: return@runNextTick
+                val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return@runNextTick
                 var highestSkill = 0
                 for ((_, info) in storage) {
                     if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel
