@@ -51,6 +51,7 @@ object ContributorManager {
             contributorNames = namesToUuid.keys.toList()
             isContributor = null
         }
+
     // Do not modify these: they are automatically updated when the contributors map is updated
     var contributorNames = emptyList<String>()
         private set
@@ -101,7 +102,7 @@ object ContributorManager {
                 ErrorManager.logErrorWithData(
                     e,
                     "Failed to parse contributor UUID",
-                    "key" to it.key, "value" to it.value
+                    "key" to it.key, "value" to it.value,
                 )
                 null
             }
@@ -192,7 +193,7 @@ object ContributorManager {
 
         val testEntry = ContributorJsonEntry(
             displayName = displayName,
-            componentSuffix = suffix
+            componentSuffix = suffix,
         )
         contributors = contributors + (uuid to testEntry)
 
@@ -226,7 +227,7 @@ object ContributorManager {
             "If you need support, please do not contact contributors directly.\n" +
                 "You can report issues or get help on the SkyHanni Discord.\n ",
             "https://discord.gg/skyhanni-997079228510117908",
-            prefixColor = "§c"
+            prefixColor = "§c",
         )
         ChatUtils.clickableChat(
             "[View seen contributors]",
@@ -235,14 +236,15 @@ object ContributorManager {
             onClick = {
                 ChatUtils.chat {
                     append("Seen contributors (${seenContributors.size}):\n")
+                    val seenContributorText =
+                        seenContributors.keys.joinToString("\n") { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() }
                     appendWithColor(
-                        seenContributors.keys.joinToString("\n")
-                            { uuid -> getDisplayNameFromUUID(uuid) ?: uuid.toString() },
+                        seenContributorText,
                         ChatFormatting.AQUA,
                     )
                 }
             },
-            hover = "§eClick to view contributors you've encountered."
+            hover = "§eClick to view contributors you've encountered.",
         )
     }
 
@@ -257,7 +259,7 @@ object ContributorManager {
                     appendWithColor("Seen contributors list cleared.", ChatFormatting.GREEN)
                 }
             },
-            hover = "§eClick to confirm clearing the seen contributors list."
+            hover = "§eClick to confirm clearing the seen contributors list.",
         )
     }
     // </editor-fold>
@@ -375,7 +377,7 @@ object ContributorManager {
     private fun saveConfig(reason: String) {
         SkyHanniMod.configManager.saveConfig(
             ConfigFileType.SEEN_CONTRIBUTORS,
-            reason
+            reason,
         )
     }
 }
