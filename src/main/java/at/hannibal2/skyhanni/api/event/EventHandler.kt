@@ -23,7 +23,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     @Suppress("ArrayInDataClass")
     private data class Bucket(
         val listeners: Array<Listener>,
-        val nextCancelled: IntArray,
+        val nextAfterCancellation: IntArray,
     )
     private val buckets: Array<Bucket?>
 
@@ -45,11 +45,11 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             val bucketListeners = localBuckets[index] ?: return@Array null
             val listenerArray = bucketListeners.toTypedArray()
 
-            val nextCancelled = IntArray(listenerArray.size) { -1 }
+            val nextAfterCancellation = IntArray(listenerArray.size) { -1 }
 
             var nextCancelledIndex = -1
             for (i in listenerArray.lastIndex downTo 0) {
-                nextCancelled[i] = nextCancelledIndex
+                nextAfterCancellation[i] = nextCancelledIndex
 
                 if (listenerArray[i].receiveCancelled) {
                     nextCancelledIndex = i
@@ -58,7 +58,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
             Bucket(
                 listeners = listenerArray,
-                nextCancelled = nextCancelled,
+                nextAfterCancellation = nextAfterCancellation,
             )
         }
     }
@@ -99,7 +99,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             }
 
             index = if (event.isCancelled) {
-                bucket.nextCancelled[index]
+                bucket.nextAfterCancellation[index]
             } else {
                 index + 1
             }
