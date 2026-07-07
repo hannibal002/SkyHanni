@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 /**
  * This class is a placeholder for world-related events.
  */
-abstract class CancellableWorldEvent : WorldEvent(), SkyHanniEvent.Cancellable
-
 abstract class WorldEvent : SkyHanniEvent() {
     abstract val location: LorenzVec
 }
+
+abstract class CancellableWorldEvent : WorldEvent(), SkyHanniEvent.Cancellable
