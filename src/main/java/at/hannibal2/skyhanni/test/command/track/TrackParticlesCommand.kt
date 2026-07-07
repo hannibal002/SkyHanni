@@ -27,7 +27,7 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleDetectedEvent, Identifi
 
     override val registerIgnoreBlock: LiteralCommandBuilder.() -> Unit = {
         argCallback("name", BrigadierArguments.string(), BrigadierUtils.dynamicSuggestionProvider { allParticleIds }) {
-            val type = ParticleUtils.getParticleTypeByName(it, shouldError = true)
+            val type = ParticleUtils.getParticleTypeByName(it)
             handleIgnorable(type)
         }
     }
