@@ -281,12 +281,11 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     if (oneLiners.any { it == null }) return versions
     val (ol1, ol2) = oneLiners.requireNoNulls()
     if (normalizeOneLiner(ol1) != normalizeOneLiner(ol2)) return versions
-    if (!isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) return versions
-    return versions.filter { (_, log) ->
-        if (log.isNullOrBlank()) return@filter true
-        val ol = parseOneLiner(log) ?: return@filter true
-        !isStonecutterOneLiner(ol)
-    }
+    // Both versions fail with the same error.
+    // Prefer the non-Stonecutter version; if neither is Stonecutter, keep the first.
+    val keepIndex = if (isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) 1 else 0
+    val keep = nonEmpty[keepIndex]
+    return versions.filter { pair -> pair.second.isNullOrBlank() || pair === keep }
 }
 
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
