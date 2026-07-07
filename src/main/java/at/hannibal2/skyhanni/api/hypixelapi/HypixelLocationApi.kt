@@ -42,10 +42,16 @@ object HypixelLocationApi {
         private set
 
     var inSkyblock: Boolean = false
-        private set
+        private set(value) {
+            field = value
+            SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
+        }
 
     var island: IslandType = IslandType.NONE
-        private set
+        private set(value) {
+            field = value
+            SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
+        }
 
     var serverId: String? = null
         private set
@@ -152,7 +158,6 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
-        SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
 
         if (oldIsland != IslandType.NONE) {
             IslandLeaveEvent(oldIsland).post()
@@ -201,7 +206,6 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
-        SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
     }
 
     private val debugData
