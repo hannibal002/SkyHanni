@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent.Cancellable
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -9,10 +8,7 @@ import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
 
 /**
- * Base class for particle events, fired in two phases to support mod interoperability.
- *
- * The particle packet triggers two separate events ([ParticleDetectedEvent] and [ParticleReceivedEvent])
- * so that detection features always see particles, even if other mods or features later hide them.
+ * TODO: add docs
  *
  * @param type the particle type from the packet
  * @param location the particle spawn location
@@ -22,7 +18,8 @@ import net.minecraft.core.registries.BuiltInRegistries
  * @param longDistance whether the packet bypasses normal distance checks
  * @param particleArgs optional particle-specific arguments
  */
-sealed class ParticleEvent(
+@PrimaryFunction("onParticle")
+class ParticleEvent(
     val type: ParticleType<*>,
     override val location: LorenzVec,
     val count: Int,
@@ -30,7 +27,7 @@ sealed class ParticleEvent(
     val offset: LorenzVec,
     val longDistance: Boolean,
     val particleArgs: IntArray? = null,
-) : WorldEvent() {
+) : CancellableWorldEvent() {
 
     val distanceToPlayer by lazy { location.distanceToPlayer() }
 
@@ -40,39 +37,3 @@ sealed class ParticleEvent(
         })"
     }
 }
-
-/**
- * Fired as soon as a particle packet is observed by the client.
- *
- * This early, read-only phase ensures detection features see all particles,
- * even if other mods or features later hide them.
- * Do not use this event to hide particles; use [ParticleReceivedEvent] instead.
- */
-@PrimaryFunction("onParticleDetected")
-class ParticleDetectedEvent(
-    type: ParticleType<*>,
-    location: LorenzVec,
-    count: Int,
-    speed: Float,
-    offset: LorenzVec,
-    longDistance: Boolean,
-    particleArgs: IntArray? = null,
-) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs)
-
-/**
- * Fired right before a particle packet is processed by the client.
- *
- * This late, cancellable phase is used to hide particles without affecting other mods'
- * particle detection. Cancelling this event prevents the particle from spawning.
- * For detection logic, use [ParticleDetectedEvent] instead.
- */
-@PrimaryFunction("onParticleReceived")
-class ParticleReceivedEvent(
-    type: ParticleType<*>,
-    location: LorenzVec,
-    count: Int,
-    speed: Float,
-    offset: LorenzVec,
-    longDistance: Boolean,
-    particleArgs: IntArray? = null,
-) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs), Cancellable
