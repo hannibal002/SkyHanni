@@ -40,5 +40,4 @@ object ParticleUtils {
         offset = LorenzVec(xDist, yDist, zDist),
         longDistance = isOverrideLimiter,
     )
-
 }
