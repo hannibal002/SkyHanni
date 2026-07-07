@@ -4,7 +4,7 @@ name: Check PR Dependencies
 
 on:
     pull_request_target:
-        types: [ opened, edited, closed ]
+        types: [ opened, edited, closed, reopened, synchronize ]
 
 permissions:
     contents: read
@@ -28,4 +28,5 @@ jobs:
                     PR_NUMBER: ${{ github.event.pull_request.number }}
                     PR_STATE: ${{ github.event.pull_request.state }}
                     PR_MERGED: ${{ github.event.pull_request.merged }}
+                    PR_ACTION: ${{ github.event.action }}
                 run: kotlinc -script .github/scripts/pr_review.main.kts

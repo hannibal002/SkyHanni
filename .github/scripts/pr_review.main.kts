@@ -1,6 +1,6 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
-
-// Execution context: base branch, called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, and changelog-review.yml
+// Execution context: base branch
+// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, and check_dependencies.yml
 
 import com.google.gson.Gson
 import com.google.gson.JsonArray
@@ -110,6 +110,15 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
         val (status, _) = ghRequest("DELETE", "/repos/$repo/issues/$prNumber/labels/$encoded")
         if (status.isHttpError && status != 404) System.err.println("Warning: could not remove $label label (HTTP $status)")
     }
+}
+
+fun getPrLabels(prNumber: String): Set<String> {
+    val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/labels")
+    if (status.isHttpError) return emptySet()
+    val array = body as? JsonArray ?: return emptySet()
+    return array.mapNotNull {
+        (it as? JsonObject)?.get("name")?.takeIf { it.isJsonPrimitive }?.asString
+    }.toSet()
 }
 
 fun normalizePath(uri: String, workspace: String): String {
@@ -236,7 +245,8 @@ fun readBuildLog(artifactDirPath: String?): String? {
 fun parseOneLiner(logContent: String): String? {
     val workspace = System.getenv("GITHUB_WORKSPACE")
     val lines = logContent.lines()
-    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") }
+    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+        ?: lines.firstOrNull { it.trimStart().startsWith("e: ") }
         ?: lines.firstOrNull { "Received status code" in it }
         ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
         ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
@@ -246,7 +256,16 @@ fun parseOneLiner(logContent: String): String? {
 
 fun parseStackTrace(logContent: String): String {
     val startIndex = logContent.indexOf("FAILURE: Build failed with an exception")
-    val raw = if (startIndex >= 0) logContent.substring(startIndex) else logContent
+    val failureBlock = if (startIndex >= 0) logContent.substring(startIndex) else logContent
+    val compilerLines = if (startIndex >= 0) {
+        logContent.substring(0, startIndex).lines()
+            .filter {
+                (it.trimStart().startsWith("e: ") || it.trimStart().startsWith("w: ")) && "warnings found and -Werror specified" !in
+                    it
+            }
+            .joinToString("\n")
+    } else ""
+    val raw = if (compilerLines.isNotEmpty()) "$compilerLines\n\n$failureBlock" else failureBlock
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
@@ -272,23 +291,55 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     if (oneLiners.any { it == null }) return versions
     val (ol1, ol2) = oneLiners.requireNoNulls()
     if (normalizeOneLiner(ol1) != normalizeOneLiner(ol2)) return versions
-    if (!isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) return versions
-    return versions.filter { (_, log) ->
-        if (log.isNullOrBlank()) return@filter true
-        val ol = parseOneLiner(log) ?: return@filter true
-        !isStonecutterOneLiner(ol)
+    // Both versions fail with the same error.
+    // Prefer the non-Stonecutter version; if neither is Stonecutter, keep the first.
+    val keepIndex = if (isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) 1 else 0
+    val keep = nonEmpty[keepIndex]
+    val combinedLabel = "${nonEmpty[0].first} and ${nonEmpty[1].first}"
+    return listOf(combinedLabel to keep.second)
+}
+
+fun getJobIdsByVersion(runId: String, versionLabels: List<String>): Map<String, Long> {
+    val (status, body) = ghRequest("GET", "/repos/$repo/actions/runs/$runId/jobs?per_page=100")
+    if (status.isHttpError) return emptyMap()
+    val jobs = (body as? JsonObject)?.get("jobs") as? JsonArray ?: return emptyMap()
+    val result = mutableMapOf<String, Long>()
+    for (label in versionLabels) {
+        val job = jobs.find { it.isJsonObject && it.asJsonObject.get("name")?.asString?.contains(label) == true } ?: continue
+        val jobId = job.asJsonObject.get("id")?.asLong ?: continue
+        result[label] = jobId
     }
+    return result
 }
 
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
     appendLine(buildMarker)
+    val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    val headSha = System.getenv("HEAD_SHA") ?: error("HEAD_SHA not set")
+    val allVersionParts = versions.flatMap { (v, _) -> v.split(" and ").map { it.trim() } }.distinct()
+    val jobIds = getJobIdsByVersion(workflowRunId, allVersionParts)
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
         val oneLiner = parseOneLiner(logContent)
-        if (oneLiner != null) appendLine("`${oneLiner.trim().take(300)}`")
+        if (oneLiner != null) {
+            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+            appendLine("`$displayLine`")
+            if ("warnings found and -Werror specified" in logContent) {
+                appendLine()
+                appendLine("_Warning elevated to error by `-Werror`_")
+            }
+        }
         appendLine()
-        appendLine("<details><summary>Full output</summary>")
+        val versionParts = version.split(" and ").map { it.trim() }
+        versionParts.forEach { part ->
+            val jobId = jobIds[part] ?: error("no job id for $part")
+            val jobUrl = "https://github.com/$repo/actions/runs/$workflowRunId/job/$jobId"
+            val rawUrl = "https://github.com/$repo/commit/$headSha/checks/$jobId/logs"
+            appendLine("[$part] \\[[job]($jobUrl)\\] \\[[raw log]($rawUrl)\\]")
+        }
+        appendLine()
+        appendLine("<details><summary>Excerpt</summary>")
         appendLine()
         appendLine("~~~")
         appendLine(parseStackTrace(logContent))
@@ -338,9 +389,13 @@ fun runMergeConflictMode(prNumber: String) {
         return
     }
 
-    val existingId = findExistingComment(prNumber, conflictMarker)
-
     if (!mergeableState) {
+        val alreadyLabeled = conflictLabel in getPrLabels(prNumber)
+        if (alreadyLabeled) {
+            println("PR #$prNumber: conflicts found, already labeled, skipping")
+            return
+        }
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
@@ -352,6 +407,7 @@ fun runMergeConflictMode(prNumber: String) {
         setLabel(prNumber, conflictLabel, true)
         println("PR #$prNumber: conflicts found, comment posted")
     } else {
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
@@ -540,7 +596,8 @@ fun isDependencyOpen(dep: Dependency): Boolean {
     return state == "open"
 }
 
-fun checkPrDependencies(issueNumber: String) {
+
+fun checkPrDependencies(issueNumber: String): Boolean {
     val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$issueNumber")
     if (status.isHttpError) {
         error("Error: could not fetch PR #$issueNumber (HTTP $status)")
@@ -549,18 +606,24 @@ fun checkPrDependencies(issueNumber: String) {
 
     if ("## Dependencies" !in prBody) {
         println("PR #$issueNumber: no Dependencies section, skipping")
-        return
+        return false
     }
 
     val deps = parseDependencies(prBody)
     if (deps.isEmpty()) {
         println("PR #$issueNumber: no dependency links found, skipping")
-        return
+        return false
     }
 
-    val hasOpen = deps.any { isDependencyOpen(it) }
+    val openDeps = deps.filter { isDependencyOpen(it) }
+    val hasOpen = openDeps.isNotEmpty()
+    val wasAlreadyLabeled = dependencyLabel in getPrLabels(issueNumber)
     setLabel(issueNumber, dependencyLabel, hasOpen)
+    if (hasOpen && !wasAlreadyLabeled) {
+        postDependencyWaitingComment(issueNumber, openDeps)
+    }
     println("PR #$issueNumber: ${if (hasOpen) "has open dependencies" else "all dependencies resolved"}")
+    return hasOpen
 }
 
 fun fetchAllLabeledOpenPRs(): List<JsonObject> {
@@ -582,6 +645,64 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
         page++
     }
     return result
+}
+
+
+fun fetchAllOpenPRs(): List<JsonObject> {
+    val result = mutableListOf<JsonObject>()
+    var page = 1
+    while (true) {
+        val (status, body) = ghRequest("GET", "/repos/$repo/issues?state=open&per_page=100&page=$page")
+        if (status.isHttpError) {
+            error("Error: could not fetch open PRs (HTTP $status)", commentError = false)
+        }
+        val array = body as? JsonArray ?: break
+        for (element in array) {
+            val obj = element as? JsonObject ?: continue
+            if (obj.get("pull_request") == null) continue
+            result.add(obj)
+        }
+        if (array.size() < 100) break
+        page++
+    }
+    return result
+}
+
+fun recheckPRsDependingOn(targetPrNum: Int) {
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+    println("Rechecking all open PRs that depend on #$targetPrNum")
+    for (pr in fetchAllOpenPRs()) {
+        val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+        if (num.toIntOrNull() == targetPrNum) continue
+        val body = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+        if ("## Dependencies" !in body) continue
+        val deps = parseDependencies(body)
+        if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
+            checkPrDependencies(num)
+        }
+    }
+}
+
+fun buildDependencyWaitingComment(deps: List<Dependency>): String = buildString {
+    if (deps.size == 1) {
+        val dep = deps.first()
+        val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
+        appendLine("This PR is now waiting on [#${dep.pullNumber}]($link).")
+    } else {
+        appendLine("This PR is now waiting on the following dependencies:")
+        for (dep in deps) {
+            val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
+            appendLine("- [#${dep.pullNumber}]($link)")
+        }
+    }
+}
+
+fun postDependencyWaitingComment(prNum: String, openDeps: List<Dependency>) {
+    val message = buildDependencyWaitingComment(openDeps)
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    if (status.isHttpError) System.err.println("Warning: could not post dependency waiting comment on PR #$prNum (HTTP $status)")
+    else println("PR #$prNum: posted dependency waiting comment")
 }
 
 fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
@@ -606,11 +727,16 @@ fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remain
     }
 }
 
-fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean): Boolean {
     if (prState != "closed") {
-        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
-        checkPrDependencies(num)
-        return
+        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return false }
+        val hasOpenDeps = checkPrDependencies(num)
+        val prAction = System.getenv("PR_ACTION") ?: ""
+        if (prAction == "reopened") {
+            val targetPrNum = num.toIntOrNull()
+            if (targetPrNum != null) recheckPRsDependingOn(targetPrNum)
+        }
+        return hasOpenDeps
     }
 
     println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
@@ -634,6 +760,7 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
         if (isDirectDep) postDependencyNotification(num, closedPrNum, merged, openRemainingCount)
         setLabel(num, dependencyLabel, openRemainingCount > 0)
     }
+    return false
 }
 
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
@@ -653,8 +780,8 @@ val prNumber: String = prNumberEnv ?: run { println("PR_NUMBER not set, skipping
 if (mode == "dependencies") {
     val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
     val prMerged = System.getenv("PR_MERGED") == "true"
-    runDependenciesMode(prState, prNumberEnv, prMerged)
-    exitProcess(0)
+    val hasOpenDeps = runDependenciesMode(prState, prNumberEnv, prMerged)
+    exitProcess(if (hasOpenDeps) 1 else 0)
 }
 
 when (mode) {
