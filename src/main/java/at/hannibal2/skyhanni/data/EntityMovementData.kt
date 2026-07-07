@@ -73,7 +73,6 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-
         val nextData = nextTeleport ?: return
 
         val passedSince = nextData.startTime.passedSince()
