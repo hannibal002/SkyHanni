@@ -299,9 +299,25 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     return listOf(combinedLabel to keep.second)
 }
 
+fun getJobIdsByVersion(runId: String, versionLabels: List<String>): Map<String, Long> {
+    val (status, body) = ghRequest("GET", "/repos/$repo/actions/runs/$runId/jobs?per_page=100")
+    if (status.isHttpError) return emptyMap()
+    val jobs = (body as? JsonObject)?.get("jobs") as? JsonArray ?: return emptyMap()
+    val result = mutableMapOf<String, Long>()
+    for (label in versionLabels) {
+        val job = jobs.find { it.isJsonObject && it.asJsonObject.get("name")?.asString?.contains(label) == true } ?: continue
+        val jobId = job.asJsonObject.get("id")?.asLong ?: continue
+        result[label] = jobId
+    }
+    return result
+}
+
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
     appendLine(buildMarker)
     val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    val headSha = System.getenv("HEAD_SHA") ?: error("HEAD_SHA not set")
+    val allVersionParts = versions.flatMap { (v, _) -> v.split(" and ").map { it.trim() } }.distinct()
+    val jobIds = getJobIdsByVersion(workflowRunId, allVersionParts)
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
@@ -313,7 +329,18 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                 appendLine("_Warning elevated to error by `-Werror`_")
             }
         }
-        appendLine("[Download full build log](https://github.com/$repo/actions/runs/$workflowRunId)")
+        val versionParts = version.split(" and ").map { it.trim() }
+        val logLinkLines = versionParts.mapNotNull { part ->
+            val jobId = jobIds[part] ?: return@mapNotNull null
+            val jobUrl = "https://github.com/$repo/actions/runs/$workflowRunId/job/$jobId"
+            val rawUrl = "https://github.com/$repo/commit/$headSha/checks/$jobId/logs"
+            "$part: [job]($jobUrl) [raw log]($rawUrl)"
+        }
+        if (logLinkLines.isNotEmpty()) {
+            logLinkLines.forEach { appendLine(it) }
+        } else {
+            appendLine("[View build run](https://github.com/$repo/actions/runs/$workflowRunId)")
+        }
         appendLine()
         appendLine("<details><summary>Excerpt</summary>")
         appendLine()
