@@ -12,6 +12,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinClientPacketListenerEarly {
     @Inject(at = @At("HEAD"), method = "handleParticleEvent")
     public void handleParticleEventEarly(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
-        ParticleUtils.postDetectedParticleEvent(packet);
+        ParticleUtils.postParticleEvent(packet);
     }
 }

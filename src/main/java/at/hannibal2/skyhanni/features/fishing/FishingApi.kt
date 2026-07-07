@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent

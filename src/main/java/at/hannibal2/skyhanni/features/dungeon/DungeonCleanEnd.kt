@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.ParticleReceivedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
@@ -114,7 +114,7 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (shouldBlock()) {
             event.cancel()
         }
