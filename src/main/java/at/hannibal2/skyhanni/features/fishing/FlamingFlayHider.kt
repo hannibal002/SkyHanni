@@ -16,13 +16,13 @@ object FlamingFlayHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(particle: ParticleEvent) {
-        if (particle.type != ParticleTypes.DUST) return
-        if (particle.distanceToPlayer > SkyHanniMod.feature.fishing.flayHideDistance) return
-        if (particle.count != 0) return
-        if (particle.speed != 1.0f) return
-        if (!ParticleType.entries.any { it.check(particle) }) return
-        particle.cancel()
+    fun onParticle(event: ParticleEvent) {
+        if (event.type != ParticleTypes.DUST) return
+        if (event.distanceToPlayer > SkyHanniMod.feature.fishing.flayHideDistance) return
+        if (event.count != 0) return
+        if (event.speed != 1.0f) return
+        if (!ParticleType.entries.any { it.check(event) }) return
+        event.cancel()
     }
 
 }

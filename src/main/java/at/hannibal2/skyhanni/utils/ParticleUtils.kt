@@ -33,7 +33,7 @@ object ParticleUtils {
     private val cancelled = ThreadLocal.withInitial { false }
 
     @JvmStatic
-    fun eventHasGotCancelled(): Boolean {
+    fun shouldSuppressParticle(): Boolean {
         val wasCancelled = cancelled.get()
         cancelled.set(false)
         return wasCancelled
