@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -42,7 +42,7 @@ object LivingCaveDefenseBlocks {
     }
 
     @HandleEvent
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onReceiveParticle(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
 
         movingBlocks = movingBlocks.editCopy {
