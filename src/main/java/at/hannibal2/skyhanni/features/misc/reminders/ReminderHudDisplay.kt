@@ -7,16 +7,10 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.days
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object ReminderHudDisplay {
@@ -36,7 +30,7 @@ object ReminderHudDisplay {
         }
         val lines = reminders.map { reminder ->
             val timeUntil = reminder.remindAt.timeUntil()
-            val timeText = if (timeUntil.isNegative()) "§cNow!" else "§e${timeUntil.formatForHud()}"
+            val timeText = if (timeUntil.isNegative()) "§cNow!" else "§e${timeUntil.format(maxUnits = 2)}"
             Renderable.text("$timeText §7— §6${reminder.reason}")
         }
         display = Renderable.vertical(lines, spacing = 1)
@@ -50,13 +44,4 @@ object ReminderHudDisplay {
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.showHud
-
-    private fun Duration.formatForHud(): String = when {
-        this >= TimeUnit.YEAR.factor.milliseconds -> format(biggestUnit = TimeUnit.YEAR, maxUnits = 2)
-        this >= 7.days -> format(biggestUnit = TimeUnit.DAY, maxUnits = 1)
-        this >= 1.days -> format(biggestUnit = TimeUnit.DAY, maxUnits = 2)
-        this >= 1.hours -> format(biggestUnit = TimeUnit.HOUR, maxUnits = 2)
-        this >= 1.minutes -> format(biggestUnit = TimeUnit.MINUTE, maxUnits = 2)
-        else -> format(biggestUnit = TimeUnit.SECOND, maxUnits = 1)
-    }
 }
