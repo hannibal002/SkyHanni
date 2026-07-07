@@ -57,8 +57,6 @@ class ParticleDetectedEvent(
     particleArgs: IntArray? = null,
 ) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs)
 
-
-
 /**
  * Fired right before a particle packet is processed by the client.
  *
@@ -75,5 +73,3 @@ class ParticleReceivedEvent(
     longDistance: Boolean,
     particleArgs: IntArray? = null,
 ) : ParticleEvent(type, location, count, speed, offset, longDistance, particleArgs), Cancellable
-
-
