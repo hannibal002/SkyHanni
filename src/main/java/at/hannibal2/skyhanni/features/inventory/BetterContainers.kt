@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -139,7 +140,7 @@ object BetterContainers {
         lastInvHashcode = inventory.hashCode()
         hasItem = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
-            stack != null
+            stack.isNotEmpty()
         }
         hasNullPane = (0 until inventory.containerSize).any { slotIndex ->
             val stack = inventory.getItem(slotIndex)
@@ -289,7 +290,8 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            // Intentionally counts empty slots as well, since we want to render them as well
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -308,7 +310,8 @@ object BetterContainers {
         }
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index) ?: continue
+            // Intentionally counts empty slots as well, since we want to render them as well
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             val xi = index % 9
             val yi = index / 9
 

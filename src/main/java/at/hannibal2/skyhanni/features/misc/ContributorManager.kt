@@ -70,10 +70,22 @@ object ContributorManager {
      * REGEX-TEST: skyhani contributor
      * REGEX-TEST: skyhanni devs are the best
      * REGEX-TEST: sh dev in the house
+     * REGEX-TEST: who is the skyhannu contrubiter?
      */
     private val contribMentionPattern by patternGroup.pattern(
         "mention",
-        """\b(?:skyhanni|skyhani|sh)\b.*\b(?:dev\w*|contrib\w*)\b"""
+        """\b(?:sh|skyhann?[iu])\b.*\b(?:dev\w*|contrib\w*|contrubit\w*)\b"""
+    )
+
+    /**
+     * REGEX-TEST: [MVP+] hannibal2
+     * REGEX-TEST: [MVP+] hannibal2 [✪DK✪]
+     * REGEX-TEST: [450] hannibal2
+     * REGEX-FAIL: [450] hannibal2 ⛃
+     */
+    private val contribNametagAppendSpacePattern by patternGroup.pattern(
+        "nametag.appendspace",
+        """[0-9A-Za-z_\]]$"""
     )
 
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
@@ -314,6 +326,7 @@ object ContributorManager {
         getSuffix(gameProfile.id)?.let {
             recordSeenContributor(gameProfile.id, gameProfile.name)
             if (!config.contributorNametags) return
+            if (contribNametagAppendSpacePattern.find(event.chatComponent)) event.chatComponent.append(" ")
             event.chatComponent.append(it)
         }
     }
