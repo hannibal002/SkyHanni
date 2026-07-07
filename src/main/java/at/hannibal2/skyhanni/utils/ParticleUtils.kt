@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier
 
 object ParticleUtils {
     fun getParticleTypeByName(name: String): Identifier? {
-        val id = Identifier.tryParse(name) ?: return null
+        val id = Identifier.tryParse(name.lowercase()) ?: return null
         if (!BuiltInRegistries.PARTICLE_TYPE.containsKey(id)) {
             return null
         }
