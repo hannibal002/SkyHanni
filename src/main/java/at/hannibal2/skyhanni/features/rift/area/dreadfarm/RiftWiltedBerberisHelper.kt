@@ -160,7 +160,7 @@ object RiftWiltedBerberisHelper {
             .minByOrNull { it.distanceIgnoreY(location) }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
         if (!hasFarmingToolInHand) return
 

@@ -322,7 +322,7 @@ object VampireSlayerFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val loc = event.location
         for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {

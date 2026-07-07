@@ -124,7 +124,7 @@ object FireFreezeFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return
         if (!config.customCircle) return

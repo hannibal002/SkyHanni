@@ -53,7 +53,7 @@ object PestParticleWaypoint {
     }
 
     @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
-    fun onDetectParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
 
         if (lastPestTrackerUse.passedSince() > 5.seconds) return
@@ -72,7 +72,7 @@ object PestParticleWaypoint {
     }
 
     @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
-    fun onHideParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled() || !config.hideParticles) return
 
         if (event.type == ParticleTypes.FIREWORK) event.cancel()

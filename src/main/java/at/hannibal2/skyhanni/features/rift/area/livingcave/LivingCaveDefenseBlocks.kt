@@ -42,7 +42,7 @@ object LivingCaveDefenseBlocks {
     }
 
     @HandleEvent
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
 
         movingBlocks = movingBlocks.editCopy {

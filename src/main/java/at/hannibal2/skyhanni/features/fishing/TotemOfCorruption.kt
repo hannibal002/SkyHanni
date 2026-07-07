@@ -97,7 +97,7 @@ object TotemOfCorruption {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!config.hideParticles) return
 
         for (totem in allTotems) {

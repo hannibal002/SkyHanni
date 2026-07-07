@@ -29,7 +29,7 @@ object GlowingMushroomHighlighter {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
-    fun onParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.ENTITY_EFFECT) return
 

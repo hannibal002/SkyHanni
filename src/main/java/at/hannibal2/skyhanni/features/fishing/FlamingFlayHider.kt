@@ -16,7 +16,7 @@ object FlamingFlayHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(particle: ParticleReceivedEvent) {
+    fun onParticleReceived(particle: ParticleReceivedEvent) {
         if (particle.type != ParticleTypes.DUST) return
         if (particle.distanceToPlayer > SkyHanniMod.feature.fishing.flayHideDistance) return
         if (particle.count != 0) return

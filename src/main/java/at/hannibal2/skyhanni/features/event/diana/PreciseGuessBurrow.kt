@@ -34,7 +34,7 @@ object PreciseGuessBurrow {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.DRIPPING_LAVA) return

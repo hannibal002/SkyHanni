@@ -39,7 +39,7 @@ object FishingHotspotRadar {
     private var isUnknown = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.FLAME) return

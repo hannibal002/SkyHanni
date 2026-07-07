@@ -114,7 +114,7 @@ object DungeonCleanEnd {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (shouldBlock()) {
             event.cancel()
         }

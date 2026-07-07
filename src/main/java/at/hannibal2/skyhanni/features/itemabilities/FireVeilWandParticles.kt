@@ -28,7 +28,7 @@ object FireVeilWandParticles {
     private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
         if (event.type == ParticleTypes.FLAME && event.speed == 0.55f) {

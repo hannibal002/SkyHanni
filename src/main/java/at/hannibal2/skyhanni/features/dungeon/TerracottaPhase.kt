@@ -45,7 +45,7 @@ object TerracottaPhase {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (isActive() && config.hideParticles) {
             event.cancel()
         }

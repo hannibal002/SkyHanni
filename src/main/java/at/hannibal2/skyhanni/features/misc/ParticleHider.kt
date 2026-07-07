@@ -24,7 +24,7 @@ object ParticleHider {
     private fun inM7Boss() = DungeonApi.inDungeon() && DungeonApi.dungeonFloor == "M7" && DungeonApi.inBossRoom
 
     @HandleEvent
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!MinecraftCompat.localPlayerExists) return
         with(event) {
             val hideFarCancel = (config.hideFarParticles && distanceToPlayer > 40 && !inM7Boss())

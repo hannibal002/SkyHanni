@@ -79,7 +79,7 @@ object LivingCaveLivingMetalHelper {
     }
 
     @HandleEvent
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return
 

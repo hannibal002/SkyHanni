@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent.Cancellable
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -47,6 +48,7 @@ sealed class ParticleEvent(
  * even if other mods or features later hide them.
  * Do not use this event to hide particles; use [ParticleReceivedEvent] instead.
  */
+@PrimaryFunction("onParticleDetected")
 class ParticleDetectedEvent(
     type: ParticleType<*>,
     location: LorenzVec,
@@ -64,6 +66,7 @@ class ParticleDetectedEvent(
  * particle detection. Cancelling this event prevents the particle from spawning.
  * For detection logic, use [ParticleDetectedEvent] instead.
  */
+@PrimaryFunction("onParticleReceived")
 class ParticleReceivedEvent(
     type: ParticleType<*>,
     location: LorenzVec,

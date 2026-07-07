@@ -204,7 +204,7 @@ object FlareDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!enabled) return
         if (!config.hideParticles) return
 

@@ -47,7 +47,7 @@ object RiftMotesOrb {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!enabled) return
         if (event.type != ParticleTypes.ENTITY_EFFECT) return
         val location = event.location.add(-0.5, 0.0, -0.5)
@@ -62,7 +62,7 @@ object RiftMotesOrb {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!enabled || !config.hideParticles) return
         if (event.type != ParticleTypes.ENTITY_EFFECT) return
         val location = event.location.add(-0.5, 0.0, -0.5)

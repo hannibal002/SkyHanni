@@ -21,7 +21,7 @@ object HideSlayerSpawnParticles {
     private var mobRecentDeaths = mutableMapOf<LorenzVec, SimpleTimeMark>()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!SlayerApi.hasActiveQuest() || !SlayerApi.isInCorrectArea) return
         val distance = event.location.distanceToNearestDeadMob() ?: return
         if (distance >= 5) return

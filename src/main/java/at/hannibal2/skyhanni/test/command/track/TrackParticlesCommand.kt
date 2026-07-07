@@ -47,7 +47,7 @@ object TrackParticlesCommand : TrackWorldCommand<ParticleDetectedEvent, Identifi
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onParticleReceive(event: ParticleDetectedEvent) = super.onTrackableEvent(event)
+    fun onParticleDetected(event: ParticleDetectedEvent) = super.onTrackableEvent(event)
 
     // TODO for DavidArthurCole, this whole structure seems unnecessary.
     //  We're defining event handlers that defer to inherits, in the same shape

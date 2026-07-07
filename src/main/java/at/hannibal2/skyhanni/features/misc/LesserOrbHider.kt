@@ -41,7 +41,7 @@ object LesserOrbHider {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
         if (event.type != ParticleTypes.DUST) return
 

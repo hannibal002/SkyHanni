@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import net.minecraft.world.entity.decoration.ArmorStand
 
@@ -27,7 +26,7 @@ object AshfangHider {
     }
 
     @HandleEvent
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!AshfangManager.active || !config.particles) return
         event.cancel()
     }

@@ -36,7 +36,7 @@ object BlazeSlayerClearView {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (isEnabled()) {
             event.cancel()
         }

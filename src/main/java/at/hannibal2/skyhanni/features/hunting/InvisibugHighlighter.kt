@@ -32,7 +32,7 @@ object InvisibugHighlighter {
     private var locationsToRender = listOf<LorenzVec>()
 
     @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!config.enabled) return
 
         val particle = event.type

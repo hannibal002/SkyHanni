@@ -53,7 +53,7 @@ object DungeonSecretTrackerLocator {
     private val SECRET_COMPASS = "SECRET_TRACKER".toInternalName()
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onReceiveParticle(event: ParticleDetectedEvent) {
+    fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.HAPPY_VILLAGER) return

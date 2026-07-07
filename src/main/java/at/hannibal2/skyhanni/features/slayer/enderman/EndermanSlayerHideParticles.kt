@@ -14,7 +14,7 @@ import net.minecraft.world.entity.monster.EnderMan
 object EndermanSlayerHideParticles {
 
     @HandleEvent
-    fun onReceiveParticle(event: ParticleReceivedEvent) {
+    fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!isEnabled()) return
 
         when (event.type) {
