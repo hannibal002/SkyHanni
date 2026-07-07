@@ -7,7 +7,7 @@ on:
         types: [ completed ]
 
 concurrency:
-    group: build-review-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
+    group: build-review-${{ github.event.workflow_run.event }}-${{ github.event.workflow_run.head_repository.id }}-${{ github.event.workflow_run.head_branch }}
     cancel-in-progress: true
 
 permissions:
@@ -92,5 +92,7 @@ jobs:
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-1.21.11
                     ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.1
+                    WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
+                    HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
                     MODE: build
                 run: kotlinc -script .github/scripts/pr_review.main.kts
