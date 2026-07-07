@@ -55,13 +55,12 @@ object PestParticleWaypoint {
     @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
     fun onDetectParticle(event: ParticleDetectedEvent) {
         if (!isEnabled()) return
-        if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
+        if (lastPestTrackerUse.passedSince() > 5.seconds) return
         when {
             event.isEnchantmentTable() -> return
             !event.isVillagerAngry() -> return
         }
-
         lastParticle = SimpleTimeMark.now()
 
         val emptyCondition: (LorenzVec) -> Boolean = { it.distance(LocationUtils.playerLocation()) > 5 }
@@ -75,10 +74,10 @@ object PestParticleWaypoint {
     @HandleEvent(priority = HandleEvent.LOW, onlyOnIsland = IslandType.GARDEN)
     fun onHideParticle(event: ParticleReceivedEvent) {
         if (!isEnabled() || !config.hideParticles) return
-        if (lastPestTrackerUse.passedSince() > 5.seconds) return
 
+        if (event.type == ParticleTypes.FIREWORK) event.cancel()
+        if (lastPestTrackerUse.passedSince() > 5.seconds) return
         when {
-            event.type == ParticleTypes.FIREWORK -> event.cancel()
             event.isEnchantmentTable() -> event.cancel()
             event.isVillagerAngry() -> event.cancel()
         }
