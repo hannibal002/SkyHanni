@@ -285,7 +285,8 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     // Prefer the non-Stonecutter version; if neither is Stonecutter, keep the first.
     val keepIndex = if (isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) 1 else 0
     val keep = nonEmpty[keepIndex]
-    return versions.filter { pair -> pair.second.isNullOrBlank() || pair === keep }
+    val combinedLabel = "${nonEmpty[0].first} and ${nonEmpty[1].first}"
+    return listOf(combinedLabel to keep.second)
 }
 
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
