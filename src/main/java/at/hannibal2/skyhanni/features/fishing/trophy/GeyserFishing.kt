@@ -61,10 +61,6 @@ object GeyserFishing {
         event.drawFilledBoundingBox(geyserBox, color)
     }
 
-    private fun isGeyserParticle(event: ParticleEvent): Boolean {
-        return event.type == ParticleTypes.CLOUD && event.count == 15 && event.speed == 0.05f && event.offset == geyserOffset
-    }
-
     private fun hideGeyserParticles(event: ParticleEvent) {
         val bobber = FishingApi.bobber ?: return
         val geyser = geyser ?: return
