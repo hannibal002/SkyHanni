@@ -66,19 +66,17 @@ object PetStorageApi {
     private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
 
     val isPetWidgetReadyForDisplay: Boolean
-        get() = petWidgetState == PetWidgetState.READY
+        get() = petWidgetState != PetWidgetState.NOT_READY
 
-    fun getPetWidgetDisplayMessage(): List<String>? = when {
+    fun getPetWidgetDisplayMessage(requireExactPetXp: Boolean): List<String>? = when {
         !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> listOf(
             "§cPet Tab Widget Missing",
             "§cDo /widget and enable the pet widget",
         )
-
-        petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> listOf(
+        requireExactPetXp && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> listOf(
             "§cPet Widget Overflow XP Missing",
             "§cEnable overflow XP in the pet widget",
         )
-
         else -> null
     }
 
