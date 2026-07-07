@@ -35,10 +35,10 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import at.hannibal2.skyhanni.events.MobEvent.Spawn as SpawnEvent
 import at.hannibal2.skyhanni.events.MobEvent.DeSpawn as DeSpawnEvent
 import at.hannibal2.skyhanni.events.MobEvent.FirstSeen as FirstSeenEvent
 import at.hannibal2.skyhanni.events.MobEvent.Hurt as HurtEvent
+import at.hannibal2.skyhanni.events.MobEvent.Spawn as SpawnEvent
 
 @SkyHanniModule
 object MobDetection {
