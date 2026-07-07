@@ -16,6 +16,7 @@ object ParticleUtils {
 
     @JvmStatic
     fun postParticleEvent(packet: ClientboundLevelParticlesPacket) {
+        cancelled.set(false)
         if(ParticleEvent(
             type = packet.particle.type,
             location = packet.toLorenzVec(),
