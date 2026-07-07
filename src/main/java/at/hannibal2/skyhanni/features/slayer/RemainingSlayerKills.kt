@@ -222,8 +222,7 @@ object RemainingSlayerKills {
         val baseCombatWisdom = SkyblockStat.COMBAT_WISDOM.lastKnownValue
         if (baseCombatWisdom == null) {
             remindToUpdateCombatWisdom()
-        }
-        else {
+        } else {
             combatWisdom += (baseCombatWisdom)
             debugMessage("Combat Wisdom in /eq is $baseCombatWisdom")
         }
