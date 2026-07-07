@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -79,7 +80,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     }
 
     fun Slot.parse() {
-        val item = this.item ?: return
+        val item = this.item.takeUnlessEmpty() ?: return
 
         if (this.handleCurrency()) return
 
@@ -135,7 +136,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
      * @return True means it read an item, false means it did not.
      */
     protected fun Slot.handleCurrency(): Boolean {
-        val item = this.item ?: return false
+        val item = this.item.takeUnlessEmpty() ?: return false
 
         val isHeartItem = when {
             heartItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> true

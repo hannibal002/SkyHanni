@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeNonAsciiNonColorCode
@@ -40,7 +41,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 
 private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 private typealias GemstoneType = SkyBlockItemModifierUtils.GemstoneType
@@ -76,11 +76,11 @@ object SackApi {
     )
 
     /**
-     * REGEX-TEST:  Rough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §fRough: §e78,999 §8(78,999)
-     * REGEX-TEST:  §aFlawed: §e604 §8(48,320)
-     * REGEX-TEST:  §9Fine: §e35 §8(224,000)
-     * REGEX-TEST:  §7Amount: §a5,968
+     * WRAPPED-REGEX-TEST: " Rough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §fRough: §e78,999 §8(78,999)"
+     * WRAPPED-REGEX-TEST: " §aFlawed: §e604 §8(48,320)"
+     * WRAPPED-REGEX-TEST: " §9Fine: §e35 §8(224,000)"
+     * WRAPPED-REGEX-TEST: " §7Amount: §a5,968"
      */
     @Suppress("MaxLineLength")
     private val gemstoneCountPattern by patternGroup.pattern(
@@ -140,7 +140,7 @@ object SackApi {
     val sackItem = mutableMapOf<NeuInternalName, SackOtherItem>()
     val runeItem = mutableMapOf<String, SackRune>()
     val gemstoneItem = mutableMapOf<String, SackGemstone>()
-    private val stackList = mutableMapOf<Int, ItemStack>()
+    private val stackList = mutableMapOf<Int, SafeItemStack>()
     private const val GEMSTONE_FILTER_SLOT = 41
 
     // TODO replace string with internal name, but also test if this works for all items as expected!
@@ -150,11 +150,13 @@ object SackApi {
     var sackListNames = emptySet<String>()
         private set
 
+    private var uniqueSackItems: Set<NeuInternalName> = emptySet()
+
     var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         isRuneSack = false
         isGemstoneSack = false
         gemstoneStackFilter = null
@@ -199,7 +201,7 @@ object SackApi {
     private fun getGemInternalName(gemType: GemstoneType, quality: GemstoneQuality = GemstoneQuality.ROUGH) =
         "${quality.name}_${gemType.name}_GEM".toInternalName()
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processGemstoneItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processGemstoneItem(savingSacks: Boolean) {
         var gemTypeProp: GemstoneType? = null
         gemstoneItemNamePattern.matchMatcher(value.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
             val gemName = group("gem") ?: return@matchMatcher
@@ -248,7 +250,7 @@ object SackApi {
         }
     }
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processRuneItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processRuneItem(savingSacks: Boolean) {
         val rune = SackRune()
         numPattern.matchAll(value.getLore()) {
             val level = group("level").romanToDecimal()
@@ -269,7 +271,7 @@ object SackApi {
         }
     }
 
-    private fun MutableMap.MutableEntry<Int, ItemStack>.processOtherItem(savingSacks: Boolean) {
+    private fun MutableMap.MutableEntry<Int, SafeItemStack>.processOtherItem(savingSacks: Boolean) {
         val item = SackOtherItem()
         numPattern.firstMatcher(value.getLore()) {
             val stored = group("stored").formatInt()
@@ -364,13 +366,16 @@ object SackApi {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
-        val uniqueSackItems = mutableSetOf<NeuInternalName>()
-
-        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
+        DelayedRun.runOrNextTick(::rebuildSackNameLists)
+    }
 
+    private fun rebuildSackNameLists() {
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map {
+            it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
+        }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
@@ -456,7 +461,7 @@ object SackApi {
     }
 
     data class SackRune(
-        var stack: ItemStack? = null,
+        var stack: SafeItemStack? = null,
         var lvl1: Int = 0,
         var lvl2: Int = 0,
         var lvl3: Int = 0,

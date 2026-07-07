@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Compan
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -88,10 +87,12 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper") ?: "0"
+    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSBLines(), "copper")
+        ?: TabWidget.COPPER.matchMatcherFirstLine { group("copper") }
+        ?: "0"
 
     internal fun getSowdust() = getGroup(ScoreboardPattern.sowdustPattern, getSBLines(), "sowdust")
-        ?: ScoreboardPattern.sowdustPattern.firstMatcher(TabWidget.GARDEN_LEVEL.lines.map { it.formattedTextCompat() }) { group("sowdust") }
+        ?: TabWidget.SOWDUST.matchMatcherFirstLine { group("sowdust") }
         ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"

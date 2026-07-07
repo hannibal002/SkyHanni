@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.deceased
 import at.hannibal2.skyhanni.utils.compat.findHealthReal
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -170,7 +170,7 @@ object BlazeSlayerDaggerHelper {
         return null
     }
 
-    private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
+    private fun getDaggerFromStack(stack: SafeItemStack?): Dagger? {
         val itemName = stack?.hoverName?.string.orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
@@ -203,7 +203,7 @@ object BlazeSlayerDaggerHelper {
     fun onItemClick(event: ItemClickEvent) {
         if (!config.daggers) return
         if (clientSideClicked) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val itemInHand = event.itemInHand ?: return
         val dagger = getDaggerFromStack(itemInHand)

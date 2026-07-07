@@ -255,7 +255,11 @@ enum class TabWidget(
     ),
     COPPER(
         // language=RegExp
-        "Copper: (?<amount>\\d+)",
+        "Copper: (?<copper>.+)",
+    ),
+    SOWDUST(
+        // language=RegExp
+        "Sowdust: (?<sowdust>.+)",
     ),
     PESTS(
         // language=RegExp
@@ -383,7 +387,7 @@ enum class TabWidget(
     /** The current active information from tab list.
      *
      * When the widget isn't visible, it will be empty
-     * */
+     */
     var lines: List<Component> = emptyList()
         private set
 

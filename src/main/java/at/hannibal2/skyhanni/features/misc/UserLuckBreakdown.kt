@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
@@ -46,7 +46,7 @@ object UserLuckBreakdown {
     private val mainLuckID = Items.ENDER_PEARL
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
-    private var fillerItem: ItemStack? = null
+    private var fillerItem: SafeItemStack? = null
     private val fillerID = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
 
     private var showAllStats = true
@@ -140,7 +140,7 @@ object UserLuckBreakdown {
         inCustomBreakdown = false
     }
 
-    private fun findValidSlot(input: Map<Int, ItemStack?>): Int? {
+    private fun findValidSlot(input: Map<Int, SafeItemStack?>): Int? {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
             if (input[slot].orNull() == null) {
@@ -236,7 +236,7 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun createFillerItem(): ItemStack {
+    private fun createFillerItem(): SafeItemStack {
         return ItemUtils.createItemStack(fillerID, " ", listOf(), 1)
     }
 
@@ -279,7 +279,7 @@ object UserLuckBreakdown {
             }
 
             "skills" -> {
-                val luckString = skillOverflowLuck.values.sum()
+                val luckString = skillOverflowLuck.values.sum().addSeparators()
                 val firstHalf = arrayOf(
                     "§8Grouped",
                     "",
@@ -293,7 +293,7 @@ object UserLuckBreakdown {
                 val sourcesList = mutableListOf<String>()
                 for ((skillType, luck) in skillOverflowLuck) {
                     if (luck == 0) continue
-                    sourcesList.add(" §a+$luck✴ §f${skillType.displayName} Skill")
+                    sourcesList.add(" §a+${luck.addSeparators()}✴ §f${skillType.displayName} Skill")
                 }
                 val finalList = mutableListOf<String>()
                 finalList.addAll(firstHalf)
@@ -327,7 +327,7 @@ object UserLuckBreakdown {
     }
 
     private fun calcSkillLuck() {
-        val storage = ProfileStorageData.profileSpecific?.skillData ?: return
+        val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return
         skillOverflowLuck.clear()
         for ((skillType, skillInfo) in storage) {
             val level = skillInfo.level

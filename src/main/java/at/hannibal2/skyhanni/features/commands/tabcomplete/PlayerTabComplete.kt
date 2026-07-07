@@ -3,16 +3,20 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.FriendApi
-import at.hannibal2.skyhanni.data.GuildApi
+import at.hannibal2.skyhanni.config.commands.brigadier.PlayerSuggestions
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
 import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.BEST_FRIENDS
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.CARRY_CUSTOMER
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.FRIENDS
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.GUILD
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.ISLAND_PLAYERS
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.PARTY
+import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource.SELF
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 
 @SkyHanniModule
 object PlayerTabComplete {
@@ -20,29 +24,27 @@ object PlayerTabComplete {
     private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var vipVisits = listOf<String>()
 
-    private val friendsEntry = lazyEntry { FriendApi.getAllFriends().map { it.name } }
-    private val partyMembersEntry = lazyEntry { PartyApi.partyMembers }
-    private val guildMembersEntry = lazyEntry { GuildApi.getAllMembers() }
     private val vipVisitsEntry = lazyEntry { vipVisits }
-    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name.string } }
+    private val allPlayers = getExcluding()
 
+    // TODO: cache lazy entries, and also cache getExcluding calls with the same parameters
     private val suggestions = SuggestionProvider.build {
         parent("f", "friend") {
-            parent("accept", "add", "deny") { add(getExcluding(PlayerCategory.FRIENDS)) }
-            parent("best") { add(friendsEntry) }
-            parent("remove", "nickname") { add(friendsEntry) }
+            parent("accept", "add", "deny") { add(getExcluding(FRIENDS)) }
+            parent("best") { add(FRIENDS.lazyEntry()) }
+            parent("remove", "nickname") { add(FRIENDS.lazyEntry()) }
             parent("list") { literal("best") }
             literal("help", "notifications", "removeall", "requests")
         }
 
         parent("g", "guild") {
-            parent("invite") { add(getExcluding(PlayerCategory.GUILD)) }
-            parent("kick", "transfer", "setrank", "promote", "demote") { add(guildMembersEntry) }
+            parent("invite") { add(getExcluding(GUILD)) }
+            parent("kick", "transfer", "setrank", "promote", "demote") { add(GUILD.lazyEntry()) }
             parent("mute", "unmute") {
-                add(guildMembersEntry)
+                add(GUILD.lazyEntry())
                 literal("everyone")
             }
-            parent("member") { add(guildMembersEntry) }
+            parent("member") { add(GUILD.lazyEntry()) }
             literal(
                 "top", "toggle", "tagcolor", "tag", "slow", "settings", "rename", "quest", "permissions", "party", "onlinemode",
                 "online", "officerchat", "notifications", "mypermissions", "motd", "menu", "members", "log", "leave", "info", "history",
@@ -51,53 +53,63 @@ object PlayerTabComplete {
         }
 
         parent("p", "party") {
-            parent("accept", "invite") { add(getExcluding(PlayerCategory.PARTY)) }
+            parent("accept", "invite") { add(getExcluding(PARTY)) }
             conditional({ PartyApi.partyMembers.isNotEmpty() }) {
-                parent("kick", "demote", "promote", "transfer") { add(partyMembersEntry) }
+                parent("kick", "demote", "promote", "transfer") { add(PARTY.lazyEntry()) }
                 literal("chat", "disband", "kickoffline", "leave", "list", "mute", "poll", "private", "settings", "warp")
             }
-            add(getExcluding(PlayerCategory.PARTY))
+            add(getExcluding(PARTY))
         }
 
-        parent("w", "msg", "tell", "boop", "boo") { add(getExcluding()) }
+        parent("w", "msg", "tell", "boop", "boo") { add(allPlayers) }
 
         parent("visit") {
-            add(getExcluding())
+            add(allPlayers)
             conditional({ config.vipVisits }) {
                 add(vipVisitsEntry)
             }
         }
 
-        parent("invite") { add(getExcluding()) }
-        parent("ah") { add(getExcluding()) }
+        parent("invite") { add(allPlayers) }
+        parent("ah") { add(allPlayers) }
 
-        parent("pv") { add(getExcluding()) }
-        parent("shmarkplayer") { add(getExcluding()) }
+        parent("pv") {
+            add(allPlayers)
+            add(SELF.lazyEntry())
+        }
 
-        parent("trade") { add(islandPlayersEntry) }
+        parent("trade") { add(ISLAND_PLAYERS.lazyEntry()) }
     }
 
-    enum class PlayerCategory {
-        FRIENDS,
-        ISLAND_PLAYERS,
-        PARTY,
-        GUILD,
+    private fun getExcluding(vararg excluded: PlayerNameSource) = LazySuggestionEntry {
+
+        fun allowed(category: PlayerNameSource): Boolean = when (category) {
+            FRIENDS -> config.friends
+            ISLAND_PLAYERS -> config.islandPlayers
+            PARTY -> config.party
+            GUILD -> config.guild
+            CARRY_CUSTOMER -> config.carryCustomer
+            else -> false
+        }
+
+        val allowedSet = PlayerNameSource.entries.filter {
+            it !in excluded && allowed(it)
+        }.toMutableSet()
+
+        if (config.onlyBestFriends) {
+            if (allowedSet.remove(FRIENDS)) {
+                allowedSet.add(BEST_FRIENDS)
+            }
+        }
+
+        addAll(
+            PlayerSuggestions.buildPlayerSuggestions {
+                include(allowedSet)
+            }.getSequence()
+        )
     }
 
-    private fun getExcluding(vararg categories: PlayerCategory) = LazySuggestionEntry {
-        if (config.friends && PlayerCategory.FRIENDS !in categories) {
-            addAll(FriendApi.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }.map { it.name })
-        }
-        if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in categories) {
-            addAll(EntityUtils.getPlayerEntities().map { it.name.string })
-        }
-        if (config.party && PlayerCategory.PARTY !in categories) {
-            addAll(PartyApi.partyMembers)
-        }
-        if (config.guild && PlayerCategory.GUILD !in categories) {
-            addAll(GuildApi.getAllMembers())
-        }
-    }
+    private fun PlayerNameSource.lazyEntry() = lazyEntry { usernames }
 
     private fun lazyEntry(getter: () -> List<String>) = LazySuggestionEntry { addAll(getter()) }
 
