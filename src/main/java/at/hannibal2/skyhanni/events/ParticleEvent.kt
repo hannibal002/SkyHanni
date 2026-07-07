@@ -8,14 +8,16 @@ import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
 
 /**
- * This event is fired when a particle packet is received from the server.
+ * Fired when a particle packet is received from the server.
  *
- * If you cancel this event it will still let other mods detect the particle,
- * as the particle will only get canceled later in the particle packet handler
+ * Unlike vanilla packet cancellation, canceling this event does not stop other
+ * mods from seeing the packet. Instead, SkyHanni records the cancellation and
+ * suppresses the particle later in the packet handler, after other mixins have
+ * had a chance to process it.
  *
- * It runs on the network thread.
+ * Runs on the network thread.
  *
- * @param type the particle type from the packet
+ * @param type the particle type
  * @param location the particle spawn location
  * @param count number of particles to spawn
  * @param speed particle speed
