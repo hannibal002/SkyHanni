@@ -17,14 +17,15 @@ object ParticleUtils {
     @JvmStatic
     fun postParticleEvent(packet: ClientboundLevelParticlesPacket) {
         cancelled.set(false)
-        if(ParticleEvent(
-            type = packet.particle.type,
-            location = packet.toLorenzVec(),
-            count = packet.count,
-            speed = packet.maxSpeed,
-            offset = packet.toOffset(),
-            longDistance = packet.isOverrideLimiter,
-        ).post()) {
+        if (ParticleEvent(
+                type = packet.particle.type,
+                location = packet.toLorenzVec(),
+                count = packet.count,
+                speed = packet.maxSpeed,
+                offset = packet.toOffset(),
+                longDistance = packet.isOverrideLimiter,
+            ).post()
+        ) {
             cancelled.set(true)
         }
     }
