@@ -245,7 +245,8 @@ fun readBuildLog(artifactDirPath: String?): String? {
 fun parseOneLiner(logContent: String): String? {
     val workspace = System.getenv("GITHUB_WORKSPACE")
     val lines = logContent.lines()
-    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") }
+    val line = lines.firstOrNull { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+        ?: lines.firstOrNull { it.trimStart().startsWith("e: ") }
         ?: lines.firstOrNull { "Received status code" in it }
         ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
         ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
@@ -255,7 +256,16 @@ fun parseOneLiner(logContent: String): String? {
 
 fun parseStackTrace(logContent: String): String {
     val startIndex = logContent.indexOf("FAILURE: Build failed with an exception")
-    val raw = if (startIndex >= 0) logContent.substring(startIndex) else logContent
+    val failureBlock = if (startIndex >= 0) logContent.substring(startIndex) else logContent
+    val compilerLines = if (startIndex >= 0) {
+        logContent.substring(0, startIndex).lines()
+            .filter {
+                (it.trimStart().startsWith("e: ") || it.trimStart().startsWith("w: ")) && "warnings found and -Werror specified" !in
+                    it
+            }
+            .joinToString("\n")
+    } else ""
+    val raw = if (compilerLines.isNotEmpty()) "$compilerLines\n\n$failureBlock" else failureBlock
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
@@ -289,15 +299,50 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     return listOf(combinedLabel to keep.second)
 }
 
+fun getJobIdsByVersion(runId: String, versionLabels: List<String>): Map<String, Long> {
+    val (status, body) = ghRequest("GET", "/repos/$repo/actions/runs/$runId/jobs?per_page=100")
+    if (status.isHttpError) return emptyMap()
+    val jobs = (body as? JsonObject)?.get("jobs") as? JsonArray ?: return emptyMap()
+    val result = mutableMapOf<String, Long>()
+    for (label in versionLabels) {
+        val job = jobs.find { it.isJsonObject && it.asJsonObject.get("name")?.asString?.contains(label) == true } ?: continue
+        val jobId = job.asJsonObject.get("id")?.asLong ?: continue
+        result[label] = jobId
+    }
+    return result
+}
+
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
     appendLine(buildMarker)
+    val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
+    val headSha = System.getenv("HEAD_SHA") ?: error("HEAD_SHA not set")
+    val allVersionParts = versions.flatMap { (v, _) -> v.split(" and ").map { it.trim() } }.distinct()
+    val jobIds = getJobIdsByVersion(workflowRunId, allVersionParts)
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
         val oneLiner = parseOneLiner(logContent)
-        if (oneLiner != null) appendLine("`${oneLiner.trim().take(300)}`")
+        if (oneLiner != null) {
+            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+            appendLine("`$displayLine`")
+            if ("warnings found and -Werror specified" in logContent) {
+                appendLine("_Warning elevated to error by `-Werror`_")
+            }
+        }
+        val versionParts = version.split(" and ").map { it.trim() }
+        val logLinkLines = versionParts.mapNotNull { part ->
+            val jobId = jobIds[part] ?: return@mapNotNull null
+            val jobUrl = "https://github.com/$repo/actions/runs/$workflowRunId/job/$jobId"
+            val rawUrl = "https://github.com/$repo/commit/$headSha/checks/$jobId/logs"
+            "$part: [job]($jobUrl) [raw log]($rawUrl)"
+        }
+        if (logLinkLines.isNotEmpty()) {
+            logLinkLines.forEach { appendLine(it) }
+        } else {
+            appendLine("[View build run](https://github.com/$repo/actions/runs/$workflowRunId)")
+        }
         appendLine()
-        appendLine("<details><summary>Full output</summary>")
+        appendLine("<details><summary>Excerpt</summary>")
         appendLine()
         appendLine("~~~")
         appendLine(parseStackTrace(logContent))
