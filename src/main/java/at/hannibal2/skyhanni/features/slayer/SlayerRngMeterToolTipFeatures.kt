@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -60,10 +62,6 @@ object SlayerRngMeterToolTipFeatures {
         "✔ LVL (?<level>\\d)",
     )
 
-    private const val SLAYER_COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
-    private const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
-    private const val SLAYER_COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
-
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
         val convertToFractions = config.rngMeterFractions
@@ -90,8 +88,8 @@ object SlayerRngMeterToolTipFeatures {
 
             // Extract prices from tooltip (only if needed)
             toolTipAmountPattern.matchAll(event.toolTip.map { it.string }) {
-                minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").toInt()).second
-                maxItemPrice = groupOrNull("max")?.toIntOrNull()?.let {
+                minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
+                maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
                     SlayerApi.getItemNameAndPrice(internalName, it).second
                 }
             }
@@ -109,7 +107,7 @@ object SlayerRngMeterToolTipFeatures {
                 }
 
                 if (coinsPerBoss) {
-                    event.toolTip.addCoinsPerBoss(index, scoreNeeded, scoreGainedPer, spawnCost, minItemPrice, maxItemPrice)
+                    event.toolTip.addProfitPerBoss(index, scoreNeeded, scoreGainedPer, spawnCost, minItemPrice, maxItemPrice)
                 }
                 return
             }
@@ -127,7 +125,7 @@ object SlayerRngMeterToolTipFeatures {
             val toolTip = item.getTooltip(false)
 
             bonusRewardsLevelPattern.matchAll(toolTip.map { it.string.removeColor() }) {
-                ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = group("level").toInt()
+                ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = group("level").formatInt()
             }
         }
     }
@@ -137,10 +135,10 @@ object SlayerRngMeterToolTipFeatures {
         if (event.reason != PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) return
 
         val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
-        val changeNegation = event.coins * -1
+        val changeNegation = (event.coins * -1).roundToInt()
 
-        val hasSlayerBonusRewards = changeNegation == expectedCoins * SLAYER_COST_REDUCTION
-        val hasBartender = changeNegation == expectedCoins * BREWERY_CONTRIBUTION_REDUCTION
+        val hasSlayerBonusRewards = changeNegation == (expectedCoins * SlayerApi.SLAYER_COST_REDUCTION).roundToInt()
+        val hasBartender = changeNegation == (expectedCoins * SlayerApi.BREWERY_CONTRIBUTION_REDUCTION).roundToInt()
 
         if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
         ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
@@ -161,7 +159,7 @@ object SlayerRngMeterToolTipFeatures {
         this[index] = line
     }
 
-    private fun MutableList<Component>.addCoinsPerBoss(
+    private fun MutableList<Component>.addProfitPerBoss(
         index: Int,
         scoreNeeded: Long,
         scoreGainedPer: Double,
@@ -174,30 +172,16 @@ object SlayerRngMeterToolTipFeatures {
         val line = buildString {
             append("§7Coins/Boss: ")
 
-            append("${calculateCoinsPerBoss(bossesNeeded, spawnCost, minItemPrice)} §7 to")
+            append(calculateProfitPerBoss(bossesNeeded, spawnCost, minItemPrice))
 
-            maxItemPrice?.let { append(calculateCoinsPerBoss(bossesNeeded, spawnCost, it)) }
-        }.let { Component.literal(it) }
-
-        addOrInsert(index + 1, line)
-    }
-
-    fun calculateCoinsPerBoss(bossesNeeded: Int, cost: Double, itemPrice: Double): String =
-        ((itemPrice / bossesNeeded) - cost).formatCoin()
-
-    fun SlayerType.calculateSpawnCost(tier: Int): Double? {
-        val base = SlayerApi.slayerJsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
-
-        val reduction = when {
-            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true -> SLAYER_COST_REDUCTION
-            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SLAYER_COST_REDUCTION_LEVEL -> BREWERY_CONTRIBUTION_REDUCTION
-            else -> 1.0
+            maxItemPrice?.let { append(" §7to ${calculateProfitPerBoss(bossesNeeded, spawnCost, it)}") }
         }
 
-        var cost = base * reduction
-        if (Perk.SLASHED_PRICING.isActive) cost *= 0.5
-        return cost
+        addOrInsert(index + 1, Component.literal(line))
     }
+
+    fun calculateProfitPerBoss(bossesNeeded: Int, cost: Double, itemPrice: Double): String =
+        ((itemPrice / bossesNeeded) - cost).formatCoin()
 
     private fun String.toFraction(): Int = (100 / toDouble()).roundToInt()
 }

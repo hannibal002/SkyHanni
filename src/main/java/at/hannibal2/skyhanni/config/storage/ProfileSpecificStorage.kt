@@ -929,6 +929,12 @@ class ProfileSpecificStorage(
         @Expose var itemGoal: String = "?",
     )
 
+    @Expose
+    var slayerBonusRewardsLevel: Int = 0
+
+    @Expose
+    var slayerBreweryContributionReduction: Boolean = false
+
     // data
     @Expose
     var currentPetUuid: UUID? = null
@@ -1039,10 +1045,4 @@ class ProfileSpecificStorage(
 
     @Expose
     var hiddenCoopMembers: MutableSet<String> = mutableSetOf()
-
-    @Expose
-    var slayerBonusRewardsLevel: Int = 0
-
-    @Expose
-    var slayerBreweryContributionReduction: Boolean = false
 }

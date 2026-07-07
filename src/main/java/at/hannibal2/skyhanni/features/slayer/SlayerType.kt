@@ -1,5 +1,9 @@
 package at.hannibal2.skyhanni.features.slayer
 
+import at.hannibal2.skyhanni.data.Perk
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.SlayerApi
+
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.EnderMan
@@ -51,6 +55,24 @@ enum class SlayerType(
         Zombie::class.java,
     ) // previously called "Riftstalker Bloodfiend"
     ;
+
+    fun calculateSpawnCost(tier: Int): Double? {
+        val base = SlayerApi.slayerJsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
+
+        val reduction = when {
+            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true ->
+                SlayerApi.BREWERY_CONTRIBUTION_REDUCTION
+
+            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SlayerApi.SLAYER_COST_REDUCTION_LEVEL ->
+                SlayerApi.SLAYER_COST_REDUCTION
+
+            else -> 1.0
+        }
+
+        var cost = base * reduction
+        if (Perk.SLASHED_PRICING.isActive) cost *= 0.5
+        return cost
+    }
 
     companion object {
         fun getByName(name: String): SlayerType? = entries.firstOrNull { slayer ->

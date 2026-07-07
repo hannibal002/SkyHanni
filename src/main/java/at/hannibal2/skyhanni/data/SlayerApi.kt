@@ -123,6 +123,10 @@ object SlayerApi {
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
+    const val SLAYER_COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
+    const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
+    const val SLAYER_COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
+
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
@@ -307,7 +311,7 @@ object SlayerApi {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
         slayerJsonData = event.getConstant<SlayerDataJson>("Slayer")
     }

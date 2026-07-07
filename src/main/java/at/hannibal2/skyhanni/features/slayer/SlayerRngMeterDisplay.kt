@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.slayer.SlayerRngMeterToolTipFeatures.calculateSpawnCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -283,29 +283,7 @@ object SlayerRngMeterDisplay {
 
                     add(StringRenderable("$itemGoal §7in §e${timesMissing.toInt().addSeparators()} §7bosses!"))
 
-                    if (config.coinsPerBoss) {
-                        val internalName = NeuInternalName.fromItemNameOrNull(itemGoal.removeColor()) ?: return@buildList
-                        val itemPrice = SlayerApi.getItemNameAndPrice(internalName, 1).second
-
-                        val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return@buildList
-
-                        val slayerType = SlayerApi.activeType ?: return@buildList
-                        val slayerXpGains = SlayerApi.slayerJsonData?.xpGains?.get(slayerType) ?: return@buildList
-                        val slayerTier = slayerXpGains.entries.firstOrNull {
-                            val baseBaseXp = it.value.toLong()
-                            baseBaseXp == gainPerBoss || baseBaseXp == (gainPerBoss / 1.25).toLong()
-                        }?.key ?: return@buildList
-
-                        val spawnCost = slayerType.calculateSpawnCost(slayerTier) ?: return@buildList
-
-                        val coinsPerBoss = SlayerRngMeterToolTipFeatures.calculateCoinsPerBoss(
-                            bossesNeeded,
-                            spawnCost,
-                            itemPrice,
-                        )
-
-                        add(StringRenderable("§7Coins/Boss: $coinsPerBoss"))
-                    }
+                    if (config.coinsPerBoss) addNotNull(addCoinsPerBossLine(itemGoal, goalNeeded, gainPerBoss))
                 }
             },
         )
@@ -328,6 +306,19 @@ object SlayerRngMeterDisplay {
         if (!SlayerApi.hasActiveQuest()) return false
 
         return true
+    }
+
+    private fun addCoinsPerBossLine(itemGoal: String, goalNeeded: Long, gainPerBoss: Long): StringRenderable? {
+        val internalName = NeuInternalName.fromItemNameOrNull(itemGoal.removeColor()) ?: return null
+        val itemPrice = SlayerApi.getItemNameAndPrice(internalName, 1).second
+
+        val bossesNeeded = ceil(goalNeeded.toDouble() / gainPerBoss).toInt().takeIf { it > 0 } ?: return null
+        val slayerType = SlayerApi.activeType ?: return null
+        val spawnCost = slayerType.calculateSpawnCost(SlayerApi.tier) ?: return null
+
+        val profitPerBoss = SlayerRngMeterToolTipFeatures.calculateProfitPerBoss( bossesNeeded, spawnCost, itemPrice)
+
+        return StringRenderable("§7Coins/Boss: $profitPerBoss")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
