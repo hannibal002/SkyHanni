@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -51,7 +52,7 @@ object SlayerRngMeterToolTipFeatures {
      */
     private val toolTipAmountPattern by patternGroup.pattern(
         "rngmeter.tooltip.amount",
-        "Tier .{1,2} amount: (?<min>\\d{1,3})(?: to (?<max>\\d{1,3}))?",
+        "Tier (?<tier>.{1,2}) amount: (?<min>\\d{1,3})(?: to (?<max>\\d{1,3}))?",
     )
 
     /**
@@ -82,12 +83,14 @@ object SlayerRngMeterToolTipFeatures {
         var scoreNeeded = 0L
 
         if (coinsPerBoss) {
-            val slayerCosts = SlayerApi.slayerJsonData?.spawnCosts?.get(slayerType) ?: return
-            val maxTier = slayerCosts.keys.maxOrNull() ?: return
-            spawnCost = slayerType?.calculateSpawnCost(maxTier) ?: return
+            val slayerCosts = SlayerApi.slayerJsonData?.spawnCosts?.get(slayerType)
+            val maxTier = slayerCosts?.keys?.maxOrNull()
+            val tierToCalculateFor = SlayerApi.tier.takeIf { it != 0 } ?: maxTier ?: return
+            spawnCost = slayerType?.calculateSpawnCost(tierToCalculateFor) ?: return
 
-            // Extract prices from tooltip (only if needed)
+            // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for.
             toolTipAmountPattern.matchAll(event.toolTip.map { it.string }) {
+                if (group("tier").romanToDecimal() != tierToCalculateFor) return@matchAll
                 minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
                 maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
                     SlayerApi.getItemNameAndPrice(internalName, it).second
@@ -95,7 +98,7 @@ object SlayerRngMeterToolTipFeatures {
             }
 
             val xpBuff = Perk.SLAYER_XP_BUFF in ElectionCandidate.AATROX.activePerks
-            val baseGained = SlayerApi.slayerJsonData?.xpGains?.get(slayerType)?.get(maxTier) ?: return
+            val baseGained = SlayerApi.slayerJsonData?.xpGains?.get(slayerType)?.get(tierToCalculateFor) ?: return
             scoreGainedPer = baseGained * (if (xpBuff) 1.25 else 1.0)
             scoreNeeded = SlayerRngMeterDisplay.rngScore[slayerName]?.get(internalName) ?: return
         }
