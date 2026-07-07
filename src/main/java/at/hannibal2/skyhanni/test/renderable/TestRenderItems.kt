@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.renderables.ItemStackDirectProvider.Companion
 import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.AnimatedItemStackRenderable.Companion.animatedItemStack
+import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AnimatedBounceLocalStorage
 import at.hannibal2.skyhanni.utils.renderables.animated.bounce.AxisBounceDefinition
 import at.hannibal2.skyhanni.utils.renderables.animated.framed.AnimatedFrameLocalStorage

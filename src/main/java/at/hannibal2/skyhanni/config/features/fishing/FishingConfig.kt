@@ -3,14 +3,17 @@ package at.hannibal2.skyhanni.config.features.fishing
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager.CompactDoubleHookPosition
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class FishingConfig {
     @Expose
@@ -53,6 +56,11 @@ class FishingConfig {
     val fishingHookDisplay: FishingHookDisplayConfig = FishingHookDisplayConfig()
 
     @Expose
+    @ConfigOption(name = "Fishing Bait Display", desc = "")
+    @Accordion
+    val fishingBaitDisplay: FishingBaitDisplayConfig = FishingBaitDisplayConfig()
+
+    @Expose
     @ConfigOption(name = "Bait Warnings", desc = "")
     @Accordion
     val fishingBaitWarnings: FishingBaitWarningsConfig = FishingBaitWarningsConfig()
@@ -93,6 +101,11 @@ class FishingConfig {
     val cocoonSettings: FishingCocoonConfig = FishingCocoonConfig()
 
     @Expose
+    @ConfigOption(name = "Common Sea Creature Hider", desc = "")
+    @Accordion
+    val commonSeaCreatureHider: CommonSeaCreatureHiderConfig = CommonSeaCreatureHiderConfig()
+
+    @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -119,6 +132,16 @@ class FishingConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var compactDoubleHook: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Compact Double Hook Position",
+        desc = "Where to put the DOUBLE HOOK! text in the catch message.\n" +
+            "§eRequires Compact Double Hook to be enabled!",
+    )
+    @SearchTag("before after")
+    @ConfigEditorDropdown
+    var compactDoubleHookPosition: CompactDoubleHookPosition = CompactDoubleHookPosition.LEFT
 
     @Expose
     @ConfigOption(name = "Hotspot Radar Guesser", desc = "Shows where the closest Fishing Hotspot is when using the §9Hotspot Radar§7.")
@@ -171,7 +194,7 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice1: String = ""
+    val notice1: String = ""
 
     @Expose
     @ConfigOption(
@@ -185,5 +208,5 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 }
