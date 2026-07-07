@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ParticleDetectedEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.ParticleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -28,9 +29,7 @@ object GeyserFishing {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onParticleDetected(event: ParticleDetectedEvent) {
         if (!shouldProcessParticles()) return
-        with(event) {
-            if (type != ParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
-        }
+        if (!isGeyserParticle(event)) return
         geyser = event.location
         val potentialGeyser = geyser ?: return
 
@@ -43,6 +42,7 @@ object GeyserFishing {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onParticleReceived(event: ParticleReceivedEvent) {
         if (!shouldProcessParticles()) return
+        if (!isGeyserParticle(event)) return
         if (config.hideParticles && FishingApi.bobber != null) {
             hideGeyserParticles(event)
         }
@@ -64,6 +64,10 @@ object GeyserFishing {
 
         val color = config.boxColor
         event.drawFilledBoundingBox(geyserBox, color)
+    }
+
+    private fun isGeyserParticle(event: ParticleEvent): Boolean {
+        return event.type == ParticleTypes.CLOUD && event.count == 15 && event.speed == 0.05f && event.offset == geyserOffset
     }
 
     private fun hideGeyserParticles(event: ParticleReceivedEvent) {
