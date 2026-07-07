@@ -281,12 +281,12 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
     if (oneLiners.any { it == null }) return versions
     val (ol1, ol2) = oneLiners.requireNoNulls()
     if (normalizeOneLiner(ol1) != normalizeOneLiner(ol2)) return versions
-    if (!isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) return versions
-    return versions.filter { (_, log) ->
-        if (log.isNullOrBlank()) return@filter true
-        val ol = parseOneLiner(log) ?: return@filter true
-        !isStonecutterOneLiner(ol)
-    }
+    // Both versions fail with the same error.
+    // Prefer the non-Stonecutter version; if neither is Stonecutter, keep the first.
+    val keepIndex = if (isStonecutterOneLiner(ol1) && !isStonecutterOneLiner(ol2)) 1 else 0
+    val keep = nonEmpty[keepIndex]
+    val combinedLabel = "${nonEmpty[0].first} and ${nonEmpty[1].first}"
+    return listOf(combinedLabel to keep.second)
 }
 
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
@@ -347,9 +347,13 @@ fun runMergeConflictMode(prNumber: String) {
         return
     }
 
-    val existingId = findExistingComment(prNumber, conflictMarker)
-
     if (!mergeableState) {
+        val alreadyLabeled = conflictLabel in getPrLabels(prNumber)
+        if (alreadyLabeled) {
+            println("PR #$prNumber: conflicts found, already labeled, skipping")
+            return
+        }
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
@@ -361,6 +365,7 @@ fun runMergeConflictMode(prNumber: String) {
         setLabel(prNumber, conflictLabel, true)
         println("PR #$prNumber: conflicts found, comment posted")
     } else {
+        val existingId = findExistingComment(prNumber, conflictMarker)
         if (existingId != null) markCommentAsStale(
             existingId,
             conflictMarker,
