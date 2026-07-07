@@ -256,7 +256,7 @@ object RemainingSlayerKills {
         var multiplier = 1.0
         val data = data ?: return 1.0
 
-        ElectionApi.getAllActivePerks().onEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
+        ElectionApi.getAllActivePerks().forEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
 
         multiplier *= data.arbitraryMultiplier
         // Derpy/Aura XP Boost were disallowed in First Aura simultaneously, this is for if they change that opinion
@@ -371,7 +371,6 @@ object RemainingSlayerKills {
             },
         )
     }
-
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.display
 }
