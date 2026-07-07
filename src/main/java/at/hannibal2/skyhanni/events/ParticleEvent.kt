@@ -62,7 +62,7 @@ sealed class ParticleEvent(
  */
 class ParticleDetectedEvent(
     type: ParticleType<*>,
-    override val location: LorenzVec,
+    location: LorenzVec,
     count: Int,
     speed: Float,
     offset: LorenzVec,
@@ -87,7 +87,7 @@ class ParticleDetectedEvent(
  */
 class ParticleReceivedEvent(
     type: ParticleType<*>,
-    override val location: LorenzVec,
+    location: LorenzVec,
     count: Int,
     speed: Float,
     offset: LorenzVec,
