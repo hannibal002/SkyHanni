@@ -8,7 +8,12 @@ import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
 
 /**
- * TODO: add docs
+ * This event is fired when a particle packet is received from the server.
+ *
+ * If you cancel this event it will still let other mods detect the particle,
+ * as the particle will only get canceled later in the particle packet handler
+ *
+ * It runs on the network thread.
  *
  * @param type the particle type from the packet
  * @param location the particle spawn location
