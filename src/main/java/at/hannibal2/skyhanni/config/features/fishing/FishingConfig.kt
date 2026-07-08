@@ -194,7 +194,7 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice1: String = ""
+    val notice1: String = ""
 
     @Expose
     @ConfigOption(
@@ -208,5 +208,5 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 }

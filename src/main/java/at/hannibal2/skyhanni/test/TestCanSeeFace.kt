@@ -175,7 +175,7 @@ object TestCanSeeFace {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (!enabled || !event.isLocalPlayer) return
+        if (!enabled) return
         if (!config.refreshOnMove.get()) return
         recalcContext(true)
     }

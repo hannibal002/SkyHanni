@@ -143,7 +143,7 @@ object EliteFarmersLeaderboard {
                             }
                             append(" Leaderboard!")
                             withColor(ChatFormatting.YELLOW)
-                        }
+                        },
                     )
                 }
             } else {
@@ -541,14 +541,15 @@ object EliteFarmersLeaderboard {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Better than the devs".asComponent(),
-            componentBuilder {
+            name = "Better than the devs".asComponent(),
+            description = componentBuilder {
                 append("Pass one of the")
                 append(" SkyHanni ") {
                     withColor(TextHelper.chromaStyle)
                 }
                 append("contributors in the farming leaderboards")
-            }
+            },
+            userLuckAmount = 0f,
         )
         event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }
