@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.loadout
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -31,6 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object LoadoutApi {
 
     val storage get() = ProfileStorageData.profileSpecific?.loadout
+    val config get() = SkyHanniMod.feature.inventory.customLoadout
 
     private val patternGroup = RepoPattern.group("inventory.loadout")
 
@@ -98,16 +99,10 @@ object LoadoutApi {
     private const val SLOTS_PER_ROW = 3
     private const val MAX_PAGES = 3
 
-    const val PREVIOUS_PAGE_SLOT = 17
-    const val NEXT_PAGE_SLOT = 44
-
     var slots = listOf<LoadoutSlot>()
 
     var currentPage: Int? = null
     private var inLoadouts = false
-    var inCustomLoadout = false
-
-    val maxPage get() = slots.maxOfOrNull { it.page } ?: MAX_PAGES
 
     internal fun emptyArmor(): List<SafeItemStack?> = listOf(null, null, null, null)
     internal fun emptyEquipment(): List<SafeItemStack?> = listOf(null, null, null, null)
@@ -144,7 +139,6 @@ object LoadoutApi {
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inventoryPattern.matches(event.inventoryName).let {
             inLoadouts = it
-            if (CustomLoadout.config.enabled) inCustomLoadout = it
         }
     }
 
@@ -222,6 +216,12 @@ object LoadoutApi {
         return if (tunings.isEmpty()) null else tunings.map { it.formattedTextCompatLessResets() }
     }
 
+    fun clickSlot(slot: LoadoutSlot) {
+        if (!slot.isInCurrentPage() || slot.locked) return
+        currentSlot = slot.id
+        InventoryUtils.clickSlot(slot.inventorySlot)
+    }
+
     @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inLoadouts) return
@@ -239,45 +239,6 @@ object LoadoutApi {
                 currentPage = null
             }
         }
-    }
-
-    @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Loadout")
-        event.addIrrelevant {
-            if (slots.isEmpty()) {
-                add("No slots")
-                return@addIrrelevant
-            }
-
-            for (slot in slots) {
-                val slotInfo = "Slot ${slot.id} (${slot.inventorySlot})"
-                when {
-                    slot.locked -> add("$slotInfo is locked")
-                    slot.isEmpty() -> add("$slotInfo is empty")
-                    else -> {
-                        add(slotInfo)
-                        slot.getData()?.let { data ->
-                            data.armor.forEachIndexed { index, item ->
-                                addItem("   Armor $index", item)
-                            }
-                            data.equipment.forEachIndexed { index, item -> addItem("   Equipment $index", item) }
-                            addItem("   Pet", data.pet)
-                            data.powerstone?.let { add("   Powerstone: $it") }
-                            data.tunings?.let { add("   Tunings: ${it.joinToString(", ")}") }
-                            data.hotm?.let { add("   HotM: $it") }
-                            data.hotf?.let { add("   HotF: $it") }
-                            add(slot.locked.toString())
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun MutableList<String>.addItem(label: String, item: SafeItemStack?) {
-        val name = item?.hoverName?.formattedTextCompatLeadingWhiteLessResets() ?: return
-        add("$label: $name")
     }
 
     class LoadoutData(

@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CustomLoadoutKeybinds {
 
-    private val config get() = CustomLoadout.config.keybinds
+    private val config get() = LoadoutApi.config.keybinds
     private val keybinds
         get() = listOf(
             config.slot1,
@@ -42,15 +42,14 @@ object CustomLoadoutKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = if (CustomLoadout.isActive()) CustomLoadout.displayedSlots()
-        else LoadoutApi.slots.filter { it.isInCurrentPage() }
+        val slots = LoadoutApi.slots.filter { it.isInCurrentPage() }
 
         for ((index, key) in keybinds.withIndex()) {
             if (!key.isKeyHeld()) continue
             if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index) ?: continue
 
-            CustomLoadout.clickSlot(slot)
+            LoadoutApi.clickSlot(slot)
             lastClick = SimpleTimeMark.now()
             return true
         }

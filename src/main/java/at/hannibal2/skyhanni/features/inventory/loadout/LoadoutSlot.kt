@@ -37,12 +37,12 @@ class LoadoutSlot(
 
     fun isEmpty(): Boolean = getData()?.let { data ->
         data.armor.all { it == null } &&
-            data.equipment.all { it == null } &&
-            data.pet == null &&
-            data.powerstone == null &&
-            data.tunings == null &&
-            data.hotm == null &&
-            data.hotf == null
+        data.equipment.all { it == null } &&
+        data.pet == null &&
+        data.powerstone == null &&
+        data.tunings == null &&
+        data.hotm == null &&
+        data.hotf == null
     } ?: true
 
     fun isCurrentSlot() = getData()?.id == LoadoutApi.currentSlot

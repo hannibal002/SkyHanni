@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.MiddleClickFix;
-import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadout;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
 import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
@@ -72,7 +71,7 @@ public abstract class MixinAbstractContainerScreen {
     //~ if < 26.1 'extractTooltip' -> 'renderTooltip'
     @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {
-        if (CustomWardrobe.shouldHideNormalTooltip() || CustomLoadout.shouldHideNormalTooltip()) {
+        if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
         }
         return ToolTipData.processModernTooltip(drawContext, itemStack, textTooltip);
