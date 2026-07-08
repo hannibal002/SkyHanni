@@ -43,7 +43,7 @@ object EstimatedWardrobePrice {
         tooltip.addAll(index, lore)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && (WardrobeApi.inWardrobe() || WardrobeApi.inEquipmentWardrobe()) &&
         (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
