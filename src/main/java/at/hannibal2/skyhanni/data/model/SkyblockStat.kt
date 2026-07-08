@@ -86,9 +86,9 @@ enum class SkyblockStat(
     ),
     TREASURE_CHANCE("§6⛃", " *Treasure Chance: ⛃(?<value>\\d+(?:\\.\\d+)?)", " *§6⛃ Treasure Chance §f(?<value>\\d+(?:\\.\\d+)?)%"),
     BONUS_PEST_CHANCE(
-        "§2ൠ",
-        " *(?:§r§7§m)?Bonus Pest Chance: ൠ$VALUE_PATTERN",
-        " *(?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?$VALUE_PATTERN",
+        "§2",
+        " *(?:§r§7§m)?Bonus Pest Chance: $VALUE_PATTERN",
+        " *(?:§7§m|§2) Bonus Pest Chance (?:§f)?$VALUE_PATTERN",
     ),
     COMBAT_WISDOM("§3☯", " *Combat Wisdom: ☯$VALUE_PATTERN", " *§3☯ Combat Wisdom §f$VALUE_PATTERN"),
     MINING_WISDOM("§3☯", " *Mining Wisdom: ☯$VALUE_PATTERN", " *§3☯ Mining Wisdom §f$VALUE_PATTERN"),
