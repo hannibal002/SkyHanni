@@ -251,9 +251,8 @@ object QuiverApi {
         val achievement = Achievement(
             "Arrowslinger".asComponent(),
             "Shoot 100,000 Arrows".asComponent(),
-            50f,
-            false,
-            listOf(100_000)
+            userLuckAmount = 50f,
+            tiers = listOf(100_000),
         )
         event.register(achievement, ARROW_ACHIEVEMENT)
     }
