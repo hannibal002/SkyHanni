@@ -231,6 +231,7 @@ object DungeonFinderFeatures {
         inventoryItems[dungeonClassItemIndex]?.getCleanLore()?.let {
             if (it.size > 3 && detectDungeonClassPattern.matches(it[0])) {
                 getDungeonClassPattern.matchMatcher(it[2]) {
+                    // This intentionally does not get cleared between lobbies
                     selectedClass = group("class")
                 }
             }
