@@ -69,12 +69,14 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine(workflowFailedMarker)
 
     appendLine("❌ Workflow failed ❌")
-    appendLine("mode:")
-    appendLine(mode)
     appendLine()
 
     appendLine("Error message:")
     appendLine(message)
+    appendLine()
+
+    appendLine("mode:")
+    appendLine(mode)
     appendLine()
 
     appendLine("Most likely fix: merge beta into this PR.")
