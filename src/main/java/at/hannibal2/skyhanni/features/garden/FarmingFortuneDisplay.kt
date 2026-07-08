@@ -57,16 +57,17 @@ object FarmingFortuneDisplay {
 
     /**
      * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
+     * WRAPPED-REGEX-TEST: " Farming Fortune: 1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ☘(?<fortune>\\d+)",
+        " Farming Fortune: [☘\uE051](?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ☘(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: [☘\uE051](?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -171,6 +172,7 @@ object FarmingFortuneDisplay {
     }
 
     private fun checkStats(widget: TabWidget) {
+        widget.lines.forEach { it.string }
         universalTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val fortune = group("fortune").toDouble()
             foundTabUniversalFortune = true
