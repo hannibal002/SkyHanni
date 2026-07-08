@@ -88,13 +88,14 @@ object SlayerRngMeterToolTipFeatures {
             val tierToCalculateFor = SlayerApi.tier.takeIf { it != 0 } ?: maxTier ?: return
             spawnCost = slayerType?.calculateSpawnCost(tierToCalculateFor) ?: return
 
-            // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for.
+            // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for
+            // if it is found or the highest amount dropped overall.
             toolTipAmountPattern.matchAll(event.toolTip.map { it.string }) {
-                if (group("tier").romanToDecimal() != tierToCalculateFor) return@matchAll
                 minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
                 maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
                     SlayerApi.getItemNameAndPrice(internalName, it).second
                 }
+                if (group("tier").romanToDecimal() == tierToCalculateFor) return@matchAll
             }
 
             val xpBuff = Perk.SLAYER_XP_BUFF in ElectionCandidate.AATROX.activePerks
