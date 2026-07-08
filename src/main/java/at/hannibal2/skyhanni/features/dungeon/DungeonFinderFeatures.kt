@@ -406,5 +406,6 @@ object DungeonFinderFeatures {
     // TODO: move this somewhere else
     private fun SafeItemStack.getCleanLore() = getLoreComponent().map { it.string.removeColor() }
 
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && IslandType.DUNGEON_HUB.isInIsland()
+    // Since you can call Mort from anywhere, or use the command, this should not check for being in DUNGEON_HUB
+    fun isEnabled() = SkyBlockUtils.inSkyBlock
 }
