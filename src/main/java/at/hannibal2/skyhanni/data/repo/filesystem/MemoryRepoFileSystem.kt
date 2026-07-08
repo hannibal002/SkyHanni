@@ -43,9 +43,24 @@ class MemoryRepoFileSystem(
         else storage.keys.removeIf { it == path || it.startsWith("$path/") }
     }
 
-    override fun list(path: String) = storage.keys.filter {
-        it.startsWith("$path/") && it.removePrefix("$path/").endsWith(".json")
-    }.map { it.removePrefix("$path/") }
+    override fun listFiles(path: String, extension: String): List<String> {
+        val prefix = path.toPrefix()
+        return storage.keys.asSequence()
+            .filter { it.startsWith(prefix) }
+            .map { it.removePrefix(prefix) }
+            .filter { "/" !in it && it.endsWith(".$extension") }
+            .toList()
+    }
+
+    override fun listDirectories(path: String): List<String> {
+        val prefix = path.toPrefix()
+        return storage.keys.asSequence()
+            .filter { it.startsWith(prefix) }
+            .map { it.removePrefix(prefix) }
+            .mapNotNull { it.substringBefore('/').takeIf { dir -> dir != it } }
+            .toSet()
+            .toList()
+    }
 
     /**
      * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz]), then
@@ -155,4 +170,6 @@ class MemoryRepoFileSystem(
     }.toSet().forEach { dir ->
         Files.createDirectories(this.resolve(dir))
     }
+
+    private fun String.toPrefix() = if (isEmpty()) "" else "$this/"
 }

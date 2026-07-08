@@ -20,8 +20,12 @@ class DiskRepoFileSystem(
         else File(root, path).deleteRecursively()
     }
 
-    override fun list(path: String) = root.resolve(path).listFiles { file ->
-        file.exists() && file.extension == "json"
+    override fun listFiles(path: String, extension: String) = root.resolve(path).listFiles { file ->
+        file.isFile && file.extension == extension
+    }?.mapNotNull { it.name }?.toList().orEmpty()
+
+    override fun listDirectories(path: String) = root.resolve(path).listFiles { file ->
+        file.isDirectory
     }?.mapNotNull { it.name }?.toList().orEmpty()
 
     override fun validatePath(relativePath: String) {
