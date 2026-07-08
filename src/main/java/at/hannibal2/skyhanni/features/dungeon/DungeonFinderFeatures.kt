@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
@@ -405,6 +406,5 @@ object DungeonFinderFeatures {
     // TODO: move this somewhere else
     private fun SafeItemStack.getCleanLore() = getLoreComponent().map { it.string.removeColor() }
 
-    // todo use graph area
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.scoreboardArea == "Dungeon Hub"
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && IslandType.DUNGEON_HUB.isInIsland()
 }
