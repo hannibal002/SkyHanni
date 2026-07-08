@@ -68,15 +68,17 @@ fun error(message: String, commentError: Boolean = true): Nothing {
 fun buildErrorComment(message: String): String = buildString {
     appendLine(workflowFailedMarker)
 
-    appendLine("❌ Workflow failed: $mode")
+    appendLine("❌ Workflow failed ❌")
+    appendLine("mode:")
+    appendLine(mode)
     appendLine()
 
     appendLine("Error message:")
     appendLine(message)
     appendLine()
 
-    appendLine("Please merge beta into this PR.")
-    appendLine("If the issue repeats or is not resolved, ping @hannibal002 or another maintainer.")
+    appendLine("Most likely fix: merge beta into this PR.")
+    appendLine("If the issue persists, ping @hannibal002 or another maintainer.")
     appendLine()
 
     val runId = System.getenv("GITHUB_RUN_ID")
