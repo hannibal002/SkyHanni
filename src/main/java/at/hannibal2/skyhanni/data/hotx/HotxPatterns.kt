@@ -26,7 +26,7 @@ object HotxPatterns {
      */
     val rotatingPerkPattern by patternGroup.pattern(
         "perk.generic",
-        """(?:New buff: |. )(?<perk>.*)"""
+        """(?:New buff: |■ )(?<perk>.*)"""
     )
 
     // The line that appears before the "current" perk effect in the item tooltip.
