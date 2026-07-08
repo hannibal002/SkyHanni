@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -48,11 +49,11 @@ object WardrobeApi {
     )
 
     /**
-     * REGEX-TEST: §7Slot 4: §aEquipped
+     * REGEX-TEST: Slot 4: Equipped
      */
     private val equippedSlotPattern by patternGroup.pattern(
-        "equippedslot",
-        "§7Slot \\d+: §aEquipped",
+        "equippedslot.colorless",
+        "Slot \\d+: Equipped",
     )
 
     const val FIRST_SLOT = 36
@@ -172,7 +173,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
