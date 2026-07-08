@@ -131,14 +131,7 @@ object WardrobeApi {
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        inventoryPattern.matchMatcher(event.inventoryName) {
-            inWardrobe = true
-            currentPage = group("currentPage").formatInt()
-        } ?: return
-        equipmentInventoryPattern.matchMatcher(event.inventoryName) {
-            inEquipmentWardrobe = true
-            currentPage = group("currentPage").formatInt()
-        } ?: return
+        if (!checkInventory(event.inventoryName)) return
 
         val itemsList = event.inventoryItems
 
@@ -161,6 +154,21 @@ object WardrobeApi {
         if (!foundCurrentSlot && getWardrobeSlotFromId(currentSlot)?.page == currentPage) {
             currentSlot = null
         }
+    }
+
+    private fun checkInventory(inventoryName: String): Boolean {
+        if (inventoryPattern.matchMatcher(inventoryName) {
+                inWardrobe = true
+                currentPage = group("currentPage").formatInt()
+            } != null
+        ) {
+            return true
+        }
+
+        return equipmentInventoryPattern.matchMatcher(inventoryName) {
+            inEquipmentWardrobe = true
+            currentPage = group("currentPage").formatInt()
+        } != null
     }
 
     private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, SafeItemStack>): Boolean {
