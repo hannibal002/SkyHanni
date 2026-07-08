@@ -57,7 +57,7 @@ object DungeonApi {
      */
     private val uniqueClassBonus by patternGroup.pattern(
         "unique_class_bonus",
-        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$",
+        "^Your (?<class>[A-Za-z]+) stats are doubled because you are the only player using this class!$",
     )
 
     /**
@@ -77,7 +77,7 @@ object DungeonApi {
     )
 
     /**
-     * REGEX-TEST: ☠ Defeated Bonzo
+     * WRAPPED-REGEX-TEST: " ☠ Defeated Bonzo"
      */
     private val killPattern by patternGroup.pattern(
         "kill",
