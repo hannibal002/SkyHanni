@@ -58,17 +58,39 @@ var errorCommentPosted = false
 fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
-        val comment = buildString {
-            appendLine(workflowFailedMarker)
-            appendLine("❌ Workflow failed: $mode")
-            appendLine()
-            appendLine(message)
-        }
-        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildErrorComment(message)))
         postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
         errorCommentPosted = true
     }
     exitProcess(1)
+}
+
+fun buildErrorComment(message: String): String = buildString {
+    appendLine(workflowFailedMarker)
+
+    appendLine("❌ Workflow failed ❌")
+    appendLine()
+
+    appendLine("Error message:")
+    appendLine(message)
+    appendLine()
+
+    appendLine("mode:")
+    appendLine(mode)
+    appendLine()
+
+    appendLine("Most likely fix: merge beta into this PR.")
+    appendLine("If the issue persists, ping @hannibal002 or another maintainer.")
+    appendLine()
+
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) {
+        val runLink = " \\[[workflow run](https://github.com/$repo/actions/runs/$runId)\\]"
+        appendLine("For investigating this error, see $runLink")
+    } else {
+        appendLine("GITHUB_RUN_ID is null, good luck finding the issue")
+    }
+
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299

@@ -439,10 +439,8 @@ object GardenPlotApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (event.isLocalPlayer) {
-            DelayedRun.runDelayed(.5.seconds) {
-                checkCurrentPlot()
-            }
+        DelayedRun.runDelayed(.5.seconds) {
+            checkCurrentPlot()
         }
     }
 
