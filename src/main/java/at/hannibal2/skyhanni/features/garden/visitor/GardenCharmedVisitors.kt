@@ -85,9 +85,9 @@ object GardenCharmedVisitors {
     }
 
     private fun removeCharmed(visitor: VisitorApi.Visitor) {
-        val store = storage ?: return
+        val storage = storage ?: return
         val name = visitor.visitorName
-        store.charmedVisitors.remove(name)
+        storage.charmedVisitors.remove(name)
         updateDisplay()
     }
 
