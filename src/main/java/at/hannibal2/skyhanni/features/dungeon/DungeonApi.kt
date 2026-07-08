@@ -81,7 +81,7 @@ object DungeonApi {
      */
     private val killPattern by patternGroup.pattern(
         "kill",
-        " +. Defeated (?<boss>\\w+).*",
+        "\\+. Defeated (?<boss>\\\\w+).*",
     )
 
     /**
