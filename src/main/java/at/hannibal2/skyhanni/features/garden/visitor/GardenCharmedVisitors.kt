@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object GardenCharmedVisitors {
 
-    private val config get() = VisitorApi.config.charmedVisitors
+    private val config get() = VisitorApi.config.charmed
     private val storage get() = GardenApi.storage
 
     private val patternGroup = RepoPattern.group("garden.visitor.charmed")
@@ -27,7 +27,7 @@ object GardenCharmedVisitors {
      * REGEX-TEST: This Visitor has been Charmed! ❤
      */
     private val charmedItemNamePattern by patternGroup.pattern(
-        "charmed.name",
+        "name",
         "This Visitor has been Charmed!.*",
     )
 
@@ -78,9 +78,9 @@ object GardenCharmedVisitors {
     }
 
     private fun addCharmed(visitor: VisitorApi.Visitor) {
-        val store = storage ?: return
+        val storage = storage ?: return
         val name = visitor.visitorName
-        store.charmedVisitors.add(name)
+        storage.charmedVisitors.add(name)
         updateDisplay()
     }
 
@@ -96,17 +96,16 @@ object GardenCharmedVisitors {
     }
 
     private fun drawDisplay() = buildList {
-        if (!config.enabled) return@buildList
-        val store = storage ?: return@buildList
-        val charmed = store.charmedVisitors
+        val storage = storage ?: return@buildList
+        val charmed = storage.charmedVisitors
         if (charmed.isEmpty()) return@buildList
         addString("§dCharmed Visitors §7(${charmed.size}):")
-        for (name in charmed.sorted()) {
+        for (name in charmed) {
             add(
                 Renderable.clickable(
                     " §7- $name",
                     onLeftClick = {
-                        store.charmedVisitors.remove(name)
+                        storage.charmedVisitors.remove(name)
                         updateDisplay()
                     },
                     tips = listOf("§eClick to remove from charmed list"),

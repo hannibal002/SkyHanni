@@ -39,7 +39,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(name = "Charmed Visitors", desc = "")
     @Accordion
-    val charmedVisitors: CharmedVisitorsConfig = CharmedVisitorsConfig()
+    val charmed: CharmedVisitorsConfig = CharmedVisitorsConfig()
 
     @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
