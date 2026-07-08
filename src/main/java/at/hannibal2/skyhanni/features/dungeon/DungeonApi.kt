@@ -42,15 +42,55 @@ import net.minecraft.world.level.block.Blocks
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
+    private val patternGroup = RepoPattern.group("dungeon")
 
-    // TODO repo patterns
-    private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
+    /**
+     * WRAPPED-REGEX-TEST: " ⏣ The Catacombs (F7)"
+     */
+    private val floorPattern by patternGroup.pattern(
+        "floor",
+        " . The Catacombs \\((?<floor>.*)\\)",
+    )
 
-    private val bossPattern = "View all your (?<name>\\w+) Collection".toPattern()
-    private val levelPattern = " +(?<kills>\\d+).*".toPattern()
-    private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
-    private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
+    /**
+     * REGEX-TEST: Your Mage stats are doubled because you are the only player using this class!
+     */
+    private val uniqueClassBonus by patternGroup.pattern(
+        "unique_class_bonus",
+        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$",
+    )
+
+    /**
+     * REGEX-TEST: View all your Bonzo Collection
+     */
+    private val bossPattern by patternGroup.pattern(
+        "boss",
+        "View all your (?<name>\\w+) Collection",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " 1234"
+     */
+    private val levelPattern by patternGroup.pattern(
+        "level",
+        " +(?<kills>\\d+).*",
+    )
+
+    /**
+     * REGEX-TEST: ☠ Defeated Bonzo
+     */
+    private val killPattern by patternGroup.pattern(
+        "kill",
+        " +☠ Defeated (?<boss>\\w+).*",
+    )
+
+    /**
+     * REGEX-TEST: Total Kills: 123
+     */
+    private val totalKillsPattern by patternGroup.pattern(
+        "total_kills",
+        "Total Kills: (?<kills>.*)",
+    )
 
     var dungeonFloor: String? = null
         private set
@@ -74,7 +114,6 @@ object DungeonApi {
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
-    private val patternGroup = RepoPattern.group("dungeon")
     private val WITHER_ESSENCE_TEXTURE by SkullTextureHolder.texture("WITHER_ESSENCE")
 
     /**
@@ -275,7 +314,7 @@ object DungeonApi {
             started = true
             DungeonStartEvent(floor).post()
         }
-        if (event.cleanMessage.matches(uniqueClassBonus)) {
+        uniqueClassBonus.matches(event.cleanMessage).let {
             isUniqueClass = true
         }
 
