@@ -48,7 +48,7 @@ object CrownOfAvariceCounter {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
     }
 
-    private var currentCrownUUID: String = ""
+    private var currentUUID: String = ""
     private var totalCoins: Long? = null
     private var coinsEarned: Long = 0L
     private var sessionUptime: Stopwatch = Stopwatch()
@@ -92,8 +92,8 @@ object CrownOfAvariceCounter {
         val coins = item.getCoinsOfAvarice() ?: return
         val itemUUID = item.getItemUuid() ?: return // this should never return unless hypixel changed something
         // Changing the current crown uuid and then returning ensures no coin change happens (like swapping in 482m coa => 1b)
-        if (currentCrownUUID != itemUUID) {
-            currentCrownUUID = itemUUID
+        if (currentUUID != itemUUID) {
+            currentUUID = itemUUID
             totalCoins = coins
             update()
             return
@@ -122,7 +122,7 @@ object CrownOfAvariceCounter {
         isWearingCrown && (totalCoins ?: 0) < MAX_AVARICE_COINS
 
     @HandleEvent(IslandJoinEvent::class)
-    fun onIslandChange() {
+    fun onIslandJoin() {
         if (config.resetOnWorldChange) reset()
         totalCoins = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }
