@@ -101,14 +101,13 @@ object RiftApi {
 
     }
 
-    // TODO use graph area for all those
-    fun inLivingCave() = SkyBlockUtils.scoreboardArea == "Living Cave"
-    fun inLivingStillness() = SkyBlockUtils.scoreboardArea == "Living Stillness"
-    fun inStillgoreChateau() = SkyBlockUtils.scoreboardArea.let { it == "Stillgore Château" || it == "Oubliette" }
-    fun inColosseum() = SkyBlockUtils.scoreboardArea == "Colosseum" || inColosseum
-    fun inDreadfarm() = SkyBlockUtils.scoreboardArea == "Dreadfarm"
-    fun inWestVillage() = SkyBlockUtils.scoreboardArea.let { it == "West Village" || it == "Infested House" }
-    fun inMountainTop() = when (SkyBlockUtils.scoreboardArea) {
+    fun inLivingCave() = SkyBlockUtils.graphArea == "Living Cave"
+    fun inLivingStillness() = SkyBlockUtils.graphArea == "Living Stillness"
+    fun inStillgoreChateau() = SkyBlockUtils.graphArea.let { it == "Stillgore Château" || it == "Oubliette" }
+    fun inColosseum() = SkyBlockUtils.graphArea == "Colosseum" || inColosseum
+    fun inDreadfarm() = SkyBlockUtils.graphArea == "Dreadfarm"
+    fun inWestVillage() = SkyBlockUtils.graphArea.let { it == "West Village" || it == "Infested House" }
+    fun inMountainTop() = when (SkyBlockUtils.graphArea) {
         "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
         "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber",
         -> true
