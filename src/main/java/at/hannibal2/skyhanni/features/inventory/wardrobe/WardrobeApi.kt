@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
@@ -33,12 +32,10 @@ object WardrobeApi {
     private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
-     * REGEX-TEST: Wardrobe (2/2)
      * REGEX-TEST: (1/3) Armor Sets
      */
-    private val inventoryPattern by patternGroup.list(
+    private val inventoryPattern by patternGroup.pattern(
         "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
         "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets"
     )
 
@@ -133,7 +130,7 @@ object WardrobeApi {
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        inventoryPattern.matchMatchers(event.inventoryName) {
+        inventoryPattern.matchMatcher(event.inventoryName) {
             inWardrobe = true
             currentPage = group("currentPage").formatInt()
         } ?: return
