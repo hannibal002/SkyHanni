@@ -50,7 +50,6 @@ import kotlinx.coroutines.sync.withLock
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
-
 //?}
 
 // Most functions are taken from NotEnoughUpdates

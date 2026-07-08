@@ -128,7 +128,6 @@ class MiscConfig {
     val enchantedClock: EnchantedClockConfig = EnchantedClockConfig()
 
     @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
-    @SearchTag("century cake slice")
     @Accordion
     @Expose
     val centuryPartyInvitation: CenturyPartyInvitationConfig = CenturyPartyInvitationConfig()
@@ -486,7 +485,7 @@ class MiscConfig {
     @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(
@@ -516,7 +515,17 @@ class MiscConfig {
     var achievementMessages: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Mute Stereo Pants",
+        desc = "Mutes music played by Stereo Pants."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteStereoPants: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @SearchTag("century cake slice")
     @ConfigEditorBoolean
     @FeatureToggle
     var giftCleanDisplay: Boolean = false
