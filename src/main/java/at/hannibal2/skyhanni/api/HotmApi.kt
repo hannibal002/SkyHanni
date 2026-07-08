@@ -113,14 +113,14 @@ object HotmApi {
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            perkDescription = "+100⸕ Mining Speed",
-            chatFallback = "Gain \\+100⸕ Mining Speed\\.",
-            itemFallback = "Gain \\+100⸕ Mining Speed\\.",
+            perkDescription = "+100\uE015 Mining Speed",
+            chatFallback = "Gain \\+100\uE015 Mining Speed\\.",
+            itemFallback = "Gain \\+100\uE015 Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            perkDescription = "+50☘ Mining Fortune",
-            chatFallback = "Gain \\+50☘ Mining Fortune\\.",
-            itemFallback = "Gain \\+50☘ Mining Fortune\\.",
+            perkDescription = "+50\uE053 Mining Fortune",
+            chatFallback = "Gain \\+50\uE053 Mining Fortune\\.",
+            itemFallback = "Gain \\+50\uE053 Mining Fortune\\.",
         ),
         EXTRA_POWDER(
             perkDescription = "+15% more Powder",
