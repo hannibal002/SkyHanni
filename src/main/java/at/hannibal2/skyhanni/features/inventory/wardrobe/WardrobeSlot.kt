@@ -9,7 +9,6 @@ class WardrobeSlot(
     val leggingsSlot: Int,
     val bootsSlot: Int,
 ) {
-
     fun getData() = WardrobeApi.storage?.data?.getOrPut(id) {
         WardrobeApi.WardrobeData(
             id,
