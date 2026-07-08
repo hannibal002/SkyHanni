@@ -87,7 +87,7 @@ object PestApi {
      */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7⏣ §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
+        " §7\uE067 §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
     )
 
     /**
