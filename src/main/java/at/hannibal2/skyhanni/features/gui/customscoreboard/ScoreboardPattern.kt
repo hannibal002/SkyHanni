@@ -291,7 +291,7 @@ object ScoreboardPattern {
 
     /**
      * WRAPPED-REGEX-TEST: "   §fCleanup§7: §e0.3%"
-     * WRAPPED-REGEX-TEST: "   §fCleanup§7: §b2 §4§lൠ§7 x1"
+     * WRAPPED-REGEX-TEST: "   §fCleanup§7: §b2 §4§l§7 x1"
      */
     val cleanUpPattern by farmingSB.pattern(
         "cleanup",
@@ -328,7 +328,7 @@ object ScoreboardPattern {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b3 §4§lൠ§7 x8"
+     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b3 §4§l§7 x8"
      */
     val plotPattern by farmingSB.pattern(
         "plot",
