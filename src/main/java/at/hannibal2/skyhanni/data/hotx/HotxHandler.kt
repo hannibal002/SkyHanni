@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -205,7 +204,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     abstract fun extraChatHandling(event: SkyHanniChatEvent.Allow)
 
     open fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (resetChatPattern.matches(event.message)) {
+        if (resetChatPattern.matches(event.cleanMessage)) {
             resetTree()
             return
         }
