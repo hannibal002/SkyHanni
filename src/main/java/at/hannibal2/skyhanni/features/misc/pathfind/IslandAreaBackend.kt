@@ -77,7 +77,7 @@ object IslandAreaBackend {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (isEnabled() && event.isLocalPlayer) {
+        if (isEnabled()) {
             hasMoved = true
         }
     }

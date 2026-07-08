@@ -15,7 +15,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 class ChromaConfig {
     @ConfigOption(name = "Chroma Preview", desc = "§" + CHROMA_PREVIEW_COLOR_CODE + "Please star SkyHanni on GitHub!")
     @ConfigEditorInfoText(infoTitle = "Only in SkyBlock")
-    var chromaPreview: Boolean = false
+    val chromaPreview: Boolean = false
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma.")
