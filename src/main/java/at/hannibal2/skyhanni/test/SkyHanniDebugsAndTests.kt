@@ -58,7 +58,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -560,10 +559,11 @@ object SkyHanniDebugsAndTests {
         val skinId = skinId ?: return
         if (skinIdTime.passedSince() > 2.minutes) return
 
-        val skullTexture = stack.getSkullTexture() ?: SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE")
+        val skullTexture = stack.getSkullTexture()
         val skullOwner = stack.getSkullOwner() ?: "unknown"
+        val skull = if (skullTexture != null) "\"$skullOwner:$skullTexture\"" else ""
         val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
-        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [\"$skullOwner:$skullTexture\"]},"
+        val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [$skull]},"
 
         OSUtils.copyToClipboard(formatted)
         ChatUtils.chat("§eCopied cosmetic data to the clipboard!")

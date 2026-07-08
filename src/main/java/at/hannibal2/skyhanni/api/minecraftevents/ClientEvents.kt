@@ -2,6 +2,7 @@
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.data.ActionBarData
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.events.minecraft.ClientConnectEvent
@@ -16,24 +17,22 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
 
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.events.minecraft.ComponentsLoadedEvent
+//? if >= 26.1
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?}
 
 @SkyHanniModule
 object ClientEvents {
@@ -58,13 +57,12 @@ object ClientEvents {
         // Connect event
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             ClientConnectEvent.post()
-            //? if >= 26.1
-            ComponentsLoadedEvent.post()
         }
 
         // World change event
         //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
+            EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 

@@ -266,7 +266,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { SkyHanniMod.feature.event.anniversaryCelebration400.highlightDailyTasks },
                 "century",
-                "Daily Tasks",
+                "Raffle Tasks",
                 "§c§lINCOMPLETE",
             )
             SkyblockGuideHighlightFeature(
