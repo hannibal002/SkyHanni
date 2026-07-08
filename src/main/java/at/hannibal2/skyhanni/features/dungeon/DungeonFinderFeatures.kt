@@ -321,8 +321,9 @@ object DungeonFinderFeatures {
         for ((slot, stack) in event.inventoryItems) {
             // TODO use enum
             val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
-            val toolTip = stack.getCleanLore().toMutableList()
-            for ((index, line) in stack.getCleanLore().withIndex()) {
+            val cleanLore = stack.getCleanLore()
+            val toolTip = cleanLore.toMutableList()
+            for ((index, line) in cleanLore.withIndex()) {
                 memberPattern.matchMatcher(line) {
                     val playerName = group("playerName")
                     val className = group("className")
@@ -332,7 +333,7 @@ object DungeonFinderFeatures {
                     classNames.remove(className)
                 }
             }
-            val name = stack.getCleanLore().firstOrNull()
+            val name = cleanLore.firstOrNull()
             if (config.showMissingClasses && dungeonFloorPattern.matches(name)) {
                 if (classNames.contains(selectedClass)) {
                     classNames[classNames.indexOf(selectedClass)] = "§a$selectedClass§7"
