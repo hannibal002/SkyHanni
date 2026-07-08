@@ -315,7 +315,7 @@ object DungeonApi {
             started = true
             DungeonStartEvent(floor).post()
         }
-        uniqueClassBonus.matches(event.cleanMessage).let {
+        if (uniqueClassBonus.matches(event.cleanMessage)) {
             isUniqueClass = true
         }
 
