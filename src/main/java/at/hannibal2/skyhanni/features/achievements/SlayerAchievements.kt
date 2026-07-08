@@ -30,19 +30,19 @@ object SlayerAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement3m = Achievement(
-            "Desperate Slayer".asComponent(),
-            "Get over 3m Stored RNG XP".asComponent(),
-            3f,
+            name = "Desperate Slayer",
+            description = "Get over 3m Stored RNG XP",
+            userLuckAmount = 3f,
         )
         val achievement10m = Achievement(
-            "Slayer Psycho".asComponent(),
-            componentBuilder {
+            name = "Slayer Psycho".asComponent(),
+            description = componentBuilder {
                 append("Get over 10m Stored RNG XP! ")
                 append("I hope you drop the dye soon!") {
                     withColor(ChatFormatting.DARK_PURPLE)
                 }
             },
-            10f,
+            userLuckAmount = 10f,
         )
         event.register(achievement3m, RNG_ACHIEVEMENT_3M)
         event.register(achievement10m, RNG_ACHIEVEMENT_10M)

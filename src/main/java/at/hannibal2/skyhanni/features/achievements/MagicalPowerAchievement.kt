@@ -19,11 +19,10 @@ object MagicalPowerAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Magical Sigma".asComponent(),
-            "Pro tip: Magical Power gives you good stats".asComponent(),
-            200f,
-            false,
-            listOf(500, 1000, 1500, 1800, 2000),
+            name = "Magical Sigma".asComponent(),
+            description = "Pro tip: Magical Power gives you good stats".asComponent(),
+            userLuckAmount = 200f,
+            tiers = listOf(500, 1000, 1500, 1800, 2000),
         )
         event.register(achievement, MP_ACHIEVEMENT)
     }
