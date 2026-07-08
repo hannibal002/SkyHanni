@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import net.minecraft.client.renderer.RenderPipelines
 import java.util.OptionalDouble
+
 //? if >= 26.2
 import java.util.Optional
-//? if < 26.2
+//? else
 //import java.util.OptionalInt
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import net.minecraft.client.renderer.RenderPipelines
 
 object RenderCompat {
 
@@ -43,13 +44,10 @@ object RenderCompat {
         return this.createCommandEncoder().createRenderPass(
             { name }, // label
             colorAttachment, // colorTexture
-            //? if >= 26.2
+            //~ if >= 26.2 'OptionalInt' -> 'Optional'
             Optional.empty(),
-            //? if < 26.2
-            //OptionalInt.empty(),
             framebuffer.findDepthAttachment(), // depthTexture
             OptionalDouble.empty(), // clearDepth
         )
     }
-
 }

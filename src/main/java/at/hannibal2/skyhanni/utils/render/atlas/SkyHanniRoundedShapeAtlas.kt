@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils.render.atlas
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.renderer.state.gui.BlitRenderState
-import net.minecraft.client.renderer.state.gui.GuiRenderState
-import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.Identifier
-import org.joml.Matrix3x2f
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
+import net.minecraft.client.gui.navigation.ScreenRectangle
+import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.state.gui.BlitRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
+import net.minecraft.resources.Identifier
+import org.joml.Matrix3x2f
 
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.shader.CircleShader

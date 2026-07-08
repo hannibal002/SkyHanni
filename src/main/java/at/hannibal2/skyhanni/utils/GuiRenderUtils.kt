@@ -17,18 +17,18 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.mojang.blaze3d.platform.Lighting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.renderer.item.TrackingItemStackRenderState
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.network.chat.Component
-import net.minecraft.util.ARGB
 import net.minecraft.resources.Identifier
+import net.minecraft.util.ARGB
 import net.minecraft.util.FormattedCharSequence
+import net.minecraft.world.item.ItemDisplayContext
 import net.minecraft.world.phys.Vec3
+import org.joml.Matrix3x2f
 import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
-import net.minecraft.client.renderer.item.TrackingItemStackRenderState
-import net.minecraft.world.item.ItemDisplayContext
-import org.joml.Matrix3x2f
 
 /**
  * Some functions taken from NotEnoughUpdates

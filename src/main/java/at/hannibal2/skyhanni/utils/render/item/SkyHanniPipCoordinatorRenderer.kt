@@ -4,19 +4,19 @@ import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 
-//? if >= 26.2 {
+//? if >= 26.2
 import net.minecraft.client.renderer.SubmitNodeCollector
-//?} else {
-/*import net.minecraft.client.renderer.MultiBufferSource
-*///?}
+//? else
+//import net.minecraft.client.renderer.MultiBufferSource
 
-//? if >= 26.2 {
+//? if >= 26.2
 class SkyHanniPipCoordinatorRenderer : PictureInPictureRenderer<SkyHanniGuiItemRenderState>() {
-//?} else {
+//? else {
 /*class SkyHanniPipCoordinatorRenderer(
     bufferSource: MultiBufferSource.BufferSource,
 ) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(bufferSource) {
 *///?}
+
     companion object {
         private val pendingStates = ArrayList<SkyHanniGuiItemRenderState>(256)
     }

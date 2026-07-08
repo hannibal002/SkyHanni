@@ -3,14 +3,14 @@ name: "PR Changelog Verification"
 
 on:
     pull_request:
-        types: [ opened, edited, ready_for_review ]
+        types: [ opened, edited, ready_for_review, synchronize ]
 
 permissions:
     contents: read
 
 jobs:
     verify-changelog:
-        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id
         runs-on: ubuntu-latest
         concurrency:
             group: verify-changelog-${{ github.event.pull_request.number }}

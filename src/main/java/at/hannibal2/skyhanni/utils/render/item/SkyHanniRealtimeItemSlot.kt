@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.render.item
 
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
@@ -9,7 +10,6 @@ import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
-import com.mojang.blaze3d.textures.FilterMode
 import kotlin.math.roundToInt
 
 //? if >= 26.1

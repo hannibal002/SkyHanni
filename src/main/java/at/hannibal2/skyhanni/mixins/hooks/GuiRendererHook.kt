@@ -17,12 +17,12 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GlyphRenderState
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 
 //? if < 26.2
 //import net.minecraft.client.renderer.MultiBufferSource
@@ -126,5 +126,4 @@ object GuiRendererHook {
     ) {
         SkyHanniItemRenderCoordinator.submitBlit(state, guiRenderState, frameNumber)
     }
-
 }

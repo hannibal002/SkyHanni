@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
@@ -117,7 +118,8 @@ object InventoryUtils {
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem
+    // mainHandItem can be AIR, since equipment in EntityLiving is an array of item stacks that can be AIR as well.
+    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeIf { it.item != Items.AIR }
 
     fun getArmor(): Array<SafeItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
     fun getArmorInternalNames(): Set<NeuInternalName> = getArmor().mapNotNull { it?.getInternalNameOrNull() }.toSet()

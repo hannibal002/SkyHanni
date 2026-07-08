@@ -10,16 +10,16 @@ import com.mojang.blaze3d.platform.Lighting
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.navigation.ScreenRectangle
+import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
-//? if >= 26.2
-import net.minecraft.client.renderer.SubmitNodeStorage
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
-//? if < 26.2
+//? if >= 26.2
+import net.minecraft.client.renderer.SubmitNodeStorage
+//? else
 //import net.minecraft.client.renderer.MultiBufferSource
 
 data class SkyHanniGuiItemRenderState(
@@ -36,6 +36,7 @@ data class SkyHanniGuiItemRenderState(
     private val frameNumber: Int? = null,
     val alpha: Float = 1f,
 ) : PictureInPictureRenderState {
+
     companion object {
         private var counter = 0
         fun nextStableId() = counter++
@@ -95,7 +96,7 @@ data class SkyHanniGuiItemRenderState(
     internal fun renderItemToTexture(
         //? if >= 26.2
         submitNodeStorage: SubmitNodeStorage,
-        //? if < 26.2
+        //? else
         //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         centerX: Float,
@@ -120,7 +121,7 @@ data class SkyHanniGuiItemRenderState(
             ps,
             //? if >= 26.2
             submitNodeStorage,
-            //? if < 26.2
+            //? else
             //featureRenderDispatcher.submitNodeStorage,
             15728880,
             OverlayTexture.NO_OVERLAY,
@@ -128,9 +129,9 @@ data class SkyHanniGuiItemRenderState(
         )
         //? if >= 26.2
         featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
-        //? if < 26.2
-        //featureRenderDispatcher.renderAllFeatures()
-        //? if < 26.2
-        //bufferSource.endBatch()
+        //? else {
+        /*featureRenderDispatcher.renderAllFeatures()
+        bufferSource.endBatch()
+        *///?}
     }
 }
