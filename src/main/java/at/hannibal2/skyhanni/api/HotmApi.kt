@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: make colorless
 @SkyHanniModule
 object HotmApi {
 
