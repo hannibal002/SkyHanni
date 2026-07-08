@@ -78,7 +78,7 @@ object FarmingContestApi {
 
         if (inContest != currentContest) {
             if (currentContest) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).post()
+                FarmingContestEvent(currentCrop, FarmingContestPhase.START).post()
                 startTime = SimpleTimeMark.now()
             } else {
                 if (startTime.passedSince() > 2.minutes) {

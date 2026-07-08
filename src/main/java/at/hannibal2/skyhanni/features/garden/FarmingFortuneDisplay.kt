@@ -57,16 +57,17 @@ object FarmingFortuneDisplay {
 
     /**
      * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
+     * WRAPPED-REGEX-TEST: " Farming Fortune: 1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ☘(?<fortune>\\d+)",
+        " Farming Fortune: [☘\uE051](?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ☘(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: [☘\uE051](?<fortune>\\d+)",
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
@@ -223,7 +224,7 @@ object FarmingFortuneDisplay {
             ChatUtils.clickToActionOrDisable(
                 "§cPest fortune buff has expired!",
                 config::bonusFortuneChat,
-                "call Phillip",
+                if (config.callPhillip) "call Phillip" else "teleport to the barn",
                 action = {
                     if (config.callPhillip) {
                         HypixelCommands.call("Phillip")

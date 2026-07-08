@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType.Companion.isInAnyIsland
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
@@ -18,9 +17,9 @@ object XpAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "High Level Gamer".asComponent(),
-            "Have 1000 XP Levels".asComponent(),
-            25f,
+            name = "High Level Gamer",
+            description = "Have 1000 XP Levels",
+            userLuckAmount = 25f,
         )
         event.register(achievement, XP_ACHIEVEMENT)
     }

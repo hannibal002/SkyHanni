@@ -69,8 +69,8 @@ object ConfigUpdaterMigrator {
                 }
                 for (realPrefix in realPrefixes) {
                     add(since, "$realPrefix.${path.substringAfter('.')}", value)
-                    return
                 }
+                return
             }
             val newParentElement = new.at(np.dropLast(1), true)
             if (newParentElement !is JsonObject) {

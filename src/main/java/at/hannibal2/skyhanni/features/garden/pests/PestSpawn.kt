@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestSpawnConfig
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -64,7 +64,7 @@ object PestSpawn {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
         var blocked = false
 
