@@ -403,7 +403,7 @@ enum class HotmData(
     MINERS_BLESSING("Miner's Blessing", 1, { null }, { mapOf(HotmReward.MAGIC_FIND to 30.0) }, null),
     ;
 
-    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", guiName)
 
     override val printName = name.allLettersFirstUppercase()
 
@@ -528,7 +528,6 @@ enum class HotmData(
             "inventory.reset.token",
             """\s+-\s*(?<token>\d+) Token of the Mountain"""
         )
-
         private val mayhemChatPattern by patternGroup.pattern(
             "mayhem",
             """MAYHEM! (?<perk>.*)"""

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -85,7 +86,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         if (this.handleCurrency()) return
 
-        val entry = data.firstOrNull { it.guiNamePattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
+        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName()) } ?: return
         entry.slot = this
         entry.item = item
 

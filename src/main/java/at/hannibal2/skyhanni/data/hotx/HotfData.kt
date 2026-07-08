@@ -251,7 +251,7 @@ enum class HotfData(
     ),
     ;
 
-    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", guiName)
 
     override val printName = name.allLettersFirstUppercase()
 
