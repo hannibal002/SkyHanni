@@ -90,12 +90,14 @@ object SlayerRngMeterToolTipFeatures {
 
             // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for
             // if it is found or the highest amount dropped overall.
-            toolTipAmountPattern.matchAll(event.toolTip.map { it.string }) {
-                minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
-                maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
-                    SlayerApi.getItemNameAndPrice(internalName, it).second
+            loop@ for (line in event.toolTip.map { it.string }) {
+                toolTipAmountPattern.matchMatcher(line) {
+                    minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
+                    maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
+                        SlayerApi.getItemNameAndPrice(internalName, it).second
+                    }
+                    if (group("tier").romanToDecimal() == tierToCalculateFor) break@loop
                 }
-                if (group("tier").romanToDecimal() == tierToCalculateFor) return@matchAll
             }
 
             val xpBuff = Perk.SLAYER_XP_BUFF in ElectionCandidate.AATROX.activePerks
