@@ -171,16 +171,14 @@ object DungeonFinderFeatures {
     )
 
     //  Variables used
-    private var selectedClass = ""
+    private var selectedClass: String? = null
     private var floorStackSize = mapOf<Int, String>()
     private var highlightParty = mapOf<Int, LorenzColor>()
     private var toolTipMap = mapOf<Int, List<String>>()
     private var inInventory = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-
         floorStackSize = stackTip(event)
         highlightParty = highlightingHandler(event)
         toolTipMap = toolTipHandler(event)
@@ -406,5 +404,5 @@ object DungeonFinderFeatures {
     private fun SafeItemStack.getCleanLore() = getLoreComponent().map { it.string.removeColor() }
 
     // Since you can call Mort from anywhere, or use the command, this should not check for being in DUNGEON_HUB
-    fun isEnabled() = SkyBlockUtils.inSkyBlock
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && selectedClass != null
 }
