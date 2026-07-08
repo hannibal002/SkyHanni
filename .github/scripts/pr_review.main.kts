@@ -551,7 +551,6 @@ fun buildChangelogBody(errors: String): String = buildString {
 }
 
 fun runChangelogMode(prNumber: String) {
-    error("this is a test error")
     val workflowConclusion = System.getenv("WORKFLOW_CONCLUSION") ?: ""
     val existingId = findExistingComment(prNumber, changelogMarker)
 
