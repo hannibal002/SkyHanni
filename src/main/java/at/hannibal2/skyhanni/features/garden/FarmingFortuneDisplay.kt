@@ -172,7 +172,6 @@ object FarmingFortuneDisplay {
     }
 
     private fun checkStats(widget: TabWidget) {
-        widget.lines.forEach { it.string }
         universalTabFortunePattern.firstMatcher(widget.lines.map { it.string }) {
             val fortune = group("fortune").toDouble()
             foundTabUniversalFortune = true
