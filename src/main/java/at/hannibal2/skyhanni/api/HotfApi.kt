@@ -18,18 +18,18 @@ object HotfApi {
     ) : RotatingPerk {
         SWEEP(
             perkDescription = "+5% \uE023 Sweep",
-            chatFallback = """Gain \+5% \uE023 Sweep\.""",
-            itemFallback = """Gain \+5% \uE023 Sweep\.""",
+            chatFallback = "Gain \\+5% \uE023 Sweep\\.",
+            itemFallback = "Gain \\+5% \uE023 Sweep\\.",
         ),
         MANGROVE_FORTUNE(
             perkDescription = "+50 \uE054 Mangrove Fortune",
-            chatFallback = """Gain \+50 \uE054 Mangrove Fortune\.""",
-            itemFallback = """Gain \+50 \uE054 Mangrove Fortune\.""",
+            chatFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
+            itemFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
         ),
         FIG_FORTUNE(
             perkDescription = "+50 \uE054 Fig Fortune",
-            chatFallback = """Gain \+50 \uE054 Fig Fortune\.""",
-            itemFallback = """Gain \+50 \uE054 Fig Fortune\.""",
+            chatFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
+            itemFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
         ),
         ;
 
