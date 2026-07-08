@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -141,8 +140,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val item = this.item.takeUnlessEmpty() ?: return false
 
         val isHeartItem = when {
-            heartItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> true
-            resetItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> false
+            heartItemPattern.matches(item.cleanName()) -> true
+            resetItemPattern.matches(item.cleanName()) -> false
             else -> return false
         }
 
