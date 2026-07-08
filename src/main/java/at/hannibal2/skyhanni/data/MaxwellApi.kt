@@ -231,9 +231,8 @@ object MaxwellApi {
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, SafeItemStack>) {
         val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
-            stack.takeUnlessEmpty() ?: continue
+            val stackName = stack.takeUnlessEmpty()?.cleanName() ?: continue
             for (line in stack.getLore()) {
-                val stackName = stack.cleanName()
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
                     it.name = tuningNamePattern.matchMatcher(stackName) {
                         group("name")
