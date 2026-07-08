@@ -113,32 +113,32 @@ object HotmApi {
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            perkDescription = "§6+100⸕ Mining Speed",
+            perkDescription = "+100⸕ Mining Speed",
             chatFallback = "Gain \\+100⸕ Mining Speed\\.",
             itemFallback = "Gain \\+100⸕ Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            perkDescription = "§6+50☘ Mining Fortune",
+            perkDescription = "+50☘ Mining Fortune",
             chatFallback = "Gain \\+50☘ Mining Fortune\\.",
             itemFallback = "Gain \\+50☘ Mining Fortune\\.",
         ),
         EXTRA_POWDER(
-            perkDescription = "§a+15% §7more Powder",
+            perkDescription = "+15% more Powder",
             chatFallback = "Gain \\+15% more Powder while mining\\.",
             itemFallback = "Gain \\+15% more Powder while mining\\.",
         ),
         ABILITY_COOLDOWN(
-            perkDescription = "§a-20% §7Pickaxe Ability cooldowns",
+            perkDescription = "-20% Pickaxe Ability cooldowns",
             chatFallback = "-20% Pickaxe Ability cooldowns\\.",
             itemFallback = "-20% Pickaxe Ability cooldowns\\.",
         ),
         GOBLIN_CHANCE(
-            perkDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
+            perkDescription = "10x Gold & Diamond Goblin chance",
             chatFallback = "10x chance to find Golden and Diamond Goblins\\.",
             itemFallback = "10x chance to find Golden and",
         ),
         TITANIUM(
-            perkDescription = "§a5x §9Titanium §7drops",
+            perkDescription = "5x Titanium drops",
             chatFallback = "Gain 5x Titanium drops",
             itemFallback = "Gain 5x Titanium drops\\.",
         ),
