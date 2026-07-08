@@ -62,7 +62,9 @@ fun error(message: String, commentError: Boolean = true): Nothing {
             appendLine(workflowFailedMarker)
             appendLine("❌ Workflow failed: $mode")
             appendLine()
-            appendLine(message)
+            appendLine("Error message: '$message'")
+            appendLine()
+            appendLine("Please merge beta into this PR. If the issue repeats or is not resolved, ping @hannibal002 or another maintainer.")
         }
         val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
         postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
