@@ -42,7 +42,7 @@ class PetDisplayConfig : Config() {
                 "For exact total or overflow XP on maxed pets, enable Pet widget overflow XP too."
         )
         @ConfigEditorInfoText
-        var xpAccuracyWarning: String = ""
+        val xpAccuracyWarning: String = ""
 
         @Expose
         @ConfigLink(owner = GeneralPetDisplayConfig::class, field = "enabled")
