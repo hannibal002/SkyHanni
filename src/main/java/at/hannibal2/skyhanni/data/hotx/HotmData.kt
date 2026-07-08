@@ -488,7 +488,7 @@ enum class HotmData(
             "perk.disabled",
             """DISABLED|Click to select!"""
         ) // unused for now since the assumption is when enabled isn't found, it is disabled,
-// but the value might be useful in the future or for debugging
+        // but the value might be useful in the future or for debugging
 
         /**
          * REGEX-TEST: Cost
