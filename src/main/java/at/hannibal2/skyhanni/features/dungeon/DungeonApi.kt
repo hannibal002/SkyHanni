@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -236,8 +236,9 @@ object DungeonApi {
 
     @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
-        floorPattern.firstMatcher(event.added) {
+        floorPattern.firstMatcher(cleanAdded) {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
@@ -245,11 +246,11 @@ object DungeonApi {
             return
         }
         if (!inDungeon()) return
-        dungeonRoomPattern.firstMatcher(event.added) {
+        dungeonRoomPattern.firstMatcher(cleanAdded) {
             roomId = group("roomId")
             return
         }
-        timePattern.firstMatcher(event.added) {
+        timePattern.firstMatcher(cleanAdded) {
             time = "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
             return
         }
@@ -352,11 +353,11 @@ object DungeonApi {
     ) {
         inventoryItems[48]?.let { item ->
             if (item.hoverName.string == "Go Back") {
-                item.getLore().getOrNull(0)?.let { firstLine ->
-                    if (firstLine == "§7To Boss Collections") {
+                item.getLoreComponent().map { it.string.removeColor() }.getOrNull(0)?.let { firstLine ->
+                    if (firstLine == "To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
-                        val lore = inventoryItems[4]?.getLore() ?: return
+                        val lore = inventoryItems[4]?.getLoreComponent()?.map { it.string.removeColor() } ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
@@ -375,8 +376,8 @@ object DungeonApi {
         nextItem@ for (stack in inventoryItems.values) {
             var name = ""
             var kills = 0
-            nextLine@ for (line in stack.getLore()) {
-                val colorlessLine = line.removeColor()
+            nextLine@ for (line in stack.getLoreComponent()) {
+                val colorlessLine = line.string.removeColor()
                 bossPattern.matchMatcher(colorlessLine) {
                     if (matches()) {
                         name = group("name")
