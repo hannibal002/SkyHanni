@@ -1118,5 +1118,5 @@ object ItemUtils {
         }
     }
 
-    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty || it.item == Items.AIR }
+    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty }
 }
