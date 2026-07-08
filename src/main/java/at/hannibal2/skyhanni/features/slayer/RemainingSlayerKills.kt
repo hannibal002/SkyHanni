@@ -2,10 +2,8 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.data.ElectionApi
-import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
@@ -20,8 +18,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -217,7 +213,7 @@ object RemainingSlayerKills {
 
     private fun getMultiplicativeMultiplier(): Double {
         var multiplier = 1.0
-        val data = data ?: return 1.0
+        val data = SlayerApi.slayerJsonData ?: return 1.0
 
         ElectionApi.getAllActivePerks().forEach { multiplier *= data.multiplicativeMayors[it.name] ?: 1.0 }
 
@@ -244,6 +240,8 @@ object RemainingSlayerKills {
         var additiveWithMultMultipliers = 1.0
 
         val championLevel = (InventoryUtils.getItemInHand()?.getHypixelEnchantments().orEmpty()["champion"] ?: 0) - 1
+
+        val data = SlayerApi.slayerJsonData
 
         if (championLevel != -1) additiveWithMultMultipliers += (data?.champion?.getOrNull(championLevel) ?: 0.0)
 
@@ -287,7 +285,7 @@ object RemainingSlayerKills {
                 }
             }
         }
-        return data?.habaneroMultiplier?.times(counter) ?: 0.0
+        return SlayerApi.slayerJsonData?.habaneroMultiplier?.times(counter) ?: 0.0
     }
 
     private fun Mob.names(xp: Double, totalQuestXP: Double) = buildString {
