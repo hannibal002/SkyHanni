@@ -528,6 +528,10 @@ enum class HotmData(
             "inventory.reset.token",
             """\s+-\s*(?<token>\d+) Token of the Mountain"""
         )
+
+        /**
+         * REGEX-TEST: MAYHEM! You received a Mining Fortune buff from your Mineshaft Mayhem perk!
+         */
         private val mayhemChatPattern by patternGroup.pattern(
             "mayhem",
             """MAYHEM! (?<perk>.*)"""
