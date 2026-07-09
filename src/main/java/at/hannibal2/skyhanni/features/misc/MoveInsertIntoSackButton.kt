@@ -42,7 +42,7 @@ object MoveInsertIntoSackButton {
         originalSlotItem = items[swapTargetSlot]
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
 
@@ -55,7 +55,7 @@ object MoveInsertIntoSackButton {
         event.replace(newSlotItem)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
 
