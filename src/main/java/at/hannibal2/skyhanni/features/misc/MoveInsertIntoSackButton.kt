@@ -33,7 +33,7 @@ object MoveInsertIntoSackButton {
         if (computedTargetSlot < 0) return
 
         val item = items[computedChestSlot]
-        if (item == null || item.getItem() != Items.CHEST) return
+        if (item?.getItem() != Items.CHEST) return
 
         inSackMenu = true
         chestSlot = computedChestSlot
