@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
 
@@ -36,11 +37,13 @@ class ParticleEvent(
     val particleArgs: IntArray? = null,
 ) : CancellableWorldEvent() {
 
-    val distanceToPlayer by lazy { location.distanceToPlayer() }
+    val distanceToPlayer: Double? by lazy {
+        if (MinecraftCompat.localPlayerExists) location.distanceToPlayer() else null
+    }
 
     override fun toString(): String {
         return "${javaClass.simpleName}(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=$offset, longDistance=$longDistance, distanceToPlayer=${
-            distanceToPlayer.roundTo(1)
+            distanceToPlayer?.roundTo(1)
         })"
     }
 }
