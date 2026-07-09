@@ -120,7 +120,6 @@ enum class AreaType(private val nameFallback: String) {
             AreaChangeEvent(areaType, currentArea).post()
         }
 
-
         @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             val data = event.getConstantAsync<AreaTypeJson>("misc/AreaType")
