@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
-import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
@@ -268,12 +268,12 @@ object HarvestFeastManager {
     }
 
     private fun assumeGrandFeast(): Boolean {
-        val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.activePerks } ?: false
+        // TODO remove Jerry guard once we fix Perkpocalypse to only set actually active perks
+        val perkBasedGrandFeast = Perk.GRAND_FEAST.isActive && !ElectionCandidate.JERRY.isActive()
         val timeBasedGrandFeast = currentFeastData?.let {
             it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
         } ?: false
-        return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
+        return perkBasedGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
