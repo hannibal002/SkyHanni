@@ -105,9 +105,13 @@ object WardrobeApi {
 
     fun inEquipmentWardrobe() = InventoryUtils.inInventory() && inEquipmentWardrobe
 
-    fun createPriceLore(slot: WardrobeSlot) = buildList {
+    fun createPriceLore(slot: WardrobeSlot, equipment: Boolean = inEquipmentWardrobe) = buildList {
         if (slot.isEmpty()) return@buildList
-        add("§aEstimated Armor Value:")
+        if (equipment) {
+            add("§aEstimated Equipment Value:")
+        } else {
+            add("§aEstimated Armor Value:")
+        }
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
@@ -195,13 +199,14 @@ object WardrobeApi {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inWardrobe && !inEquipmentWardrobe) return
+
         DelayedRun.runDelayed(250.milliseconds) {
-            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inWardrobe = false
-                currentPage = null
-            }
-            if (!equipmentInventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inEquipmentWardrobe = false
+            val inventoryName = InventoryUtils.openInventoryName()
+
+            inWardrobe = inventoryPattern.matches(inventoryName)
+            inEquipmentWardrobe = equipmentInventoryPattern.matches(inventoryName)
+
+            if (!inWardrobe && !inEquipmentWardrobe) {
                 currentPage = null
             }
         }
