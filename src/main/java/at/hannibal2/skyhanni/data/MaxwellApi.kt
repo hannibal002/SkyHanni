@@ -94,9 +94,14 @@ object MaxwellApi {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)",
     )
+
+    /**
+     * REGEX-TEST: (1/2) Accessory Bag Thaumaturgy
+     * REGEX-TEST: Accessory Bag Thaumaturgy
+     */
     private val thaumaturgyGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy",
-        "Accessory Bag Thaumaturgy",
+        "(?:\\(\\d/\\d\\) )?Accessory Bag Thaumaturgy",
     )
     private val thaumaturgyStartPattern by patternGroup.pattern(
         "gui.thaumaturgy.start",
