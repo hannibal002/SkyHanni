@@ -268,12 +268,11 @@ object HarvestFeastManager {
     }
 
     private fun assumeGrandFeast(): Boolean {
-        val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.activePerks } ?: false
+        val perkBasedGrandFeast = Perk.GRAND_FEAST.isActive
         val timeBasedGrandFeast = currentFeastData?.let {
             it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
         } ?: false
-        return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
+        return perkBasedGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {

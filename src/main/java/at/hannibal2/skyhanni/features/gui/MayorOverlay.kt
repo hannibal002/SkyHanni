@@ -56,7 +56,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
                     renderPerson(
                         "Candidate",
                         candidate.name,
-                        candidate.perks.orEmpty().mapNotNull { it.toPerk() },
+                        candidate.allPerks.orEmpty().mapNotNull { it.toPerk() },
                     )
                 },
                 spacing = config.candidateSpacing,

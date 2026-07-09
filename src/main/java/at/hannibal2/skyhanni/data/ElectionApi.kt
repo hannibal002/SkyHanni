@@ -250,7 +250,7 @@ object ElectionApi {
             if (lastMayor?.name != currentMayorName) {
                 Perk.resetPerks()
                 val oldMayor = currentMayor
-                currentMayor = setAssumeMayorJson(currentMayorName, mayor.perks)
+                currentMayor = setAssumeMayorJson(currentMayorName, mayor.allPerks)
                 currentMinister = mayor.minister?.let { setAssumeMayorJson(it.name, listOfNotNull(it.perk)) }
                 MayorChangeEvent(oldMayor, currentMayor).post()
             }
