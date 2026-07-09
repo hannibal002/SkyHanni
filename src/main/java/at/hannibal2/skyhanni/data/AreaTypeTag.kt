@@ -16,11 +16,15 @@ import kotlin.collections.component2
  * Each [AreaTypeTag] consists of one or more [AreaType] or [AreaTypeTag]
  */
 enum class AreaTypeTag(vararg types: Any) {
-    GLACITE_TUNNELS(
+    MINABLE_GLACITE_TUNNELS(
         AreaType.GLACITE_TUNNELS,
+        AreaType.GREAT_GLACITE_LAKE
+    ),
+
+    GLACITE_TUNNELS(
         AreaType.DWARVEN_BASE_CAMP,
-        AreaType.GREAT_GLACITE_LAKE,
         AreaType.FOSSIL_RESEARCH_CENTER,
+        MINABLE_GLACITE_TUNNELS
     ),
 
     DOJO(

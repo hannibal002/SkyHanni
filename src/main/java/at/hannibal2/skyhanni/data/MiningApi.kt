@@ -192,8 +192,7 @@ object MiningApi {
 
     fun inMineshaft() = IslandType.MINESHAFT.isInIsland()
 
-    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() &&
-        AreaType.GLACITE_TUNNELS.isInArea() || AreaType.GREAT_GLACITE_LAKE.isInArea()
+    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && AreaTypeTag.MINABLE_GLACITE_TUNNELS.isInArea()
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
