@@ -8,13 +8,14 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.world.inventory.Slot
 import java.util.regex.Matcher
 import java.util.regex.Pattern
@@ -84,11 +85,11 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         if (this.handleCurrency()) return
 
-        val entry = data.firstOrNull { it.guiNamePattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
+        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName()) } ?: return
         entry.slot = this
         entry.item = item
 
-        val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
+        val lore = item.getLoreComponent().takeIf { it.isNotEmpty() }?.map { it.string.removeColor() } ?: return
 
         if (entry != core && notUnlockedPattern.matches(lore.last())) {
             entry.rawLevel = 0
@@ -139,8 +140,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val item = this.item.takeUnlessEmpty() ?: return false
 
         val isHeartItem = when {
-            heartItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> true
-            resetItemPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) -> false
+            heartItemPattern.matches(item.cleanName()) -> true
+            resetItemPattern.matches(item.cleanName()) -> false
             else -> return false
         }
 
@@ -150,7 +151,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
             heartItem = this
         }
 
-        val lore = item.getLore()
+        val lore = item.getLoreComponent().map { it.string.removeColor() }
 
         val tokenPattern = if (isHeartItem) heartTokensPattern else resetTokensPattern
         lore@ for (line in lore) {
@@ -203,7 +204,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     abstract fun extraChatHandling(event: SkyHanniChatEvent.Allow)
 
     open fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (resetChatPattern.matches(event.message)) {
+        if (resetChatPattern.matches(event.cleanMessage)) {
             resetTree()
             return
         }
@@ -213,7 +214,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
     abstract fun tryBlock(event: SkyHanniChatEvent.Allow)
 
     fun tryReadRotatingPerkChat(event: SkyHanniChatEvent.Allow): Boolean? {
-        rotatingPerkPattern.matchMatcher(event.message) {
+        rotatingPerkPattern.matchMatcher(event.cleanMessage) {
             val perkString = group("perk")
             val foundPerk = rotatingPerks.firstNotNullOfOrNull { perk ->
                 if (!perk.chatPattern.matches(perkString)) return@firstNotNullOfOrNull null
