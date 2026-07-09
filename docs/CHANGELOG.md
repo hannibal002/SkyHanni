@@ -177,6 +177,7 @@
 #### Combat
 
 + Added toggle to only show Cocoon Overlay when the player can cocoon. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
++ Added multiplicative pet perk support to Remaining Slayer Kills Display. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
 
 #### Rift
 
@@ -286,6 +287,9 @@
 + Fixed garden warp keybinds having an unnecessary cooldown. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5796)
 + Fixed /shmouselock and /shsensreduce not locking mouse right away. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5939)
 + Fixed In-Season Crop Timer sometimes showing a very large number. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5909)
++ Fixed some pest features not working with the new resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6021)
++ Fixed the Pest fortune buff has expired message saying click to call Phillip even if it is set to teleport to the barn. - Luna (https://github.com/hannibal002/SkyHanni/pull/6007)
++ Fixed the Pest Spawn chat message appearing twice when Chat Message Format is set to Compact. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6004)
 
 #### Combat
 
@@ -314,6 +318,9 @@
 + Fixed Crown of Avarice Counter not working. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/5899)
 + Fixed all rare instances of Sea Creature Cocoon Warning falsely activating by detecting the Hypixel cocooning chat message instead of cocoon entity spawns. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5737)
 + Fixed mob highlight features sometimes not working on mobs made of skulls (e.g. Titanoboa, Fire Eel). - Luna (https://github.com/hannibal002/SkyHanni/pull/5942)
++ Fixed Crown of Avarice Counter to support changing between them. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/6010)
+  + Coin per hour metric should stay intact, the value on the counter will only change.
++ Fixed Remaining Slayer Kills Display not detecting decimal Combat Wisdom. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
 
 #### GUI
 
@@ -333,6 +340,7 @@
 + Fixed Custom Wardrobe appearing off-screen at high GUI scales. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5926)
 + Fixed some GUI features incorrectly detecting two objects as being hovered at once. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
 + Fixed Pet Display sometimes not updating after Autopet switches pets. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5993)
++ Fixed Pet Display requiring Pet widget overflow XP when exact total/overflow XP text is not enabled. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/6003)
 
 #### Item Ability
 
@@ -376,6 +384,7 @@
 + Fixed Sea Creature Tracker error when attempting to migrate outdated sea creature names to new ones. - Luna (https://github.com/hannibal002/SkyHanni/pull/5900)
 + Fixed Fishing Tracker disappearing while killing mobs occasionally. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5708)
 + Fixed Obfuscated Fish 1 and 2 not counting as bait. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5833)
++ Fixed Trophy Fish related features not working. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6022)
 
 #### Item
 
@@ -391,6 +400,9 @@
 + Fixed Croesus Highlight not working on chests made on a separate game instance. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5322)
 + Fixed Dungeon Clean End feature not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5386)
 + Fixed Dungeon Finder class and Catacombs level detection. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5910)
++ Fixed Dungeon Finder features not detecting classes. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6014)
++ Fixed Dungeon Finder features not working outside of dungeon hub. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6014)
++ Fixed dungeon floor detection being broken due to new update. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6018)
 
 #### Foraging
 
@@ -428,6 +440,12 @@
 + Fixed the Experimentation Table dry-streak tracker not resetting when finding a non-book Ultra-Rare item (e.g. Severed Pincer or End Stone Idol). - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 + Reduced the number of random errors happening in inventories. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5977)
 + Fixed error when opening pets menu when there are pets without alternate skin data. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5990)
++ Fixed Better SkyBlock Containers not rendering slot background for empty slots. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6005)
++ Fixed Colorful Item Stats not working with some stats. - Luna (https://github.com/hannibal002/SkyHanni/pull/6023)
++ Fixed Custom wardrobe not working with new hypixel update. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5933)
++ Fixed maxwell features when you have a second page of power stones. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6025)
++ Fixed Maxwell tuning stats sometimes not being detected correctly. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6011)
++ Fixed tab list and inventory detection for stats with the new official SkyBlock resource pack. - Luna (https://github.com/hannibal002/SkyHanni/pull/6023)
 
 #### Commands
 
@@ -449,6 +467,7 @@
 + Fixed Mineshaft Cave-in Timer estimate not working. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5907)
 + Fixed description for Auto-Load Shaft Routes giving incorrect examples for route names. - Luna (https://github.com/hannibal002/SkyHanni/pull/5904)
 + Fixed Glacite Mineshaft entrance/ladder waypoints being set to wrong location. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5858)
++ Fixed glacite tunnels auto commision not working due to hypixel update. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6015)
 
 #### Chat
 
@@ -558,6 +577,10 @@
 + Fixed SkyHanni causing the game to freeze for multiple seconds on the Loading Terrain screen on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/5971)
     + This would mainly happen the first time you joined a world (e.g. by connecting to Hypixel) after a game restart, but could also happen later.
 + Fixed not being able to detect particles hidden by Sodium-Extra. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5991)
++ Fixed area detection being broken due to new texture pack. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6016)
++ Fixed contributors' suffixes in nametags being too close to the username when no emblem is equipped. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5996)
++ Fixed other mods breaking particle detection. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6002)
++ Fixed Skymall / Lottery perks giving an error. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6012)
 
 ### Technical Details
 
@@ -842,6 +865,17 @@
 + Removed unused Git commit-related data classes. - Luna (https://github.com/hannibal002/SkyHanni/pull/5944)
 + Removed unused kotest and power-assert dependencies. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5955)
 + Removed unused Year 300 features. - Luna (https://github.com/hannibal002/SkyHanni/pull/5974)
++ Fixed `InventoryUtils.getItemInHand` returning an AIR `ItemStack` instead of null for an empty main hand. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5768)
++ Fixed config migrator not adding values to all profiles. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5807)
++ Made a way to generate nullable repo patterns. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6024)
++ Made dungeon floor detection use repo patterns. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6018)
++ Made DungeonFinderFeatures regex colorless. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6014)
++ Made Hotx features colorless. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6012)
++ Made non god pot data use the repo. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6024)
++ Made the StorageVarOrVal detekt rule enforce `val` for config entries annotated with `@ConfigEditorInfoText`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5988)
++ Made TunnelsMaps regex colorless. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6015)
++ Refactored Achievement constructors and enforced named parameters. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5902)
++ Reworked ParticleEvent to fire early while deferring cancellation until later in packet handling, improving mod interoperability. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6002)
 
 ### Removed Features
 
