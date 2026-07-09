@@ -35,7 +35,18 @@ internal class SkyHanniItemAtlasRenderer(
     ) {
         val size = sizePixels.toFloat()
         val bufferSlice = projectionBuffer.getBuffer(
-            /*? if >= 26.1 {*/Matrix4f().setOrtho(0f, /*?}*/size, size,/*? if >= 26.1 {*/ 0f, -1000f, 1000f)/*?}*/
+            //? if >= 26.1 {
+            Matrix4f().setOrtho(
+                0f,
+            //?}
+                size,
+                size,
+            //? if >= 26.1 {
+                0f,
+                -1000f,
+                1000f,
+            ),
+            //?}
         )
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView

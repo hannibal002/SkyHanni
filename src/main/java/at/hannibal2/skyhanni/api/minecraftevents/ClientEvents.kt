@@ -1,4 +1,3 @@
-//~ if < 26.1 'ClientLevelEvents' -> 'ClientWorldEvents' {
 package at.hannibal2.skyhanni.api.minecraftevents
 
 import at.hannibal2.skyhanni.SkyHanniMod
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
@@ -25,13 +23,17 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
-//? if >= 26.1
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.Identifier
 import net.minecraft.server.packs.PackType
 import java.util.concurrent.CompletableFuture
+
+//? if >= 26.1 {
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//?} else
+//import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 
 @SkyHanniModule
 object ClientEvents {
@@ -59,13 +61,13 @@ object ClientEvents {
         }
 
         // World change event
-        //~ if < 26.1 'AFTER_CLIENT_LEVEL_CHANGE' -> 'AFTER_CLIENT_WORLD_CHANGE'
+        //~ if >= 26.1 'ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE' -> 'ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 
-        //~ if < 26.1 'registerReloadListener' -> 'registerReloader'
+        //~ if >= 26.1 'registerReloader' -> 'registerReloadListener'
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->
@@ -85,11 +87,11 @@ object ClientEvents {
     var currentMessage: Component? = null
 
     private fun onAllow(message: Component, actionBar: Boolean): Boolean {
-        // if we created the message we don't want to pipe it back into our events
+        // If we created the message we don't want to pipe it back into our events
         if (message.skyhanniCreated) return true
 
         if (actionBar) {
-            // we never cancel the action bar
+            // We never cancel the action bar
             return true
         }
 
@@ -98,7 +100,7 @@ object ClientEvents {
         val cancel = ChatManager.onChatAllow(message)
 
         if (cancel) {
-            // the message doesn't get logged if we cancel it, so we do that ourselves
+            // The message doesn't get logged if we cancel it, so we do that ourselves
             val chatHudLine = GuiMessage(
                 MinecraftCompat.hud.guiTicks,
                 message,
@@ -112,7 +114,7 @@ object ClientEvents {
             MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }
 
-        // if we cancel then we don't allow the message
+        // If we cancel then we don't allow the message
         return !cancel
     }
 
@@ -120,9 +122,9 @@ object ClientEvents {
         if (message.skyhanniCreated) return message
 
         if (actionBar) {
-            // we don't have to worry about cancelling the action bar
-            // this is more compatible with other mods changing the action bar as well
-            // ie to remove hp/mana
+            // We don't have to worry about cancelling the action bar
+            // This is more compatible with other mods changing the action bar as well
+            // e.g. to remove HP/Mana
             val result = ActionBarData.onChatReceive(message)
             if (result == null) {
                 return if (rainbowConfig()) {
@@ -148,7 +150,7 @@ object ClientEvents {
         }
 
         val new = ChatManager.onChatModify(message)
-        // if new is null then we didn't want to change the message
+        // If new is null then we didn't want to change the message
         new?.let { return it }
 
         currentMessage?.let {
@@ -168,6 +170,4 @@ object ClientEvents {
     }
 
     fun rainbowConfig() = SkyHanniMod.feature.misc.rainbowActionBar
-
 }
-//~}
