@@ -8,12 +8,21 @@ import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.minecraft.addAll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+
+    private val clickToEquipPattern by RepoPattern.pattern(
+        "inventory.wardrobe.clicktoequip",
+        "Click to (un)equip!"
+    )
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
@@ -28,11 +37,17 @@ object EstimatedWardrobePrice {
         val lore = WardrobeApi.createPriceLore(slot)
         if (lore.isEmpty()) return
 
+
         val tooltip = event.toolTip
-        var index = 3
+        val index = getClickToEquipIndex(tooltip)
 
         try {
-            tooltip.add(index++, "")
+            if (index != null) {
+                tooltip.removeAt(index)
+                tooltip.addAll(index, lore)
+            } else {
+                tooltip.addAll(lore)
+            }
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorStateWithData(
                 "Can not show Estimated Wardrobe Price",
@@ -41,10 +56,13 @@ object EstimatedWardrobePrice {
                 "lore" to lore,
             )
         }
-        tooltip.addAll(index, lore)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && (WardrobeApi.inWardrobe() || WardrobeApi.inEquipmentWardrobe()) &&
+    private fun getClickToEquipIndex(tooltip: MutableList<Component>): Int? =
+        tooltip.indexOfFirstOrNull { clickToEquipPattern.matches(it) }
+
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
+        (config.armor && WardrobeApi.inWardrobe()) || (config.equipment && WardrobeApi.inEquipmentWardrobe()) &&
         (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
