@@ -189,6 +189,7 @@ object RareDropMessages {
         event.move(71, "chat.petRarityDropMessage", "chat.rareDropMessages.petRarity")
     }
 
+    @Suppress("MaxLineLength")
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestenchantedbookname") {
