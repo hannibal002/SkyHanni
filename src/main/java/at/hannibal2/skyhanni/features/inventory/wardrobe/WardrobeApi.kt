@@ -105,13 +105,9 @@ object WardrobeApi {
 
     fun inEquipmentWardrobe() = InventoryUtils.inInventory() && inEquipmentWardrobe
 
-    fun createPriceLore(slot: WardrobeSlot, equipment: Boolean = inEquipmentWardrobe) = buildList {
+    fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
-        if (equipment) {
-            add("§aEstimated Equipment Value:")
-        } else {
-            add("§aEstimated Armor Value:")
-        }
+        add("§aEstimated Armor Value:")
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
