@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigEleme
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -92,9 +94,14 @@ object MaxwellApi {
         "inventory.magicalpower",
         "§7Magical Power: §6(?<mp>[\\d,]+)",
     )
+
+    /**
+     * REGEX-TEST: (1/2) Accessory Bag Thaumaturgy
+     * REGEX-TEST: Accessory Bag Thaumaturgy
+     */
     private val thaumaturgyGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy",
-        "Accessory Bag Thaumaturgy",
+        "(?:\\(\\d/\\d\\) )?Accessory Bag Thaumaturgy",
     )
     private val thaumaturgyStartPattern by patternGroup.pattern(
         "gui.thaumaturgy.start",
@@ -158,6 +165,21 @@ object MaxwellApi {
         "(?:§.)*Requires (?:§.)*Redstone Collection I+(?:§.)*\\.",
     )
 
+    /**
+     * REGEX-TEST: ❤ Health
+     * REGEX-TEST: ❈ Defense
+     * REGEX-TEST: ✦ Speed
+     * REGEX-TEST: ❁ Strength
+     * REGEX-TEST: ☠ Crit Damage
+     * REGEX-TEST: ☣ Crit Chance
+     * REGEX-TEST: ⚔ Attack Speed
+     * REGEX-TEST: ✎ Intelligence
+     */
+    private val tuningNamePattern by patternGroup.pattern(
+        "tuning.name",
+        ". (?<name>.+)",
+    )
+
     fun isThaumaturgyInventory(inventoryName: String) = thaumaturgyGuiPattern.matches(inventoryName)
 
     @HandleEvent
@@ -214,13 +236,14 @@ object MaxwellApi {
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, SafeItemStack>) {
         val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
+            val stackName = stack.takeUnlessEmpty()?.cleanName() ?: continue
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
-                    it.name = "§.. (?<name>.+)".toPattern().matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+                    it.name = tuningNamePattern.matchMatcher(stackName) {
                         group("name")
                     } ?: ErrorManager.skyHanniError(
                         "found no name in thaumaturgy",
-                        "stack name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                        "stack name" to stackName,
                         "line" to line,
                     )
                     map.add(it)

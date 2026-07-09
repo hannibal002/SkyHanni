@@ -21,7 +21,7 @@ object ShiftClickEquipment {
 
         if (slot.index == slot.containerSlot) return
 
-        if (slot.item == null) return
+        if (slot.item.isEmpty) return
 
         val chestName = InventoryUtils.openInventoryName()
         if (!chestName.startsWith("Your Equipment")) return
