@@ -5,11 +5,11 @@ import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
-import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import java.awt.Color
-import org.joml.Matrix3x2f
 import net.minecraft.client.gui.GuiGraphicsExtractor
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.LivingEntity
+import org.joml.Matrix3x2f
+import java.awt.Color
 
 fun Renderable.Companion.fakePlayer(
     player: FakePlayer,
