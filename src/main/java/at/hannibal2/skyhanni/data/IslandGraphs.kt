@@ -183,18 +183,17 @@ object IslandGraphs {
         resetNavigation()
     }
 
-    private fun isGlaciteTunnelsArea(area: AreaType): Boolean = AreaTypeTag.GLACITE_TUNNELS.isInScoreboardArea()
+    private fun isGlaciteTunnelsArea(): Boolean = AreaTypeTag.GLACITE_TUNNELS.isInScoreboardArea()
 
-    @HandleEvent()
-    fun onScoreboardAreaChange(event: ScoreboardAreaChangeEvent) {
+    @HandleEvent
+    fun onScoreboardAreaChange() {
         if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
         }
 
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        val area = AreaType.getByNameOrNull(event.area) ?: return
-        val now = isGlaciteTunnelsArea(area)
+        val now = isGlaciteTunnelsArea()
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -205,9 +204,9 @@ object IslandGraphs {
         reloadFromJson(lobby)
     }
 
-    private fun loadDwarvenMines(area: AreaType = AreaType.currentScoreboardArea) {
+    private fun loadDwarvenMines() {
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        if (isGlaciteTunnelsArea(area)) {
+        if (isGlaciteTunnelsArea()) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
