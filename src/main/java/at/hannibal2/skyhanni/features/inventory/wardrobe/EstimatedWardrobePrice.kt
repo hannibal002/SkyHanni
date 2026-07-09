@@ -7,26 +7,12 @@ import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.addAll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
-
-    /**
-     * REGEX-TEST: Click to equip!
-     * REGEX-TEST: Click to unequip!
-     */
-    private val clickToEquipPattern by RepoPattern.pattern(
-        "inventory.wardrobe.clicktoequip",
-        "Click to (?:un)?equip!"
-    )
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {
@@ -43,15 +29,10 @@ object EstimatedWardrobePrice {
 
 
         val tooltip = event.toolTip
-        val index = getClickToEquipIndex(tooltip)
 
         try {
-            if (index != null) {
-                tooltip.removeAt(index)
-                tooltip.addAll(index, lore)
-            } else {
-                tooltip.addAll(lore)
-            }
+            tooltip.add("")
+            tooltip.addAll(lore)
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorStateWithData(
                 "Can not show Estimated Wardrobe Price",
@@ -61,9 +42,6 @@ object EstimatedWardrobePrice {
             )
         }
     }
-
-    private fun getClickToEquipIndex(tooltip: MutableList<Component>): Int? =
-        tooltip.indexOfFirstOrNull { clickToEquipPattern.matches(it.string.removeColor()) }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
         (config.armor && WardrobeApi.inWardrobe()) || (config.equipment && WardrobeApi.inEquipmentWardrobe()) &&
