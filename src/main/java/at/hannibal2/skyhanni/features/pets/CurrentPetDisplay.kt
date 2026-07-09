@@ -61,6 +61,12 @@ private typealias ETextCenter = TextPetDisplayConfig.EquippedPetTextConfig.Cente
 private typealias EXPSharePlace = ExpSharePetOrganizationConfig.ExpShareLocationOption
 private typealias EXPShareGO = ExpSharePetOrganizationConfig.GroupOrientation
 
+internal fun PetDisplayConfig.requiresExactCurrentPetXp(): Boolean {
+    val enabledTexts = text.equippedPet.enabledTexts.get()
+    return TextPetDisplayConfig.TextElement.OVERFLOW_XP in enabledTexts ||
+        TextPetDisplayConfig.TextElement.TOTAL_XP in enabledTexts
+}
+
 @SkyHanniModule
 object CurrentPetDisplay {
 
@@ -480,7 +486,7 @@ object CurrentPetDisplay {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.general.enabled.get()) return
-        PetStorageApi.getPetWidgetDisplayMessage()?.let { lines ->
+        PetStorageApi.getPetWidgetDisplayMessage(config.requiresExactCurrentPetXp())?.let { lines ->
             invalidateRenderable()
             config.general.position.renderRenderable(
                 buildWidgetMessageRenderable(lines, config.text.equippedPet),
