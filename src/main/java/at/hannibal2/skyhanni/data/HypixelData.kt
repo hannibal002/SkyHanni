@@ -64,7 +64,7 @@ object HypixelData {
      */
     private val skyblockAreaPattern by patternGroup.pattern(
         "skyblock.area",
-        "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
+        "\\s*§\\d(?<symbol>.) §(?<color>.)(?<area>.*)",
     )
 
     val connectedToHypixel get() = HypixelLocationApi.inHypixel
