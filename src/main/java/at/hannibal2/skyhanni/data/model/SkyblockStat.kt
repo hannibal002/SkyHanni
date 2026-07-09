@@ -192,6 +192,8 @@ enum class SkyblockStat(
 
         fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string || it.hypixelId == string }
 
+        fun getValueByDisplayNameOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.displayName == string }
+
         fun getValue(string: String): SkyblockStat = getValueOrNull(string) ?: UNKNOWN
 
         init {
@@ -208,6 +210,8 @@ enum class SkyblockStat(
         }
 
         fun getIconOrNull(string: String): String? = resourcePackOverrides[string] ?: getValueOrNull(string)?.icon
+
+        fun getIconByDisplayNameOrNull(string: String): String? = getValueByDisplayNameOrNull(string)?.icon
 
         private var resourcePackOverrides = emptyMap<String, String>()
 
