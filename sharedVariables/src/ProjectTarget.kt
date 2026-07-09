@@ -35,7 +35,7 @@ enum class ProjectTarget(
         fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.153.0+26.1.2",
         hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
         hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
-        modMenuVersion = "18.0.0-beta.1",
+        modMenuVersion = "18.0.0",
         modrinthInfo = ModrinthInfo.FABRIC_26_1,
     ),
     MODERN_26200(
