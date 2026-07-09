@@ -99,7 +99,7 @@ object MinecraftCompat {
         *///?}
     }
     // </editor-fold>
-    
+
     val hideGui get(): Boolean = Minecraft.getInstance().options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
