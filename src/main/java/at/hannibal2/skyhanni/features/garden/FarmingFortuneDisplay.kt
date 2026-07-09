@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -56,21 +57,25 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
 
     /**
-     * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
+     * WRAPPED-REGEX-TEST: " Farming Fortune: 1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ☘(?<fortune>\\d+)",
+        " Farming Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ☘(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §7You have §6+12 Wheat Fortune
+     */
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
+        "§7You have §6\\+(?<ff>\\d{1,3})${FARMING_FORTUNE.hypixelIcon} .*",
     )
 
     @Suppress("MaxLineLength")
@@ -84,28 +89,31 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     * REGEX-TEST: §7Piece Bonus: §6+10
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)☘",
+        "§7Piece Bonus: §6+(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}",
     )
 
+    /**
+     * REGEX-TEST: §7Fermento Armor. §7Grants §60 Farming
+     */
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)☘.*",
+        "§7.*§7Grants §6(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}.*",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " Bonus: INACTIVE"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 29m"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 5m 2s"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 8s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 29m"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 5m 2s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 8s"
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
-        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)☘ (?<time>.*))?.*",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${FARMING_FORTUNE.hypixelIcon} (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()
