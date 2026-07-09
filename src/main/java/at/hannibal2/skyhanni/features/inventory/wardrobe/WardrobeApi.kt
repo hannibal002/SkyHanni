@@ -195,13 +195,14 @@ object WardrobeApi {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inWardrobe && !inEquipmentWardrobe) return
+
         DelayedRun.runDelayed(250.milliseconds) {
-            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inWardrobe = false
-                currentPage = null
-            }
-            if (!equipmentInventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inEquipmentWardrobe = false
+            val inventoryName = InventoryUtils.openInventoryName()
+
+            inWardrobe = inventoryPattern.matches(inventoryName)
+            inEquipmentWardrobe = equipmentInventoryPattern.matches(inventoryName)
+
+            if (!inWardrobe && !inEquipmentWardrobe) {
                 currentPage = null
             }
         }
