@@ -68,6 +68,10 @@ object FarmingFortuneDisplay {
         "tablist.cropspecific-no-color",
         " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: [☘\uE051](?<fortune>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §7You have §6+12 Wheat Fortune
+     */
     private val collectionPattern by patternGroup.pattern(
         "collection",
         "§7You have §6\\+(?<ff>\\d{1,3})\uE051 .*",
@@ -84,13 +88,16 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEXT: §7Piece Bonus: §6+10
+     * REGEX-TEST: §7Piece Bonus: §6+10
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
         "§7Piece Bonus: §6+(?<bonus>.*)\uE051",
     )
 
+    /**
+     * REGEX-TEST: §7Fermento Armor. §7Grants §60 Farming
+     */
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
