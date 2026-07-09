@@ -207,7 +207,7 @@ object RemainingSlayerKills {
     private fun getMobs(): List<Mob>? {
         val data = data ?: return null
         val areas = data.normalMobs[SlayerApi.currentAreaType] ?: mapOf()
-        val normalMobs = areas[SkyBlockUtils.area.displayName] ?: listOf()
+        val normalMobs = areas[SkyBlockUtils.area.displayName].orEmpty()
 
         return buildList {
             addAll(normalMobs)

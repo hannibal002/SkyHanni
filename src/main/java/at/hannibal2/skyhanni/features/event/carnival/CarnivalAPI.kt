@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.MayorChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule

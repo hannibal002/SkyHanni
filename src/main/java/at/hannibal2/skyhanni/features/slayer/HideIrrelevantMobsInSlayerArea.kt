@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import net.minecraft.world.entity.LivingEntity
 
 @SkyHanniModule
