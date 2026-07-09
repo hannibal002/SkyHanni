@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fame
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
@@ -76,7 +77,7 @@ object CityProjectFeatures {
         val playerSpecific = ProfileStorageData.playerSpecific ?: return
         if (ReminderUtils.isBusy()) return
 
-        if (SkyBlockUtils.graphArea == "Community Center") return
+        if (AreaType.COMMUNITY_CENTER.isInArea()) return
 
         playerSpecific.nextCityProjectParticipationTime.let {
             if (it.isFarPast() || it.isInFuture()) return

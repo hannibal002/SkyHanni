@@ -158,16 +158,6 @@ object IslandGraphs {
 
     private val patternGroup = RepoPattern.group("data.island.navigation")
 
-    /**
-     * REGEX-TEST: Dwarven Base Camp
-     * REGEX-FAIL: Forge
-     * REGEX-TEST: Fossil Research Center
-     */
-    private val glaciteTunnelsPattern by patternGroup.pattern(
-        "glacitetunnels",
-        "Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center",
-    )
-
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
@@ -193,17 +183,18 @@ object IslandGraphs {
         resetNavigation()
     }
 
-    private fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
+    private fun isGlaciteTunnelsArea(area: AreaType): Boolean = AreaTypeTag.GLACITE_TUNNELS.isInScoreboardArea()
 
-    @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    @HandleEvent()
+    fun onScoreboardAreaChange(event: ScoreboardAreaChangeEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) {
             inGlaciteTunnels = null
             return
         }
 
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        val now = isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)
+        val area = AreaType.getByNameOrNull(event.area) ?: return
+        val now = isGlaciteTunnelsArea(area)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -214,9 +205,9 @@ object IslandGraphs {
         reloadFromJson(lobby)
     }
 
-    private fun loadDwarvenMines() {
+    private fun loadDwarvenMines(area: AreaType = AreaType.currentScoreboardArea) {
         // can not use IslandAreas for area detection here. It HAS TO be the scoreboard
-        if (isGlaciteTunnelsArea(SkyBlockUtils.scoreboardArea)) {
+        if (isGlaciteTunnelsArea(area)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
@@ -654,7 +645,7 @@ object IslandGraphs {
         data["island"] = island
         data["reported location"] = "/shtestwaypoint ${location.toLocalFormat()} pathfind"
         if (graphArea != scoreboardArea) {
-            data["area graph"] = graphArea.orEmpty()
+            data["area graph"] = graphArea ?: "unknown"
             data["area scoreboard"] = scoreboardArea
         }
 

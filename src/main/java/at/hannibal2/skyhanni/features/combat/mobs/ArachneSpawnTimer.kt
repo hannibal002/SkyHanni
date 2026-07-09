@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -107,5 +108,5 @@ object ArachneSpawnTimer {
     }
 
     fun isEnabled() =
-        IslandType.SPIDER_DEN.isInIsland() && SkyBlockUtils.graphArea == "Arachne's Sanctuary" && config.showArachneSpawnTimer
+        IslandType.SPIDER_DEN.isInIsland() && AreaType.ARACHNES_SANCTUARY.isInArea() && config.showArachneSpawnTimer
 }

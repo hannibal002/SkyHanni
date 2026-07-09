@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -123,8 +124,8 @@ object QuestLoader {
 
     @Suppress("HandleEventInspection")
     fun checkInventory(event: InventoryFullyOpenedEvent) {
-        val inMageRegion = SkyBlockUtils.graphArea == "Community Center"
-        val inBarbarianRegion = SkyBlockUtils.graphArea == "Dragontail"
+        val inMageRegion = AreaType.COMMUNITY_CENTER.isInArea()
+        val inBarbarianRegion = AreaType.DRAGONTAIL.isInArea()
         if (!inMageRegion && !inBarbarianRegion) return
 
         val name = event.inventoryName

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isBait
@@ -69,10 +70,10 @@ object ShowFishingItemName {
 
     private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isInIsland()) {
-            SkyBlockUtils.graphArea?.let {
-                if (it.endsWith(" Atrium") || it.endsWith(" Museum")) return false
-                if (it == "Fashion Shop" || it == "Shen's Auction") return false
-            }
+            val area = SkyBlockUtils.area
+            val areaName = area.displayName
+            if (areaName.endsWith(" Atrium") || areaName.endsWith(" Museum")) return false
+            if (area == AreaType.FASHION_SHOP || area == AreaType.SHENS_AUCTION) return false
         }
         return !(IslandType.THE_END.isInIsland())
     }

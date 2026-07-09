@@ -294,41 +294,42 @@ object SlayerApi {
             }
         }
     }
+    private fun checkTypeForCurrentArea(): Type? {
+        val area = SkyBlockUtils.area
 
-    // TODO USE SH-REPO
-    private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
-        "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
-        "Revenant Cave" -> Type.REVENANT
+        return when {
+            AreaTypeTag.REVENANT.contains(area) -> {
+                if (AreaType.REVENANT_CAVE.isInArea()) {
+                    Type.REVENANT
+                } else if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) {
+                    Type.REVENANT
+                } else {
+                    null
+                }
+            }
+            AreaTypeTag.TARANTULA.contains(area) -> Type.TARANTULA
 
-        "Spider Mound",
-        "Arachne's Burrow",
-        "Arachne's Sanctuary",
-        "Burning Desert",
-        -> Type.TARANTULA
+            AreaTypeTag.SVEN.contains(area) -> Type.SVEN
 
-        "Ruins",
-        "Howling Cave",
-        "Soul Cave",
-        "Spirit Cave",
-        -> Type.SVEN
+            AreaTypeTag.VOID.contains(area) -> when {
+                AreaType.VOID_SEPULTURE.isInArea() ||
+                    AreaType.ZEALOT_BRUISER_HIDEOUT.isInArea() -> Type.VOID
 
-        "Void Sepulture",
-        "Zealot Bruiser Hideout",
-        -> Type.VOID
+                AreaType.DRAGONS_NEST.isInArea() ->
+                    if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
-        "Dragon's Nest" -> if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
-        AreaNode.NO_AREA -> if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
+                AreaType.NONE.isInArea() ->
+                    if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
-        "Stronghold",
-        "The Wasteland", // TODO check if we can remove this
-        "Smoldering Tomb",
-        -> Type.INFERNO
+                else -> null
+            }
 
-        "Stillgore Château",
-        "Oubliette",
-        -> Type.VAMPIRE
+            AreaTypeTag.INFERNO.contains(area) -> Type.INFERNO
 
-        else -> null
+            AreaTypeTag.VAMPIRE.contains(area) -> Type.VAMPIRE
+
+            else -> null
+        }
     }
 
     private enum class SlayerLinesSource {

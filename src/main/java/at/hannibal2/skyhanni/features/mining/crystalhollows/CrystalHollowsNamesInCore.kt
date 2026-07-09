@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -27,8 +29,8 @@ object CrystalHollowsNamesInCore {
     private var inNucleus = false
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inNucleus = event.area == "Crystal Nucleus"
+    fun onAreaChange(event: AreaChangeEvent) {
+        inNucleus = event.area == AreaType.CRYSTAL_NUCLEUS
         update()
     }
 

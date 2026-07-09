@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.AreaTypeTag
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.Graph
@@ -534,9 +535,6 @@ object TunnelsMaps {
         setNextGoal()
     }
 
-    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
-
     private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && config.enable &&
-            (SkyBlockUtils.graphArea in areas || SkyBlockUtils.scoreboardArea in areas)
+        IslandType.DWARVEN_MINES.isInIsland() && config.enable && AreaTypeTag.GLACITE_TUNNELS.isInArea()
 }

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fame
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -84,7 +85,7 @@ object UpgradeReminder {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (ReminderUtils.isBusy()) return
-        if (inInventory || SkyBlockUtils.graphArea == "Community Center") return
+        if (inInventory || AreaType.COMMUNITY_CENTER.isInArea()) return
         if (lastReminderSend.passedSince() < 30.seconds) return
 
         currentProfileUpgrade?.sendReminderIfClaimable()

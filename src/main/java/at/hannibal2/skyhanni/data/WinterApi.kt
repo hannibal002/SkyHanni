@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -33,7 +34,7 @@ object WinterApi {
     fun isDecember() = TimeUtils.getCurrentLocalDate().month == Month.DECEMBER
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "Glacial Cave"
+    fun onAreaChange(event: AreaChangeEvent) {
+        inArea = event.area == AreaType.GLACIAL_CAVE
     }
 }

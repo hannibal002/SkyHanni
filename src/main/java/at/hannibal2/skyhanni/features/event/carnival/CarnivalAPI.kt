@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.event.carnival
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.MayorChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
@@ -19,8 +21,8 @@ object CarnivalAPI {
     private var isAreaHidden = false
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "Carnival"
+    fun onAreaChange(event: AreaChangeEvent) {
+        inArea = event.area == AreaType.CARNIVAL
     }
 
     @HandleEvent(MayorChangeEvent::class, onlyOnIsland = IslandType.HUB)

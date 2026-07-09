@@ -92,7 +92,7 @@ object FrogMaskFeatures {
 
     private fun handleWarning(helmetRegion: String) {
         if (!IslandType.THE_PARK.isInIsland()) return
-        val inWrongArea = SkyBlockUtils.graphArea != helmetRegion.removeColor()
+        val inWrongArea = SkyBlockUtils.area.displayName != helmetRegion.removeColor()
         val timeToWarn = lastWarning.passedSince() > config.warning.cooldown.seconds
 
         if (!inWrongArea || !timeToWarn) return

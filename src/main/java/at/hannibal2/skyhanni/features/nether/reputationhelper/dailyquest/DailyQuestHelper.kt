@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.CrimsonIsleReputationApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -140,7 +141,7 @@ object DailyQuestHelper {
         val chestName = InventoryUtils.openInventoryName()
 
         if (chestName == "Challenges") {
-            if (SkyBlockUtils.graphArea != "Dojo") return
+            if (!AreaType.DOJO.isInArea()) return
             val dojoQuest = getQuest<DojoQuest>() ?: return
             if (dojoQuest.state != QuestState.ACCEPTED) return
 

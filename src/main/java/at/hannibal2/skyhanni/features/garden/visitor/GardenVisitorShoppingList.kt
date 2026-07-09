@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.ItemBuyApi.buy
 import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
@@ -357,10 +358,10 @@ object GardenVisitorShoppingList {
 
     private fun showGui(): Boolean {
         if (IslandType.HUB.isInIsland()) {
-            if (config.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
+            if (config.inBazaarAlley && AreaType.BAZAAR_ALLEY.isInArea()) {
                 return true
             }
-            if (config.inFarmingAreas && SkyBlockUtils.graphArea == "Farm") {
+            if (config.inFarmingAreas && AreaType.FARM.isInArea()) {
                 return true
             }
         }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
@@ -46,28 +44,14 @@ object MiningApi {
     private val group = RepoPattern.group("data.miningapi")
 
     /**
-     * REGEX-TEST: Glacite Tunnels
-     * REGEX-TEST: Great Glacite Lake
-     */
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
-    private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
-
-    /**
-     * REGEX-TEST: Mines of Divan
-     */
-    private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
-
-    /**
-     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
+     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
-    @Suppress("MaxLineLength")
     private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
-    // This intentionally uses the old heat icon, since hypixel
     /**
      * REGEX-TEST: Heat: §6IMMUNE
      * REGEX-TEST: Heat: §c14♨
@@ -78,7 +62,6 @@ object MiningApi {
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
-    // This intentionally uses the old cold icon, since hypixel
     /**
      * REGEX-TEST: Cold: §b-1❄
      */
@@ -199,17 +182,17 @@ object MiningApi {
 
     fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
-    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
+    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && AreaType.DWARVEN_BASE_CAMP.isInArea()
 
     fun inRegularDwarven() = IslandType.DWARVEN_MINES.isInIsland() && !inGlacialTunnels()
 
     fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
-    fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
+    fun inMinesOfDivan() = inCrystalHollows() && AreaType.MINES_OF_DIVAN.isInArea()
 
     fun inMineshaft() = IslandType.MINESHAFT.isInIsland()
 
-    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && AreaType.GLACITE_TUNNELS.isInArea() || AreaType.GREAT_GLACITE_LAKE.isInArea()
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -54,9 +55,7 @@ object DragonFightAPI {
         "Your Damage: (?<damage>[\\d.,]+)",
     )
 
-    private val nestAreaPattern by group.pattern("area.nest", "Dragon's Nest")
-
-    fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inNestArea() = IslandType.THE_END.isInIsland() && AreaType.DRAGONS_NEST.isInArea()
 
     @HandleEvent
     fun onChat(event: SystemMessageEvent.Allow) {

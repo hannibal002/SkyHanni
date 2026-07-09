@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
@@ -94,7 +95,7 @@ object DeepCavernsGuide {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
-        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
+        if (!AreaType.GUNPOWDER_MINES.isInArea()) return
         if (notUnlockedPattern.matches(event.message)) {
             DelayedRun.runNextTick {
                 start()
@@ -107,11 +108,11 @@ object DeepCavernsGuide {
         showStartIcon = false
         if (!isEnabled()) return
         if (event.inventoryName != "Lift") return
-        if (SkyBlockUtils.graphArea != "Gunpowder Mines") return
+        if (!AreaType.GUNPOWDER_MINES.isInArea()) return
         showStartIcon = true
 
         event.inventoryItems[31]?.let {
-            if (it.hoverName.string != "Obsidian Sanctuary") {
+            if (it.hoverName.string != AreaType.OBSIDIAN_SANCTUARY.displayName) {
                 start()
             }
         }

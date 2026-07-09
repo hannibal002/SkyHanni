@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.DungeonStorage.DungeonRunInfo
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
@@ -261,7 +262,7 @@ object CroesusChestTracker {
 
     private fun shouldRenderCroesus(): Boolean = when {
         config.croesusOverlayKuudra && KuudraApi.inKuudra -> true
-        config.croesusOverlay && (SkyBlockUtils.graphArea == "Forgotten Skull" || isInDH()) -> true
+        config.croesusOverlay && (AreaType.FORGOTTEN_SKULL.isInArea() || isInDH()) -> true
         config.croesusOverlayDungeons && inDungeon() -> true
         else -> false
     }

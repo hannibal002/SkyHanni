@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -43,7 +44,7 @@ object BlobbercystsHighlight {
         }
     }
 
-    fun isEnabled() = RiftApi.inRift() && config.highlightBlobbercysts && SkyBlockUtils.graphArea == "Colosseum"
+    fun isEnabled() = RiftApi.inRift() && config.highlightBlobbercysts && AreaType.COLOSSEUM.isInArea()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

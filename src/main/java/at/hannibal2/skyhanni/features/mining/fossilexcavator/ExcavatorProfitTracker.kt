@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -214,7 +215,7 @@ object ExcavatorProfitTracker {
         }
     }
 
-    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && SkyBlockUtils.graphArea == "Fossil Research Center"
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && AreaType.FOSSIL_RESEARCH_CENTER.isInArea()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

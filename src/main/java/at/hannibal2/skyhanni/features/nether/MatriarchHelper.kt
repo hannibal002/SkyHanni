@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
-import at.hannibal2.skyhanni.events.IslandGraphReloadEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 import at.hannibal2.skyhanni.utils.render.LineDrawer
@@ -37,7 +36,6 @@ object MatriarchHelper {
     }
 
     private const val EXIT_LABEL = "Heavy Pearls"
-    private const val AREA_NAME = "Belly of the Beast"
 
     private val exitNodeLazy = { IslandGraphs.currentIslandGraph?.getNodesWithName(EXIT_LABEL)?.firstOrNull()?.also { exitNode == it } }
     private var exitNode: GraphNode? = null
@@ -100,7 +98,7 @@ object MatriarchHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onTick() {
-        if (SkyBlockUtils.graphArea != AREA_NAME) return
+        if (AreaType.BELLY_OF_THE_BEAST.isInGraphArea()) return
         path.clear()
         path.addAll(accessPearls())
         val exitNode = exitNode ?: exitNodeLazy() ?: return
@@ -109,9 +107,9 @@ object MatriarchHelper {
         path.addAll(GraphUtils.findShortestPath(endNode, exitNode).drop(1).map { it.blockCenter() })
     }
 
-    @HandleEvent(GraphAreaChangeEvent::class, onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGraphAreaChange() {
-        if (SkyBlockUtils.graphArea != AREA_NAME) {
+    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    fun onGraphAreaChange(event: GraphAreaChangeEvent) {
+        if (AreaType.BELLY_OF_THE_BEAST.isInArea(event.area)) {
             tspCache = null
             lastTspPearls = 0
             path.clear()
@@ -146,7 +144,7 @@ object MatriarchHelper {
         }
     }
 
-    @HandleEvent(IslandGraphReloadEvent::class)
+    @HandleEvent
     fun onIslandGraphReload() {
         exitNode = null
     }

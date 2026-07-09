@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.rift
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.rift.RiftConfig
+import at.hannibal2.skyhanni.data.AreaType
+import at.hannibal2.skyhanni.data.AreaTypeTag
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -102,17 +104,11 @@ object RiftApi {
     }
 
     // TODO use graph area for all those
-    fun inLivingCave() = SkyBlockUtils.scoreboardArea == "Living Cave"
-    fun inLivingStillness() = SkyBlockUtils.scoreboardArea == "Living Stillness"
-    fun inStillgoreChateau() = SkyBlockUtils.scoreboardArea.let { it == "Stillgore Château" || it == "Oubliette" }
-    fun inColosseum() = SkyBlockUtils.scoreboardArea == "Colosseum" || inColosseum
-    fun inDreadfarm() = SkyBlockUtils.scoreboardArea == "Dreadfarm"
-    fun inWestVillage() = SkyBlockUtils.scoreboardArea.let { it == "West Village" || it == "Infested House" }
-    fun inMountainTop() = when (SkyBlockUtils.scoreboardArea) {
-        "Continuum", "The Mountaintop", "Trial Grounds", "Time-Torn Isles",
-        "Wizardman Bureau", "Wizard Brawl", "Walk of Fame", "Time Chamber",
-        -> true
-
-        else -> false
-    }
+    fun inLivingCave() = AreaType.LIVING_CAVE.isInArea()
+    fun inLivingStillness() = AreaType.LIVING_STILLNESS.isInArea()
+    fun inStillgoreChateau() = AreaTypeTag.STILLGORE.isInArea()
+    fun inColosseum() = AreaType.COLOSSEUM.isInArea() || inColosseum
+    fun inDreadfarm() = AreaType.DREADFARM.isInArea()
+    fun inWestVillage() = AreaTypeTag.WEST_VILLAGE.isInArea()
+    fun inMountainTop() = AreaTypeTag.MOUNTAINTOP.isInArea()
 }

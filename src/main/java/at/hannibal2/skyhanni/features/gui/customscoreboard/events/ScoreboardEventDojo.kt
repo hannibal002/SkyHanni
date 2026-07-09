@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
+import at.hannibal2.skyhanni.data.AreaTypeTag
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSBLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
@@ -12,7 +13,7 @@ object ScoreboardEventDojo : ScoreboardEvent() {
 
     override fun getDisplay() = elementPatterns.allMatches(getSBLines())
 
-    override fun showWhen() = SkyBlockUtils.graphArea in listOf("Dojo", "Dojo Arena")
+    override fun showWhen() = AreaTypeTag.DOJO.isInArea()
 
     override val configLine = "§7(All Dojo Lines)"
 

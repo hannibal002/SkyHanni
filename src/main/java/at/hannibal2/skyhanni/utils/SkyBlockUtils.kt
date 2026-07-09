@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.misc.pathfind.IslandAreaBackend
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
@@ -25,11 +27,25 @@ object SkyBlockUtils {
      */
     val currentIsland get() = SkyBlockIslandTest.testIsland ?: HypixelLocationApi.island
 
-    // almost always prefer this over scoreboardArea
-    val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea else null
+    /**
+     * Consider using [AreaType.isInGraphArea] instead
+     */
+    val graphArea get() =
+        if (inSkyBlock) {
+            IslandAreaBackend.currentArea
+                .takeUnless { it == AreaNode.NO_AREA }
+                ?.let { AreaType.getByNameOrNull(it) }
+        } else null
 
-    // Only use scoreboardArea if graph data is not usable in this scenario.
-    val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
+    /**
+     * Consider using [AreaType.isInScoreboardArea] instead
+     */
+    val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea?.let { AreaType.getByNameOrNull(it) } else null
+
+    /**
+     * Consider using [AreaType.isInArea] instead
+     */
+    val area: AreaType get() = (graphArea ?: scoreboardArea) ?: AreaType.UNKNOWN
 
     val noTradeMode get() = HypixelData.noTrade
 

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -66,7 +67,7 @@ object ArachneChatMessageHider {
             return true
         }
 
-        if (SkyBlockUtils.graphArea == "Arachne's Sanctuary") return false
+        if (AreaType.ARACHNES_SANCTUARY.isInArea()) return false
 
         arachneCallingPattern.matchMatcher(message) {
             return true

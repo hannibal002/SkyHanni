@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.BeltsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -97,5 +98,5 @@ object DojoRankDisplay {
     }
 
     private fun isEnabled() =
-        IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Dojo" && config.showDojoRankDisplay
+        IslandType.CRIMSON_ISLE.isInIsland() && AreaType.DOJO.isInArea() && config.showDojoRankDisplay
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.SlayerApi.ActiveQuestState
@@ -94,7 +95,7 @@ object SlayerQuestWarning {
         // workaround for rift mob that is unrelated to slayer
         if (entity.name.string == "Oubliette Guard") return false
         // workaround for Bladesoul in Crimson Isle
-        if (SkyBlockUtils.scoreboardArea == "Stronghold" && entity.name.string == "Skeleton") return false
+        if (AreaType.STRONGHOLD.isInArea() && entity.name.string == "Skeleton") return false
 
         val isSlayer = slayerType.clazz.isInstance(entity)
         if (!isSlayer) return false

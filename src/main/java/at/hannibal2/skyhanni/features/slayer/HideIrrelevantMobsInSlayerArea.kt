@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.entity.EntityTransparencyActiveEvent
@@ -38,7 +39,7 @@ object HideIrrelevantMobsInSlayerArea {
     enum class IrrelevantMob(val mobNames: Set<String>, val isInArea: () -> Boolean) {
         CRIMSON_MAGMA_CUBE(
             mobNames = setOf("Magma Cube", "Magma Cube Rider"),
-            isInArea = { IslandType.CRIMSON_ISLE.isInIsland() && SkyBlockUtils.graphArea == "Burning Desert" },
+            isInArea = { IslandType.CRIMSON_ISLE.isInIsland() && AreaType.BURNING_DESERT.isInArea() },
         ),
     }
 

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -23,6 +24,7 @@ import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
+import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -318,8 +320,8 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
+    fun onAreaChange(event: AreaChangeEvent) {
+        inArea = event.area == AreaType.THE_MIST && IslandType.DWARVEN_MINES.isInIsland()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 

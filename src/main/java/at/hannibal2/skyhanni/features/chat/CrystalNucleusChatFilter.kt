@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
+import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -308,6 +309,6 @@ object CrystalNucleusChatFilter {
     }
 
     private fun shouldBlock(type: CrystalNucleusMessageTypes) = config.modifiedMessages.contains(type)
-    private fun inNucleus() = SkyBlockUtils.graphArea == "Crystal Nucleus"
+    private fun inNucleus() = AreaType.CRYSTAL_NUCLEUS.isInArea()
     private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
