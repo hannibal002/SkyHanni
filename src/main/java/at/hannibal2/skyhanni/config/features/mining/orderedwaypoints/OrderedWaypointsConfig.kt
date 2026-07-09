@@ -13,7 +13,7 @@ class OrderedWaypointsConfig {
 
     @ConfigOption(name = "Credits", desc = "This feature is from Coleweight and SoopyV2, huge thanks to them!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Enable Ordered Waypoints", desc = "Enables ordered waypoints.")

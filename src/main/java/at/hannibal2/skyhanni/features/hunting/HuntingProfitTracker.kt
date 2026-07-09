@@ -114,7 +114,7 @@ object HuntingProfitTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { isEnabled() && config.enabled && (isRecentPickup || heldItemEnabled()) },
+            condition = { isEnabled() && config.enabled && (config.alwaysShow || isRecentPickup || heldItemEnabled()) },
             onRender = {
                 tracker.renderDisplay(config.position)
             },
