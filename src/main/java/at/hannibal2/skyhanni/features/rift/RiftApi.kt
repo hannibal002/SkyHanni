@@ -102,7 +102,6 @@ object RiftApi {
 
     }
 
-    // TODO use graph area for all those
     fun inLivingCave() = AreaType.LIVING_CAVE.isInArea()
     fun inLivingStillness() = AreaType.LIVING_STILLNESS.isInArea()
     fun inStillgoreChateau() = AreaTypeTag.STILLGORE.isInArea()
