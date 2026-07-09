@@ -210,7 +210,7 @@ object SeaCreatureTracker {
     }
 
     private fun inDisabledArea() = SkyBlockUtils.currentIsland in excludedIslands ||
-        SkyBlockUtils.graphArea?.displayName in excludedGraphAreas
+        SkyBlockUtils.graphArea in excludedGraphAreas
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {

@@ -79,8 +79,19 @@ enum class AreaTypeTag(vararg types: Any) {
     ;
 
     fun isInArea(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.area)
-    fun isInScoreboardArea(): Boolean = SkyBlockUtils.inSkyBlock && SkyBlockUtils.scoreboardArea?.let { contains(it) } ?: false
-    fun isInGraphAreas(): Boolean = SkyBlockUtils.inSkyBlock && SkyBlockUtils.graphArea?.let { contains(it) } ?: false
+    fun isInScoreboardArea(): Boolean {
+        if (!SkyBlockUtils.inSkyBlock) return false
+        val scoreboardArea = SkyBlockUtils.scoreboardArea ?: return false
+        val areaType = AreaType.getByNameOrUnknown(scoreboardArea)
+        return contains(areaType)
+    }
+
+    fun isInGraphArea(): Boolean {
+        if (!SkyBlockUtils.inSkyBlock) return false
+        val graphArea = SkyBlockUtils.graphArea ?: return false
+        val areaType = AreaType.getByNameOrUnknown(graphArea)
+        return contains(areaType)
+    }
 
     private val types: EnumSet<AreaType> = types.fold(
         EnumSet.noneOf(AreaType::class.java),

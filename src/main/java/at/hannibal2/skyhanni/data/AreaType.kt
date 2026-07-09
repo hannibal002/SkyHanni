@@ -76,8 +76,8 @@ enum class AreaType(private val nameFallback: String) {
 
     val displayName: String get() = nameFallback
 
-    fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == this
-    fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == this
+    fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == nameFallback
+    fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == nameFallback
     fun isInArea(): Boolean = SkyBlockUtils.area == this
     fun isInArea(area: String): Boolean {
         return getByNameOrUnknown(area) == this
@@ -87,8 +87,8 @@ enum class AreaType(private val nameFallback: String) {
     companion object {
         private var currentArea = NONE
 
-        val currentScoreboardArea get() = SkyBlockUtils.scoreboardArea ?: UNKNOWN
-        val currentGraphArea get() = SkyBlockUtils.graphArea ?: UNKNOWN
+        val currentScoreboardArea get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
+        val currentGraphArea get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
         fun onGraphAreaChange(event: GraphAreaChangeEvent) {

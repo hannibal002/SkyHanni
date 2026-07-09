@@ -30,22 +30,17 @@ object SkyBlockUtils {
     /**
      * Consider using [AreaType.isInGraphArea] instead
      */
-    val graphArea get() =
-        if (inSkyBlock) {
-            IslandAreaBackend.currentArea
-                .takeUnless { it == AreaNode.NO_AREA }
-                ?.let { AreaType.getByNameOrNull(it) }
-        } else null
+    val graphArea get() = if (inSkyBlock) IslandAreaBackend.currentArea.takeUnless { it == AreaNode.NO_AREA } else null
 
     /**
      * Consider using [AreaType.isInScoreboardArea] instead
      */
-    val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea?.let { AreaType.getByNameOrNull(it) } else null
+    val scoreboardArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
     /**
      * Consider using [AreaType.isInArea] instead
      */
-    val area: AreaType get() = (graphArea ?: scoreboardArea) ?: AreaType.UNKNOWN
+    val area: AreaType get() = (graphArea ?: scoreboardArea)?.let { AreaType.getByNameOrUnknown(it) } ?: AreaType.UNKNOWN
 
     val noTradeMode get() = HypixelData.noTrade
 
