@@ -97,7 +97,7 @@ enum class AreaType(private val nameFallback: String) {
 
         fun getByName(name: String): AreaType = getByNameOrNull(name) ?: error("AreaType not found: '$name'")
         fun getByNameOrUnknown(name: String): AreaType = getByNameOrNull(name) ?: UNKNOWN
-        fun getByNameOrNull(name: String): AreaType? = AreaType.entries.find { it.nameFallback == name }
+        fun getByNameOrNull(name: String): AreaType? = AreaType.entries.find { it.displayName == name }
 
         val currentScoreboardArea get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
         val currentGraphArea get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
