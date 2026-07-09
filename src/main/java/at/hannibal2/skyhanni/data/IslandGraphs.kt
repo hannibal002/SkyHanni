@@ -639,7 +639,7 @@ object IslandGraphs {
         data["island"] = island
         data["reported location"] = "/shtestwaypoint ${location.toLocalFormat()} pathfind"
         if (graphArea != scoreboardArea) {
-            data["area graph"] = graphArea ?: "unknown"
+            data["area graph"] = graphArea.orEmpty()
             data["area scoreboard"] = scoreboardArea
         }
 
