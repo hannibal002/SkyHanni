@@ -78,10 +78,13 @@ public abstract class MixinHud {
     }
 
     @WrapOperation(
+        //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations'
         method = "extractHotbarAndDecorations",
         at = @At(value = "INVOKE",
+            //~ if < 26.1 'extractBackground' -> 'renderBackground' {
             //~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+            //~}
         )
     )
     public void renderExperienceBar(
@@ -97,11 +100,14 @@ public abstract class MixinHud {
     }
 
     @WrapOperation(
+        //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations'
         method = "extractHotbarAndDecorations",
         at = @At(
             value = "INVOKE",
+            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
             //~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
+            //~}
         )
     )
     public void renderExperienceLevel(
