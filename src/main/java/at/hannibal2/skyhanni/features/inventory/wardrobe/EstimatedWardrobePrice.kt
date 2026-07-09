@@ -4,12 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
-import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.minecraft.addAll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -19,9 +19,13 @@ object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
+    /**
+     * REGEX-TEST: Click to equip!
+     * REGEX-TEST: Click to unequip!
+     */
     private val clickToEquipPattern by RepoPattern.pattern(
         "inventory.wardrobe.clicktoequip",
-        "Click to (un)equip!"
+        "Click to (?:un)?equip!"
     )
 
     @HandleEvent
@@ -59,7 +63,7 @@ object EstimatedWardrobePrice {
     }
 
     private fun getClickToEquipIndex(tooltip: MutableList<Component>): Int? =
-        tooltip.indexOfFirstOrNull { clickToEquipPattern.matches(it) }
+        tooltip.indexOfFirstOrNull { clickToEquipPattern.matches(it.string.removeColor()) }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
         (config.armor && WardrobeApi.inWardrobe()) || (config.equipment && WardrobeApi.inEquipmentWardrobe()) &&
