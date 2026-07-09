@@ -129,8 +129,7 @@ object EffectApi {
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
-    // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
-    // TODO: Move these to repo
+    // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
