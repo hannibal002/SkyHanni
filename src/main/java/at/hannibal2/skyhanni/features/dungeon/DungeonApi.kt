@@ -56,7 +56,7 @@ object DungeonApi {
      * REGEX-TEST: Your Mage stats are doubled because you are the only player using this class!
      */
     private val uniqueClassBonus by patternGroup.pattern(
-        "unique_class_bonus",
+        "unique-class-bonus",
         "^Your (?<class>[A-Za-z]+) stats are doubled because you are the only player using this class!$",
     )
 
@@ -88,7 +88,7 @@ object DungeonApi {
      * REGEX-TEST: Total Kills: 123
      */
     private val totalKillsPattern by patternGroup.pattern(
-        "total_kills",
+        "total-kills",
         "Total Kills: (?<kills>.*)",
     )
 
