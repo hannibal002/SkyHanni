@@ -137,7 +137,7 @@ enum class NonGodPotEffect(
     PEST_REPELLENT(
         "Pest Repellent I",
         displayName = "§6Pest Repellent I§r",
-        effectGainedMessage = "§a§lYUMiuahisuf! §r§2 Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!",
+        effectGainedMessage = "§a§lYUM! §r§2 Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -203,12 +203,12 @@ enum class NonGodPotEffect(
     val effectGainedPattern by NullableRepoPatternDelegate(
         effectGainedMessage?.let {
             RepoPattern.pattern("misc.nongodpot.effects.gained.$patternName", it)
-        }
+        },
     )
 
     val effectRemovedPattern by NullableRepoPatternDelegate(
         effectRemovedMessage?.let {
             RepoPattern.pattern("misc.nongodpot.effects.removed.$patternName", it)
-        }
+        },
     )
 }

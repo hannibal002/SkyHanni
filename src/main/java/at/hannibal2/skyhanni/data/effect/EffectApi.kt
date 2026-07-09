@@ -157,8 +157,7 @@ object EffectApi {
                 return
             }
 
-            val gainedPattern = effect.effectGainedPattern ?: continue
-            if (gainedPattern.pattern() != modifiedMessage) continue
+            if (effect.effectGainedPattern?.pattern() != modifiedMessage) continue
             val changeType = effect.effectChangeType ?: continue
             val duration = effect.effectDuration ?: continue
 
