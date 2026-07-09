@@ -42,7 +42,7 @@ enum class SkyblockStat(
     TRUE_DEFENSE(WHITE, '\uE027'),
     STRENGTH(RED, '\uE00D'),
     CRIT_CHANCE(DARK_BLUE, '\uE02C', hypixelId = "CRITICAL_CHANCE"),
-    CRIT_DAMAGE(DARK_BLUE, '\uE007'),
+    CRIT_DAMAGE(DARK_BLUE, '\uE007', hypixelId = "CRITICAL_DAMAGE"),
     BONUS_ATTACK_SPEED(YELLOW, '\uE001', displayName = "Attack Speed", hypixelId = "ATTACK_SPEED"),
     FEROCITY(RED, '\uE00B'),
     SWING_RANGE(YELLOW, '\uE024'),
