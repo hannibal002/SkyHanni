@@ -174,7 +174,7 @@ object LoadoutApi {
             if (icon?.isDye(DyeCompat.RED) == true) {
                 slot.getData()?.clear()
                 slot.locked = true
-            }
+            } else slot.locked = false
             if (icon.isCurrentSelectedLoadout()) {
                 currentSlot = slot.id
                 anyLoadoutEquipped = true
