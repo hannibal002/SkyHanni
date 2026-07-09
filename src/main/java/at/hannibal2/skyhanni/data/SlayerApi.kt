@@ -293,7 +293,7 @@ object SlayerApi {
         }
     }
     private fun checkTypeForCurrentArea(): Type? {
-        if (IslandType.THE_END.isInIsland() && trackerConfig.voidgloomInNoArea.get()) return Type.VOID
+        if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) return Type.VOID
 
         val area = SkyBlockUtils.area
         return when {
