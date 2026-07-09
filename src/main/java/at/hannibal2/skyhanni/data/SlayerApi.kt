@@ -277,7 +277,7 @@ object SlayerApi {
         else -> ActiveQuestState.NO_ACTIVE_QUEST
     }
 
-    @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onAreaChange() {
         currentAreaType = checkTypeForCurrentArea()
         updateArea()
@@ -296,27 +296,26 @@ object SlayerApi {
         val area = SkyBlockUtils.area
 
         return when {
-            AreaTypeTag.REVENANT.contains(area) -> {
-                if (AreaType.REVENANT_CAVE.isInArea()) {
-                    Type.REVENANT
-                } else if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) {
+            AreaTypeTag.REVENANT.contains(area) -> when (area) {
+                AreaType.GRAVEYARD -> if (IslandType.HUB.isInIsland() && trackerConfig.revenantInGraveyard.get()) {
                     Type.REVENANT
                 } else {
                     null
                 }
+
+                else -> Type.REVENANT
             }
+
             AreaTypeTag.TARANTULA.contains(area) -> Type.TARANTULA
 
             AreaTypeTag.SVEN.contains(area) -> Type.SVEN
 
-            AreaTypeTag.VOID.contains(area) -> when {
-                AreaType.VOID_SEPULTURE.isInArea() ||
-                    AreaType.ZEALOT_BRUISER_HIDEOUT.isInArea() -> Type.VOID
-
-                AreaType.DRAGONS_NEST.isInArea() ->
+            AreaTypeTag.VOID.contains(area) -> when (area) {
+                AreaType.VOID_SEPULTURE, AreaType.ZEALOT_BRUISER_HIDEOUT -> Type.VOID
+                AreaType.DRAGONS_NEST ->
                     if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
-                AreaType.NONE.isInArea() ->
+                AreaType.NONE ->
                     if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
                 else -> null
