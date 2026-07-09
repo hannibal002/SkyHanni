@@ -108,8 +108,8 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGraphAreaChange(event: GraphAreaChangeEvent) {
-        if (AreaType.BELLY_OF_THE_BEAST.isInArea(event.area)) {
+    fun onGraphAreaChange() {
+        if (AreaType.BELLY_OF_THE_BEAST.isInGraphArea()) {
             tspCache = null
             lastTspPearls = 0
             path.clear()

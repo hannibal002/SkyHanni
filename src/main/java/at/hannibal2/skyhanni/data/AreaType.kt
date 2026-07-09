@@ -87,9 +87,6 @@ enum class AreaType(private val nameFallback: String) {
     fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == nameFallback
     fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == nameFallback
     fun isInArea(): Boolean = SkyBlockUtils.area == this
-    fun isInArea(area: String): Boolean {
-        return getByNameOrUnknown(area) == this
-    }
 
     @SkyHanniModule
     companion object {
