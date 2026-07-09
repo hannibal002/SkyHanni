@@ -71,7 +71,7 @@ object RepoPatternManager {
         }
 
     private val localLoading: Boolean
-        get() = config.forceLocal.get() /* || (!insideTest && PlatformUtils.isDevEnvironment) */ || SkyHanniRepoManager.isUsingBackup
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || SkyHanniRepoManager.isUsingBackup
 
     private val logger = LogManager.getLogger("SkyHanni")
 
