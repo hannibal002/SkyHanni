@@ -19,7 +19,9 @@ open class SkyHanniLogger(filePath: String) {
 
     companion object {
         private var deletedExpired = false
-        val fullFormat = SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
+        private val fullFormat by lazy {
+            SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
+        }
     }
 
     @Suppress("PrintStackTrace")
