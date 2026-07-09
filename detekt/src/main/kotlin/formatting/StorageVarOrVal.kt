@@ -47,16 +47,7 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
     override fun visitProperty(property: KtProperty) {
         if (!property.doWeNeedToCheckConfigProp()) return
 
-        val shouldBeVar = analyze(property) {
-            val type = property.returnType
-            val classId = (type as? KaClassType)?.classId
-            classId in PRIMITIVE_CLASS_IDS ||
-                classId == StandardClassIds.String ||
-                type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
-                classId == CHROMA_COLOUR_CLASS_ID
-        }
-
-        val expected = if (shouldBeVar) StorageType.VAR else StorageType.VAL
+        val expected = if (shouldBeVar(property)) StorageType.VAR else StorageType.VAL
         val actual = if (property.isVar) StorageType.VAR else StorageType.VAL
 
         if (actual != expected) return property.reportIssue(
@@ -64,5 +55,17 @@ class StorageVarOrVal(config: Config) : RequiresAnalysisApi, SkyHanniRule(
         )
 
         super.visitProperty(property)
+    }
+
+    private fun shouldBeVar(property: KtProperty): Boolean {
+        val isInfoText = property.annotationEntries.any { it.shortName?.asString() == "ConfigEditorInfoText" }
+        return !isInfoText && analyze(property) {
+            val type = property.returnType
+            val classId = (type as? KaClassType)?.classId
+            classId in PRIMITIVE_CLASS_IDS ||
+                classId == StandardClassIds.String ||
+                type.expandedSymbol?.classKind == KaClassKind.ENUM_CLASS ||
+                classId == CHROMA_COLOUR_CLASS_ID
+        }
     }
 }

@@ -7,9 +7,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.input.MouseButtonInfo
 import kotlin.math.sign
 
+/**
+ * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
+ * This class should be used in utils/data/api classes and not in feature classes.
+ */
 object MouseCompat {
 
-    private const val NUMBER_OF_MOUSE_BUTTONS = 6
+    const val NUMBER_OF_MOUSE_BUTTONS = 6
 
     @JvmStatic
     var deltaMouseX = 0.0

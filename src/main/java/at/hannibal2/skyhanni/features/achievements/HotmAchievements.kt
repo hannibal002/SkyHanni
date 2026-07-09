@@ -18,10 +18,10 @@ object HotmAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Have 4 Pickaxe Abilities unlocked".asComponent(),
-            "Jack of all Abilities, master of none".asComponent(),
-            4f,
-            true,
+            name = "Have 4 Pickaxe Abilities unlocked".asComponent(),
+            description = "Jack of all Abilities, master of none".asComponent(),
+            userLuckAmount = 4f,
+            secret = true,
         )
         event.register(achievement, PICKAXE_ABILITY_ACHIEVEMENT)
     }
