@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.data.jsonobjects.repo.AreaTypeJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 
 // TODO: Repofiy
 enum class AreaType(private val nameFallback: String) {
@@ -74,7 +79,10 @@ enum class AreaType(private val nameFallback: String) {
     UNKNOWN("???"),
     ;
 
-    val displayName: String get() = nameFallback
+    var areaData: AreaData? = null
+        private set
+
+    val displayName: String get() = areaData?.name ?: nameFallback
 
     fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == nameFallback
     fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == nameFallback
@@ -87,10 +95,16 @@ enum class AreaType(private val nameFallback: String) {
     companion object {
         private var currentArea = NONE
 
+        fun getByName(name: String): AreaType = getByNameOrNull(name) ?: error("AreaType not found: '$name'")
+        fun getByNameOrUnknown(name: String): AreaType = getByNameOrNull(name) ?: UNKNOWN
+        fun getByNameOrNull(name: String): AreaType? = AreaType.entries.find { it.nameFallback == name }
+
         val currentScoreboardArea get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
         val currentGraphArea get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
 
-        @HandleEvent(priority = HandleEvent.HIGHEST)
+        private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
+
+        @HandleEvent(priority = HIGHEST)
         fun onGraphAreaChange(event: GraphAreaChangeEvent) {
             val areaType = getByNameOrUnknown(event.area)
             if (currentArea == areaType) return
@@ -98,7 +112,7 @@ enum class AreaType(private val nameFallback: String) {
             AreaChangeEvent(areaType, currentArea).post()
         }
 
-        @HandleEvent(priority = HandleEvent.HIGHEST)
+        @HandleEvent(priority = HIGHEST)
         fun onScoreboardAreaChange(event: ScoreboardAreaChangeEvent) {
             val areaType = getByNameOrUnknown(event.area)
             if (currentArea == areaType) return
@@ -106,8 +120,20 @@ enum class AreaType(private val nameFallback: String) {
             AreaChangeEvent(areaType, currentArea).post()
         }
 
-        fun getByName(name: String): AreaType = getByNameOrNull(name) ?: error("AreaType not found: '$name'")
-        fun getByNameOrUnknown(name: String): AreaType = getByNameOrNull(name) ?: UNKNOWN
-        fun getByNameOrNull(name: String): AreaType? = AreaType.entries.find { it.nameFallback == name }
+
+        @HandleEvent(priority = HIGHEST)
+        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+            val data = event.getConstantAsync<AreaTypeJson>("misc/AreaType")
+
+            AreaType.entries.forEach { islandType ->
+                islandType.areaData = data.areas[islandType.name]?.let { area ->
+                    AreaData(area.name)
+                }
+            }
+        }
     }
 }
+
+data class AreaData(
+    val name: String,
+)

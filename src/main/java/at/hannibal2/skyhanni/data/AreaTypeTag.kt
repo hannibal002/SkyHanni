@@ -1,7 +1,15 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 // TODO maybe rename this class to AreaTypeGroup
 /**
@@ -106,4 +114,21 @@ enum class AreaTypeTag(vararg types: Any) {
     }
 
     operator fun contains(type: AreaType) = type in types
+
+    private fun update(newValues: List<String>) {
+        types.clear()
+        newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<AreaType>(it.uppercase()) }
+    }
+
+    @SkyHanniModule
+    companion object {
+        private val repoReloadCoroutine = CoroutineSettings("area type tag repo reload")
+
+        @HandleEvent
+        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+            event.getConstantAsync<Map<String, List<String>>>("AreaTypeTags").forEach { (name, values) ->
+                EnumUtils.enumValueOfOrNull<AreaTypeTag>(name.uppercase())?.update(values)
+            }
+        }
+    }
 }
