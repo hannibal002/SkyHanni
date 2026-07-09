@@ -41,6 +41,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.StringUtils.addStrikethrough
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -50,6 +51,7 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 @Suppress("UnusedPrivateProperty")
@@ -240,6 +242,7 @@ object InstanceChestProfit {
                 }
             } else {
                 var itemPrice: Double
+                var ignoreItem = false
                 val bookCheckedLoreLine = ItemUtils.readBookType(loreLine) ?: loreLine
                 var itemInternalName = NeuInternalName.fromItemNameOrNull(bookCheckedLoreLine)
                 bookColorFixer.matchMatcher(bookCheckedLoreLine) {
@@ -256,6 +259,7 @@ object InstanceChestProfit {
                     itemPrice = getPrice(internalName)
                     essencePattern.matchMatcher(loreLine) {
                         itemPrice = getEssence(group("name"), group("count").toInt())
+                        if (config.ignoreEssence) ignoreItem = true
                     }
                     if (requiresDungeonChestKeyPattern.matches(loreLine) || loreLine.isEmpty()) {
                         itemPrice = -1.0
@@ -265,8 +269,13 @@ object InstanceChestProfit {
                         itemPrice = -1.0
                     }
                     if (itemPrice != -1.0) {
-                        chestTips.add(" ${internalName.repoItemName}: ${itemPrice.formatCoin()} $favorited")
-                        totalPrice += itemPrice
+                        val tip = " ${internalName.repoItemName}: ${itemPrice.formatCoin()} $favorited"
+                        if (ignoreItem) {
+                            chestTips.add(tip.addStrikethrough(color = ChatFormatting.GRAY))
+                        } else {
+                            chestTips.add(tip)
+                            totalPrice += itemPrice
+                        }
                         chestList.add(internalName)
                     }
                     kuudraChestKey.matchMatcher(loreLine) {
@@ -395,8 +404,12 @@ object InstanceChestProfit {
 
             val coins = "$coinsColor${itemWithCost.value.formatCoin()}"
 
-            total += itemWithCost.value
-            add(Renderable.text("${itemWithCost.key} $coins$favourited"))
+            if (config.ignoreEssence && essencePattern.matches(itemWithCost.key)) {
+                add(Renderable.text("${itemWithCost.key} $coins$favourited".addStrikethrough(color = ChatFormatting.GRAY)))
+            } else {
+                total += itemWithCost.value
+                add(Renderable.text("${itemWithCost.key} $coins$favourited"))
+            }
         }
 
         chestProfits[fixedInventoryName] = total

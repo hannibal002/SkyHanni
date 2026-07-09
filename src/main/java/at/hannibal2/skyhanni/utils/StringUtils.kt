@@ -541,12 +541,19 @@ object StringUtils {
         }
     }
 
-    fun String.addStrikethrough(strikethrough: Boolean = true): String {
+    /**
+     * Add strikethrough and remove other formatting.
+     * @param strikethrough if this is false, return the string without changing it
+     * @param color set a color for the strikethrough, defaults to the first color code
+     */
+    fun String.addStrikethrough(strikethrough: Boolean = true, color: ChatFormatting? = null): String {
         if (!strikethrough) return this
 
-        val firstColor = getFirstColorCode()
+        val firstColor = color?.char ?: getFirstColorCode()
+        val format = if (firstColor != null) "§$firstColor" else ""
+
         val clean = removeColor()
-        return "§$firstColor§m$clean"
+        return "$format§m$clean"
     }
 
     fun getListOfStringsMatchingLastWord(words: Array<String>, args: Collection<String>): List<String> {
