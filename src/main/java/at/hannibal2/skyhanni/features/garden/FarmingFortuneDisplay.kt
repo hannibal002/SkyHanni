@@ -56,12 +56,11 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
 
     /**
-     * WRAPPED-REGEX-TEST: " Farming Fortune: ☘1234"
      * WRAPPED-REGEX-TEST: " Farming Fortune: 1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: [☘\uE051](?<fortune>\\d+)",
+        " Farming Fortune: \uE051(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
@@ -71,7 +70,7 @@ object FarmingFortuneDisplay {
     )
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
+        "§7You have §6\\+(?<ff>\\d{1,3})\uE051 .*",
     )
 
     @Suppress("MaxLineLength")
@@ -85,28 +84,28 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     * REGEX-TEXT: §7Piece Bonus: §6+10
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)☘",
+        "§7Piece Bonus: §6+(?<bonus>.*)\uE051",
     )
 
     // todo make pattern work on Melon and Cropie armor
     private val armorAbilityFortunePattern by patternGroup.pattern(
         "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)☘.*",
+        "§7.*§7Grants §6(?<bonus>.*)\uE051.*",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " Bonus: INACTIVE"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 29m"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 5m 2s"
-     * WRAPPED-REGEX-TEST: " Bonus: +200☘ 8s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 29m"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 5m 2s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 8s"
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
-        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)☘ (?<time>.*))?.*",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)\uE051 (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()
