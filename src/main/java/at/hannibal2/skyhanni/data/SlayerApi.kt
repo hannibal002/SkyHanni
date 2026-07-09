@@ -293,8 +293,9 @@ object SlayerApi {
         }
     }
     private fun checkTypeForCurrentArea(): Type? {
-        val area = SkyBlockUtils.area
+        if (IslandType.THE_END.isInIsland() && trackerConfig.voidgloomInNoArea.get()) return Type.VOID
 
+        val area = SkyBlockUtils.area
         return when {
             AreaTypeTag.REVENANT.contains(area) -> when (area) {
                 AreaType.GRAVEYARD -> if (IslandType.HUB.isInIsland() && trackerConfig.revenantInGraveyard.get()) {
@@ -311,14 +312,10 @@ object SlayerApi {
             AreaTypeTag.SVEN.contains(area) -> Type.SVEN
 
             AreaTypeTag.VOID.contains(area) -> when (area) {
-                AreaType.VOID_SEPULTURE, AreaType.ZEALOT_BRUISER_HIDEOUT -> Type.VOID
                 AreaType.DRAGONS_NEST ->
                     if (trackerConfig.voidgloomInNest.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
 
-                AreaType.NONE ->
-                    if (trackerConfig.voidgloomInNoArea.get() && IslandType.THE_END.isInIsland()) Type.VOID else null
-
-                else -> null
+                else -> Type.VOID
             }
 
             AreaTypeTag.INFERNO.contains(area) -> Type.INFERNO
