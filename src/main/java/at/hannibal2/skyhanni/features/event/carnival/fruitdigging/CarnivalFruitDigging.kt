@@ -52,8 +52,6 @@ object CarnivalFruitDigging {
     private const val GRID_LENGTH = 7
     const val MAX_DIGS = 15
 
-    private val CARNIVAL_SHOVEL = "CARNIVAL_SHOVEL".toInternalName()
-
     private val config get() = SkyHanniMod.feature.event.carnival.fruitDigging
 
     private var isPlayingFruitDigging = false
