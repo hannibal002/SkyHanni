@@ -88,7 +88,7 @@ object DungeonApi {
      * REGEX-TEST: Total Kills: 123
      */
     private val totalKillsPattern by patternGroup.pattern(
-        "total_kills",
+        "total-kills",
         "Total Kills: (?<kills>.*)",
     )
 
