@@ -102,9 +102,6 @@ abstract class WardrobeApi {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    /**
-     * @return whether [inventoryName] matched this wardrobe's inventory pattern.
-     */
     protected fun handleInventoryOpen(inventoryName: String): Boolean {
         val matched = inventoryPattern.matches(inventoryName)
         inThisWardrobe = matched
