@@ -321,7 +321,8 @@ object SuperpairDataDisplay {
         ((currentExperiment.gridSize - 2) / 2) - currentFoundData.filter { it.key != FoundType.POWERUP }.values.sumOf { it.size }
 
     private fun SafeItemStack.convertToReward() = when {
-        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
+        guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) ->
+            hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
         hoverName.string.removeColor() == "Enchanted Book" -> getLore()[2].removeColor()
         else -> hoverName.string.removeColor()
     }

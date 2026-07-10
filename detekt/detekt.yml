@@ -44,6 +44,8 @@ SkyHanniStyle:
         active: true
     OnlyOnIslandSpecificity:
         active: true
+    MaxLineLength:
+        active: true
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
@@ -62,10 +64,8 @@ style:
             - 'SubscribeEvent'
             - 'HandleEvent'
             - 'Mod.EventHandler'
-    MaxLineLength:
-        active: true
-        maxLineLength: 140
-        excludeCommentStatements: true
+    MaxLineLength: # handled by custom rule
+        active: false
     LoopWithTooManyJumpStatements:
         active: true
         maxJumpCount: 3
