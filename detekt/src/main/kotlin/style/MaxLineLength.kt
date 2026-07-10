@@ -129,13 +129,14 @@ class MaxLineLength(config: Config) :
         ): PsiElement? =
             findKtElementInParents(file, offset, line)
                 .firstOrNull { !BLANK_OR_QUOTES.matches(it.text) }
+
+        private fun KtFile.absolutePath(): Path = Path(virtualFilePath)
+
+        private fun findKtElementInParents(file: KtFile, offset: Int, line: String): Sequence<PsiElement> =
+            file.elementsInRange(TextRange.create(offset, offset + line.length))
+                .asSequence()
+                .plus(file.findElementAt(offset))
+                .mapNotNull { it?.getNonStrictParentOfType() }
+
     }
 }
-
-fun KtFile.absolutePath(): Path = Path(virtualFilePath)
-
-fun findKtElementInParents(file: KtFile, offset: Int, line: String): Sequence<PsiElement> =
-    file.elementsInRange(TextRange.create(offset, offset + line.length))
-        .asSequence()
-        .plus(file.findElementAt(offset))
-        .mapNotNull { it?.getNonStrictParentOfType() }
