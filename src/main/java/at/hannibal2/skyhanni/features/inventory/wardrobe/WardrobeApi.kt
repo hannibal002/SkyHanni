@@ -22,11 +22,6 @@ import com.google.gson.annotations.Expose
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Shared logic between the Armor Sets wardrobe ([ArmorWardrobeApi]) and the Equipment Sets
- * wardrobe ([EquipmentWardrobeApi]). Both GUIs share the exact same slot layout, Hypixel just
- * reuses it to display different item types.
- */
 abstract class WardrobeApi {
 
     companion object {
