@@ -31,6 +31,7 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -66,7 +67,7 @@ object UserLuckBreakdown {
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
     private val invalidItemSlots = (0..53).filter { it !in validItemSlots }
 
-    private val skillOverflowLuck = mutableMapOf<SkillType, Int>()
+    private val skillOverflowLuck = ConcurrentHashMap<SkillType, Int>()
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
