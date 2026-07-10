@@ -715,6 +715,9 @@ class ProfileSpecificStorage(
     @Expose
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
+    @Expose
+    var equipmentWardrobe: WardrobeStorage = WardrobeStorage()
+
     class WardrobeStorage {
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()

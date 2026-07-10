@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 class WardrobeSlot(
+    private val api: WardrobeApi,
     val id: Int,
     val page: Int,
     val inventorySlot: Int,
@@ -9,7 +10,7 @@ class WardrobeSlot(
     val leggingsSlot: Int,
     val bootsSlot: Int,
 ) {
-    fun getData() = WardrobeApi.storage?.data?.getOrPut(id) {
+    fun getData() = api.storage?.data?.getOrPut(id) {
         WardrobeApi.WardrobeData(
             id,
             armor = WardrobeApi.emptyArmor(),
@@ -36,7 +37,7 @@ class WardrobeSlot(
 
     fun isEmpty(): Boolean = armor.all { it == null }
 
-    fun isCurrentSlot() = getData()?.id == WardrobeApi.currentSlot
+    fun isCurrentSlot() = getData()?.id == api.currentSlot
 
-    fun isInCurrentPage() = (WardrobeApi.currentPage == null && page == 1) || (page == WardrobeApi.currentPage)
+    fun isInCurrentPage() = (api.currentPage == null && page == 1) || (page == api.currentPage)
 }
