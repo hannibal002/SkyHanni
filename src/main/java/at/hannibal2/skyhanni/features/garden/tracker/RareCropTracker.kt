@@ -115,7 +115,7 @@ object RareCropTracker {
          */
         val chatPattern by patternGroup.pattern(
             "${name.lowercase().replace('_', '-')}.colorless",
-            "(?:VERY )?RARE CROP! ${cleanName}(?: .*)?",
+            "(?:VERY )?RARE CROP! $cleanName(?: .*)?",
         )
     }
 
