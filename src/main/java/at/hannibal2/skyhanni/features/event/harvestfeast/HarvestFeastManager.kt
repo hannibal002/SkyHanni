@@ -285,10 +285,12 @@ object HarvestFeastManager {
             ).asTimeMark()
     }
 
-    private fun fetch() {
-        if (!config.fetchAutomatically) return
-        if (!isCurrentOutdated) return
-        if (lastFetched.passedSince() < 10.minutes) return
+    private fun fetch(force: Boolean = false) {
+        if (!force) {
+            if (!config.fetchAutomatically) return
+            if (!isCurrentOutdated) return
+            if (lastFetched.passedSince() < 10.minutes) return
+        }
         if (fetchingFeastDataMutex.isLocked) return
 
         CoroutineSettings("harvest feast data fetch").withIOContext().withMutex(fetchingFeastDataMutex).launchCoroutine {
@@ -340,6 +342,7 @@ object HarvestFeastManager {
         lastSubmit = null
         profileStorage.lastHarvestFeastSubmitYear = -1
         profileStorage.lastHarvestFeastSubmitMonth = -1
+        fetch(force = true)
     }
 
     private fun updateDisplay() {
