@@ -326,7 +326,7 @@ enum class HotfData(
          * REGEX-TEST: §7Level 21§8/50
          */
         override val levelPattern: Pattern by patternGroup.pattern(
-            "perk.level.colorfull",
+            "perk.level",
             "(?:§.)*Level (?<level>\\d+).*"
         )
 
