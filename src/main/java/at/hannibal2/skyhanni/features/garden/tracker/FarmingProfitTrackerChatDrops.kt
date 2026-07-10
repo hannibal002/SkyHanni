@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
+import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -18,12 +20,13 @@ object FarmingProfitTrackerChatDrops {
     private val wildStrawberryDye = "DYE_WILD_STRAWBERRY".toInternalName()
 
     /**
-     * REGEX-TEST: ABOUT TIME! You find an Overclocker 3000 (+137☀)!
-     * REGEX-TEST: ABOUT TIME! You find an Overclocker 3000 (+1,810☘)!
+     * REGEX-TEST: ABOUT TIME! You find an Overclocker 3000 (+137)!
+     * REGEX-TEST: ABOUT TIME! You find an Overclocker 3000 (+1,810)!
      */
     private val overclockerPityPattern by patternGroup.pattern(
         "overclocker.pity",
-        "^ABOUT TIME! You find an Overclocker 3000 \\([+]\\d[\\d,.]*[☘☀]\\)!$",
+        "^ABOUT TIME! You find an Overclocker 3000 \\([+]\\d[\\d,.]*" +
+            "[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]\\)!$",
     )
 
     /**

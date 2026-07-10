@@ -44,7 +44,6 @@ class FarmingProfitTrackerConfig {
         TrackedSource.CROP_FEVER,
         TrackedSource.PESTS,
         TrackedSource.VISITORS,
-        TrackedSource.GREENHOUSE,
     )
 
     @Expose
@@ -74,7 +73,6 @@ class FarmingProfitTrackerConfig {
         CROP_FEVER("Crop Fever"),
         PESTS("Pests"),
         VISITORS("Visitors"),
-        GREENHOUSE("Greenhouse"),
         ;
 
         override fun toString() = displayName

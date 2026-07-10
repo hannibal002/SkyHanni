@@ -78,7 +78,6 @@ private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 private val seasoningInternalName = "SEASONING".toInternalName()
 private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
 private val carrotColoredVinylSet = "CARROT_COLORED_VINYL_SET".toInternalName()
-private val bountifulCoinCauses = setOf(PurseChangeCause.GAIN_MOB_KILL, PurseChangeCause.GAIN_UNKNOWN)
 private val sackCompactionTimeout = 30.seconds
 private val farmingProfitTrackerPatternGroup = RepoPattern.group("garden.farming.profit.tracker")
 
@@ -115,7 +114,7 @@ private fun FarmingProfitTracker.Data.hasNoFarmingData(): Boolean =
 private fun CropCollectionType.toTrackedSource(): TrackedSource? = when (this) {
     CropCollectionType.BREAKING_CROPS -> TrackedSource.CROPS
     CropCollectionType.MOOSHROOM_COW -> TrackedSource.MOOSHROOM_COW
-    CropCollectionType.GREENHOUSE -> TrackedSource.GREENHOUSE
+    CropCollectionType.GREENHOUSE,
     CropCollectionType.CROP_FEVER,
     CropCollectionType.PEST_BASE,
     CropCollectionType.PEST_RNG,
@@ -289,7 +288,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
             when (selectedBucket) {
                 TrackedSource.CROPS,
                 TrackedSource.MOOSHROOM_COW,
-                TrackedSource.GREENHOUSE,
                 -> ProfitAction(getTotalCropAmount(), "crop", "Crops")
 
                 TrackedSource.PESTS -> ProfitAction(getTotalPestKills(), "kill", "Kills")
@@ -386,7 +384,8 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         if (!shouldTrack(TrackedSource.BOUNTIFUL)) return
         if (!currentToolHasBountiful) return
         if (lastFarmingActivity.passedSince() > 2.seconds) return
-        if (event.reason !in bountifulCoinCauses) return
+        // Bountiful coins show up as mob kill gains here.
+        if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         val coins = event.coins.roundToInt().takeIf { it > 0 } ?: return
         GardenApi.getCurrentlyFarmedCrop() ?: GardenApi.lastBrokenCropType ?: return
 
