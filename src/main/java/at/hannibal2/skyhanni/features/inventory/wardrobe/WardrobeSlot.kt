@@ -8,7 +8,7 @@ class WardrobeSlot(
     val item2Slot: Int,
     val item3Slot: Int,
     val item4Slot: Int,
-    val type: WardrobeType
+    val type: WardrobeType,
 ) {
     // Armor aliases
     val helmetSlot get() = item1Slot
@@ -65,5 +65,4 @@ class WardrobeSlot(
 enum class WardrobeType(val displayName: String, val slotNames: List<String>) {
     ARMOR("Armor", listOf("Helmet", "Chestplate", "Leggings", "Boots")),
     EQUIPMENT("Equipment", listOf("Necklace", "Cloak", "Belt", "Gloves")),
-    ;
 }

@@ -198,8 +198,9 @@ object WardrobeApi {
         }
 
         if (equipmentInventoryPattern.matchMatcher(inventoryName) {
-            currentPage = group("currentPage").formatInt()
-        } != null) {
+                currentPage = group("currentPage").formatInt()
+            } != null
+        ) {
             return WardrobeType.EQUIPMENT
         }
 
@@ -210,7 +211,7 @@ object WardrobeApi {
         var foundCurrentSlot = false
 
         for (slot in activeSlots.filter { it.isInCurrentPage() }) {
-             val updatedItems = listOf(
+            val updatedItems = listOf(
                 getWardrobeItem(itemsList[slot.item1Slot]),
                 getWardrobeItem(itemsList[slot.item2Slot]),
                 getWardrobeItem(itemsList[slot.item3Slot]),

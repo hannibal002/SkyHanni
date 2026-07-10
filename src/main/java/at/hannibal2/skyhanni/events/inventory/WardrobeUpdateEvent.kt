@@ -13,5 +13,5 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 @PrimaryFunction("onWardrobeUpdate")
 class WardrobeUpdateEvent(
     val type: WardrobeType,
-    val items: List<SafeItemStack?>
-): SkyHanniEvent()
+    val items: List<SafeItemStack?>,
+) : SkyHanniEvent()
