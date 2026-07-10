@@ -11,9 +11,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.toEnumName
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 
-// TODO: Repofiy
 class AreaType private constructor(
-    val name: String,
+    val identifier: String,
     private val nameFallback: String,
 ) {
     var areaData: AreaData? = null
@@ -22,30 +21,27 @@ class AreaType private constructor(
     val displayName: String
         get() = areaData?.name ?: nameFallback
 
-    private fun setAreaData(areaData: AreaData?) {
-        this.areaData = areaData
-    }
-
     fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == displayName
     fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == displayName
     fun isInArea(): Boolean = SkyBlockUtils.area == this
 
-    override fun toString(): String = name
-    override fun equals(other: Any?): Boolean = this === other || (other is AreaType && name == other.name)
-    override fun hashCode(): Int = name.hashCode()
+    override fun toString(): String = identifier
+    override fun equals(other: Any?): Boolean = this === other || (other is AreaType && identifier == other.identifier)
+    override fun hashCode(): Int = identifier.hashCode()
 
     @SkyHanniModule
     companion object {
         private val entriesList = mutableListOf<AreaType>()
 
-        private fun create(nameFallback: String): AreaType {
-            return AreaType(
-                name = nameFallback.toEnumName(),
+        private fun create(nameFallback: String): AreaType = create(nameFallback.toEnumName(), nameFallback)
+
+        private fun create(identifier: String, nameFallback: String): AreaType =
+            AreaType(
+                identifier = identifier,
                 nameFallback = nameFallback,
             ).also {
                 entriesList.add(it)
             }
-        }
 
         val BELLY_OF_THE_BEAST = create("Belly of the Beast")
         val THE_END = create("The End")
@@ -154,11 +150,9 @@ class AreaType private constructor(
             val data = event.getConstantAsync<AreaTypeJson>("misc/AreaType")
 
             entries.forEach { areaType ->
-                areaType.setAreaData(
-                    data.areas[areaType.name]?.let { area ->
-                        AreaData(area.name)
-                    },
-                )
+                areaType.areaData = data.areas[areaType.identifier]?.let { area ->
+                    AreaData(area.name)
+                }
             }
         }
     }
