@@ -24,6 +24,7 @@ import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object FarmingPersonalBestGain {
+
     private val config get() = GardenApi.config.jacobContest.personalBests
 
     private val patternGroup = RepoPattern.group("garden.contest.personal.best")
@@ -53,18 +54,15 @@ object FarmingPersonalBestGain {
         "\\[NPC] Jacob: Your Personal Bests perk is now granting you \\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune!",
     )
 
-    // TODO remove after 9.0.0 at the latest
-    // <editor-fold desc="Backwards Compatibility Patterns">
-    init {
-        /**
-         * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69 Potato Fortune§f!
-         */
-        @Suppress("MaxLineLength")
-        patternGroup.pattern(
-            "ff.new",
-            "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
-        )
-    }
+    /**
+     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6+46.69 Potato Fortune§f!
+     */
+    @Deprecated("Only exists for repo. Remove after 9.0.0.", level = DeprecationLevel.ERROR)
+    @Suppress("MaxLineLength")
+    private val unused by patternGroup.pattern(
+        "ff.new",
+        "§e\\[NPC] Jacob§f: §rYour §6Personal Bests §fperk is now granting you §6\\+(?<ff>.*)${FARMING_FORTUNE.hypixelIcon} (?<crop>.*) Fortune§f!",
+    )
     // </editor-fold>
 
     private val repoReloadCoroutine = CoroutineSettings("farming personal best gain repo reload")
