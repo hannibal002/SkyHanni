@@ -111,24 +111,29 @@ object WardrobeApi {
         equipmentSlots = eList
     }
 
-    fun getSlots(type: WardrobeType) = when (type) {
+    fun getSlots(type: WardrobeType): List<WardrobeSlot> = when (type) {
         EQUIPMENT -> equipmentSlots
         ARMOR -> armorSlots
     }
 
-    fun getCurrentWardrobeSlot(type: WardrobeType) = when (type) {
+    fun getCurrentWardrobeSlot(type: WardrobeType): Int? = when (type) {
         EQUIPMENT -> currentEquipmentSlot
         ARMOR -> currentSlot
     }
+
+    fun getCurrentWardrobeData(type: WardrobeType): MutableMap<Int, WardrobeData>? = when (type) {
+        EQUIPMENT -> storage?.equipmentData
+        ARMOR -> storage?.data
+    }
+
+    fun inWardrobe(): Boolean = InventoryUtils.inInventory() && inWardrobeType == WardrobeType.ARMOR
+
+    fun inEquipmentWardrobe(): Boolean = InventoryUtils.inInventory() && inWardrobeType == WardrobeType.EQUIPMENT
 
     private fun getWardrobeItem(itemStack: SafeItemStack?) =
         if (itemStack == null || itemStack.isStainedGlassPane()) null else itemStack
 
     private fun getWardrobeSlotFromId(id: Int?, type: WardrobeType) = getSlots(type).find { it.id == id }
-
-    fun inWardrobe() = InventoryUtils.inInventory() && inWardrobeType == WardrobeType.ARMOR
-
-    fun inEquipmentWardrobe() = InventoryUtils.inInventory() && inWardrobeType == WardrobeType.EQUIPMENT
 
     fun createPriceLore(slot: WardrobeSlot, type: WardrobeType = slot.type) = buildList {
         if (slot.isEmpty()) return@buildList

@@ -23,11 +23,7 @@ class WardrobeSlot(
     val glovesSlot get() = item4Slot
 
     fun getData(): WardrobeApi.WardrobeData? {
-        val storage = when (type) {
-            EQUIPMENT -> WardrobeApi.storage?.equipmentData
-            ARMOR -> WardrobeApi.storage?.data
-        }
-        return storage?.getOrPut(id) {
+        return WardrobeApi.getCurrentWardrobeData(type)?.getOrPut(id) {
             WardrobeApi.WardrobeData(
                 id,
                 armor = WardrobeApi.emptyItems(),
