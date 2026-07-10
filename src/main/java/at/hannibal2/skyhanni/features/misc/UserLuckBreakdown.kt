@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -135,7 +134,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         inMiscStats = false
         inCustomBreakdown = false
     }
@@ -208,7 +207,7 @@ object UserLuckBreakdown {
 
     private fun tryTruncateFloat(input: Float): String {
         val string = input.addSeparators()
-        return if (string.endsWith(".0")) return string.dropLast(2)
+        return if (string.endsWith(".0")) string.dropLast(2)
         else string
     }
 
