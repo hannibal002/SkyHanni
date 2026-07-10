@@ -12,8 +12,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 @SkyHanniModule
 object ArmorWardrobeApi : WardrobeApi() {
 
-    private val patternGroup = RepoPattern.group("inventory.wardrobe")
-
     /**
      * REGEX-TEST: (1/3) Armor Sets
      */

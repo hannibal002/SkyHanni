@@ -25,7 +25,8 @@ import kotlin.time.Duration.Companion.milliseconds
 abstract class WardrobeApi {
 
     companion object {
-        private val patternGroup = RepoPattern.group("inventory.wardrobe")
+        @JvmStatic
+        protected val patternGroup = RepoPattern.group("inventory.wardrobe")
 
         /**
          * REGEX-TEST: Slot 4: Equipped
@@ -36,14 +37,14 @@ abstract class WardrobeApi {
         )
 
         const val FIRST_SLOT = 36
-        private const val FIRST_HELMET_SLOT = 0
-        private const val FIRST_CHESTPLATE_SLOT = 9
-        private const val FIRST_LEGGINGS_SLOT = 18
-        private const val FIRST_BOOTS_SLOT = 27
+        private const val FIRST_ITEM_SLOT = 0
+        private const val SECOND_ITEM_SLOT = 9
+        private const val THIRD_ITEM_SLOT = 18
+        private const val FORTH_ITEM_SLOT = 27
         const val MAX_SLOT_PER_PAGE = 9
         const val MAX_PAGES = 3
 
-        internal fun emptyArmor(): List<SafeItemStack?> = listOf(null, null, null, null)
+        internal fun emptyItems(): List<SafeItemStack?> = listOf(null, null, null, null)
     }
 
     protected abstract val inventoryPattern: Pattern
@@ -72,11 +73,11 @@ abstract class WardrobeApi {
         for (page in 1..MAX_PAGES) {
             for (slot in 0 until MAX_SLOT_PER_PAGE) {
                 val inventorySlot = FIRST_SLOT + slot
-                val helmetSlot = FIRST_HELMET_SLOT + slot
-                val chestplateSlot = FIRST_CHESTPLATE_SLOT + slot
-                val leggingsSlot = FIRST_LEGGINGS_SLOT + slot
-                val bootsSlot = FIRST_BOOTS_SLOT + slot
-                list.add(WardrobeSlot(this, ++id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
+                val item1Slot = FIRST_ITEM_SLOT + slot
+                val item2Slot = SECOND_ITEM_SLOT + slot
+                val item3Slot = THIRD_ITEM_SLOT + slot
+                val item4Slot = FORTH_ITEM_SLOT + slot
+                list.add(WardrobeSlot(this, ++id, page, inventorySlot, item1Slot, item2Slot, item3Slot, item4Slot))
             }
         }
         slots = list
@@ -123,7 +124,7 @@ abstract class WardrobeApi {
             }
             if (allSlotsEmpty) {
                 for (slot in slots.filter { it.isInCurrentPage() }) {
-                    slot.getData()?.armor = emptyArmor()
+                    slot.getData()?.items = emptyItems()
                 }
             } else return
         }
@@ -144,11 +145,11 @@ abstract class WardrobeApi {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
-            slot.getData()?.armor = listOf(
-                getWardrobeItem(itemsList[slot.helmetSlot]),
-                getWardrobeItem(itemsList[slot.chestplateSlot]),
-                getWardrobeItem(itemsList[slot.leggingsSlot]),
-                getWardrobeItem(itemsList[slot.bootsSlot]),
+            slot.getData()?.items = listOf(
+                getWardrobeItem(itemsList[slot.item1Slot]),
+                getWardrobeItem(itemsList[slot.item2Slot]),
+                getWardrobeItem(itemsList[slot.item3Slot]),
+                getWardrobeItem(itemsList[slot.item4Slot]),
             )
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
                 currentSlot = slot.id
@@ -190,8 +191,8 @@ abstract class WardrobeApi {
                     add("$slotInfo is empty")
                 } else {
                     add(slotInfo)
-                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
-                        slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
+                    setOf("Item1", "Item2", "Item3", "Item4").forEachIndexed { id, armorName ->
+                        slot.getData()?.items?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }
@@ -202,7 +203,7 @@ abstract class WardrobeApi {
 
     class WardrobeData(
         @Expose val id: Int,
-        @Expose var armor: List<SafeItemStack?>,
+        @Expose var items: List<SafeItemStack?>,
         @Expose var locked: Boolean,
         @Expose var favorite: Boolean,
     )

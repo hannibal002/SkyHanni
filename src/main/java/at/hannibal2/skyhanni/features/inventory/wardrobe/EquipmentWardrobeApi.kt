@@ -6,13 +6,15 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.collections.forEach
 
 @SkyHanniModule
 object EquipmentWardrobeApi : WardrobeApi() {
-
-    private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
      * REGEX-TEST: (1/2) Equipment Sets
@@ -36,7 +38,19 @@ object EquipmentWardrobeApi : WardrobeApi() {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) = handleInventoryUpdated(event)
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) = handleInventoryClose()
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        handleInventoryClose()
+
+        val currentEquipped = currentSlot?.let {
+            slots[it]
+        }?.getData()?.items ?: return
+        EquipmentSlot.entries.forEach {
+            val itemStack = currentEquipped[it.slot]
+            if (itemStack != null && !itemStack.isStainedGlassPane()) {
+                EquipmentApi.setEquipment(it, itemStack)
+            } else EquipmentApi.setEquipment(it, null)
+        }
+    }
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)

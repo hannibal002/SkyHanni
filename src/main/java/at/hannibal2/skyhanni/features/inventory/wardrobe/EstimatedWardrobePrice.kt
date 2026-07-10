@@ -29,19 +29,17 @@ object EstimatedWardrobePrice {
         if (lore.isEmpty()) return
 
         val tooltip = event.toolTip
-        var index = 3
 
         try {
-            tooltip.add(index++, "")
+            tooltip.add("")
+            tooltip.addAll(lore)
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorStateWithData(
                 "Can not show Estimated Wardrobe Price",
                 "IndexOutOfBoundsException while trying to add the estimated wardrobe price line to the tooltip",
-                "index" to index,
                 "lore" to lore,
             )
         }
-        tooltip.addAll(index, lore)
     }
 
     private fun activeWardrobeApi(): WardrobeApi? = when {
