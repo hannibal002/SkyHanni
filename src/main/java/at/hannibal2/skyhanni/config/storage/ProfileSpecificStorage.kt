@@ -716,11 +716,18 @@ class ProfileSpecificStorage(
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
     class WardrobeStorage {
+        // for armor
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null
+
+        @Expose
+        var equipmentData: MutableMap<Int, WardrobeData> = mutableMapOf()
+
+        @Expose
+        var currentEquipmentSlot: Int? = null
     }
 
     @Expose

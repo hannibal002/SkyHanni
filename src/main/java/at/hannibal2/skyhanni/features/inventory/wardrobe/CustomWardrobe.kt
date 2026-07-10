@@ -302,7 +302,7 @@ object CustomWardrobe {
     }
 
     private fun createRenderables(): Renderable {
-        val (wardrobeWarning, list) = createWarning(WardrobeApi.slots)
+        val (wardrobeWarning, list) = createWarning(WardrobeApi.armorSlots)
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1

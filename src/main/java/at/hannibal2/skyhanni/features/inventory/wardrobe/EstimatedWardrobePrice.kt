@@ -20,8 +20,7 @@ object EstimatedWardrobePrice {
         if (!isEnabled()) return
         event.slot ?: return
 
-        // TODO if we are in eq wardrobe get eq slots instead of normal wardrobe slots
-        val slot = WardrobeApi.slots.firstOrNull {
+        val slot = WardrobeApi.slots?.firstOrNull {
             event.slot.index == it.inventorySlot && it.isInCurrentPage()
         } ?: return
 

@@ -41,7 +41,7 @@ object CustomWardrobeKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = WardrobeApi.slots.filter { it.isInCurrentPage() }
+        val slots = WardrobeApi.armorSlots.filter { it.isInCurrentPage() }
             .filterNot { config.onlyFavorites && !it.favorite }
             .filterNot { config.hideEmptySlots && it.armor.all { piece -> piece == null } }
 
