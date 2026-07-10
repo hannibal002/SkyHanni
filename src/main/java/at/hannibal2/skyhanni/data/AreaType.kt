@@ -110,7 +110,8 @@ class AreaType private constructor(
         val entries: List<AreaType>
             get() = entriesList
 
-        private var currentArea = NONE
+        var currentArea = NONE
+            private set
 
         fun getByName(name: String): AreaType =
             getByNameOrNull(name) ?: error("AreaType not found: '$name'")
@@ -121,29 +122,29 @@ class AreaType private constructor(
         fun getByNameOrNull(name: String): AreaType? =
             entries.find { it.displayName == name }
 
-        val currentScoreboardArea
-            get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
-
-        val currentGraphArea
-            get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
-
-        private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
+        fun String.isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == this
+        fun String.isInGraphArea(): Boolean = SkyBlockUtils.graphArea == this
+        fun String.isInArea(): Boolean = SkyBlockUtils.rawArea == this
 
         @HandleEvent(priority = HIGHEST)
         fun onGraphAreaChange() {
-            val areaType = SkyBlockUtils.area
-            if (currentArea == areaType) return
-            currentArea = areaType
-            AreaChangeEvent(areaType, currentArea).post()
+            postAreaChangeEvent()
         }
 
         @HandleEvent(priority = HIGHEST)
         fun onScoreboardAreaChange() {
-            val areaType = SkyBlockUtils.area
-            if (currentArea == areaType) return
-            currentArea = areaType
-            AreaChangeEvent(areaType, currentArea).post()
+            postAreaChangeEvent()
         }
+
+        fun postAreaChangeEvent() {
+            val areaString = SkyBlockUtils.rawArea ?: "???"
+            val newArea = getByNameOrUnknown(areaString)
+            val oldArea = currentArea
+            currentArea = newArea
+            AreaChangeEvent(newArea, oldArea).post()
+        }
+
+        private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
 
         @HandleEvent(priority = HIGHEST)
         fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {

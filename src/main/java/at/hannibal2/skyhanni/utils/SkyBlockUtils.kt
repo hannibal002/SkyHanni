@@ -39,8 +39,15 @@ object SkyBlockUtils {
 
     /**
      * Consider using [AreaType.isInArea] instead
+     * Or [SkyBlockUtils.area] even
      */
-    val area: AreaType get() = (graphArea ?: scoreboardArea)?.let { AreaType.getByNameOrUnknown(it) } ?: AreaType.UNKNOWN
+    val rawArea get() = graphArea ?: scoreboardArea
+
+    /**
+     * Consider using [AreaType.isInArea] instead
+     * Or [SkyBlockUtils.area] even
+     */
+    val area: AreaType get() = AreaType.currentArea
 
     val noTradeMode get() = HypixelData.noTrade
 
