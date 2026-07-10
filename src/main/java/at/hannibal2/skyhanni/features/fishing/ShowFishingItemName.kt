@@ -70,10 +70,9 @@ object ShowFishingItemName {
 
     private fun inCorrectArea(): Boolean {
         if (IslandType.HUB.isInIsland()) {
-            val area = SkyBlockUtils.area
-            val areaName = area.displayName
-            if (areaName.endsWith(" Atrium") || areaName.endsWith(" Museum")) return false
-            if (area == AreaType.FASHION_SHOP || area == AreaType.SHENS_AUCTION) return false
+            val area = SkyBlockUtils.rawArea ?: return false
+            if (area.endsWith(" Atrium") || area.endsWith(" Museum")) return false
+            if (area == AreaType.FASHION_SHOP.displayName || area == AreaType.SHENS_AUCTION.displayName) return false
         }
         return !(IslandType.THE_END.isInIsland())
     }
