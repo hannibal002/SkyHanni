@@ -28,6 +28,7 @@ object AreaLocationApi {
     fun postAreaChangeEvent() {
         val areaString = SkyBlockUtils.rawArea ?: "???"
         val newArea = AreaType.getByNameOrUnknown(areaString)
+        if (newArea == currentArea) return
         val oldArea = currentArea
         currentArea = newArea
         AreaChangeEvent(newArea, oldArea).post()
