@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.inventory.WardrobeUpdateEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -184,6 +185,7 @@ object WardrobeApi {
                 EQUIPMENT -> currentEquipmentSlot = null
                 ARMOR -> currentSlot = null
             }
+            WardrobeUpdateEvent(wardrobeType, emptyItems()).post()
         }
     }
 
@@ -208,18 +210,23 @@ object WardrobeApi {
         var foundCurrentSlot = false
 
         for (slot in activeSlots.filter { it.isInCurrentPage() }) {
-            slot.getData()?.armor = listOf(
+             val updatedItems = listOf(
                 getWardrobeItem(itemsList[slot.item1Slot]),
                 getWardrobeItem(itemsList[slot.item2Slot]),
                 getWardrobeItem(itemsList[slot.item3Slot]),
                 getWardrobeItem(itemsList[slot.item4Slot]),
             )
+            slot.getData()?.armor = updatedItems
             if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
+                val wasNew = (getCurrentWardrobeSlot(type) != slot.id)
                 when (type) {
                     EQUIPMENT -> currentEquipmentSlot = slot.id
                     ARMOR -> currentSlot = slot.id
                 }
                 foundCurrentSlot = true
+                if (wasNew) {
+                    WardrobeUpdateEvent(type, updatedItems).post()
+                }
             }
             slot.locked = (itemsList[slot.inventorySlot]?.isDye(DyeCompat.RED) == true)
             if (slot.locked) activeSlots.forEach { if (it.id > slot.id) it.locked = true }

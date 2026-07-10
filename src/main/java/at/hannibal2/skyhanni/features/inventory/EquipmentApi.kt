@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.inventory.WardrobeUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeType
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -69,6 +71,14 @@ object EquipmentApi {
 
     private var lastClickedEquipment: Pair<SafeItemStack, EquipmentSlot>? = null
     private var lastClickedEquipmentTime = SimpleTimeMark.farPast()
+
+    @HandleEvent
+    fun onWardrobeUpdate(event: WardrobeUpdateEvent) {
+        if (event.type != WardrobeType.EQUIPMENT) return
+        EquipmentSlot.entries.forEachIndexed { index, slot ->
+            handleInventoryItem(slot, event.items.getOrNull(index))
+        }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryUpdate(event: InventoryOpenEvent) {
