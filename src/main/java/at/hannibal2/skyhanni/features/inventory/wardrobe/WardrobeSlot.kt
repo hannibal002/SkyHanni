@@ -57,14 +57,7 @@ class WardrobeSlot(
 
     fun isEmpty(): Boolean = items.all { it == null }
 
-    fun isCurrentSlot() = when (type) {
-        WardrobeType.EQUIPMENT -> {
-            getData()?.id == WardrobeApi.currentEquipmentSlot
-        }
-        WardrobeType.ARMOR -> {
-            getData()?.id == WardrobeApi.currentSlot
-        }
-    }
+    fun isCurrentSlot() = getData()?.id == WardrobeApi.getCurrentWardrobeSlot(type)
 
     fun isInCurrentPage() = (WardrobeApi.currentPage == null && page == 1) || (page == WardrobeApi.currentPage)
 }

@@ -115,7 +115,7 @@ object WardrobeApi {
         ARMOR -> armorSlots
     }
 
-    private fun getCurrentWardrobeSlot(type: WardrobeType) = when (type) {
+    fun getCurrentWardrobeSlot(type: WardrobeType) = when (type) {
         EQUIPMENT -> currentEquipmentSlot
         ARMOR -> currentSlot
     }
