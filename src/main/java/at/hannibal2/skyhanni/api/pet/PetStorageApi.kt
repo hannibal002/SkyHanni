@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
@@ -26,23 +27,23 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.compat.hover
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.Style
 import java.util.UUID
@@ -65,18 +66,16 @@ object PetStorageApi {
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
     private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
 
-    val isPetWidgetReadyForDisplay: Boolean
-        get() = petWidgetState == PetWidgetState.READY
+    private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
 
-    fun getPetWidgetDisplayMessage(): List<String>? = when {
-        !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> listOf(
-            "§cPet Tab Widget Missing",
-            "§cDo /widget and enable the pet widget",
-        )
-        petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> listOf(
-            "§cPet Widget Overflow XP Missing",
-            "§cEnable overflow XP in the pet widget",
-        )
+    fun getPetWidgetWarning(showMissingOverflowXpWarning: Boolean): String? = when {
+        isPetWidgetUnavailable() -> null
+        !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> {
+            "§cInaccurate! Enable /tab → Pet Widget"
+        }
+        showMissingOverflowXpWarning && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> {
+            "§cInaccurate! Enable /tab → Pet Widget → Show Overflow Pet XP"
+        }
         else -> null
     }
 
@@ -730,5 +729,4 @@ object PetStorageApi {
         val allowedError = (readExp * expErrorFactor).coerceAtLeast(1.0)
         abs((this.exp ?: 0.0) - readExp) <= allowedError
     } ?: true
-
 }
