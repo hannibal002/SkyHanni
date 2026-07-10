@@ -36,7 +36,7 @@ object RiftTimer {
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) \uE020",
+        "(?<time>\\d+) ${SkyblockStat.RIFT_TIME.hypixelIcon}",
     )
 
     private var display = emptyList<String>()
