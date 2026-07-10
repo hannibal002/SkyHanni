@@ -129,10 +129,11 @@ object PetUtils {
      * REGEX-TEST: §7§eRight-click to add this pet to
      * REGEX-TEST: §7§eRight-click to add this pet to your
      * REGEX-TEST: §eRight-click to add this pet to your
+     * REGEX-TEST: §eRight-click to add this pet to your pet menu!
      */
     private val neuPetLorePattern by CurrentPetApi.patternGroup.pattern(
         "neu.pet.lore",
-        "(?:§7)?§eRight-click to add this pet to(?: your)?",
+        "(?:§7)?§eRight-click to add this pet to(?: your(?: pet menu!)?)?",
     )
     // </editor-fold>
 
