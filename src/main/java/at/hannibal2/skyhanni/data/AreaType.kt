@@ -6,112 +6,144 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AreaTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.toEnumName
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 
 // TODO: Repofiy
-enum class AreaType(private val nameFallback: String) {
-    BELLY_OF_THE_BEAST("Belly of the Beast"),
-    THE_END("The End"),
-    KUUDRA("Kuudra"),
-    CRIMSON_ISLE("Crimson Isle"),
-    DWARVEN_MINES("Dwarven Mines"),
-    DUNGEON_HUB("Dungeon Hub"),
-    GLACIAL_CAVE("Glacial Cave"),
-    THE_MIST("The Mist"),
-    CARNIVAL("Carnival"),
-    CRYSTAL_NUCLEUS("Crystal Nucleus"),
-    GLACITE_TUNNELS("Glacite Tunnels"),
-    DWARVEN_BASE_CAMP("Dwarven Base Camp"),
-    GREAT_GLACITE_LAKE("Great Glacite Lake"),
-    FOSSIL_RESEARCH_CENTER("Fossil Research Center"),
-    FORGOTTEN_SKULL("Forgotten Skull"),
-    MINES_OF_DIVAN("Mines of Divan"),
-    COMMUNITY_CENTER("Community Center"),
-    FASHION_SHOP("Fashion Shop"),
-    SHENS_AUCTION("Shen's Auction"),
-    BLAZING_VOLCANO("Blazing Volcano"),
-    BAZAAR_ALLEY("Bazaar Alley"),
-    FARM("Farm"),
-    GRAVEYARD("Graveyard"),
-    REVENANT_CAVE("Revenant Cave"),
-    SPIDER_MOUND("Spider Mound"),
-    ARACHNES_BURROW("Arachne's Burrow"),
-    ARACHNES_SANCTUARY("Arachne's Sanctuary"),
-    BURNING_DESERT("Burning Desert"),
-    RUINS("Ruins"),
-    HOWLING_CAVE("Howling Cave"),
-    SOUL_CAVE("Soul Cave"),
-    SPIRIT_CAVE("Spirit Cave"),
-    VOID_SEPULTURE("Void Sepulture"),
-    ZEALOT_BRUISER_HIDEOUT("Zealot Bruiser Hideout"),
-    DRAGONS_NEST("Dragon's Nest"),
-    STRONGHOLD("Stronghold"),
-    THE_WASTELAND("The Wasteland"),
-    SMOLDERING_TOMB("Smoldering Tomb"),
-    STILLGORE_CHATEAU("Stillgore Château"),
-    OUBLIETTE("Oubliette"),
-    DOJO("Dojo"),
-    DOJO_ARENA("Dojo Arena"),
-    GUNPOWDER_MINES("Gunpowder Mines"),
-    OBSIDIAN_SANCTUARY("Obsidian Sanctuary"),
-    ROYAL_PALACE("Royal Palace"),
-    DRAGONTAIL("Dragontail"),
-    LIVING_CAVE("Living Cave"),
-    LIVING_STILLNESS("Living Stillness"),
-    COLOSSEUM("Colosseum"),
-    DREADFARM("Dreadfarm"),
-    WEST_VILLAGE("West Village"),
-    INFESTED_HOUSE("Infested House"),
-    CONTINUUM("Continuum"),
-    THE_MOUNTAINTOP("The Mountaintop"),
-    TRIAL_GROUNDS("Trial Grounds"),
-    TIME_TORN_ISLES("Time-Torn Isles"),
-    WIZARDMAN_BUREAU("Wizardman Bureau"),
-    WIZARD_BRAWL("Wizard Brawl"),
-    WALK_OF_FAME("Walk of Fame"),
-    TIME_CHAMBER("Time Chamber"),
-
-    NONE(""),
-    UNKNOWN("???"),
-    ;
-
+class AreaType private constructor(
+    val name: String,
+    private val nameFallback: String,
+) {
     var areaData: AreaData? = null
         private set
 
-    val displayName: String get() = areaData?.name ?: nameFallback
+    val displayName: String
+        get() = areaData?.name ?: nameFallback
 
-    fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == nameFallback
-    fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == nameFallback
+    private fun setAreaData(areaData: AreaData?) {
+        this.areaData = areaData
+    }
+
+    fun isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == displayName
+    fun isInGraphArea(): Boolean = SkyBlockUtils.graphArea == displayName
     fun isInArea(): Boolean = SkyBlockUtils.area == this
+
+    override fun toString(): String = name
+    override fun equals(other: Any?): Boolean = this === other || (other is AreaType && name == other.name)
+    override fun hashCode(): Int = name.hashCode()
 
     @SkyHanniModule
     companion object {
+        private val entriesList = mutableListOf<AreaType>()
+
+        private fun create(nameFallback: String): AreaType {
+            return AreaType(
+                name = nameFallback.toEnumName(),
+                nameFallback = nameFallback,
+            ).also {
+                entriesList.add(it)
+            }
+        }
+
+        val BELLY_OF_THE_BEAST = create("Belly of the Beast")
+        val THE_END = create("The End")
+        val KUUDRA = create("Kuudra")
+        val CRIMSON_ISLE = create("Crimson Isle")
+        val DWARVEN_MINES = create("Dwarven Mines")
+        val DUNGEON_HUB = create("Dungeon Hub")
+        val GLACIAL_CAVE = create("Glacial Cave")
+        val THE_MIST = create("The Mist")
+        val CARNIVAL = create("Carnival")
+        val CRYSTAL_NUCLEUS = create("Crystal Nucleus")
+        val GLACITE_TUNNELS = create("Glacite Tunnels")
+        val DWARVEN_BASE_CAMP = create("Dwarven Base Camp")
+        val GREAT_GLACITE_LAKE = create("Great Glacite Lake")
+        val FOSSIL_RESEARCH_CENTER = create("Fossil Research Center")
+        val FORGOTTEN_SKULL = create("Forgotten Skull")
+        val MINES_OF_DIVAN = create("Mines of Divan")
+        val COMMUNITY_CENTER = create("Community Center")
+        val FASHION_SHOP = create("Fashion Shop")
+        val SHENS_AUCTION = create("Shen's Auction")
+        val BLAZING_VOLCANO = create("Blazing Volcano")
+        val BAZAAR_ALLEY = create("Bazaar Alley")
+        val FARM = create("Farm")
+        val GRAVEYARD = create("Graveyard")
+        val REVENANT_CAVE = create("Revenant Cave")
+        val SPIDER_MOUND = create("Spider Mound")
+        val ARACHNES_BURROW = create("Arachne's Burrow")
+        val ARACHNES_SANCTUARY = create("Arachne's Sanctuary")
+        val BURNING_DESERT = create("Burning Desert")
+        val RUINS = create("Ruins")
+        val HOWLING_CAVE = create("Howling Cave")
+        val SOUL_CAVE = create("Soul Cave")
+        val SPIRIT_CAVE = create("Spirit Cave")
+        val VOID_SEPULTURE = create("Void Sepulture")
+        val ZEALOT_BRUISER_HIDEOUT = create("Zealot Bruiser Hideout")
+        val DRAGONS_NEST = create("Dragon's Nest")
+        val STRONGHOLD = create("Stronghold")
+        val THE_WASTELAND = create("The Wasteland")
+        val SMOLDERING_TOMB = create("Smoldering Tomb")
+        val STILLGORE_CHATEAU = create("Stillgore Château")
+        val OUBLIETTE = create("Oubliette")
+        val DOJO = create("Dojo")
+        val DOJO_ARENA = create("Dojo Arena")
+        val GUNPOWDER_MINES = create("Gunpowder Mines")
+        val OBSIDIAN_SANCTUARY = create("Obsidian Sanctuary")
+        val ROYAL_PALACE = create("Royal Palace")
+        val DRAGONTAIL = create("Dragontail")
+        val LIVING_CAVE = create("Living Cave")
+        val LIVING_STILLNESS = create("Living Stillness")
+        val COLOSSEUM = create("Colosseum")
+        val DREADFARM = create("Dreadfarm")
+        val WEST_VILLAGE = create("West Village")
+        val INFESTED_HOUSE = create("Infested House")
+        val CONTINUUM = create("Continuum")
+        val THE_MOUNTAINTOP = create("The Mountaintop")
+        val TRIAL_GROUNDS = create("Trial Grounds")
+        val TIME_TORN_ISLES = create("Time-Torn Isles")
+        val WIZARDMAN_BUREAU = create("Wizardman Bureau")
+        val WIZARD_BRAWL = create("Wizard Brawl")
+        val WALK_OF_FAME = create("Walk of Fame")
+        val TIME_CHAMBER = create("Time Chamber")
+
+        val NONE = create("")
+        val UNKNOWN = create("???")
+
+        val entries: List<AreaType>
+            get() = entriesList
+
         private var currentArea = NONE
 
-        fun getByName(name: String): AreaType = getByNameOrNull(name) ?: error("AreaType not found: '$name'")
-        fun getByNameOrUnknown(name: String): AreaType = getByNameOrNull(name) ?: UNKNOWN
-        fun getByNameOrNull(name: String): AreaType? = AreaType.entries.find { it.displayName == name }
+        fun getByName(name: String): AreaType =
+            getByNameOrNull(name) ?: error("AreaType not found: '$name'")
 
-        val currentScoreboardArea get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
-        val currentGraphArea get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
+        fun getByNameOrUnknown(name: String): AreaType =
+            getByNameOrNull(name) ?: UNKNOWN
+
+        fun getByNameOrNull(name: String): AreaType? =
+            entries.find { it.displayName == name }
+
+        val currentScoreboardArea
+            get() = SkyBlockUtils.scoreboardArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
+
+        val currentGraphArea
+            get() = SkyBlockUtils.graphArea?.let { getByNameOrUnknown(it) } ?: UNKNOWN
 
         private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
 
         @HandleEvent(priority = HIGHEST)
-        fun onGraphAreaChange(event: GraphAreaChangeEvent) {
-            val areaType = getByNameOrUnknown(event.area)
+        fun onGraphAreaChange() {
+            val areaType = SkyBlockUtils.area
             if (currentArea == areaType) return
             currentArea = areaType
             AreaChangeEvent(areaType, currentArea).post()
         }
 
         @HandleEvent(priority = HIGHEST)
-        fun onScoreboardAreaChange(event: ScoreboardAreaChangeEvent) {
-            val areaType = getByNameOrUnknown(event.area)
+        fun onScoreboardAreaChange() {
+            val areaType = SkyBlockUtils.area
             if (currentArea == areaType) return
             currentArea = areaType
             AreaChangeEvent(areaType, currentArea).post()
@@ -121,10 +153,12 @@ enum class AreaType(private val nameFallback: String) {
         fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             val data = event.getConstantAsync<AreaTypeJson>("misc/AreaType")
 
-            AreaType.entries.forEach { islandType ->
-                islandType.areaData = data.areas[islandType.name]?.let { area ->
-                    AreaData(area.name)
-                }
+            entries.forEach { areaType ->
+                areaType.setAreaData(
+                    data.areas[areaType.name]?.let { area ->
+                        AreaData(area.name)
+                    },
+                )
             }
         }
     }

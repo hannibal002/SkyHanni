@@ -596,4 +596,33 @@ object StringUtils {
     fun Map<String, Any>.toQueryString(): String = "?" + map { (k, v) ->
         "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.toString(), "UTF-8")}"
     }.joinToString("&")
+
+    fun String.toEnumName(): String {
+        val result = StringBuilder()
+        var lastWasSeparator = false
+
+        for (char in this) {
+            when {
+                char.isLetterOrDigit() -> {
+                    result.append(char.uppercaseChar())
+                    lastWasSeparator = false
+                }
+
+                char == '\'' || char == '"' -> {
+                    // Skip apostrophes and quotes
+                }
+
+                !lastWasSeparator && result.isNotEmpty() -> {
+                    result.append('_')
+                    lastWasSeparator = true
+                }
+            }
+        }
+
+        if (lastWasSeparator) {
+            result.setLength(result.length - 1)
+        }
+
+        return result.toString()
+    }
 }
