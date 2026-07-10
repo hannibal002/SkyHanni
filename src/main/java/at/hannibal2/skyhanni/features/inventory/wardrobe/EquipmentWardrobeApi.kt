@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.collections.forEach
 
 @SkyHanniModule
@@ -20,7 +19,7 @@ object EquipmentWardrobeApi : WardrobeApi() {
      * REGEX-TEST: (1/2) Equipment Sets
      */
     override val inventoryPattern by patternGroup.pattern(
-        "inventory.name.equipment",
+        "equipment.name",
         "\\((?<currentPage>\\d+)/\\d+\\) Equipment Sets",
     )
 
@@ -43,7 +42,7 @@ object EquipmentWardrobeApi : WardrobeApi() {
 
         val currentEquipped = currentSlot?.let {
             slots[it]
-        }?.getData()?.items ?: return
+        }?.getData()?.armor ?: return
         EquipmentSlot.entries.forEach {
             val itemStack = currentEquipped[it.slot]
             if (itemStack != null && !itemStack.isStainedGlassPane()) {

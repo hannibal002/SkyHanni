@@ -124,7 +124,7 @@ abstract class WardrobeApi {
             }
             if (allSlotsEmpty) {
                 for (slot in slots.filter { it.isInCurrentPage() }) {
-                    slot.getData()?.items = emptyItems()
+                    slot.getData()?.armor = emptyItems()
                 }
             } else return
         }
@@ -145,7 +145,7 @@ abstract class WardrobeApi {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
-            slot.getData()?.items = listOf(
+            slot.getData()?.armor = listOf(
                 getWardrobeItem(itemsList[slot.item1Slot]),
                 getWardrobeItem(itemsList[slot.item2Slot]),
                 getWardrobeItem(itemsList[slot.item3Slot]),
@@ -192,7 +192,7 @@ abstract class WardrobeApi {
                 } else {
                     add(slotInfo)
                     setOf("Item1", "Item2", "Item3", "Item4").forEachIndexed { id, armorName ->
-                        slot.getData()?.items?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
+                        slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }
                     }
@@ -203,7 +203,7 @@ abstract class WardrobeApi {
 
     class WardrobeData(
         @Expose val id: Int,
-        @Expose var items: List<SafeItemStack?>,
+        @Expose var armor: List<SafeItemStack?>,
         @Expose var locked: Boolean,
         @Expose var favorite: Boolean,
     )

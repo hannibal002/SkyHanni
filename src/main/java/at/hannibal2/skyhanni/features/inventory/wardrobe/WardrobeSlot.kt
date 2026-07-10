@@ -13,7 +13,7 @@ class WardrobeSlot(
     fun getData() = api.storage?.data?.getOrPut(id) {
         WardrobeApi.WardrobeData(
             id,
-            items = WardrobeApi.emptyItems(),
+            armor = WardrobeApi.emptyItems(),
             locked = true,
             favorite = false,
         )
@@ -31,7 +31,7 @@ class WardrobeSlot(
             getData()?.favorite = value
         }
 
-    val armor get() = getData()?.items ?: WardrobeApi.emptyItems()
+    val armor get() = getData()?.armor ?: WardrobeApi.emptyItems()
 
     val inventorySlots = listOf(item1Slot, item2Slot, item3Slot, item4Slot)
 

@@ -16,7 +16,7 @@ object ArmorWardrobeApi : WardrobeApi() {
      * REGEX-TEST: (1/3) Armor Sets
      */
     override val inventoryPattern by patternGroup.pattern(
-        "inventory.name",
+        "armor.name",
         "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets",
     )
 
