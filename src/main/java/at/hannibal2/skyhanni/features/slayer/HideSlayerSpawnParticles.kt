@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.particles.ParticleTypes
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HideSlayerSpawnParticles {
+
     private val config get() = SlayerApi.config
 
-    @Suppress("VarCouldBeVal")
-    private var mobRecentDeaths = mutableMapOf<LorenzVec, SimpleTimeMark>()
+    private val mobRecentDeaths = ConcurrentHashMap<LorenzVec, SimpleTimeMark>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onParticle(event: ParticleEvent) {
