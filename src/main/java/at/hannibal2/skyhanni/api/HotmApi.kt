@@ -108,37 +108,37 @@ object HotmApi {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(
-        override val perkDescription: String,
+        override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            perkDescription = "+100\uE015 Mining Speed",
+            displayDescription = "§6+100\uE015 Mining Speed",
             chatFallback = "Gain \\+100\uE015 Mining Speed\\.",
             itemFallback = "Gain \\+100\uE015 Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            perkDescription = "+50\uE053 Mining Fortune",
+            displayDescription = "§6+50\uE053 Mining Fortune",
             chatFallback = "Gain \\+50\uE053 Mining Fortune\\.",
             itemFallback = "Gain \\+50\uE053 Mining Fortune\\.",
         ),
         EXTRA_POWDER(
-            perkDescription = "+15% more Powder",
+            displayDescription = "§a+15% §7more Powder",
             chatFallback = "Gain \\+15% more Powder while mining\\.",
             itemFallback = "Gain \\+15% more Powder while mining\\.",
         ),
         ABILITY_COOLDOWN(
-            perkDescription = "-20% Pickaxe Ability cooldowns",
+            displayDescription = "§a-20% §7Pickaxe Ability cooldowns",
             chatFallback = "-20% Pickaxe Ability cooldowns\\.",
             itemFallback = "-20% Pickaxe Ability cooldowns\\.",
         ),
         GOBLIN_CHANCE(
-            perkDescription = "10x Gold & Diamond Goblin chance",
+            displayDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
             chatFallback = "10x chance to find Golden and Diamond Goblins\\.",
             itemFallback = "10x chance to find Golden and",
         ),
         TITANIUM(
-            perkDescription = "5x Titanium drops",
+            displayDescription = "§a5x §9Titanium §7drops",
             chatFallback = "Gain 5x Titanium drops",
             itemFallback = "Gain 5x Titanium drops\\.",
         ),

@@ -12,22 +12,22 @@ object HotfApi {
     var lottery: LotteryPerk? = null
 
     enum class LotteryPerk(
-        override val perkDescription: String,
+        override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         SWEEP(
-            perkDescription = "+5% \uE023 Sweep",
+            displayDescription = "§a+5% §r§2\uE023 Sweep",
             chatFallback = "Gain \\+5% \uE023 Sweep\\.",
             itemFallback = "Gain \\+5% \uE023 Sweep\\.",
         ),
         MANGROVE_FORTUNE(
-            perkDescription = "+50 \uE054 Mangrove Fortune",
+            displayDescription = "§a+50 §r§6\uE054 Mangrove Fortune",
             chatFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
             itemFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
         ),
         FIG_FORTUNE(
-            perkDescription = "+50 \uE054 Fig Fortune",
+            displayDescription = "§a+50 §r§6\uE054 Fig Fortune",
             chatFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
             itemFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
         ),
