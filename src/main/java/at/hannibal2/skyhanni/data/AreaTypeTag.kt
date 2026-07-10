@@ -61,38 +61,38 @@ class AreaTypeTag private constructor(
     companion object {
         private val entriesList = mutableListOf<AreaTypeTag>()
 
-        private fun create(vararg types: Any): AreaTypeTag {
-            val name = Throwable()
-                .stackTrace
-                .first()
-                .methodName
-
-            return AreaTypeTag(name, types.toList())
+        private fun create(identifier: String, vararg types: Any): AreaTypeTag {
+            return AreaTypeTag(identifier, types.toList())
                 .also(entriesList::add)
         }
 
         val MINABLE_GLACITE_TUNNELS = create(
+            "MINABLE_GLACITE_TUNNELS",
             AreaType.GLACITE_TUNNELS,
             AreaType.GREAT_GLACITE_LAKE,
         )
 
         val GLACITE_TUNNELS = create(
+            "GLACITE_TUNNELS",
             AreaType.DWARVEN_BASE_CAMP,
             AreaType.FOSSIL_RESEARCH_CENTER,
             MINABLE_GLACITE_TUNNELS,
         )
 
         val DOJO = create(
+            "DOJO",
             AreaType.DOJO,
             AreaType.DOJO_ARENA,
         )
 
         val REVENANT = create(
+            "REVENANT",
             AreaType.GRAVEYARD,
             AreaType.REVENANT_CAVE,
         )
 
         val TARANTULA = create(
+            "TARANTULA",
             AreaType.SPIDER_MOUND,
             AreaType.ARACHNES_BURROW,
             AreaType.ARACHNES_SANCTUARY,
@@ -100,6 +100,7 @@ class AreaTypeTag private constructor(
         )
 
         val SVEN = create(
+            "SVEN",
             AreaType.RUINS,
             AreaType.HOWLING_CAVE,
             AreaType.SOUL_CAVE,
@@ -107,33 +108,39 @@ class AreaTypeTag private constructor(
         )
 
         val VOID = create(
+            "VOID",
             AreaType.VOID_SEPULTURE,
             AreaType.ZEALOT_BRUISER_HIDEOUT,
             AreaType.DRAGONS_NEST,
         )
 
         val INFERNO = create(
+            "INFERNO",
             AreaType.STRONGHOLD,
             AreaType.THE_WASTELAND,
             AreaType.SMOLDERING_TOMB,
         )
 
         val VAMPIRE = create(
+            "VAMPIRE",
             AreaType.STILLGORE_CHATEAU,
             AreaType.OUBLIETTE,
         )
 
         val STILLGORE = create(
+            "STILLGORE",
             AreaType.STILLGORE_CHATEAU,
             AreaType.OUBLIETTE,
         )
 
         val WEST_VILLAGE = create(
+            "WEST_VILLAGE",
             AreaType.WEST_VILLAGE,
             AreaType.INFESTED_HOUSE,
         )
 
         val MOUNTAINTOP = create(
+            "MOUNTAINTOP",
             AreaType.CONTINUUM,
             AreaType.THE_MOUNTAINTOP,
             AreaType.TRIAL_GROUNDS,
