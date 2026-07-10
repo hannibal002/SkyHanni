@@ -135,14 +135,14 @@ object LimboTimeTracker {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Forgot to turn off the PC".asComponent(),
-            componentBuilder {
+            name = "Forgot to turn off the PC".asComponent(),
+            description = componentBuilder {
                 append("Spend 6 hours in limbo at once! ")
                 append("What a waste of electricity :(") {
                     withColor(ChatFormatting.DARK_GRAY)
                 }
             },
-            6f,
+            userLuckAmount = 6f,
         )
         event.register(achievement, LIMBO_ACHIEVEMENT)
     }

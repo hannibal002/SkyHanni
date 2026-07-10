@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
+import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -78,22 +80,22 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     private val patternGroup = RepoPattern.group("garden.pests.tracker")
 
     /**
-     * REGEX-TEST: RARE DROP! Mutant Nether Wart x9 (+134☀)
-     * REGEX-TEST: RARE DROP! Enchanted Cookie x9 (+1,810☘)
-     * REGEX-TEST: PET DROP! Slug (+1300☘)
-     * REGEX-TEST: PET DROP! Slug (+78☀)
-     * REGEX-TEST: RARE DROP! Squeaky Toy (+1,549☘)
-     * REGEX-TEST: RARE DROP! Squeaky Mousemat (+1,549☘)
-     * REGEX-TEST: RARE DROP! Wings of Harmony Vinyl (+139.5☀)
+     * REGEX-TEST: RARE DROP! Mutant Nether Wart x9 (+134)
+     * REGEX-TEST: RARE DROP! Enchanted Cookie x9 (+1,810)
+     * REGEX-TEST: PET DROP! Slug (+1300)
+     * REGEX-TEST: PET DROP! Slug (+78)
+     * REGEX-TEST: RARE DROP! Squeaky Toy (+1,549)
+     * REGEX-TEST: RARE DROP! Squeaky Mousemat (+1,549)
+     * REGEX-TEST: RARE DROP! Wings of Harmony Vinyl (+139.5)
      * REGEX-TEST: RARE DROP! Not Just a Pest Vinyl (Cocoaleech)
-     * REGEX-FAIL: RARE CROP! Cane Knot (+139.5☀)
+     * REGEX-FAIL: RARE CROP! Cane Knot (+139.5)
      */
     // Harvest Feast drops are handled elsewhere; they're added here if determined to come from a pest.
     // This pattern intentionally does not match them.
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
         "(?:RARE|PET) DROP! (?<item>.+?)(?: x(?<amount>\\d+))? " +
-            "\\((?:\\+[\\d.,]+[☘☀]|Cocoaleech)\\)",
+            "\\((?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)",
     )
 
     /**

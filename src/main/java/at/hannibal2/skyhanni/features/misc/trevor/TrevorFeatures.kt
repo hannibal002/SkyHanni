@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -107,6 +106,10 @@ object TrevorFeatures {
         "area.trappersden",
         "Trapper's Den",
     )
+    private val clickArmorStandPattern by patternGroup.pattern(
+        "click.armorstand",
+        "CLICK",
+    )
     // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
@@ -121,7 +124,7 @@ object TrevorFeatures {
     private var lastChatPrompt = ""
     private var lastChatPromptTime = SimpleTimeMark.farPast()
 
-    private var trevorTexture: String? = null
+    private val trevorTexture by SkullTextureHolder.texture("TREVOR")
     private var trevorEntity: RemotePlayer? = null
 
     var questActive = false
@@ -276,16 +279,6 @@ object TrevorFeatures {
         }
     }
 
-    private fun loadTrevorTexture() {
-        trevorTexture = SkullTextureHolder.getTextureOrNull("TREVOR")
-    }
-
-    @HandleEvent
-    fun onRepoReload() = loadTrevorTexture()
-
-    @HandleEvent
-    fun onComponentsLoaded() = loadTrevorTexture()
-
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (trevorTexture != null && event.entity.getSkinTexture() == trevorTexture) trevorEntity = event.entity
@@ -365,7 +358,7 @@ object TrevorFeatures {
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
-        if (event.entity.name.formattedTextCompatLessResets() == "§e§lCLICK") event.cancel()
+        if (clickArmorStandPattern.matches(event.entity.name.string)) event.cancel()
     }
 
     private fun resetTrapper() {

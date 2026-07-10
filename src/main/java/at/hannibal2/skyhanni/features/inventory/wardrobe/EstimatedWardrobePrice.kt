@@ -20,6 +20,7 @@ object EstimatedWardrobePrice {
         if (!isEnabled()) return
         event.slot ?: return
 
+        // TODO if we are in eq wardrobe get eq slots instead of normal wardrobe slots
         val slot = WardrobeApi.slots.firstOrNull {
             event.slot.index == it.inventorySlot && it.isInCurrentPage()
         } ?: return
@@ -27,23 +28,23 @@ object EstimatedWardrobePrice {
         val lore = WardrobeApi.createPriceLore(slot)
         if (lore.isEmpty()) return
 
+
         val tooltip = event.toolTip
-        var index = 3
 
         try {
-            tooltip.add(index++, "")
+            tooltip.add("")
+            tooltip.addAll(lore)
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorStateWithData(
                 "Can not show Estimated Wardrobe Price",
                 "IndexOutOfBoundsException while trying to add the estimated wardrobe price line to the tooltip",
-                "index" to index,
                 "lore" to lore,
             )
         }
-        tooltip.addAll(index, lore)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.armor && WardrobeApi.inWardrobe() &&
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
+        (config.armor && WardrobeApi.inWardrobe()) || (config.equipment && WardrobeApi.inEquipmentWardrobe()) &&
         (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent

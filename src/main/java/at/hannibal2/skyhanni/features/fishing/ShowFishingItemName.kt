@@ -27,12 +27,9 @@ object ShowFishingItemName {
     private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(750.milliseconds, useWeakKeys = true)
 
     // Textures taken from Skytils - moved to REPO
-    private val cheapCoins by lazy {
-        setOf(
-            SkullTextureHolder.getTexture("COINS_1"),
-            SkullTextureHolder.getTexture("COINS_2"),
-        )
-    }
+    private val CHEAP_COINS_1 by SkullTextureHolder.texture("COINS_1")
+    private val CHEAP_COINS_2 by SkullTextureHolder.texture("COINS_2")
+    private val cheapCoins get() = setOfNotNull(CHEAP_COINS_1, CHEAP_COINS_2)
 
     @HandleEvent
     fun onTick() {

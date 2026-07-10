@@ -61,7 +61,7 @@ object ExperimentationTableApi {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val storage get() = ProfileStorageData.profileSpecific?.experimentation
-    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
+    private val EXPERIMENTATION_TABLE_SKULL by SkullTextureHolder.texture("EXPERIMENTATION_TABLE")
     private val currentExperimentData = ExperimentationDataSet()
 
     val patternGroup = RepoPattern.group("enchanting.experiments")
@@ -237,6 +237,11 @@ object ExperimentationTableApi {
     var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
 
+    // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
+    // no in-game "ULTRA-RARE" lore header at flip time, so detected via processRewardOrNull() instead.
+    var ultraRareMiscItems: List<NeuInternalName> = emptyList()
+        private set
+
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
         EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
@@ -326,7 +331,9 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRepoRewards = event.getConstant<ExperimentsJson>("ExperimentationTable").miscRewards
+        val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
+        miscRepoRewards = experiments.miscRewards
+        ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -523,6 +530,14 @@ object ExperimentationTableApi {
 
         val internalName = NeuInternalName.fromItemNameOrNull(this)
             ?: return ChatUtils.debug("Could not read item name from $this")
+        // Intentionally fires later than the book detection path (tryFireRareBookUncovered runs at
+        // card-flip time). Non-book Ultra Rares show no "ULTRA-RARE" lore text at flip time — unlike
+        // books — so lore-based flip-time detection is impossible. Whether their identity is readable
+        // at flip time some other way is unconfirmed; these drops are too rare to test live. The
+        // post-experiment summary is used instead because it is confirmed to work reliably.
+        if (currentExperimentData.type == ExperimentationTaskType.SUPERPAIRS && internalName in ultraRareMiscItems) {
+            TableRareUncoverEvent(this, isBook = false).post()
+        }
         currentExperimentData.addReward(internalName, 1)
     }
 

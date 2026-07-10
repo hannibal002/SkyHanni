@@ -38,7 +38,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CocoonAPI {
-    private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
+    private val COCOON_SKULL_TEXTURE by SkullTextureHolder.texture("RIFT_LARVA")
 
     /*
     roughly where cocoon's time to hatch took during my testing.

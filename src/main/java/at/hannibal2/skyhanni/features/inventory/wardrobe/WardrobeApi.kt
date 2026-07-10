@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -32,19 +33,27 @@ object WardrobeApi {
     private val patternGroup = RepoPattern.group("inventory.wardrobe")
 
     /**
-     * REGEX-TEST: Wardrobe (2/2)
+     * REGEX-TEST: (1/3) Armor Sets
      */
     private val inventoryPattern by patternGroup.pattern(
         "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
+        "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets"
     )
 
     /**
-     * REGEX-TEST: §7Slot 4: §aEquipped
+     * REGEX-TEST: (1/2) Equipment Sets
+     */
+    private val equipmentInventoryPattern by patternGroup.pattern(
+        "inventory.name.equipment",
+        "\\((?<currentPage>\\d+)/\\d+\\) Equipment Sets"
+    )
+
+    /**
+     * REGEX-TEST: Slot 4: Equipped
      */
     private val equippedSlotPattern by patternGroup.pattern(
-        "equippedslot",
-        "§7Slot \\d+: §aEquipped",
+        "equippedslot.colorless",
+        "Slot \\d+: Equipped",
     )
 
     const val FIRST_SLOT = 36
@@ -68,6 +77,7 @@ object WardrobeApi {
 
     var currentPage: Int? = null
     private var inWardrobe = false
+    private var inEquipmentWardrobe = false
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -93,9 +103,15 @@ object WardrobeApi {
 
     fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
 
-    fun createPriceLore(slot: WardrobeSlot) = buildList {
+    fun inEquipmentWardrobe() = InventoryUtils.inInventory() && inEquipmentWardrobe
+
+    fun createPriceLore(slot: WardrobeSlot, equipment: Boolean = inEquipmentWardrobe) = buildList {
         if (slot.isEmpty()) return@buildList
-        add("§aEstimated Armor Value:")
+        if (equipment) {
+            add("§aEstimated Equipment Value:")
+        } else {
+            add("§aEstimated Armor Value:")
+        }
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
@@ -112,14 +128,14 @@ object WardrobeApi {
             inWardrobe = it
             if (CustomWardrobe.config.enabled) inCustomWardrobe = it
         }
+        equipmentInventoryPattern.matches(event.inventoryName).let {
+            inEquipmentWardrobe = it
+        }
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        inventoryPattern.matchMatcher(event.inventoryName) {
-            inWardrobe = true
-            currentPage = group("currentPage").formatInt()
-        } ?: return
+        if (!checkInventory(event.inventoryName)) return
 
         val itemsList = event.inventoryItems
 
@@ -144,6 +160,21 @@ object WardrobeApi {
         }
     }
 
+    private fun checkInventory(inventoryName: String): Boolean {
+        if (inventoryPattern.matchMatcher(inventoryName) {
+                inWardrobe = true
+                currentPage = group("currentPage").formatInt()
+            } != null
+        ) {
+            return true
+        }
+
+        return equipmentInventoryPattern.matchMatcher(inventoryName) {
+            inEquipmentWardrobe = true
+            currentPage = group("currentPage").formatInt()
+        } != null
+    }
+
     private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, SafeItemStack>): Boolean {
         var foundCurrentSlot = false
 
@@ -154,7 +185,7 @@ object WardrobeApi {
                 getWardrobeItem(itemsList[slot.leggingsSlot]),
                 getWardrobeItem(itemsList[slot.bootsSlot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -167,10 +198,15 @@ object WardrobeApi {
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inWardrobe) return
+        if (!inWardrobe && !inEquipmentWardrobe) return
+
         DelayedRun.runDelayed(250.milliseconds) {
-            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inWardrobe = false
+            val inventoryName = InventoryUtils.openInventoryName()
+
+            inWardrobe = inventoryPattern.matches(inventoryName)
+            inEquipmentWardrobe = equipmentInventoryPattern.matches(inventoryName)
+
+            if (!inWardrobe && !inEquipmentWardrobe) {
                 currentPage = null
             }
         }
