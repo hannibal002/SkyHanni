@@ -45,8 +45,8 @@ object HideMobNames {
         addMobToHide("Flaming Spider") // 5.5m
     }
 
-    @Suppress("MaxLineLength")
     // TODO: IF YOU READ THIS, YOU ARE LEGALLY OBLIGATED TO MAKE THIS USE SH-REPO
+    @Suppress("MaxLineLength")
     private fun addMobToHide(bossName: String) {
         patterns.add("§8\\[§7Lv\\d+§8] (?<mobType>(§.[✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? §c$bossName§r §[ae](?<min>.+)§f\\/§a(?<max>.+)§c❤(§r)?".toPattern())
     }

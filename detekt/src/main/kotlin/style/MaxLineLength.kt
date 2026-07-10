@@ -82,7 +82,7 @@ class MaxLineLength(config: Config) :
                 it.getNonStrictParentOfType<KtAnonymousInitializer>() != null ||
                 it.getNonStrictParentOfType<KtLambdaExpression>() != null
         } == true
-    
+
     private fun getLineLength(
         file: KtFile,
         offset: Int,
