@@ -110,40 +110,6 @@ class AreaType private constructor(
         val entries: List<AreaType>
             get() = entriesList
 
-        var currentArea = NONE
-            private set
-
-        fun getByName(name: String): AreaType =
-            getByNameOrNull(name) ?: error("AreaType not found: '$name'")
-
-        fun getByNameOrUnknown(name: String): AreaType =
-            getByNameOrNull(name) ?: UNKNOWN
-
-        fun getByNameOrNull(name: String): AreaType? =
-            entries.find { it.displayName == name }
-
-        fun String.isInScoreboardArea(): Boolean = SkyBlockUtils.scoreboardArea == this
-        fun String.isInGraphArea(): Boolean = SkyBlockUtils.graphArea == this
-        fun String.isInArea(): Boolean = SkyBlockUtils.rawArea == this
-
-        @HandleEvent(priority = HIGHEST)
-        fun onGraphAreaChange() {
-            postAreaChangeEvent()
-        }
-
-        @HandleEvent(priority = HIGHEST)
-        fun onScoreboardAreaChange() {
-            postAreaChangeEvent()
-        }
-
-        fun postAreaChangeEvent() {
-            val areaString = SkyBlockUtils.rawArea ?: "???"
-            val newArea = getByNameOrUnknown(areaString)
-            val oldArea = currentArea
-            currentArea = newArea
-            AreaChangeEvent(newArea, oldArea).post()
-        }
-
         private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
 
         @HandleEvent(priority = HIGHEST)
@@ -156,6 +122,15 @@ class AreaType private constructor(
                 }
             }
         }
+
+        fun getByName(name: String): AreaType =
+            getByNameOrNull(name) ?: error("AreaType not found: '$name'")
+
+        fun getByNameOrUnknown(name: String): AreaType =
+            getByNameOrNull(name) ?: UNKNOWN
+
+        fun getByNameOrNull(name: String): AreaType? =
+            entries.find { it.displayName == name }
     }
 }
 

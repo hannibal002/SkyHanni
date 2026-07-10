@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
+import at.hannibal2.skyhanni.data.AreaLocationApi
 import at.hannibal2.skyhanni.data.AreaType
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -47,7 +48,7 @@ object SkyBlockUtils {
      * Consider using [AreaType.isInArea] instead
      * Or [SkyBlockUtils.area] even
      */
-    val area: AreaType get() = AreaType.currentArea
+    val area: AreaType get() = AreaLocationApi.currentArea
 
     val noTradeMode get() = HypixelData.noTrade
 
