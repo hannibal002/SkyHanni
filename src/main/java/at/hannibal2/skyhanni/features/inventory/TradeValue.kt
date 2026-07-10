@@ -40,8 +40,8 @@ object TradeValue {
     private var yourDisplay = emptyList<Renderable>()
 
     /**
-     * REGEX-TEST:  §71
-     * REGEX-TEST:  §8(1,000)
+     * WRAPPED-REGEX-TEST: " §71"
+     * WRAPPED-REGEX-TEST: " §8(1,000)"
      */
     private val coinPattern by RepoPattern.pattern(
         "inventory.tradevalue.coins",

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.AccessoryBagUpdateEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropAccessory
@@ -9,20 +9,10 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CropAccessoryData {
-
-    /**
-     * REGEX-TEST: Accessory Bag (1/2)
-     */
-    private val accessoryBagNamePattern by RepoPattern.pattern(
-        "data.accessory.bagname.new",
-        "Accessory Bag.*",
-    )
 
     private var accessoryInBag = CropAccessory.NONE
     private var accessoryInInventory = CropAccessory.NONE
@@ -34,9 +24,7 @@ object CropAccessoryData {
     }
 
     @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!accessoryBagNamePattern.matches(event.inventoryName)) return
-
+    fun onAccessoryBagUpdate(event: AccessoryBagUpdateEvent) {
         val items = event.inventoryItems.values
         val bestInPage = bestCropAccessory(items)
         if (bestInPage > accessoryInBag) {

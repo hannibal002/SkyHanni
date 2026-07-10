@@ -92,7 +92,8 @@ object DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val data = mutableMapOf<UUID, EntityData>()
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
+    // EntityData is owned by the field 'data', so we can use weak keys
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
 
     private var tarantulaFoundTime = SimpleTimeMark.farPast()
     private val tarantulaErrored = mutableSetOf<UUID>()
@@ -793,7 +794,6 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_2 -> 30
                 BossType.SLAYER_ENDERMAN_3 -> 60
                 BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
             }
             val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()
@@ -1095,7 +1095,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")

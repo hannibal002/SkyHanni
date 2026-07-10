@@ -191,7 +191,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaApi.isDoingDiana()) {
@@ -335,7 +335,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.isLocalPlayer) {
+        if (event.distance > 10) {
             update()
         }
     }
