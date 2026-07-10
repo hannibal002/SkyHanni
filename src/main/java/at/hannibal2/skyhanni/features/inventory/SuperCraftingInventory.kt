@@ -122,7 +122,7 @@ object SuperCraftingInventory {
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
 
-    private fun calculateMaxPossible(string: String, craftingAmount: Long, craftMultiplier: Int) =
+    private fun calculateMaxPossible(string: String, craftingAmount: Long, craftMultiplier: Int): Long? =
         craftingResourcePattern.matchMatcher(string.removeColor()) {
             val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
             val used = groupOrNull("used")?.formatLongOrNull() ?: return null

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.ensureComponentsBound
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
@@ -180,8 +182,9 @@ class ItemResolutionQuery {
     }
 
     fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
+        stack.ensureComponentsBound()
         this.itemType = stack.itemType
-        this.compound = stack.components
+        this.compound = stack.immutableComponents()
         return this
     }
 
@@ -377,7 +380,7 @@ class ItemResolutionQuery {
         }
         val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getItem(bazaarSlot) ?: return false
+        val stackInSlot = chest.getItem(bazaarSlot).takeUnlessEmpty() ?: return false
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()

@@ -250,7 +250,8 @@ object HoppityApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
-            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
+            !event.inventoryItems.containsKey(it.key) ||
+                event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
         }
 
         // Only process if we're in the Chocolate Factory.

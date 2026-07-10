@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -44,7 +45,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -269,7 +269,7 @@ object HarvestFeastManager {
 
     private fun assumeGrandFeast(): Boolean {
         val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
+        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.activePerks } ?: false
         val timeBasedGrandFeast = currentFeastData?.let {
             it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
         } ?: false

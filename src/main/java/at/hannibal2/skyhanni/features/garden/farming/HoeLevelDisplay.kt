@@ -193,8 +193,8 @@ object HoeLevelDisplay {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Hoe Expert".asComponent(),
-            componentBuilder {
+            name = "Hoe Expert".asComponent(),
+            description = componentBuilder {
                 append("Get a hoe to level 1000. ") {
                     withColor(ChatFormatting.YELLOW)
                 }
@@ -209,7 +209,7 @@ object HoeLevelDisplay {
                     withColor(ChatFormatting.GREEN)
                 }
             },
-            30f,
+            userLuckAmount = 30f,
         )
         event.register(achievement, HOE_ACHIEVEMENT)
     }
