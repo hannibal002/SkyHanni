@@ -387,7 +387,7 @@ object PetStorageApi {
             updateCurrentPetHeldItem(petHeldItem)
         }
 
-        PetStoragePatterns.petItemRemovedMessagePattern.matchMatcher(event.message.removeColor().removeResets()) {
+        PetStoragePatterns.petItemRemovedMessagePattern.matchMatcher(event.cleanMessage) {
             updateCurrentPetHeldItem(null)
         }
 
