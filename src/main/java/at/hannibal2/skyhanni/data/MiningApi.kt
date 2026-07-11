@@ -69,12 +69,12 @@ object MiningApi {
 
     /**
      * REGEX-TEST: Heat: §6IMMUNE
-     * REGEX-TEST: Heat: §c14
-     * REGEX-TEST: Heat: §c0
+     * REGEX-TEST: Heat: §c14♨
+     * REGEX-TEST: Heat: §c0♨
      */
     val heatPattern by group.pattern(
         "heat.scoreboard",
-        "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)${SkyblockStat.HEAT_RESISTANCE.hypixelIcon}?)\$",
+        "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
     /**
