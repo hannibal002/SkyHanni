@@ -110,7 +110,8 @@ object CarryTracker {
                 val coins = recentTrades[name] ?: return@runNextTick
                 if (coins <= 0.0) return@runNextTick
 
-                findCustomer(name)?.let { customer ->
+                val customer = findCustomer(name)
+                if (customer != null) {
                     customer.coinsPaid += coins
                     updateDisplay()
                 }
@@ -394,39 +395,48 @@ object CarryTracker {
 
     private fun addCustomerInternal(name: String): Customer {
         val customer = Customer(name)
-        customers.add(customer)
+
         recentTrades.entries.firstOrNull { it.key.equals(name, true) }?.let {
             customer.coinsPaid += it.value
+            recentTrades.remove(it.key)
         }
 
+        customers.add(customer)
         return customer
     }
 
     private fun addCarry(customerName: String, rawType: String, amount: Int = 0) {
-        findCarryType(rawType)?.let { type ->
-            val customer = findCustomer(customerName) ?: addCustomerInternal(customerName)
+        val type = findCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return
+        }
 
-            customer.findCarry(type)?.let { carry ->
-                updateTotal(customer, carry, amount)
-            } ?: run {
-                if (amount < 0) {
-                    ChatUtils.userError("Carry amount cannot be negative!")
-                    return
-                }
+        val customer = findCustomer(customerName) ?: addCustomerInternal(customerName)
+        val carry = customer.findCarry(type)
 
-                val carry = Carry(type, amount)
-                customer.carries.add(carry)
-
-                updateDisplay()
-                ChatUtils.chat("Carry added: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
+        if (carry != null) {
+            updateTotal(customer, carry, amount)
+        } else {
+            if (amount < 0) {
+                ChatUtils.userError("Carry amount cannot be negative!")
+                return
             }
-        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+
+            val newCarry = Carry(type, amount)
+            customer.carries.add(newCarry)
+
+            updateDisplay()
+            ChatUtils.chat("Carry added: §b${customer.name} ${newCarry.formatProgress()} §d${newCarry.type.displayName}")
+        }
     }
 
     private fun removeCustomer(customerName: String) {
-        findCustomer(customerName)?.let { customer ->
-            removeCustomerInternal(customer)
-        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+        val customer = findCustomer(customerName) ?: run {
+            ChatUtils.userError("Customer not found: §b$customerName")
+            return
+        }
+
+        removeCustomerInternal(customer)
     }
 
     private fun removeCustomerInternal(customer: Customer) {
@@ -436,14 +446,21 @@ object CarryTracker {
     }
 
     private fun removeCarry(customerName: String, rawType: String, amount: Int? = null) {
-        findCustomer(customerName)?.let { customer ->
-            findCarryType(rawType)?.let { type ->
-                customer.findCarry(type)?.let { carry ->
-                    if (amount != null) updateTotal(customer, carry, -amount)
-                    else removeCarryInternal(customer, carry)
-                } ?: ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
-            } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
-        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+        val customer = findCustomer(customerName) ?: run {
+            ChatUtils.userError("Customer not found: §b$customerName")
+            return
+        }
+        val type = findCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return
+        }
+        val carry = customer.findCarry(type) ?: run {
+            ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
+            return
+        }
+
+        if (amount != null) updateTotal(customer, carry, -amount)
+        else removeCarryInternal(customer, carry)
     }
 
     private fun removeCarryInternal(customer: Customer, carry: Carry) {
@@ -458,20 +475,27 @@ object CarryTracker {
             ChatUtils.userError("New carry amount cannot be negative!")
             return
         }
-        carry.total = newTotal
 
+        carry.total = newTotal
         updateDisplay()
         ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
     }
 
     private fun updateDone(customerName: String, rawType: String, amount: Int) {
-        findCustomer(customerName)?.let { customer ->
-            findCarryType(rawType)?.let { type ->
-                customer.findCarry(type)?.let { carry ->
-                    updateDoneInternal(customer, carry, amount)
-                } ?: ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
-            } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
-        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+        val customer = findCustomer(customerName) ?: run {
+            ChatUtils.userError("Customer not found: §b$customerName")
+            return
+        }
+        val type = findCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return
+        }
+        val carry = customer.findCarry(type) ?: run {
+            ChatUtils.userError("Carry not found: §b${customer.name} §d${type.displayName}")
+            return
+        }
+
+        updateDoneInternal(customer, carry, amount)
     }
 
     private fun updateDoneInternal(customer: Customer, carry: Carry, amount: Int) {
@@ -480,24 +504,25 @@ object CarryTracker {
             ChatUtils.userError("New carries done cannot be negative!")
             return
         }
-        carry.done = newDone
 
+        carry.done = newDone
         updateDisplay()
         ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
     }
 
     private fun updatePaid(customerName: String, rawCoins: String) {
-        findCustomer(customerName)?.let { customer ->
-            rawCoins.formatDoubleOrUserError()?.let { coins ->
-                customer.coinsPaid += coins
-                updateDisplay()
-                ChatUtils.chat(
-                    "Customer updated: §b${customer.name} " +
-                        "§6${customer.coinsPaid.shortFormat()}§8/§6${customer.getTotalCost().shortFormat()}" +
-                        " coins §epaid",
-                )
-            }
-        } ?: ChatUtils.userError("Customer not found: §b$customerName")
+        val customer = findCustomer(customerName) ?: run {
+            ChatUtils.userError("Customer not found: §b$customerName")
+            return
+        }
+        val coins = rawCoins.formatDoubleOrUserError() ?: return
+
+        customer.coinsPaid += coins
+        updateDisplay()
+        ChatUtils.chat(
+            "Customer updated: " +
+                "§b${customer.name} §6${customer.coinsPaid.shortFormat()}§8/§6${customer.getTotalCost().shortFormat()} coins §epaid",
+        )
     }
 
     private fun listPrices(page: Int = 1) {
@@ -529,25 +554,30 @@ object CarryTracker {
     }
 
     private fun setPrice(rawType: String, rawPrice: String) {
-        findCarryType(rawType)?.let { type ->
-            rawPrice.formatDoubleOrUserError()?.let { price ->
-                if (price < 0.0) ChatUtils.userError("Carry price cannot be negative!")
-                else if (price == 0.0) ChatUtils.userError("Carry price cannot be 0! Use /shcarry price delete $rawType instead")
-                else {
-                    type.pricePer = price
-                    updateDisplay()
-                    ChatUtils.chat("Set carry price for §d${type.displayName} §eto §6${price.shortFormat()} coins")
-                }
-            }
-        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+        val type = findCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return
+        }
+        val price = rawPrice.formatDoubleOrUserError() ?: return
+
+        if (price < 0.0) ChatUtils.userError("Carry price cannot be negative!")
+        else if (price == 0.0) ChatUtils.userError("Carry price cannot be 0! Use /shcarry price delete $rawType instead")
+        else {
+            type.pricePer = price
+            updateDisplay()
+            ChatUtils.chat("Set carry price for §d${type.displayName} §eto §6${price.shortFormat()} coins")
+        }
     }
 
     private fun deletePrice(rawType: String) {
-        findCarryType(rawType)?.let { type ->
-            type.pricePer = 0.0
-            updateDisplay()
-            ChatUtils.chat("Deleted carry price for §d${type.displayName}")
-        } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
+        val type = findCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return
+        }
+
+        type.pricePer = 0.0
+        updateDisplay()
+        ChatUtils.chat("Deleted carry price for §d${type.displayName}")
     }
 
     private fun deleteAllPrices() {
@@ -558,10 +588,9 @@ object CarryTracker {
 
     private fun clearAll() {
         val customerSize = customers.size
-        val carrySize = customers.sumOf { it.carries.size }
         customers.clear()
         updateDisplay()
-        ChatUtils.chat("Removed §b$customerSize §ecustomers including §b$carrySize §ecarries")
+        ChatUtils.chat("Removed §b$customerSize §ecustomers")
     }
 
     private fun countCarry(customer: Customer, carry: Carry) {
@@ -668,10 +697,6 @@ object CarryTracker {
         }
     }
 
-    private fun findCustomer(name: String): Customer? = customers.firstOrNull { it.name.equals(name, ignoreCase = true) }
-    private fun findCarryType(id: String): CarryType? = findCarryType { it.id.equals(id, ignoreCase = true) }
-    private fun findCarryType(predicate: (CarryType) -> Boolean): CarryType? = carryTypes.firstOrNull(predicate)
-
     private data class Customer(
         val name: String,
         var coinsPaid: Double = 0.0,
@@ -727,10 +752,10 @@ object CarryTracker {
 
     private data class SlayerCarryType(
         override val id: String,
-        override val displayName: String,
         override val shortName: String,
         val slayerType: SlayerType,
         val slayerTier: Int,
+        override val displayName: String = "${slayerType.displayName} $slayerTier",
     ) : CarryType()
 
     private data class DungeonCarryType(
@@ -742,44 +767,37 @@ object CarryTracker {
 
     private data class KuudraCarryType(
         override val id: String,
-        override val displayName: String,
         val kuudraTier: KuudraTier,
+        override val displayName: String = "${kuudraTier.displayName} Kuudra",
         override val shortName: String = displayName,
     ) : CarryType()
 
     private data class CrimsonMinibossCarryType(
         override val id: String,
-        override val displayName: String,
-        override val shortName: String,
         val crimsonMiniboss: CrimsonMiniBoss,
+        override val displayName: String = crimsonMiniboss.displayName,
+        override val shortName: String = displayName,
     ) : CarryType()
 
     private val carryTypes: List<CarryType> = buildList {
-        for (i in 1..5) add(SlayerCarryType("rev$i", "${SlayerType.REVENANT.displayName} $i", "Rev $i", SlayerType.REVENANT, i))
-        for (i in 1..5) add(SlayerCarryType("tara$i", "${SlayerType.TARANTULA.displayName} $i", "Tara $i", SlayerType.TARANTULA, i))
-        for (i in 1..4) add(SlayerCarryType("sven$i", "${SlayerType.SVEN.displayName} $i", "Sven $i", SlayerType.SVEN, i))
-        for (i in 1..4) add(SlayerCarryType("eman$i", "${SlayerType.VOID.displayName} $i", "Eman $i", SlayerType.VOID, i))
-        for (i in 1..4) add(SlayerCarryType("blaze$i", "${SlayerType.INFERNO.displayName} $i", "Blaze $i", SlayerType.INFERNO, i))
-        for (i in 1..5) add(SlayerCarryType("vamp$i", "${SlayerType.VAMPIRE.displayName} $i", "Vamp $i", SlayerType.VAMPIRE, i))
+        for (i in 1..5) add(SlayerCarryType("rev$i", "Rev $i", SlayerType.REVENANT, i))
+        for (i in 1..5) add(SlayerCarryType("tara$i", "Tara $i", SlayerType.TARANTULA, i))
+        for (i in 1..4) add(SlayerCarryType("sven$i", "Sven $i", SlayerType.SVEN, i))
+        for (i in 1..4) add(SlayerCarryType("eman$i", "Eman $i", SlayerType.VOID, i))
+        for (i in 1..4) add(SlayerCarryType("blaze$i", "Blaze $i", SlayerType.INFERNO, i))
+        for (i in 1..5) add(SlayerCarryType("vamp$i", "Vamp $i", SlayerType.VAMPIRE, i))
 
         add(DungeonCarryType("f0", "Entrance Floor", "E"))
         for (i in 1..7) add(DungeonCarryType("f$i", "Floor $i", "F$i"))
         for (i in 1..7) add(DungeonCarryType("m$i", "Master Mode $i", "M$i"))
 
-        for (i in 1..5) add(KuudraCarryType("k$i", "${KuudraTier.entries[i - 1].displayName} Kuudra", KuudraTier.entries[i - 1]))
+        for (i in 1..5) add(KuudraCarryType("k$i", KuudraTier.entries[i - 1]))
 
-        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL.displayName, "Bladesoul", CrimsonMiniBoss.BLADESOUL))
-        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW.displayName, "Mage Outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
-        add(
-            CrimsonMinibossCarryType(
-                "barb_duke",
-                CrimsonMiniBoss.BARBARIAN_DUKE_X.displayName,
-                "Barb Duke",
-                CrimsonMiniBoss.BARBARIAN_DUKE_X,
-            ),
-        )
-        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG.displayName, "Ashfang", CrimsonMiniBoss.ASHFANG))
-        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_BOSS.displayName, "Magma Boss", CrimsonMiniBoss.MAGMA_BOSS))
+        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL))
+        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
+        add(CrimsonMinibossCarryType("barb_duke", CrimsonMiniBoss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
+        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG))
+        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_BOSS))
     }
 
     @HandleEvent
@@ -841,6 +859,10 @@ object CarryTracker {
             DelayedRun.runNextTick { countCarry(customer, carry) }
         }
     }
+
+    private fun findCustomer(name: String): Customer? = customers.firstOrNull { it.name.equals(name, ignoreCase = true) }
+    private fun findCarryType(id: String): CarryType? = findCarryType { it.id.equals(id, ignoreCase = true) }
+    private fun findCarryType(predicate: (CarryType) -> Boolean): CarryType? = carryTypes.firstOrNull(predicate)
 
     fun isCustomer(customerName: String): Boolean = findCustomer(customerName) != null
     fun getCustomerNames(): List<String> = customers.map { it.name }
