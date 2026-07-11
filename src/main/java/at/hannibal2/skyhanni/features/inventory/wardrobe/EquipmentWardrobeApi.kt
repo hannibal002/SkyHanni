@@ -44,7 +44,7 @@ object EquipmentWardrobeApi : WardrobeApi() {
             slots[it]
         }?.getData()?.armor ?: return
         EquipmentSlot.entries.forEach {
-            val itemStack = currentEquipped[it.slot]
+            val itemStack = currentEquipped[it.ordinal]
             if (itemStack != null && !itemStack.isStainedGlassPane()) {
                 EquipmentApi.setEquipment(it, itemStack)
             } else EquipmentApi.setEquipment(it, null)
