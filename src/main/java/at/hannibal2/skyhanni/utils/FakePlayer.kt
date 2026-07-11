@@ -28,6 +28,6 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
 
         fun fromLocalPlayerOrThrow(): FakePlayer =
             fromLocalPlayer()
-            ?: error("cannot create fake player because local player is null")
+                ?: error("cannot create fake player because local player is null")
     }
 }
