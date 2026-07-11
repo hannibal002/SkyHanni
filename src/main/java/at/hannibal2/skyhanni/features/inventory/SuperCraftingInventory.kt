@@ -13,8 +13,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -121,7 +122,7 @@ object SuperCraftingInventory {
         "lore" to slots.map { slot -> slot.item.getLore().map { line -> line.removeColor() } },
     )
 
-    private fun calculateMaxPossible(string: String, craftingAmount: Long, craftMultiplier: Int) =
+    private fun calculateMaxPossible(string: String, craftingAmount: Long, craftMultiplier: Int): Long? =
         craftingResourcePattern.matchMatcher(string.removeColor()) {
             val owned = groupOrNull("owned")?.formatLongOrNull() ?: return null
             val used = groupOrNull("used")?.formatLongOrNull() ?: return null
@@ -162,7 +163,7 @@ object SuperCraftingInventory {
     }
 
     private fun getSuperCraftingCount(slots: List<Slot>): Long? {
-        val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
+        val lore = slots[PICKAXE_SLOT].item.getCleanLore().toSingleLineLore()
         return craftingCount.matchMatcher(lore) {
             groupOrNull("count")?.formatLongOrNull()
         }

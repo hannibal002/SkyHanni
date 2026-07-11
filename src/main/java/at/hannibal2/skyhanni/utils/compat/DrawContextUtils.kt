@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.compat
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.Legacy
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 
@@ -61,12 +60,12 @@ object DrawContextUtils {
         drawContext.pose().scale(x, y)
     }
 
-    @Legacy("Use pushPop instead")
+    @Deprecated("Use pushPop instead")
     fun pushMatrix() {
         drawContext.pose().pushMatrix()
     }
 
-    @Legacy("Use pushPop instead")
+    @Deprecated("Use pushPop instead")
     fun popMatrix() {
         drawContext.pose().popMatrix()
     }
