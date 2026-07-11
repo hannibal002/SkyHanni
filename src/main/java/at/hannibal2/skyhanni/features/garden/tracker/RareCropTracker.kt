@@ -103,18 +103,26 @@ object RareCropTracker {
         WARTY("§5Warty"),
         ;
 
+        val cleanName = dropName.removeColor()
+
         val canDropFromPests: Boolean = pestType != null
 
+        /**
+         * REGEX-TEST: RARE CROP! Cropie (+97)
+         * REGEX-TEST: RARE CROP! Cane Knot (+137.6)
+         * REGEX-TEST: RARE CROP! Seasoning (+115) (automatically donated)
+         * REGEX-TEST: VERY RARE CROP! Burrowing Spores
+         */
         val chatPattern by patternGroup.pattern(
-            name.lowercase().replace('_', '-'),
-            "(?:§.)*(?:VERY )?RARE CROP! (?:§.)*${dropName.removeColor()}.*",
+            "${name.lowercase().replace('_', '-')}.colorless",
+            "(?:VERY )?RARE CROP! $cleanName(?: .*)?",
         )
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in RareCropDropType.entries) {
-            if (!dropType.chatPattern.matches(event.message)) continue
+            if (!dropType.chatPattern.matches(event.cleanMessage)) continue
             addDrop(dropType)
             PestProfitTracker.addRareCropDrop(dropType)
             if (config.hideChat) {
