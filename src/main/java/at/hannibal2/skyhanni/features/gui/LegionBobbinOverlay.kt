@@ -122,20 +122,10 @@ object LegionBobbinOverlay {
     private fun createRenderable(): List<Renderable> {
         return buildList {
             if (!config.hideWithoutEnchant || wearingLegion) add(
-                Renderable.horizontal(
-                    listOf(
-                        Renderable.text("§d§lLegion: "),
-                        Renderable.text("§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
-                    ),
-                ),
+                Renderable.text("§d§lLegion: §r§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
             )
             if (!config.hideWithoutEnchant || wearingBobbin) add(
-                Renderable.horizontal(
-                    listOf(
-                        Renderable.text("§3§lBobbin': "),
-                        Renderable.text("§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
-                    ),
-                ),
+                Renderable.text("§3§lBobbin': §r§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
             )
         }
     }
