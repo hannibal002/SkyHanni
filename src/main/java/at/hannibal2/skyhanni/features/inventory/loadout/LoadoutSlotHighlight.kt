@@ -17,10 +17,11 @@ object LoadoutSlotHighlight {
         LoadoutApi.slots
             .filter { it.isInCurrentPage() }
             .forEach { loadoutSlot ->
+                val slot = event.container.getSlot(loadoutSlot.inventorySlot)
                 if (config.currentlyEquipped && LoadoutApi.currentSlot == loadoutSlot.id) {
-                    event.container.getSlot(loadoutSlot.inventorySlot).highlight(config.equippedColor)
+                    slot.highlight(config.equippedColor)
                 } else if (config.favorites && loadoutSlot.favorite) {
-                    event.container.getSlot(loadoutSlot.inventorySlot).highlight(config.favoriteColor)
+                    slot.highlight(config.favoriteColor)
                 }
             }
     }
