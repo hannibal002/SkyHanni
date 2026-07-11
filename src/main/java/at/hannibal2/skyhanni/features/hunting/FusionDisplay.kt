@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -22,8 +21,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object FusionDisplay {
 
     private val config get() = SkyHanniMod.feature.hunting
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fusionDisplay
 
     private var renderable: List<Renderable>? = null
 
@@ -73,7 +70,7 @@ object FusionDisplay {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.fusionDisplay) return
         if (!AttributeShardsData.isInFusionMachine()) return
         renderable?.let {
             config.fusionDisplayPosition.renderRenderables(it, posLabel = "Fusion Display")
