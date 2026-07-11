@@ -18,7 +18,7 @@ object BacteApi {
     private val group = RepoPattern.group("rift.colosseum.bacte")
 
     /**
-     * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c❤ §2﴿
+     * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c §2﴿
      */
     @Suppress("MaxLineLength")
     private val namePattern by group.pattern(

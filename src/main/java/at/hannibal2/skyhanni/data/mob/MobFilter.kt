@@ -62,8 +62,8 @@ object MobFilter {
     private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
 
     /**
-     * REGEX-TEST: Wither Husk 500M❤
-     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
+     * REGEX-TEST: Wither Husk 500M
+     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
@@ -83,14 +83,14 @@ object MobFilter {
 
     /**
      * REGEX-TEST: ﴾ Storm ﴿
-     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M ﴿
      * REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
-     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M ﴿
+     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000 ﴿
+     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k ﴿
+     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M ﴿
+     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M ﴿
+     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M ﴿
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
