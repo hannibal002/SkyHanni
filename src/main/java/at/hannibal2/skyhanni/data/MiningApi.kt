@@ -43,7 +43,6 @@ import kotlin.time.Duration.Companion.seconds
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object MiningApi {
-
     private val group = RepoPattern.group("data.miningapi")
 
     /**
@@ -601,7 +600,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val repo = event.getConstant<MiningJson>("Mining")
 
         blockStrengths.clear()

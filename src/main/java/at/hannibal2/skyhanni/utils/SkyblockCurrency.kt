@@ -218,7 +218,7 @@ enum class SkyblockCurrency(
          * silently instead: every comparison against it never matches.
          */
         @HandleEvent
-        private fun onNeuRepoReload() {
+        private suspend fun onNeuRepoReload() {
             // The item name lookup needs NeuItems.allItemsCache, which another handler of this event rebuilds
             // on the next tick. Running at the end of that tick puts this check after the rebuild.
             DelayedRun.runNextTickEnd {

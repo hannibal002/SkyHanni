@@ -15,7 +15,7 @@ object FameRanks {
     fun getByInternalName(internalName: String) = fameRanksMap[internalName]
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val ranks = event.getConstant<FameRankJson>("FameRank")
         fameRanksMap = ranks.fameRank.map { (internalName, rank) ->
             FameRank(rank.name, rank.fameRequired, rank.bitsMultiplier, rank.votes, internalName)

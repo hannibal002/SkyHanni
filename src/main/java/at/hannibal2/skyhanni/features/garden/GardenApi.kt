@@ -67,7 +67,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
 object GardenApi {
-
     private const val GARDEN_OVERFLOW_EXP = 10000
 
     private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
@@ -308,7 +307,7 @@ object GardenApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExpTiers = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size

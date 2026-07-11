@@ -26,7 +26,8 @@ private val repoGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")
  * This class defines various widgets within the tab list, specifically focusing on the reading of the values.
  * Each enum value corresponds to a distinct widget in the tab list, ensuring no overlap between them.
  * The general info widget is broken up into multiple smaller ones.
- * The class facilitates access to the lines associated with each widget and triggers events when a widget undergoes changes or becomes invisible.
+ * The class facilitates access to the lines associated with each widget
+ * and triggers events when a widget undergoes changes or becomes invisible.
  */
 enum class TabWidget(
     pattern0: String,
@@ -528,8 +529,8 @@ enum class TabWidget(
             sentSinceWorldChange = false
         }
 
-        @HandleEvent(priority = HandleEvent.LOW)
-        private fun onRepoReload(event: RepositoryReloadEvent) {
+        @HandleEvent(priorityLevel = LOW)
+        private suspend fun onRepoReload(event: RepositoryReloadEvent) {
             extraPatterns = repoGroup.getUnusedPatterns()
         }
 

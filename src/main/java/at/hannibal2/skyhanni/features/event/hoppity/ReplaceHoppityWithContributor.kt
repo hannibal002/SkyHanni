@@ -26,12 +26,12 @@ object ReplaceHoppityWithContributor {
     private val replaceMap = mutableMapOf<String, String>()
 
     @HandleEvent(priorityLevel = LOWEST)
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         update()
     }
 
     @HandleEvent(priorityLevel = LOW)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         update()
     }
 

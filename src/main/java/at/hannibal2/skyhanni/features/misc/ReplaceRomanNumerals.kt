@@ -277,7 +277,7 @@ object ReplaceRomanNumerals {
 
     // LOW runs after default priority, so RepoPatternManager has already replaced the patterns
     @HandleEvent(priorityLevel = LOW)
-    private fun onRepoReload() {
+    private suspend fun onRepoReload() {
         cachedStrings.clear()
         inventoryPatterns = buildInventoryPatterns()
     }

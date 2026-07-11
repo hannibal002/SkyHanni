@@ -9,8 +9,9 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
+import kotlin.coroutines.cancellation.CancellationException
 
-class EventHandler<T : SkyHanniEvent> private constructor(
+class AsyncEventHandler<T : AsyncSkyHanniEvent> private constructor(
     val name: String,
     private val listenerCollection: ListenerCollection,
     private val canReceiveCancelled: Boolean,
@@ -23,25 +24,30 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         listeners.any { it.receiveCancelled },
     )
 
-    fun post(event: T, onError: ((Throwable) -> Unit)? = null) {
+    suspend fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
         invokeLog.invokeCount++
-        if (SkyHanniEvents.isDisabledHandler(name)) return
+        if (SkyHanniEvents.isDisabledHandler(name)) return false
 
         var errors = 0
         listenerCollection.forEachCurrent { listener ->
             if (!listener.shouldInvoke(event)) return@forEachCurrent true
 
             try {
-                requireNotNull(listener.invoker) { "Async listener ${listener.name} registered for synchronous event $name" }
-                    .accept(event)
+                requireNotNull(listener.suspendInvoker) {
+                    "Synchronous listener ${listener.name} registered for asynchronous event $name"
+                }(event)
+            } catch (e: CancellationException) {
+                throw e
             } catch (originalThrowable: Throwable) {
                 val throwable = originalThrowable.maybeSkipError()
                 errors++
                 if (errors <= 3) {
                     val errorName = throwable::class.simpleName ?: "error"
-                    val aOrAn = StringUtils.optionalAn(errorName)
-                    val message = "Caught $aOrAn $errorName in ${listener.name} at $name: ${throwable.message}"
-                    ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
+                    val message = "Caught ${StringUtils.optionalAn(errorName)} $errorName in " +
+                        "${listener.name} at $name: ${throwable.message}"
+                    runCatching {
+                        ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
+                    }
                 }
                 onError?.invoke(throwable)
             }
@@ -50,13 +56,13 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         }
 
         if (errors > 3) {
-            val hiddenErrors = errors - 3
             ChatUtils.chat(
                 componentBuilder {
-                    append("[SkyHanni/${SkyHanniMod.VERSION}] $hiddenErrors more errors in $name are hidden!")
+                    append("[SkyHanni/${SkyHanniMod.VERSION}] ${errors - 3} more errors in $name are hidden!")
                     withColor(ChatFormatting.RED)
-                }
+                },
             )
         }
+        return event.isCancelled
     }
 }

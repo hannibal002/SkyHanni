@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
@@ -18,16 +17,13 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object QuickModMenuSwitch {
-
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
-    private val reloadRepoCoroutine = CoroutineSettings("quick mod menu switch repo reload")
 
     private var display = emptyList<Renderable>()
     private var latestGuiPath = ""
@@ -38,8 +34,8 @@ object QuickModMenuSwitch {
     private var lastGuiOpen = 0L
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = reloadRepoCoroutine.launch {
-        mods = event.getConstantAsync<ModGuiSwitcherJson>("ModGuiSwitcher").mods.filter { mod ->
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        mods = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher").mods.filter { mod ->
             mod.value.guiPath.any { runCatching { Class.forName(it) }.isSuccess }
         }.map { (name, mod) ->
             Mod(name, mod.description, mod.command, mod.guiPath)
@@ -53,7 +49,6 @@ object QuickModMenuSwitch {
     }
 
     class Mod(val name: String, val description: List<String>, val command: String, private val guiPath: List<String>) {
-
         fun isInGui() = guiPath.any { latestGuiPath.startsWith(it) }
     }
 

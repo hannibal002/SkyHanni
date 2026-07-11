@@ -32,7 +32,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EnchantedClockHelper {
-
     private val patternGroup = RepoPattern.group("misc.eclock")
     private val storage get() = ProfileStorageData.profileSpecific?.enchantedClockBoosts
     private val config get() = SkyHanniMod.feature.misc.enchantedClock
@@ -177,7 +176,7 @@ object EnchantedClockHelper {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EnchantedClockJson>("misc/EnchantedClock")
         BoostType.populateFromJson(data)
     }

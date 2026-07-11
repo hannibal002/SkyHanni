@@ -13,14 +13,14 @@ annotation class HandleEvent(
      * To specify multiple events, use [eventTypes] instead.
      */
     @Deprecated("Use primary function name or explicit type parameter instead")
-    val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
+    val eventType: KClass<out AbstractSkyHanniEvent> = AbstractSkyHanniEvent::class,
 
     /**
      * For cases where multiple events are listened to, and properties are unnecessary.
      * To specify only one event, use [eventType] instead.
      */
     @Deprecated("Use primary function name or explicit type parameter instead")
-    val eventTypes: Array<KClass<out SkyHanniEvent>> = [],
+    val eventTypes: Array<KClass<out AbstractSkyHanniEvent>> = [],
 
     /**
      * If the event should only be received while on SkyBlock.

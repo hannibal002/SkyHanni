@@ -49,7 +49,6 @@ typealias CategoryName = String
 
 @SkyHanniModule
 object FishingProfitTracker {
-
     val config get() = SkyHanniMod.feature.fishing.fishingProfitTracker
 
     /**
@@ -106,7 +105,7 @@ object FishingProfitTracker {
     private var itemCategories = mapOf<String, List<NeuInternalName>>()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
     }
 
