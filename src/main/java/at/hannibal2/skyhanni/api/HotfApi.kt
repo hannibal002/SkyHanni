@@ -13,23 +13,23 @@ object HotfApi {
 
     enum class LotteryPerk(
         override val perkDescription: String,
-        @Language("RegExp") val chatFallback: String,
-        @Language("RegExp") val itemFallback: String,
+        @field:Language("RegExp") val chatFallback: String,
+        @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         SWEEP(
-            perkDescription = "§a+5% §r§2∮ Sweep",
-            chatFallback = "Gain §r§a\\+5% §r§2∮ Sweep§r§f\\.",
-            itemFallback = "Gain §a\\+5% §2∮ Sweep§7\\.",
+            perkDescription = "+5% \uE023 Sweep",
+            chatFallback = "Gain \\+5% \uE023 Sweep\\.",
+            itemFallback = "Gain \\+5% \uE023 Sweep\\.",
         ),
         MANGROVE_FORTUNE(
-            perkDescription = "§a+50 §r§6☘ Mangrove Fortune",
-            chatFallback = "Gain §r§a\\+50 §r§6☘ Mangrove Fortune§r§f\\.",
-            itemFallback = "Gain §a\\+50 §6☘ Mangrove Fortune§7\\.",
+            perkDescription = "+50 \uE054 Mangrove Fortune",
+            chatFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
+            itemFallback = "Gain \\+50 \uE054 Mangrove Fortune\\.",
         ),
         FIG_FORTUNE(
-            perkDescription = "§a+50 §r§6☘ Fig Fortune",
-            chatFallback = "Gain §r§a\\+50 §r§6☘ Fig Fortune§r§f\\.",
-            itemFallback = "Gain §a\\+50 §6☘ Fig Fortune§7\\.",
+            perkDescription = "+50 \uE054 Fig Fortune",
+            chatFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
+            itemFallback = "Gain \\+50 \uE054 Fig Fortune\\.",
         ),
         ;
 
@@ -37,5 +37,4 @@ object HotfApi {
         override val chatPattern by RepoPattern.pattern("$basePath.chat.${asPatternId()}", chatFallback)
         override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
-
 }

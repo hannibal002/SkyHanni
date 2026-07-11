@@ -1,3 +1,4 @@
+# Execution context: base branch code, called by Detekt workflow
 name: Detekt Review
 
 on:
@@ -19,7 +20,7 @@ jobs:
     review:
         name: Post Detekt review
         runs-on: ubuntu-latest
-        if: github.event.workflow_run.event == 'pull_request'
+        if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion != 'cancelled'
         steps:
             -   name: Checkout
                 uses: actions/checkout@v7
@@ -46,7 +47,19 @@ jobs:
                     | jq -s --arg repo "$HEAD_REPO" --arg branch "$HEAD_BRANCH" \
                     'add | map(select(.head.repo.full_name == $repo and .head.ref == $branch)) | .[0].number // empty')
                     echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
-
+            -   name: Check if commit is still current
+                id: check_sha
+                if: steps.pr.outputs.number != ''
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                run: |
+                    CURRENT_SHA=$(gh api "repos/${{ github.repository }}/pulls/${{ steps.pr.outputs.number }}" --jq '.head.sha' 2>/dev/null || echo "")
+                    if [ "$CURRENT_SHA" = "${{ github.event.workflow_run.head_sha }}" ]; then
+                    echo "current=true" >> "$GITHUB_OUTPUT"
+                    else
+                    echo "Skipping: ${{ github.event.workflow_run.head_sha }} is no longer PR HEAD (current: $CURRENT_SHA)"
+                    echo "current=false" >> "$GITHUB_OUTPUT"
+                    fi
             -   name: Cache Kotlin compiler
                 uses: actions/cache@v6
                 with:
@@ -62,10 +75,11 @@ jobs:
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
             -   name: Post review and manage label
-                if: steps.pr.outputs.number != '' && steps.download.outcome == 'success'
+                if: steps.pr.outputs.number != '' && steps.check_sha.outputs.current == 'true' && steps.download.outcome == 'success'
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
-                run: kotlinc -script .github/scripts/post_detekt_review.main.kts
+                    MODE: detekt
+                run: kotlinc -script .github/scripts/pr_review.main.kts

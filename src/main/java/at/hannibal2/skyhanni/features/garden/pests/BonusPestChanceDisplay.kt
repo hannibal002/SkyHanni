@@ -25,12 +25,12 @@ object BonusPestChanceDisplay {
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
     /**
-     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: ൠ70"
-     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: ൠ70"
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: 70"
+     * WRAPPED-REGEX-TEST: " Bonus Pest Chance: 70"
      */
     private val bonusPestChancePattern by patternGroup.pattern(
         "widget-no-color",
-        "\\s+Bonus Pest Chance: ൠ(?<amount>[\\d,.]+)",
+        "\\s+Bonus Pest Chance: (?<amount>[\\d,.]+)",
     )
     private var display: Renderable? = null
 
@@ -48,7 +48,7 @@ object BonusPestChanceDisplay {
             val amount = group("amount").formatInt()
 
             display = Renderable.text {
-                if (compact) append("§2ൠ BPC ") else append("§2ൠ Bonus Pest Chance ")
+                if (compact) append("§2 BPC ") else append("§2 Bonus Pest Chance ")
                 if (disabled) append("§c§m") else append("§f")
                 append("$amount%")
                 if (disabled && !compact) append("§r §cDISABLED")
