@@ -142,8 +142,8 @@ enum class SkyblockStat(
     RIFT_SPEED(WHITE, '\uE022', displayName = "Speed", hypixelId = "RIFT_WALK_SPEED"),
     RIFT_INTELLIGENCE(AQUA, '\uE003', displayName = "Intelligence"),
     // MAGIC_FIND is just the overworld stat
-    MANA_REGEN(AQUA, '⚡'),
-    HEARTS(RED, '♥'),
+    MANA_REGEN(AQUA, '\uE004'),
+    HEARTS(RED, '\uE01F'),
     // </editor-fold>
 
     UNKNOWN(GRAY, '?', generatePatterns = false),
