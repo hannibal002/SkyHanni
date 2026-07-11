@@ -74,7 +74,7 @@ object MiningApi {
      */
     val heatPattern by group.pattern(
         "heat.scoreboard",
-        "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
+        "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)${SkyblockStat.HEAT_RESISTANCE.hypixelIcon}?)\$",
     )
 
     /**
