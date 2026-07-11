@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -60,9 +61,10 @@ object MiningApi {
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
+    @Suppress("MaxLineLength")
     private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
     /**
@@ -80,7 +82,7 @@ object MiningApi {
      */
     val coldPattern by group.pattern(
         "cold",
-        "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
+        "(?:§.)*Cold: §.(?<cold>-?\\d+)${SkyblockStat.COLD_RESISTANCE.hypixelIcon}",
     )
 
     private val pickobulusGroup = group.group("pickobulus")
