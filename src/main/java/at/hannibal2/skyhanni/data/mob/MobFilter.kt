@@ -112,9 +112,9 @@ object MobFilter {
     )
 
     /**
-     * REGEX-TEST: [Lv1] ✰ Throwpo's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰ RecluseFang's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰ aThunderblade73's Green Jerrya 7 Hits
+     * REGEX-TEST: [Lv1]  Throwpo's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  RecluseFang's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  aThunderblade73's Green Jerrya 7 Hits
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
