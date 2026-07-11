@@ -89,6 +89,7 @@ enum class SkyblockStat(
     FORAGING_FORTUNE(GOLD, '\uE054'),
     FIG_FORTUNE(GOLD, '\uE054'),
     MANGROVE_FORTUNE(GOLD, '\uE054'),
+    HELIX_FORTUNE(GOLD, '\uE054'),
     // </editor-fold>
 
     // <editor-fold desc="Fishing Stats">
@@ -116,6 +117,7 @@ enum class SkyblockStat(
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
     HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
+    CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
     // <editor-fold desc="Wisdom Stats">
