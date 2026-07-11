@@ -67,6 +67,8 @@
 + Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
   + Highlights completed categories in green.
 + Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
++ Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
++ Added Option To Move `Insert Item Into Sack` button back to original placement. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5874)
 
 #### Garden
 
@@ -173,6 +175,8 @@
 + Added Lock Mouse when snapping to Squeaky Mousemat. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5939)
 + Added Reduce Sensitivity with Sun's Grasp active. - zumbiepig (https://github.com/hannibal002/SkyHanni/pull/5939)
 + Improved Garden Shopping List to ignore any Visitor. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5661)
++ Lock on Mousemat is no longer enabled by default. - Luna (https://github.com/hannibal002/SkyHanni/pull/6045)
+    + If you're an existing user, you will have to manually disable it if you don't want it.
 
 #### Combat
 
@@ -194,10 +198,14 @@
 + Added support for Turbo-Crop VI and VII in Estimated Item Value. - Luna (https://github.com/hannibal002/SkyHanni/pull/5666)
 + Added a `/shresetdrystreak` command to reset the Experimentation Table's dry-streak counter. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 + Added a manual reset button for the Experimentation Table's Dry-Streak Display. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
++ Added equipment wardrobe value estimation. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6036)
 
 #### Fishing
 
 + Improved Fishing Tracker to appear when within lootshare range of other players' mobs. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5708)
+
+#### Hunting
++ Added an Always Show option to the Hunting Profit Tracker, to keep it visible on screen at all times. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5997)
 
 #### Commands
 
@@ -233,6 +241,8 @@
 + Added search tags to Improved SkyBlock Menus option to make it easier to find. - Luna (https://github.com/hannibal002/SkyHanni/pull/5930)
 + Improved island detection for better performance. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5951)
 + Improved scrolling in the /shwords editor: faster and smoother. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
++ Added an on-screen display for active reminders. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6008)
++ Pet Display will now display best-effort cached data even if some tab list information is missing. - Luna (https://github.com/hannibal002/SkyHanni/pull/6035)
 
 ### Fixes
 
@@ -290,6 +300,13 @@
 + Fixed some pest features not working with the new resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6021)
 + Fixed the Pest fortune buff has expired message saying click to call Phillip even if it is set to teleport to the barn. - Luna (https://github.com/hannibal002/SkyHanni/pull/6007)
 + Fixed the Pest Spawn chat message appearing twice when Chat Message Format is set to Compact. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6004)
++ Fixed Rare Crop Tracker sometimes throwing an Internal name found with color codes error. - Luna (https://github.com/hannibal002/SkyHanni/pull/6057)
++ Fixed pest farming fortune bonus not being detected. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6031)
++ Fixed pest profit tracker not detecting rare drops. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6034)
++ Fixed Harvest Feast incorrectly detecting a Grand Feast when Finnegan is mayor. - Luna (https://github.com/hannibal002/SkyHanni/pull/6040)
++ Fixed Harvest Feast incorrectly detecting a Grand Feast when Finnegan is minister. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6038)
++ Fixed Jacob Contest Personal Bests not being detected from chat because of the Farming Fortune icon change. - Luna (https://github.com/hannibal002/SkyHanni/pull/6059)
++ Fixed bonus pest chance display not working. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6056)
 
 #### Combat
 
@@ -321,6 +338,8 @@
 + Fixed Crown of Avarice Counter to support changing between them. - Tryp0xd (https://github.com/hannibal002/SkyHanni/pull/6010)
   + Coin per hour metric should stay intact, the value on the counter will only change.
 + Fixed Remaining Slayer Kills Display not detecting decimal Combat Wisdom. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
++ Fixed ghost tracker not detecting rare drops. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6034)
++ Fixed ConcurrentModificationException error in Hide Slayer Spawn Particles. - Luna (https://github.com/hannibal002/SkyHanni/pull/6051)
 
 #### GUI
 
@@ -341,6 +360,7 @@
 + Fixed some GUI features incorrectly detecting two objects as being hovered at once. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
 + Fixed Pet Display sometimes not updating after Autopet switches pets. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5993)
 + Fixed Pet Display requiring Pet widget overflow XP when exact total/overflow XP text is not enabled. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/6003)
++ Fixed custom wardrobe freezing after the first click. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6036)
 
 #### Item Ability
 
@@ -403,10 +423,12 @@
 + Fixed Dungeon Finder features not detecting classes. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6014)
 + Fixed Dungeon Finder features not working outside of dungeon hub. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6014)
 + Fixed dungeon floor detection being broken due to new update. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6018)
++ Fixed dungeon chat filter not filter certain blessings. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6053)
 
 #### Foraging
 
 + Fixed error in DNA Analyzer Solver. - hannibal2 + nopo (https://github.com/hannibal002/SkyHanni/pull/5337)
++ Fixed a few errors when trying the torrhus canyon on the alpha. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6060)
 
 #### Rift
 
@@ -414,6 +436,7 @@
 + Fixed Dance Room Helper getting out of sync. - Luna (https://github.com/hannibal002/SkyHanni/pull/5433)
   + It should now remain accurate even if the server is lagging.
 + Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
++ Fixed rift time features not working with the hypixel resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6050)
 
 #### Inventory
 
@@ -468,12 +491,15 @@
 + Fixed description for Auto-Load Shaft Routes giving incorrect examples for route names. - Luna (https://github.com/hannibal002/SkyHanni/pull/5904)
 + Fixed Glacite Mineshaft entrance/ladder waypoints being set to wrong location. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5858)
 + Fixed glacite tunnels auto commision not working due to hypixel update. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6015)
++ Fixed mineshaft mayham perk buff giving an error. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6055)
++ Fixed gemstones not being detected in treasure chests. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6030)
 
 #### Chat
 
 + Fixed Copy Chat sometimes copying the wrong message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5854)
 + Fixed occasional error while editing/deleting a message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5843)
 + Fixed potential error message in chat centering when space width is zero. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5966)
++ Fixed Same Chat Color not working. - Tomeko (https://github.com/hannibal002/SkyHanni/pull/6052)
 
 #### Misc
 
@@ -581,6 +607,11 @@
 + Fixed contributors' suffixes in nametags being too close to the username when no emblem is equipped. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5996)
 + Fixed other mods breaking particle detection. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6002)
 + Fixed Skymall / Lottery perks giving an error. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6012)
++ Fixed Skymall/Lottery display being colorless. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6048)
++ Fixed Skymall/Lottery not being detected in the hotm/hotf menu. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6048)
++ Fixed skyhanni user luck breakdown randomly giving an error. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6054)
++ Fixed pet names displaying incorrectly in trackers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6046)
++ Fixed /shresetfeastdata not working if Fetch Upcoming Feast Data is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/6043)
 
 ### Technical Details
 
@@ -876,6 +907,19 @@
 + Made TunnelsMaps regex colorless. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6015)
 + Refactored Achievement constructors and enforced named parameters. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/5902)
 + Reworked ParticleEvent to fire early while deferring cancellation until later in packet handling, improving mod interoperability. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6002)
++ Added DataComponentMap.getLoreComponent and DataComponentMap.getCleanLore. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Added FakePlayer.fromLocalPlayer and FakePlayer.fromLocalPlayerOrThrow methods. - Luna (https://github.com/hannibal002/SkyHanni/pull/5579)
++ Added ItemStack.getCleanLore. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Adjusted ItemStack.getLoreComponent and ItemStack.getLore to use the underlying DataComponent methods. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Changed fullFormat into the companion object of SkyHanniLogger to fix log folder splitting. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6033)
++ DataComponentMap.getLore no longer has a nullable receiver. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ FakePlayer now requires passing in an AbstractClientPlayer to instantiate. - Luna (https://github.com/hannibal002/SkyHanni/pull/5579)
++ Item lore and NeuInternalName caches now use TimeLimitedCache instead of custom cache implementation. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Item lore cache is now keyed on DataComponentMap rather than ItemStack and stored as List\<Component> rather than List\<String>, allowing all methods dealing with it to benefit from it. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Made WardrobeApi be abstract so it has different storage. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6047)
++ Renamed ElectionCandidate.perks to allPerks. - Luna (https://github.com/hannibal002/SkyHanni/pull/6040)
++ Replaced ItemStack.getSingleLineLore with new List\<String>.toSingleLineLore method. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
++ Restricted /shreloadlisteners and /shstoplisteners to development environment. - Luna (https://github.com/hannibal002/SkyHanni/pull/6044)
 
 ### Removed Features
 
