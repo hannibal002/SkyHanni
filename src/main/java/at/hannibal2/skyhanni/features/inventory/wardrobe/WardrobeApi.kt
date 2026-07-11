@@ -1,15 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -22,52 +19,52 @@ import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
+import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
-object WardrobeApi {
+abstract class WardrobeApi {
 
-    val storage get() = ProfileStorageData.profileSpecific?.wardrobe
+    companion object {
+        @JvmStatic
+        protected val patternGroup = RepoPattern.group("inventory.wardrobe")
 
-    private val patternGroup = RepoPattern.group("inventory.wardrobe")
+        /**
+         * REGEX-TEST: Slot 4: Equipped
+         */
+        val equippedSlotPattern by patternGroup.pattern(
+            "equippedslot.colorless",
+            "Slot \\d+: Equipped",
+        )
 
-    /**
-     * REGEX-TEST: Wardrobe (2/2)
-     */
-    private val inventoryPattern by patternGroup.pattern(
-        "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
-    )
+        const val FIRST_SLOT = 36
+        private const val FIRST_ITEM_SLOT = 0
+        private const val SECOND_ITEM_SLOT = 9
+        private const val THIRD_ITEM_SLOT = 18
+        private const val FORTH_ITEM_SLOT = 27
+        const val MAX_SLOT_PER_PAGE = 9
+        const val MAX_PAGES = 3
 
-    /**
-     * REGEX-TEST: §7Slot 4: §aEquipped
-     */
-    private val equippedSlotPattern by patternGroup.pattern(
-        "equippedslot",
-        "§7Slot \\d+: §aEquipped",
-    )
+        internal fun emptyItems(): List<SafeItemStack?> = listOf(null, null, null, null)
+    }
 
-    const val FIRST_SLOT = 36
-    private const val FIRST_HELMET_SLOT = 0
-    private const val FIRST_CHESTPLATE_SLOT = 9
-    private const val FIRST_LEGGINGS_SLOT = 18
-    private const val FIRST_BOOTS_SLOT = 27
-    const val MAX_SLOT_PER_PAGE = 9
-    const val MAX_PAGES = 3
+    protected abstract val inventoryPattern: Pattern
+    protected abstract val valueName: String
+    protected abstract val debugTitle: String
 
-    var slots = listOf<WardrobeSlot>()
-    var inCustomWardrobe = false
+    abstract val storage: ProfileSpecificStorage.WardrobeStorage?
 
-    internal fun emptyArmor(): List<SafeItemStack?> = listOf(null, null, null, null)
+    var slots: List<WardrobeSlot> = emptyList()
+        private set
+
+    private var inThisWardrobe = false
+
+    internal var currentPage: Int? = null
 
     var currentSlot: Int?
         get() = storage?.currentSlot
         set(value) {
             storage?.currentSlot = value
         }
-
-    var currentPage: Int? = null
-    private var inWardrobe = false
 
     init {
         val list = mutableListOf<WardrobeSlot>()
@@ -76,11 +73,11 @@ object WardrobeApi {
         for (page in 1..MAX_PAGES) {
             for (slot in 0 until MAX_SLOT_PER_PAGE) {
                 val inventorySlot = FIRST_SLOT + slot
-                val helmetSlot = FIRST_HELMET_SLOT + slot
-                val chestplateSlot = FIRST_CHESTPLATE_SLOT + slot
-                val leggingsSlot = FIRST_LEGGINGS_SLOT + slot
-                val bootsSlot = FIRST_BOOTS_SLOT + slot
-                list.add(WardrobeSlot(++id, page, inventorySlot, helmetSlot, chestplateSlot, leggingsSlot, bootsSlot))
+                val item1Slot = FIRST_ITEM_SLOT + slot
+                val item2Slot = SECOND_ITEM_SLOT + slot
+                val item3Slot = THIRD_ITEM_SLOT + slot
+                val item4Slot = FORTH_ITEM_SLOT + slot
+                list.add(WardrobeSlot(this, ++id, page, inventorySlot, item1Slot, item2Slot, item3Slot, item4Slot))
             }
         }
         slots = list
@@ -91,11 +88,11 @@ object WardrobeApi {
 
     private fun getWardrobeSlotFromId(id: Int?) = slots.find { it.id == id }
 
-    fun inWardrobe() = InventoryUtils.inInventory() && inWardrobe
+    fun inWardrobe() = InventoryUtils.inInventory() && inThisWardrobe
 
     fun createPriceLore(slot: WardrobeSlot) = buildList {
         if (slot.isEmpty()) return@buildList
-        add("§aEstimated Armor Value:")
+        add("§aEstimated $valueName Value:")
         var totalPrice = 0.0
         for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             EstimatedItemValueCalculator.getTotalPrice(stack)?.let { price ->
@@ -106,20 +103,14 @@ object WardrobeApi {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    @HandleEvent
-    fun onInventoryOpen(event: InventoryOpenEvent) {
-        inventoryPattern.matches(event.inventoryName).let {
-            inWardrobe = it
-            if (CustomWardrobe.config.enabled) inCustomWardrobe = it
-        }
+    protected fun handleInventoryOpen(inventoryName: String): Boolean {
+        val matched = inventoryPattern.matches(inventoryName)
+        inThisWardrobe = matched
+        return matched
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        inventoryPattern.matchMatcher(event.inventoryName) {
-            inWardrobe = true
-            currentPage = group("currentPage").formatInt()
-        } ?: return
+    protected fun handleInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!checkInventory(event.inventoryName)) return
 
         val itemsList = event.inventoryItems
 
@@ -133,7 +124,7 @@ object WardrobeApi {
             }
             if (allSlotsEmpty) {
                 for (slot in slots.filter { it.isInCurrentPage() }) {
-                    slot.getData()?.armor = emptyArmor()
+                    slot.getData()?.armor = emptyItems()
                 }
             } else return
         }
@@ -144,17 +135,23 @@ object WardrobeApi {
         }
     }
 
+    private fun checkInventory(inventoryName: String): Boolean =
+        inventoryPattern.matchMatcher(inventoryName) {
+            inThisWardrobe = true
+            currentPage = group("currentPage").formatInt()
+        } != null
+
     private fun processSlots(slots: List<WardrobeSlot>, itemsList: Map<Int, SafeItemStack>): Boolean {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
             slot.getData()?.armor = listOf(
-                getWardrobeItem(itemsList[slot.helmetSlot]),
-                getWardrobeItem(itemsList[slot.chestplateSlot]),
-                getWardrobeItem(itemsList[slot.leggingsSlot]),
-                getWardrobeItem(itemsList[slot.bootsSlot]),
+                getWardrobeItem(itemsList[slot.item1Slot]),
+                getWardrobeItem(itemsList[slot.item2Slot]),
+                getWardrobeItem(itemsList[slot.item3Slot]),
+                getWardrobeItem(itemsList[slot.item4Slot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
@@ -165,20 +162,18 @@ object WardrobeApi {
         return foundCurrentSlot
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        if (!inWardrobe) return
+    protected fun handleInventoryClose() {
+        if (!inThisWardrobe) return
+
         DelayedRun.runDelayed(250.milliseconds) {
-            if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) {
-                inWardrobe = false
-                currentPage = null
-            }
+            val inventoryName = InventoryUtils.openInventoryName()
+            inThisWardrobe = inventoryPattern.matches(inventoryName)
+            if (!inThisWardrobe) currentPage = null
         }
     }
 
-    @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Wardrobe")
+    protected fun handleDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title(debugTitle)
         event.addIrrelevant {
             if (slots.isEmpty()) {
                 add("No slots")
@@ -196,7 +191,7 @@ object WardrobeApi {
                     add("$slotInfo is empty")
                 } else {
                     add(slotInfo)
-                    setOf("Helmet", "Chestplate", "Leggings", "Boots").forEachIndexed { id, armorName ->
+                    setOf("Item1", "Item2", "Item3", "Item4").forEachIndexed { id, armorName ->
                         slot.getData()?.armor?.get(id)?.hoverName?.formattedTextCompatLeadingWhiteLessResets()?.let { name ->
                             add("   $armorName: $name")
                         }

@@ -23,19 +23,10 @@ object TabComplete {
 
     @Suppress("ReturnCount")
     private fun customTabComplete(fullCommand: String, command: String): List<String>? {
-        GetFromSacksTabComplete.handleTabComplete(command)?.let { return it }
         PlayerTabComplete.handleTabComplete(fullCommand)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
 
         return null
-    }
-
-    private fun buildResponse(arguments: List<String>, fullResponse: List<String>): List<String> {
-        if (arguments.size == 2) {
-            val start = arguments[1].lowercase()
-            return fullResponse.filter { it.lowercase().startsWith(start) }
-        }
-        return emptyList()
     }
 }

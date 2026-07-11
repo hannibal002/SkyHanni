@@ -12,12 +12,13 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
+import at.hannibal2.skyhanni.events.SackOpenEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
-import at.hannibal2.skyhanni.features.inventory.SackDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -149,6 +150,8 @@ object SackApi {
     var sackListNames = emptySet<String>()
         private set
 
+    private var uniqueSackItems: Set<NeuInternalName> = emptySet()
+
     var sacks = mapOf<String, List<NeuInternalName>>()
         private set
 
@@ -182,7 +185,7 @@ object SackApi {
         isTrophySack = inventoryName.contains("Trophy Fishing Sack")
         sackRarity = inventoryName.getTrophyRarity()
         stackList.putAll(stacks)
-        SackDisplay.update(isNewInventory)
+        SackOpenEvent(isNewInventory, event).post()
     }
 
     private fun String.getTrophyRarity(): TrophyRarity? = when {
@@ -363,13 +366,16 @@ object SackApi {
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.getConstant<NeuSacksJson>("sacks").sacks
-        val uniqueSackItems = mutableSetOf<NeuInternalName>()
-
-        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
+        uniqueSackItems = sacksData.values.flatMap { it.contents }.toSet()
         sacks = sacksData.mapValues { it.value.contents }
+        DelayedRun.runOrNextTick(::rebuildSackNameLists)
+    }
 
+    private fun rebuildSackNameLists() {
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
-        sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase() }.toSet()
+        sackListNames = uniqueSackItems.map {
+            it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
+        }.toSet()
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)

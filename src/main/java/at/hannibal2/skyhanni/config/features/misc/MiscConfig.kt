@@ -418,6 +418,14 @@ class MiscConfig {
     var gfsPiggyBank: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Move Insert Into Sack Button",
+        desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
+    )
+    @ConfigEditorBoolean
+    var moveInsertIntoSackButton: Boolean = false
+
+    @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -485,7 +493,7 @@ class MiscConfig {
     @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(
@@ -515,7 +523,17 @@ class MiscConfig {
     var achievementMessages: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Mute Stereo Pants",
+        desc = "Mutes music played by Stereo Pants."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteStereoPants: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @SearchTag("century cake slice")
     @ConfigEditorBoolean
     @FeatureToggle
     var giftCleanDisplay: Boolean = false

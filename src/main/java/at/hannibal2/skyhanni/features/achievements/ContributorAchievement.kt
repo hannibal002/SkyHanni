@@ -25,49 +25,54 @@ object ContributorAchievement {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
             Achievement(
-                "EEEEKK!".asComponent(),
-                componentBuilder {
+                name = "EEEEKK!".asComponent(),
+                description = componentBuilder {
                     append("Be in the same lobby as a")
                     appendWithColor(" SkyHanni ", TextHelper.chromaStyle)
                     append("contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_ACHIEVEMENT
+            CONTRIBUTOR_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "I Know a Guy".asComponent(),
-                componentBuilder {
+                name = "I Know a Guy".asComponent(),
+                description = componentBuilder {
                     append("Have a ")
                     appendWithColor("SkyHanni ", TextHelper.chromaStyle)
                     append("contributor as a friend")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_FRIEND_ACHIEVEMENT
+            CONTRIBUTOR_FRIEND_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "Notice Me Senpai".asComponent(),
-                componentBuilder {
-                    append("Have your friend request ignored by ")
+                name = "Notice Me Senpai".asComponent(),
+                description = componentBuilder {
+                    append("Have your friend request ignored by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
-                }
+                    append(" contributor")
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_NOBODY_ACHIEVEMENT
+            CONTRIBUTOR_NOBODY_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "Rejected".asComponent(),
-                componentBuilder {
+                name = "Rejected".asComponent(),
+                description = componentBuilder {
                     append("Have your friend request declined by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
                     append(" contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_REJECTED_ACHIEVEMENT
+            CONTRIBUTOR_REJECTED_ACHIEVEMENT,
         )
     }
 
