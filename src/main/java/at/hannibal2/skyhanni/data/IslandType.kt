@@ -38,6 +38,8 @@ enum class IslandType(private val nameFallback: String) {
     BACKWATER_BAYOU("Backwater Bayou"),
     GALATEA("Galatea"),
     LOTUS_ATOLL("Lotus Atoll"),
+    TORRHUS_CANYON("Torrhus Canyon"),
+    SAFARI("Safari"),
 
     NONE(""),
     ANY(""),
