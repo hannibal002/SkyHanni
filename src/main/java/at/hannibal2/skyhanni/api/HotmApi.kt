@@ -150,12 +150,13 @@ object HotmApi {
         override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
+    @Suppress("MaxLineLength")
     enum class MayhemPerk(
         @field:Language("RegExp") val chatFallback: String,
     ) {
         SCRAP_CHANCE("Your Suspicious Scrap chance was buffed by your Mineshaft Mayhem perk!"),
-        MINING_FORTUNE("You received a Mining Fortune buff from your Mineshaft Mayhem perk!"),
-        MINING_SPEED("You received a Mining Speed buff from your Mineshaft Mayhem perk!"),
+        MINING_FORTUNE("You received a ${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune buff from your Mineshaft Mayhem perk!"),
+        MINING_SPEED("You received a ${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed buff from your Mineshaft Mayhem perk!"),
         COLD_RESISTANCE("You received a ${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold Resistance buff from your Mineshaft Mayhem perk!"),
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!"),
         ;
