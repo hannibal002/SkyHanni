@@ -325,7 +325,7 @@ object ChatFilter {
     )
 
     /**
-     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25☘ Carrot Fortune §fduring the contest!
+     * REGEX-TEST: §e[NPC] Jacob§f: §rYour §9Anita's Talisman §fis giving you §6+25 Carrot Fortune §fduring the contest!
      */
     @Suppress("MaxLineLength")
     private val anitaFortunePattern by RepoPattern.pattern(

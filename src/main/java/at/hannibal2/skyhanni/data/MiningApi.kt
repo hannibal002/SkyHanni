@@ -58,7 +58,7 @@ object MiningApi {
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
 
     /**
-     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
+     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
     @Suppress("MaxLineLength")
@@ -69,8 +69,8 @@ object MiningApi {
 
     /**
      * REGEX-TEST: Heat: §6IMMUNE
-     * REGEX-TEST: Heat: §c14♨
-     * REGEX-TEST: Heat: §c0♨
+     * REGEX-TEST: Heat: §c14
+     * REGEX-TEST: Heat: §c0
      */
     val heatPattern by group.pattern(
         "heat.scoreboard",
@@ -78,7 +78,7 @@ object MiningApi {
     )
 
     /**
-     * REGEX-TEST: Cold: §b-1❄
+     * REGEX-TEST: Cold: §b-1
      */
     val coldPattern by group.pattern(
         "cold",
