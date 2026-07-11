@@ -38,9 +38,11 @@ object AreaLocationApi {
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Area")
-        event.addData("Current Area Identifier: ${currentArea.identifier}")
-        event.addData("Current Area displayName: ${currentArea.displayName}")
-        event.addData("Graph Area: ${SkyBlockUtils.graphArea ?: "???"}")
-        event.addData("Scoreboard Area: ${SkyBlockUtils.scoreboardArea ?: "???"}")
+        event.addIrrelevant {
+            add("Current Area Identifier: ${currentArea.identifier}")
+            add("Current Area displayName: ${currentArea.displayName}")
+            add("Graph Area: ${SkyBlockUtils.graphArea ?: "???"}")
+            add("Scoreboard Area: ${SkyBlockUtils.scoreboardArea ?: "???"}")
+        }
     }
 }
