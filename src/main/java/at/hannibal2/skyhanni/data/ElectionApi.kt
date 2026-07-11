@@ -325,7 +325,7 @@ object ElectionApi {
     var repoPerks: List<Perk>? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ForcedRepoPerksJson>("misc/ForcedRepoPerks")
         repoPerks?.forEach { it.isActive = false }
         repoPerks = data.perks

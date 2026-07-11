@@ -33,7 +33,7 @@ abstract class MoveableHudOverlay(
     private fun inSbEnabled() = SkyBlockUtils.inSkyBlock || (MinecraftCompat.localPlayerExists && config.showOutsideSkyblock)
     private var matrixPushed = false
 
-    internal open fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
+    open fun onRenderOverlayPre(event: GameOverlayRenderPreEvent) {
         if (event.type !in layers || !isEnabled()) return
         matrixPushed = true
         @Suppress("DEPRECATION")
@@ -45,7 +45,7 @@ abstract class MoveableHudOverlay(
         GuiEditManager.add(position, displayName, width - 1, height - 1) // Editor adds +1
     }
 
-    internal open fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
+    open fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type !in layers || !matrixPushed) return
         @Suppress("DEPRECATION")
         DrawContextUtils.popMatrix()

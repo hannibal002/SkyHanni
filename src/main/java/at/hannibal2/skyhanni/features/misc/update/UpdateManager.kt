@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
@@ -24,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonElement
@@ -46,10 +44,7 @@ import kotlin.time.Duration
 
 @SkyHanniModule
 object UpdateManager {
-
     private val logger = SkyHanniLogger("update_manager")
-
-    private val repoReloadCoroutine = CoroutineSettings("update manager repo reload")
 
     private var _activePromise: CompletableFuture<*>? = null
     private var activePromise: CompletableFuture<*>?
@@ -289,8 +284,8 @@ object UpdateManager {
     private var hasWarned = false
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        discontinuedVersions = event.getConstantAsync<DiscontinuedMinecraftVersionsJson>(
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        discontinuedVersions = event.getConstant<DiscontinuedMinecraftVersionsJson>(
             "DiscontinuedMinecraftVersions",
         ).versions.orEmpty()
     }

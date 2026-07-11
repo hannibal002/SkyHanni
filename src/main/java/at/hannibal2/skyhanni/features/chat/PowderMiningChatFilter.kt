@@ -314,8 +314,8 @@ object PowderMiningChatFilter {
     private var rewardPatterns: Map<Pair<Pattern, PowderMiningConfig.SimplePowderMiningRewardTypes>, String> =
         emptyMap()
 
-    @HandleEvent(priority = HandleEvent.HIGH)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = HIGH)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",

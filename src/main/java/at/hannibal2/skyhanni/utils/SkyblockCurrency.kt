@@ -183,7 +183,6 @@ enum class SkyblockCurrency(
 
     @SkyHanniModule
     companion object {
-
         /**
          * REGEX-TEST: 5,000 Bits
          * REGEX-TEST: 40 Pests
@@ -219,7 +218,7 @@ enum class SkyblockCurrency(
          * silently instead: every comparison against it never matches.
          */
         @HandleEvent
-        private fun onNeuRepoReload() {
+        private suspend fun onNeuRepoReload() {
             // the item name lookup needs NeuItems.allItemsCache, which is filled by another handler of this event
             DelayedRun.runNextTick {
                 val conflicts = entries.mapNotNull { currency ->

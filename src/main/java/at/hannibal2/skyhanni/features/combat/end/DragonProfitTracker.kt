@@ -101,7 +101,7 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
     var lastDragonPlacement: Int? = null
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         allowedItems = event.getConstant<DragonProfitTrackerItemsJson>("DragonProfitTrackerItems").items
     }
 
@@ -147,7 +147,6 @@ object DragonProfitTracker : SkyHanniBucketedItemTracker<DragonType, DragonProfi
                 totalProfit += profit
             }
         }
-
 
         val eyePrice = getPricePer(SUMMONING_EYE)
         totalProfit -= eyePrice * lastPlaced

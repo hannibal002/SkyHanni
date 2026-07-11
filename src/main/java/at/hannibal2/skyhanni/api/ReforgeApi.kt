@@ -101,7 +101,7 @@ object ReforgeApi {
     )
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         reforgeStones = event.getConstant<Map<String, NeuReforgeJson>>("reforgestones").values.map { it.mapReforge() }
         basicReforges = event.getConstant<Map<String, NeuReforgeJson>>("reforges").values.map { it.mapReforge() }
         reforges = (reforgeStones + basicReforges)

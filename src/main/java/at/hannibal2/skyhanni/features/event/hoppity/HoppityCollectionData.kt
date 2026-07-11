@@ -39,7 +39,7 @@ object HoppityCollectionData {
     }
 
     @HandleEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         rabbitRarities.clear()
         rarityBonuses.clear()
         specialBonuses.clear()

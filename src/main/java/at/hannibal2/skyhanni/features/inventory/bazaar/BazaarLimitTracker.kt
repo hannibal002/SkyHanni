@@ -90,7 +90,7 @@ object BazaarLimitTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<BazaarJson>("Bazaar")
         dailyLimit = data.dailyLimit
         capOrdersAtIntLimit = data.capOrdersAtIntLimit

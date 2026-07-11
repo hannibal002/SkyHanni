@@ -17,10 +17,8 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 
 class HypixelItemApi {
-
     @SkyHanniModule
     companion object {
-
         // prices = george prices + npc prices
         private var prices = mapOf<NeuInternalName, Double>()
         private var npcPrices = mapOf<NeuInternalName, Double>()
@@ -29,7 +27,7 @@ class HypixelItemApi {
         fun getNpcPrice(internalName: NeuInternalName) = prices[internalName]
 
         @HandleEvent
-        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
             val constant = event.getConstant<NeuGeorgeJson>("george")
             georgePrices = constant.prices ?: return
             prices = georgePrices + npcPrices
@@ -67,5 +65,4 @@ class HypixelItemApi {
 
         // TODO use SecondPassedEvent
     }
-
 }

@@ -167,7 +167,7 @@ object IslandGraphs {
     )
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<IslandGraphSettingsJson>("misc/IslandGraphSettings")
         ignoredIslandTypes = data.ignoredIslandTypes
 

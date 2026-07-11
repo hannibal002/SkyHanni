@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
@@ -33,7 +32,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import org.lwjgl.glfw.GLFW
@@ -44,11 +42,7 @@ private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String,
 
 @SkyHanniModule
 object EstimatedItemValue {
-
     val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
-
-    private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
-    private val neuRepoReloadCoroutine = CoroutineSettings("estimated item value neu repo reload")
 
     private val tooltipTimeout = 200.milliseconds
 
@@ -61,7 +55,6 @@ object EstimatedItemValue {
     private var hoveredItem: SafeItemStack? = null
     private var hoverStart = SimpleTimeMark.farPast()
     private var hoverDelayOver = false
-
     var gemstoneUnlockCosts = NeuGemstoneCostJson()
     var hasLegacyGemstoneSlots = emptyList<NeuInternalName>()
     var bookBundleAmount = mapOf<String, Int>()
@@ -77,18 +70,18 @@ object EstimatedItemValue {
     fun isCurrentlyShowing() = currentlyShowing && MinecraftCompat.screen != null
 
     @HandleEvent
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
-        gemstoneUnlockCosts = event.getConstantAsync<NeuGemstoneCostJson>("gemstonecosts")
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        gemstoneUnlockCosts = event.getConstant<NeuGemstoneCostJson>("gemstonecosts")
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-        val data = event.getConstantAsync<ItemsJson>("Items")
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
         itemValueCalculationData = data.valueCalculationData
         crimsonPrestigeCosts = data.crimsonPrestigeCosts
         hasLegacyGemstoneSlots = data.hasLegacyGemstoneSlots.orEmpty()
-        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
+        stackingEnchants = event.getConstant<EnchantsJson>("Enchants").stacking
     }
 
     // TODO test if this can go now since NEU pv is gone (SB-PV mod support?)

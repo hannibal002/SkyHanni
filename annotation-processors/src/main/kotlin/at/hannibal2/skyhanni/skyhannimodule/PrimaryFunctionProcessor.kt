@@ -16,11 +16,10 @@ class PrimaryFunctionProcessor(
     mcVersion: String,
     cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
-
     private val cache = KspIncrementalCache(cacheDir, mcVersion, "ksp-primary-function-state")
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
-        val skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")
+        val skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent")
             ?.asStarProjectedType() ?: return emptyList()
 
         val symbols = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
@@ -63,7 +62,7 @@ class PrimaryFunctionProcessor(
                 |package at.hannibal2.skyhanni.api.event
                 |
                 |object GeneratedEventPrimaryFunctionNames {
-                |    val map: Map<String, Class<out SkyHanniEvent>> = mapOf(
+                |    val map: Map<String, Class<out AbstractSkyHanniEvent>> = mapOf(
                 |        $entries
                 |    )
                 |}

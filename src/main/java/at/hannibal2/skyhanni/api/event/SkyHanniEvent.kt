@@ -4,13 +4,10 @@ import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 /**
- * Use @[HandleEvent]
+ * Base class for synchronous SkyHanni events.
+ * Use @[HandleEvent] on a `private fun` to register a listener for an event of this type.
  */
-abstract class SkyHanniEvent protected constructor() {
-    // TODO: This should only be accessible in the cancellable interface
-    var isCancelled: Boolean = false
-        private set
-
+abstract class SkyHanniEvent protected constructor() : AbstractSkyHanniEvent() {
     fun post() = prePost(onError = null)
 
     fun post(onError: (Throwable) -> Unit = {}) = prePost(onError)
@@ -19,13 +16,6 @@ abstract class SkyHanniEvent protected constructor() {
         (this as? Rendering)?.let { DrawContextUtils.setContext(it.context) }
         SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
         if (this is Rendering) DrawContextUtils.clearContext()
-    }
-
-    interface Cancellable {
-        fun cancel() {
-            val event = this as SkyHanniEvent
-            event.isCancelled = true
-        }
     }
 
     interface Rendering {

@@ -151,8 +151,8 @@ object WikiManager {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    @HandleEvent(priorityLevel = LOW)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<WikiJson>("misc/Wiki")
     }
 }

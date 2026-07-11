@@ -44,7 +44,6 @@ fun requireDevEnv(value: Boolean, lazyMessage: (() -> Any)?) {
 
 @SkyHanniModule
 object ErrorManager {
-
     // These are left as mutable properties so that they can be updated by the repo
     // however we still want to leave some defaults in here in case a repo reload fails
     // and tries to call ErrorManager methods.
@@ -389,7 +388,7 @@ object ErrorManager {
     }
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val repoData = event.getConstant<ErrorManagerJson>("ErrorManager")
         breakAfter = repoData.breakAfter
         replacements = repoData.replacements

@@ -194,16 +194,16 @@ object ItemUtils {
             get(DataComponents.LORE)?.lines.orEmpty()
         }
 
+    fun SafeItemStack.getLoreComponent(): List<Component> = components.getLoreComponent()
+
     fun DataComponentMap.getCleanLore(): List<String> =
         getLoreComponent().map { it.string.removeColor() }
+
+    fun SafeItemStack.getCleanLore(): List<String> = components.getCleanLore()
 
     @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
     fun DataComponentMap.getLore(): List<String> =
         getLoreComponent().map { it.formattedTextCompatLessResets() }
-
-    fun SafeItemStack.getLoreComponent(): List<Component> = components.getLoreComponent()
-
-    fun SafeItemStack.getCleanLore(): List<String> = components.getCleanLore()
 
     @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
     @Suppress("Deprecation")
@@ -666,18 +666,21 @@ object ItemUtils {
         get() = getInternalNameOrNull()?.repoItemName ?: "<null>"
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
+    val NeuInternalName.repoItemName: String
+        get() = itemNameCache.getOrPut(this) { grabItemName() }
+
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val SafeItemStack.repoItemNameCompact: String
         get() = getInternalNameOrNull()?.repoItemNameCompact ?: "<null>"
+
+    val NeuInternalName.repoItemNameCompact
+        get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val SafeItemStack.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.repoItemName: String
-        get() = itemNameCache.getOrPut(this) { grabItemName() }
-
-    val NeuInternalName.repoItemNameCompact
-        get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
+    val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     private fun NeuInternalName.getRepoCompactName(): String {
         var name = repoItemName
@@ -697,7 +700,7 @@ object ItemUtils {
     )
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         compactItemNameCache.clear()
         repoSkullProviders.forEach { it.reset() }
         coinSkullCache.clear()
@@ -708,7 +711,7 @@ object ItemUtils {
     }
 
     @HandleEvent
-    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private suspend fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         bazaarOverrides = event.getConstant<List<BazaarOverride>>("bazaarstocks").associate {
             it.bazaarInternalName to it.neuInternalName
         }
@@ -717,9 +720,6 @@ object ItemUtils {
         itemNameCache.clear()
         missingRepoItems.clear()
     }
-
-    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
-    val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
 
     fun NeuInternalName.matchesItemName(itemName: String): Boolean = when {
         itemName.contains('§') -> repoItemName == itemName

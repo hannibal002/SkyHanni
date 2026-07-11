@@ -20,10 +20,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
-// todo: create abstract class for this and BasketWaypoints
+// TODO create abstract class for this and BasketWaypoints
 @SkyHanniModule
 object PresentWaypoints {
-
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.christmasPresent
     private var presentLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
@@ -116,7 +115,7 @@ object PresentWaypoints {
     private fun EventWaypoint.shouldShow(): Boolean = !isFound && (!config.onlyClosest || closest == this)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
         presentLocations = loadEventWaypoints(data.presents)
         presentEntranceLocations = loadEventWaypoints(data.presentsEntrances)
