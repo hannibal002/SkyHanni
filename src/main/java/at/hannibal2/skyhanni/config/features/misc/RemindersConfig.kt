@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.misc
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class RemindersConfig {
@@ -21,4 +23,16 @@ class RemindersConfig {
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
     var interval: Float = 5f
+
+    @Expose
+    @ConfigOption(
+        name = "Show Reminders HUD",
+        desc = "Display active reminders on screen with time remaining."
+    )
+    @ConfigEditorBoolean
+    var showHud: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = RemindersConfig::class, field = "showHud")
+    val hudPosition: Position = Position(10, -130)
 }
