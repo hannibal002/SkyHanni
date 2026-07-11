@@ -117,7 +117,7 @@ enum class SkyblockStat(
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
     HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
-    CHARM_CHANCE(LIGHT_PURPLE, '❣'),
+    CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
     // <editor-fold desc="Wisdom Stats">
