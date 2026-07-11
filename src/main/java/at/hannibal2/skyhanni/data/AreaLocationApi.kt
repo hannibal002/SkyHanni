@@ -41,6 +41,7 @@ object AreaLocationApi {
         event.addIrrelevant {
             add("Current Area Identifier: ${currentArea.identifier}")
             add("Current Area displayName: ${currentArea.displayName}")
+            add("Raw Area: ${SkyBlockUtils.rawArea ?: "???"}")
             add("Graph Area: ${SkyBlockUtils.graphArea ?: "???"}")
             add("Scoreboard Area: ${SkyBlockUtils.scoreboardArea ?: "???"}")
         }
