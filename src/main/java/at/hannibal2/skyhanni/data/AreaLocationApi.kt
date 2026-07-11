@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -32,5 +33,14 @@ object AreaLocationApi {
         val oldArea = currentArea
         currentArea = newArea
         AreaChangeEvent(newArea, oldArea).post()
+    }
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Area")
+        event.addData("Current Area Identifier: ${currentArea.identifier}")
+        event.addData("Current Area displayName: ${currentArea.displayName}")
+        event.addData("Graph Area: ${SkyBlockUtils.graphArea ?: "???"}")
+        event.addData("Scoreboard Area: ${SkyBlockUtils.scoreboardArea ?: "???"}")
     }
 }
