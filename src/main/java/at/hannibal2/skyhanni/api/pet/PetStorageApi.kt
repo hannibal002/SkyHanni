@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
@@ -65,18 +66,16 @@ object PetStorageApi {
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
     private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
 
-    val isPetWidgetReadyForDisplay: Boolean
-        get() = petWidgetState != PetWidgetState.NOT_READY
+    private fun isPetWidgetUnavailable(): Boolean = IslandType.CATACOMBS.isInIsland()
 
-    fun getPetWidgetDisplayMessage(requireExactPetXp: Boolean): List<String>? = when {
-        !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> listOf(
-            "§cPet Tab Widget Missing",
-            "§cDo /widget and enable the pet widget",
-        )
-        requireExactPetXp && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> listOf(
-            "§cPet Widget Overflow XP Missing",
-            "§cEnable overflow XP in the pet widget",
-        )
+    fun getPetWidgetWarning(showMissingOverflowXpWarning: Boolean): String? = when {
+        isPetWidgetUnavailable() -> null
+        !TabWidget.PET.isActive && SkyBlockUtils.lastWorldSwitch.passedSince() >= WIDGET_LOAD_GRACE -> {
+            "§cInaccurate! Enable /tab → Pet Widget"
+        }
+        showMissingOverflowXpWarning && petWidgetState == PetWidgetState.MAXED_WITHOUT_OVERFLOW_XP -> {
+            "§cInaccurate! Enable /tab → Pet Widget → Show Overflow Pet XP"
+        }
         else -> null
     }
 
@@ -730,5 +729,4 @@ object PetStorageApi {
         val allowedError = (readExp * expErrorFactor).coerceAtLeast(1.0)
         abs((this.exp ?: 0.0) - readExp) <= allowedError
     } ?: true
-
 }

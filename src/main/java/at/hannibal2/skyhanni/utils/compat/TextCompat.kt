@@ -32,6 +32,7 @@ import kotlin.time.Duration.Companion.minutes
 //? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.world.item.ItemStackTemplate
+
 //?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
@@ -337,8 +338,18 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
     else -> throw NotImplementedError("Action ${action.name} is not implemented")
 }
 
-fun Component.changeColor(color: LorenzColor): Component =
-    this.copyIfNeeded().withStyle(color.toChatFormatting())
+fun Component.changeColor(color: LorenzColor): Component {
+    val component = Component.empty()
+
+    this.visit(
+        { style: Style?, string: String? ->
+            component.append(Component.literal(string.orEmpty()).withStyle((style ?: Style.EMPTY).withColor(color.toChatFormatting())))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
+    return component
+}
 
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
