@@ -27,7 +27,7 @@ object JyrreTimer {
     private val config get() = SkyHanniMod.feature.event.winter.jyrreTimer
 
     /**
-     * REGEX-TEST: §7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b+300✎ Intelligence §r§7for §r§a60m§r§7!
+     * REGEX-TEST: §7You consumed a §r§6Refined Bottle of Jyrre §r§7and gained §r§b+300 Intelligence §r§7for §r§a60m§r§7!
      */
     @Suppress("MaxLineLength")
     private val drankBottlePattern by RepoPattern.pattern(
