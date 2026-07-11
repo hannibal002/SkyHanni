@@ -30,12 +30,10 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
     override fun isModelPartShown(part: PlayerModelPart): Boolean =
         player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
-    //? if >= 26.2 {
     companion object {
+        //? if >= 26.2
         private val nextFakeEntityId = AtomicInt(-1)
-    }
 
-    companion object {
         fun fromLocalPlayer(): FakePlayer? = MinecraftCompat.localPlayerOrNull?.let { FakePlayer(it) }
 
         fun fromLocalPlayerOrThrow(): FakePlayer = fromLocalPlayer()
