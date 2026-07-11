@@ -21,7 +21,7 @@ class LoadoutHighlightingConfig {
     var currentlyEquipped: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Currently Equipped Color", desc = "The color used to highlight loadouts in the inventory.")
+    @ConfigOption(name = "Currently Equipped Color", desc = "The color used to highlight the currently equipped loadout in the inventory.")
     @ConfigEditorColour
     var equippedColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 
