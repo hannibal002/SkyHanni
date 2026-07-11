@@ -18,11 +18,9 @@ object LoadoutSlotHighlight {
             .filter { it.isInCurrentPage() }
             .forEach { loadoutSlot ->
                 val slot = event.container.getSlot(loadoutSlot.inventorySlot)
-                if (config.currentlyEquipped && LoadoutApi.currentSlot == loadoutSlot.id) {
-                    slot.highlight(config.equippedColor)
-                }
-                if (config.favorites && loadoutSlot.favorite) {
-                    slot.highlight(config.favoriteColor)
+                when {
+                    config.currentlyEquipped && LoadoutApi.currentSlot == loadoutSlot.id -> slot.highlight(config.equippedColor)
+                    config.favorites && loadoutSlot.favorite -> slot.highlight(config.favoriteColor)
                 }
             }
     }
