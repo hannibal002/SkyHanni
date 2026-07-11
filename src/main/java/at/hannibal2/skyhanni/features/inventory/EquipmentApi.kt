@@ -52,7 +52,7 @@ object EquipmentApi {
 
     fun getAll(): List<SafeItemStack> = equipment?.filterNotNull().orEmpty()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
+    fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
         equipment[slot.ordinal] = itemStack
         SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()

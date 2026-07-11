@@ -176,29 +176,43 @@ object ItemUtils {
 
     fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
-    fun SafeItemStack.getLore(): List<String> {
-        val data = cachedData
-        if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
-            return data.lastLore
+    private val loreComponentCache = TimeLimitedCache<IdentityCharacteristics<DataComponentMap>, List<Component>>(
+        expireAfterWrite = 0.1.seconds,
+    )
+
+    private val internalNameCache = TimeLimitedCache<IdentityCharacteristics<SafeItemStack>, NeuInternalName>(
+        expireAfterWrite = 1.seconds,
+    )
+
+    /**
+     * For use in [ItemUtilsTest].
+     */
+    internal fun SafeItemStack.cacheInternalName(internalName: NeuInternalName) {
+        internalNameCache[IdentityCharacteristics(this)] = internalName
+    }
+
+    fun DataComponentMap.getLoreComponent(): List<Component> =
+        loreComponentCache.getOrPut(IdentityCharacteristics(this)) {
+            get(DataComponents.LORE)?.lines.orEmpty()
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
-        data.lastLore = lore
-        data.lastLoreFetchTime = SimpleTimeMark.now()
-        return lore
-    }
 
-    fun SafeItemStack.getLoreComponent(): List<Component> {
-        val lore = this.get(DataComponents.LORE)?.lines
-        return lore ?: emptyList()
-    }
+    fun DataComponentMap.getCleanLore(): List<String> =
+        getLoreComponent().map { it.string.removeColor() }
 
-    fun SafeItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
+    @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
+    fun DataComponentMap.getLore(): List<String> =
+        getLoreComponent().map { it.formattedTextCompatLessResets() }
 
-    fun DataComponentMap?.getLore(): List<String> {
-        this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
-    }
+    fun SafeItemStack.getLoreComponent(): List<Component> = components.getLoreComponent()
+
+    fun SafeItemStack.getCleanLore(): List<String> = components.getCleanLore()
+
+    @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
+    @Suppress("Deprecation")
+    fun SafeItemStack.getLore(): List<String> = components.getLore()
+
+    fun List<String>.toSingleLineLore(): String =
+        filter { it.isNotEmpty() }.joinToString(" ")
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()
@@ -277,18 +291,13 @@ object ItemUtils {
         return list
     }
 
-    fun SafeItemStack.getInternalName() = getInternalNameOrNull() ?: NeuInternalName.NONE
-
-    fun SafeItemStack.getInternalNameOrNull(): NeuInternalName? {
-        val data = cachedData
-        if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
-            return data.lastInternalName
+    fun SafeItemStack.getInternalName(): NeuInternalName =
+        internalNameCache.getOrPut(IdentityCharacteristics(this)) {
+            grabInternalNameOrNull() ?: NeuInternalName.NONE
         }
-        val internalName = grabInternalNameOrNull()
-        data.lastInternalName = internalName
-        data.lastInternalNameFetchTime = SimpleTimeMark.now()
-        return internalName
-    }
+
+    fun SafeItemStack.getInternalNameOrNull(): NeuInternalName? =
+        getInternalName().takeUnless { it == NeuInternalName.NONE }
 
     /*
     This will cause errors if used with basically anything EXCEPT getPrice
