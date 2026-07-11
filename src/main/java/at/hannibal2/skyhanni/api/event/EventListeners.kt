@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import java.lang.reflect.Method
 import java.util.function.Consumer
 
-typealias EventPredicate = (event: SkyHanniEvent) -> Boolean
+typealias EventPredicate = (event: AbstractSkyHanniEvent) -> Boolean
 
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
     private val listeners: MutableList<Listener> = mutableListOf()
@@ -19,21 +19,25 @@ class EventListeners private constructor(val name: String, private val isGeneric
     )
 
     fun removeListener(listener: Any) {
-        listeners.removeIf { it.invoker == listener }
+        listeners.removeIf { it.method == listener }
     }
 
-    fun addListener(method: Method, instance: Any, options: HandleEvent) {
+    fun addListener(method: Method, instance: Any, options: HandleEvent, isSuspend: Boolean) {
         val name = buildListenerName(method)
-        val eventConsumer = when (method.parameterCount) {
+        val logicalParameterCount = method.parameterCount - if (isSuspend) 1 else 0
+        val eventConsumer = if (isSuspend) null else when (logicalParameterCount) {
             0 -> createZeroParameterConsumer(method, instance)
             1 -> createSingleParameterConsumer(method, instance)
-            else -> throw IllegalArgumentException(
-                "Method ${method.name} must have either 0 or 1 parameters.",
-            )
+            else -> error("Validated listener has an invalid parameter count: $name")
+        }
+        val suspendEventConsumer = if (!isSuspend) null else when (logicalParameterCount) {
+            0 -> createZeroParameterSuspendConsumer(method, instance)
+            1 -> createSingleParameterSuspendConsumer(method, instance)
+            else -> error("Validated listener has an invalid parameter count: $name")
         }
         val generic = if (isGeneric) resolveGenericType(method) else null
 
-        listeners.add(Listener(name, eventConsumer, options, generic))
+        listeners.add(Listener(method, name, eventConsumer, suspendEventConsumer, options, generic))
     }
 
     private fun buildListenerName(method: Method): String {
@@ -58,6 +62,16 @@ class EventListeners private constructor(val name: String, private val isGeneric
         return { event -> consumer.accept(event) }
     }
 
+    private fun createZeroParameterSuspendConsumer(method: Method, instance: Any): suspend (Any) -> Unit {
+        val runnable = SuspendEventInvokerFactory.createRunnable(instance, method)
+        return { _: Any -> runnable.run() }
+    }
+
+    private fun createSingleParameterSuspendConsumer(method: Method, instance: Any): suspend (Any) -> Unit {
+        val consumer = SuspendEventInvokerFactory.createConsumer(instance, method)
+        return { event -> consumer.accept(event) }
+    }
+
     private fun resolveGenericType(method: Method): Class<*> =
         method.genericParameterTypes.getOrNull(0)?.let { genericType ->
             ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
@@ -72,8 +86,10 @@ class EventListeners private constructor(val name: String, private val isGeneric
     fun getListeners(): List<Listener> = listeners
 
     class Listener(
+        val method: Method,
         val name: String,
-        val invoker: Consumer<Any>,
+        val invoker: Consumer<Any>?,
+        val suspendInvoker: (suspend (Any) -> Unit)?,
         options: HandleEvent,
         private val generic: Class<*>?,
         extraPredicates: List<EventPredicate> = listOf(),
@@ -89,7 +105,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
         private val predicates: List<EventPredicate>
 
-        fun shouldInvoke(event: SkyHanniEvent): Boolean {
+        fun shouldInvoke(event: AbstractSkyHanniEvent): Boolean {
             val generation = SkyHanniEvents.getListenerCacheGeneration()
             if (generation != lastCacheGeneration) {
                 cachedPredicateValue = cachedPredicates.all { it(event) }

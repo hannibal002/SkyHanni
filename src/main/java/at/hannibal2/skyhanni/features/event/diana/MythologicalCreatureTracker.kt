@@ -34,7 +34,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MythologicalCreatureTracker {
-
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
 
     private val tracker = SkyHanniTracker(
@@ -167,7 +166,7 @@ object MythologicalCreatureTracker {
     }
 
     @HandleEvent
-    fun onRepoLoaded(event: RepositoryReloadEvent) {
+    private suspend fun onRepoLoaded(event: RepositoryReloadEvent) {
         val dianaJson = event.getConstant<DianaJson>("events/Diana")
 
         tracker.modify {
@@ -208,7 +207,6 @@ object MythologicalCreatureTracker {
         jsonElement.asJsonObject.also {
             it.entrySet().forEach { (k, v) -> it.add(k, fixData(v)) }
         }
-
 
     private fun fixData(jsonElement: JsonElement): JsonElement {
         val jsonObject = jsonElement.asJsonObject
