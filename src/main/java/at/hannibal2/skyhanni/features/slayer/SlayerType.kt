@@ -49,6 +49,8 @@ enum class SlayerType(
         "Riftstalker Bloodfiend",
         "vampire",
         Zombie::class.java,
+        null,
+        listOf("Bloodfiend"),
     )
     ;
 

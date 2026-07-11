@@ -38,19 +38,20 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
+import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.width
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.hover
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.suggest
 import at.hannibal2.skyhanni.utils.inPartialHours
-import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import kotlin.math.roundToInt
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss as CrimsonMiniBoss
 
@@ -59,38 +60,39 @@ import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBos
 object CarryTracker {
     private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
-    private val storage get() = SkyHanniMod.feature.storage.carryPrices
-    private val config get() = SkyHanniMod.feature.misc
-
+    private val config get() = SkyHanniMod.feature.combat.carryTracker
+    private val storage get() = config.storage
     private var display: List<Renderable> = emptyList()
 
     private val customers: MutableList<Customer> = mutableListOf()
 
-    // TODO create trade event with player name, coins and items
+    // TODO implement full trade detection; for now this will do
     private var lastTradedPlayer: String? = null
     private val recentTrades: MutableMap<String, Double> = mutableMapOf()
+
+    private val patternGroup = RepoPattern.group("carrytracker")
 
     /**
      * REGEX-TEST: Trade completed with [MVP+] ClachersHD!
      */
-    private val tradeCompletedPattern by RepoPattern.pattern(
-        "carry.trade.completed",
+    private val tradeCompletedPattern by patternGroup.pattern(
+        "trade.completed",
         "Trade completed with (?<name>.+)!",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " + 500k coins"
      */
-    private val tradeCoinsGainedPattern by RepoPattern.pattern(
-        "carry.trade.coins.gained",
+    private val tradeCoinsGainedPattern by patternGroup.pattern(
+        "trade.coins.gained",
         " \\+ (?<coins>.+) coins",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " - 500k coins"
      */
-    private val tradeCoinsLostPattern by RepoPattern.pattern(
-        "carry.trade.coins.lost",
+    private val tradeCoinsLostPattern by patternGroup.pattern(
+        "trade.coins.lost",
         " - (?<coins>.+) coins",
     )
 
@@ -108,7 +110,7 @@ object CarryTracker {
 
                 findCustomer(name)?.let { customer ->
                     customer.coinsPaid += coins
-                    update()
+                    updateDisplay()
                 }
 
                 val types = carryTypes.filter { it.pricePer != 0.0 && (coins % it.pricePer) == 0.0 }
@@ -124,16 +126,17 @@ object CarryTracker {
                         val amount = (coins / type.pricePer).toInt()
                         val component = " ".asComponent().append(
                             "§b[${amount}x ${type.shortName}]".asComponent {
-                                hover = "§eClick to add ${amount}x §d${type.displayName}§e!".asComponent()
+                                onHover("§eClick to add ${amount}x §d${type.displayName}§e!")
                                 onClick { addCarry(name, type.id, amount) }
                             },
                         )
 
                         // dont break component into 2 lines
                         val remainingWidth = chatWidth - ((prefixWidth + this.width()) % chatWidth)
-                        // this is (remainingWidth < component.width() < chatWidth) but kotlin doesnt support it
-                        if (component.width() in (remainingWidth + 1)..<chatWidth)
-                            repeat(remainingWidth / spaceWidth) { append(" ") }
+                        val appendWidth = component.width()
+                        // this is (remainingWidth < appendWidth < chatWidth) refactored by intellij
+                        if (appendWidth in (remainingWidth + 1)..<chatWidth)
+                            append(" ".repeat(remainingWidth / spaceWidth))
 
                         append(component)
                     }
@@ -156,7 +159,7 @@ object CarryTracker {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderTop() {
         if (InventoryUtils.inAnyInventory()) {
             InventoryGuiScaleCompat.withOriginalHudScale {
@@ -168,12 +171,12 @@ object CarryTracker {
     }
 
     private fun renderDisplay() {
-        config.carryPosition.renderRenderables(display, posLabel = "Carry Tracker")
+        config.display.renderRenderables(display, posLabel = "Carry Tracker")
     }
 
     @HandleEvent
     fun onSecondPassed() {
-        update()
+        updateDisplay()
     }
 
     @HandleEvent
@@ -182,7 +185,7 @@ object CarryTracker {
         event.addIrrelevant {
             add("customers: $customers")
             add("carryTypes: $carryTypes")
-            add("carryPrices: $storage")
+            add("carryPrices: ${storage.carryPrices}")
             add("lastTradedPlayer: $lastTradedPlayer")
             add("recentTrades: $recentTrades")
         }
@@ -412,7 +415,7 @@ object CarryTracker {
                 val carry = Carry(type, amount)
                 customer.carries.add(carry)
 
-                update()
+                updateDisplay()
                 ChatUtils.chat("Carry added: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
             }
         } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
@@ -426,7 +429,7 @@ object CarryTracker {
 
     private fun removeCustomerInternal(customer: Customer) {
         customers.remove(customer)
-        update()
+        updateDisplay()
         ChatUtils.chat("Customer removed: §b${customer.name}")
     }
 
@@ -443,7 +446,7 @@ object CarryTracker {
 
     private fun removeCarryInternal(customer: Customer, carry: Carry) {
         customer.carries.remove(carry)
-        update()
+        updateDisplay()
         ChatUtils.chat("Carry removed: §b${customer.name} §d${carry.type.displayName}")
     }
 
@@ -455,7 +458,7 @@ object CarryTracker {
         }
         carry.total = newTotal
 
-        update()
+        updateDisplay()
         ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
     }
 
@@ -477,7 +480,7 @@ object CarryTracker {
         }
         carry.done = newDone
 
-        update()
+        updateDisplay()
         ChatUtils.chat("Carry updated: §b${customer.name} ${carry.formatProgress()} §d${carry.type.displayName}")
     }
 
@@ -485,7 +488,7 @@ object CarryTracker {
         findCustomer(customerName)?.let { customer ->
             rawCoins.formatDoubleOrUserError()?.let { coins ->
                 customer.coinsPaid += coins
-                update()
+                updateDisplay()
                 ChatUtils.chat(
                     "Customer updated: §b${customer.name} " +
                         "§6${customer.coinsPaid.shortFormat()}§8/§6${customer.getTotalCost().shortFormat()}" +
@@ -505,21 +508,21 @@ object CarryTracker {
         ) { type ->
             val name = type.displayName
             val price = type.pricePer.shortFormat()
-            TextHelper.join(
-                "§8[§c✖§8]".asComponent {
-                    hover = "§eClick to delete price!".asComponent()
+            componentBuilder {
+                append("§8[§c✖§8]") {
+                    onHover("§eClick to delete price!")
                     onClick {
                         deletePrice(type.id)
                         listPrices()
                     }
-                },
-                " ",
-                "§8[§e✎§8]".asComponent {
-                    hover = "§eClick to edit price!".asComponent()
+                }
+                append(" ")
+                append("§8[§e✎§8]") {
+                    onHover("§eClick to edit price!")
                     suggest = "/shcarry price set ${type.id} ${price.lowercase()}"
-                },
-                " §d$name§8: §6$price coins",
-            )
+                }
+                append(" §d$name§8: §6$price coins")
+            }
         }
     }
 
@@ -530,7 +533,7 @@ object CarryTracker {
                 else if (price == 0.0) ChatUtils.userError("Carry price cannot be 0! Use /shcarry price delete $rawType instead")
                 else {
                     type.pricePer = price
-                    update()
+                    updateDisplay()
                     ChatUtils.chat("Set carry price for §d${type.displayName} §eto §6${price.shortFormat()} coins")
                 }
             }
@@ -540,14 +543,14 @@ object CarryTracker {
     private fun deletePrice(rawType: String) {
         findCarryType(rawType)?.let { type ->
             type.pricePer = 0.0
-            update()
+            updateDisplay()
             ChatUtils.chat("Deleted carry price for §d${type.displayName}")
         } ?: ChatUtils.userError("Unknown carry type: '$rawType'")
     }
 
     private fun deleteAllPrices() {
         for (type in carryTypes) type.pricePer = 0.0
-        update()
+        updateDisplay()
         ChatUtils.chat("Deleted all carry prices")
     }
 
@@ -555,35 +558,38 @@ object CarryTracker {
         val customerSize = customers.size
         val carrySize = customers.sumOf { it.carries.size }
         customers.clear()
-        update()
+        updateDisplay()
         ChatUtils.chat("Removed §b$customerSize §ecustomers including §b$carrySize §ecarries")
     }
 
     private fun countCarry(customer: Customer, carry: Carry) {
         carry.done++
         customer.stats.done()
-        update()
+        updateDisplay()
 
         HypixelCommands.partyChat("${customer.name}: ${carry.done}/${carry.total}")
         if (carry.done >= carry.total) {
-            ChatUtils.chat(
-                TextHelper.join(
-                    "Carry finished: §b${customer.name} ${carry.formatProgress()} §b${carry.type.displayName}\n",
-                    if (customer.carries.size > 1) "§e[CLICK to remove this carry]".asComponent {
-                        hover = "§eClick to remove this carry!".asComponent()
+            ChatUtils.chat {
+                append("Carry finished: §b${customer.name} ${carry.formatProgress()} §b${carry.type.displayName}\n")
+
+                if (customer.carries.size > 1) {
+                    append("§e[CLICK to remove this carry]") {
+                        onHover("§eClick to remove this carry!")
                         onClick { removeCarryInternal(customer, carry) }
-                    } else "§e[CLICK to remove this customer]".asComponent {
-                        hover = "§eClick to remove this customer!".asComponent()
+                    }
+                } else {
+                    append("§e[CLICK to remove this customer]") {
+                        onHover("§eClick to remove this customer!")
                         onClick { removeCustomerInternal(customer) }
-                    },
-                ),
-            )
+                    }
+                }
+            }
             TitleManager.sendTitle("§eCarry finished for §b${customer.name}§e!", duration = 3.seconds)
             SoundUtils.playBeepSound()
         }
     }
 
-    private fun update() {
+    private fun updateDisplay() {
         display = buildList {
             if (customers.isEmpty()) return@buildList
             addString("§c§lCarries")
@@ -661,7 +667,7 @@ object CarryTracker {
     }
 
     private fun findCustomer(name: String): Customer? = customers.firstOrNull { it.name.equals(name, ignoreCase = true) }
-    private fun findCarryType(id: String): CarryType? = carryTypes.firstOrNull { it.id.equals(id, ignoreCase = true) }
+    private fun findCarryType(id: String): CarryType? = findCarryType { it.id.equals(id, ignoreCase = true) }
     private fun findCarryType(predicate: (CarryType) -> Boolean): CarryType? = carryTypes.firstOrNull(predicate)
 
     private data class Customer(
@@ -676,11 +682,14 @@ object CarryTracker {
 
     private data class Carry(val type: CarryType, var total: Int, var done: Int = 0) {
         fun getCost(): Double = type.pricePer * total
-        fun formatProgress(): String = when {
-            done > total -> 'c'
-            done == total -> 'a'
-            else -> 'e'
-        }.let { "§$it$done§8/§$it$total" }
+        fun formatProgress(): String {
+            val color = when {
+                done > total -> 'c'
+                done == total -> 'a'
+                else -> 'e'
+            }
+            return "§$color$done§8/§$color$total"
+        }
     }
 
     private data class CustomerStats(
@@ -696,8 +705,8 @@ object CarryTracker {
         fun sinceLast(): Duration = stopwatch.getLapTime() ?: Duration.ZERO
         fun elapsed(): Duration = sinceStart() - sinceLast()
 
-        fun perHour(): Double = (totalDone / ((elapsed().inPartialHours).takeUnless { it == 0.0 } ?: 1.0))
-        fun averageTime(): Duration = (elapsed().inWholeMilliseconds / (totalDone.takeUnless { it == 0 } ?: 1)).milliseconds
+        fun perHour(): Double = totalDone / (elapsed().inPartialHours.takeUnless { it == 0.0 } ?: 1.0)
+        fun averageTime(): Duration = elapsed() / totalDone.coerceAtLeast(1)
     }
 
     private abstract class CarryType {
@@ -706,11 +715,11 @@ object CarryTracker {
         abstract val shortName: String
 
         var pricePer: Double = 0.0
-            get() = storage.getOrDefault(id, field)
+            get() = storage.carryPrices.getOrDefault(id, field)
             set(value) {
                 field = value
-                if (value == 0.0) storage.remove(id)
-                else storage.put(id, value)
+                if (value == 0.0) storage.carryPrices.remove(id)
+                else storage.carryPrices.put(id, value)
             }
     }
 

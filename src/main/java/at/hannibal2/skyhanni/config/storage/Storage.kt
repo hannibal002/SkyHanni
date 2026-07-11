@@ -36,8 +36,5 @@ class Storage {
     var reminders: MutableMap<String, Reminder> = mutableMapOf()
 
     @Expose
-    var carryPrices: MutableMap<String, Double> = mutableMapOf()
-
-    @Expose
     var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
 }
