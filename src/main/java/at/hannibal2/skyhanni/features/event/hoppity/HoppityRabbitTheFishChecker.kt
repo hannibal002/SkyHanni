@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -100,7 +100,7 @@ object HoppityRabbitTheFishChecker {
         rabbitTheFishIndex = null
     }
 
-    private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
+    private fun AbstractSkyHanniEvent.Cancellable.sendPreventClosureTitle() {
         TitleManager.sendTitle(
             "§cRabbit the Fish Prevented Close",
             subtitleText = "§7Hold §eShift §7to bypass",

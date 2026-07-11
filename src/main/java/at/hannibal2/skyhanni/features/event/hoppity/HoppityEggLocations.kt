@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 
 @SkyHanniModule
 object HoppityEggLocations {
-
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
         get() = CFApi.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
@@ -55,7 +54,7 @@ object HoppityEggLocations {
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         // TODO: split Chocolate Factory and Hoppity repo data
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
         apiEggLocations = data.apiEggLocations

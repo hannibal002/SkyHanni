@@ -14,14 +14,17 @@ import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
 import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
+import com.google.devtools.ksp.symbol.Modifier
 import com.google.devtools.ksp.validate
 import java.io.File
 import java.io.OutputStreamWriter
 
-// These annotations live in the main source set rather than here, so they can only be matched by name.
+// These annotations are not all declared here, so they are matched by name for consistency.
 private const val HANDLE_EVENT = "at.hannibal2.skyhanni.api.event.HandleEvent"
 private const val PRIMARY_FUNCTION = "at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction"
 private const val SKYHANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
+
+private val eventSpecificationArguments = setOf("eventType", "eventTypes")
 
 class ModuleProcessor(
     codeGenerator: CodeGenerator,
@@ -31,28 +34,37 @@ class ModuleProcessor(
     private val buildPaths: String?,
     cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
-
+    private var abstractSkyHanniEvent: KSType? = null
     private var skyHanniEvent: KSType? = null
+    private var asyncSkyHanniEvent: KSType? = null
+    private var primaryFunctionEvents = emptyMap<String, KSType>()
 
     private val cache = KspIncrementalCache(cacheDir, mcVersion, "ksp-module-state")
 
     private fun Int.withPlural(string: String) = "$this $string${if (this == 1) "" else "s"}"
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
+        abstractSkyHanniEvent = resolver.getClassDeclarationByName(
+            "at.hannibal2.skyhanni.api.event.AbstractSkyHanniEvent",
+        )?.asStarProjectedType()
         skyHanniEvent = resolver.getClassDeclarationByName(
             "at.hannibal2.skyhanni.api.event.SkyHanniEvent",
         )?.asStarProjectedType()
+        asyncSkyHanniEvent = resolver.getClassDeclarationByName(
+            "at.hannibal2.skyhanni.api.event.AsyncSkyHanniEvent",
+        )?.asStarProjectedType()
+        primaryFunctionEvents = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
+            .filterIsInstance<KSClassDeclaration>()
+            .mapNotNull { symbol ->
+                val annotation = symbol.annotations.firstOrNull { it.getQualifiedName() == PRIMARY_FUNCTION }
+                val name = annotation?.arguments?.firstOrNull()?.value as? String ?: return@mapNotNull null
+                name to symbol.asStarProjectedType()
+            }
+            .toMap()
 
         val symbols = processBuildPaths(
             resolver.getSymbolsWithAnnotation(SKYHANNI_MODULE).toList(),
         )
-        val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
-            .filterIsInstance<KSClassDeclaration>()
-            .mapNotNull { symbol ->
-                val annotation = symbol.annotations.firstOrNull { it.getQualifiedName() == PRIMARY_FUNCTION }
-                annotation?.arguments?.firstOrNull()?.value as? String
-            }
-            .toSet()
 
         validateModuleMembership(resolver)
 
@@ -78,7 +90,7 @@ class ModuleProcessor(
         }
 
         val validSymbols = symbols.mapNotNull {
-            validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths, primaryFunctionNames)
+            validateSymbol(it, it.containingFile?.filePath in dirtyFilePaths)
         }
         if (validSymbols.isNotEmpty()) generateFile(validSymbols)
         cache.commit()
@@ -131,11 +143,7 @@ class ModuleProcessor(
      * @param isDirty Whether the symbol's source file is new or modified since the last build.
      *                If false, expensive type resolution is skipped as the symbol was already validated.
      */
-    private fun validateSymbol(
-        symbol: KSAnnotated,
-        isDirty: Boolean,
-        primaryFunctionNames: Set<String>,
-    ): KSClassDeclaration? {
+    private fun validateSymbol(symbol: KSAnnotated, isDirty: Boolean): KSClassDeclaration? {
         if (!symbol.validate()) {
             logger.warn("Symbol is not valid: $symbol")
             return null
@@ -150,71 +158,99 @@ class ModuleProcessor(
         }
 
         if (isDirty) {
-            val event = skyHanniEvent ?: return symbol
+            val className = symbol.qualifiedName?.asString() ?: "unknown"
             for (function in symbol.getDeclaredFunctions()) {
-                val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT } ?: continue
-                validateHandleEvent(function, primaryFunctionNames, handleEvent, event)
+                if (function.annotations.none { it.getQualifiedName() == HANDLE_EVENT }) continue
+                validateEventHandler(function, className)
             }
         }
+
         return symbol
     }
 
-    private fun validateHandleEvent(
-        function: KSFunctionDeclaration,
-        primaryFunctionNames: Set<String>,
-        handleEvent: KSAnnotation,
-        event: KSType,
-    ) {
-        val eventParameterType = function.extensionReceiver?.resolve()
-            ?: function.parameters.firstOrNull()?.type?.resolve()
+    private fun validateEventHandler(function: KSFunctionDeclaration, className: String) {
+        val abstractEvent = abstractSkyHanniEvent ?: return
+        val syncEvent = skyHanniEvent ?: return
+        val asyncEvent = asyncSkyHanniEvent ?: return
+        val name = "$className.${function.simpleName.asString()}"
+        fun invalid(message: String) = logger.error("Function $name $message", function)
+
         val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
-        val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
-        val hasExplicitEventSpec = handleEvent.hasExplicitEventSpec()
-        val name = (function.qualifiedName ?: function.simpleName).asString()
-
-        when (parameterCount) {
-            0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
-                logger.error(
-                    "Function $name must have an event parameter, a primary function " +
-                        "name, or an explicit event specification because it is " +
-                        "annotated with @HandleEvent",
-                    function,
-                )
-            }
-
-            1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
-                logger.error(
-                    "Function $name must have an event assignable from SkyHanniEvent " +
-                        "because it is annotated with @HandleEvent",
-                    function,
-                )
-            }
-
-            else -> logger.error(
-                "Function $name has too many parameters. It must have exactly one " +
-                    "event parameter, or be parameterless with a primary function " +
-                    "name or an explicit event specification because it is annotated " +
-                    "with @HandleEvent",
-                function,
+        if (parameterCount > 1) {
+            invalid(
+                "has too many parameters. It must have exactly one event parameter, or be " +
+                    "parameterless with a primary function name or an explicit event " +
+                    "specification because it is annotated with @HandleEvent",
             )
+            return
         }
+
+        val eventTypes = resolveEventTypes(function)
+        if (eventTypes.isEmpty()) {
+            invalid(
+                "must have an event parameter, a primary function name, or an explicit event " +
+                    "specification because it is annotated with @HandleEvent",
+            )
+            return
+        }
+        if (eventTypes.any { !abstractEvent.isAssignableFrom(it) }) {
+            invalid("must only declare event types assignable from AbstractSkyHanniEvent")
+            return
+        }
+
+        val hasSyncEvents = eventTypes.any(syncEvent::isAssignableFrom)
+        val hasAsyncEvents = eventTypes.any(asyncEvent::isAssignableFrom)
+        if (!hasSyncEvents.xor(hasAsyncEvents) || eventTypes.any {
+                !syncEvent.isAssignableFrom(it) && !asyncEvent.isAssignableFrom(it)
+            }) {
+            invalid("must not mix synchronous and asynchronous event families")
+            return
+        }
+
+        val isSuspend = Modifier.SUSPEND in function.modifiers
+        if (isSuspend != hasAsyncEvents) {
+            invalid(if (hasAsyncEvents) "must be suspend for asynchronous events" else "must not be suspend for synchronous events")
+        }
+        if (isSuspend && function.returnType?.resolve()?.declaration?.qualifiedName?.asString() != "kotlin.Unit") {
+            invalid("must return Unit")
+        }
+    }
+
+    /**
+     * Resolves the event types a handler listens to, taken from its event parameter, from an
+     * explicit `eventType`/`eventTypes` specification, or from its primary function name.
+     */
+    private fun resolveEventTypes(function: KSFunctionDeclaration): List<KSType> {
+        val declaredEventType = function.extensionReceiver?.resolve()
+            ?: function.parameters.firstOrNull()?.type?.resolve()
+        if (declaredEventType != null) return listOf(declaredEventType)
+
+        val annotation = function.annotations.first { it.getQualifiedName() == HANDLE_EVENT }
+        return annotation.explicitEventTypes().ifEmpty {
+            listOfNotNull(primaryFunctionEvents[function.simpleName.asString()])
+        }
+    }
+
+    /**
+     * Reads the event types out of an `eventType`/`eventTypes` specification, ignoring arguments
+     * that KSP reports from the annotation's own defaults instead of from the use site.
+     */
+    private fun KSAnnotation.explicitEventTypes(): List<KSType> {
+        val annotationFilePath = (location as? FileLocation)?.filePath ?: return emptyList()
+        return arguments
+            .filter { it.name?.asString() in eventSpecificationArguments }
+            .filter { (it.location as? FileLocation)?.filePath == annotationFilePath }
+            .flatMap { argument ->
+                when (val value = argument.value) {
+                    is KSType -> listOf(value)
+                    is List<*> -> value.filterIsInstance<KSType>()
+                    else -> emptyList()
+                }
+            }
     }
 
     private fun KSAnnotation.getQualifiedName(): String? =
         annotationType.resolve().declaration.qualifiedName?.asString()
-
-    private fun KSAnnotation.hasExplicitEventSpec(): Boolean {
-        val annotationFilePath = (location as? FileLocation)?.filePath ?: return false
-        return arguments.any { argument ->
-            val value = argument.value
-            (argument.location as? FileLocation)?.filePath == annotationFilePath &&
-                when (value) {
-                    is KSType -> true
-                    is List<*> -> value.isNotEmpty() && value.all { it is KSType }
-                    else -> false
-                }
-        }
-    }
 
     private fun isDevOnly(klass: KSClassDeclaration): Boolean =
         klass.annotations.find { it.getQualifiedName() == SKYHANNI_MODULE }

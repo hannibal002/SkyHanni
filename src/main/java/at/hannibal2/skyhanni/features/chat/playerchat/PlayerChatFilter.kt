@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object PlayerChatFilter {
-
     private val filters = mutableMapOf<String, MultiFilter>()
 
     fun shouldChatFilter(original: Component): Boolean {
@@ -25,7 +24,7 @@ object PlayerChatFilter {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         filters.clear()
         var countFilters = 0
 

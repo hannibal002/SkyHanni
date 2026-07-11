@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -8,7 +7,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import net.minecraft.world.phys.AABB
 
 enum class IslandType(private val nameFallback: String, private val apiNameFallback: String?) {
@@ -93,7 +91,6 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
     @SkyHanniModule
     companion object {
         fun Collection<IslandType>.isInAnyIsland(): Boolean = any { it.isInIsland() }
-        private val repoReloadCoroutine = CoroutineSettings("island type repo reload")
 
         /**
          * The maximum amount of players that can be on an island.
@@ -115,8 +112,8 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
         fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
 
         @HandleEvent(priorityLevel = HIGH)
-        private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
-            val data = event.getConstantAsync<IslandTypeJson>("misc/IslandType")
+        private suspend fun onRepoReload(event: RepositoryReloadEvent) {
+            val data = event.getConstant<IslandTypeJson>("misc/IslandType")
 
             entries.forEach { islandType ->
                 islandType.islandData = data.islands[islandType.name]?.let { island ->

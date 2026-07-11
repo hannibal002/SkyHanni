@@ -23,7 +23,6 @@ import net.minecraft.network.chat.Style
 
 @SkyHanniModule
 object TrophyFishManager {
-
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
     private val patternGroup = RepoPattern.group("fishing.trophyfish")
@@ -67,7 +66,7 @@ object TrophyFishManager {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
         trophyFishInfo = data.trophyFish
         loadMissingTrophyFish()

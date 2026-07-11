@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ViewRecipeCommand {
-
     private val config get() = SkyHanniMod.feature.misc.commands
 
     /**
@@ -62,8 +60,8 @@ object ViewRecipeCommand {
         HypixelCommands.viewRecipe(item.toInternalName(), page)
     }
 
-    @HandleEvent(NeuRepositoryReloadEvent::class)
-    fun onNeuRepoReload() {
+    @HandleEvent
+    private suspend fun onNeuRepoReload() {
         list = NeuItems.allNeuRepoItems().asSequence().filter { (_, json) ->
             json.recipe != null || json.recipes.any { it.type == NeuRecipeType.CRAFTING }
         }.map { (key, json) -> key.asString().toSkyblockCommandId(json) }.toList()

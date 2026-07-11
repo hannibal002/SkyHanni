@@ -9,14 +9,13 @@ import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object LocationFixData {
-
     private val locationFixes = mutableMapOf<IslandType, List<LocationFix>>()
 
     private data class LocationFix(val area: AABB, val realLocation: String)
 
-    // priority set to low so that IslandType can load their island names from repo earlier
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    // Priority set to low so that IslandType can load their island names from repo earlier
+    @HandleEvent(priorityLevel = LOW)
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<LocationFixJson>("LocationFix")
         locationFixes.clear()
 
@@ -38,5 +37,4 @@ object LocationFixData {
         locationFixes[skyBlockIsland]
             ?.find { it.area.isPlayerInside() }
             ?.realLocation
-
 }

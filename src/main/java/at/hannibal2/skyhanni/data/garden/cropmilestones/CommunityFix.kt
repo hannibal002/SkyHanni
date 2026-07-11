@@ -32,7 +32,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CommunityFix {
-
     /**
      * REGEX-TEST: §2§l§m       §f§l§m             §r §e676,985§6/§e2M
      */
@@ -45,7 +44,7 @@ object CommunityFix {
     private var showWhenAllCorrect = false
 
     @HandleEvent
-    private fun onRepoReload(event: RepositoryReloadEvent) {
+    private suspend fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         val map = data.cropMilestoneCommunityHelp
         for ((key, value) in map) {
