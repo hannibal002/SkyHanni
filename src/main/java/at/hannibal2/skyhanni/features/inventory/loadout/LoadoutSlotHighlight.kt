@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 object LoadoutSlotHighlight {
     val config get() = SkyHanniMod.feature.inventory.customLoadout.highlighting
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
