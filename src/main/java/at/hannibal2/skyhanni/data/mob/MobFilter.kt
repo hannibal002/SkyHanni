@@ -49,7 +49,7 @@ import net.minecraft.world.entity.npc.villager.Villager
 import net.minecraft.world.entity.player.Player
 import org.intellij.lang.annotations.Language
 
-@Suppress("RegExpRedundantEscape")
+@Suppress("RegExpRedundantEscape", "MaxLineLength")
 @SkyHanniModule
 object MobFilter {
 
@@ -132,7 +132,7 @@ object MobFilter {
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",
