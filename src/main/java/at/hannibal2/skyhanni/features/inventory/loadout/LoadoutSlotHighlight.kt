@@ -20,7 +20,8 @@ object LoadoutSlotHighlight {
                 val slot = event.container.getSlot(loadoutSlot.inventorySlot)
                 if (config.currentlyEquipped && LoadoutApi.currentSlot == loadoutSlot.id) {
                     slot.highlight(config.equippedColor)
-                } else if (config.favorites && loadoutSlot.favorite) {
+                }
+                if (config.favorites && loadoutSlot.favorite) {
                     slot.highlight(config.favoriteColor)
                 }
             }
