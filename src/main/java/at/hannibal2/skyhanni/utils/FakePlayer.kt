@@ -20,14 +20,14 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
     }
 
     override fun isModelPartShown(part: PlayerModelPart): Boolean =
-    player.isModelPartShown(part) && part != PlayerModelPart.CAPE
+        player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
     companion object {
         fun fromLocalPlayer(): FakePlayer? =
-        MinecraftCompat.localPlayerOrNull?.let(::FakePlayer)
+            MinecraftCompat.localPlayerOrNull?.let(::FakePlayer)
 
         fun fromLocalPlayerOrThrow(): FakePlayer =
-        fromLocalPlayer()
-        ?: error("cannot create fake player because local player is null")
+            fromLocalPlayer()
+            ?: error("cannot create fake player because local player is null")
     }
 }
