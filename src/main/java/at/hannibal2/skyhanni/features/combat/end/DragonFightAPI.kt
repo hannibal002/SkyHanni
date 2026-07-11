@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.combat.end
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -22,19 +22,19 @@ object DragonFightAPI {
     private val group = RepoPattern.group("combat.end-dragon-fight")
 
     /**
-     * REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lOld Dragon§r§d§l has spawned!§r
+     * REGEX-TEST: ☬ The Old Dragon has spawned!
      */
     private val chatSpawnPattern by group.pattern(
         "chat.spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<type>.*)§r§d§l has spawned!§r",
+        "☬ The (?<type>.+) has spawned!",
     )
 
     /**
-     * REGEX-TEST: §r§f                           §r§6§lOLD DRAGON DOWN!§r
+     * WRAPPED-REGEX-TEST: "                           OLD DRAGON DOWN!"
      */
     private val chatDeath by group.pattern(
         "chat.death",
-        "§r§f {27}§r§6§l(?<type>.*) DOWN!§r",
+        " +(?<type>.+) DOWN!",
     )
 
     /**
@@ -42,7 +42,7 @@ object DragonFightAPI {
      */
     private val scoreboardHPPattern by group.pattern(
         "scoreboard.hp",
-        "Dragon HP: (?<hp>.*) ❤",
+        "Dragon HP: (?<hp>.+) ❤",
     )
 
     /**
@@ -58,12 +58,14 @@ object DragonFightAPI {
     fun inNestArea() = IslandType.THE_END.isInIsland() && nestAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
-    fun onChat(event: SystemMessageEvent.Allow) {
+    fun onChat(event: SkyHanniChatEvent.Allow) {
         chatSpawnPattern.matchMatcher(event.cleanMessage) {
             currentType = group("type")
+            return
         }
         chatDeath.matchMatcher(event.cleanMessage) {
             reset()
+            return
         }
     }
 
