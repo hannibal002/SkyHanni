@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -195,6 +197,13 @@ object LoadoutApi {
         data.tunings = itemsList[TUNINGS_SLOT].parseTunings()
         data.hotm = itemsList[HOTM_SLOT].parseCurrentSelection()
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
+
+        EquipmentSlot.entries.forEach {
+            val itemStack = data.equipment[it.ordinal]
+            if (itemStack != null && !itemStack.isStainedGlassPane()) {
+                EquipmentApi.setEquipment(it, itemStack)
+            } else EquipmentApi.setEquipment(it, null)
+        }
     }
 
     // This is for Hotm, Hotf and Powerstone

@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.Companion.MAX_PAGES
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.Companion.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -138,7 +138,7 @@ object CustomWardrobe {
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         DelayedRun.runDelayed(300.milliseconds) {
-            if (!WardrobeApi.inWardrobe()) {
+            if (!ArmorWardrobeApi.inWardrobe()) {
                 reset()
             }
         }
@@ -303,7 +303,7 @@ object CustomWardrobe {
     }
 
     private fun createRenderables(): Renderable {
-        val (wardrobeWarning, list) = createWarning(WardrobeApi.slots)
+        val (wardrobeWarning, list) = createWarning(ArmorWardrobeApi.slots)
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
@@ -402,7 +402,7 @@ object CustomWardrobe {
                     onLeftClick = {
                         config::enabled.jumpToEditor()
                         reset()
-                        WardrobeApi.currentPage = null
+                        ArmorWardrobeApi.currentPage = null
                     },
                 ),
                 blockBottomHover = false,
@@ -412,7 +412,7 @@ object CustomWardrobe {
         )
 
     private fun reset() {
-        WardrobeApi.inCustomWardrobe = false
+        ArmorWardrobeApi.inCustomWardrobe = false
         editMode = false
         displayRenderable = null
         inventoryButton = null
@@ -428,7 +428,7 @@ object CustomWardrobe {
             onClick = {
                 InventoryUtils.clickSlot(48)
                 reset()
-                WardrobeApi.currentPage = null
+                ArmorWardrobeApi.currentPage = null
             },
         )
         val exitButton = createLabeledButton(
@@ -436,7 +436,7 @@ object CustomWardrobe {
             onClick = {
                 InventoryUtils.clickSlot(49)
                 reset()
-                WardrobeApi.currentPage = null
+                ArmorWardrobeApi.currentPage = null
             },
         )
 
@@ -488,7 +488,7 @@ object CustomWardrobe {
             hoveredColor = color,
             unhoveredColor = color.darker(0.8),
             onClick = {
-                WardrobeApi.inCustomWardrobe = false
+                ArmorWardrobeApi.inCustomWardrobe = false
                 editMode = false
                 update()
             },
@@ -516,7 +516,7 @@ object CustomWardrobe {
                 add(
                     Renderable.hoverTips(
                         centerString("§2$", scale = textScale),
-                        WardrobeApi.createPriceLore(wardrobeSlot),
+                        ArmorWardrobeApi.createPriceLore(wardrobeSlot),
                     ),
                 )
             }
@@ -622,18 +622,18 @@ object CustomWardrobe {
     fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
-        val wardrobePage = WardrobeApi.currentPage ?: return
+        val wardrobePage = ArmorWardrobeApi.currentPage ?: return
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
-            WardrobeApi.currentSlot = if (isCurrentSlot()) null else id
+            ArmorWardrobeApi.currentSlot = if (isCurrentSlot()) null else id
             InventoryUtils.clickSlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
-                WardrobeApi.currentPage = wardrobePage - 1
+                ArmorWardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
                 InventoryUtils.clickSlot(previousPageSlot)
             } else if (page > wardrobePage) {
-                WardrobeApi.currentPage = wardrobePage + 1
+                ArmorWardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
                 InventoryUtils.clickSlot(nextPageSlot)
             }
@@ -651,7 +651,7 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && ArmorWardrobeApi.inWardrobe()
 
     private fun centerString(
         text: String,
@@ -660,5 +660,5 @@ object CustomWardrobe {
     ) = Renderable.text(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
 
     @JvmStatic
-    fun shouldHideNormalTooltip(): Boolean = WardrobeApi.inCustomWardrobe && !editMode
+    fun shouldHideNormalTooltip(): Boolean = ArmorWardrobeApi.inCustomWardrobe && !editMode
 }
