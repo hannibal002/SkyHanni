@@ -13,7 +13,7 @@ class CarryTrackerConfig {
         desc = "Type §e/shcarry §rto manage the carry tracker.",
     )
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @NoConfigLink
