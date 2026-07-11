@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 
 /**
- * Fired when any slayer boss spawns or dies. Can be your own or another player's boss.
+ * Fired when any player's slayer boss spawns or dies.
  */
 sealed class OtherPlayersSlayerEvent(val slayerType: SlayerType, val tier: Int, val owner: String) : SkyHanniEvent() {
     /** Gets called when a slayer is initially detected. */

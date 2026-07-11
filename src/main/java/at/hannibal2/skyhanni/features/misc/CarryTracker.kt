@@ -15,11 +15,13 @@ import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.PlayerNameSource
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -376,7 +378,7 @@ object CarryTracker {
                 "  §c/shcarry price delete <type>\n" +
                 "  §c/shcarry price deleteAll\n" +
                 "  §c/shcarry clearAll",
-            true,
+            replaceSameMessage = true,
         )
     }
 
@@ -782,68 +784,61 @@ object CarryTracker {
 
     @HandleEvent
     fun onOtherPlayersSlayerSpawn(event: OtherPlayersSlayerEvent.Spawn) {
-        findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier }?.let { type ->
-            findCustomer(event.owner)?.let { customer ->
-                customer.findCarry(type)?.let { carry ->
-                    ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
-                    TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
-                    SoundUtils.playPlingSound()
-                }
-            }
-        }
+        val type = findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier } ?: return
+        val customer = findCustomer(event.owner) ?: return
+        val carry = customer.findCarry(type) ?: return
+
+        ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
+        TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
+        SoundUtils.playPlingSound()
     }
 
     @HandleEvent
     fun onOtherPlayersSlayerDeath(event: OtherPlayersSlayerEvent.Death) {
-        findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier }?.let { type ->
-            findCustomer(event.owner)?.let { customer ->
-                customer.findCarry(type)?.let { carry ->
-                    // MobEvent.Death already triggers late, no need to wait
-                    countCarry(customer, carry)
-                }
-            }
-        }
+        val type = findCarryType { it is SlayerCarryType && it.slayerType == event.slayerType && it.slayerTier == event.tier } ?: return
+        val customer = findCustomer(event.owner) ?: return
+        val carry = customer.findCarry(type) ?: return
+
+        countCarry(customer, carry)
     }
 
     @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
-        findCarryType { it is DungeonCarryType && it.dungeonFloor == event.floor }?.let { type ->
-            for (partyMember in PartyApi.partyMembers) {
-                findCustomer(partyMember)?.let { customer ->
-                    customer.findCarry(type)?.let { carry ->
-                        // wait for other server messages first
-                        DelayedRun.runNextTick { countCarry(customer, carry) }
-                    }
-                }
-            }
+        val type = findCarryType { it is DungeonCarryType && it.dungeonFloor == event.floor } ?: return
+
+        for (player in DungeonApi.getPlayerNames()) {
+            val customer = findCustomer(player) ?: continue
+            val carry = customer.findCarry(type) ?: continue
+
+            // wait for other server messages first
+            DelayedRun.runNextTick { countCarry(customer, carry) }
         }
     }
 
     @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
-        findCarryType { it is KuudraCarryType && it.kuudraTier.tierNumber == event.kuudraTier }?.let { type ->
-            for (partyMember in PartyApi.partyMembers) {
-                findCustomer(partyMember)?.let { customer ->
-                    customer.findCarry(type)?.let { carry ->
-                        // wait for other server messages first
-                        DelayedRun.runNextTick { countCarry(customer, carry) }
-                    }
-                }
-            }
+        val type = findCarryType { it is KuudraCarryType && it.kuudraTier.tierNumber == event.kuudraTier } ?: return
+
+        for (player in EntityUtils.getPlayerEntities().map { it.name.string }) {
+            val customer = findCustomer(player) ?: continue
+            val carry = customer.findCarry(type) ?: continue
+
+            // wait for other server messages first
+            DelayedRun.runNextTick { countCarry(customer, carry) }
         }
     }
 
     @HandleEvent
     fun onCrimsonMinibossKilled(event: CrimsonMinibossKilledEvent) {
-        findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniboss }?.let { type ->
-            for (partyMember in PartyApi.partyMembers) {
-                findCustomer(partyMember)?.let { customer ->
-                    customer.findCarry(type)?.let { carry ->
-                        // wait for other server messages first
-                        DelayedRun.runNextTick { countCarry(customer, carry) }
-                    }
-                }
-            }
+        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniboss } ?: return
+
+        // party members is the best method i could think of here
+        for (partyMember in PartyApi.partyMembers) {
+            val customer = findCustomer(partyMember) ?: continue
+            val carry = customer.findCarry(type) ?: continue
+
+            // wait for other server messages first
+            DelayedRun.runNextTick { countCarry(customer, carry) }
         }
     }
 
