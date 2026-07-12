@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils.playSound
  * @param pitch the pitch of the sound
  * @param volume the volume of the sound
  */
+@Thread(RENDER)
 @PrimaryFunction("onPlaySound")
 class PlaySoundEvent(
     val soundName: String,

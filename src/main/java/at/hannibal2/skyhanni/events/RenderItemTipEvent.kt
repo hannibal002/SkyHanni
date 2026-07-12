@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
+@Thread(RENDER)
 class RenderItemTipEvent(
     val stack: SafeItemStack,
     var renderObjects: MutableList<RenderObject>,

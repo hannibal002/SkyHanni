@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.system.ModInstance
 
 /**
  * Fired when a message or command is about to be sent from the client to the server.
  * Cancelling this event prevents the message from being sent.
  */
+@Thread(RENDER)
 class MessageSendToServerEvent(
     val message: String,
     val splitMessage: List<String>,

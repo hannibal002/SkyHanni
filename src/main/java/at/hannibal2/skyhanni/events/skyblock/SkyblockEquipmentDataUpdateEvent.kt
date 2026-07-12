@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events.skyblock
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
 /**
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
  * @param newItemStack Item Stack (or Null when previously clicked is unknown) of the Equipment.
  *
  */
+@Thread(NETWORK, RENDER)
 @PrimaryFunction("onSkyblockEquipmentDataUpdate")
 class SkyblockEquipmentDataUpdateEvent(val slot: EquipmentSlot, val newItemStack: SafeItemStack?) : SkyHanniEvent() {
 

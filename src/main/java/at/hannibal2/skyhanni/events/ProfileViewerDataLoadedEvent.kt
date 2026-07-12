@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
+import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.PlayerUtils
 
 class ProfileViewerDataLoadedEvent(val playerData: HypixelPlayerApiJson) : SkyHanniEvent() {
@@ -12,4 +13,5 @@ class ProfileViewerDataLoadedEvent(val playerData: HypixelPlayerApiJson) : SkyHa
     fun getCurrentPlayerData() = getCurrentProfileData()?.members?.get(PlayerUtils.getUuid())
 }
 
+@Thread(RENDER)
 class ProfileDataReadyEvent : SkyHanniEvent()
