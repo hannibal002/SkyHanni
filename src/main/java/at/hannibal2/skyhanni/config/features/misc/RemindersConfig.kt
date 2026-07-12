@@ -25,6 +25,11 @@ class RemindersConfig {
     var interval: Float = 5f
 
     @Expose
+    @ConfigOption(name = "Show Title", desc = "Show a title on screen when a reminder is due.")
+    @ConfigEditorBoolean
+    var showTitle: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Show Reminders HUD",
         desc = "Display active reminders on screen with time remaining."
