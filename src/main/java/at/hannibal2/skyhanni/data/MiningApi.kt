@@ -67,6 +67,7 @@ object MiningApi {
         "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
+    // This intentionally uses the old heat icon, since hypixel
     /**
      * REGEX-TEST: Heat: §6IMMUNE
      * REGEX-TEST: Heat: §c14♨
@@ -77,12 +78,13 @@ object MiningApi {
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
+    // This intentionally uses the old cold icon, since hypixel
     /**
-     * REGEX-TEST: Cold: §b-1
+     * REGEX-TEST: Cold: §b-1❄
      */
     val coldPattern by group.pattern(
         "cold",
-        "(?:§.)*Cold: §.(?<cold>-?\\d+)${SkyblockStat.COLD_RESISTANCE.hypixelIcon}",
+        "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
     private val pickobulusGroup = group.group("pickobulus")
