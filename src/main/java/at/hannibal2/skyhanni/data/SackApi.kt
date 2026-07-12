@@ -106,7 +106,7 @@ object SackApi {
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:(?:§.)?[❤❈☘⸕✎✧❁☠❂☂] |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:(?:§.)?. |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**

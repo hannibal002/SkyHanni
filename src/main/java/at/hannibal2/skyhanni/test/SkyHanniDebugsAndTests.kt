@@ -657,7 +657,7 @@ object SkyHanniDebugsAndTests {
                 } else if (SkyBlockUtils.onHypixel) {
                     ChatUtils.chat("§eYou are on Hypixel, but not in SkyBlock.")
                 } else {
-                    ChatUtils.chat("§eYou not on Hypixel.")
+                    ChatUtils.chat("§eYou are not on Hypixel.")
                 }
             }
         }

@@ -318,6 +318,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Museum Category Highlighter. - nopo (https://github.com/hannibal002/SkyHanni/pull/5450)
   + Highlights completed categories in green.
 + Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
++ Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
++ Added Option To Move `Insert Item Into Sack` button back to original placement. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5874)
 
 </details>
 <details open><summary>
