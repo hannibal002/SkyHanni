@@ -77,12 +77,13 @@ object MiningApi {
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
+    // Should not use cold resistance icon
     /**
-     * REGEX-TEST: Cold: §b-1
+     * REGEX-TEST: Cold: §b-1❄
      */
     val coldPattern by group.pattern(
         "cold",
-        "(?:§.)*Cold: §.(?<cold>-?\\d+)${SkyblockStat.COLD_RESISTANCE.hypixelIcon}",
+        "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
     )
 
     private val pickobulusGroup = group.group("pickobulus")
