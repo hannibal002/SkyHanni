@@ -70,6 +70,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import java.util.EnumMap
+import kotlin.math.absoluteValue
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.time.Duration.Companion.seconds
@@ -157,6 +158,9 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     trackerConfig = { SkyHanniMod.feature.garden.farmingProfitTracker.perTrackerConfig },
     customUptimeControl = true,
 ) {
+
+    override fun formatItemAmount(amount: Long): String =
+        if (amount.absoluteValue >= 1_000_000L) amount.shortFormat() else amount.addSeparators()
 
     private val config: FarmingProfitTrackerConfig get() = SkyHanniMod.feature.garden.farmingProfitTracker
     private val blocksBrokenCache: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
