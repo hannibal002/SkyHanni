@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.config.features.garden.FarmingProfitTrackerConfig.T
 import at.hannibal2.skyhanni.data.BitsApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.effect.EffectApi
+import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -79,6 +81,8 @@ private val pestShard = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 private val seasoningInternalName = "SEASONING".toInternalName()
 private val toolExpCapsule = "TOOL_EXP_CAPSULE".toInternalName()
 private val carrotColoredVinylSet = "CARROT_COLORED_VINYL_SET".toInternalName()
+private val stinkyCheesePotion = "POTION_STINKY_CHEESE;1".toInternalName()
+private val harvestHarbingerPotion = "POTION_HARVEST_HARBINGER;5".toInternalName()
 private val sackCompactionTimeout = 30.seconds
 private val farmingProfitTrackerPatternGroup = RepoPattern.group("garden.farming.profit.tracker")
 
@@ -171,6 +175,10 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     private var lastVisitorAccept = SimpleTimeMark.farPast()
     private var pendingVisitorVinylGift: PendingVisitorVinylGift? = null
     private var currentToolHasBountiful = false
+    private val trackedPotionEffects = mapOf(
+        NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE to (TrackedSource.PESTS to stinkyCheesePotion),
+        NonGodPotEffect.HARVEST_HARBINGER to (TrackedSource.CROPS to harvestHarbingerPotion),
+    )
 
     data class Data(
         @Expose var cropAmounts: MutableMap<CropType, MutableMap<TrackedSource, Long>> =
@@ -402,12 +410,22 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
+        checkPotionConsumption(event.message)
         checkRareCropDrop(event.cleanMessage)
         checkBlessedDrop(event.cleanMessage)
         checkCropFeverStart(event.cleanMessage)
         checkCropFeverDrop(event.cleanMessage)
         checkToolExpCapsule(event.cleanMessage)
         checkVisitorCopper(event.cleanMessage.trim())
+    }
+
+    private fun checkPotionConsumption(message: String) {
+        val effect = EffectApi.getEffectFromGainedMessage(message) ?: return
+        val trackedPotion = trackedPotionEffects[effect] ?: return
+        val (source, internalName) = trackedPotion
+        if (!shouldTrack(source)) return
+        addTrackedItem(source, internalName, -1L, message = false)
+        lastFarmingActivity = SimpleTimeMark.now()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)

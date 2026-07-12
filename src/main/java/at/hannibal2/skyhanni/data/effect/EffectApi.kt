@@ -33,6 +33,8 @@ import kotlin.time.toDuration
 @SkyHanniModule
 object EffectApi {
 
+    private const val ACTIVE_EFFECTS_MESSAGE_SUFFIX = " Press TAB or type /effects to view your active effects!"
+
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: God Potion: 4d
@@ -146,23 +148,25 @@ object EffectApi {
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
 
-        val modifiedMessage = event.message.replace(
-            " Press TAB or type /effects to view your active effects!",
-            "",
-        )
+        val modifiedMessage = event.message.removeSuffix(ACTIVE_EFFECTS_MESSAGE_SUFFIX)
 
         for (effect in NonGodPotEffect.entries) {
             if (effect.effectRemovedPattern?.pattern() == modifiedMessage) {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.REMOVE, null).post()
                 return
             }
+        }
 
-            if (effect.effectGainedPattern?.pattern() != modifiedMessage) continue
-            val changeType = effect.effectChangeType ?: continue
-            val duration = effect.effectDuration ?: continue
+        val effect = getEffectFromGainedMessage(event.message) ?: return
+        val changeType = effect.effectChangeType ?: return
+        val duration = effect.effectDuration ?: return
+        EffectDurationChangeEvent(effect, changeType, duration).post()
+    }
 
-            EffectDurationChangeEvent(effect, changeType, duration).post()
-            return
+    fun getEffectFromGainedMessage(message: String): NonGodPotEffect? {
+        val modifiedMessage = message.removeSuffix(ACTIVE_EFFECTS_MESSAGE_SUFFIX)
+        return NonGodPotEffect.entries.firstOrNull {
+            it.effectGainedPattern?.pattern() == modifiedMessage
         }
     }
 
