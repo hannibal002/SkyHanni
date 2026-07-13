@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -122,12 +123,18 @@ object BeaconPower {
             if (config.beaconPowerStat) {
                 append {
                     append(" (")
-                    append(stat ?: Component.literal("§cNo stat"))
+                    append(getStatDisplay())
                     append(")")
                     withColor(ChatFormatting.GRAY)
                 }
             }
         }
+    }
+
+    private fun getStatDisplay(): Component {
+        val stat = stat ?: return Component.literal("§cNo stat")
+        if (!config.beaconPowerCompressStat) return stat
+        return TextHelper.split(stat, " ")?.firstOrNull() ?: stat
     }
 
     @HandleEvent
