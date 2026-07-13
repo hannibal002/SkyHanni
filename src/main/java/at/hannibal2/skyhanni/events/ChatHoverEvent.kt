@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.network.chat.HoverEvent
 
@@ -15,7 +14,6 @@ import net.minecraft.network.chat.HoverEvent
  * Currently, only functionality to change the `value` of `HoverEvent.ShowText` exists through the
  * use of methods in [GuiChatHook][at.hannibal2.skyhanni.mixins.hooks.GuiChatHook].
  */
-@Thread(RENDER)
 class ChatHoverEvent(private val hoverEvent: HoverEvent?) : SkyHanniEvent() {
     fun get(): HoverEvent = hoverEvent ?: ErrorManager.skyHanniError("Hover event from component is missing")
 }

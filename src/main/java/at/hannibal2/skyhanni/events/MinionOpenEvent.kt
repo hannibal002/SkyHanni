@@ -9,5 +9,4 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 class MinionOpenEvent(val inventoryName: String, val inventoryItems: Map<Int, SafeItemStack>) : SkyHanniEvent()
 @Thread(RENDER)
 class MinionCloseEvent : SkyHanniEvent()
-@Thread(NETWORK)
 class MinionStorageOpenEvent(val position: LorenzVec?, val inventoryItems: Map<Int, SafeItemStack>) : SkyHanniEvent()
