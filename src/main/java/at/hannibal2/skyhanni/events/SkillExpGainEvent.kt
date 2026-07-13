@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 
+@Thread(RENDER)
 class SkillExpGainEvent(
     val skill: SkillType,
     val gained: Double,

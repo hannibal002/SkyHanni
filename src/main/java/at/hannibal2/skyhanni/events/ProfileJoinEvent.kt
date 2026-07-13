@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
@@ -8,5 +9,6 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  *
  * @param name The lowercase name of the profile that was joined.
  */
+@Thread(RENDER)
 @PrimaryFunction("onProfileJoin")
 class ProfileJoinEvent(val name: String) : SkyHanniEvent()

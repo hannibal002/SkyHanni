@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.skyhannimodule.ThreadType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 

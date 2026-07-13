@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.skyhannimodule
+package at.hannibal2.skyhanni.api.event
 
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.RUNTIME)

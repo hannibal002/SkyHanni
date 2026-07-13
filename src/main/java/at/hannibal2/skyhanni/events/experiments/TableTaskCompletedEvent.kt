@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.events.experiments
 import at.hannibal2.skyhanni.api.ExperimentationTableApi.ExperimentationTaskType
 import at.hannibal2.skyhanni.api.ExperimentationTableApi.ExperimentationTier
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import at.hannibal2.skyhanni.utils.NeuInternalName
 
+@Thread(RENDER)
 class TableTaskCompletedEvent(
     val type: ExperimentationTaskType,
     val tier: ExperimentationTier,

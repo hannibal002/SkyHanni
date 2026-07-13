@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import net.minecraft.world.Container
@@ -19,6 +20,7 @@ import net.minecraft.world.Container
  * @param originalItem the item currently in the slot
  * @param slot the slot index being accessed
  */
+@Thread(NETWORK, RENDER)
 class ReplaceItemEvent(val inventory: Container, val originalItem: SafeItemStack, val slot: Int) : SkyHanniEvent() {
     var replacement: SafeItemStack? = null
         private set

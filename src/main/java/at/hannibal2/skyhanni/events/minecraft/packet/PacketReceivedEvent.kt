@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events.minecraft.packet
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import net.minecraft.network.protocol.Packet
 
 /**
@@ -13,4 +14,5 @@ import net.minecraft.network.protocol.Packet
  *
  * @param packet the received packet
  */
+@Thread(NETWORK)
 class PacketReceivedEvent(val packet: Packet<*>) : SkyHanniEvent()

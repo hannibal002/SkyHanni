@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import net.minecraft.world.entity.Entity
 
 /**
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.Entity
  * Do not use this event when you want to do further render calls!
  * Internally we directly mixin to shouldRender.
  */
+@Thread(RENDER)
 data class CheckRenderEntityEvent<T : Entity>(
     val entity: T,
     val camX: Double,

@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.events.minecraft.packet
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.network.protocol.Packet
+import at.hannibal2.skyhanni.api.event.Thread as ThreadAnnotation
 
+@ThreadAnnotation(ANY)
 @PrimaryFunction("onPacketSent")
 class PacketSentEvent(val packet: Packet<*>) : CancellableSkyHanniEvent() {
 

@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.events.achievements
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.Thread
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.test.command.ErrorManager
 
+@Thread(RENDER)
 class AchievementRegistrationEvent : SkyHanniEvent() {
     private val achievements = mutableMapOf<String, Achievement>()
 
