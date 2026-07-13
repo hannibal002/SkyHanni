@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.DrawScreenAfterEvent;
 import at.hannibal2.skyhanni.events.GuiContainerEvent;
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent;
 import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent;
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent;
 import at.hannibal2.skyhanni.features.inventory.BetterContainers;
 import at.hannibal2.skyhanni.features.inventory.MiddleClickFix;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe;
@@ -82,18 +81,14 @@ public abstract class MixinAbstractContainerScreen {
         int keyCode = input.input();
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
-        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
+        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this, false).post() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }
 
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
-        AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiKeyPressEvent(screen).post()) {
-            cir.setReturnValue(false);
-        }
-        if (new GuiMouseInputEvent(screen).post()) {
+        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this, true).post()) {
             cir.setReturnValue(false);
         }
     }

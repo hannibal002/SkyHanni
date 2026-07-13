@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -32,11 +31,6 @@ object CustomLoadoutKeybinds {
 
     @HandleEvent
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        if (handlePress()) event.cancel()
-    }
-
-    @HandleEvent
-    fun onGuiMouseInput(event: GuiMouseInputEvent) {
         if (handlePress()) event.cancel()
     }
 

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
-import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -31,11 +30,6 @@ object CustomWardrobeKeybinds {
 
     @HandleEvent
     fun onGui(event: GuiKeyPressEvent) {
-        if (handlePress()) event.cancel()
-    }
-
-    @HandleEvent
-    fun onMouseInput(event: GuiMouseInputEvent) {
         if (handlePress()) event.cancel()
     }
 
