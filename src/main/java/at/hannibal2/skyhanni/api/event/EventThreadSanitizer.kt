@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import java.lang.Thread as JavaThread
 
 object EventThreadSanitizer {
     val THREADS = mapOf<String, ThreadType>(
@@ -15,7 +16,7 @@ object EventThreadSanitizer {
     private val regex = Regex("""(\s*#|-)\d+$""")
 
     private fun getCurrentThreadType(): ThreadType? {
-        val threadName = Thread.currentThread().name.replace(regex, "")
+        val threadName = JavaThread.currentThread().name.replace(regex, "")
         return THREADS[threadName]
     }
 
