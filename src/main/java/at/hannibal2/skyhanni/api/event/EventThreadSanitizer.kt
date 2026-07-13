@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import java.lang.Thread as JavaThread
 
 object EventThreadSanitizer {
@@ -21,7 +20,6 @@ object EventThreadSanitizer {
     }
 
     fun checkThread(name: String, allowedThreads: Set<ThreadType>?) {
-        if (!PlatformUtils.isDevEnvironment) return
         val threads = allowedThreads.takeUnless { it.isNullOrEmpty() } ?: return
         if (ANY in threads) return
 
