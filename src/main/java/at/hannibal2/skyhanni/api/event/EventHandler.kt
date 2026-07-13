@@ -1,18 +1,22 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.skyhannimodule.Thread
+import at.hannibal2.skyhanni.skyhannimodule.ThreadType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.test.command.ErrorManager.maybeSkipError
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.ChatFormatting
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
     private val listeners: List<EventListeners.Listener>,
     private val canReceiveCancelled: Boolean,
+    private val allowedThreads: Set<ThreadType>?,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
@@ -21,6 +25,9 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
         listeners.sortedBy { it.priority }.toList(),
         listeners.any { it.receiveCancelled },
+        if (PlatformUtils.isDevEnvironment) {
+            event::class.java.getAnnotation(Thread::class.java)?.value?.toSet()
+        } else null
     )
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
@@ -28,6 +35,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (listeners.isEmpty()) return false
 
         if (SkyHanniEvents.isDisabledHandler(name)) return false
+
+        EventThreadSanitizer.checkThread(name, allowedThreads)
 
         var errors = 0
 
