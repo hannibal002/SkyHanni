@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.world.inventory.Slot
 
-@Thread(RENDER)
 class RenderInventoryItemTipEvent(
     val inventoryName: String,
     val slot: Slot,

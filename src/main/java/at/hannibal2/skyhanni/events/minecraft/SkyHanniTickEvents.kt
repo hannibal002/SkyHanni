@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.events.minecraft
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 
 /**
  * Fired at the end of every client tick, as long as both a local player and local world are present.
@@ -21,7 +20,6 @@ import at.hannibal2.skyhanni.skyhannimodule.Thread
  * @see ServerTickEvent
  * @see SecondPassedEvent
  */
-@Thread(RENDER)
 @PrimaryFunction("onTick")
 class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
 
@@ -49,7 +47,6 @@ class SkyHanniTickEvent(private val tick: Int) : SkyHanniEvent() {
  * @see SkyHanniTickEvent
  * @see SecondPassedEvent
  */
-@Thread(NETWORK)
 @PrimaryFunction("onServerTick")
 class ServerTickEvent(val tick: Int) : SkyHanniEvent() {
     fun isMod(i: Int, offset: Int = 0) = (tick + offset) % i == 0

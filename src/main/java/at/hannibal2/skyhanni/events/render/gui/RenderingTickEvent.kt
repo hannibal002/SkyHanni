@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.events.render.gui
 
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
 /**
@@ -19,7 +18,6 @@ import net.minecraft.client.gui.GuiGraphicsExtractor
  * @param context the graphics context for the current frame
  * @param startPhase true at the start of the frame, false at the end
  */
-@Thread(RENDER)
 @PrimaryFunction("onRenderingTick")
 class RenderingTickEvent(
     context: GuiGraphicsExtractor,

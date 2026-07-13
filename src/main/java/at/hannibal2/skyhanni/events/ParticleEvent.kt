@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -26,7 +25,6 @@ import net.minecraft.core.registries.BuiltInRegistries
  * @param longDistance whether the packet bypasses normal distance checks
  * @param particleArgs optional particle-specific arguments
  */
-@Thread(NETWORK, RENDER)
 @PrimaryFunction("onParticle")
 class ParticleEvent(
     val type: ParticleType<*>,

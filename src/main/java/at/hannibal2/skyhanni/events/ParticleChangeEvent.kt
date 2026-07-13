@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import net.minecraft.core.particles.ParticleOptions
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 
@@ -13,5 +12,4 @@ import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
  * @param particleOptions The particle type to be spawned. Can be replaced to change the visual.
  * @param packet The original packet that triggered the particle spawn.
  */
-@Thread(RENDER)
 class ParticleChangeEvent(var particleOptions: ParticleOptions, val packet: ClientboundLevelParticlesPacket) : SkyHanniEvent()

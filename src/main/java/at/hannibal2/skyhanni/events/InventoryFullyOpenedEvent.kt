@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.events
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -43,9 +42,7 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
  *
  * TODO does not work for inventories with empty slots. e.g. dungeon when death ghost tp menu "Teleport to Player".
  */
-@Thread(NETWORK)
 @PrimaryFunction("onInventoryFullyOpened")
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
-@Thread(NETWORK, RENDER)
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)

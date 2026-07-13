@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 
 /**
  * Fired when SkyHanni's config and profile storage are loaded and ready to use.
@@ -15,6 +14,5 @@ import at.hannibal2.skyhanni.skyhannimodule.Thread
  *
  * @param firstLoad true only the first time this event fires in the current game session
  */
-@Thread(RENDER)
 @PrimaryFunction("onConfigLoad")
 class ConfigLoadEvent(val firstLoad: Boolean) : SkyHanniEvent()

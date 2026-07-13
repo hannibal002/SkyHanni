@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.events.chat
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 
-@Thread(RENDER)
 class TabCompletionEvent(
     val leftOfCursor: String,
     val fullText: String,

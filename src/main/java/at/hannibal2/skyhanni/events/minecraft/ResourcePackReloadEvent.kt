@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.events.minecraft
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.JsonSyntaxException
@@ -12,7 +11,6 @@ import net.minecraft.server.packs.resources.ResourceManager
 import java.io.IOException
 import kotlin.jvm.optionals.getOrNull
 
-@Thread(RENDER)
 @PrimaryFunction("onResourcePackReload")
 class ResourcePackReloadEvent(
     val resourceManager: ResourceManager,

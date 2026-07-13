@@ -3,9 +3,7 @@ package at.hannibal2.skyhanni.events.render.gui
 import at.hannibal2.skyhanni.api.event.RenderingSkyHanniEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
-import at.hannibal2.skyhanni.skyhannimodule.Thread
 import net.minecraft.client.gui.GuiGraphicsExtractor
 
-@Thread(RENDER)
 @PrimaryFunction("onRenderOverlayPost")
 class GameOverlayRenderPostEvent(context: GuiGraphicsExtractor, val type: RenderLayer) : RenderingSkyHanniEvent(context)
