@@ -109,7 +109,7 @@ object MoongladeBeacon {
         RED,
         ;
 
-        val displayName: String = name.toFormattedName()
+        val displayName: String = toFormattedName()
 
         override fun toString() = displayName
 
