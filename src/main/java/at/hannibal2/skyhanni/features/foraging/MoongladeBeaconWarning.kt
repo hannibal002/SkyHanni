@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -23,8 +23,8 @@ object MoongladeBeaconWarning {
         " Cooldown: AVAILABLE",
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onWidget(event: WidgetUpdateEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.MOONGLADE_BEACON)) return
         if (lastAlert.passedSince() < 9.minutes) return

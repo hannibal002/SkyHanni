@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -19,13 +19,12 @@ import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconSpeed.Compa
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -42,6 +41,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
@@ -59,6 +59,31 @@ object MoongladeBeacon {
     private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
+    /**
+     * REGEX-TEST: Current color: Red
+     */
+    val beaconCurrentColorPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.color.colorless",
+        "Current color: (?<color>.+)",
+    )
+
+    /**
+     * REGEX-TEST: Current speed: 3
+     */
+    val beaconCurrentSpeedPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.speed.colorless",
+        "Current speed: (?<speed>\\d)",
+    )
+
+    /**
+     * REGEX-TEST: Current pitch: Low
+     */
+    val beaconCurrentPitchPattern by RepoPattern.pattern(
+        "foraging.moonglade.beacon.pitch.colorless",
+        "Current pitch: (?<pitch>.+)",
+    )
+
+
     // <editor-fold desc="Enums & Enum Helpers">
     /**
      * Represents the order of colors for the beacon minigame.
@@ -68,19 +93,19 @@ object MoongladeBeacon {
      * @param itemOverride Optional override for the item to use for this color.
      */
     enum class BeaconColor(private val displayName: String, itemOverride: Item? = null) {
-        WHITE("§fWhite"),
-        ORANGE("§6Orange"),
-        MAGENTA("§dMagenta"),
-        LIGHT_BLUE("§9Light Blue"), // Why did hypixel do this
-        YELLOW("§eYellow"),
-        LIME("§aLime"),
-        PINK("§dPink"),
-        CYAN("§bCyan"), // This too
-        PURPLE("§5Purple"),
-        BLUE("§1Blue"), // This one makes sense ig
-        BROWN("§6Brown"),
-        GREEN("§2Green"),
-        RED("§4Red"),
+        WHITE("White"),
+        ORANGE("Orange"),
+        MAGENTA("Magenta"),
+        LIGHT_BLUE("Light Blue"),
+        YELLOW("Yellow"),
+        LIME("Lime"),
+        PINK("Pink"),
+        CYAN("Cyan"),
+        PURPLE("Purple"),
+        BLUE("Blue"),
+        BROWN("Brown"),
+        GREEN("Green"),
+        RED("Red"),
         ;
 
         override fun toString() = displayName
@@ -93,7 +118,7 @@ object MoongladeBeacon {
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentColorPattern.firstMatcher(stack.getCleanLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
                 }
@@ -127,7 +152,7 @@ object MoongladeBeacon {
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentSpeedPattern.firstMatcher(stack.getCleanLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
                 }
@@ -153,7 +178,7 @@ object MoongladeBeacon {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentPitchPattern.firstMatcher(stack.getCleanLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
             }
@@ -239,7 +264,7 @@ object MoongladeBeacon {
         nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!solverEnabled()) return
         if (event.blockOverClick()) {
@@ -270,13 +295,13 @@ object MoongladeBeacon {
 
     private var currentServerTicks = 0
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onServerTick(event: ServerTickEvent) {
         if (!colorMinigameInventory.isInside()) return
         currentServerTicks++
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onPlaySound(event: PlaySoundEvent) {
         if (!colorMinigameInventory.isInside() || event.soundName != "block.note_block.bass") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
@@ -297,15 +322,14 @@ object MoongladeBeacon {
             outsideInventory = false,
             inOwnInventory = false,
             inventory = colorMinigameInventory,
-            condition = { config.enabled },
-            onlyOnIsland = IslandType.GALATEA,
+            condition = { config.enabled && IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() },
             onRender = {
                 config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
             },
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!solverEnabled()) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
@@ -314,14 +338,14 @@ object MoongladeBeacon {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun RenderInventoryItemTipEvent.onRenderItemTip() {
         if (!solverEnabled()) return
         with(normalTuning) { tryLabelIfAble() }
         if (upgradingStrength) with(enchantedTuning) { tryLabelIfAble() }
     }
 
-    @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(InventoryUpdatedEvent::class, onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
