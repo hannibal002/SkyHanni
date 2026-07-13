@@ -53,14 +53,15 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     open val backupRepoResourcePath: String? = null
 
     abstract val config: AbstractRepoConfig
-    abstract val configDirectory: File
+
+    /**
+     * The root directory for this specific repo.
+     * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
+     */
+    abstract val repoDirectory: File
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
-    val repoDirectory by lazy {
-        // ~/.minecraft/config/[...]/repo
-        File(configDirectory, "repo")
-    }
     @Suppress("UNCHECKED_CAST")
     private val eventClass: Class<E> by lazy {
         (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<E>
@@ -70,17 +71,17 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
     private val repoTgzFile by lazy {
-        // ~/.minecraft/config/[...]/repo/[name]-repo-[def_branch].tar.gz
-        // e.g., 'sh-repo-main' or 'neu-repo-master'
+        // e.g. ~/.minecraft/repo/skyhanni/sh-repo-main.tar.gz
         File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
     }
     private val legacyRepoZipFile by lazy {
         File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
     }
     private val commitStorage: RepoCommitStorage by lazy {
-        // ~/.minecraft/config/[...]/currentCommit.json
-        RepoCommitStorage(File(configDirectory, "currentCommit.json"))
+        // e.g. ~/.minecraft/repo/skyhanni/hash.json
+        RepoCommitStorage(File(repoDirectory, "hash.json"))
     }
+
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
     private val successfulConstants = mutableSetOf<String>()
     private val unsuccessfulConstants = mutableSetOf<String>()

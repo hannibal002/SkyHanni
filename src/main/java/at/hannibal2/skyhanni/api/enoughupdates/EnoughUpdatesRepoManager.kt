@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.data.repo.AbstractRepoManager
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import java.io.File
 
 @SkyHanniModule
 object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>() {
     override val commonName = "NotEnoughUpdates"
     override val commonShortNameCased = "NEU"
-    override val configDirectory = EnoughUpdatesManager.configDirectory
+    override val repoDirectory = File(EnoughUpdatesManager.repoDirectory, "neu")
     override val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
     override val backupRepoResourcePath: String = "assets/skyhanni/neu-repo.tar.gz"
 

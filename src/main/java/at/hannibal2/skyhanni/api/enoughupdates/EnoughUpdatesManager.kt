@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -56,8 +57,7 @@ import net.minecraft.world.item.ItemStackTemplate
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val configDirectory = File("config/notenoughupdates")
-    private val repoDirectory = File(configDirectory, "repo")
+    val repoDirectory: File = PlatformUtils.gameDir.resolve("repo").toFile()
     private val itemsFolder = File(repoDirectory, "items")
 
     private val loadingMutex = Mutex()
