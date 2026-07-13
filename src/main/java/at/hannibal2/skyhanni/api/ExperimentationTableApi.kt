@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -238,7 +239,7 @@ object ExperimentationTableApi {
         private set
 
     // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
-    // no in-game "ULTRA-RARE" lore header at flip time, so detected via processRewardOrNull() instead.
+    // no in-game "ULTRA-RARE" lore header at flip time, so detected via internal-name matching instead.
     var ultraRareMiscItems: List<NeuInternalName> = emptyList()
         private set
 
@@ -440,8 +441,9 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
-        event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
+        event.tryFireRareBookUncovered()
+        event.tryFireRareItemUncovered()
         refreshBottlesInInventory()
     }
 
@@ -530,14 +532,6 @@ object ExperimentationTableApi {
 
         val internalName = NeuInternalName.fromItemNameOrNull(this)
             ?: return ChatUtils.debug("Could not read item name from $this")
-        // Intentionally fires later than the book detection path (tryFireRareBookUncovered runs at
-        // card-flip time). Non-book Ultra Rares show no "ULTRA-RARE" lore text at flip time — unlike
-        // books — so lore-based flip-time detection is impossible. Whether their identity is readable
-        // at flip time some other way is unconfirmed; these drops are too rare to test live. The
-        // post-experiment summary is used instead because it is confirmed to work reliably.
-        if (currentExperimentData.type == ExperimentationTaskType.SUPERPAIRS && internalName in ultraRareMiscItems) {
-            TableRareUncoverEvent(this, isBook = false).post()
-        }
         currentExperimentData.addReward(internalName, 1)
     }
 
@@ -552,6 +546,18 @@ object ExperimentationTableApi {
                 currentExperimentData.rareFoundFired = true
                 return
             }
+        }
+    }
+
+    private fun InventoryOpenEvent.tryFireRareItemUncovered() {
+        if (currentExperimentData.rareFoundFired) return
+        if (!inSuperpairs) return
+        for ((_, item) in inventoryItems) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (internalName !in ultraRareMiscItems) continue
+            TableRareUncoverEvent(item.cleanName(), isBook = false).post()
+            currentExperimentData.rareFoundFired = true
+            return
         }
     }
 
