@@ -376,8 +376,6 @@ object SackApi {
         sackListNames = uniqueSackItems.map {
             it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
         }.toSet()
-        println(sackListNames)
-        println(sackListInternalNames)
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
