@@ -25,6 +25,7 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
 import java.nio.file.Path
@@ -33,8 +34,6 @@ import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-    protected val globalRepoDirectory: Path = PlatformUtils.gameDir.resolve("repo")
-
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
      * Gets used in error messages and logging.
@@ -59,7 +58,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * The root directory for this specific repo.
      * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
      */
-    abstract val repoDirectory: Path
+    abstract val repoDirectory: File
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
@@ -80,7 +79,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
     private val commitStorage: RepoCommitStorage by lazy {
         // e.g. ~/.minecraft/repo/skyhanni/hash.json
-        RepoCommitStorage(repoDirectory.resolve("hash.json").toFile())
+        RepoCommitStorage(repoDirectory.resolve("hash.json"))
     }
 
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
@@ -584,5 +583,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
             debug("  extra:")
             for ((key, value) in extraData) debug("    $key: $value")
         }
+    }
+
+    companion object {
+        protected val globalRepoDirectory: Path = PlatformUtils.gameDir.resolve("repo")
     }
 }
