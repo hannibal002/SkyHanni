@@ -24,7 +24,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         listeners.sortedBy { it.priority }.toList(),
         listeners.any { it.receiveCancelled },
         if (PlatformUtils.isDevEnvironment) {
-            event::class.java.getAnnotation(Thread::class.java)?.value?.toSet()
+            event.getAnnotation(Thread::class.java)?.value?.toSet()
         } else null
     )
 
