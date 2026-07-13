@@ -49,16 +49,18 @@ object ItemNameResolver {
             if (split.size == 3) {
                 val gemstoneQuery = "${
                     when (split[1]) {
-                        "jade", "peridot", "citrine" -> '☘'
-                        "amethyst" -> '❈'
-                        "ruby" -> '❤'
-                        "amber" -> '⸕'
-                        "opal" -> '❂'
-                        "topaz" -> '✧'
-                        "onyx" -> '☠'
-                        "sapphire" -> '✎'
-                        "aquamarine" -> '☂'
-                        "jasper" -> '❁'
+                        "jade" -> ""
+                        "peridot" -> "\uE051"
+                        "citrine" -> ''
+                        "amethyst" -> ''
+                        "ruby" -> ''
+                        "amber" -> ''
+                        "opal" -> ''
+                        "topaz" -> ''
+                        "onyx" -> ''
+                        "sapphire" -> ''
+                        "aquamarine" -> ''
+                        "jasper" -> ''
                         else -> ' '
                     }
                 } ${split.joinToString("_").allLettersFirstUppercase()}"

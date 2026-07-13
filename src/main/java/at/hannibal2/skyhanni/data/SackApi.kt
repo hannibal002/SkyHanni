@@ -89,24 +89,24 @@ object SackApi {
     )
 
     /**
-     * REGEX-TEST: ☘ Rough Jade Gemstone
-     * REGEX-TEST: §f☘ Rough Jade Gemstone
-     * REGEX-TEST: §f⸕ Rough Amber Gemstone
-     * REGEX-TEST: §f✧ Rough Topaz Gemstone
-     * REGEX-TEST: §f✎ Rough Sapphire Gemstone
-     * REGEX-TEST: §f❈ Rough Amethyst Gemstone
-     * REGEX-TEST: §f❁ Rough Jasper Gemstone
-     * REGEX-TEST: §f❤ Rough Ruby Gemstone
-     * REGEX-TEST: §f❂ Rough Opal Gemstone
-     * REGEX-TEST: §f☠ Rough Onyx Gemstone
-     * REGEX-TEST: §f☂ Rough Aquamarine Gemstone
-     * REGEX-TEST: §a☘ Flawed Citrine Gemstone
-     * REGEX-TEST: §9☘ Fine Peridot Gemstone
+     * REGEX-TEST:  Rough Jade Gemstone
+     * REGEX-TEST: §f Rough Jade Gemstone
+     * REGEX-TEST: §f Rough Amber Gemstone
+     * REGEX-TEST: §f Rough Topaz Gemstone
+     * REGEX-TEST: §f Rough Sapphire Gemstone
+     * REGEX-TEST: §f Rough Amethyst Gemstone
+     * REGEX-TEST: §f Rough Jasper Gemstone
+     * REGEX-TEST: §f Rough Ruby Gemstone
+     * REGEX-TEST: §f Rough Opal Gemstone
+     * REGEX-TEST: §f Rough Onyx Gemstone
+     * REGEX-TEST: §f Rough Aquamarine Gemstone
+     * REGEX-TEST: §a Flawed Citrine Gemstone
+     * REGEX-TEST: §9 Fine Peridot Gemstone
      * REGEX-TEST: §eTopaz Gemstones
      */
     private val gemstoneItemNamePattern by patternGroup.pattern(
         "gemstone.name",
-        "(?:(?:§.)?[❤❈☘⸕✎✧❁☠❂☂] |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
+        "(?:(?:§.)?[\uE051] |§.)(?:(?:Rough|Flawed|Fine) )?(?<gem>[^ ]+) Gemstones?",
     )
 
     /**
@@ -376,6 +376,8 @@ object SackApi {
         sackListNames = uniqueSackItems.map {
             it.itemNameWithoutColor.removeNonAsciiNonColorCode().trim().uppercase()
         }.toSet()
+        println(sackListNames)
+        println(sackListInternalNames)
     }
 
     @HandleEvent(ProfileJoinEvent::class, priority = HandleEvent.HIGH)
