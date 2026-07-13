@@ -25,15 +25,15 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
-import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
-    protected val globalRepoDirectory: File = PlatformUtils.gameDir.resolve("repo")
+    protected val globalRepoDirectory: Path = PlatformUtils.gameDir.resolve("repo")
 
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
@@ -59,7 +59,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * The root directory for this specific repo.
      * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
      */
-    abstract val repoDirectory: File
+    abstract val repoDirectory: Path
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
@@ -73,14 +73,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
     private val repoTgzFile by lazy {
         // e.g. ~/.minecraft/repo/skyhanni/sh-repo-main.tar.gz
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
+        repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
     }
     private val legacyRepoZipFile by lazy {
-        File(repoDirectory, "$commonShortName-repo-${config.location.defaultBranch}.zip")
+        repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.zip")
     }
     private val commitStorage: RepoCommitStorage by lazy {
         // e.g. ~/.minecraft/repo/skyhanni/hash.json
-        RepoCommitStorage(File(repoDirectory, "hash.json"))
+        RepoCommitStorage(repoDirectory.resolve("hash.json").toFile())
     }
 
     private val commonShortName by lazy { commonShortNameCased.lowercase() }
