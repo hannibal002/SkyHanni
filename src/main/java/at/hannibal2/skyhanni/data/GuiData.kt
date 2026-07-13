@@ -48,8 +48,7 @@ object GuiData {
             if (CustomLoadoutKeybinds.allowKeyboardClick()) return
 
             if (preDrawEventCancelled) event.cancel()
-        }
-        else {
+        } else {
             if (CustomWardrobeKeybinds.allowMouseClick()) return
             if (CustomLoadoutKeybinds.allowMouseClick()) return
 
