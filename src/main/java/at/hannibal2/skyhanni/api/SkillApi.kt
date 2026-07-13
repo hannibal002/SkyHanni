@@ -336,9 +336,9 @@ object SkillApi {
             lore@ for ((index, line) in lore.withIndex()) {
                 val cleanLine = line.removeColor()
                 if (!cleanLine.startsWith("                    ")) continue@lore
-                val previousLine = lore.getOrNull(index - 1) ?: continue@lore
+                val previousLine = lore.getOrNull(index - 1)?.removeColor() ?: continue@lore
                 val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
-                if (previousLine == "§7§8Max Skill level reached!") {
+                if (previousLine == "Max Skill level reached!") {
                     onUpdateMax(progress, skill, skillInfo, skillLevel)
                 } else {
                     onUpdateNotMax(progress, skillLevel, skillInfo)
