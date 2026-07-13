@@ -35,12 +35,10 @@ import at.hannibal2.skyhanni.utils.compat.getVanillaItem
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.json.fromJsonOrNull
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.nbt.StringTag
-import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
@@ -56,10 +54,6 @@ import net.minecraft.world.item.ItemStackTemplate
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
 object EnoughUpdatesManager {
-
-    val repoDirectory: File = File(PlatformUtils.gameDir, "repo")
-    private val itemsFolder = File(repoDirectory, "items")
-
     private val loadingMutex = Mutex()
     private val itemMap = TreeMap<NeuInternalName, NeuItemJson>()
     private val internalNameSet: MutableSet<NeuInternalName> = mutableSetOf()
@@ -357,20 +351,6 @@ object EnoughUpdatesManager {
         if (itemMap.isNotEmpty()) {
             ChatUtils.chat("Reloaded ${itemMap.size.addSeparators()} items in the NEU repo")
         }
-    }
-
-    fun reportItemStatus() {
-        val loadedItems = itemMap.size
-        val directorySize = itemsFolder.listFiles()?.size ?: 0
-
-        val status = when {
-            directorySize == 0 -> "§cNo item directory entries found!"
-            loadedItems == 0 -> "§cNo items loaded!"
-            loadedItems < directorySize -> "§eLoaded $loadedItems/$directorySize items"
-            loadedItems > directorySize -> "§eLoaded Items: $loadedItems (more than directory size)"
-            else -> "§aLoaded all $loadedItems items!"
-        }
-        ChatUtils.chat("  §aNEU Repo Item Status:\n  $status", prefix = false)
     }
 
     fun reportRecipeStatus() {

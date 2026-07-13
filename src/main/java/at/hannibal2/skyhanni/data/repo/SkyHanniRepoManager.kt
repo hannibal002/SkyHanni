@@ -15,7 +15,7 @@ import java.io.File
 object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val commonName = "SkyHanni"
     override val commonShortNameCased = "SH"
-    override val repoDirectory: File = File(EnoughUpdatesManager.repoDirectory, "skyhanni")
+    override val repoDirectory: File = File(globalRepoDirectory, "skyhanni")
     override val config get() = SkyHanniMod.feature.dev.repo
     override val backupRepoResourcePath: String = "assets/skyhanni/repo.tar.gz"
 

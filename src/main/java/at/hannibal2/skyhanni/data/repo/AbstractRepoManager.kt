@@ -33,6 +33,7 @@ import kotlin.time.Duration.Companion.minutes
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
+    protected val globalRepoDirectory: File = PlatformUtils.gameDir.resolve("repo")
 
     /**
      * Should be user-friendly, e.g. "SkyHanni" or "NotEnoughUpdates".
