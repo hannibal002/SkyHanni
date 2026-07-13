@@ -668,15 +668,17 @@ object SkyHanniDebugsAndTests {
             }
             simpleCallback { waypoint() }
         }
-        event.registerBrigadier("shstoplisteners") {
-            description = "Unregistering all loaded event listeners"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { stopListeners() }
-        }
-        event.registerBrigadier("shreloadlisteners") {
-            description = "Reloads all event listeners again"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { reloadListeners() }
+        if (PlatformUtils.isDevEnvironment) {
+            event.registerBrigadier("shstoplisteners") {
+                description = "Unregistering all loaded event listeners"
+                category = CommandCategory.DEVELOPER_TEST
+                callback { stopListeners() }
+            }
+            event.registerBrigadier("shreloadlisteners") {
+                description = "Reloads all event listeners again"
+                category = CommandCategory.DEVELOPER_TEST
+                callback { reloadListeners() }
+            }
         }
         event.registerBrigadier("shresetcontestdata") {
             description = "Resets Jacob's Contest Data"
@@ -692,7 +694,7 @@ object SkyHanniDebugsAndTests {
                 } else if (SkyBlockUtils.onHypixel) {
                     ChatUtils.chat("§eYou are on Hypixel, but not in SkyBlock.")
                 } else {
-                    ChatUtils.chat("§eYou not on Hypixel.")
+                    ChatUtils.chat("§eYou are not on Hypixel.")
                 }
             }
         }

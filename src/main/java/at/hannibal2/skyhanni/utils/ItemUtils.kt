@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -64,8 +65,8 @@ import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.compat.stackHover
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.common.collect.ImmutableMultimap
 import com.google.gson.annotations.Expose
@@ -176,29 +177,43 @@ object ItemUtils {
 
     fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName.endsWith(" Sack")
 
-    @Deprecated("Use getLoreComponent unless you really need color codes", ReplaceWith("this.getLoreComponent()"))
-    fun SafeItemStack.getLore(): List<String> {
-        val data = cachedData
-        if (data.lastLoreFetchTime.passedSince() < 0.1.seconds) {
-            return data.lastLore
+    private val loreComponentCache = TimeLimitedCache<IdentityCharacteristics<DataComponentMap>, List<Component>>(
+        expireAfterWrite = 0.1.seconds,
+    )
+
+    private val internalNameCache = TimeLimitedCache<IdentityCharacteristics<SafeItemStack>, NeuInternalName>(
+        expireAfterWrite = 1.seconds,
+    )
+
+    /**
+     * For use in [ItemUtilsTest].
+     */
+    internal fun SafeItemStack.cacheInternalName(internalName: NeuInternalName) {
+        internalNameCache[IdentityCharacteristics(this)] = internalName
+    }
+
+    fun DataComponentMap.getLoreComponent(): List<Component> =
+        loreComponentCache.getOrPut(IdentityCharacteristics(this)) {
+            get(DataComponents.LORE)?.lines.orEmpty()
         }
-        val lore = this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
-        data.lastLore = lore
-        data.lastLoreFetchTime = SimpleTimeMark.now()
-        return lore
-    }
 
-    fun SafeItemStack.getLoreComponent(): List<Component> {
-        val lore = this.get(DataComponents.LORE)?.lines
-        return lore ?: emptyList()
-    }
+    fun DataComponentMap.getCleanLore(): List<String> =
+        getLoreComponent().map { it.string.removeColor() }
 
-    fun SafeItemStack.getSingleLineLore(): String = getLore().filter { it.isNotEmpty() }.joinToString(" ")
+    @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
+    fun DataComponentMap.getLore(): List<String> =
+        getLoreComponent().map { it.formattedTextCompatLessResets() }
 
-    fun DataComponentMap?.getLore(): List<String> {
-        this ?: return emptyList()
-        return this.get(DataComponents.LORE)?.lines?.map { it.formattedTextCompatLessResets() }.orEmpty()
-    }
+    fun SafeItemStack.getLoreComponent(): List<Component> = components.getLoreComponent()
+
+    fun SafeItemStack.getCleanLore(): List<String> = components.getCleanLore()
+
+    @Deprecated("Use getLoreComponent or getCleanLore unless you really need color codes")
+    @Suppress("Deprecation")
+    fun SafeItemStack.getLore(): List<String> = components.getLore()
+
+    fun List<String>.toSingleLineLore(): String =
+        filter { it.isNotEmpty() }.joinToString(" ")
 
     fun CompoundTag?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
         this ?: return emptyList()
@@ -277,18 +292,13 @@ object ItemUtils {
         return list
     }
 
-    fun SafeItemStack.getInternalName() = getInternalNameOrNull() ?: NeuInternalName.NONE
-
-    fun SafeItemStack.getInternalNameOrNull(): NeuInternalName? {
-        val data = cachedData
-        if (data.lastInternalNameFetchTime.passedSince() < 1.seconds) {
-            return data.lastInternalName
+    fun SafeItemStack.getInternalName(): NeuInternalName =
+        internalNameCache.getOrPut(IdentityCharacteristics(this)) {
+            grabInternalNameOrNull() ?: NeuInternalName.NONE
         }
-        val internalName = grabInternalNameOrNull()
-        data.lastInternalName = internalName
-        data.lastInternalNameFetchTime = SimpleTimeMark.now()
-        return internalName
-    }
+
+    fun SafeItemStack.getInternalNameOrNull(): NeuInternalName? =
+        getInternalName().takeUnless { it == NeuInternalName.NONE }
 
     /*
     This will cause errors if used with basically anything EXCEPT getPrice
@@ -313,7 +323,8 @@ object ItemUtils {
     }
 
     private fun SafeItemStack.grabInternalNameOrNull(): NeuInternalName? {
-        if (!SafeItemStackUtils.componentsLoaded) return null
+        if (!SafeItemStackUtils.canReadComponents(this)) return null
+        ensureComponentsBound()
         if (isEmpty) return null
         if (hoverName.string == "Wisp's Ice-Flavored Water I Splash Potion") {
             return NeuInternalName.WISP_POTION
@@ -349,7 +360,6 @@ object ItemUtils {
     fun SafeItemStack.getSkullTexture(): String? {
         if (!this.`is`(Items.PLAYER_HEAD)) return null
         return this.get(DataComponents.PROFILE)?.partialProfile()?.properties?.get("textures")?.firstOrNull()?.value
-
     }
 
     fun SafeItemStack.getSkullOwner(): String? {
@@ -684,14 +694,10 @@ object ItemUtils {
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.repoItemName: String
-        get() = if (SafeItemStackUtils.componentsLoaded) {
-            itemNameCache.getOrPut(this) { grabItemName() }
-        } else grabItemName()
+        get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     val NeuInternalName.repoItemNameCompact
-        get() = if (SafeItemStackUtils.componentsLoaded) {
-            compactItemNameCache.getOrPut(this) { getRepoCompactName() }
-        } else getRepoCompactName()
+        get() = compactItemNameCache.getOrPut(this) { getRepoCompactName() }
 
     private fun NeuInternalName.getRepoCompactName(): String {
         var name = repoItemName
@@ -732,23 +738,47 @@ object ItemUtils {
         missingRepoItems.clear()
     }
 
-    @HandleEvent(priority = HandleEvent.LOW)
-    fun onComponentsLoaded() {
-        itemNameCache.clear()
-        compactItemNameCache.clear()
-        missingRepoItems.clear()
-    }
-
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = repoItemName.removeColor()
+
+    fun NeuInternalName.matchesItemName(itemName: String): Boolean = when {
+        itemName.contains('§') -> repoItemName == itemName
+        else ->
+            itemNameWithoutColor == itemName ||
+                asString().replace("_", " ").equals(itemName, ignoreCase = true)
+    }
 
     val NeuInternalName.readableInternalName: String
         get() = asString().replace("_", " ").lowercase()
 
     @Suppress("ReturnCount")
     private fun NeuInternalName.grabItemName(): String {
-        if (!SafeItemStackUtils.componentsLoaded) return "§c$this"
-        if (this.isPet) {
+        getSpecialRepoItemName()?.let { return it }
+
+        val itemInfo = EnoughUpdatesManager.getItemById(this) ?: run {
+            val name = toString()
+            addMissingRepoItem(name, "Could not find item name for $name")
+            return "§c$name"
+        }
+        getRepoItemNameFromJson(itemInfo)?.let { return it }
+
+        // Local fallback for repo items that do not expose enough name data in JSON.
+        val itemStack = getItemStackOrNull() ?: run {
+            val name = toString()
+            addMissingRepoItem(name, "Could not find item stack for $name")
+            return "§c$name"
+        }
+        return grabItemNameFromStack(itemStack)
+    }
+
+    fun NeuInternalName.getRepoItemNameFromJson(itemInfo: NeuItemJson): String? {
+        getSpecialRepoItemName()?.let { return it }
+        val name = itemInfo.displayName ?: return null
+        return formatRepoItemName(name, itemInfo)
+    }
+
+    private fun NeuInternalName.getSpecialRepoItemName(): String? {
+        if (PetUtils.isKnownPetInternalName(this)) {
             return PetUtils.getCleanPetName(this, colored = true) + " Pet"
         }
         if (this == NeuInternalName.WISP_POTION) {
@@ -763,13 +793,37 @@ object ItemUtils {
         if (NeuItems.ignoreItemsFilter.match(this.asString())) {
             return "§cBugged Item"
         }
+        return null
+    }
 
-        // We do not use NeuItems.allItemsCache here since we need itemStack below
-        val itemStack = getItemStackOrNull() ?: run {
-            val name = toString()
-            addMissingRepoItem(name, "Could not find item name for $name")
-            return "§c$name"
+    private fun NeuInternalName.formatRepoItemName(name: String, itemInfo: NeuItemJson): String {
+        if (itemInfo.itemId.endsWith(":enchanted_book")) {
+            val enchantName = itemInfo.lore.firstNotNullOfOrNull {
+                val clean = it.removeColor()
+                it.takeIf { clean.isNotBlank() && !anvilCombinablePattern.matches(clean) }
+            }
+            if (enchantName != null) {
+                if (name.endsWith("Enchanted Book Bundle")) {
+                    return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(enchantName).removeColor())
+                }
+                if (name.endsWith("Enchanted Book")) {
+                    return ReplaceRomanNumerals.replaceLine(enchantName)
+                }
+            }
         }
+
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
+        }
+
+        if (isRune()) {
+            return ReplaceRomanNumerals.replaceLine(name)
+        }
+
+        return name
+    }
+
+    private fun NeuInternalName.grabItemNameFromStack(itemStack: SafeItemStack): String {
         val name = itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
 
         // show enchanted book name
@@ -784,21 +838,16 @@ object ItemUtils {
             }
             return ReplaceRomanNumerals.replaceLine(enchantName)
         }
-        if (name.endsWith("Enchanted Book Bundle")) {
-            return name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
-        }
 
-        // obfuscated trophy fish
-        if (name.contains("§kObfuscated")) {
-            return name.replace("§kObfuscated", "Obfuscated")
+        return when {
+            name.endsWith("Enchanted Book Bundle") ->
+                name.replace("Enchanted Book", ReplaceRomanNumerals.replaceLine(itemStack.getLore()[0]).removeColor())
+            // Obfuscated trophy fish
+            name.contains("§kObfuscated") -> name.replace("§kObfuscated", "Obfuscated")
+            // Remove roman runic tier
+            isRune() -> ReplaceRomanNumerals.replaceLine(name)
+            else -> name
         }
-
-        // remove roman runic tier
-        if (isRune()) {
-            return ReplaceRomanNumerals.replaceLine(name)
-        }
-
-        return name
     }
 
     fun SafeItemStack.loreCosts(): MutableList<NeuInternalName> {
@@ -1077,4 +1126,6 @@ object ItemUtils {
             }
         }
     }
+
+    fun SafeItemStack.takeUnlessEmpty(): SafeItemStack? = takeUnless { it.isEmpty }
 }

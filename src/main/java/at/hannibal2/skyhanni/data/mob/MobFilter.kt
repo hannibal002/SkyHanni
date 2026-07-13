@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ElectionApi.derpy
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult
 import at.hannibal2.skyhanni.data.mob.MobData.MobResult.Companion.makeMobResult
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,7 +49,7 @@ import net.minecraft.world.entity.npc.villager.Villager
 import net.minecraft.world.entity.player.Player
 import org.intellij.lang.annotations.Language
 
-@Suppress("RegExpRedundantEscape")
+@Suppress("RegExpRedundantEscape", "MaxLineLength")
 @SkyHanniModule
 object MobFilter {
 
@@ -61,12 +62,12 @@ object MobFilter {
     private val level = "(?:\\[Lv(?<level>\\d+)\\] )?"
 
     /**
-     * REGEX-TEST: Wither Husk 500M❤
-     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000❤
+     * REGEX-TEST: Wither Husk 500M
+     * REGEX-TEST: [Lv10] ⚓♃ Sea Guardian 4,250/5,000
      */
     val mobNameFilter by patternGroup.pattern(
         "filter.basic",
-        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,❤]+",
+        "$level$mobType(?<corrupted>.Corrupted )?(?<name>[^ᛤ]*)(?: ᛤ)? [\\dBMk.,${SkyblockStat.HEALTH.hypixelIcon}]+",
     )
 
     /**
@@ -82,18 +83,18 @@ object MobFilter {
 
     /**
      * REGEX-TEST: ﴾ Storm ﴿
-     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] aMage Outlawa 70M/70M ﴿
      * REGEX-TEST: ﴾ [Lv500] Magma Boss █████████████████████████ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000❤ ﴿
-     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k❤ ﴿
-     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M❤ ﴿
-     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M❤ ﴿
+     * REGEX-TEST: ﴾ [Lv200] Bladesoul 50M/50M ﴿
+     * REGEX-TEST: ﴾ [Lv300] Arachne 20,000/20,000 ﴿
+     * REGEX-TEST: ﴾ [Lv500] Arachne 100k/100k ﴿
+     * REGEX-TEST: ﴾ [Lv200] Barbarian Duke X 70M/70M ﴿
+     * REGEX-TEST: ﴾ [Lv100] Endstone Protector 4.6M/5M ﴿
+     * REGEX-TEST: ﴾ [Lv400] Thunder 29M/35M ﴿
      */
     val bossMobNameFilter by patternGroup.pattern(
         "filter.boss",
-        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,❤]+| █+)? .$",
+        "^. $level$mobType(?<name>[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH.hypixelIcon}]+| █+)? .$",
     )
 
     @Suppress("MaxLineLength")
@@ -111,13 +112,13 @@ object MobFilter {
     )
 
     /**
-     * REGEX-TEST: [Lv1] ✰⛨ Throwpo's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰⛨ RecluseFang's Green Jerry 3 Hits
-     * REGEX-TEST: [Lv1] ✰⛨ aThunderblade73's Green Jerrya 7 Hits
+     * REGEX-TEST: [Lv1]  Throwpo's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  RecluseFang's Green Jerry 3 Hits
+     * REGEX-TEST: [Lv1]  aThunderblade73's Green Jerrya 7 Hits
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
-        "(?:\\[\\w+(?<level>\\d+)] )?✰⛨ (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
+        "(?:\\[\\w+(?<level>\\d+)] )?.. (?:(?:a(?=a ))?(?<owner>\\w+)'s (?<name>\\w+ Jerrya?)) \\d+ Hits",
     )
     val petCareNamePattern by patternGroup.pattern(
         "pattern.petcare",
@@ -131,7 +132,7 @@ object MobFilter {
     )
     val jerryMagmaCubePattern by patternGroup.pattern(
         "pattern.jerry.magma.cube",
-        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤",
+        "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}",
     )
     val summonOwnerPattern by patternGroup.pattern(
         "pattern.summon.owner",

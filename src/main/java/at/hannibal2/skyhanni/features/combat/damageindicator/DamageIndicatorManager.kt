@@ -794,7 +794,6 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_2 -> 30
                 BossType.SLAYER_ENDERMAN_3 -> 60
                 BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
             }
             val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()

@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.ChatFormatting
-import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.client.Minecraft
+import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.ClickEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
@@ -30,8 +30,9 @@ import kotlin.math.abs
 import kotlin.time.Duration.Companion.minutes
 
 //? if >= 26.1 {
-import net.minecraft.world.item.ItemStackTemplate
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
+import net.minecraft.world.item.ItemStackTemplate
+
 //?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
@@ -137,6 +138,8 @@ fun Style.chatStyle() = buildString {
     if (isStrikethrough) append("§m")
     if (isObfuscated) append("§k")
 }
+
+fun Style.takeUnlessEmpty(): Style? = takeUnless { it.isEmpty }
 
 fun TextColor.toChatFormatting(): ChatFormatting? {
     return textColorLUT[this.value]
@@ -335,8 +338,18 @@ fun createHoverEvent(action: HoverEvent.Action?, component: MutableComponent): H
     else -> throw NotImplementedError("Action ${action.name} is not implemented")
 }
 
-fun Component.changeColor(color: LorenzColor): Component =
-    this.copyIfNeeded().withStyle(color.toChatFormatting())
+fun Component.changeColor(color: LorenzColor): Component {
+    val component = Component.empty()
+
+    this.visit(
+        { style: Style?, string: String? ->
+            component.append(Component.literal(string.orEmpty()).withStyle((style ?: Style.EMPTY).withColor(color.toChatFormatting())))
+            Optional.empty<Component>()
+        },
+        Style.EMPTY,
+    )
+    return component
+}
 
 fun Component.convertToJsonString(): String {
     return net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(
