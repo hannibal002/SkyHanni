@@ -392,4 +392,12 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var museumCategoryHighlight: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Inventory Close Preventer",
+        desc = "Prevent using non mouse keys to close Inventories using Hypixel Close Menu Items."
+    )
+    @ConfigEditorBoolean
+    var doNotAllowClosingInventoriesUsingNonMouseKeys: Boolean = false
 }
