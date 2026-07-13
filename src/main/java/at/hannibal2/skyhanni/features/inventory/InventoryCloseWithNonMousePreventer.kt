@@ -21,12 +21,12 @@ object InventoryCloseWithNonMousePreventer {
         "closebuttons",
         "Close"
     )
-    private val config get() = SkyHanniMod.feature.inventory
+    private val config get() = SkyHanniMod.feature.inventory.closePrevention
 
     @HandleEvent(priority = HIGHEST)
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        if (!config.doNotAllowClosingInventoriesUsingNonMouseKeys) return
-        if (Minecraft.getInstance().options.keyInventory.isDown || GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
+        if (!config.enabled) return
+        if (inventoryButtonDown() || escapeKeyHeld()) return
         if (!event.isMouseBasedEvent) {
             val underMouseItemStack = stackUnderCursor() ?: return
             ChatUtils.debug(underMouseItemStack.hoverName.string.removeColor())
@@ -35,4 +35,8 @@ object InventoryCloseWithNonMousePreventer {
             }
         }
     }
+
+    fun escapeKeyHeld(): Boolean = config.shouldIgnoreEscapeKey && GLFW.GLFW_KEY_ESCAPE.isKeyHeld()
+
+    fun inventoryButtonDown(): Boolean = config.shouldIgnoreInventoryKey && Minecraft.getInstance().options.keyInventory.isDown
 }
