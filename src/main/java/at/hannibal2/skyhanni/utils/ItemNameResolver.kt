@@ -72,7 +72,7 @@ object ItemNameResolver {
     }
 
     private fun resolveGemstoneToStat(itemName: String): SkyblockStat? =
-        when(itemName) {
+        when (itemName) {
             "jade" -> MINING_FORTUNE
             "peridot" -> FARMING_FORTUNE
             "citrine" -> FORAGING_FORTUNE
