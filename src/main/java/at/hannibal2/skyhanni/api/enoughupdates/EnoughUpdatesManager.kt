@@ -57,7 +57,7 @@ import net.minecraft.world.item.ItemStackTemplate
 @SkyHanniModule
 object EnoughUpdatesManager {
 
-    val repoDirectory: File = PlatformUtils.gameDir.resolve("repo").toFile()
+    val repoDirectory: File = File(PlatformUtils.gameDir, "repo")
     private val itemsFolder = File(repoDirectory, "items")
 
     private val loadingMutex = Mutex()

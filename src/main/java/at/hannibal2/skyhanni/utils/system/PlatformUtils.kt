@@ -10,7 +10,8 @@ import at.hannibal2.skyhanni.utils.MarkdownBuilder
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.VersionConstants
 import net.fabricmc.loader.api.FabricLoader
-import java.nio.file.Path
+import net.minecraft.client.Minecraft
+import java.io.File
 import kotlin.system.exitProcess
 
 /**
@@ -30,8 +31,8 @@ object PlatformUtils {
 
     @JvmStatic
     @get:JvmName("gameDir")
-    val gameDir: Path by lazy {
-        FabricLoader.getInstance().gameDir
+    val gameDir: File by lazy {
+        Minecraft.getInstance().gameDirectory
     }
 
     private val allowedFabricReports = setOf(
