@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -124,15 +123,15 @@ object GardenNextJacobContest {
     // This pattern covers both the tab list widget, and calendar item lore.
     /**
      * REGEX-TEST: ○ Cactus
-     * REGEX-TEST:  Carrot
+     * REGEX-TEST: ☘ Carrot
      * REGEX-TEST: ○ Melon
-     * WRAPPED-REGEX-TEST: "  Mushroom"
+     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
      * WRAPPED-REGEX-TEST: " ○ Pumpkin"
      * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
-        " ?(?:○|(?<boosted>${SkyblockStat.FARMING_FORTUNE.hypixelIcon})) (?<crop>.*)",
+        " ?(?:○|(?<boosted>☘)) (?<crop>.*)",
     )
 
     /**

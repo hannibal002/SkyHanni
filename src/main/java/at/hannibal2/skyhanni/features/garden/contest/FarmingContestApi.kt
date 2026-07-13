@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.contest
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -40,7 +39,7 @@ object FarmingContestApi {
     )
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop",
-        "\\s*(?:§e○|§6${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) §f(?<crop>.*) §a.*",
+        "\\s*(?:§e○|§6☘) §f(?<crop>.*) §a.*",
     )
     private val bulkClaimFarmingPattern by patternGroup.pattern(
         "bulkclaim",

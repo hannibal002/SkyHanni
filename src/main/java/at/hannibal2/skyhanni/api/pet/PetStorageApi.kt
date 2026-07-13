@@ -387,10 +387,6 @@ object PetStorageApi {
             updateCurrentPetHeldItem(petHeldItem)
         }
 
-        PetStoragePatterns.petItemRemovedMessagePattern.matchMatcher(event.cleanMessage) {
-            updateCurrentPetHeldItem(null)
-        }
-
         PetStoragePatterns.autoPetMessagePattern.matchMatcher(event.message.removeResets()) {
             if (config.hideAutopet) event.blockedReason = "autopet"
 
@@ -446,7 +442,7 @@ object PetStorageApi {
         return PetUtils.resolvePetItemOrNull(itemName)
     }
 
-    private fun updateCurrentPetHeldItem(heldItem: NeuInternalName?) {
+    private fun updateCurrentPetHeldItem(heldItem: NeuInternalName) {
         val currentPet = CurrentPetApi.currentPet ?: return
         if (currentPet.heldItemInternalName == heldItem) return
         currentPet.heldItemInternalName = heldItem
