@@ -18,6 +18,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
     PRIVATE_ISLAND_GUEST("Private Island Guest", null),
     HUB("Hub", "hub"),
     DARK_AUCTION("Dark Auction", "dark_auction"),
+    WINTER("Jerry's Workshop", "winter"),
 
     // Farming
     THE_FARMING_ISLANDS("The Farming Islands", "farming_1"),
@@ -51,7 +52,6 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
     KUUDRA_ARENA("Kuudra", "kuudra"),
 
     // Special
-    WINTER("Jerry's Workshop", "winter"),
     THE_RIFT("The Rift", "rift"),
     SAFARI("Safari", "safari"),
 
