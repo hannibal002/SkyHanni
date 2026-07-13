@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -75,7 +74,7 @@ object ScoreboardPattern {
      */
     val locationPattern by mainSB.pattern(
         "location",
-        "\\s*(?<location>§.. .*)",
+        "\\s*(?<location>(?:§7⏣|§5ф) .*)",
     )
 
     /**
@@ -203,12 +202,12 @@ object ScoreboardPattern {
     private val dungeonSB = scoreboardGroup.group("dungeon")
 
     /**
-     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c
+     * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M§c❤
      * REGEX-TEST: §8- §c§4Power Dragon§a 497.3M
      */
     val m7dragonsPattern by dungeonSB.pattern(
         "m7dragons",
-        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH.hypixelIcon})?",
+        "§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.❤)?",
     )
     val keysPattern by dungeonSB.pattern(
         "keys",
@@ -238,7 +237,7 @@ object ScoreboardPattern {
      */
     val floor3GuardiansPattern by dungeonSB.pattern(
         "floor3guardians",
-        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c${SkyblockStat.HEALTH.hypixelIcon})?",
+        "§. - §.(?:Healthy|Reinforced|Laser|Chaos)§a [\\w,.]*(?:§c❤)?",
     )
 
     // kuudra
@@ -471,11 +470,11 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Event Bonus: §6+4
+     * REGEX-TEST: Event Bonus: §6+4☘
      */
     val fortunateFreezingBonusPattern by miningSB.pattern(
         "fortunatefreezing.bonus",
-        "Event Bonus: §6\\+\\d+${SkyblockStat.MINING_FORTUNE.hypixelIcon}",
+        "Event Bonus: §6\\+\\d+☘",
     )
 
     /**
@@ -533,20 +532,20 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: §e389.6k§f/§a10M§c
+     * REGEX-TEST: §e389.6k§f/§a10M§c❤
      */
     val bossHealthBarPattern by combatSB.pattern(
         "magmabosshealthbar",
-        "§.[\\w,.]+§f/§a10M§c${SkyblockStat.HEALTH.hypixelIcon}",
+        "§.[\\w,.]+§f/§a10M§c❤",
     )
 
     /**
-     * REGEX-TEST: Dragon HP: §a2,317,156 §c
-     * REGEX-TEST: Dragon HP: §a8,612,684 §c
+     * REGEX-TEST: Dragon HP: §a2,317,156 §c❤
+     * REGEX-TEST: Dragon HP: §a8,612,684 §c❤
      */
     val bossHPPattern by combatSB.pattern(
         "bosshp",
-        "(?:Protector|Dragon) HP: §a[\\d,.]* §c${SkyblockStat.HEALTH.hypixelIcon}",
+        "(?:Protector|Dragon) HP: §a[\\d,.]* §c❤",
     )
 
     /**

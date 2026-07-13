@@ -143,12 +143,4 @@ internal object PetStoragePatterns {
         "chat.helditem",
         "Your pet is now holding (?<item>.+?)\\.",
     )
-
-    /**
-     * REGEX-TEST: You removed Quick Claw from your pet!
-     */
-    val petItemRemovedMessagePattern by patternGroup.pattern(
-        "chat.removedhelditem",
-        "You removed (?<item>.+?) from your pet!",
-    )
 }

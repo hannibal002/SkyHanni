@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.achievements.Achievement
-import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -48,10 +47,9 @@ object ItemAddManager {
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".toInternalName()
     private val HIGH_CLASS_ARCHFIEND_DICE = "HIGH_CLASS_ARCHFIEND_DICE".toInternalName()
 
-    @Suppress("MaxLineLength")
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
-        "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)${SkyblockStat.HEALTH.hypixelIcon}",
+        "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
     )
 
     private var inSackInventory = false
