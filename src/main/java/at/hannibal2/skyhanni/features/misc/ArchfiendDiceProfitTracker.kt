@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.PurseApi
 import at.hannibal2.skyhanni.data.achievements.Achievement
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -48,6 +49,7 @@ object ArchfiendDiceProfitTracker {
      * REGEX-TEST: §eYour §r§5Archfiend Dice §r§erolled a §r§56§r§e! Bonus: §r§c12❤
      * REGEX-TEST: §eYour §r§6High Class Archfiend Dice §r§erolled a §r§67§r§e! Bonus: §r§a24❤
      */
+    @Suppress("MaxLineLength")
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
         "§eYour §r§[56](?<isHighClass>High Class )?Archfiend Dice §r§erolled a §r§.(?<number>[1-7])§r§e! Bonus: §r§.(?<hearts>.*)${SkyblockStat.HEALTH.hypixelIcon}",
