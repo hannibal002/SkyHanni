@@ -85,7 +85,7 @@ object FarmingProfitTrackerStats {
             val total = rareDrops.values.sum()
             add(
                 Renderable.hoverTips(
-                    "§7Rare crop drops: §e${total.addSeparators()}",
+                    "§6Rare crop drops: §6${total.addSeparators()}",
                     rareDrops.entries.sortedBy { it.key.dropName.removeColor() }.map { (drop, amount) ->
                         "§7${drop.dropName}: §e${amount.addSeparators()}"
                     },
@@ -100,7 +100,7 @@ object FarmingProfitTrackerStats {
         if (total == 0L) return
         add(
             Renderable.hoverTips(
-                "§7Seasoning: §e${total.addSeparators()}",
+                "§2Seasoning: §2${total.addSeparators()}",
                 listOf("§7Automatically donated to the Harvest Feast."),
             ).toSearchable("Seasoning"),
         )
@@ -111,7 +111,7 @@ object FarmingProfitTrackerStats {
         if (total == 0L) return
         add(
             Renderable.hoverTips(
-                "§7Blessed drops: §e${total.addSeparators()}",
+                "§9Blessed drops: §9${total.addSeparators()}",
                 data.blessedDrops.entries.sortedBy { it.key.itemNameWithoutColor }.map { (drop, amount) ->
                     "§7${drop.itemNameWithoutColor}: §e${amount.addSeparators()}"
                 },
@@ -150,7 +150,7 @@ object FarmingProfitTrackerStats {
         if (total == 0L) return
         add(
             Renderable.hoverTips(
-                "§7Pests killed: §e${total.addSeparators()}",
+                "§2Pests killed: §2${total.addSeparators()}",
                 data.pestKills.entries
                     .filter { it.key != PestType.UNKNOWN && it.value > 0 }
                     .sortedBy { it.key.displayName }
@@ -238,7 +238,7 @@ object FarmingProfitTrackerStats {
         if (coins == 0L) return
         add(
             Renderable.hoverTips(
-                "§7Bountiful coins: §6${coins.addSeparators()}",
+                "§6Bountiful coins: §6${coins.addSeparators()}",
                 listOf("§7Coins gained directly from the Bountiful reforge."),
             ).toSearchable("Bountiful coins"),
         )
