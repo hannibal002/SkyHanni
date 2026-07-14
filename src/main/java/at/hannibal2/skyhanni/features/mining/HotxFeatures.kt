@@ -40,7 +40,7 @@ object HotxFeatures {
         if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
         val currentPerk = currentRotPerk
 
-        val perkDescriptionFormat = currentPerk?.perkDescription
+        val perkDescriptionFormat = currentPerk?.displayDescription
             ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
         val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
 
