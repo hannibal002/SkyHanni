@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import com.mojang.blaze3d.systems.RenderSystem
+import net.minecraft.client.Minecraft
 import java.lang.Thread as JavaThread
 
 object EventThreadSanitizer {
-    
     private fun getCurrentThreadType(): ThreadType? {
-        val threadName = JavaThread.currentThread().name
         return when {
-            threadName == "Render thread" -> RENDER
-            threadName.startsWith("Netty Epoll IO") -> NETWORK
-            threadName.startsWith("DefaultDispatcher-worker") -> DISPATCHER
+            RenderSystem.isOnRenderThread() -> RENDER
+            Minecraft.getInstance().packetProcessor().isSameThread -> NETWORK
+            JavaThread.currentThread().name.startsWith("DefaultDispatcher-worker") -> DISPATCHER
             else -> null
         }
     }
