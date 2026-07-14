@@ -87,7 +87,7 @@ object SkyHanniEvents {
     }
 
     private fun unregisterHandler(clazz: Class<out SkyHanniEvent>) {
-        this.handlers.removeIfKey { it.isAssignableFrom(clazz) }
+        handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
     @HandleEvent
@@ -95,6 +95,7 @@ object SkyHanniEvents {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
         disabledHandlerInvokers = data.disabledInvokers
+        EventListeners.markEventCacheDirty()
     }
 
     val seconds = listOf(10, 60, 60 * 5)
@@ -136,7 +137,7 @@ object SkyHanniEvents {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Events")
         event.addIrrelevant {
             add("- <event name> (<total invoke count> invokes per second: <last 10s, 60s, 5m, total>)")

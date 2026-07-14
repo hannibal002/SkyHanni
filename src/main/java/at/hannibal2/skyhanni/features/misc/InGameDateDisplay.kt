@@ -44,7 +44,7 @@ object InGameDateDisplay {
     private var display: Renderable? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed(event: SecondPassedEvent) = with(config) {
+    fun onSecondPassed(event: SecondPassedEvent): Unit = with(config) {
         if (!enabled || (!useScoreboard && !event.repeatSeconds(refreshSeconds))) return
         checkDate()
     }

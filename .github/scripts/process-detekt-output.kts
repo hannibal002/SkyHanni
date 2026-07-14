@@ -1,5 +1,7 @@
 #!/usr/bin/env kotlin
 
+// TODO find out why this file exists, as it seems to be dead code
+
 import java.io.File
 
 val prSha = System.getenv("PR_SHA")

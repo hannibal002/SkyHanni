@@ -215,7 +215,7 @@ object SpiderDenRelicPathfinder {
         }
     }
 
-    private val calculatingMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val calculatingMessageId = ChatUtils.getUniqueMessageId()
     private var calculating = false
     private var calculatingStart = SimpleTimeMark.farPast()
 
