@@ -78,7 +78,7 @@ object ContributorAchievement {
 
         event.register(
             Achievement(
-                name = "Famous Contributor".asComponent(),
+                name = "(Contributor Only Achievement) Am I famous yet?".asComponent(),
                 description = componentBuilder {
                     append("Be mentioned by other players as a")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
