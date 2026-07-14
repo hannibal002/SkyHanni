@@ -4,19 +4,15 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import java.lang.Thread as JavaThread
 
 object EventThreadSanitizer {
-    val THREADS = mapOf<String, ThreadType>(
-        "Render thread" to RENDER,
-        "Netty Epoll IO" to NETWORK,
-        "DefaultDispatcher-worker" to DISPATCHER,
-    )
-
-    // DefaultDispatcher-worker-1 -> DefaultDispatcher-worker
-    // Netty Epoll IO #1 -> Netty Epoll IO
-    private val regex = Regex("""(\s*#|-)\d+$""")
-
+    
     private fun getCurrentThreadType(): ThreadType? {
-        val threadName = JavaThread.currentThread().name.replace(regex, "")
-        return THREADS[threadName]
+        val threadName = JavaThread.currentThread().name
+        return when {
+            threadName == "Render thread" -> RENDER
+            threadName.startsWith("Netty Epoll IO") -> NETWORK
+            threadName.startsWith("DefaultDispatcher-worker") -> DISPATCHER
+            else -> null
+        }
     }
 
     fun checkThread(name: String, allowedThreads: Set<ThreadType>?) {
