@@ -58,14 +58,14 @@ object MoongladeBeacon {
     private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
-    private val patternGroup = RepoPattern.group("foraging.moonglade.beacon")
+    private val patternGroup = RepoPattern.group("foraging.beacon")
 
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Current color: Red
      */
     private val beaconCurrentColorPattern by patternGroup.pattern(
-        "foraging.moonglade.beacon.color.colorless",
+        "color",
         "Current color: (?<color>\\w+)",
     )
 
@@ -73,7 +73,7 @@ object MoongladeBeacon {
      * REGEX-TEST: Current speed: 3
      */
     private val beaconCurrentSpeedPattern by patternGroup.pattern(
-        "foraging.moonglade.beacon.speed.colorless",
+        "speed",
         "Current speed: (?<speed>\\d+)",
     )
 
@@ -81,7 +81,7 @@ object MoongladeBeacon {
      * REGEX-TEST: Current pitch: Low
      */
     private val beaconCurrentPitchPattern by patternGroup.pattern(
-        "foraging.moonglade.beacon.pitch.colorless",
+        "pitch",
         "Current pitch: (?<pitch>\\w+)",
     )
     // </editor-fold>
