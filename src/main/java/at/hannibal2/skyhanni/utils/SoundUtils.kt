@@ -12,8 +12,11 @@ import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
+import net.minecraft.client.sounds.AudioStream
+import net.minecraft.client.sounds.SoundBufferLibrary
 import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundEvent
+import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
 object SoundUtils {
@@ -55,10 +58,14 @@ object SoundUtils {
     private fun SoundInstance.setLevel(level: Float) =
         Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
 
-    fun createSound(name: String, pitch: Float, volume: Float = 50f): SoundInstance {
+    fun createSound(name: String, pitch: Float, volume: Float = 50f, realVolume: Boolean = false): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
-        return SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
+        val sound = SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
+        if (realVolume) {
+            return RealVolumeSound(sound)
+        }
+        return sound
     }
 
     fun playBeepSound(pitch: Float = 1f) {
@@ -112,5 +119,27 @@ object SoundUtils {
                 ChatUtils.userError("Specify a sound effect to test")
             }
         }
+    }
+}
+
+class RealVolumeSound(val delegate: SoundInstance) : SoundInstance by delegate {
+    override fun canStartSilent(): Boolean {
+        return delegate.canStartSilent()
+    }
+
+    override fun canPlaySound(): Boolean {
+        return delegate.canPlaySound()
+    }
+
+    override fun getAttenuation(): SoundInstance.Attenuation {
+        return SoundInstance.Attenuation.NONE
+    }
+
+    override fun getAudioStream(
+        library: SoundBufferLibrary,
+        id: Identifier,
+        repeatInstantly: Boolean,
+    ): CompletableFuture<AudioStream> {
+        return delegate.getAudioStream(library, id, repeatInstantly)
     }
 }
