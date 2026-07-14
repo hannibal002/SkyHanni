@@ -58,7 +58,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      * The root directory for this specific repo.
      * Inheriting classes should provide the path, e.g.: `File(mcDataDir, "repo/skyhanni")`
      */
-    abstract val repoDirectory: File
+    val repoDirectory: File by lazy {
+        globalRepoDirectory.resolve("skyhanni-$commonShortName").toFile()
+    }
 
     @PublishedApi
     internal val logger by lazy { RepoLogger(this) }
@@ -582,6 +584,9 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
     }
 
     companion object {
-        protected val globalRepoDirectory: Path = PlatformUtils.gameDir.resolve("repo")
+        // PlatformUtils.gameDir cannot be called at init time, so must use lazy
+        private val globalRepoDirectory: Path by lazy {
+            PlatformUtils.gameDir.resolve("repo")
+        }
     }
 }
