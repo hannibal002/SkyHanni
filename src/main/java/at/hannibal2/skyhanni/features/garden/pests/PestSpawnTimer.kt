@@ -307,7 +307,7 @@ object PestSpawnTimer {
     @JvmStatic
     fun playUserSound() {
         with(config.sound) {
-            SoundUtils.createSound(name, pitch, volume, realVolume = true).playSound()
+            SoundUtils.createSound(name, pitch, volume, bypassVolumeMaximum = true).playSound()
         }
     }
 

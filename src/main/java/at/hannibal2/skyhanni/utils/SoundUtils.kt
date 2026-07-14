@@ -15,7 +15,7 @@ import net.minecraft.client.resources.sounds.SoundInstance
 import net.minecraft.client.sounds.AudioStream
 import net.minecraft.client.sounds.SoundBufferLibrary
 import net.minecraft.resources.Identifier
-import net.minecraft.sounds.SoundEvent
+import net.minecraft.sounds.SoundSource
 import java.util.concurrent.CompletableFuture
 
 @SkyHanniModule
@@ -58,13 +58,26 @@ object SoundUtils {
     private fun SoundInstance.setLevel(level: Float) =
         Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
 
-    fun createSound(name: String, pitch: Float, volume: Float = 50f, realVolume: Boolean = false): SoundInstance {
+    fun createSound(name: String, pitch: Float, volume: Float = 50f, bypassVolumeMaximum: Boolean = false): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
-        val sound = SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
-
-        return if (realVolume) {
-            RealVolumeSound(sound)
+        val sound =  SimpleSoundInstance(
+            identifier,
+            SoundSource.UI,
+            volume,
+            pitch,
+            SoundInstance.createUnseededRandom(),
+            false,
+            0,
+            SoundInstance.Attenuation.NONE,
+            0.0,
+            0.0,
+            0.0,
+            false, // Should not be relative to any position
+        )
+        
+        return if (bypassVolumeMaximum) {
+            BypassMaximumVolumeSound(sound)
         } else {
             sound
         }
@@ -124,17 +137,13 @@ object SoundUtils {
     }
 }
 
-class RealVolumeSound(val delegate: SoundInstance) : SoundInstance by delegate {
+class BypassMaximumVolumeSound(val delegate: SoundInstance) : SoundInstance by delegate {
     override fun canStartSilent(): Boolean {
         return delegate.canStartSilent()
     }
 
     override fun canPlaySound(): Boolean {
         return delegate.canPlaySound()
-    }
-
-    override fun getAttenuation(): SoundInstance.Attenuation {
-        return SoundInstance.Attenuation.NONE
     }
 
     override fun getAudioStream(

@@ -21,7 +21,7 @@ class PestTimerSoundSettings {
 
     @Expose
     @ConfigOption(name = "Volume", desc = "The volume of the notification sound.")
-    @ConfigEditorSlider(minValue = 0f, maxValue = 5f, minStep = 0.1f)
+    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.1f)
     var volume: Float = 1.0f
 
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
