@@ -54,7 +54,7 @@ object CoralFishHelper {
      * REGEX-TEST: Fish Shown: 1/31
      * REGEX-TEST: Fish Shown: 15/31
      */
-    val coralFishFoundPattern by patternGroup.pattern(
+    private val coralFishFoundPattern by patternGroup.pattern(
         "shown",
         "Fish Shown: (?<found>\\d+)/(?<total>\\d+)",
     )
