@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.PlaySoundEvent;
+import at.hannibal2.skyhanni.utils.BypassMaximumVolumeSound;
 import at.hannibal2.skyhanni.utils.LorenzVec;
-import at.hannibal2.skyhanni.utils.RealVolumeSound;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
@@ -65,7 +65,7 @@ public class MixinSoundEngine {
         SoundInstance soundInstance
     ) {
         // Skips the clamping from 0 to 1
-        if (soundInstance instanceof RealVolumeSound sound) {
+        if (soundInstance instanceof BypassMaximumVolumeSound sound) {
             return sound.getVolume()
                 * Mth.clamp(this.options.getFinalSoundSourceVolume(source), 0.0F, 1.0F)
                 * this.gainBySource.getFloat(source);
