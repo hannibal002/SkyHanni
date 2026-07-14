@@ -63,10 +63,11 @@ object MoongladeBeacon {
     // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Current color: Red
+     * REGEX-TEST: Current color: Light Blue
      */
     private val beaconCurrentColorPattern by patternGroup.pattern(
         "color",
-        "Current color: (?<color>\\w+)",
+        "Current color: (?<color>[\\w ]+)",
     )
 
     /**
