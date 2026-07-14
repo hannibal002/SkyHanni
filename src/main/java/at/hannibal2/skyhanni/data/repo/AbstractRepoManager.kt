@@ -71,14 +71,11 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         eventClass.getConstructor(AbstractRepoManager::class.java)
     }
     private val repoTgzFile by lazy {
-        // e.g. ~/.minecraft/repo/skyhanni/sh-repo-main.tar.gz
+        // e.g. ~/.minecraft/repo/skyhanni-sh/sh-repo-main.tar.gz
         repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.tar.gz")
     }
-    private val legacyRepoZipFile by lazy {
-        repoDirectory.resolve("$commonShortName-repo-${config.location.defaultBranch}.zip")
-    }
     private val commitStorage: RepoCommitStorage by lazy {
-        // e.g. ~/.minecraft/repo/skyhanni/hash.json
+        // e.g. ~/.minecraft/repo/skyhanni-neu/hash.json
         RepoCommitStorage(repoDirectory.resolve("hash.json"))
     }
 
@@ -562,7 +559,6 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
-        legacyRepoZipFile.delete()
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {
