@@ -181,7 +181,7 @@ enum class SkyblockStat(
 
     val menuPattern by patternGroup.pattern(
         "menu.no-color.$keyName",
-        if (generatePatterns) "$hypixelIcon ${this@SkyblockStat.displayName} $VALUE_PATTERN" else "",
+        if (generatePatterns) "\\s*$hypixelIcon ${this@SkyblockStat.displayName} $VALUE_PATTERN" else "",
     )
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
