@@ -62,10 +62,12 @@ object SoundUtils {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         val sound = SimpleSoundInstance.forUI(SoundEvent.createVariableRangeEvent(identifier), pitch, volume)
-        if (realVolume) {
-            return RealVolumeSound(sound)
+
+        return if (realVolume) {
+            RealVolumeSound(sound)
+        } else {
+            sound
         }
-        return sound
     }
 
     fun playBeepSound(pitch: Float = 1f) {
