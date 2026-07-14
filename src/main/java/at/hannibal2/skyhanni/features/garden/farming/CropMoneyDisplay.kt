@@ -91,7 +91,9 @@ object CropMoneyDisplay {
 
     @HandleEvent(GardenToolChangeEvent::class)
     fun onGardenToolChange() {
-        update()
+        DelayedRun.runOrNextTick {
+            update()
+        }
     }
 
     @HandleEvent
