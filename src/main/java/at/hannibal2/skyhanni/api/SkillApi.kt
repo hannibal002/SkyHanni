@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -128,6 +129,14 @@ object SkillApi {
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent.colorless",
         " (?<type>\\w+)(?: (?<level>\\d+))?: (?<current>[0-9,.]+)/(?<needed>[\\d,.]+[kMB]?+)",
+    )
+
+    /**
+     * Regex-TEST: Max Skill level reached!
+     */
+    private val skillMaxLevelMenuPattern by patternGroup.pattern(
+        "skiil.menu.max",
+        "Max Skill level reached!"
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -338,7 +347,7 @@ object SkillApi {
                 if (!cleanLine.startsWith("                    ")) continue@lore
                 val previousLine = lore.getOrNull(index - 1)?.removeColor() ?: continue@lore
                 val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
-                if (previousLine == "Max Skill level reached!") {
+                if (skillMaxLevelMenuPattern.matches(previousLine)) {
                     onUpdateMax(progress, skill, skillInfo, skillLevel)
                 } else {
                     onUpdateNotMax(progress, skillLevel, skillInfo)
