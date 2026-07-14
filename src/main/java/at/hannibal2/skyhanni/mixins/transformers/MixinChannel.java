@@ -18,7 +18,7 @@ public class MixinChannel {
 
     @Inject(method = "setVolume", at = @At("RETURN"))
     private void check(float volume, CallbackInfo ci) {
-        // This check is so that it only for SkyhanniSound
+        // This check is so that it only for sounds that bypassed the max volume limit.
         // a 1000 was chosen as that is the value AL10.alGetInteger(AL_GAIN_LIMIT_SOFT) gives
         if (volume > 1.0f) {
             AL10.alSourcef(source, AL10.AL_MAX_GAIN, 1000.0f);

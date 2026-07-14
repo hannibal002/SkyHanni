@@ -75,7 +75,7 @@ object SoundUtils {
             0.0,
             false, // Should not be relative to any position
         )
-        
+
         return if (bypassVolumeMaximum) {
             BypassMaximumVolumeSound(sound)
         } else {
