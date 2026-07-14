@@ -52,6 +52,8 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     open val backupRepoResourcePath: String? = null
 
+    open val legacyConfigDirectory: File? = null
+
     abstract val config: AbstractRepoConfig
 
     /**
@@ -60,6 +62,14 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
      */
     val repoDirectory: File by lazy {
         globalRepoDirectory.resolve("skyhanni-$commonShortName").toFile()
+    }
+
+    private val legacyRepoDirectory: File? by lazy {
+        legacyConfigDirectory?.resolve("repo")
+    }
+
+    private val legacyCommitFile: File? by lazy {
+        legacyConfigDirectory?.resolve("currentCommit.json")
     }
 
     @PublishedApi
@@ -561,6 +571,23 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
 
     private fun deleteArchiveFiles() {
         repoTgzFile.delete()
+        deleteLegacyFiles()
+    }
+
+    private fun deleteLegacyFiles() {
+        legacyRepoDirectory?.let {
+            if (it.exists()) {
+                logger.warn("Deleting legacy repo directory: ${it.absolutePath}")
+                it.deleteRecursively()
+            }
+        }
+
+        legacyCommitFile?.let {
+            if (it.exists()) {
+                logger.warn("Deleting legacy commit file: ${it.absolutePath}")
+                it.delete()
+            }
+        }
     }
 
     internal fun dumpDiagnosticsToLog(vararg extraData: Pair<String, Any?>) = with(logger) {

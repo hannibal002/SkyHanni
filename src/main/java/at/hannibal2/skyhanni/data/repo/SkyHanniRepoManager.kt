@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import java.io.File
 
 @SkyHanniModule
 object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
@@ -14,6 +15,7 @@ object SkyHanniRepoManager : AbstractRepoManager<RepositoryReloadEvent>() {
     override val commonShortNameCased = "SH"
     override val config get() = SkyHanniMod.feature.dev.repo
     override val backupRepoResourcePath: String = "assets/skyhanni/repo.tar.gz"
+    override val legacyConfigDirectory = File("config/skyhanni")
 
     override val reloadCommand: String = "shreloadlocalrepo"
     override val statusCommand: String = "shrepostatus"
