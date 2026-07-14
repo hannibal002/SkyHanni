@@ -19,6 +19,11 @@ class PestTimerSoundSettings {
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2f, minStep = 0.1f)
     var pitch: Float = 0.5f
 
+    @Expose
+    @ConfigOption(name = "Volume", desc = "The volume of the notification sound.")
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var volume: Float = 50f
+
     @ConfigOption(name = "Test Sound", desc = "Test current sound settings.")
     @ConfigEditorButton(buttonText = "Test")
     val testSound: Runnable = Runnable(PestSpawnTimer::playUserSound)
