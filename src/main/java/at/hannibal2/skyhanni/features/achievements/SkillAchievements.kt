@@ -42,21 +42,20 @@ object SkillAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val skill100Achievement = Achievement(
-            "Expert Skiller".asComponent(),
-            "Get a skill to level 70/80/90/100".asComponent(),
-            50f,
-            false,
-            listOf(70, 80, 90, 100),
+            name = "Expert Skiller".asComponent(),
+            description = "Get a skill to level 70/80/90/100".asComponent(),
+            userLuckAmount = 50f,
+            tiers = listOf(70, 80, 90, 100),
         )
         val rockAchievement = Achievement(
-            "Where's my Mythic Rock Pet".asComponent(),
-            "Mine 1 million Ores".asComponent(),
-            10f,
+            name = "Where's my Mythic Rock Pet",
+            description = "Mine 1 million Ores",
+            userLuckAmount = 10f,
         )
         val dolphinAchievement = Achievement(
-            "Mythical Dolphin Pull".asComponent(),
-            "Kill 50,000 Sea Creatures".asComponent(),
-            10f,
+            name = "Mythical Dolphin Pull",
+            description = "Kill 50,000 Sea Creatures",
+            userLuckAmount = 10f,
         )
         event.register(skill100Achievement, SKILL_ACHIEVEMENT)
         event.register(rockAchievement, ROCK_ACHIEVEMENT)
@@ -76,7 +75,7 @@ object SkillAchievements {
         val lore = event.inventoryItems[petSlot]?.getLoreComponent()
         if (skillDetector.isInside()) {
             DelayedRun.runNextTick {
-                val storage = ProfileStorageData.profileSpecific?.skillData ?: return@runNextTick
+                val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return@runNextTick
                 var highestSkill = 0
                 for ((_, info) in storage) {
                     if (info.overflowLevel > highestSkill) highestSkill = info.overflowLevel

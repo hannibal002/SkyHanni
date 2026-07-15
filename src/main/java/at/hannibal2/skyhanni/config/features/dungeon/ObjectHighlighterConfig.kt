@@ -32,7 +32,7 @@ class ObjectHighlighterConfig {
         public Property<Boolean> showOutline = Property.of(true); */
         @ConfigOption(name = "No Chroma", desc = "§cThe chroma setting for the color is currently not working!")
         @ConfigEditorInfoText
-        var info: String? = null
+        val info: String? = null
 
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight starred mobs.")
