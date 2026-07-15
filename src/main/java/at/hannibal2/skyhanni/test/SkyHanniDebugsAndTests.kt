@@ -525,7 +525,7 @@ object SkyHanniDebugsAndTests {
         val skullTexture = stack.getSkullTexture()
         val skullOwner = stack.getSkullOwner() ?: "unknown"
         val skull = if (skullTexture != null) "\"$skullOwner:$skullTexture\"" else ""
-        val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
+        val skinColor = stack.cleanName.uppercase(Locale.getDefault()).replace(" ", "_")
         val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [$skull]},"
 
         OSUtils.copyToClipboard(formatted)

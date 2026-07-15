@@ -96,7 +96,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         if (screenTicks != 5) return
         val title = InventoryUtils.openInventoryName()
         if (shouldCloseScreen) {
-            MinecraftCompat.localPlayer.closeContainer()
+            MinecraftCompat.localPlayerOrThrow.closeContainer()
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true

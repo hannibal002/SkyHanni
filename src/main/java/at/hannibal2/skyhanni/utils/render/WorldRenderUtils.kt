@@ -1080,7 +1080,7 @@ object WorldRenderUtils {
     fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
         val eyeHeight = player.eyeHeight.toDouble()
         return exactLocation(player).add(y = eyeHeight)
     }

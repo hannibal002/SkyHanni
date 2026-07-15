@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.User
@@ -26,41 +25,71 @@ object MinecraftCompat {
 
     private val mc = Minecraft.getInstance()
 
-    val localPlayer get(): LocalPlayer = localPlayerOrNull ?: ErrorManager.skyHanniError("player is null")
+    // <editor-fold desc="World">
+    /**
+     * Returns the active [ClientLevel] or throws an exception if it doesn't exist.
+     *
+     * Prefer [localWorldOrNull]. Only use this in situations where you're confident that the world has to exist.
+     *
+     * Do not use `if (localWorldExists) { localWorldOrThrow }`. Instead, use `localWorldOrNull?.let { ... }`.
+     */
+    val localWorldOrThrow get(): ClientLevel = localWorldOrNull ?: error("level is null")
 
-    val localPlayerOrNull get(): LocalPlayer? = mc.player
+    /**
+     * Returns the active [ClientLevel] or null if it doesn't exist.
+     */
+    val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
 
+    /**
+     * Returns whether there is an active [ClientLevel].
+     *
+     * Do not use `if (localWorldExists) { localWorldOrThrow }`. Instead, use `localWorldOrNull?.let { ... }`.
+     */
+    @JvmStatic
+    val localWorldExists get(): Boolean = localWorldOrNull != null
+    // </editor-fold>
+
+
+    // <editor-fold desc="User">
     /**
      * The local user's information, such as the username and UUID.
      * This is always non-null, even if the player is not in a world / singleplayer.
      */
     val localUser get(): User = mc.user
+    // </editor-fold>
 
-    val Entity?.isLocalPlayer get(): Boolean = this == localPlayerOrNull && this != null
 
+    // <editor-fold desc="Player">
+    /**
+     * Returns the active [LocalPlayer] or throws an exception if it doesn't exist.
+     *
+     * Prefer [localPlayerOrNull]. Only use this in situations where you're confident that the player has to exist.
+     *
+     * Do not use `if (localPlayerExists) { localPlayerOrThrow }`. Instead, use `localPlayerOrNull?.let { ... }`.
+     */
+    val localPlayerOrThrow get(): LocalPlayer = localPlayerOrNull ?: error("player is null")
+
+    /**
+     * Returns the active [LocalPlayer] or null if it doesn't exist.
+     */
+    val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
+
+    /**
+     * Returns whether there is an active [LocalPlayer].
+     *
+     * Do not use `if (localPlayerExists) { localPlayerOrThrow }`. Instead, use `localPlayerOrNull?.let { ... }`.
+     */
     @JvmStatic
     val localPlayerExists get(): Boolean = localPlayerOrNull != null
 
-    val localWorld get(): ClientLevel = localWorldOrNull ?: ErrorManager.skyHanniError("level is null")
+    /**
+     * Returns whether the specified [Entity] is a [LocalPlayer].
+     */
+    val Entity?.isLocalPlayer get(): Boolean = this is LocalPlayer
+    // </editor-fold>
 
-    val localWorldOrNull get(): ClientLevel? = mc.level
 
-    @JvmStatic
-    val localWorldExists get(): Boolean = localWorldOrNull != null
-
-    //? if >= 26.2
-    val hud get(): Hud = mc.gui.hud
-    //? else
-    //val hud get(): Gui = mc.gui
-
-    val hideGui get(): Boolean =
-        //? if >= 26.2
-        hud.isHidden()
-        //? else
-        //mc.options.hideGui
-
-    val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
-
+    // <editor-fold desc="World Time">
     //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
 
@@ -87,4 +116,19 @@ object MinecraftCompat {
         /*serverTime = packet.dayTime
         *///?}
     }
+    // </editor-fold>
+
+
+    //? if >= 26.2
+    val hud get(): Hud = mc.gui.hud
+    //? else
+    //val hud get(): Gui = mc.gui
+
+    val hideGui get(): Boolean =
+        //? if >= 26.2
+        hud.isHidden()
+        //? else
+        //mc.options.hideGui
+
+    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 }
