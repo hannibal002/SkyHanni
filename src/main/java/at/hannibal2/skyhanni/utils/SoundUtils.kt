@@ -58,7 +58,7 @@ object SoundUtils {
     private fun SoundInstance.setLevel(level: Float) =
         Minecraft.getInstance().soundManager.updateCategoryVolume(source, level)
 
-    fun createSound(name: String, pitch: Float, volume: Float = 50f, bypassVolumeMaximum: Boolean = false): SoundInstance {
+    fun createSound(name: String, pitch: Float, volume: Float = 1f, bypassVolumeMaximum: Boolean = false): SoundInstance {
         val newSound = SoundCompat.getModernSoundName(name)
         val identifier = Identifier.parse(newSound.replace(Regex("[^a-z0-9/._-]"), ""))
         val sound = SimpleSoundInstance(
@@ -73,7 +73,7 @@ object SoundUtils {
             0.0,
             0.0,
             0.0,
-            false, // Should not be relative to any position
+            false, // Should not be relative to position
         )
 
         return if (bypassVolumeMaximum) {
@@ -119,15 +119,29 @@ object SoundUtils {
                 arg("pitch", BrigadierArguments.float()) { pitch ->
                     arg("volume", BrigadierArguments.float()) { volume ->
                         callback {
-                            createSound(getArg(soundName), getArg(pitch), getArg(volume)).playSound()
+                            createSound(
+                                getArg(soundName),
+                                getArg(pitch),
+                                getArg(volume)
+                            ).playSound()
+                        }
+                        arg("bypassVolumeMaximum", BrigadierArguments.bool()) { bypassVolumeMaximum ->
+                            callback {
+                                createSound(
+                                    getArg(soundName),
+                                    getArg(pitch),
+                                    getArg(volume),
+                                    getArg(bypassVolumeMaximum)
+                                ).playSound()
+                            }
                         }
                     }
                     callback {
-                        createSound(getArg(soundName), getArg(pitch), 50f).playSound()
+                        createSound(getArg(soundName), getArg(pitch), 1f).playSound()
                     }
                 }
                 callback {
-                    createSound(getArg(soundName), 1f, 50f).playSound()
+                    createSound(getArg(soundName), 1f, 1f).playSound()
                 }
             }
             simpleCallback {
