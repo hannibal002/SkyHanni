@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
-/** Fired when the player changes the tool they are holding in their hand.
+/**
+ * Fired when the player changes the tool they are holding in their hand.
  *
  * Can be from both networking and render threads.
  */
