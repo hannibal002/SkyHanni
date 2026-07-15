@@ -136,7 +136,7 @@ object MinionFeatures {
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
-            newMinionName = getMinionName(equipped.cleanName())
+            newMinionName = getMinionName(equipped.cleanName)
         } else {
             newMinion = null
             newMinionName = null

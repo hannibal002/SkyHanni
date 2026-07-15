@@ -335,7 +335,7 @@ object SkillApi {
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue
-            val cleanName = stack.cleanName()
+            val cleanName = stack.cleanName
             val split = cleanName.split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: continue
