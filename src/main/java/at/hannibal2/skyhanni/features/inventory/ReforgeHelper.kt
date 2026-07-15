@@ -142,7 +142,7 @@ object ReforgeHelper {
         if (event.slot?.index == reforgeButton) {
             val lastLine = event.slot.item.getLoreComponent().lastOrNull()?.string
             if (!clickToReforgePattern.matches(lastLine)) return
-            if (!handleNonBasicReforgeBlock(event)) return
+            if (handleNonBasicReforgeBlock(event)) return
             if (handleReforgeButtonClick(event)) return
         }
 
