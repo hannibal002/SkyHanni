@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
@@ -51,7 +51,7 @@ object PestParticleWaypoint {
     }
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnIsland = IslandType.GARDEN)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 
         if (config.hideParticles && event.type == ParticleTypes.FIREWORK) event.cancel()
@@ -77,10 +77,11 @@ object PestParticleWaypoint {
         isGuessPlotMiddle = GardenPlotApi.getPlot(solved)?.middle?.equalsIgnoreY(solved.ceil()) ?: false
     }
 
-    private fun ReceiveParticleEvent.isEnchantmentTable(): Boolean =
+
+    private fun ParticleEvent.isEnchantmentTable(): Boolean =
         type == ParticleTypes.ENCHANT && count == 10 && speed == -2f && offset.isZero()
 
-    private fun ReceiveParticleEvent.isVillagerAngry(): Boolean =
+    private fun ParticleEvent.isVillagerAngry(): Boolean =
         type == ParticleTypes.ANGRY_VILLAGER && count == 1 && speed == 0f && offset.isZero()
 
     @HandleEvent

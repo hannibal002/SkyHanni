@@ -61,6 +61,12 @@ private typealias ETextCenter = TextPetDisplayConfig.EquippedPetTextConfig.Cente
 private typealias EXPSharePlace = ExpSharePetOrganizationConfig.ExpShareLocationOption
 private typealias EXPShareGO = ExpSharePetOrganizationConfig.GroupOrientation
 
+internal fun PetDisplayConfig.requiresExactCurrentPetXp(): Boolean {
+    val enabledTexts = text.equippedPet.enabledTexts.get()
+    return TextPetDisplayConfig.TextElement.OVERFLOW_XP in enabledTexts ||
+        TextPetDisplayConfig.TextElement.TOTAL_XP in enabledTexts
+}
+
 @SkyHanniModule
 object CurrentPetDisplay {
 
@@ -480,19 +486,22 @@ object CurrentPetDisplay {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.HOTBAR) return
         if (RiftApi.inRift() || !config.general.enabled.get()) return
-        PetStorageApi.getPetWidgetDisplayMessage()?.let { lines ->
-            invalidateRenderable()
-            config.general.position.renderRenderable(
-                buildWidgetMessageRenderable(lines, config.text.equippedPet),
-                posLabel = "Pet Display",
-            )
-            return
-        }
-        if (!PetStorageApi.isPetWidgetReadyForDisplay) return invalidateRenderable()
+        val widgetWarning = PetStorageApi.getPetWidgetWarning(
+            config.text.equippedPet.requiresOverflowXpForAccuracy(),
+        )
         val currentPet = CurrentPetApi.currentPet ?: return invalidateRenderable()
-        currentPet.withAnimatedExp().buildRenderable()?.also {
-            config.general.position.renderRenderable(it, posLabel = "Pet Display")
-        }
+        currentPet.withAnimatedExp()
+            .buildRenderable()
+            ?.withWidgetWarning(widgetWarning, config.text.equippedPet)
+            ?.also {
+                config.general.position.renderRenderable(it, posLabel = "Pet Display")
+            }
+    }
+
+    private fun TextPetDisplayConfig.EquippedPetTextConfig.requiresOverflowXpForAccuracy(): Boolean {
+        val enabledTexts = enabledTexts.get()
+        return TextPetDisplayConfig.TextElement.OVERFLOW_XP in enabledTexts ||
+            TextPetDisplayConfig.TextElement.TOTAL_XP in enabledTexts
     }
 
     @HandleEvent

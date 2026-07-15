@@ -48,13 +48,14 @@ import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
+import at.hannibal2.skyhanni.features.inventory.loadout.LoadoutApi.LoadoutData
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
@@ -715,9 +716,23 @@ class ProfileSpecificStorage(
     @Expose
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
+    @Expose
+    var equipmentWardrobe: WardrobeStorage = WardrobeStorage()
+
     class WardrobeStorage {
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+
+        @Expose
+        var currentSlot: Int? = null
+    }
+
+    @Expose
+    var loadout: LoadoutStorage = LoadoutStorage()
+
+    class LoadoutStorage {
+        @Expose
+        var data: MutableMap<Int, LoadoutData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null

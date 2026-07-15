@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
 object JawbusAchievements {
@@ -15,9 +14,9 @@ object JawbusAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Lord Almighty".asComponent(),
-            "Double Hook a Lord Jawbus".asComponent(),
-            20f,
+            name = "Lord Almighty",
+            description = "Double Hook a Lord Jawbus",
+            userLuckAmount = 20f,
         )
         event.register(achievement, JAWBUS_ACHIEVEMENT)
     }

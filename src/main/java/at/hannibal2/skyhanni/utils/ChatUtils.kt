@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
-import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.LinkedList
@@ -385,7 +385,7 @@ object ChatUtils {
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             val message = sendQueue.poll() ?: return
-            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
+            MinecraftCompat.localPlayerOrThrow.connection.dispatchMessage(message)
         }
     }
 
