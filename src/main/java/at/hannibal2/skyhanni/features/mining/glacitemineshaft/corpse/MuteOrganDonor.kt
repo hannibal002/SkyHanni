@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.mining.CorpseFoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 
 @SkyHanniModule
 object MuteOrganDonor {
@@ -22,12 +21,9 @@ object MuteOrganDonor {
         }
     }
 
-    @HandleEvent(priority = 1)
+    @HandleEvent
     fun onCorpseFound(event: CorpseFoundEvent) {
         allCorpsesFound = event.isLastCorpse
-        if (config.muteWhenAllFound && event.isLastCorpse) {
-            ChatUtils.chat("The Organ Donor's sounds have been muted as all Frozen Corpses in this Mineshaft have been found.")
-        }
     }
 
     @HandleEvent

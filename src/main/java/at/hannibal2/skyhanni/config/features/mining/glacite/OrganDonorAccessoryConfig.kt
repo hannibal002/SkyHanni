@@ -14,5 +14,5 @@ class OrganDonorAccessoryConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var muteWhenAllFound: Boolean = false
+    var muteWhenAllFound: Boolean = true
 }
