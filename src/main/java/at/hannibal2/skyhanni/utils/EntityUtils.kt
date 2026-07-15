@@ -210,9 +210,9 @@ object EntityUtils {
         }.asSequence()
 
         return blockEntityTickers.mapNotNull { invoker ->
+            // This can be null due to other mods
             @Suppress("UNNECESSARY_SAFE_CALL")
-            val pos = invoker.pos ?: return@mapNotNull null
-            invoker.pos.let(world::getBlockEntity)
+            invoker.pos?.let(world::getBlockEntity)
         }
     }
 
