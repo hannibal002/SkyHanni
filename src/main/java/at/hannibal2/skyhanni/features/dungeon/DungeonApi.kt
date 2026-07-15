@@ -252,8 +252,8 @@ object DungeonApi {
             level >= 20 -> DARK_GREEN
             level >= 15 -> GREEN
             level >= 10 -> YELLOW
-            level >= 5  -> WHITE
-            else        -> GRAY
+            level >= 5 -> WHITE
+            else -> GRAY
         }
         return componentBuilder {
             append("$level") {
