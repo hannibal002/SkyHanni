@@ -243,7 +243,6 @@ object DungeonApi {
 
     fun getLevelComponent(level: Int): Component {
         val formatting: ChatFormatting = when {
-            level >= 50 -> RED
             level >= 45 -> RED
             level >= 40 -> GOLD
             level >= 35 -> LIGHT_PURPLE
