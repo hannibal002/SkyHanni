@@ -299,7 +299,7 @@ object DungeonFinderFeatures {
             }
             val memberClasses = members.map {
                 memberPattern.matchMatcher(it) {
-                    group("className")
+                    DungeonClass.getByClassName(group("className"))
                 }
             }
             if (config.markBelowClassLevel != 0) {
@@ -310,7 +310,7 @@ object DungeonFinderFeatures {
                 }
             }
 
-            if (config.markMissingClass && memberClasses.none { it == selectedClass?.displayName }) {
+            if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
                 map[slot] = LorenzColor.GREEN
             }
         }
