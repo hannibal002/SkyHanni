@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -311,7 +310,7 @@ object DungeonFinderFeatures {
                 }
             }
 
-            if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
+            if (config.markMissingClass && memberClasses.none { it == selectedClass?.displayName }) {
                 map[slot] = LorenzColor.GREEN
             }
         }
@@ -324,7 +323,7 @@ object DungeonFinderFeatures {
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
-            val missingClasses = DungeonClass.entries
+            val missingClasses = DungeonClass.entries.toMutableList()
             val cleanLore = stack.getCleanLore()
             val toolTip = stack.getLoreComponent().toMutableList()
             for ((index, line) in cleanLore.withIndex()) {
@@ -339,7 +338,7 @@ object DungeonFinderFeatures {
                         appendWithColor("$className ", ChatFormatting.YELLOW)
                         append(levelComponent)
                     }
-                    missingClasses.removeFirst { it.displayName == className }
+                    missingClasses.remove(DungeonClass.getByClassName(className))
                 }
             }
             val name = cleanLore.firstOrNull()
