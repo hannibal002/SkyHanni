@@ -23,7 +23,7 @@
 + Added Party Chat and Title Warning when an owned Sea Creature gets Cocooned. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5110)
 + Added a Fishing Bobber Timer that shows how long the bobber has been deployed. - hijiol (https://github.com/hannibal002/SkyHanni/pull/5569)
   + Configurable to start on liquid touch or on cast.
-+ Added automatic Wormhole locator. - FabiHBBBT. (https://github.com/hannibal002/SkyHanni/pull/5699)
++ Added automatic Wormhole locator. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5699)
 + Added Fishing Bait Display. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5725)
     + Shows the currently selected fishing bait and remaining amount while holding a fishing rod.
 
@@ -145,7 +145,7 @@
   + This includes Velvet Top Hat, Cashmere Jacket, Satin Trousers, and Oxford Shoes.
 + Hoe Levels Display now warns you if your tool is not gaining XP because you're farming the wrong crop. - Luna (https://github.com/hannibal002/SkyHanni/pull/5415)
 + Added an achievement for passing a Skyhanni contrib in the Farming Leaderboards. - nopo (https://github.com/hannibal002/SkyHanni/pull/5756)
-+ Added Celestial Mason Jar Mixin for Non-God Pot Effects. - Alex. (https://github.com/hannibal002/SkyHanni/pull/5734)
++ Added Celestial Mason Jar Mixin for Non-God Pot Effects. - Alex (https://github.com/hannibal002/SkyHanni/pull/5734)
 + Added the option to call Phillip instead of teleporting to barn when the pest fortune buff expires. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5559)
 + Farming Leaderboard messages now show contributor suffixes. - nopo (https://github.com/hannibal002/SkyHanni/pull/5756)
 + Harvest Feast rare crops are now added to the Pest Profit Tracker if you get them from pests. - Luna (https://github.com/hannibal002/SkyHanni/pull/5794)
@@ -247,7 +247,7 @@
 + Added 8 new SkyHanni Achievements. - nopo (https://github.com/hannibal002/SkyHanni/pull/5558)
 + Made the Pet Symbiosis Achievement trigger as soon as you hold the weapon. - Luna (https://github.com/hannibal002/SkyHanni/pull/5562)
 + The day counter fix in the debug menu (F3) now works correctly when using a time changer mod. - Luna (https://github.com/hannibal002/SkyHanni/pull/5583)
-+ Added mineshaft types to /shtestisland. - Rain. (https://github.com/hannibal002/SkyHanni/pull/5625)
++ Added mineshaft types to /shtestisland. - Rain (https://github.com/hannibal002/SkyHanni/pull/5625)
 + Enabled Better Wiki for everyone. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5893)
 + Added search tags to Improved SkyBlock Menus option to make it easier to find. - Luna (https://github.com/hannibal002/SkyHanni/pull/5930)
 + Improved island detection for better performance. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5951)
@@ -674,7 +674,7 @@
 + Added more classes related to the NEU repo. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4576)
     + Recipes, improved `NeuItemJson`.
 + Added Reputation API. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5261)
-+ Added support for other RNG Meters in the Copy RNG Meter feature. - jani270 (https://github.com/hannibal002/SkyHanni/pull/5328)
++ Added support for other RNG Meters in the Copy RNG Meter feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5328)
 + Changed a method in the `ReplaceHoppityWithContributor` feature to work in a Kotlin nullable way. - Taubsie (https://github.com/hannibal002/SkyHanni/pull/5308)
 + Changed Iris programs to be driven by enums instead of free-text. - Daveed (https://github.com/hannibal002/SkyHanni/pull/5326)
 + Changed more NEU-compat methods to use `NeuInternalName` instead of `String`s. - Daveed (https://github.com/hannibal002/SkyHanni/pull/4576)
