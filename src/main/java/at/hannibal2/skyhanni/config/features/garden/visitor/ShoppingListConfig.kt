@@ -25,11 +25,11 @@ class ShoppingListConfig {
 
     @Expose
     @ConfigOption(
-        name = "Old Shopping List",
-        desc = "Show only shopping list and new visitors, hide known visitor names."
+        name = "Hide Known Visitors",
+        desc = "Hide known visitors from display, only show new visitors."
     )
     @ConfigEditorBoolean
-    var oldShoppingList: Boolean = false
+    var hideKnownVisitors: Boolean = false
 
     @Expose
     @ConfigOption(

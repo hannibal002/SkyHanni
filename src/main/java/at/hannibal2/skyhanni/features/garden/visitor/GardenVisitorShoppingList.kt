@@ -66,7 +66,7 @@ object GardenVisitorShoppingList {
             it.shoppingList.isEmpty()
         }
 
-        if (config.oldShoppingList) {
+        if (config.hideKnownVisitors) {
             drawShoppingList(shoppingList)
             if (newVisitors.isNotEmpty()) {
                 drawVisitorSection(newVisitors, "New Visitor") { drawNewVisitor(it) }
