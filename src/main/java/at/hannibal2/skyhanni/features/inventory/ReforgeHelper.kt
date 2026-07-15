@@ -212,7 +212,7 @@ object ReforgeHelper {
         isInReforgeMenu = true
         waitForChat.set(false)
         DelayedRun.runNextTick {
-            inventoryContainer = MinecraftCompat.localPlayer.containerMenu
+            inventoryContainer = MinecraftCompat.localPlayerOrThrow.containerMenu
         }
     }
 

@@ -276,7 +276,7 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<SafeItemStack> {
         val list: LinkedList<SafeItemStack> = LinkedList()
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
 
         for (slot in player.containerMenu.slots) {
             if (slot.hasItem()) {
