@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.toStringWithPlus
@@ -85,6 +86,7 @@ object ReforgeHelper {
 
     private var isInReforgeMenu = false
     private var isInHexReforgeMenu = false
+    private var rareReforgeBlocked = false
 
     private fun isReforgeMenu(chestName: String) = reforgeMenuPattern.matches(chestName)
     private fun isHexReforgeMenu(chestName: String) = reforgeHexMenuPattern.matches(chestName)
@@ -135,9 +137,12 @@ object ReforgeHelper {
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
+        rareReforgeBlocked = false
+
         if (event.slot?.index == reforgeButton) {
             val lastLine = event.slot.item.getLoreComponent().lastOrNull()?.string
             if (!clickToReforgePattern.matches(lastLine)) return
+            if (handleNonBasicReforgeBlock(event)) return
             if (handleReforgeButtonClick(event)) return
         }
 
@@ -164,6 +169,18 @@ object ReforgeHelper {
             }
         }
         return false
+    }
+
+    private fun handleNonBasicReforgeBlock(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (!config.blockNonBasicReforge) return false
+        val current = currentReforge ?: return false
+        if (current in ReforgeApi.basicReforges) return false
+        if (KeyboardManager.isModifierKeyDown()) return false
+
+        rareReforgeBlocked = true
+        SoundUtils.playBeepSound()
+        event.cancel()
+        return true
     }
 
     @HandleEvent
@@ -227,6 +244,7 @@ object ReforgeHelper {
         sortAfter = null
         itemToReforge = null
         display = emptyList()
+        rareReforgeBlocked = false
     }
 
     private fun updateDisplay() {
@@ -396,6 +414,17 @@ object ReforgeHelper {
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (currentReforge == null) return
+
+        if (rareReforgeBlocked) {
+            inventoryContainer?.getSlot(reforgeButton)?.let {
+                val modifier = KeyboardManager.getModifierKeyName(true)
+                event.drawSlotText(
+                    it.x - 55, it.y + 20,
+                    "§cThis item has a non-Blacksmith reforge! ($modifier to bypass)",
+                    1f
+                )
+            }
+        }
 
         inventoryContainer?.getSlot(reforgeItem)?.let {
             event.drawSlotText(it.x - 5, it.y, "§e${currentReforge?.name}", 1f)
