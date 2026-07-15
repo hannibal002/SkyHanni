@@ -436,7 +436,7 @@ object ReforgeHelper {
 
     private fun colorReforgeStone(color: Color, reforgeStone: String?) {
         val inventory = inventoryContainer?.slots ?: return
-        val slot = inventory.firstOrNull { it?.item?.cleanName() == reforgeStone }
+        val slot = inventory.firstOrNull { it?.item?.cleanName == reforgeStone }
         if (slot != null) {
             slot.highlight(color)
         } else {

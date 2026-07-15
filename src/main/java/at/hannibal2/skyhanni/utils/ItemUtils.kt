@@ -172,9 +172,10 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun SafeItemStack.cleanName() = hoverName.string.removeColor()
+    val SafeItemStack.cleanName
+        get() = hoverName.string.removeColor()
 
-    fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
+    fun isSack(stack: SafeItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName.endsWith(" Sack")
 
     private val loreComponentCache = TimeLimitedCache<IdentityCharacteristics<DataComponentMap>, List<Component>>(
         expireAfterWrite = 0.1.seconds,
@@ -476,7 +477,6 @@ object ItemUtils {
     private fun SafeItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         if (this.getPetInfo() != null) return getPetRarity(this) to ItemCategory.PET
 
-        val cleanName = this.cleanName()
         val cleanLore = this.getLoreComponent().map { it.string.removeColor() }
         for (line in cleanLore.reversed()) {
             if (UtilsPatterns.notRarityLoreLinePattern.matches(line)) continue
@@ -487,7 +487,7 @@ object ItemUtils {
             } ?: continue
 
             val name = hoverName.formattedTextCompatLeadingWhiteLessResets()
-            val itemCategory = getItemCategory(category, name, cleanName)
+            val itemCategory = getItemCategory(category, name, this.cleanName)
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
