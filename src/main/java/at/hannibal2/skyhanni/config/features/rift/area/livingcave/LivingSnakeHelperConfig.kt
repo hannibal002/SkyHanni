@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class LivingSnakeHelperConfig {
 
@@ -22,7 +23,7 @@ class LivingSnakeHelperConfig {
         name = "Solo Mode",
         desc = "Highlights both the head and tail if both pickaxe and pungi are in hotbar."
     )
+    @SearchTag("snake")
     @ConfigEditorBoolean
-    @FeatureToggle
-    var solo: Boolean = false
+    var solo: Boolean = true
 }
