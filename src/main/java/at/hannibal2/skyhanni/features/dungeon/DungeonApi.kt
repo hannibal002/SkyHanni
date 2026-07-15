@@ -37,7 +37,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.append
-import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
@@ -293,7 +292,7 @@ object DungeonApi {
 
         val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
-            if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
+            if (playerTeam.contains("(${dungeonClass.displayName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                 playerClass = dungeonClass
                 playerClassLevel = level
@@ -452,7 +451,7 @@ object DungeonApi {
         }
     }
 
-    enum class DungeonClass(val scoreboardName: String) {
+    enum class DungeonClass(val displayName: String) {
         ARCHER("Archer"),
         BERSERK("Berserk"),
         HEALER("Healer"),
@@ -462,7 +461,7 @@ object DungeonApi {
 
         companion object {
             fun getByClassName(className: String): DungeonClass? {
-                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+                return DungeonClass.entries.firstOrNull { it.displayName.equals(className, ignoreCase = true) }
             }
         }
     }

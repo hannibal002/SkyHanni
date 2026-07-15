@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonClass
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -20,8 +21,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -174,7 +175,7 @@ object DungeonFinderFeatures {
     )
 
     //  Variables used
-    private var selectedClass: String? = null
+    private var selectedClass: DungeonClass? = null
     private var floorStackSize = mapOf<Int, String>()
     private var highlightParty = mapOf<Int, LorenzColor>()
     private var toolTipMap = mapOf<Int, List<Component>>()
@@ -235,7 +236,7 @@ object DungeonFinderFeatures {
             if (it.size > 3 && detectDungeonClassPattern.matches(it[0])) {
                 getDungeonClassPattern.matchMatcher(it[2]) {
                     // This intentionally does not get cleared between lobbies
-                    selectedClass = group("class")
+                    selectedClass = DungeonClass.getByClassName(group("class"))
                 }
             }
         }
@@ -323,8 +324,7 @@ object DungeonFinderFeatures {
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
-            // TODO use enum
-            val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
+            val missingClasses = DungeonClass.entries
             val cleanLore = stack.getCleanLore()
             val toolTip = stack.getLoreComponent().toMutableList()
             for ((index, line) in cleanLore.withIndex()) {
@@ -339,19 +339,27 @@ object DungeonFinderFeatures {
                         appendWithColor("$className ", ChatFormatting.YELLOW)
                         append(levelComponent)
                     }
-                    classNames.remove(className)
+                    missingClasses.removeFirst { it.displayName == className }
                 }
             }
             val name = cleanLore.firstOrNull()
             if (config.showMissingClasses && dungeonFloorPattern.matches(name)) {
-                if (classNames.contains(selectedClass)) {
-                    classNames[classNames.indexOf(selectedClass)] = "§a$selectedClass§7"
-                }
                 toolTip.add("")
                 toolTip.add(
                     componentBuilder {
                         appendWithColor("Missing: ", ChatFormatting.RED)
-                        appendWithColor(classNames.createCommaSeparatedList(), ChatFormatting.GRAY)
+                        missingClasses.forEachIndexed { index, dungeonClass ->
+                            if (dungeonClass == selectedClass) {
+                                appendWithColor(dungeonClass.displayName, ChatFormatting.GREEN)
+                            } else {
+                                appendWithColor(dungeonClass.displayName, ChatFormatting.GRAY)
+                            }
+
+                            // Add comma and space between items
+                            if (index < missingClasses.size - 1) {
+                                appendWithColor(", ", ChatFormatting.GRAY)
+                            }
+                        }
                     }
                 )
             }
