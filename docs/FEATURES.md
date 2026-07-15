@@ -320,6 +320,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 + Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
 + Added Option To Move `Insert Item Into Sack` button back to original placement. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5874)
++ Block Overriding Rare Reforges in Blacksmith and Hex. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5856)
 
 </details>
 <details open><summary>
@@ -1063,6 +1064,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Bacte Kill Zone Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4541)
     + Sound and title alert if you are outside the arena during the Bacte fight and about to die.
 + Added Ubik Cube Timer GUI. - nopo (https://github.com/hannibal002/SkyHanni/pull/4909)
++ Added solo mode for rift snake features. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5946)
 
 </details>
 <details open><summary>

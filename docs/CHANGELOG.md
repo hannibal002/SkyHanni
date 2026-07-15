@@ -69,6 +69,7 @@
 + Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 + Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
 + Added Option To Move `Insert Item Into Sack` button back to original placement. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5874)
++ Block Overriding Rare Reforges in Blacksmith and Hex. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5856)
 
 #### Garden
 
@@ -99,6 +100,10 @@
 #### Slayer
 
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
+
+#### Rift
+
++ Added solo mode for rift snake features. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5946)
 
 #### Misc
 
@@ -154,6 +159,7 @@
 + Added support for Littlefoot's Den Shaft. - nopo (https://github.com/hannibal002/SkyHanni/pull/5523)
 + Frozen corpse waypoint text in mineshafts now turns green after looting. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5581)
 + Improved Glacite Mineshaft corpse detection to be instantaneous. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5916)
++ Made Glacite tunnels Landmarks togglable. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5876)
 
 #### Garden
 
@@ -199,6 +205,7 @@
 + Added a `/shresetdrystreak` command to reset the Experimentation Table's dry-streak counter. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 + Added a manual reset button for the Experimentation Table's Dry-Streak Display. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 + Added equipment wardrobe value estimation. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6036)
++ Improved loadouts by letting you highlight currently equipped and favorite loadouts. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6067)
 
 #### Fishing
 
@@ -206,6 +213,10 @@
 
 #### Hunting
 + Added an Always Show option to the Hunting Profit Tracker, to keep it visible on screen at all times. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5997)
+
+#### Foraging
+
++ Improved Clear Tree View support for Torrhus Canyon. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6076)
 
 #### Commands
 
@@ -243,6 +254,8 @@
 + Improved scrolling in the /shwords editor: faster and smoother. - Luna (https://github.com/hannibal002/SkyHanni/pull/5980)
 + Added an on-screen display for active reminders. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6008)
 + Pet Display will now display best-effort cached data even if some tab list information is missing. - Luna (https://github.com/hannibal002/SkyHanni/pull/6035)
++ Added title and sound notification when a `/shremind` reminder is due. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6072)
++ Compressed island beacon buff display. - T0R0NT0 (https://github.com/hannibal002/SkyHanni/pull/6081)
 
 ### Fixes
 
@@ -307,6 +320,7 @@
 + Fixed Harvest Feast incorrectly detecting a Grand Feast when Finnegan is minister. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6038)
 + Fixed Jacob Contest Personal Bests not being detected from chat because of the Farming Fortune icon change. - Luna (https://github.com/hannibal002/SkyHanni/pull/6059)
 + Fixed bonus pest chance display not working. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6056)
++ Fixed crop money display error when switching farming tools. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6090)
 
 #### Combat
 
@@ -361,6 +375,7 @@
 + Fixed Pet Display sometimes not updating after Autopet switches pets. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/5993)
 + Fixed Pet Display requiring Pet widget overflow XP when exact total/overflow XP text is not enabled. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/6003)
 + Fixed custom wardrobe freezing after the first click. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6036)
++ Fixed Pet Display visually keeping removed pet items. - Akinsoft (https://github.com/hannibal002/SkyHanni/pull/6066)
 
 #### Item Ability
 
@@ -469,6 +484,8 @@
 + Fixed maxwell features when you have a second page of power stones. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6025)
 + Fixed Maxwell tuning stats sometimes not being detected correctly. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6011)
 + Fixed tab list and inventory detection for stats with the new official SkyBlock resource pack. - Luna (https://github.com/hannibal002/SkyHanni/pull/6023)
++ Fixed non-book ultra rare items in Superpairs not triggering the mid-game notification immediately when uncovered. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6071)
++ Fixed prevent missing rabbit the fish sometimes causing you to not be able to close other inventories. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6087)
 
 #### Commands
 
@@ -477,6 +494,7 @@
 + Fixed SkyHanni command arguments containing quotes getting truncated. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
 + Fixed /shnav ignoring exact location matches when similarly named locations exist. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5966)
 + Fixed `/gfs` tab-complete showing internal names on 26.1.2. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5958)
++ Fixed /shminingspeed and /shblockstrength giving not being able to read your stats. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6088)
 
 #### Mining
 
@@ -612,6 +630,9 @@
 + Fixed skyhanni user luck breakdown randomly giving an error. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6054)
 + Fixed pet names displaying incorrectly in trackers. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6046)
 + Fixed /shresetfeastdata not working if Fetch Upcoming Feast Data is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/6043)
++ Fixed cold detection not working due to skyblock NOT using the new cold icon. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6074)
++ Fixed fusion display not showing outside Galatea (for when calling Kysha). - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6065)
++ Fixed Overflow Skill Level in tooltip showing inaccurate XP & not calculating level properly. - Rain (https://github.com/hannibal002/SkyHanni/pull/6082)
 
 ### Technical Details
 
@@ -920,6 +941,13 @@
 + Renamed ElectionCandidate.perks to allPerks. - Luna (https://github.com/hannibal002/SkyHanni/pull/6040)
 + Replaced ItemStack.getSingleLineLore with new List\<String>.toSingleLineLore method. - Luna (https://github.com/hannibal002/SkyHanni/pull/5596)
 + Restricted /shreloadlisteners and /shstoplisteners to development environment. - Luna (https://github.com/hannibal002/SkyHanni/pull/6044)
++ Added fallback island api name. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6080)
++ Changed Entity.cleanName and SafeItemStack.cleanName from a method to a property. - Luna (https://github.com/hannibal002/SkyHanni/pull/5597)
++ Event handler functions are no longer required to be public. - Luna (https://github.com/hannibal002/SkyHanni/pull/5584)
++ Fixed reading stats from skyblock menu not working. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6088)
++ Moved some old stat icons regex usage to new ones. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/6068)
++ Renamed MinecraftCompat.localPlayer to MinecraftCompat.localPlayerOrThrow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5887)
++ Renamed MinecraftCompat.localWorld to MinecraftCompat.localWorldOrThrow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5887)
 
 ### Removed Features
 
