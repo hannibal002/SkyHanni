@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -39,12 +39,9 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.mojang.blaze3d.platform.InputConstants
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.world.inventory.ChestMenu
-import org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN
-import org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT
-import org.lwjgl.glfw.GLFW.GLFW_KEY_UP
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
@@ -353,11 +350,11 @@ object CakeTracker {
                     renderable,
                     tips = getPriceHoverTooltip(displayType, colorCode),
                     onAnyClick = mapOf(
-                        GLFW_KEY_LEFT to { changeSelectedSingular(-1) },
-                        GLFW_KEY_UP to { changeSelectedSingular(-1) },
-                        GLFW_KEY_RIGHT to { changeSelectedSingular(1) },
-                        GLFW_KEY_DOWN to { changeSelectedSingular(1) },
-                        LEFT_MOUSE to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
+                        InputConstants.KEY_LEFT to { changeSelectedSingular(-1) },
+                        InputConstants.KEY_UP to { changeSelectedSingular(-1) },
+                        InputConstants.KEY_RIGHT to { changeSelectedSingular(1) },
+                        InputConstants.KEY_DOWN to { changeSelectedSingular(1) },
+                        KeyboardManager.LEFT_MOUSE to { HypixelCommands.auctionSearch("New Year Cake (Year $selectedSingular)") },
                     ),
                 )
             }

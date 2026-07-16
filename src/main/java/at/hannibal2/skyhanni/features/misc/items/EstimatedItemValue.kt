@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.Minecraft
-import org.lwjgl.glfw.GLFW
 import kotlin.math.roundToLong
 
 private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String, List<String>>>
@@ -99,10 +99,10 @@ object EstimatedItemValue {
         if (!currentlyShowing) return
 
         if (SkyBlockUtils.debug) {
-            if (GLFW.GLFW_KEY_RIGHT.isKeyClicked()) {
+            if (InputConstants.KEY_RIGHT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange += 1
                 cache.clear()
-            } else if (GLFW.GLFW_KEY_LEFT.isKeyClicked()) {
+            } else if (InputConstants.KEY_LEFT.isKeyClicked()) {
                 EstimatedItemValueCalculator.starChange -= 1
                 cache.clear()
             }

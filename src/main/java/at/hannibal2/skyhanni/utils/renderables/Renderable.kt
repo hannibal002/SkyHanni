@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
@@ -161,7 +160,7 @@ interface Renderable {
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
              * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [org.lwjgl.glfw.GLFW] enums.
+             * For keyboard codes, use the [com.mojang.blaze3d.platform.InputConstants] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
@@ -175,7 +174,7 @@ interface Renderable {
             /**
              * This should be a direct map of key code int, to the unit that should be invoked.
              * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
-             * For keyboard codes, use the [org.lwjgl.glfw.GLFW] enums.
+             * For keyboard codes, use the [com.mojang.blaze3d.platform.InputConstants] enums.
              */
             onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,

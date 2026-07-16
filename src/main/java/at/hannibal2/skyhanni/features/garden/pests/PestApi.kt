@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -48,7 +49,6 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
-import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -454,7 +454,7 @@ object PestApi {
             return
         }
         val disabled = with(config.pestFinder) {
-            !showDisplay && !showPlotInWorld && teleportHotkey == GLFW.GLFW_KEY_UNKNOWN
+            !showDisplay && !showPlotInWorld && teleportHotkey == KEY_UNKNOWN
         }
         if (disabled) {
             event.addIrrelevant("disabled in config")

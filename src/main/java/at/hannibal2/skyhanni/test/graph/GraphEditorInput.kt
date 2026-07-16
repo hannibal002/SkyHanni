@@ -24,10 +24,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
+import com.mojang.blaze3d.platform.InputConstants
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
-import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object GraphEditorInput {
@@ -163,11 +163,11 @@ object GraphEditorInput {
 
     private fun handleUndoRedo(): Boolean {
         if (Minecraft.getInstance().screen == null) {
-            if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Y.isKeyClicked()) {
+            if (KeyboardManager.isControlKeyDown() && InputConstants.KEY_Y.isKeyClicked()) {
                 GraphEditorHistory.undo()
                 return true
             }
-            if (KeyboardManager.isControlKeyDown() && GLFW.GLFW_KEY_Z.isKeyClicked()) {
+            if (KeyboardManager.isControlKeyDown() && InputConstants.KEY_Z.isKeyClicked()) {
                 GraphEditorHistory.redo()
                 return true
             }

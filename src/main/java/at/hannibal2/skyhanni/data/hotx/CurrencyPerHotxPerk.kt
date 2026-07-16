@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import org.lwjgl.glfw.GLFW
+import com.mojang.blaze3d.platform.InputConstants
 
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
 
@@ -42,7 +42,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
     abstract fun currentCurrencyLineString(perk: HotxData<*>): String?
 
     private fun handleCurrencyFor10Levels(event: ToolTipTextEvent, perk: HotxData<*>) {
-        if (!GLFW.GLFW_KEY_LEFT_SHIFT.isKeyHeld()) return
+        if (!InputConstants.KEY_LSHIFT.isKeyHeld()) return
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }
         if (indexOfCost == -1) return
 
