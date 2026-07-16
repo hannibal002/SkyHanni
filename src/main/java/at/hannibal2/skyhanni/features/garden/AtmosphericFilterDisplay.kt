@@ -1,4 +1,5 @@
 package at.hannibal2.skyhanni.features.garden
+import org.lwjgl.glfw.GLFW
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
