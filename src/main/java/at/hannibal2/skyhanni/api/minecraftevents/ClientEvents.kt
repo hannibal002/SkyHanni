@@ -80,7 +80,8 @@ object ClientEvents {
         ClientReceiveMessageEvents.MODIFY_GAME.register(::onModify)
         ClientReceiveMessageEvents.GAME_CANCELED.register(::onCanceled)
 
-        ClientLifecycleEvents.CLIENT_STOPPING.register { ClientShutdownEvent.post() }
+        ClientLifecycleEvents.CLIENT_STOPPING.register {   ClientShutdownEvent.post()
+        }
     }
 
     var currentMessage: Component? = null
