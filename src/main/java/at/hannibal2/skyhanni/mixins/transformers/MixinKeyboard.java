@@ -6,13 +6,13 @@ import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
-import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
+import static at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN;
 
 // TODO 26.1 rei compat needed
 //? if < 26.1
@@ -25,7 +25,7 @@ public class MixinKeyboard {
     private void onKey(long window, int action, KeyEvent input, CallbackInfo ci) {
         int key = input.key();
         if (Minecraft.getInstance().player == null) return;
-        if (key == GLFW.GLFW_KEY_UNKNOWN) return;
+        if (key == KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
         // don't send key events if Rei search bar is selected
