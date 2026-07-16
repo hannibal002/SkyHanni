@@ -1,3 +1,4 @@
+# Execution context: PR branch code
 name: Detekt
 
 on:
