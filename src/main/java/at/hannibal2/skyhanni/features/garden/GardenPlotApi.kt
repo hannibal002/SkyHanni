@@ -43,7 +43,6 @@ object GardenPlotApi {
     private const val PLOT_GRID_SIZE = 5
     private const val PLOT_GRID_MIN = -240.0
     private const val PLOT_GRID_MAX = 240.0
-    private const val PLOT_EDGE_EPSILON = 0.0001
 
     private val plotMap = listOf(
         listOf(21, 13, 9, 14, 22),
@@ -303,14 +302,14 @@ object GardenPlotApi {
     fun Plot.isPlayerInside() = getCurrentPlot() == this
 
     fun getPlot(location: LorenzVec): Plot? {
-        if (location.y < 0.0 || location.y >= 256.0) return null
+        if (location.y !in 0.0..<256.0) return null
         val plotX = location.x.toPlotIndex() ?: return null
         val plotZ = location.z.toPlotIndex() ?: return null
         return getPlotByID(plotMap[plotZ][plotX])
     }
 
     private fun Double.toPlotIndex(): Int? {
-        if (this < PLOT_GRID_MIN - PLOT_EDGE_EPSILON || this > PLOT_GRID_MAX + PLOT_EDGE_EPSILON) return null
+        if (this < PLOT_GRID_MIN || this > PLOT_GRID_MAX) return null
         if (this >= PLOT_GRID_MAX) return PLOT_GRID_SIZE - 1
         return floor((this - PLOT_GRID_MIN) / PLOT_SIZE).toInt().coerceIn(0, PLOT_GRID_SIZE - 1)
     }
