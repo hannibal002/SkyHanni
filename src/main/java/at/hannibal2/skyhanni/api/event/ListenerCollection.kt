@@ -1,25 +1,29 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.api.event.EventListeners.Listener
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 class ListenerCollection(
-    listeners: List<EventListeners.Listener>,
+    listeners: List<Listener>,
 ) {
 
-    private val buckets: Array<Array<EventListeners.Listener>?>
+    @Suppress("ArrayInDataClass")
+    data class Bucket(
+        val listeners: Array<Listener>,
+        val nextAfterCancellation: IntArray,
+    )
+    private val buckets: Array<Bucket?>
 
     init {
-        val sorted = listeners.sortedBy { it.priority }
+        val localBuckets = arrayOfNulls<MutableList<Listener>>(BUCKET_COUNT)
 
-        val localBuckets = arrayOfNulls<MutableList<EventListeners.Listener>>(BUCKET_COUNT)
-
-        for (listener in sorted) {
-            for (index in listener.indices) {
+        listeners.forEach { listener ->
+            listener.indices.forEach { index ->
                 val bucket = localBuckets[index]
                 if (bucket != null) {
-                    bucket += listener
+                    bucket.add(listener)
                 } else {
                     localBuckets[index] = mutableListOf(listener)
                 }
@@ -27,18 +31,35 @@ class ListenerCollection(
         }
 
         buckets = Array(BUCKET_COUNT) { index ->
-            localBuckets[index]?.toTypedArray()
+            val bucketListeners = localBuckets[index] ?: return@Array null
+            val listenerArray = bucketListeners.toTypedArray()
+
+            val nextAfterCancellation = IntArray(listenerArray.size) { -1 }
+
+            var nextCancelledIndex = -1
+            for (i in listenerArray.lastIndex downTo 0) {
+                nextAfterCancellation[i] = nextCancelledIndex
+
+                if (listenerArray[i].receiveCancelled) {
+                    nextCancelledIndex = i
+                }
+            }
+
+            Bucket(
+                listeners = listenerArray,
+                nextAfterCancellation = nextAfterCancellation,
+            )
         }
     }
 
-    fun current(): Array<EventListeners.Listener>? =
+    fun current(): Bucket? =
         buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex())
 
     fun isEmpty(): Boolean =
         buckets.all { it == null }
 
     inline fun forEachCurrent(
-        action: (EventListeners.Listener) -> Boolean,
+        action: (Listener) -> Boolean,
     ) {
         val listeners = current() ?: return
 
