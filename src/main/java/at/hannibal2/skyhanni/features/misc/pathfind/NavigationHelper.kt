@@ -53,7 +53,7 @@ object NavigationHelper {
 
         if (config.allowInstantNavigation) {
             val exactMatch = locations.firstOrNull { (name, _) ->
-                name.substringBefore(" (").equals(searchTerm, ignoreCase = true)
+                name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
             }
 
             val target = exactMatch ?: locations.takeIf { it.size == 1 }?.first()

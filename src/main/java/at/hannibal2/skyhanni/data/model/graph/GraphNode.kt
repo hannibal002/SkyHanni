@@ -14,7 +14,7 @@ class GraphNode(
     val extraWeight: Int = 0,
 ) : GraphUtils.GenericNode {
 
-    val cleanName
+    val cleanName: String?
         get() = name?.removeColor()
 
     val tags: List<GraphNodeTag> by lazy {
