@@ -12,16 +12,15 @@ import net.minecraft.ChatFormatting
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
-    listeners: List<Listener>,
+    private val listenerCollection: ListenerCollection,
     private val canReceiveCancelled: Boolean,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
-    private val listenerCollection = ListenerCollection(listeners)
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        listeners,
+        ListenerCollection(listeners),
         listeners.any { it.receiveCancelled },
     )
 
