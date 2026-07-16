@@ -28,16 +28,17 @@ object KeyboardManager {
         if (InputConstants.KEY_RETURN.isKeyHeld()) lockedKeys.add(InputConstants.KEY_RETURN)
         if (InputConstants.KEY_NUMPADENTER.isKeyHeld()) lockedKeys.add(InputConstants.KEY_NUMPADENTER)
     }
-
+    // InputConstants.UNKNOWN exists, but is not a compile time constant
+    const val KEY_UNKNOWN: Int = -1
+    
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
 
-    const val KEY_UNKNOWN: Int = -1
-
-    // These aren't in InputConstants for some reason.
-    const val KEY_KP_SUBTRACT = GLFW.GLFW_KEY_KP_SUBTRACT
-    const val KEY_KP_ADD = GLFW.GLFW_KEY_KP_ADD
+    // These constant isn't defined in InputConstants for some reason
+    const val KEY_KP_SUBTRACT = InputConstants.KEY_ADD - 1
+    // This constant is renamed in 26.3
+    const val KEY_KP_ADD = InputConstants.KEY_ADD
 
     /**
      * Represents whether either the left or right Super key (also known as Windows key) is down.
