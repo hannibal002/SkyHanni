@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -125,8 +126,10 @@ object PestFinder {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        display = listOf()
-        update()
+        DelayedRun.runOrNextTick {
+            display = listOf()
+            update()
+        }
     }
 
     init {
