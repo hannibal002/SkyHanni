@@ -30,7 +30,7 @@ object KeyboardManager {
     }
     // InputConstants.UNKNOWN exists, but is not a compile time constant
     const val KEY_UNKNOWN: Int = -1
-    
+
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
