@@ -313,6 +313,8 @@ object ContributorManager {
 
         ChatUtils.chat("Total contributor mentions: ${contributorMentions.size}")
         saveConfig("added contributor mention record")
+
+        ContributorAchievement.onContributorMention(amount)
     }
 
     private fun isContributorMentionMessage(message: String): Boolean {
