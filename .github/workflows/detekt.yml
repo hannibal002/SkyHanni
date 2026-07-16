@@ -1,4 +1,3 @@
-# Execution context: PR branch code
 name: Detekt
 
 on:
@@ -35,6 +34,19 @@ jobs:
                 if: github.repository == 'hannibal002/SkyHanni'
             -   uses: ./.github/actions/setup-normal-workspace
                 if: github.repository != 'hannibal002/SkyHanni'
+
+            -   name: Run detekt git diff w/gradle retry
+                if: github.repository == 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: detektGitDiff --stacktrace
+
+            -   name: Run detekt git diff w/gradle retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: detektGitDiff --stacktrace
+
             -   name: Run detekt main (w/ typing analysis) w/gradle retry
                 id: run_detekt
                 if: github.repository == 'hannibal002/SkyHanni'
