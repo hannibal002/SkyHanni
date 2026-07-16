@@ -1,0 +1,99 @@
+package at.hannibal2.skyhanni.api.event
+
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+
+class ListenerCollection(
+    listeners: List<EventListeners.Listener>,
+) {
+
+    private val buckets: Array<Array<EventListeners.Listener>?>
+
+    init {
+        val sorted = listeners.sortedBy { it.priority }
+
+        val localBuckets = arrayOfNulls<MutableList<EventListeners.Listener>>(BUCKET_COUNT)
+
+        for (listener in sorted) {
+            for (index in listener.indices) {
+                val bucket = localBuckets[index]
+                if (bucket != null) {
+                    bucket += listener
+                } else {
+                    localBuckets[index] = mutableListOf(listener)
+                }
+            }
+        }
+
+        buckets = Array(BUCKET_COUNT) { index ->
+            localBuckets[index]?.toTypedArray()
+        }
+    }
+
+    fun current(): Array<EventListeners.Listener>? =
+        buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex())
+
+    fun isEmpty(): Boolean =
+        buckets.all { it == null }
+
+    inline fun forEachCurrent(
+        action: (EventListeners.Listener) -> Boolean,
+    ) {
+        val listeners = current() ?: return
+
+        for (listener in listeners) {
+            if (!action(listener)) return
+        }
+    }
+
+    companion object {
+
+        const val OUTSIDE = 0
+
+        private const val ISLAND_OFFSET = 1
+        private val BUCKET_COUNT = IslandType.entries.size + ISLAND_OFFSET
+
+        fun getCurrentStateIndex(): Int {
+            if (!SkyBlockUtils.inSkyBlock) return OUTSIDE
+            return SkyBlockUtils.currentIsland.ordinal + ISLAND_OFFSET
+        }
+
+        fun createListenerIndices(options: HandleEvent): List<Int> {
+            val islands = getIslands(options)
+                .map { it.ordinal }
+
+            if (islands.isEmpty()) {
+                return if (options.onlyOnSkyblock) {
+                    (ISLAND_OFFSET until BUCKET_COUNT).toList()
+                } else {
+                    (OUTSIDE until BUCKET_COUNT).toList()
+                }
+            }
+
+            return buildList {
+                islands.forEach {
+                    add(it + ISLAND_OFFSET)
+                }
+            }
+        }
+
+        private fun getIslands(options: HandleEvent): List<IslandType> {
+            val islandTypes = mutableSetOf<IslandType>()
+
+            options.onlyOnIsland
+                .takeIf { it != IslandType.ANY }
+                ?.let(islandTypes::add)
+
+            islandTypes += options.onlyOnIslands
+
+            options.onlyOnIslandTypeTag
+                .takeIfNotEmpty()
+                ?.forEach { tag ->
+                    islandTypes += tag.getTypes()
+                }
+
+            return islandTypes.toList()
+        }
+    }
+}
