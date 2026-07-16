@@ -75,7 +75,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Plays bark sound when 'woof' appears in chat.
 + Added option to shorten coin amounts in chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3231)
 + Added filters for reward bundles reminders, redundant shard hunting messages, and unmineable trees. - Erymanthus (https://github.com/hannibal002/SkyHanni/pull/4327)
-+ Added a chat message when you encounter a SkyHanni contributor for the first time. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5787)
++ Added a chat message when you encounter a SkyHanni contributor for the first time. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5787)
 
 </details>
 <details open><summary>
@@ -319,7 +319,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   + Highlights completed categories in green.
 + Added Gift Clean Display: Show only 'CLICK TO OPEN' on gifts, hiding the From/To name. - LegentPc (https://github.com/hannibal002/SkyHanni/pull/5619)
 + Added Loadout Keybinds. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6013)
-+ Added Option To Move `Insert Item Into Sack` button back to original placement. - AverageUser125 (https://github.com/hannibal002/SkyHanni/pull/5874)
++ Added Option To Move `Insert Item Into Sack` button back to original placement. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5874)
++ Block Overriding Rare Reforges in Blacksmith and Hex. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5856)
 
 </details>
 <details open><summary>
@@ -494,7 +495,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Party Chat and Title Warning when an owned Sea Creature gets Cocooned. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5110)
 + Added a Fishing Bobber Timer that shows how long the bobber has been deployed. - hijiol (https://github.com/hannibal002/SkyHanni/pull/5569)
   + Configurable to start on liquid touch or on cast.
-+ Added automatic Wormhole locator. - FabiHBBBT. (https://github.com/hannibal002/SkyHanni/pull/5699)
++ Added automatic Wormhole locator. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5699)
 + Added Fishing Bait Display. - bendonaldson (https://github.com/hannibal002/SkyHanni/pull/5725)
     + Shows the currently selected fishing bait and remaining amount while holding a fishing rod.
 
@@ -1063,6 +1064,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Bacte Kill Zone Warning. - Luna (https://github.com/hannibal002/SkyHanni/pull/4541)
     + Sound and title alert if you are outside the arena during the Bacte fight and about to die.
 + Added Ubik Cube Timer GUI. - nopo (https://github.com/hannibal002/SkyHanni/pull/4909)
++ Added solo mode for rift snake features. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5946)
 
 </details>
 <details open><summary>
@@ -1104,7 +1106,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Also include breakdown information on hover.
 + Textured cold overlay to Glacite Tunnels. - j10a1n15, Empa (https://github.com/hannibal002/SkyHanni/pull/1438)
     + Change at what cold level the texture should appear.
-+ Glacial Powder as stack size in the Fossil Excavator. - jani270 (https://github.com/hannibal002/SkyHanni/pull/1458)
++ Glacial Powder as stack size in the Fossil Excavator. - jani (https://github.com/hannibal002/SkyHanni/pull/1458)
 + Highlight own Golden/Diamond Goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1466)
 + Click to get an Ascension Rope from sacks in the Mineshaft. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1542)
 + Tunnel Maps. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1546)
