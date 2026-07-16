@@ -37,6 +37,11 @@ class ListenerCollection(
     fun isEmpty(): Boolean =
         buckets.all { it == null }
 
+    operator fun iterator(): Iterator<EventListeners.Listener> {
+        val listeners = current() ?: emptyArray()
+        return listeners.iterator()
+    }
+
     companion object {
 
         const val OUTSIDE = 0

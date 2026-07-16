@@ -28,10 +28,9 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
         invokeLog.invokeCount++
         if (SkyHanniEvents.isDisabledHandler(name)) return false
-        val listeners = listenerCollection.current() ?: return false
 
         var errors = 0
-        for (listener in listeners) {
+        for (listener in listenerCollection) {
             if (!listener.shouldInvoke(event)) continue
             try {
                 listener.invoker.accept(event)
