@@ -15,7 +15,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.input.InputQuirks
 import net.minecraft.client.input.KeyEvent
 import org.apache.commons.lang3.SystemUtils
-import org.lwjgl.glfw.GLFW
 
 @SkyHanniModule
 object KeyboardManager {
