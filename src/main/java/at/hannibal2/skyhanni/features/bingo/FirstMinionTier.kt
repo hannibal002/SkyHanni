@@ -41,7 +41,7 @@ object FirstMinionTier {
         minionId: NeuInternalName,
     ) {
         if (recipe.ingredients.any { help.contains(it.internalName) }) {
-            val name = recipe.output?.internalName?.getItemStackOrNull()?.cleanName().orEmpty()
+            val name = recipe.output?.internalName?.getItemStackOrNull()?.cleanName.orEmpty()
             val abc = name.replace(" I", " 0")
             minions[abc] = minionId.replace("_1", "_0")
         }

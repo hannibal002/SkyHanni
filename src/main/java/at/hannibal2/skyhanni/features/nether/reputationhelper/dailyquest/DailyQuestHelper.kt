@@ -196,7 +196,7 @@ object DailyQuestHelper {
         val itemName = fetchQuest.itemName
 
         val count =
-            InventoryUtils.countItemsInLowerInventory { it.cleanName() == itemName }
+            InventoryUtils.countItemsInLowerInventory { it.cleanName == itemName }
         updateProcessQuest(fetchQuest, count)
     }
 

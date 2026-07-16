@@ -239,7 +239,7 @@ object BazaarApi {
                 continue
             }
 
-            if (stack.cleanName() == currentSearchedItem) {
+            if (stack.cleanName == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

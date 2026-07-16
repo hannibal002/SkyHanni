@@ -49,7 +49,7 @@ object SkillExperience {
         if (event.inventoryName != "Your Skills") return
 
         for ((_, stack) in event.inventoryItems) {
-            val name = stack.cleanName()
+            val name = stack.cleanName
             if (!name.contains(" ")) continue
 
             val lore = stack.getLore()

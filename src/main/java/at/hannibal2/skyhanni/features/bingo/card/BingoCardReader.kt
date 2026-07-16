@@ -53,7 +53,7 @@ object BingoCardReader {
                 lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
                 else -> continue
             }
-            val name = stack.cleanName()
+            val name = stack.cleanName
             val builder = StringBuilder()
             for ((index, s) in lore.withIndex()) {
                 if (index > 1) {

@@ -28,7 +28,7 @@ object CropUpgrades {
     )
 
     /**
-     * REGEX-TEST:   §r§6§lCROP UPGRADE §eNether Wart§7 #7
+     * WRAPPED-REGEX-TEST: "  §r§6§lCROP UPGRADE §eNether Wart§7 #7"
      */
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",
@@ -52,7 +52,7 @@ object CropUpgrades {
         if (event.inventoryName != "Crop Upgrades") return
 
         for (item in event.inventoryItems.values) {
-            val crop = CropType.getByNameOrNull(item.cleanName()) ?: continue
+            val crop = CropType.getByNameOrNull(item.cleanName) ?: continue
             tierPattern.firstMatcher(item.getLore()) {
                 val level = group("level").formatInt()
                 crop.setUpgradeLevel(level)

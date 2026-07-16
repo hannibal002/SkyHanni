@@ -109,7 +109,7 @@ object ExperimentsAddonsHelper {
         chronHasBeenEmpty = true
     }
 
-    private fun SafeItemStack.getLorenzColorOrNull(): LorenzColor? = when (cleanName()) {
+    private fun SafeItemStack.getLorenzColorOrNull(): LorenzColor? = when (cleanName) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
         "Pink" -> LorenzColor.LIGHT_PURPLE
@@ -117,7 +117,7 @@ object ExperimentsAddonsHelper {
         "Orange" -> LorenzColor.GOLD
         "Purple" -> LorenzColor.DARK_PURPLE
         else -> try {
-            LorenzColor.valueOf(cleanName().uppercase())
+            LorenzColor.valueOf(cleanName.uppercase())
         } catch (exception: IllegalArgumentException) {
             null
         }
@@ -308,7 +308,7 @@ object ExperimentsAddonsHelper {
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
-            val sequenceNumber = stack.cleanName().toIntOrNull() ?: return@mapNotNull null
+            val sequenceNumber = stack.cleanName.toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
             if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
             UltraSequencerSlot(

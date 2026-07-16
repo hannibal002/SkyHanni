@@ -214,7 +214,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.cleanName()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
             // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
             // which is distinct from finding it on an island.
             val found = stack.getLoreComponent().firstOrNull()?.let {
@@ -231,7 +231,7 @@ object FastFairySoulsPathfinder {
     }
 
     private fun createEmptyData(): Data = Data(0, 0, mutableListOf(), emptySet()).apply { disabled = true }
-    private val calculatingMessageId = ChatUtils.getUniqueCustomMessageId()
+    private val calculatingMessageId = ChatUtils.getUniqueMessageId()
 
     private var calculating = false
     private var calculatingStart = SimpleTimeMark.farPast()

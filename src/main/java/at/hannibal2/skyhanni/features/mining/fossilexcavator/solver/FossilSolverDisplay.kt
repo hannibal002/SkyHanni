@@ -95,7 +95,7 @@ object FossilSolverDisplay {
     fun onTick() {
         if (!isEnabled()) return
         val slots = InventoryUtils.getItemsInOpenChest()
-        val itemNames = slots.map { it.item.cleanName() }
+        val itemNames = slots.map { it.item.cleanName }
         if (itemNames != inventoryItemNames) {
             inventoryItemNames = itemNames
             if (inExcavatorMenu) return
@@ -112,7 +112,7 @@ object FossilSolverDisplay {
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             val stack = slot.item
             val slotIndex = slot.containerSlot
-            val stackName = stack.cleanName()
+            val stackName = stack.cleanName
             val isDirt = stackName == "Dirt"
             val isFossil = stackName == "Fossil"
             when {

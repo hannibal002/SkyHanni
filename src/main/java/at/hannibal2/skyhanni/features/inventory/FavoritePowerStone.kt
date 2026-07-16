@@ -35,7 +35,7 @@ object FavoritePowerStone {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !KeyboardManager.isShiftKeyDown() || !inInventory) return
 
-        val displayName = event.item?.cleanName()?.trim() ?: return
+        val displayName = event.item?.cleanName?.trim() ?: return
         val power = MaxwellApi.getPowerByNameOrNull(displayName) ?: return
 
         if (power in MaxwellApi.favoritePowers) {
@@ -61,7 +61,7 @@ object FavoritePowerStone {
         if (!isEnabled() || !inInventory) return
 
         highlightedSlots = event.inventoryItems
-            .filter { (_, item) -> item.cleanName() in MaxwellApi.favoritePowers }
+            .filter { (_, item) -> item.cleanName in MaxwellApi.favoritePowers }
             .keys
     }
 

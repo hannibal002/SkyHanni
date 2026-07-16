@@ -135,12 +135,12 @@ object SuperpairDataDisplay {
         val currentTier = ExperimentationTableApi.currentExperimentTier ?: return
 
         val item = event.item ?: return
-        if (isOutOfBounds(event.slotId, currentTier) || item.cleanName() == "?") return
+        if (isOutOfBounds(event.slotId, currentTier) || item.cleanName == "?") return
 
         val items = uncoveredItems.toMutableMap()
         val itemExistsInData = items.any { it.value.slotId == event.slotId && it.key == items.keys.max() }
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
-        val clicksItemName = clicksItem?.cleanName().orEmpty()
+        val clicksItemName = clicksItem?.cleanName.orEmpty()
         val hasRemainingClicks = remainingClicksPattern.matchMatcher(clicksItemName) {
             group("clicks").toInt() > 0
         } ?: false
@@ -151,7 +151,7 @@ object SuperpairDataDisplay {
 
     private fun handleItem(items: MutableMap<Int, SuperpairItem>, slot: Int) = DelayedRun.runDelayed(200.milliseconds) {
         val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return@runDelayed
-        val itemName = itemNow.cleanName()
+        val itemName = itemNow.cleanName
         val reward = itemNow.convertToReward()
         val itemData = SuperpairItem(slot, reward, DyeCompat.toDamage(itemNow))
         val uncovered = items.keys.maxOrNull() ?: -1
@@ -323,8 +323,8 @@ object SuperpairDataDisplay {
 
     private fun SafeItemStack.convertToReward() = when {
         guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) -> hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
-        cleanName() == "Enchanted Book" -> getLore()[2].removeColor()
-        else -> cleanName()
+        cleanName == "Enchanted Book" -> getLore()[2].removeColor()
+        else -> cleanName
     }
 
     private fun determinePrefix(index: Int, lastIndex: Int) = if (index == lastIndex) "└" else "├"

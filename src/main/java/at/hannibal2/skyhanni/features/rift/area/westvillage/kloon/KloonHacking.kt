@@ -66,7 +66,7 @@ object KloonHacking {
             correctButtons.clear()
             for ((slot, stack) in event.inventoryItems) {
                 if (slot in 2..6) {
-                    correctButtons.add(stack.cleanName())
+                    correctButtons.add(stack.cleanName)
                 }
             }
         }
@@ -88,12 +88,12 @@ object KloonHacking {
             var i = 0
             for (slot in InventoryUtils.getItemsInOpenChest()) {
                 if (slot.containerSlot == 11 + 10 * i) {
-                    val correctButton = slot.item.cleanName() == correctButtons[i]
+                    val correctButton = slot.item.cleanName == correctButtons[i]
                     slot.highlight(if (correctButton) LorenzColor.GREEN else LorenzColor.RED)
                     continue
                 }
                 if (slot.containerSlot > i * 9 + 8 && slot.containerSlot < i * 9 + 18 &&
-                    slot.item.cleanName() == correctButtons[i]
+                    slot.item.cleanName == correctButtons[i]
                 ) {
                     slot.highlight(LorenzColor.YELLOW)
                 }

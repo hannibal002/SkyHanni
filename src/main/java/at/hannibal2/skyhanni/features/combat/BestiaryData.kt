@@ -307,12 +307,10 @@ object BestiaryData {
                     val currentKill = when (type) {
                         DisplayTypeEntry.GLOBAL_MAX -> mob.totalKills
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.currentKillToNextLevel
-                        else -> 0
                     }
                     val killNeeded = when (type) {
                         DisplayTypeEntry.GLOBAL_MAX -> mob.killToMax
                         DisplayTypeEntry.GLOBAL_NEXT -> mob.killNeededForNextLevel
-                        else -> 0
                     }
                     val percentage = ((currentKill.toDouble() / killNeeded) * 100).roundTo(2)
                     val suffix = if (type == DisplayTypeEntry.GLOBAL_NEXT) "§ato level ${mob.getNextLevel()}" else ""

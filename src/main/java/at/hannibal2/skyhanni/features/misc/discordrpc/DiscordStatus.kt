@@ -157,7 +157,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
     ITEM(
         {
             val heldItem = InventoryUtils.getItemInHand()
-            val heldItemName = heldItem?.cleanName()
+            val heldItemName = heldItem?.cleanName
 
             if (heldItem == null || heldItemName == "Air") "No item in hand"
             else String.format(java.util.Locale.US, "Holding $heldItemName")
@@ -246,7 +246,7 @@ enum class DiscordStatus(private val displayMessageSupplier: DiscordStatus.() ->
         {
             // Logic for getting the currently held stacking enchant is from Skytils
             val itemInHand = InventoryUtils.getItemInHand()
-            val itemName = itemInHand?.cleanName().orEmpty()
+            val itemName = itemInHand?.cleanName.orEmpty()
 
             fun getProgressPercent(amount: Int, levels: List<Int>): String {
                 var percent = "MAXED"

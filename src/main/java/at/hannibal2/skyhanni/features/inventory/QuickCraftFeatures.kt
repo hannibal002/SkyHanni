@@ -85,7 +85,7 @@ object QuickCraftFeatures {
     }
 
     private fun needsQuickCraftConfirmation(item: SafeItemStack): Boolean {
-        return !quickCraftableItems.contains(item.cleanName())
+        return !quickCraftableItems.contains(item.cleanName)
     }
 
     private fun getInventoryType(): InventoryType? {

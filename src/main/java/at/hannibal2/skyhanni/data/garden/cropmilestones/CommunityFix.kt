@@ -90,7 +90,7 @@ object CommunityFix {
         crop: CropType,
         wrongData: MutableList<String>,
     ) {
-        val rawNumber = stack.cleanName().replace(crop.cropName, "").trim()
+        val rawNumber = stack.cleanName.replace(crop.cropName, "").trim()
         val realTier = if (rawNumber == "") 0 else rawNumber.romanToDecimalIfNecessary()
 
         val lore = stack.getLore()

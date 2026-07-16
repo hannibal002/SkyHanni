@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.hunting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -14,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -23,8 +21,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object FusionDisplay {
 
     private val config get() = SkyHanniMod.feature.hunting
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.fusionDisplay
 
     private var renderable: List<Renderable>? = null
 
@@ -67,14 +63,14 @@ object FusionDisplay {
         renderable = list
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (pureReptilePattern.find(event.message)) pureReptiles++
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.fusionDisplay) return
         if (!AttributeShardsData.isInFusionMachine()) return
         renderable?.let {
             config.fusionDisplayPosition.renderRenderables(it, posLabel = "Fusion Display")
