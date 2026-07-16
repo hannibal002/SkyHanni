@@ -23,11 +23,9 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
         player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
     companion object {
-        fun fromLocalPlayer(): FakePlayer? =
-            MinecraftCompat.localPlayerOrNull?.let(::FakePlayer)
+        fun fromLocalPlayer(): FakePlayer? = MinecraftCompat.localPlayerOrNull?.let { FakePlayer(it) }
 
-        fun fromLocalPlayerOrThrow(): FakePlayer =
-            fromLocalPlayer()
-                ?: error("cannot create fake player because local player is null")
+        fun fromLocalPlayerOrThrow(): FakePlayer = fromLocalPlayer()
+            ?: error("cannot create fake player because local player is null")
     }
 }
