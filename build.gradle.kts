@@ -506,37 +506,37 @@ tasks.register("detektGitDiff", Detekt::class) {
     }
 }.configure {
     val repoRoot = rootProject.projectDir
-
     try {
-
         val gitOutput = providers.exec {
             commandLine("git", "diff", "--name-only", "origin/beta")
         }.standardOutput.asText.get()
 
-        if (gitOutput.isNotBlank()) {
-            val modifiedKotlinFiles = gitOutput
-                .split("\n")
-                .filter { it.isNotBlank() && (it.endsWith(".kt") || it.endsWith(".java")) }
-                .map { repoRoot.resolve(it) }
-                .filter { it.exists() }
-
-            println("[detektGitDiff] Kotlin files found: ${modifiedKotlinFiles.size}")
-            modifiedKotlinFiles.forEach { println("[detektGitDiff]   - ${it.absolutePath}") }
-
-            if (modifiedKotlinFiles.isNotEmpty()) {
-                // Include files relative to the repository root so files anywhere in the repo are picked up
-                source = fileTree(repoRoot) {
-                    include(modifiedKotlinFiles.map { it.relativeTo(repoRoot).path })
-                }
-                println("[detektGitDiff] Source set to ${modifiedKotlinFiles.size} files")
-            } else {
-                println("[detektGitDiff] No Kotlin files found, disabling task")
-                onlyIf { false }
-            }
-        } else {
+        if (gitOutput.isBlank()) {
             println("[detektGitDiff] No files from git diff, disabling task")
             onlyIf { false }
+            return@configure
         }
+
+        val modifiedKotlinFiles = gitOutput
+            .split("\n")
+            .filter { it.isNotBlank() && (it.endsWith(".kt") || it.endsWith(".java")) }
+            .map { repoRoot.resolve(it) }
+            .filter { it.exists() }
+
+        println("[detektGitDiff] Kotlin files found: ${modifiedKotlinFiles.size}")
+        modifiedKotlinFiles.forEach { println("[detektGitDiff]   - ${it.absolutePath}") }
+
+        if (modifiedKotlinFiles.isEmpty()) {
+            println("[detektGitDiff] No Kotlin files found, disabling task")
+            onlyIf { false }
+            return@configure
+        }
+
+        source = fileTree(repoRoot) {
+            include(modifiedKotlinFiles.map { it.relativeTo(repoRoot).path })
+        }
+        println("[detektGitDiff] Source set to ${modifiedKotlinFiles.size} files")
+
     } catch (e: Exception) {
         println("[detektGitDiff] Error running git diff: ${e.message}")
         e.printStackTrace()
