@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypointType
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftWaypoints
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -44,12 +45,18 @@ object CorpseSharing {
     }
 
     private fun shareCorpse() {
-        val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
-            .filterNot { corpse ->
-                sharedWaypoints.any { corpse.location.distance(it) <= 5 }
+        val closestCorpse = MineshaftWaypoints.waypoints
+            .filter { waypoint ->
+                waypoint.isCorpse &&
+                    waypoint.waypointType != MineshaftWaypointType.POTENTIAL &&
+                    !waypoint.shared &&
+                    waypoint.location.distanceToPlayer() <= 5 &&
+                    sharedWaypoints.none {
+                        waypoint.location.distance(it) <= 5
+                    }
             }
-            .filter { it.location.distanceToPlayer() <= 5 }
-            .minByOrNull { it.location.distanceToPlayer() } ?: return
+            .minByOrNull { it.location.distanceToPlayer() }
+            ?: return
 
         val location = closestCorpse.location.toChatFormat()
         val type = closestCorpse.waypointType.display

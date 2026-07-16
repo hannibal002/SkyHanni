@@ -145,9 +145,9 @@ object MineshaftWaypoints {
                 (it.isCorpse && config.corpseLocator.enabled) || (!it.isCorpse && config.mineshaftWaypoints.enabled)
             }
             .forEach {
-                val maxAlpha = if (it.waypointType == MineshaftWaypointType.POTENTIAL) 0.2f else 0.33f
-                event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true, maximumAlpha = maxAlpha)
-                event.drawDynamicText(it.location, "${it.colorCode}${it.waypointType.display}", it.scale)
+                val waypoint = it.waypointType
+                event.drawWaypointFilled(it.location, waypoint.color.toColor(), seeThroughBlocks = true, maximumAlpha = waypoint.maxAlpha)
+                event.drawDynamicText(it.location, "${it.colorCode}${waypoint.display}", waypoint.scale)
             }
     }
 

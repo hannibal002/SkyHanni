@@ -14,6 +14,4 @@ data class MineshaftWaypoint(
         waypointType == MineshaftWaypointType.POTENTIAL -> "§b"
         else -> "§e"
     }
-
-    val scale get() = if (waypointType == MineshaftWaypointType.POTENTIAL) 0.6 else 1.0
 }
