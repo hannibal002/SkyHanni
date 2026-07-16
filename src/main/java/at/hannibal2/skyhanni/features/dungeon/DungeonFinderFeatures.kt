@@ -213,7 +213,7 @@ object DungeonFinderFeatures {
     private fun partyFinderStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.cleanName()
+            val name = stack.cleanName
             if (!checkIfPartyPattern.matches(name)) continue
             val lore = stack.getCleanLore()
             val floor = lore.find { floorPattern.matches(it) } ?: continue
@@ -239,7 +239,7 @@ object DungeonFinderFeatures {
 
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
-            val name = stack.cleanName()
+            val name = stack.cleanName
             if (!floorTypePattern.matches(name)) continue
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -264,7 +264,7 @@ object DungeonFinderFeatures {
         @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getCleanLore()
-            if (!checkIfPartyPattern.matches(stack.cleanName())) continue
+            if (!checkIfPartyPattern.matches(stack.cleanName)) continue
             if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                 map[slot] = LorenzColor.DARK_RED
                 continue
