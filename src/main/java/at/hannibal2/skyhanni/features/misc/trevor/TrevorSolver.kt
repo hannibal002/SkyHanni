@@ -54,7 +54,7 @@ object TrevorSolver {
     // TODO: use entity events
     @OptIn(AllEntitiesGetter::class)
     fun findMob() {
-        val hasBlindness = MinecraftCompat.localPlayer.hasPotionEffect(EffectsCompat.BLINDNESS)
+        val hasBlindness = MinecraftCompat.localPlayerOrThrow.hasPotionEffect(EffectsCompat.BLINDNESS)
         for (entity in EntityUtils.getAllEntities()) {
             if (entity is RemotePlayer) continue
             val mob = MobData.entityToMob[entity]

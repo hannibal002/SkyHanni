@@ -102,7 +102,7 @@ object DamageIndicatorManager {
         if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.deceased) return false
-        val name = entity.cleanName().replace(",", "")
+        val name = entity.cleanName.replace(",", "")
 
         return damagePattern.matcher(name).matches()
     }
@@ -794,7 +794,6 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_2 -> 30
                 BossType.SLAYER_ENDERMAN_3 -> 60
                 BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
             }
             val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()
@@ -1001,7 +1000,7 @@ object DamageIndicatorManager {
 
         val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
-            val name = entity.cleanName().replace(",", "")
+            val name = entity.cleanName.replace(",", "")
 
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()

@@ -87,6 +87,11 @@ abstract class GuiContainerEvent(open val gui: SkyHanniGuiContainer, open val co
                 cancel()
             }
         }
+
+        fun redirectClick(newSlotId: Int) {
+            InventoryUtils.clickSlot(newSlotId, container.containerId, clickedButton, clickType ?: ContainerInput.PICKUP)
+            cancel()
+        }
     }
 
 }

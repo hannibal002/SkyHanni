@@ -136,7 +136,7 @@ object MinionFeatures {
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
-            newMinionName = getMinionName(equipped.cleanName())
+            newMinionName = getMinionName(equipped.cleanName)
         } else {
             newMinion = null
             newMinionName = null
@@ -347,11 +347,10 @@ object MinionFeatures {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Inflation Contributor".asComponent(),
-            "Gain Coins from a single Minion Hopper".asComponent(),
-            10f,
-            false,
-            listOf(1_000_000, 5_000_000, 10_000_000),
+            name = "Inflation Contributor".asComponent(),
+            description = "Gain Coins from a single Minion Hopper".asComponent(),
+            userLuckAmount = 10f,
+            tiers = listOf(1_000_000, 5_000_000, 10_000_000),
         )
         event.register(achievement, MINION_COIN_ACHIEVEMENT)
     }
