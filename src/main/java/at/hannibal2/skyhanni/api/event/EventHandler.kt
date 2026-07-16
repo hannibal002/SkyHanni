@@ -30,8 +30,9 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         if (SkyHanniEvents.isDisabledHandler(name)) return false
 
         var errors = 0
-        for (listener in listenerCollection) {
-            if (!listener.shouldInvoke(event)) continue
+        listenerCollection.forEachCurrent { listener ->
+            if (!listener.shouldInvoke(event)) return@forEachCurrent true
+
             try {
                 listener.invoker.accept(event)
             } catch (originalThrowable: Throwable) {
@@ -45,7 +46,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
                 onError?.invoke(throwable)
             }
-            if (event.isCancelled && !canReceiveCancelled) break
+
+            !event.isCancelled || canReceiveCancelled
         }
 
         if (errors > 3) {

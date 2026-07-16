@@ -37,9 +37,14 @@ class ListenerCollection(
     fun isEmpty(): Boolean =
         buckets.all { it == null }
 
-    operator fun iterator(): Iterator<EventListeners.Listener> {
-        val listeners = current() ?: emptyArray()
-        return listeners.iterator()
+    inline fun forEachCurrent(
+        action: (EventListeners.Listener) -> Boolean,
+    ) {
+        val listeners = current() ?: return
+
+        for (listener in listeners) {
+            if (!action(listener)) return
+        }
     }
 
     companion object {
