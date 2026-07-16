@@ -500,9 +500,9 @@ tasks.register("detektGitDiff", Detekt::class) {
     val detektDir = rootProject.layout.buildDirectory.dir("reports/detekt").get().asFile.absolutePath
     reports {
         html.required.set(true)
-        html.outputLocation.set(file("$detektDir/detekt-git-diff.html"))
+        html.outputLocation.set(file("$detektDir/main.html"))
         sarif.required.set(true)
-        sarif.outputLocation.set(file("$detektDir/detekt-git-diff.sarif"))
+        sarif.outputLocation.set(file("$detektDir/main.sarif"))
     }
 }.configure {
     val repoRoot = rootProject.projectDir
