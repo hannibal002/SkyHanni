@@ -12,7 +12,7 @@ class LoadoutKeybindConfig {
     @Expose
     @ConfigOption(
         name = "Slot Keybinds Toggle",
-        desc = "Enable/Disable the slot loadout keybinds.",
+        desc = "Enable/Disable the loadout slot keybinds.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
