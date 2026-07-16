@@ -13,7 +13,6 @@ import net.minecraft.ChatFormatting
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
     listeners: List<Listener>,
-    private val canReceiveCancelled: Boolean,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
@@ -21,8 +20,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        listeners,
-        listeners.any { it.receiveCancelled },
+        listeners
     )
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
@@ -47,7 +45,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 onError?.invoke(throwable)
             }
 
-            !event.isCancelled || canReceiveCancelled
+            !event.isCancelled
         }
 
         if (errors > 3) {
