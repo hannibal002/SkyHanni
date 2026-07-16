@@ -21,10 +21,12 @@ object TabWidgetSettings {
     /**
      * REGEX-TEST: Widgets on Private Island
      * REGEX-TEST: Widgets in Crystal Hollows
+     * REGEX-TEST: (1/2) Widgets on Galatea
+     * REGEX-TEST: (1/2) Widgets in Crystal Hollows
      */
     private val mainPageSettingPattern by patternGroup.pattern(
         "gui",
-        "Widgets in.*|Widgets on.*",
+        "^(?:\\(\\d+/\\d+\\) )?Widgets (?:in|on) .*$",
     )
 
     /**
