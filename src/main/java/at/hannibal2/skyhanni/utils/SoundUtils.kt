@@ -64,7 +64,7 @@ object SoundUtils {
         val sound = SimpleSoundInstance(
             identifier,
             SoundSource.UI,
-            volume,
+            volume.coerceIn(0f, 1000f),
             pitch,
             SoundInstance.createUnseededRandom(),
             false,
