@@ -1,19 +1,20 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.api.event.EventListeners.Listener
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 class ListenerCollection(
-    listeners: List<EventListeners.Listener>,
+    listeners: List<Listener>,
 ) {
 
-    private val buckets: Array<Array<EventListeners.Listener>?>
+    private val buckets: Array<Array<Listener>?>
 
     init {
         val sorted = listeners.sortedBy { it.priority }
 
-        val localBuckets = arrayOfNulls<MutableList<EventListeners.Listener>>(BUCKET_COUNT)
+        val localBuckets = arrayOfNulls<MutableList<Listener>>(BUCKET_COUNT)
 
         for (listener in sorted) {
             for (index in listener.indices) {
@@ -31,14 +32,14 @@ class ListenerCollection(
         }
     }
 
-    fun current(): Array<EventListeners.Listener>? =
+    fun current(): Array<Listener>? =
         buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex())
 
     fun isEmpty(): Boolean =
         buckets.all { it == null }
 
     inline fun forEachCurrent(
-        action: (EventListeners.Listener) -> Boolean,
+        action: (Listener) -> Boolean,
     ) {
         val listeners = current() ?: return
 
