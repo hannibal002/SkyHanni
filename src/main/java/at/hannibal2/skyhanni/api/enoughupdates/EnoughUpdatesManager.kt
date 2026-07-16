@@ -50,7 +50,6 @@ import kotlinx.coroutines.sync.withLock
 import at.hannibal2.skyhanni.utils.DeferredItemStack
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStackTemplate
-
 //?}
 
 // Most functions are taken from NotEnoughUpdates
@@ -234,7 +233,7 @@ object EnoughUpdatesManager {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {
-            val freshStack = SafeItemStack(baseItem, countVal)
+            val freshStack = ItemStackTemplate(baseItem, countVal).create()
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
             var innerReplacements = emptyMap<String, String>()
             if (useReplacements) {

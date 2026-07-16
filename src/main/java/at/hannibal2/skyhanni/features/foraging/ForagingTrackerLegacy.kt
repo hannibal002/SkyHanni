@@ -21,6 +21,7 @@ object ForagingTrackerLegacy {
     enum class TreeType(private val displayName: String) {
         FIG("Fig"),
         MANGROVE("Mangrove"),
+        HELIX("Helix"),
         ;
 
         override fun toString() = displayName

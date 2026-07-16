@@ -387,7 +387,7 @@ enum class TabWidget(
     /** The current active information from tab list.
      *
      * When the widget isn't visible, it will be empty
-     * */
+     */
     var lines: List<Component> = emptyList()
         private set
 
