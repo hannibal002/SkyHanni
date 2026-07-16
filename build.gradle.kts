@@ -508,7 +508,7 @@ tasks.register("detektGitDiff", Detekt::class) {
     val repoRoot = rootProject.projectDir
     try {
         val gitOutput = providers.exec {
-            commandLine("git", "diff", "--name-only", "origin/beta")
+            commandLine("/usr/bin/git", "diff", "--name-only", "origin/beta")
         }.standardOutput.asText.get()
 
         if (gitOutput.isBlank()) {
