@@ -58,13 +58,21 @@ class ListenerCollection(
     fun isEmpty(): Boolean =
         buckets.all { it == null }
 
-    inline fun forEachCurrent(
-        action: (Listener) -> Boolean,
-    ) {
-        val listeners = current() ?: return
+    inline fun forEachCurrent(action: (Listener) -> Boolean) {
+        val bucket = current() ?: return
 
-        for (listener in listeners) {
-            if (!action(listener)) return
+        val listeners = bucket.listeners
+        val nextReceiveCancelled = bucket.nextAfterCancellation
+
+        var index = 0
+        while (index < listeners.size) {
+            val shouldContinue = action(listeners[index])
+
+            index = if (shouldContinue) {
+                index + 1
+            } else {
+                nextReceiveCancelled[index]
+            }
         }
     }
 
