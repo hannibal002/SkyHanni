@@ -52,7 +52,7 @@ object MineshaftWaypoints {
         if (event.island != IslandType.MINESHAFT) return
 
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
-        val direction = MinecraftCompat.localPlayer.direction.unitVec3i
+        val direction = MinecraftCompat.localPlayerOrThrow.direction.unitVec3i
 
         addEntranceWaypoints(spawnLocation, direction)
     }

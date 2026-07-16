@@ -134,7 +134,7 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: SafeItemStack): String? {
-        val itemName = item.cleanName()
+        val itemName = item.cleanName
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
         val lore = item.getLore()
