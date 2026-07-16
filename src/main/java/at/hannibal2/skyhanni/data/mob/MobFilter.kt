@@ -298,7 +298,7 @@ object MobFilter {
                     MobFactories.boss(baseEntity, it.first(), it.drop(1))
                 }
 
-            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName()))
+            else -> MobResult.found(MobFactories.basic(baseEntity, baseEntity.cleanName))
         }
 
         baseEntity is Giant && baseEntity.name.string == "Dinnerbone" -> MobResult.found(
@@ -308,7 +308,7 @@ object MobFilter {
             ),
         ) // Will false trigger if there is another Dinnerbone Giant
         baseEntity is CaveSpider -> MobUtils.getArmorStand(baseEntity, -1)
-            ?.takeIf { summonOwnerPattern.matches(it.cleanName()) }?.let {
+            ?.takeIf { summonOwnerPattern.matches(it.cleanName) }?.let {
                 MobData.entityToMob[MobUtils.getNextEntity(baseEntity, -4)]?.internalAddEntity(baseEntity)
                     ?.let { MobResult.illegal }
             }
@@ -337,7 +337,7 @@ object MobFilter {
 
         if (armorStand == null) return null
         armorStandOnlyMobs(baseEntity, armorStand)?.also { return it }
-        jerryPattern.matchMatcher(armorStand.cleanName()) {
+        jerryPattern.matchMatcher(armorStand.cleanName) {
             val level = this.group("level")?.toInt() ?: -1
             val owner = this.group("owner") ?: return@matchMatcher
             val name = this.group("name") ?: return@matchMatcher
@@ -354,7 +354,7 @@ object MobFilter {
         }
         return when {
             (baseEntity is Pig || baseEntity is Horse) && illegalEntitiesPattern.matches(armorStand.name.formattedTextCompatLessResets()) -> MobResult.illegal
-            baseEntity is Guardian && armorStand.cleanName()
+            baseEntity is Guardian && armorStand.cleanName
                 .matches("^\\d+".toRegex()) -> MobResult.illegal // Wierd Sea Guardian Ability
             else -> null
         }
