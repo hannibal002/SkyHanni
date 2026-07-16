@@ -12,15 +12,14 @@ import net.minecraft.ChatFormatting
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
-    listeners: List<Listener>,
+    private val listenerCollection: ListenerCollection,
 ) {
 
     val invokeLog = SkyHanniEvents.EventInvokeLog()
-    private val listenerCollection = ListenerCollection(listeners)
 
     constructor(event: Class<T>, listeners: List<Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        listeners
+        ListenerCollection(listeners),
     )
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
