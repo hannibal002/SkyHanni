@@ -31,9 +31,9 @@ object TrevorSolver {
     var mobLocation = TrapperMobArea.NONE
     var averageHeight = (minHeight + maxHeight) / 2
 
-    fun findMobHeight(height: Int, above: Boolean) {
+    fun findMobHeight(height: Int) {
         val playerPosition = LocationUtils.playerLocation().roundTo(2)
-        val mobHeight = if (above) playerPosition.y + height else playerPosition.y - height
+        val mobHeight = playerPosition.y + height
         if (maxHeight == 0.0) {
 
             maxHeight = mobHeight + 2.5
