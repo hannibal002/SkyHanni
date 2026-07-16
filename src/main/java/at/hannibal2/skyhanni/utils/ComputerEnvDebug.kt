@@ -25,7 +25,7 @@ object ComputerEnvDebug {
     private var genericStacks: List<String> = listOf()
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         os(event)
         launcher(event)
         ram(event)

@@ -45,10 +45,10 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEdition
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMaxPetLevel
@@ -134,7 +134,7 @@ object ItemDisplayOverlayFeatures {
     }
 
     private fun getStackTip(item: SafeItemStack): String? {
-        val itemName = item.cleanName()
+        val itemName = item.cleanName
         val internalName = item.getInternalName()
         val chestName = InventoryUtils.openInventoryName()
         val lore = item.getLore()
@@ -176,7 +176,7 @@ object ItemDisplayOverlayFeatures {
             item.getPetInfo()?.takeIf {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
-                it.exp > 10.0 || PetStorageApi.mainPetMenuNamePattern.matches(
+                it.exp > 10.0 || PetStorageApi.isMainPetMenuName(
                     InventoryUtils.openInventoryName(),
                 )
             } ?: return null
@@ -328,9 +328,7 @@ object ItemDisplayOverlayFeatures {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
             } ?: run {
-                val tier = itemName.split(" ")
-
-                return tier.last().romanToDecimalIfNecessary().toString()
+                return itemName.split(" ").last().romanToDecimalIfNecessaryOrNull()?.toString()
             }
         }
 

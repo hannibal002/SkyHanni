@@ -323,6 +323,8 @@ fun Rotations.toLorenzVec(): LorenzVec = LorenzVec(x(), y(), z())
 
 fun ClientboundLevelParticlesPacket.toLorenzVec() = LorenzVec(x, y, z)
 
+fun ClientboundLevelParticlesPacket.toOffset() = LorenzVec(xDist, yDist, zDist)
+
 fun Array<Double>.toLorenzVec(): LorenzVec {
     return LorenzVec(this[0], this[1], this[2])
 }

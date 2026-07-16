@@ -51,7 +51,6 @@ enum class ItemCategory {
     @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
-    FISHING_BAIT,
     POTION,
     RIFT_TIMECHARM,
     COSMETIC,
@@ -77,6 +76,7 @@ enum class ItemCategory {
     WATERING_CAN,
     FARMING_TOOL,
     TROPHY,
+    CAPSULE,
 
     NONE,
     ;

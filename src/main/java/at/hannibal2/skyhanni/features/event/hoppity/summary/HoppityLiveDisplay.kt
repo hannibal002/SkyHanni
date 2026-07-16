@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDi
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -41,6 +40,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
@@ -141,8 +141,8 @@ object HoppityLiveDisplay {
 
     private var inventoryOpen = false
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRender() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiRenderTop() {
         if (!liveDisplayEnabled()) return
 
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
@@ -158,6 +158,16 @@ object HoppityLiveDisplay {
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
         }
 
+        if (invCurrentlyOpen) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         eventConfig.eventSummary.liveDisplayPosition.renderRenderables(
             displayCardRenderables,
             posLabel = "Hoppity's Hunt Stats",
