@@ -555,7 +555,7 @@ object ExperimentationTableApi {
         for ((_, item) in inventoryItems) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (internalName !in ultraRareMiscItems) continue
-            TableRareUncoverEvent(item.cleanName(), isBook = false).post()
+            TableRareUncoverEvent(item.cleanName, isBook = false).post()
             currentExperimentData.rareFoundFired = true
             return
         }
