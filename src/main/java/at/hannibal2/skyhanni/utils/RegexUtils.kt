@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.skyhanni.utils.StringUtils.stripped
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -11,7 +12,7 @@ object RegexUtils {
         matcher(text).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.matchMatcher(text: Component, consumer: Matcher.() -> T) =
-        matcher(text.string).let { if (it.matches()) consumer(it) else null }
+        matcher(text.stripped).let { if (it.matches()) consumer(it) else null }
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
@@ -34,7 +35,7 @@ object RegexUtils {
 
     inline fun <T> Pattern.firstComponentMatcher(list: List<Component>, consumer: Matcher.() -> T): T? {
         for (line in list) {
-            matcher(line.string).let { if (it.matches()) return consumer(it) }
+            matcher(line.stripped).let { if (it.matches()) return consumer(it) }
         }
         return null
     }
@@ -50,7 +51,7 @@ object RegexUtils {
 
     inline fun <T> Pattern.matchAllComponents(list: List<Component>, consumer: Matcher.(Component) -> T) {
         for (line in list) {
-            matcher(line.string).let { if (it.find()) consumer(it, line) }
+            matcher(line.stripped).let { if (it.find()) consumer(it, line) }
         }
     }
 
@@ -68,12 +69,12 @@ object RegexUtils {
     fun List<Pattern>.anyMatches(string: String): Boolean = any { it.matches(string) }
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
-    fun Pattern.matches(component: Component?): Boolean = component?.let { matcher(it.string).matches() } ?: false
+    fun Pattern.matches(component: Component?): Boolean = component?.let { matcher(it.stripped).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
-    fun Pattern.find(component: Component?) = component?.let { matcher(it.string).find() } ?: false
+    fun Pattern.find(component: Component?) = component?.let { matcher(it.stripped).find() } ?: false
 
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { matches(it) } ?: false
-    fun Pattern.anyMatchesComponent(list: List<Component>?): Boolean = list?.any { matches(it.string) } ?: false
+    fun Pattern.anyMatchesComponent(list: List<Component>?): Boolean = list?.any { matches(it.stripped) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
 
     fun Pattern.matchGroup(text: String, groupName: String): String? = matchMatcher(text) { groupOrNull(groupName) }

@@ -513,6 +513,9 @@ object StringUtils {
 
     fun Component.startsWith(other: String): Boolean = string.startsWith(other)
 
+    val Component.stripped: String
+        get() = string.removeColor()
+
     fun String.width(): Int = Minecraft.getInstance().font.width(this)
 
     private val vowels = "aeiouAEIOU".toSet()
