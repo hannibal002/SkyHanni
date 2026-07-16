@@ -151,7 +151,7 @@ abstract class WardrobeApi {
                 getWardrobeItem(itemsList[slot.item3Slot]),
                 getWardrobeItem(itemsList[slot.item4Slot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName)) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
             }
