@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
+import io.github.notenoughupdates.moulconfig.gui.CloseEventListener
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
 import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.math.max
 
-class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option), CloseEventListener {
 
     private val download = GuiElementButton()
     private val changelog = GuiElementButton().apply { text = "Show Changelog" }
@@ -71,6 +72,12 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
     private var wasMouseButtonDown = false
     private var wasInsideDownload = false
     private var wasInsideChangelog = false
+
+    override fun onAfterClose() {
+        wasMouseButtonDown = false
+        wasInsideDownload = false
+        wasInsideChangelog = false
+    }
 
     override fun mouseInput(
         x: Int,
