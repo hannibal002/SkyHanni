@@ -67,7 +67,7 @@ object TabWidgetSettings {
      * REGEX-TEST: Currently: ENABLED
      */
     private val enabledPattern by patternGroup.pattern(
-        "is.enabled",
+        "is.enabled.colorless",
         ".*ENABLED",
     )
 
