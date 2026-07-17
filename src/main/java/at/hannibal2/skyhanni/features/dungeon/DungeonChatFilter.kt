@@ -23,151 +23,151 @@ object DungeonChatFilter {
     // <editor-fold desc="Patterns, Messages, and Maps">
     private val endPatterns by patternGroup.list(
         "end",
-        "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!",
-        " {4}§r§d(.*) Essence §r§8x(.*)",
-        "(.*)Experience §r§b(Team Bonus)"
+        "(.*) unlocked (.*) Essence x(.*)!",
+        " {4}(.*) Essence x(.*)",
+        "(.*)Experience (Team Bonus)"
     )
 
     private val abilityPatterns by patternGroup.list(
         "ability",
-        "§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.",
-        "§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!",
-        "§aYou were healed for (.*) health by (.*)§a!",
-        "§aYou gained (.*) HP worth of absorption for 3s from §r(.*)§r§a!",
-        "§c(.*) §r§epicked up your (.*) Orb!",
-        "§cThis ability is on cooldown for (.*)s.",
-        "§a§l(.*) healed you for (.*) health!",
-        "§eYour bone plating reduced the damage you took by §r§c(.*)§r§e!",
-        "(.*) §r§eformed a tether with you!",
-        "§eYour tether with (.*) §r§ehealed you for §r§a(.*) §r§ehealth.",
-        "§7Your Implosion hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.",
-        "§eYour §r§6Spirit Pet §r§ehealed (.*) §r§efor §r§a(.*) §r§ehealth!",
-        "§eYour §r§6Spirit Pet §r§ehit (.*) enemy for §r§c(.*) §r§edamage.",
-        "§cYou need at least (.*) mana to activate this!",
-        "§eYou were healed for §r§a(.*)§r§e health by §r(.*)§r§e's §r§9Healing Bow§r§e and gained §r§c\\+(.*) Strength§r§e for 10 seconds.",
-        "(.*)§r§a granted you §r§c(.*) §r§astrength for §r§e20 §r§aseconds!",
-        "§eYour fairy healed §r§ayourself §r§efor §r§a(.*) §r§ehealth!",
-        "§eYour fairy healed §r(.*) §r§efor §r§a(.*) §r§ehealth!",
-        "(.*) fairy healed you for §r§a(.*) §r§ehealth!",
-        "§a§r§6Guided Sheep §r§ais now available!",
-        "§dCreeper Veil §r§aActivated!",
-        "§dCreeper Veil §r§cDe-activated!",
-        "§6Rapid Fire§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
-        "§6Castle of Stone§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
-        "§6Ragnarok§r§a is ready to use! Press §r§6§lDROP§r§a to activate it!",
-        "§bThunderstorm§a is ready to use! Press §r§6§lDROP§r§a to activate it!"
+        "Your Guided Sheep hit (.*) enemy for (.*) damage.",
+        "BUFF! You were splashed by (.*) with Healing VIII!",
+        "You were healed for (.*) health by (.*)!",
+        "You gained (.*) HP worth of absorption for 3s from (.*)!",
+        "(.*) picked up your (.*) Orb!",
+        "This ability is on cooldown for (.*)s.",
+        "(.*) healed you for (.*) health!",
+        "Your bone plating reduced the damage you took by (.*)!",
+        "(.*) formed a tether with you!",
+        "Your tether with (.*) healed you for (.*) health.",
+        "Your Implosion hit (.*) enemy for (.*) damage.",
+        "Your Spirit Pet healed (.*) for (.*) health!",
+        "Your Spirit Pet hit (.*) enemy for (.*) damage.",
+        "You need at least (.*) mana to activate this!",
+        "You were healed for (.*) health by (.*)'s Healing Bow and gained \\+(.*) Strength for 10 seconds.",
+        "(.*) granted you (.*) strength for 20 seconds!",
+        "Your fairy healed yourself for (.*) health!",
+        "Your fairy healed (.*) for (.*) health!",
+        "(.*) fairy healed you for (.*) health!",
+        "Guided Sheep is now available!",
+        "Creeper Veil Activated!",
+        "Creeper Veil De-activated!",
+        "Rapid Fire is ready to use! Press DROP to activate it!",
+        "Castle of Stone is ready to use! Press DROP to activate it!",
+        "Ragnarok is ready to use! Press DROP to activate it!",
+        "Thunderstorm is ready to use! Press DROP to activate it!"
     )
 
     private val damagePatterns by patternGroup.list(
         "damage",
-        "(.*) §r§aused §r(.*) §r§aon you!",
-        "§cThe (.*)§r§c struck you for (.*) damage!",
-        "§cThe (.*) hit you for (.*) damage!",
-        "§7(.*) struck you for §r§c(.*)§r§7 damage.",
-        "(.*) hit you for §r§c(.*)§r§7 damage.",
-        "(.*) hit you for §r§c(.*)§r§7 true damage.",
-        "§7(.*) exploded, hitting you for §r§c(.*)§r§7 damage.",
-        "(.*)§r§c hit you with §r(.*) §r§cfor (.*) damage!",
-        "(.*)§r§a struck you for §r§c(.*)§r§a damage!",
-        "(.*)§r§c struck you for (.*)!",
-        "§7The Mage's Magma burnt you for §r§c(.*)§r§7 true damage.",
-        "§7Your (.*) hit §r§c(.*) §r§7(enemy|enemies) for §r§c(.*) §r§7damage.",
-        "§cMute silenced you!"
+        "(.*) used (.*) on you!",
+        "The (.*) struck you for (.*) damage!",
+        "The (.*) hit you for (.*) damage!",
+        "(.*) struck you for (.*) damage.",
+        "(.*) hit you for (.*) damage.",
+        "(.*) hit you for (.*) true damage.",
+        "(.*) exploded, hitting you for (.*) damage.",
+        "(.*) hit you with (.*) for (.*) damage!",
+        "(.*) struck you for (.*) damage!",
+        "(.*) struck you for (.*)!",
+        "The Mage's Magma burnt you for (.*) true damage.",
+        "Your (.*) hit (.*) (enemy|enemies) for (.*) damage.",
+        "Mute silenced you!"
     )
 
     private val notPossiblePatterns by patternGroup.list(
         "not_possible",
-        "§cYou cannot hit the silverfish while it's moving!",
-        "§cYou cannot move the silverfish in that direction!",
-        "§cThere are blocks in the way!",
-        "§cThis chest has already been searched!",
-        "§cThis lever has already been used.",
-        "§cYou cannot do that in this room!",
-        "§cYou do not have the key for this door!",
-        "§cYou have already opened this dungeon chest!",
-        "§cYou cannot use abilities in this room!",
-        "§cA mystical force in this room prevents you from using that ability!"
+        "You cannot hit the silverfish while it's moving!",
+        "You cannot move the silverfish in that direction!",
+        "There are blocks in the way!",
+        "This chest has already been searched!",
+        "This lever has already been used.",
+        "You cannot do that in this room!",
+        "You do not have the key for this door!",
+        "You have already opened this dungeon chest!",
+        "You cannot use abilities in this room!",
+        "A mystical force in this room prevents you from using that ability!"
     )
 
     private val buffPatterns by patternGroup.list(
         "buff",
-        "§6§lDUNGEON BUFF! (.*) §r§ffound a §r§dBlessing of (.*)§r§f!(.*)",
-        "§6§lDUNGEON BUFF! §r§fYou found a §r§dBlessing of (.*)§r§f!(.*)",
-        "§6§lDUNGEON BUFF! §r§fA §r§dBlessing of (.*)§r§f was found! (.*)",
-        "§eA §r§a§r§dBlessing of (.*)§r§e was picked up!",
-        "(.*) §r§ehas obtained §r§a§r§dBlessing of (.*)§r§e!",
-        " {5}§r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c${SkyblockStat.STRENGTH.hypixelIcon} Strength§r§7.",
-        " {5}§r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9${SkyblockStat.CRIT_DAMAGE.hypixelIcon} Crit Damage§r§7.",
-        " {5}§r§7(Grants|Granted) you §r§a(.*) Defense §r§7and §r§a+(.*) Damage§r§7.",
-        " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c${SkyblockStat.HEALTH_REGEN.hypixelIcon} Health Regen§r§7.",
-        " {5}§r§7(Grants|Granted) you §r§a(.*) Intelligence §r§7and §r§a+(.*)? Speed§r§7.",
-        " {5}§r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.",
-        "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!"
+        "DUNGEON BUFF! (.*) found a Blessing of (.*)!(.*)",
+        "DUNGEON BUFF! You found a Blessing of (.*)!(.*)",
+        "DUNGEON BUFF! A Blessing of (.*) was found! (.*)",
+        "A Blessing of (.*) was picked up!",
+        "(.*) has obtained Blessing of (.*)!",
+        " {5}Granted you (.*) & (.*)x ${SkyblockStat.STRENGTH.hypixelIcon} Strength.",
+        " {5}Also granted you (.*) & (.*)x ${SkyblockStat.CRIT_DAMAGE.hypixelIcon} Crit Damage.",
+        " {5}(Grants|Granted) you (.*) Defense and +(.*) Damage.",
+        " {5}Granted you (.*)x HP and (.*)x ${SkyblockStat.HEALTH_REGEN.hypixelIcon} Health Regen.",
+        " {5}(Grants|Granted) you (.*) Intelligence and +(.*)? Speed.",
+        " {5}Granted you +(.*) HP, (.*) Defense, (.*) Intelligence, and (.*) Strength.",
+        "BUFF! You have gained Healing V!"
     )
 
     private val puzzlePatterns by patternGroup.list(
         "puzzle",
-        "§a§lPUZZLE SOLVED! (.*) §r§ewasn't fooled by §r§c(.*)§r§e! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!",
-        "§a§lPUZZLE SOLVED! (.*) §r§etied Tic Tac Toe! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r(.*) §r§fthinks the answer is §r§6 . §r(.*)§r§f! §r§fLock in your party's answer in my Chamber!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fThough I sit stationary in this prison that is §r§cThe Catacombs§r§f, my knowledge knows no bounds.",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fAnswer incorrectly, and your moment of ineptitude will live on for generations.",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§f2 questions left... Then you will have proven your worth to me!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fOne more question!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fI bestow upon you all the power of a hundred years!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fYou've already proven enough to me! No need to press more of my buttons!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fI've had enough of you and your party fiddling with my buttons. Scram!",
-        "§4\\[STATUE] Oruo the Omniscient§r§f: §r§fEnough! My buttons are not to be pressed with such lack of grace!"
+        "PUZZLE SOLVED! (.*) wasn't fooled by (.*)! Good job!",
+        "PUZZLE SOLVED! (.*) tied Tic Tac Toe! Good job!",
+        "\\[STATUE] Oruo the Omniscient: (.*) thinks the answer is\\s+. (.*)! Lock in your party's answer in my Chamber!",
+        "\\[STATUE] Oruo the Omniscient: Though I sit stationary in this prison that is The Catacombs, my knowledge knows no bounds.",
+        "\\[STATUE] Oruo the Omniscient: Prove your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
+        "\\[STATUE] Oruo the Omniscient: Answer incorrectly, and your moment of ineptitude will live on for generations.",
+        "\\[STATUE] Oruo the Omniscient: 2 questions left... Then you will have proven your worth to me!",
+        "\\[STATUE] Oruo the Omniscient: One more question!",
+        "\\[STATUE] Oruo the Omniscient: I bestow upon you all the power of a hundred years!",
+        "\\[STATUE] Oruo the Omniscient: You've already proven enough to me! No need to press more of my buttons!",
+        "\\[STATUE] Oruo the Omniscient: I've had enough of you and your party fiddling with my buttons. Scram!",
+        "\\[STATUE] Oruo the Omniscient: Enough! My buttons are not to be pressed with such lack of grace!"
     )
 
     private val ambiencePatterns by patternGroup.list(
         "ambience",
-        "§5A shiver runs down your spine..."
+        "A shiver runs down your spine..."
     )
 
     private val reminderPatterns by patternGroup.list(
         "reminder",
-        "§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
-        "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!"
+        "RIGHT CLICK on a WITHER door to open it. This key can only be used to open 1 door!",
+        "RIGHT CLICK on the BLOOD DOOR to open it. This key can only be used to open 1 door!"
     )
 
     private val pickupPatterns by patternGroup.list(
         "pickup",
-        "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!",
-        "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!",
-        "§6§lRARE DROP! §r§9Hunk of Blue Ice §r§b\\(+(.*)%? Magic Find!\\)",
-        "(.*) §r§ehas obtained §r§a§r§6Revive Stone§r§e!",
-        "(.*) §r§ffound a §r§dWither Essence§r§f! Everyone gains an extra essence!",
-        "§d(.*) the Fairy§r§f: You killed me! Take this §r§6Revive Stone §r§fso that my death is not in vain!",
-        "§d(.*) the Fairy§r§f: You killed me! I'll revive you so that my death is not in vain!",
-        "§d(.*) the Fairy§r§f: You killed me! I'll revive your friend §r(.*) §r§fso that my death is not in vain!",
-        "§d(.*) the Fairy§r§f: Have a great life!",
-        "§c(.*) §r§eYou picked up a (.*) Orb from (.*) §r§ehealing you for §r§c(.*) §r§eand granting you +(.*)% §r§e(.*) for §r§b10 §r§eseconds.",
-        "(.*) §r§ehas obtained §r§a§r§9Premium Flesh§r§e!",
-        "§6§lRARE DROP! §r§9Beating Heart §r§b(.*)",
-        "(.*) §r§ehas obtained §r§a§r§9Beating Heart§r§e!",
-        "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
+        "(.*) has obtained Superboom TNT!",
+        "(.*) has obtained Superboom TNT x2!",
+        "RARE DROP! Hunk of Blue Ice \\(+(.*)%? Magic Find!\\)",
+        "(.*) has obtained Revive Stone!",
+        "(.*) found a Wither Essence! Everyone gains an extra essence!",
+        "(.*) the Fairy: You killed me! Take this Revive Stone so that my death is not in vain!",
+        "(.*) the Fairy: You killed me! I'll revive you so that my death is not in vain!",
+        "(.*) the Fairy: You killed me! I'll revive your friend (.*) so that my death is not in vain!",
+        "(.*) the Fairy: Have a great life!",
+        "(.*) You picked up a (.*) Orb from (.*) healing you for (.*) and granting you +(.*)% (.*) for 10 seconds.",
+        "(.*) has obtained Premium Flesh!",
+        "RARE DROP! Beating Heart (.*)",
+        "(.*) has obtained Beating Heart!",
+        "You found a Wither Essence! Everyone gains an extra essence!"
     )
 
     private val startPatterns by patternGroup.list(
         "start",
-        "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)",
-        "§e\\[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.",
-        "§e\\[NPC] §bMort§f: §rYou should find it useful if you get lost.",
-        "§e\\[NPC] §bMort§f: §rGood luck.",
-        "§e\\[NPC] §bMort§f: §rTalk to me to change your class and ready up."
+        "(.*) (.*) (.*) -> (.*)",
+        "\\[NPC] Mort: Here, I found this map when I first entered the dungeon.",
+        "\\[NPC] Mort: You should find it useful if you get lost.",
+        "\\[NPC] Mort: Good luck.",
+        "\\[NPC] Mort: Talk to me to change your class and ready up."
     )
 
     private val preparePatterns by patternGroup.list(
         "prepare",
         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.",
-        "§e\\[NPC] §bMort§f: §rTalk to me to change your class and ready up.",
-        "(.*)§a is now ready!",
-        "§aDungeon starts in (.*) seconds.",
-        "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
-        "§aDungeon starts in 1 second.",
-        "§aYou can no longer consume or splash any potions during the remainder of this Dungeon run!"
+        "\\[NPC] Mort: Talk to me to change your class and ready up.",
+        "(.*) is now ready!",
+        "Dungeon starts in (.*) seconds.",
+        "Your active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
+        "Dungeon starts in 1 second.",
+        "You can no longer consume or splash any potions during the remainder of this Dungeon run!"
     )
 
     private val patternMap = mapOf(
@@ -187,7 +187,7 @@ object DungeonChatFilter {
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.dungeonFilteredMessageTypes.isEmpty()) return
-        val blockReason = block(event.message)
+        val blockReason = block(event.cleanMessage)
         if (blockReason.isNotEmpty()) event.blockedReason = "dungeon_$blockReason"
     }
 
