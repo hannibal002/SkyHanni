@@ -176,7 +176,7 @@ class CustomTodoEditor(
 
     @Bind
     fun copyTemplate() {
-        ClipboardUtils.copyToClipboard(into().toTemplate())
+        ClipboardUtils.copyToClipboardAsyncWithResponse(into().toTemplate(), info = "Template")
     }
 
     @Bind

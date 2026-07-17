@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -116,8 +116,7 @@ abstract class TrackCommand<T : SkyHanniEvent, K>(
             val cancelFormat = if (isCancelled) "❌" else "✅"
             "Time: ${it.time.passedSince().inWholeMilliseconds} $cancelFormat ${it.event}"
         }
-        OSUtils.copyToClipboard(string)
-        ChatUtils.chat("§b${tracked.size} §a$commonNamePlural §ecopied into the clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(string, info = "§b${tracked.size} §a$commonNamePlural §e")
         tracked.clear()
         isRecording = false
     }

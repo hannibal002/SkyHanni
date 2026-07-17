@@ -239,7 +239,7 @@ object ChatUtils {
             "$message §7(hover for info)",
             hover = "$text\n \n§eClick to copy to clipboard!",
             onClick = {
-                ClipboardUtils.copyToClipboard(text.removeColor())
+                ClipboardUtils.copyToClipboardAsyncWithResponse(text.removeColor(), info = "Message")
             },
         )
     }

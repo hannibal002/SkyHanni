@@ -375,8 +375,7 @@ object OrderedWaypoints {
             else exportWaypoints(orderedWaypointsList, format.lowercase(Locale.getDefault()))
 
             route?.let {
-                ClipboardUtils.copyToClipboard(it)
-                ChatUtils.chat("Route was copied to clipboard.")
+                ClipboardUtils.copyToClipboardAsyncWithResponse(it, info = "Route")
             } ?: run {
                 ChatUtils.userError(
                     "Invalid waypoint format specified.\n" +

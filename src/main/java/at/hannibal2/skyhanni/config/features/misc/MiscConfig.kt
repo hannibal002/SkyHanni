@@ -537,4 +537,13 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var giftCleanDisplay: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Copy Information To Clipboard",
+        desc = "Automatically copy information related to skyhanni features you use to your clipboard. " +
+            "An example for this is the visitor shopping list that copies the amount required when searching for the item on the bazaar.",
+    )
+    @ConfigEditorBoolean
+    var copyInfoToClipboard: Boolean = true
 }

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod.launchCoroutine
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.api.ApiUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
@@ -54,7 +54,7 @@ object GoogleTranslator {
                 "Found translation: §f$translatedMessage",
                 onClick = {
                     CoroutineSettings("translator toNativeLanguage clickableChat", 10.seconds).launchCoroutine {
-                        OSUtils.copyToClipboardAsync(translatedMessage)
+                        ClipboardUtils.copyToClipboardAsyncWithResponse(translatedMessage, info = "Translated message")
                     }
                 },
                 "§eClick to copy!\n§eOriginal message: §f$message §7(Language: $detectedLanguage)",
@@ -76,7 +76,7 @@ object GoogleTranslator {
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = {
                     CoroutineSettings("translator fromNativeLanguage clickableChat").launchCoroutine {
-                        OSUtils.copyToClipboardAsync(translation)
+                        ClipboardUtils.copyToClipboardAsync(translation)
                     }
                 },
                 "§eClick to copy!\n§eOriginal message: §f$message",

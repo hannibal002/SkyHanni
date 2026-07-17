@@ -370,7 +370,7 @@ object HarvestFeastManager {
             add(
                 Renderable.item(cropStack) {
                     scale = 1.0
-                }
+                },
             )
         }
 
@@ -392,10 +392,10 @@ object HarvestFeastManager {
             description = "Copies the current harvest feast data"
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback {
-                CoroutineSettings("copy feast data to clipboard").withIOContext().launchCoroutine {
-                    ClipboardUtils.copyToClipboardAsync(currentFeastData?.getBody().toString()).await() ?: return@launchCoroutine
-                    ChatUtils.chat("Copied harvest feast debug data to clipboard.")
-                }
+                ClipboardUtils.copyToClipboardAsyncWithResponse(
+                    currentFeastData?.getBody().toString(),
+                    info = "Harvest feast debug data",
+                )
             }
         }
         event.registerBrigadier("shresetfeastdata") {

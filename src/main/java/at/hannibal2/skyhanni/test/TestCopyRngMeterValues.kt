@@ -5,12 +5,11 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -45,8 +44,7 @@ object TestCopyRngMeterValues {
         }
         if (map.isEmpty()) return
 
-        OSUtils.copyToClipboard(ConfigManager.gson.toJson(map))
-        ChatUtils.debug("${map.size} items saved to clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(ConfigManager.gson.toJson(map), info = "${map.size} items")
     }
 
     @HandleEvent

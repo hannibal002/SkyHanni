@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
@@ -79,8 +80,7 @@ object GraphEditorIO {
 
         val compileGraph = compileGraph()
         val json = compileGraph.toJson()
-        val copied = OSUtils.copyToClipboardAsync(json) ?: false
-        if (!copied) return@launch ChatUtils.chat("Failed to copy graph to clipboard.")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(json, info = "Graph")
 
         ChatUtils.chat("Copied Graph to Clipboard.")
         val networkCount = GraphEditorNetworks.recalculate()

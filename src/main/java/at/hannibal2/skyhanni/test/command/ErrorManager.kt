@@ -159,7 +159,7 @@ object ErrorManager {
         val name = if (fullErrorMessage) "Full error" else "Error"
         ChatUtils.chat(
             errorMessage?.let {
-                val copied = ClipboardUtils.copyToClipboardAsync(it).await() ?: false
+                val copied = ClipboardUtils.copyToClipboardAsync(it) ?: false
                 if (copied) {
                     AchievementManager.completeAchievement(COPY_ERROR_ACHIEVEMENT)
                     "$name copied into the clipboard, please report it on the SkyHanni discord!"

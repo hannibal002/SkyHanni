@@ -197,7 +197,7 @@ object CFStats {
             val list = text.toMutableList()
             list.add(0, "${PlayerUtils.getName()}'s Chocolate Factory Stats")
 
-            ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
+            ClipboardUtils.copyToClipboardAsyncWithResponse(list.joinToString("\n") { it.removeColor() }, info = "Chocolate Factory Stats")
         },
     )
 

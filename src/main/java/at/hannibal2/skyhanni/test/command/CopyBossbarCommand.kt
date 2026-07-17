@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 @SkyHanniModule
@@ -18,8 +18,7 @@ object CopyBossbarCommand {
         if (bossbarName.isBlank()) {
             ChatUtils.chat("Boss bar appears to be blank.")
         } else {
-            OSUtils.copyToClipboard(bossbarName)
-            ChatUtils.chat("Boss bar name copied to clipboard $status formatting codes!")
+            ClipboardUtils.copyToClipboardAsyncWithResponse(bossbarName, info = "Boss bar name $status formatting codes")
         }
     }
 

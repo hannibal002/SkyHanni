@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -58,8 +57,7 @@ object CopyChat {
             else -> chatLine.fullComponent.string.removeColor() to "message"
         }
 
-        ClipboardUtils.copyToClipboard(clipboard)
-        ChatUtils.chat("Copied $infoMessage to clipboard!")
+        ClipboardUtils.copyToClipboardAsyncWithResponse(clipboard, info = infoMessage)
     }
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {

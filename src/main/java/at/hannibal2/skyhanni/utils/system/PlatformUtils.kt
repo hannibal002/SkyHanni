@@ -5,9 +5,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.MarkdownBuilder
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.VersionConstants
 import net.fabricmc.loader.api.FabricLoader
 import kotlin.system.exitProcess
@@ -45,8 +44,7 @@ object PlatformUtils {
                 loadedMods.forEach { (_, name, version, origin) ->
                     loadedModsMd.append(name, "$origin ($version)")
                 }
-                OSUtils.copyToClipboard(loadedModsMd.toString())
-                ChatUtils.chat("Copied ${loadedMods.size} mods to clipboard!")
+                ClipboardUtils.copyToClipboardAsyncWithResponse(loadedModsMd.toString(), info = "${loadedMods.size} mods")
             }
         }
     }
