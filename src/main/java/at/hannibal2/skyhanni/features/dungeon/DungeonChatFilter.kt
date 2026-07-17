@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
 import java.util.regex.Pattern
 
 private typealias MessageTypes = ChatConfig.DungeonMessageTypes
@@ -19,14 +20,15 @@ object DungeonChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat
 
+    private val patternGroup = RepoPatternGroup("dungeon-chat-filter")
+
     // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO
-    private val endPatterns = listOf(
-        "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
-        " {4}§r§d(.*) Essence §r§8x(.*)".toPattern(),
-    )
-    private val endMessagesEndWith = listOf(
-        " Experience §r§b(Team Bonus)",
+    private val endPatterns by patternGroup.list(
+        "emd",
+        "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!",
+        " {4}§r§d(.*) Essence §r§8x(.*)",
+        "(.*)Experience §r§b(Team Bonus)\""
     )
 
     private val abilityPatterns = listOf(
@@ -162,6 +164,7 @@ object DungeonChatFilter {
         "§e[NPC] §bMort§f: §rGood luck.",
         "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.",
     )
+
     private val preparePatterns = listOf(
         "(.*) has started the dungeon countdown. The dungeon will begin in 1 minute.".toPattern(),
         "§e[NPC] §bMort§f: §rTalk to me to change your class and ready up.".toPattern(),
@@ -196,9 +199,6 @@ object DungeonChatFilter {
         MessageTypes.ABILITY to abilityPatterns,
         MessageTypes.PUZZLE to puzzlePatterns,
         MessageTypes.END to endPatterns,
-    )
-    private val messagesEndsWithMap: Map<MessageTypes, List<String>> = mapOf(
-        MessageTypes.END to endMessagesEndWith,
     )
     // </editor-fold>
 
@@ -246,11 +246,9 @@ object DungeonChatFilter {
      * @return True if the message is present in any of the maps
      * @see messagesMap
      * @see patternsMap
-     * @see messagesEndsWithMap
      */
     private fun String.isPresent(key: MessageTypes): Boolean {
         return this in (messagesMap[key].orEmpty()) ||
-            (patternsMap[key].orEmpty()).any { it.matches(this) } ||
-            (messagesEndsWithMap[key].orEmpty()).any { this.endsWith(it) }
+            (patternsMap[key].orEmpty()).any { it.matches(this) }
     }
 }
