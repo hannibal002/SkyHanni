@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
@@ -95,18 +96,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+?)(?: §8x(?<amount>\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)",
     )
 
-    /**
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aPlant Matter§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aDung§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aHoney Jar§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aTasty Cheese§r§7!
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§bFR1 §r§7with §r§aCompost§r§7!
-     */
-    private val sprayonatorUsedPattern by patternGroup.pattern(
-        "sprayonator",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- .* §r§7with §r§.(?<spray>.*)§r§7!",
-    )
-
     val DUNG_ITEM = "DUNG".toInternalName()
     val ENCHANTED_SUNFLOWER_ITEM = "ENCHANTED_SUNFLOWER".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
@@ -170,7 +159,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
-    private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
+    private fun SprayType.addSprayUsed(amount: Int = 1) = modify { it.spraysUsed.addOrPut(this, amount) }
 
     fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
         if (!drop.canDropFromPests) return
@@ -269,8 +258,10 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
-        sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
-            SprayType.getByNameOrNull(it)?.addSprayUsed()
+        GardenPlotApi.plotSprayedPattern.matchMatcher(message) {
+            val spray = group("spray")
+            val amount = groupOrNull("amount")?.formatInt() ?: 1
+            SprayType.getByNameOrNull(spray)?.addSprayUsed(amount)
         }
     }
 
