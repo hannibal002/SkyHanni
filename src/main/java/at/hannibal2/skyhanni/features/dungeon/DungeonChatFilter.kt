@@ -1,4 +1,4 @@
-@file:Suppress("MaxLineLength")
+@file:Suppress("MaxLineLength", "RepoPatternRegexTestMissing")
 
 package at.hannibal2.skyhanni.features.dungeon
 
@@ -21,6 +21,7 @@ object DungeonChatFilter {
     private val patternGroup = RepoPatternGroup("dungeon-chat-filter")
 
     // <editor-fold desc="Patterns, Messages, and Maps">
+    // TODO: Add regex tests
     private val endPatterns by patternGroup.list(
         "end",
         "(.*) unlocked (.*) Essence x(.*)!",
