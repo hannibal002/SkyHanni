@@ -183,7 +183,7 @@ object DungeonChatFilter {
         MessageTypes.PUZZLE to puzzlePatterns,
         MessageTypes.END to endPatterns
     )
-    
+
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.dungeonFilteredMessageTypes.isEmpty()) return
@@ -198,5 +198,4 @@ object DungeonChatFilter {
     private fun String.isFiltered(key: MessageTypes): Boolean = config.dungeonFilteredMessageTypes.contains(key) && isPresent(key)
 
     private fun String.isPresent(key: MessageTypes): Boolean = patternMap[key]?.any { it.matcher(this).matches() } == true
-}
 }
