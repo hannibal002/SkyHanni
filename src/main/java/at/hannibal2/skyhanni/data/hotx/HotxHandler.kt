@@ -86,7 +86,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         if (this.handleCurrency()) return
 
-        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName()) } ?: return
+        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName) } ?: return
         entry.slot = this
         entry.item = item
 
@@ -143,8 +143,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val item = this.item.takeUnlessEmpty() ?: return false
 
         val isHeartItem = when {
-            heartItemPattern.matches(item.cleanName()) -> true
-            resetItemPattern.matches(item.cleanName()) -> false
+            heartItemPattern.matches(item.cleanName) -> true
+            resetItemPattern.matches(item.cleanName) -> false
             else -> return false
         }
 

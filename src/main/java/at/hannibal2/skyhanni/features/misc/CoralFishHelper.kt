@@ -82,7 +82,7 @@ object CoralFishHelper {
         val neededFish = mutableListOf<String>()
 
         for (item in items) {
-            val itemName = item.cleanName()
+            val itemName = item.cleanName
             if (!coralFishNamePattern.matches(itemName)) continue
 
             if (!item.isDye(DyeCompat.GRAY)) continue

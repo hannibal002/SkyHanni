@@ -41,7 +41,7 @@ object SuperPairsItemVisibility {
         if (!config.enabled) return
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
         if (superpairsSlotMap.isEmpty() || event.slot !in superpairsSlotMap.keys) return
-        if (!unknownSuperpairsClickPattern.matches(event.originalItem.cleanName())) return
+        if (!unknownSuperpairsClickPattern.matches(event.originalItem.cleanName)) return
         val replacementItem = superpairsSlotMap[event.slot] ?: return
         event.replace(replacementItem)
     }
@@ -57,7 +57,7 @@ object SuperPairsItemVisibility {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val slotNumber = event.slot?.index?.takeUnless(superpairsSlotMap.keys::contains) ?: return
         val clickedItem = event.item ?: return
-        if (unknownSuperpairsClickPattern.matches(clickedItem.cleanName())) {
+        if (unknownSuperpairsClickPattern.matches(clickedItem.cleanName)) {
             superpairsSlotsToRead.add(slotNumber)
         } else {
             superpairsSlotMap[slotNumber] = clickedItem
@@ -71,7 +71,7 @@ object SuperPairsItemVisibility {
         if (superpairsSlotsToRead.isEmpty()) return
 
         event.inventoryItems.filter { (slot, stack) ->
-            slot in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(stack.cleanName())
+            slot in superpairsSlotsToRead && !unknownSuperpairsClickPattern.matches(stack.cleanName)
         }.forEach {
             superpairsSlotMap[it.key] = it.value
             superpairsSlotsToRead.remove(it.key)

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -112,7 +113,7 @@ object EnigmaSoulWaypoints {
         for (stack in event.inventoryItems.values) {
             stack.getLore().lastOrNull()?.let {
                 if (notCompletedPattern.matches(it.removeColor())) {
-                    enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
+                    enigmaTitlePattern.matchMatcher(stack.cleanName) {
                         inventoryUnfound.add(group("name"))
                     }
                 }
@@ -149,7 +150,7 @@ object EnigmaSoulWaypoints {
 
         if (event.slot?.item == null) return
 
-        val name = enigmaTitlePattern.matchMatcher(event.slot.item.hoverName.string.removeColor()) {
+        val name = enigmaTitlePattern.matchMatcher(event.slot.item.cleanName) {
             group("name")
         } ?: return
         event.makePickblock()
@@ -192,7 +193,7 @@ object EnigmaSoulWaypoints {
         val tracked = trackedSouls[area] ?: return
 
         for ((slot, stack) in chest.getAllItems()) {
-            enigmaTitlePattern.matchMatcher(stack.hoverName.string.removeColor()) {
+            enigmaTitlePattern.matchMatcher(stack.cleanName) {
                 if (group("name") in tracked) {
                     slot.highlight(LorenzColor.DARK_PURPLE)
                 }
