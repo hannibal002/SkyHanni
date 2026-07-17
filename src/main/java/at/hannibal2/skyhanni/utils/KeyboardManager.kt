@@ -30,6 +30,7 @@ object KeyboardManager {
     // InputConstants.UNKNOWN exists, but is not a compile time constant
     const val KEY_UNKNOWN: Int = -1
 
+    // FIXME: mouse button != slot click button codes in SDL, so conversion is needed where this is used
     const val LEFT_MOUSE = InputConstants.MOUSE_BUTTON_LEFT
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
