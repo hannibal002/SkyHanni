@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -40,6 +41,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoeLevelDisplay {
@@ -55,6 +57,10 @@ object HoeLevelDisplay {
 
     private val patternGroup = RepoPattern.group("hoe.levels")
 
+    private var tickCounter: Int = 0
+    private var lastXpGained: Long = 0
+    private var xpPerHour: Long = 0
+    
     /**
      * REGEX-TEST: OVERFLOW! Your Turing Sugar Cane Hoe Mk. III has just dropped a Tool Exp Capsule!
      */
@@ -67,6 +73,29 @@ object HoeLevelDisplay {
     fun onTick() {
         if (!isEnabled()) return
         display = getDisplay()?.map(Renderable::text)
+        tickCounter++
+        if (tickCounter % 20 == 0) {
+            val heldItem = InventoryUtils.getItemInHand() ?: return
+            val hoeExp = heldItem.getHoeExp() ?: return
+            if (hoeExp != lastXpGained) {
+                val xpGained = hoeExp - lastXpGained
+                xpPerHour = (xpGained * 3600) / 20
+                lastXpGained = hoeExp
+            }
+        }
+    }
+    private fun nextLevelTimer(): String {
+        val heldItem = InventoryUtils.getItemInHand() ?: return "Unknown"
+        val hoeExp = heldItem.getHoeExp() ?: return "Unknown"
+        val hoeLevel = heldItem.getHoeLevel() ?: return "Unknown"
+        val hoeLevels = hoeLevels ?: return "Unknown"
+        val next =
+            if (hoeLevel <= hoeLevels.size) hoeLevels[hoeLevel - 1]
+            else hoeOverflow
+        if (xpPerHour <= 0L) return "Calculating..."
+        val xpToNext = (next - hoeExp).coerceAtLeast(0L)
+        val secondsLeft = xpToNext * 3600 / xpPerHour
+        return secondsLeft.seconds.toString().substringBefore('.')
     }
 
     private fun getDisplay(): List<String>? = buildList {
@@ -95,6 +124,9 @@ object HoeLevelDisplay {
         val formattedXp = hoeExp.addSeparators()
         val formattedXpToNext = next.addSeparators()
         add("$colorPrefix$formattedXp§8/§e$formattedXpToNext")
+        if ((hoeLevel < MAX_LEVEL || (hoeLevel == MAX_LEVEL && config.overflow) )&& config.showTimer) {
+            add("In §b${nextLevelTimer()}")
+        }
 
         GardenApi.lastBrokenCropType?.takeIf { it != GardenApi.cropInHand }?.let {
             add("§cNot gaining XP! (Wrong crop)")
