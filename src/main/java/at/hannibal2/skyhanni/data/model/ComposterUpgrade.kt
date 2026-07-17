@@ -22,7 +22,7 @@ enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
          * REGEX-TEST: Cost Reduction V
          */
         val composterUpgradePattern by RepoPattern.pattern(
-            "composter.upgrade",
+            "composter.upgrade.name",
             "(?<name>${regexValues()})(?: (?<level>.*))?",
         )
 
