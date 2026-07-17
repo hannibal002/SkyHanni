@@ -16,7 +16,9 @@ import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.reflect.KClass
 
@@ -52,9 +54,19 @@ enum class EliteLeaderboards(
         }
 
         @HandleEvent
-        fun onGuiRender() {
+        fun onGuiRenderTop() {
             if (config.displayPositions.isEmpty()) return
             if (!config.enabled) return
+            if (InventoryUtils.inAnyInventory()) {
+                InventoryGuiScaleCompat.withOriginalHudScale {
+                    renderDisplays()
+                }
+            } else {
+                renderDisplays()
+            }
+        }
+
+        private fun renderDisplays() {
             config.display.get().forEach { leaderboard ->
                 leaderboard.display.renderDisplay(leaderboard.position)
             }

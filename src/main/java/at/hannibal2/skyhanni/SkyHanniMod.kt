@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SeenContributorStorage
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.OtherInventoryData
@@ -47,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -95,7 +97,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         if (screenTicks != 5) return
         val title = InventoryUtils.openInventoryName()
         if (shouldCloseScreen) {
-            MinecraftCompat.localPlayer.closeContainer()
+            MinecraftCompat.localPlayerOrThrow.closeContainer()
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
@@ -118,6 +120,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     const val MODID: String = "skyhanni"
     const val VERSION: String = VersionConstants.MOD_VERSION
 
+    fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
+
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 
     val isBetaVersion: Boolean
@@ -139,6 +143,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
     lateinit var customTodos: CustomTodosStorage
     lateinit var seaCreatureStorage: SpecificSeaCreatureStorage
     lateinit var achievementStorage: AchievementStorage
+    lateinit var seenContributorStorage: SeenContributorStorage
 
     lateinit var configManager: ConfigManager
     val logger: Logger = LogManager.getLogger("SkyHanni")

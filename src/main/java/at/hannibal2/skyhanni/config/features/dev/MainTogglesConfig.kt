@@ -12,7 +12,7 @@ class MainTogglesConfig {
         desc = "§cOnly disable when you know what you are doing!",
     )
     @ConfigEditorInfoText
-    var note: String = ""
+    val note: String = ""
 
     @Expose
     @ConfigOption(
