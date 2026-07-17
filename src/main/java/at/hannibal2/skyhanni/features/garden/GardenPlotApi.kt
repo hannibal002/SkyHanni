@@ -98,7 +98,7 @@ object GardenPlotApi {
      */
     val plotSprayedPattern by patternGroup.pattern(
         "spray.target.colorless",
-        "SPRAYONATOR! You sprayed Plot - (?<plot>.+) with (?:(<amount>\\d+) )?(<spray>.+)!",
+        "SPRAYONATOR! You sprayed Plot - (?<plot>.+) with (?:(?<amount>\\d+) )?(?<spray>.+)!",
     )
 
     /**
