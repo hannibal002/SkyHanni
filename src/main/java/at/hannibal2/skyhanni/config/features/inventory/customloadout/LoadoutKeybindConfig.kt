@@ -8,10 +8,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class LoadoutKeybindConfig {
+
     @Expose
     @ConfigOption(
         name = "Slot Keybinds Toggle",
-        desc = "Enable/Disable the slot keybinds.",
+        desc = "Enable/Disable the loadout slot keybinds.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

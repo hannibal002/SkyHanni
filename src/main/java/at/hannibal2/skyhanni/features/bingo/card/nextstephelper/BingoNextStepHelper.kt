@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -195,7 +196,7 @@ object BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.hoverName.string.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.cleanName == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {
