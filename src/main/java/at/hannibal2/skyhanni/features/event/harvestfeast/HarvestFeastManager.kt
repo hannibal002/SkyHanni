@@ -228,7 +228,7 @@ object HarvestFeastManager {
     private fun readCurrentActiveCrops(stacks: Map<Int, SafeItemStack>): List<CropType> {
         val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
         val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
-        // Can happen when calling Ted when it's not harvest feast
+        // Can happen when calling Ted outside of harvest feast
         if (current.isEmpty()) return emptyList()
 
         if (current.size != 4) {
