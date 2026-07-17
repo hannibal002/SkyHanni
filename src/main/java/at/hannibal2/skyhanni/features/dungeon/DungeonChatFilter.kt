@@ -151,6 +151,10 @@ object DungeonChatFilter {
         "You found a Wither Essence! Everyone gains an extra essence!"
     )
 
+    /**
+     * REGEX-TEST: [Berserk] Melee Damage 48% -> 88%
+     * REGEX-TEST: [Berserk] Walk Speed 38 -> 68
+     */
     private val startPatterns by patternGroup.list(
         "start",
         "(.*) (.*) (.*) -> (.*)",
