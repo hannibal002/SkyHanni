@@ -57,7 +57,8 @@ object HarvestFeastManager {
     private val config get() = SkyHanniMod.feature.event.feast
 
     private const val MONTH_MIDDLE_DAY = 18
-    private val CURRENT_CROPS_SLOTS = listOf(12, 13, 14)
+    // TODO: figure out the real slots
+    private val CURRENT_CROPS_SLOTS = listOf(12, 13, 14, 15)
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
@@ -157,7 +158,7 @@ object HarvestFeastManager {
     }
 
     private fun readAllCrops(items: Map<Int, SafeItemStack>) {
-        val current = readCurrentActiveCrops(items).takeIf { it.size == 3 } ?: return
+        val current = readCurrentActiveCrops(items).takeIf { it.size == 4 } ?: return
         val next = readCropTimestamps(items)
 
         val sendData = EliteFeastJson.of(
@@ -229,7 +230,7 @@ object HarvestFeastManager {
         val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
         val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
 
-        if (current.size != 3) {
+        if (current.size != 4) {
             ErrorManager.logErrorStateWithData(
                 "Error reading current Harvest Feast crops.",
                 "current harvest feast crops not 3",
