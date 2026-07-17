@@ -44,7 +44,7 @@ object MinionUpgradeHelper {
      */
     private val requiredItemsPattern by RepoPattern.pattern(
         "minion.items.upgrade.colorless",
-        "( +)?You need (?<amount>\\d+) more (?<itemName>.+)\\.",
+        "(?: +)?You need (?<amount>\\d+) more (?<itemName>.+)\\.",
     )
 
     private var lastMinionOpen = SimpleTimeMark.farPast()
