@@ -380,7 +380,8 @@ object HarvestFeastManager {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
-        if ((!GardenApi.inGarden() && !config.showOutsideGarden) && !isCurrentOutdated) return
+        if (isCurrentOutdated) return
+        if (!GardenApi.inGarden() && !config.showOutsideGarden) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")
