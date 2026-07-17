@@ -143,25 +143,22 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onEntityClick(event: EntityClickEvent) {
-        if (!enableWithHub()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastClickedEntity = event.clickedEntity.getLorenzVec()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onBlockClick(event: BlockClickEvent) {
-        if (!enableWithHub()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastStorage = event.position
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
-        if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
         val color = config.lastClickedMinion.color.toColor()
@@ -182,9 +179,8 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!enableWithHub()) return
         val inventoryName = event.inventoryName
         if (!minionTitlePattern.find(inventoryName)) return
 
@@ -199,9 +195,8 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!enableWithHub()) return
         if (minionInventoryOpen) {
             MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
         }
@@ -441,8 +436,6 @@ object MinionFeatures {
             event.cancel()
         }
     }
-
-    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.HUB.isInIsland()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
