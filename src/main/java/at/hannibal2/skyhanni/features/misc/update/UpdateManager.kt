@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.api.ApiInternalUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
@@ -130,11 +131,49 @@ object UpdateManager {
             config.updateStream.set(UpdateStream.BETA)
         }
 
+        val source = debugConfig.updateSource.get()
+        checkUpdateFromSource(
+            source,
+            forcedUpdateStream,
+            fallbackSources = if (debugConfig.fallbackUpdateSources) {
+                SkyHanniUpdateSource.entries.removeFirst { it == source }
+            } else {
+                emptyList()
+            },
+            force,
+        )
+    }
+
+    private fun checkUpdateFromSource(
+        source: SkyHanniUpdateSource,
+        updateStream: UpdateStream,
+        fallbackSources: List<SkyHanniUpdateSource>,
+        force: Boolean,
+    ) {
+        val context = buildContext(source)
+
+        logger.log("Checking update source: ${source.name}")
+
         activePromise = context.checkUpdate(updateStream.stream)
             .orTimeout(15, TimeUnit.SECONDS)
             .whenCompleteAsync(
                 { update, throwable ->
                     if (throwable != null) {
+                        context.cleanup()
+
+                        if (fallbackSources.isNotEmpty()) {
+                            val nextSource = fallbackSources.first()
+                            logger.log("Update source ${source.name} failed, trying ${nextSource.name}")
+
+                            checkUpdateFromSource(
+                                nextSource,
+                                updateStream,
+                                fallbackSources.drop(1),
+                                force,
+                            )
+                            return@whenCompleteAsync
+                        }
+
                         if (throwable is TimeoutException) {
                             ErrorManager.logErrorWithData(throwable, "Update check timed out")
                         } else {
@@ -142,38 +181,51 @@ object UpdateManager {
                         }
                         return@whenCompleteAsync
                     }
+                    context.cleanup()
                     logger.log("Update check completed")
                     if (updateState != UpdateState.NONE) {
                         logger.log("This appears to be the second update check. Ignoring this one")
                         return@whenCompleteAsync
                     }
-                    potentialUpdate = update
-                    if (update.isUpdateAvailable) {
-                        updateState = UpdateState.AVAILABLE
-                        ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
-                        getDownloadPage(update)?.let { url ->
-                            ChatUtils.clickableLinkChat(
-                                "§e§lCLICK HERE §r§eto open the download page.",
-                                url,
-                            )
-                        }
-                        ChatUtils.clickableChat(
-                            "§e§lCLICK HERE §r§eto view changes in-game.",
-                            onClick = {
-                                ChangelogViewer.showChangelog(SkyHanniMod.VERSION, update.update.versionName)
-                            },
-                        )
-                    } else if (force) {
-                        ChatUtils.chat(
-                            componentBuilder {
-                                append("SkyHanni didn't find a new update.")
-                                withColor(ChatFormatting.GREEN)
-                            },
-                        )
-                    }
+
+                    handleUpdateResult(update, force)
                 },
                 Minecraft.getInstance(),
             )
+    }
+
+    private fun handleUpdateResult(update: PotentialUpdate, force: Boolean) {
+        potentialUpdate = update
+
+        if (update.isUpdateAvailable) {
+            updateState = UpdateState.AVAILABLE
+
+            ChatUtils.chat("§aSkyHanni found a new update: ${update.update.versionName}.")
+
+            getDownloadPage(update)?.let { url ->
+                ChatUtils.clickableLinkChat(
+                    "§e§lCLICK HERE §r§eto open the download page.",
+                    url,
+                )
+            }
+
+            ChatUtils.clickableChat(
+                "§e§lCLICK HERE §r§eto view changes in-game.",
+                onClick = {
+                    ChangelogViewer.showChangelog(
+                        SkyHanniMod.VERSION,
+                        update.update.versionName,
+                    )
+                },
+            )
+        } else if (force) {
+            ChatUtils.chat(
+                componentBuilder {
+                    append("SkyHanni didn't find a new update.")
+                    withColor(ChatFormatting.GREEN)
+                },
+            )
+        }
     }
 
     fun getDownloadPage(update: PotentialUpdate? = potentialUpdate): String? {

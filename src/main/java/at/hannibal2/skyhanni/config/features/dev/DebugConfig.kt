@@ -170,6 +170,14 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(
+        name = "Fallback Update Sources",
+        desc = "If the selected update source fails, fallback to the other sources.",
+    )
+    @ConfigEditorBoolean
+    val fallbackUpdateSources: Boolean = true
+
+    @Expose
+    @ConfigOption(
         name = "Always Outdated",
         desc = "When checking for updates, act like you are always outdated.",
     )
