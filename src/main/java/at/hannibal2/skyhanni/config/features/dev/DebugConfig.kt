@@ -174,7 +174,7 @@ class DebugConfig {
         desc = "If the selected update source fails, fallback to the other sources.",
     )
     @ConfigEditorBoolean
-    val fallbackUpdateSources: Boolean = true
+    var fallbackUpdateSources: Boolean = true
 
     @Expose
     @ConfigOption(
