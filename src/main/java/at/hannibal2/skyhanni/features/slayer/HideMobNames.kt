@@ -47,7 +47,7 @@ object HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        val patternName = bossName.lowercase().replace(" ", "_")
+        val patternName = bossName.lowercase().replace(" ", "-")
         val pattern by RepoPattern.pattern(
             "slayer.mobname.$patternName",
             "\\[Lv\\d+] (?<mobType>([✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? $bossName ae](?<min>.+)/(?<max>.+)❤",
