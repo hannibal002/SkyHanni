@@ -51,7 +51,7 @@ object EquipmentApi {
 
     fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
+    fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
         equipment[slot.ordinal] = itemStack
         SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
@@ -95,7 +95,7 @@ object EquipmentApi {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
             val chatItem = group("item").removeColor()
             val (item, slot) = lastClickedEquipment ?: return@matchMatcher
-            if (item.cleanName() != chatItem) return@matchMatcher
+            if (item.cleanName != chatItem) return@matchMatcher
             setEquipment(slot, item)
             lastClickedEquipment = null
         }

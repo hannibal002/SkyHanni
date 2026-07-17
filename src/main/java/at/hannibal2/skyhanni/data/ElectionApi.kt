@@ -286,7 +286,7 @@ object ElectionApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mayor Election")
 
         val assumeMayor = assumeMayorConfig.get()
@@ -341,5 +341,15 @@ object ElectionApi {
             mayor?.addAdditionalPerks(data.perks)
             currentMayor = mayor
         }
+    }
+
+    fun getAllActivePerks(
+        includeMayor: Boolean = true,
+        includeMinister: Boolean = true,
+        includeRepoPerk: Boolean = true,
+    ): List<Perk> = buildList {
+        if (includeMayor) addAll(currentMayor?.activePerks.orEmpty())
+        if (includeMinister) addAll(currentMinister?.activePerks.orEmpty())
+        if (includeRepoPerk) addAll(repoPerks.orEmpty())
     }
 }

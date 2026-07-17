@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -29,7 +31,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -108,8 +109,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent
-    fun onGuiRender() {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -163,7 +164,7 @@ object ItemPickupLog {
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
                 ?.filterNotNull().orEmpty().toMutableList()
-            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
+            val cursorItem = MinecraftCompat.localPlayerOrThrow.getItemOnCursor()
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
@@ -259,7 +260,7 @@ object ItemPickupLog {
     }
 
     private fun SafeItemStack.hash(): Int {
-        var displayName = this.hoverName.string.removeColor()
+        var displayName = this.cleanName
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

@@ -20,7 +20,7 @@ object SlayerItemsOnGround {
 
     private val config get() = SlayerApi.config.itemsOnGround
 
-    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(2.seconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(2.seconds, useWeakKeys = true)
 
     @HandleEvent
     fun onTick() {
