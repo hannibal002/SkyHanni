@@ -58,7 +58,7 @@ object HarvestFeastManager {
 
     private const val MONTH_MIDDLE_DAY = 18
     // TODO: figure out the real slots
-    private val CURRENT_CROPS_SLOTS = listOf(12, 13, 14, 15)
+    private val CURRENT_CROPS_SLOTS = listOf(11, 12, 14, 15)
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
