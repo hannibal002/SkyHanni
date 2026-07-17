@@ -33,7 +33,7 @@ object TrophyFishManager {
      */
     private val odgerRankPattern by patternGroup.pattern(
         "odger.rank.colorless",
-        "( +)?(?<rarity>.*) ✔ \\((?<amount>.*)\\)",
+        "(?: +)?(?<rarity>.*) ✔ \\((?<amount>.*)\\)",
     )
 
     /**
@@ -41,7 +41,7 @@ object TrophyFishManager {
      */
     private val odgerRankEmptyPattern by patternGroup.pattern(
         "odger.rank.empty.colorless",
-        "( +)?(?<rarity>.*) ✖",
+        "(?: +)?(?<rarity>.*) ✖",
     )
 
     val odgerInventory = InventoryDetector { name -> name == "Trophy Fish" }
