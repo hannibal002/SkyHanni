@@ -381,6 +381,7 @@ object HarvestFeastManager {
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return
+        @Suppress("IsInIslandEarlyReturn")
         if (!GardenApi.inGarden() && !config.showOutsideGarden) return
         if (!isDataAvailable()) return
         val display = display ?: return
