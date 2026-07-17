@@ -551,8 +551,11 @@ object AttributeShardsData {
     private fun isEnabled(shardName: String): Boolean =
         storage?.get(shardName)?.enabled ?: false
 
-    fun getActiveLevel(shardName: String) =
+    fun getActiveLevel(shardName: String): Int =
         if (isEnabled(shardName)) getLevel(shardName) else 0
+
+    fun getActiveLevelByAbilityName(abilityName: String): Int =
+        attributeAbilityNameToShard[abilityName]?.let(::getActiveLevel) ?: 0
 
     fun getSyphonedAmount(shardName: String): Int {
         return storage?.get(shardName)?.amountSyphoned ?: 0

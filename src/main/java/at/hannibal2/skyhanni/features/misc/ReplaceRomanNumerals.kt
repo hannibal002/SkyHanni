@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -19,7 +18,7 @@ object ReplaceRomanNumerals {
     private val cachedStrings = TimeLimitedCache<String, String>(5.seconds)
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    fun onRepoReload() {
         cachedStrings.clear()
     }
 
@@ -44,7 +43,7 @@ object ReplaceRomanNumerals {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyHanniMod.feature.misc.replaceRomanNumerals.get()
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Replace Roman Numerals")
         event.addIrrelevant {
             val map = cachedStrings.toMap()

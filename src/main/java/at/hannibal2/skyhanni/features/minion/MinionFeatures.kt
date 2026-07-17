@@ -48,7 +48,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
@@ -137,7 +136,7 @@ object MinionFeatures {
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
-            newMinionName = getMinionName(equipped.cleanName())
+            newMinionName = getMinionName(equipped.cleanName)
         } else {
             newMinion = null
             newMinionName = null
@@ -216,7 +215,7 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        val inHub = SkyBlockUtils.currentIsland == IslandType.HUB
+        val inHub = IslandType.HUB.isInIsland()
         val inStorage = minions.contains(entity)
 
         if (!inStorage && !inHub) minions[entity] = ProfileSpecificStorage.MinionConfig().apply {
@@ -348,11 +347,10 @@ object MinionFeatures {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Inflation Contributor".asComponent(),
-            "Gain Coins from a single Minion Hopper".asComponent(),
-            10f,
-            false,
-            listOf(1_000_000, 5_000_000, 10_000_000),
+            name = "Inflation Contributor".asComponent(),
+            description = "Gain Coins from a single Minion Hopper".asComponent(),
+            userLuckAmount = 10f,
+            tiers = listOf(1_000_000, 5_000_000, 10_000_000),
         )
         event.register(achievement, MINION_COIN_ACHIEVEMENT)
     }
