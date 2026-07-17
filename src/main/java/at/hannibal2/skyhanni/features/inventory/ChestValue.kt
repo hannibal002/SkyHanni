@@ -52,9 +52,14 @@ object ChestValue {
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
 
+    /**
+     * REGEX-TEST: Personal Vault
+     * REGEX-TEST: Chest Storage
+     * REGEX-TEST: Wood Chest+
+     */
     private val relevantChestValuePattern by RepoPattern.pattern(
         "inventory.chestvalue.relevant",
-        "(Personal Vault|Chest Storage|Wood Chest\\+)"
+        "Personal Vault|Chest Storage|Wood Chest\\+"
     )
 
     @HandleEvent
