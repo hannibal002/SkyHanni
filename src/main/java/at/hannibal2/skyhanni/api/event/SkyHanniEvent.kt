@@ -19,7 +19,6 @@ abstract class SkyHanniEvent protected constructor() {
         (this as? Rendering)?.let { DrawContextUtils.setContext(it.context) }
         SkyHanniEvents.getEventHandler(javaClass).post(this, onError)
         if (this is Rendering) DrawContextUtils.clearContext()
-        return this
     }
 
     interface Cancellable {
