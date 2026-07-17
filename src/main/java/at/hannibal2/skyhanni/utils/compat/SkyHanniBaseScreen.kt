@@ -4,10 +4,10 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.network.chat.Component
-import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.client.input.CharacterEvent
 import net.minecraft.client.input.KeyEvent
+import net.minecraft.client.input.MouseButtonEvent
+import net.minecraft.network.chat.Component
 
 @Suppress("UnusedParameter", "TooManyFunctions")
 abstract class SkyHanniBaseScreen : Screen(Component.empty()) {

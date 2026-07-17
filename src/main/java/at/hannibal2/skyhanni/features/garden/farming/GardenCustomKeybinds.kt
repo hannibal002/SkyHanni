@@ -2,36 +2,26 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenApi.isFarmingTool
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
-import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
 import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
-import net.minecraft.world.item.Items
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GardenCustomKeybinds {
-
-    private val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
-    private val SUNS_GRASP = "SUNS_GRASP".toInternalName()
 
     private val config get() = GardenApi.config.keyBind
     private val mcSettings get() = Minecraft.getInstance().options
@@ -134,7 +124,7 @@ object GardenCustomKeybinds {
     }
 
     private fun KeyMapping.isToggle(): Boolean =
-        this is ToggleKeyMapping && needsToggle.getAsBoolean()
+        this is ToggleKeyMapping && needsToggle.asBoolean
 
     private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
         key.value != override
@@ -159,7 +149,7 @@ object GardenCustomKeybinds {
         if (pressedToggleKeys[this] == override) return false
 
         pressedToggleKeys[this] = override
-        setDown(true)
+        isDown = true
         return true
     }
 
@@ -168,17 +158,12 @@ object GardenCustomKeybinds {
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
-    private fun isHoldingTool(): Boolean = InventoryUtils.getItemInHand()?.let { heldItem ->
-        val internalName = heldItem.getInternalName()
-
-        val wearingSunsGrasp = EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP
-
-        return internalName.isFarmingTool() ||
-            (config.mousemat && internalName == SQUEAKY_MOUSEMAT) ||
+    private fun isHoldingTool(): Boolean =
+        GardenApi.hasFarmingToolInHand() ||
+            (config.mousemat && GardenApi.hasMousematInHand()) ||
             (config.vacuum && PestApi.hasVacuumInHand()) ||
-            (config.fishingRod && internalName.isFishingRod()) ||
-            (config.sunsGrasp && wearingSunsGrasp && heldItem.isEmpty)
-    } ?: false
+            (config.fishingRod && FishingApi.holdingRod) ||
+            (config.sunsGrasp && GardenApi.hasActiveSunsGrasp())
 
     private fun isActive(): Boolean =
         isEnabled() &&

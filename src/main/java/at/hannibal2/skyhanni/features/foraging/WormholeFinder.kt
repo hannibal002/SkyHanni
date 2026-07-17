@@ -15,15 +15,14 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.entity.Display
@@ -66,12 +65,16 @@ object WormholeFinder {
             }
         } else {
             val last = lastPlayerPos
-            val isMoving = last != null && run { val d = playerPos - last; d.x * d.x + d.z * d.z > 0.25 }
+            val isMoving = last != null && run {
+                val d = playerPos - last
+                d.x * d.x + d.z * d.z > 0.25
+            }
             if (rawArrows.isNotEmpty() && !isMoving) currentTarget = null
         }
         lastPlayerPos = playerPos
     }
 
+    @Suppress("UnnecessarySafeCall")
     private fun Display.TextDisplay.arrowForwardVec(): LorenzVec {
         //~ if < 26.1 'leftRotation()' -> 'leftRotation'
         val quat = renderState()?.transformation()?.get(0f)?.leftRotation() ?: return LorenzVec(0, 0, 1)

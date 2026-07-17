@@ -81,45 +81,50 @@ object PestApi {
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
     val patternGroup = RepoPattern.group("garden.pests-api")
+
+    /**
+     * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
+     */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
     )
 
     /**
-     * REGEX-TEST:  §7⏣ §aPlot §7- §b22a
-     * REGEX-TEST:  §7⏣ §aThe Garden
+     * WRAPPED-REGEX-TEST: " §7 §aPlot §7- §b22a"
+     * WRAPPED-REGEX-TEST: " §7 §aThe Garden"
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.no-pests",
-        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
+        " §7. §a(?:The Garden|Plot §7- §b.+)$",
     )
 
     /**
-     * REGEX-TEST:    §aPlot §7- §b4 §4§lൠ§7 x1
+     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b4 §4§l§7 x1"
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
-     * REGEX-TEST:  §aPlot §7- §b3
+     * WRAPPED-REGEX-TEST: " §aPlot §7- §b3"
      */
     private val noPestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.no-pests",
         "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.{1,3})$",
     )
+
     /**
-     * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
+     * REGEX-TEST: §4§l §cThis plot has §25 §2 Pests§c!
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §.(?<amount>\\d+) §2ൠ Pests?§c!",
+        "§4§l §cThis plot has §.(?<amount>\\d+) §2 Pests?§c!",
     )
 
     /**
-     * REGEX-TEST:  Plots: 4, 12, 13, 18, 20
+     * WRAPPED-REGEX-TEST: " Plots: 4, 12, 13, 18, 20"
      */
     private val infestedPlotsTabListPattern by patternGroup.pattern(
         "tablist.infected-plots-no-color",
@@ -441,7 +446,7 @@ object PestApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Pests")
 
         if (!GardenApi.inGarden()) {

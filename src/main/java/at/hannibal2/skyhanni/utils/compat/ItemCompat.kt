@@ -11,12 +11,12 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import net.minecraft.world.item.TooltipFlag
 
-fun SafeItemStack.getTooltip(advanced: Boolean): MutableList<Component> {
+fun SafeItemStack.getTooltip(advanced: Boolean = false): MutableList<Component> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
     return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType)
 }
 
-fun SafeItemStack.getTooltipCompat(advanced: Boolean): MutableList<String> {
+fun SafeItemStack.getTooltipCompat(advanced: Boolean = false): MutableList<String> {
     val tooltipType = if (advanced) TooltipFlag.ADVANCED else TooltipFlag.NORMAL
     return this.getTooltipLines(Item.TooltipContext.EMPTY, Minecraft.getInstance().player, tooltipType).map { it.formattedTextCompat() }
         .toMutableList()

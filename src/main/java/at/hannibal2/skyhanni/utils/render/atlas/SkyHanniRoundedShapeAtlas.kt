@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.utils.render.atlas
 
-import net.minecraft.client.gui.navigation.ScreenRectangle
-import net.minecraft.client.gui.render.TextureSetup
-import net.minecraft.client.renderer.state.gui.BlitRenderState
-import net.minecraft.client.renderer.state.gui.GuiRenderState
-import net.minecraft.client.renderer.RenderPipelines
-import net.minecraft.resources.Identifier
-import org.joml.Matrix3x2f
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
+import net.minecraft.client.gui.navigation.ScreenRectangle
+import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.RenderPipelines
+import net.minecraft.client.renderer.state.gui.BlitRenderState
+import net.minecraft.client.renderer.state.gui.GuiRenderState
+import net.minecraft.resources.Identifier
+import org.joml.Matrix3x2f
 
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.shader.CircleShader
@@ -53,6 +53,7 @@ internal class SkyHanniRoundedShapeAtlas : SkyHanniAbstractAtlas<SkyHanniRounded
      * Pre-renders any new static [shapes] into atlas slots before the GUI render pass.
      * No-op on 26.1+, where all shapes use the deferred rendering path.
      */
+    @Suppress("UnusedParameter")
     fun preRenderShapes(shapes: List<SkyHanniRoundedShapeAtlasKey>) {
         //? if < 26.1 {
         /*if (shapes.isEmpty()) return
