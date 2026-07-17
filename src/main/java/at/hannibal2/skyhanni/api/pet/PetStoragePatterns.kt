@@ -124,7 +124,7 @@ internal object PetStoragePatterns {
     @Suppress("MaxLineLength")
     val autoPetMessagePattern by patternGroup.pattern(
         "autopet.message.formatted",
-       "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?:\\[(?:§.)*\\d+(?:§.)*(?<altskin>✦)(?:§.)*] (?:§.)*)?(?<pet>[^§!]+?)(?<skin>§. ✦)?§e! §a§lVIEW RULE(?: \\(\\d+\\))?"
+        "§cAutopet §eequipped your §7\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?:\\[(?:§.)*\\d+(?:§.)*(?<altskin>✦)(?:§.)*] (?:§.)*)?(?<pet>[^§!]+?)(?<skin>§. ✦)?§e! §a§lVIEW RULE(?: \\(\\d+\\))?"
     )
 
     /**
