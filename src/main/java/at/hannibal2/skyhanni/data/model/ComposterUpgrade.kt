@@ -14,6 +14,13 @@ enum class ComposterUpgrade(val displayName: String, val slotNumber: Int) {
 
         private fun regexValues() = entries.joinToString("|") { it.displayName }
 
+        /**
+         * REGEX-TEST: Composter Speed II
+         * REGEX-TEST: Multi Drop III
+         * REGEX-TEST: Fuel Cap I
+         * REGEX-TEST: Organic Matter Cap IV
+         * REGEX-TEST: Cost Reduction V
+         */
         val composterUpgradePattern by RepoPattern.pattern(
             "composter.upgrade",
             "(?<name>${regexValues()})(?: (?<level>.*))?",
