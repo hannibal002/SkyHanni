@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.features.bingo.card.goals.HiddenGoalData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -52,7 +53,7 @@ object BingoCardReader {
                 lore.any { it.endsWith("Community Goal") } -> GoalType.COMMUNITY
                 else -> continue
             }
-            val name = stack.hoverName.string.removeColor()
+            val name = stack.cleanName
             val builder = StringBuilder()
             for ((index, s) in lore.withIndex()) {
                 if (index > 1) {
