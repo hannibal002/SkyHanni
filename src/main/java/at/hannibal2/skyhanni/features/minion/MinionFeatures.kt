@@ -122,7 +122,7 @@ object MinionFeatures {
         "Minion [^➜]",
     )
     private val minionCollectItemPattern by patternGroup.pattern(
-        "item.collect",
+        "item.collect.colorless",
         "^Collect All$",
     )
 
