@@ -228,11 +228,13 @@ object HarvestFeastManager {
     private fun readCurrentActiveCrops(stacks: Map<Int, SafeItemStack>): List<CropType> {
         val filteredStacks = stacks.filterKeys { it in CURRENT_CROPS_SLOTS }
         val current = filteredStacks.mapNotNull { CropType.getByNameOrNull(it.value.hoverName.string.removeColor()) }
+        // Can happen when calling Ted when it's not harvest feast
+        if (current.isEmpty()) return emptyList()
 
         if (current.size != 4) {
             ErrorManager.logErrorStateWithData(
                 "Error reading current Harvest Feast crops.",
-                "current harvest feast crops not 3",
+                "current harvest feast crops not 4",
                 "current crops" to current,
             )
         }
