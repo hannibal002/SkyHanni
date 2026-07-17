@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.GardenApi.isSprayonator
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
@@ -44,6 +45,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,10 +56,14 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestApi {
 
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
+    private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
+    private val GROOVY_SPRAYONATOR = "GROOVY_SPRAYONATOR".toInternalName()
+
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+
     val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
-    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -73,10 +79,13 @@ object PestApi {
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
     var lastTimeLassoHeld = SimpleTimeMark.farPast()
 
+
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
-    fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
+
+    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, GROOVY_SPRAYONATOR)
+    fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 

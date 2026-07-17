@@ -69,6 +69,7 @@ import kotlin.time.Duration.Companion.minutes
 object GardenApi {
 
     private const val GARDEN_OVERFLOW_EXP = 10000
+
     private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
     val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
     val SUNS_GRASP = "SUNS_GRASP".toInternalName()
