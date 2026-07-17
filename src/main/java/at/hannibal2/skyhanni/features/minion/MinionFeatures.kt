@@ -98,6 +98,22 @@ object MinionFeatures {
     )
 
     /**
+     * REGEX-TEST: You picked up a minion!
+     */
+    private val minionPickupPattern by patternGroup.pattern(
+        "chat.pickup",
+        "You picked up a minion!",
+    )
+
+    /**
+     * REGEX-TEST: You placed a minion!
+     */
+    private val minionPlacePattern by patternGroup.pattern(
+        "chat.place",
+        "You placed a minion!",
+    )
+
+    /**
      * REGEX-TEST: Redstone Minion IV
      * REGEX-TEST: Chicken Minion XI
      */
@@ -107,7 +123,7 @@ object MinionFeatures {
     )
     private val minionCollectItemPattern by patternGroup.pattern(
         "item.collect",
-        "^§aCollect All$",
+        "^Collect All$",
     )
 
     /**
@@ -185,7 +201,7 @@ object MinionFeatures {
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (minionCollectItemPattern.matches(it.cleanName)) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -352,7 +368,6 @@ object MinionFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        // TODO use repo patterns
         val message = event.cleanMessage
         minionCoinPattern.matchMatcher(message) {
             if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
@@ -366,14 +381,14 @@ object MinionFeatures {
                 AchievementManager.updateTieredAchievement(MINION_COIN_ACHIEVEMENT, coins)
             }
         }
-        if (message.startsWith("You picked up a minion!") && lastMinion != null) {
+        if (minionPickupPattern.find(message) && lastMinion != null) {
             minions?.remove(lastMinion)
             lastClickedEntity = null
             lastMinion = null
             lastMinionOpened = 0L
         }
 
-        if (message.startsWith("You placed a minion!")) newMinion?.let {
+        if (minionPlacePattern.find(message)) newMinion?.let {
             minions?.put(
                 it,
                 ProfileSpecificStorage.MinionConfig().apply {
