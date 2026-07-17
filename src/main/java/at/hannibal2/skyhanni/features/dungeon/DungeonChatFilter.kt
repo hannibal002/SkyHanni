@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
+import java.util.regex.Pattern
 
 private typealias MessageTypes = ChatConfig.DungeonMessageTypes
 
@@ -175,32 +176,32 @@ object DungeonChatFilter {
         "You can no longer consume or splash any potions during the remainder of this Dungeon run!"
     )
 
-    private val patternMap = mapOf(
-        MessageTypes.PREPARE to preparePatterns,
-        MessageTypes.START to startPatterns,
-        MessageTypes.AMBIENCE to ambiencePatterns,
-        MessageTypes.PICKUP to pickupPatterns,
-        MessageTypes.REMINDER to reminderPatterns,
-        MessageTypes.BUFF to buffPatterns,
-        MessageTypes.NOT_POSSIBLE to notPossiblePatterns,
-        MessageTypes.DAMAGE to damagePatterns,
-        MessageTypes.ABILITY to abilityPatterns,
-        MessageTypes.PUZZLE to puzzlePatterns,
-        MessageTypes.END to endPatterns
-    )
+    private fun getPatterns(type: MessageTypes): List<Pattern> = when (type) {
+        PREPARE -> preparePatterns
+        START -> startPatterns
+        AMBIENCE -> ambiencePatterns
+        PICKUP -> pickupPatterns
+        REMINDER -> reminderPatterns
+        BUFF -> buffPatterns
+        NOT_POSSIBLE -> notPossiblePatterns
+        DAMAGE -> damagePatterns
+        ABILITY -> abilityPatterns
+        PUZZLE -> puzzlePatterns
+        END -> endPatterns
+    }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (config.dungeonFilteredMessageTypes.isEmpty()) return
-        val blockReason = block(event.cleanMessage)
-        if (blockReason.isNotEmpty()) event.blockedReason = "dungeon_$blockReason"
+        val blockReason = block(event.cleanMessage) ?: return
+        event.blockedReason = "dungeon_$blockReason"
     }
 
-    private fun block(message: String): String {
-        return MessageTypes.entries.firstOrNull { message.isFiltered(it) }?.blockReason ?: ""
+    private fun block(message: String): String? {
+        return MessageTypes.entries.firstOrNull { message.isFiltered(it) }?.blockReason
     }
 
     private fun String.isFiltered(key: MessageTypes): Boolean = config.dungeonFilteredMessageTypes.contains(key) && isPresent(key)
 
-    private fun String.isPresent(key: MessageTypes): Boolean = patternMap[key]?.any { it.matcher(this).matches() } == true
+    private fun String.isPresent(key: MessageTypes): Boolean = getPatterns(key).any { it.matcher(this).matches() }
 }
