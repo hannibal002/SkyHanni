@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
@@ -36,6 +37,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -49,6 +51,16 @@ object ChestValue {
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
+
+    /**
+     * REGEX-TEST: Personal Vault
+     * REGEX-TEST: Chest Storage
+     * REGEX-TEST: Wood Chest+
+     */
+    private val relevantChestValuePattern by RepoPattern.pattern(
+        "inventory.chestvalue.relevant",
+        "Personal Vault|Chest Storage|Wood Chest\\+"
+    )
 
     @HandleEvent
     fun onChestGuiRender() {
@@ -243,8 +255,7 @@ object ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
-        // TODO: Use repo for this
-        return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
+        return InventoryUtils.isInNormalChest() || inMinion || relevantChestValuePattern.matches(name)
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
