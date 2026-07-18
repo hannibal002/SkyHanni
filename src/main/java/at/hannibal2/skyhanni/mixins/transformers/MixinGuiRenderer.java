@@ -36,14 +36,14 @@ public abstract class MixinGuiRenderer {
         at = @At("HEAD")
     )
     public void computeChromaBufferSlice(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
+        Supplier<String> label,
+        RenderTarget mainRenderTarget,
         GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
+        GpuBufferSlice dynamicTransforms,
         GpuBuffer indexBuffer,
         VertexFormat.IndexType indexType,
-        int from,
-        int _to,
+        int startIndex,
+        int endIndex,
         CallbackInfo ci
     ) {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
@@ -59,20 +59,23 @@ public abstract class MixinGuiRenderer {
         )
     )
     public void insertChromaSetUniform(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
+        Supplier<String> label,
+        RenderTarget mainRenderTarget,
         GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
+        GpuBufferSlice dynamicTransforms,
         GpuBuffer indexBuffer,
         VertexFormat.IndexType indexType,
-        int from, int _to, CallbackInfo ci,
-        @Local RenderPass renderPass) {
+        int startIndex,
+        int endIndex,
+        CallbackInfo ci,
+        @Local RenderPass renderPass
+    ) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
 
     @WrapOperation(
         method = "addElementToMesh",
-        //~ if < 26.1 'renderer/state/gui/' -> 'gui/render/state/'
+        //~ if < 26.1 'renderer/state/gui' -> 'gui/render/state'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
