@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.garden
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade.entries
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +25,7 @@ object ComposterUpgradesData {
         "composter.upgrade.name",
         "(?<name>${regexValues()})(?: (?<level>.*))?",
     )
-    private fun regexValues() = entries.joinToString("|") { it.displayName }
+    private fun regexValues() = ComposterUpgrade.entries.joinToString("|") { it.displayName }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
