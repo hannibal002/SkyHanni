@@ -7,8 +7,10 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.experiments.TableSuperpairDataUpdatedEvent
 import at.hannibal2.skyhanni.events.experiments.TableTaskStartedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -147,7 +149,7 @@ object ExperimentationSuperpairApi {
     private fun SafeItemStack.isHiddenCard() =
         unknownSuperpairsClickPattern.matches(hoverName.formattedTextCompatLeadingWhiteLessResets())
 
-    private fun SafeItemStack.isPowerup() = getLore().any { powerupLorePattern.matches(it.removeColor()) }
+    private fun SafeItemStack.isPowerup() = powerupLorePattern.anyMatches(getLore())
 
     private fun SafeItemStack.toSuperpairItem(slot: Int) = SuperpairItem(slot, convertToReward(), DyeCompat.toDamage(this))
 
@@ -155,7 +157,7 @@ object ExperimentationSuperpairApi {
         guardianPetInternalNamePattern.matches(getInternalNameOrNull()?.asString().orEmpty()) ->
             hoverName.formattedTextCompatLeadingWhiteLessResets().split("] ")[1]
 
-        hoverName.string.removeColor() == "Enchanted Book" -> getLore().getOrNull(2)?.removeColor() ?: "Enchanted Book"
-        else -> hoverName.string.removeColor()
+        cleanName == "Enchanted Book" -> getLore().getOrNull(2)?.removeColor() ?: "Enchanted Book"
+        else -> cleanName
     }
 }
