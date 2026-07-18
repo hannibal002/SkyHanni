@@ -17,37 +17,37 @@ object HideMobNames {
 
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<Int>()
-    private val patterns = mutableListOf<Pattern>()
 
-    init {
-        // TODO USE SH-REPO
-        addMobToHide("Zombie")
-        addMobToHide("Zombie Villager")
-        addMobToHide("Crypt Ghoul")
-        addMobToHide("Graveyard Zombie")
+    enum class HideNameBossType(bossName: String) {
+        ZOMBIE("Zombie"),
+        ZOMBIE_VILLAGER("Zombie Villager"),
+        CRYPT_GHOUL("Crypt Ghoul"),
+        GRAVEYARD_ZOMBIE("Graveyard Zombie"),
 
-        addMobToHide("Dasher Spider")
-        addMobToHide("Weaver Spider")
-        addMobToHide("Splitter Spider")
-        addMobToHide("Voracious Spider")
-        addMobToHide("Silverfish")
+        DASHER_SPIDER("Dasher Spider"),
+        WEAVER_SPIDER("Weaver Spider"),
+        SPLITTER_SPIDER("Splitter Spider"),
+        VORACIOUS_SPIDER("Voracious Spider"),
+        SILVERFISH("Silverfish"),
 
-        addMobToHide("Wolf")
-        addMobToHide("Howling Spirit")
-        addMobToHide("Pack Spirit")
+        WOLF("Wolf"),
+        HOWLING_SPIRIT("Howling Spirit"),
+        PACK_SPIRIT("Pack Spirit"),
 
-        addMobToHide("Enderman")
-        addMobToHide("Voidling Fanatic")
+        ENDERMAN("Enderman"),
+        VOIDLING_FANATIC("Voidling Fanatic"),
 
-        addMobToHide("Blaze") // 1.2m
-        addMobToHide("Mutated Blaze") // 1.5m
-        addMobToHide("Bezal") // 2m
-        addMobToHide("Smoldering Blaze") // 5.5m
-        addMobToHide("Flaming Spider") // 5.5m
-    }
+        BLAZE("Blaze"),
+        MUTATED_BLAZE("Mutated Blaze"),
+        BEZAL("Bezal"),
+        SMOLDERING_BLAZE("Smoldering Blaze"),
+        FLAMING_SPIDER("Flaming Spider");
 
-    private fun addMobToHide(bossName: String) {
-        patterns.add("\\[Lv\\d+] (?<mobType>([✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? $bossName ae](?<min>.+)/(?<max>.+)❤".toPattern())
+        private val patternName = bossName.lowercase().replace(" ", "-")
+        val pattern by RepoPattern.pattern(
+            "slayer.mobname.$patternName",
+            "\\[Lv\\d+] (?<mobType>([✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? $bossName ae](?<min>.+)/(?<max>.+)❤",
+        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -82,7 +82,8 @@ object HideMobNames {
     }
 
     private fun shouldNameBeHidden(name: String): Boolean {
-        for (pattern in patterns) {
+        for (mob in HideNameBossType.entries) {
+            val pattern = mob.pattern
             pattern.matchMatcher(name) {
                 val min = group("min")
                 val max = group("max")
