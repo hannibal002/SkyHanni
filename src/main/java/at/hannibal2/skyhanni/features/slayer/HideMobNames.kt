@@ -18,7 +18,7 @@ object HideMobNames {
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<Int>()
 
-    enum class HideNameBossType(bossName: String) {
+    private enum class HideNameBossType(bossName: String) {
         ZOMBIE("Zombie"),
         ZOMBIE_VILLAGER("Zombie Villager"),
         CRYPT_GHOUL("Crypt Ghoul"),
