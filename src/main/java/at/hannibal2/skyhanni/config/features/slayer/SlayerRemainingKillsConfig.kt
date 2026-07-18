@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyDebug
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -33,6 +34,12 @@ class SlayerRemainingKillsConfig {
     @ConfigOption(name = "Show Health", desc = "Include the mob Health in the display.")
     @ConfigEditorBoolean
     var includeMobHealth: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Debug", desc = "Enables Extra Debug messages for Remaining Slayer Kills.")
+    @ConfigEditorBoolean
+    @OnlyDebug
+    var remainingKillsDebug: Boolean = false
 
     @Expose
     @ConfigLink(owner = SlayerRemainingKillsConfig::class, field = "display")

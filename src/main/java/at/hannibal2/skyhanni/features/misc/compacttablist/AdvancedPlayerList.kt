@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.flow.merge
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -167,7 +166,7 @@ object AdvancedPlayerList {
     }
 
     fun ignoreCustomTabList(): Boolean {
-        val denyKeyPressed = SkyHanniMod.feature.dev.debug.bypassAdvancedPlayerTabList.isKeyHeld()
+        val denyKeyPressed = config.bypassAdvancedPlayerTabList.isKeyHeld()
         return GlobalRender.renderDisabled || denyKeyPressed
     }
 

@@ -63,7 +63,7 @@ object QuickModMenuSwitch {
         if (latestGuiPath != openGui) {
             latestGuiPath = openGui
 
-            if (SkyHanniMod.feature.dev.debug.modMenuLog) {
+            if (config.modMenuLog) {
                 ChatUtils.debug("Open GUI: $latestGuiPath")
             }
         }
@@ -149,10 +149,5 @@ object QuickModMenuSwitch {
         DrawContextUtils.pushPop {
             config.pos.renderRenderables(display, posLabel = "Quick Mod Menu Switch")
         }
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "dev.modMenuLog", "dev.debug.modMenuLog")
     }
 }

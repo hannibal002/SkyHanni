@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.config.features.event
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyDebug
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class GreatSpookConfig {
     @Expose
@@ -53,4 +55,10 @@ class GreatSpookConfig {
     @Accordion
     @Expose
     val primalFearSolver: PrimalFearSolverConfig = PrimalFearSolverConfig()
+
+    @Expose
+    @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
+    @ConfigEditorBoolean
+    @OnlyDebug
+    val forceGreatSpook: Property<Boolean> = Property.of(false)
 }

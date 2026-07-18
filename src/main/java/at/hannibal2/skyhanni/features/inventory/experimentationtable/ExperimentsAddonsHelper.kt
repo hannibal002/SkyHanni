@@ -44,7 +44,6 @@ object ExperimentsAddonsHelper {
     private const val ROUND_STATUS_SLOT = 4
     private const val PHASE_STATUS_SLOT = 49
 
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable.addons
     private val hypixelChronomatronData: MutableList<LorenzColor> = mutableListOf()
     private val userChronomatronProgress: MutableList<LorenzColor> = mutableListOf()
@@ -335,7 +334,7 @@ object ExperimentsAddonsHelper {
     init {
         RenderDisplayHelper(
             inventory = ExperimentationTableApi.experimentationTableInventory,
-            condition = { ExperimentationTableApi.inAddon && debugConfig.addonsDebug },
+            condition = { ExperimentationTableApi.inAddon && config.addonsDebug },
             onlyOnIsland = IslandType.PRIVATE_ISLAND,
             onRender = {
                 val renderable = Renderable.vertical {
@@ -360,7 +359,7 @@ object ExperimentsAddonsHelper {
                         addString("Dye Map: $ultrasequencerDyeMap")
                     } else return@vertical
                 }
-                debugConfig.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
+                config.addonsDebugPosition.renderRenderable(renderable, posLabel = "Addons Debug")
             },
         )
     }

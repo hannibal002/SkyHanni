@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.slayer
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
@@ -47,7 +46,6 @@ import kotlin.time.Duration.Companion.minutes
 object RemainingSlayerKills {
 
     private val config get() = SlayerApi.config.slayerRemainingKills
-    private val debugToggle get() = SkyHanniMod.feature.dev.debug.remainingKillsDebug
 
     private val patternGroup = RepoPattern.group("slayer.remaining-kills")
 
@@ -344,7 +342,7 @@ object RemainingSlayerKills {
     }
 
     private fun debugMessage(message: String) {
-        if (debugToggle) ChatUtils.debug(message)
+        if (config.remainingKillsDebug) ChatUtils.debug(message)
     }
 
     private fun remindToUpdateCombatWisdom() {

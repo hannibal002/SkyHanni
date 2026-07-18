@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.misc
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyDebug
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -26,6 +27,16 @@ class QuickModMenuSwitchConfig {
     )
     @ConfigEditorBoolean
     var insidePlayerInventory: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Mod Menu Log",
+        desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
+            "Useful for adding more mods to quick mod menu switch.",
+    )
+    @ConfigEditorBoolean
+    @OnlyDebug
+    var modMenuLog: Boolean = false
 
     @Expose
     @ConfigLink(owner = QuickModMenuSwitchConfig::class, field = "enabled")

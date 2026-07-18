@@ -1,16 +1,19 @@
 package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyDebug
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.dev.DebugConfig
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
 class ExperimentsAddonsConfig {
-
     @Expose
     @ConfigOption(
         name = "Enabled",
@@ -56,4 +59,14 @@ class ExperimentsAddonsConfig {
     @FeatureToggle
     var maxSequenceAlert: Boolean = true
 
+    @Expose
+    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
+    @ConfigEditorBoolean
+    @OnlyDebug
+    var addonsDebug: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
+    @OnlyDebug
+    val addonsDebugPosition: Position = Position(300, 300)
 }

@@ -111,7 +111,7 @@ object TheGreatSpook {
 
     @HandleEvent
     fun onConfigLoad() {
-        val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
+        val config = config.forceGreatSpook
         config.afterChange {
             if (config.get()) {
                 isGreatSpookActive = true
@@ -217,7 +217,7 @@ object TheGreatSpook {
         val endTime = data["end_time"] ?: SimpleTimeMark.farPast()
 
         greatSpookTimeRange = startTime..endTime
-        greatSpookEndTime = if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
+        greatSpookEndTime = if (config.forceGreatSpook.get()) SimpleTimeMark.farFuture() else endTime
     }
 
     @HandleEvent

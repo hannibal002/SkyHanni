@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.config.features.misc.compacttablist
 
+import at.hannibal2.skyhanni.config.OnlyDebug
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import org.lwjgl.glfw.GLFW
 
 class AdvancedPlayerListConfig {
     @Expose
@@ -81,4 +84,13 @@ class AdvancedPlayerListConfig {
     )
     @ConfigEditorBoolean
     var markSpecialPersons: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Bypass Advanced Tab List",
+        desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
+    )
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    @OnlyDebug
+    var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
 }

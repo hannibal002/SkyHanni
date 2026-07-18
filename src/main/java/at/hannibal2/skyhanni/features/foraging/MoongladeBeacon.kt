@@ -57,7 +57,6 @@ import kotlin.time.times
 object MoongladeBeacon {
 
     private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
     // <editor-fold desc="Enums & Enum Helpers">
     /**
@@ -234,7 +233,7 @@ object MoongladeBeacon {
 
     @HandleEvent
     fun onTick() {
-        if (!debugConfig.moongladeBeacon || nextDevUpdate.isInFuture()) return
+        if (!config.extraDebugInfo || nextDevUpdate.isInFuture()) return
         display = drawDisplay()
         nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
@@ -567,7 +566,7 @@ object MoongladeBeacon {
             appendLine(" §7Ref Speed: §a${speedPair.reference.formatOrDefault("§eCalculating..")}")
             appendLine(" §7Ref Pitch: §a${pitchPair.reference.formatOrDefault()}")
 
-            if (debugConfig.moongladeBeacon) {
+            if (config.extraDebugInfo) {
                 appendLine("  §8Our Color: ${colorPair.ours.formatOrDefault()}")
                 appendLine("  §8Our Speed: §a${speedPair.ours.formatOrDefault()}")
                 appendLine("  §8Our Pitch: §a${pitchPair.ours.formatOrDefault()}")

@@ -29,15 +29,6 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(
-        name = "Mod Menu Log",
-        desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
-            "Useful for adding more mods to quick mod menu switch.",
-    )
-    @ConfigEditorBoolean
-    var modMenuLog: Boolean = false
-
-    @Expose
-    @ConfigOption(
         name = "ApiUtils Never Silent",
         desc = "Forces ApiUtils' `silentError` to always be false, so that errors always debug to ErrorManager.",
     )
@@ -185,14 +176,6 @@ class DebugConfig {
     var eventCounter: Boolean = false
 
     @Expose
-    @ConfigOption(
-        name = "Bypass Advanced Tab List",
-        desc = "The Advanced Player Tab list is disabled while pressing this hotkey.",
-    )
-    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var bypassAdvancedPlayerTabList: Int = GLFW.GLFW_KEY_UNKNOWN
-
-    @Expose
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
     @ConfigEditorBoolean
     var oreEventMessages: Boolean = false
@@ -231,30 +214,6 @@ class DebugConfig {
     @ConfigOption(name = "Always Hoppity's", desc = "Always act as if Hoppity's Hunt is active.")
     @ConfigEditorBoolean
     var alwaysHoppitys: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Always Great Spook", desc = "Assumes the Great Spook is always active.")
-    @ConfigEditorBoolean
-    val forceGreatSpook: Property<Boolean> = Property.of(false)
-
-    @Expose
-    @ConfigOption(name = "Moonglade Beacon", desc = "Add more debug information to the beacon solver.")
-    @ConfigEditorBoolean
-    var moongladeBeacon: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Addons Debug", desc = "Enable extra Superpairs Addons debug info.")
-    @ConfigEditorBoolean
-    var addonsDebug: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
-    val addonsDebugPosition: Position = Position(300, 300)
-
-    @Expose
-    @ConfigOption(name = "Remaining Kills Debug", desc = "Enables Extra Debug messages for Remaining Slayer Kills.")
-    @ConfigEditorBoolean
-    var remainingKillsDebug: Boolean = false
 
     @Expose
     @ConfigOption(name = "Track Sound", desc = "")

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.foraging
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.OnlyDebug
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -32,7 +33,12 @@ class MoongladeBeaconConfig {
     var beaconAlert: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Beacon Debug Info", desc = "Add more debug information to the beacon solver.")
+    @ConfigEditorBoolean
+    @OnlyDebug
+    var extraDebugInfo: Boolean = false
+
+    @Expose
     @ConfigLink(owner = MoongladeBeaconConfig::class, field = "enabled")
     val displayPosition: Position = Position(-300, 140)
-
 }
