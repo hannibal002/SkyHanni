@@ -3,17 +3,17 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.compat.ReiCompat;
 import at.hannibal2.skyhanni.events.minecraft.CharEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent;
-import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent;
+import at.hannibal2.skyhanni.events.minecraft.KeyUpEvent;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.input.CharacterEvent;
-import net.minecraft.client.input.KeyEvent;
 
 @Mixin(KeyboardHandler.class)
 public class MixinKeyboardHandler {
@@ -25,7 +25,7 @@ public class MixinKeyboardHandler {
         if (key == GLFW.GLFW_KEY_UNKNOWN) return;
         //System.out.println("Key: " + key + " Scancode: " + scancode + " Action: " + action + " Modifiers: " + modifiers);
 
-        // don't send key events if REI search bar is selected
+        // Don't send key events if REI search bar is selected
         if (ReiCompat.searchHasFocus()) return;
 
         /*
@@ -39,7 +39,7 @@ public class MixinKeyboardHandler {
          * modifiers = 2: Control
          * modifiers = 4: Alt
          */
-        // TODO on 1.8 it first checks TextInput.isActive() before posting, however im not sure if this is needed
+        // TODO on 1.8 it first checks TextInput.isActive() before posting, however I'm not sure if this is needed
         //  and as of now that file would need to be recoded to work with 1.21 so it hasn't been put here
         //  there is also an onChar method we could mixin to and use for typing fields and replace TextInput.isActive()
         //  with that somehow
@@ -48,7 +48,7 @@ public class MixinKeyboardHandler {
         if (action == 0) new KeyUpEvent(key).post();
         if (action == 1) {
             new KeyDownEvent(key).post();
-            // on 1.21 it takes like 1 full second before the key press event will get posted so im doing it here
+            // On 1.21 it takes like 1 full second before the key press event will get posted so we're doing it here
             new KeyPressEvent(key).post();
         }
         if (action == 2) new KeyPressEvent(key).post();

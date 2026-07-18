@@ -3,20 +3,29 @@ package at.hannibal2.skyhanni.events.minecraft
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import com.mojang.blaze3d.vertex.PoseStack
-//~ if < 26.1 'renderer.state.level.CameraRenderState' -> 'Camera'
-import net.minecraft.client.renderer.state.level.CameraRenderState
+import net.minecraft.world.phys.Vec3
+import org.joml.Quaternionf
 
 //? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeStorage
-//? } else {
+//?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource
+*///?}
+
+//? if >= 26.1 {
+import net.minecraft.client.renderer.state.level.CameraRenderState
+//?} else {
+/*import net.minecraft.client.Camera
 *///?}
 
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
-    //~ if < 26.1 'CameraRenderState' -> 'Camera'
+    //? if >= 26.1 {
     val cameraState: CameraRenderState,
+    //?} else {
+    /*camera: Camera,
+    *///?}
     //? if >= 26.2 {
     val submitNodeStorage: SubmitNodeStorage,
     //?} else {
@@ -26,8 +35,21 @@ class SkyHanniRenderWorldEvent(
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent() {
 
-    val camera get() = cameraState
+    val cameraPos: Vec3 =
+        //? if >= 26.1 {
+        cameraState.pos
+        //?} else {
+        /*camera.position
+        *///?}
 
-    //? if >= 26.2
+    val cameraRotation: Quaternionf =
+        //? if >= 26.1 {
+        cameraState.orientation
+        //?} else {
+        /*camera.rotation()
+        *///?}
+
+    //? if >= 26.2 {
     internal var skyHanniTextSubmitOrder = 0
+    //?}
 }

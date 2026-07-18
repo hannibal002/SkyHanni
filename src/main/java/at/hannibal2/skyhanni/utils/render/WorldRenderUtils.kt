@@ -29,7 +29,6 @@ import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
-import net.minecraft.util.FormattedCharSequence
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
@@ -39,23 +38,22 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if < 26.2
-//import org.joml.Matrix4f
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.compat.position
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.utils.compat.rotation
+//? if >= 26.2 {
+import net.minecraft.util.FormattedCharSequence
+//?} else {
+/*import org.joml.Matrix4f
 *///?}
-//?}
 
+// TODO refactor
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
     //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.2
+    //? if >= 26.2 {
     private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
+    //?}
 
     private fun getDisplayMode(seeThrough: Boolean) =
         if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
@@ -114,13 +112,14 @@ object WorldRenderUtils {
         rgb: Int,
     ) {
         matrices.pushPose()
-        matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
+        matrices.translate(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //? if >= 26.2
+            //? if >= 26.2 {
             submitNodeStorage,
-            //? if < 26.2
-            //Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
+            //?} else {
+            /*Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
+            *///?}
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -311,7 +310,6 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -344,7 +342,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
+        ).rotate(cameraRotation)
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -391,7 +389,6 @@ object WorldRenderUtils {
             return
         }
 
-        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -424,7 +421,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(camera.rotation())
+        ).rotate(cameraRotation)
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -1086,13 +1083,8 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        //? if >= 26.1 {
-        val look = Vector3f(0f, 0f, -1f).rotate(cameraState.orientation)
-        return cameraState.pos.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-        //?} else {
-        /*val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
-        return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-        *///?}
+        val look = Vector3f(0f, 0f, -1f).rotate(cameraRotation)
+        return cameraPos.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
@@ -1188,6 +1180,8 @@ object WorldRenderUtils {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
     }
 
-    // returns true if the camera is underwater
+    /**
+     * Returns true if the camera is underwater.
+     */
     fun isRenderingUnderwater() = Minecraft.getInstance().gameRenderer.mainCamera().fluidInCamera == FogType.WATER
 }

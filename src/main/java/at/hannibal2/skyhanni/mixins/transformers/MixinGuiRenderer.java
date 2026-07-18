@@ -27,8 +27,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 import java.util.function.Supplier;
 
-//? if < 26.2
-//import net.minecraft.client.renderer.MultiBufferSource;
+//? if < 26.2 {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
 
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
@@ -74,46 +75,60 @@ public abstract class MixinGuiRenderer {
         at = @At("HEAD")
     )
     public void computeChromaBufferSlice(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
+        Supplier<String> label,
+        RenderTarget mainRenderTarget,
         GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
+        GpuBufferSlice dynamicTransforms,
         GpuBuffer indexBuffer,
         VertexFormat.IndexType indexType,
-        int from,
-        int _to,
+        int startIndex,
+        int endIndex,
         CallbackInfo ci
     ) {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1, shift = At.Shift.AFTER))
+    @Inject(
+        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
+            ordinal = 1,
+            shift = At.Shift.AFTER
+        )
+    )
     public void insertChromaSetUniform(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
+        Supplier<String> label,
+        RenderTarget mainRenderTarget,
         GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
+        GpuBufferSlice dynamicTransforms,
         GpuBuffer indexBuffer,
         VertexFormat.IndexType indexType,
-        int from, int _to, CallbackInfo ci,
-        @Local RenderPass renderPass) {
+        int startIndex,
+        int endIndex,
+        CallbackInfo ci,
+        @Local RenderPass renderPass
+    ) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
     *///?}
 
     @WrapOperation(
         method = "addElementToMesh",
-        //~ if < 26.1 'renderer/state/gui/' -> 'gui/render/state/'
+        //~ if < 26.1 'renderer/state/gui' -> 'gui/render/state'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/state/gui/GuiElementRenderState;pipeline()Lcom/mojang/blaze3d/pipeline/RenderPipeline;")
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    //~ if < 26.1 'Unique' -> 'Shadow'
+    //? if >= 26.1 {
     @Unique
-    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
     private int skyhanni$frameNumber;
+    //?} else {
+    /*@Shadow
+    private int frameNumber;
+    *///?}
 
     //? if >= 26.1 {
     @Inject(method = "render", at = @At("HEAD"))
@@ -147,8 +162,9 @@ public abstract class MixinGuiRenderer {
     private void skyhanni$preRenderAtlas(CallbackInfo ci) {
         GuiRendererHook.INSTANCE.preRenderAtlas(
             pictureInPictureRenderers,
-            //? if < 26.2
-            //bufferSource,
+            //? if < 26.2 {
+            /*bufferSource,
+            *///?}
             featureRenderDispatcher,
             //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
@@ -172,5 +188,4 @@ public abstract class MixinGuiRenderer {
             skyhanni$frameNumber
         );
     }
-
 }

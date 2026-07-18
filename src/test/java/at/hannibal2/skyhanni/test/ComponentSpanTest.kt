@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import java.util.regex.Pattern
 
 class ComponentSpanTest {
+
     private val redColor = TextColor.fromLegacyFormat(ChatFormatting.RED)!!.value
 
     @Test
@@ -85,5 +86,4 @@ class ComponentSpanTest {
             assertNull(component("skin") ?: component("altskin"))
         }
     }
-
 }

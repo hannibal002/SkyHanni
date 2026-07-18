@@ -8,10 +8,11 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.renderer.RenderPipelines
 import java.util.OptionalDouble
 
-//? if >= 26.2
+//? if >= 26.2 {
 import java.util.Optional
-//? else
-//import java.util.OptionalInt
+//?} else {
+/*import java.util.OptionalInt
+*///?}
 
 object RenderCompat {
 
@@ -30,8 +31,9 @@ object RenderCompat {
             0,
             indices,
             1,
-            //? if >= 26.2
+            //? if >= 26.2 {
             0,
+            //?}
         )
     }
 

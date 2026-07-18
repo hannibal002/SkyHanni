@@ -1,6 +1,6 @@
-//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.mixins.hooks.FluidModelTransparencyOverride;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.platform.Transparency;

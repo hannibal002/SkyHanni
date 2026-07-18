@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import net.minecraft.client.Minecraft
+
 //? if >= 26.2 {
+import at.hannibal2.skyhanni.SkyHanniMod
+import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.pipeline.RenderPipeline
@@ -18,16 +21,11 @@ import net.minecraft.resources.Identifier
 /*import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
-*///?}
-//? if < 26.2 {
-/*import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.blaze3d.textures.TextureFormat
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 *///?}
-import net.minecraft.client.Minecraft
-
-//~ if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
-import com.mojang.blaze3d.GpuFormat
 
 // The idea and implementation for this class was inspired by Skyblocker. This implementation has
 // been modified from the original Skyblocker code to work across multiple versions.

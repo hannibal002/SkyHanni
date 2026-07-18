@@ -65,8 +65,11 @@ public abstract class MixinLevelRenderer {
     *///?}
 
     @Unique
-    //~ if < 26.1 'CameraRenderState ' -> 'Camera '
+    //? if >= 26.1 {
     CameraRenderState skyhanni$currentCameraState;
+    //?} else {
+    /*Camera skyhanni$currentCamera;
+    *///?}
 
     @Unique
     DeltaTracker skyhanni$currentDeltaTracker;
@@ -77,23 +80,28 @@ public abstract class MixinLevelRenderer {
         GraphicsResourceAllocator resourceAllocator,
         DeltaTracker deltaTracker,
         boolean renderOutline,
-        //~ if < 26.1 'CameraRenderState' -> 'Camera'
-        CameraRenderState cameraState,
         //? if >= 26.1 {
+        CameraRenderState cameraState,
         Matrix4fc modelViewMatrix,
         //?} else {
-        /*Matrix4f positionMatrix,
+        /*Camera camera,
+        Matrix4f positionMatrix,
         Matrix4f matrix4f,
         Matrix4f projectionMatrix,
         *///?}
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
-        //? if = 26.1
+        //? if = 26.1 {
         //ChunkSectionsToRender chunkSectionsToRender,
+        //?}
         CallbackInfo ci
     ) {
+        //? if >= 26.1 {
         skyhanni$currentCameraState = cameraState;
+        //?} else {
+        //skyhanni$currentCamera = camera;
+        //?}
         skyhanni$currentDeltaTracker = deltaTracker;
     }
 
@@ -128,8 +136,7 @@ public abstract class MixinLevelRenderer {
     //?}
 
     //? if < 26.2 {
-    /*
-    @WrapOperation(
+    /*@WrapOperation(
         method = "lambda$addMainPass$0",
         slice = @Slice(
             from = @At(
@@ -155,11 +162,13 @@ public abstract class MixinLevelRenderer {
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             new PoseStack(),
+            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             skyhanni$currentCameraState,
-            //? if >= 26.2
+            //? if >= 26.2 {
             submitNodeStorage,
-            //? else
-            //renderBuffers.bufferSource(),
+            //?} else {
+            /^renderBuffers.bufferSource(),
+            ^///?}
             skyhanni$currentDeltaTracker.getGameTimeDeltaPartialTick(true),
             true
         );
@@ -171,10 +180,11 @@ public abstract class MixinLevelRenderer {
         method = "lambda$addMainPass$0",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.2
+            //? if >= 26.2 {
             target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V",
-            //? else
-            //target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
+            //?} else {
+            /*target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
+            *///?}
             ordinal = 0,
             shift = At.Shift.AFTER
         )

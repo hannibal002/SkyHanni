@@ -30,6 +30,7 @@ class ChromaRenderLayer(
         RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT()).withTexture("Sampler0", texture)
     }.createRenderSetup(),
 ) {
+
     override fun draw(buffer: MeshData) {
         val renderPipeline = this.state.pipeline
         val matrix4fStack = RenderSystem.getModelViewStack()

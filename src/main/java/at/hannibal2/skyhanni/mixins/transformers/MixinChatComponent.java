@@ -9,12 +9,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
-//? if < 26.1 {
-/*import net.minecraft.client.GuiMessage;
-import net.minecraft.util.FormattedCharSequence;
-*///?}
-//? if >= 26.1
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
@@ -28,10 +22,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
 
-//? if >= 26.2
+//? if >= 26.2 {
 import net.minecraft.client.gui.Hud;
-//? else
-//import net.minecraft.client.gui.Gui;
+//?} else {
+/*import net.minecraft.client.gui.Gui;
+*///?}
+
+//? if >= 26.1 {
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+//?} else {
+/*import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.util.FormattedCharSequence;
+*///?}
 
 @Mixin(ChatComponent.class)
 public abstract class MixinChatComponent {
@@ -95,13 +97,16 @@ public abstract class MixinChatComponent {
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
 
-    //~ if < 26.1 'addMessage' -> 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V'
-    @Inject(method = "addMessage", at = @At("HEAD"))
+    @Inject(
+        method = "addMessage"/*? if < 26.1 {*/ /*+ "(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"*//*?}*/,
+        at = @At("HEAD")
+    )
     private void setChatLine(
         Component contents,
         MessageSignature signature,
-        //? if >= 26.1
+        //? if >= 26.1 {
         GuiMessageSource source,
+        //?}
         GuiMessageTag tag,
         CallbackInfo ci
     ) {
@@ -116,7 +121,7 @@ public abstract class MixinChatComponent {
             target = "net/minecraft/client/GuiMessage$Line"
         )
     )
-    private GuiMessage.Line addMessageId(
+    private GuiMessage.Line addParent(
         int addedTime,
         FormattedCharSequence content,
         GuiMessageTag tag,
@@ -125,7 +130,7 @@ public abstract class MixinChatComponent {
         GuiMessage message
     ) {
         GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
-        line.skyhanni$setMessageId(message.skyhanni$getMessageId());
+        line.skyhanni$setParent(message);
         return line;
     }
     *///?}

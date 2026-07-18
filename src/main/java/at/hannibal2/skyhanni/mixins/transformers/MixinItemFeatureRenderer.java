@@ -27,78 +27,20 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
+    //? if >= 26.2 {
     @WrapOperation(
-        //? if >= 26.2 {
         method = "prepareOutlineSubmit",
-        //?} else {
-        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        *///?}
-        //~ if < 26.2 'com/mojang/blaze3d/vertex/QuadInstance' -> 'net/minecraft/client/renderer/OutlineBufferSource'
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
-        //~ if < 26.2 'QuadInstance' -> 'OutlineBufferSource'
         QuadInstance instance,
         int color,
         Operation<Void> original,
-        //~ if < 26.1 '"submit"' -> '"itemSubmit"'
-        @Local(
-            //? if >= 26.1
-            argsOnly = true,
-            //~ if < 26.1 'submit' -> 'itemSubmit'
-            name = "submit"
-        ) ItemFeatureRenderer.Submit submit
+        @Local(argsOnly = true, name = "submit") ItemFeatureRenderer.Submit submit
     ) {
-        boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
-
-        //? if < 26.2 {
-        /*if (hasCustomOutline) {
-            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
-            return;
-        }
-        *///?}
         original.call(instance, color);
     }
-
-    @WrapOperation(
-        //? if >= 26.2
-        method = "prepareOutlineSubmit",
-        //? else
-        //method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        at = @At(
-            value = "INVOKE",
-            //? if >= 26.2
-            target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-            //? else
-            //target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-        )
-    )
-    private VertexConsumer wrapOutlineVertexConsumer(
-        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
-        ItemFeatureRenderer instance,
-        RenderType renderType,
-        Operation<VertexConsumer> original,
-        /*? if < 26.2 {*//*@Local(argsOnly = true, name = "submit") *//*?}*/ItemFeatureRenderer.Submit submit
-    ) {
-        boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
-
-        //? if < 26.2 {
-        /*if (hasCustomOutline) {
-            return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
-        }
-        *///?}
-        //? if >= 26.2 {
-        if (hasCustomOutline) {
-            SkyHanniOutlineHook.beginCustomOutlineBuild();
-            try {
-                return original.call(instance, renderType);
-            } finally {
-                SkyHanniOutlineHook.finishCustomOutlineBuild();
-            }
-        }
-        //?}
-        return original.call(instance, renderType);
-    }
+    //?}
 
     //? if >= 26.1 {
     @ModifyArg(
@@ -133,4 +75,40 @@ public abstract class MixinItemFeatureRenderer {
         return RenderTypes.glintTranslucent();
     }
     //?}
+
+    @WrapOperation(
+        //? if >= 26.2 {
+        method = "prepareOutlineSubmit",
+        //?} else {
+        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        *///?}
+        at = @At(
+            value = "INVOKE",
+            //? if >= 26.2 {
+            target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
+            //?} else {
+            /*target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
+            *///?}
+        )
+    )
+    private VertexConsumer wrapOutlineVertexConsumer(
+        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
+        ItemFeatureRenderer instance,
+        RenderType renderType,
+        Operation<VertexConsumer> original,
+        /*? if < 26.2 {*//*@Local(argsOnly = true, name = "submit") *//*?}*/ItemFeatureRenderer.Submit submit
+    ) {
+        if (!submit.skyhanni$isUsingCustomOutline()) return original.call(instance, renderType);
+
+        //? if >= 26.2 {
+        SkyHanniOutlineHook.beginCustomOutlineBuild();
+        try {
+            return original.call(instance, renderType);
+        } finally {
+            SkyHanniOutlineHook.finishCustomOutlineBuild();
+        }
+        //?} else {
+        /*return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
+        *///?}
+    }
 }

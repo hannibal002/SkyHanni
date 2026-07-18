@@ -32,37 +32,48 @@ public abstract class MixinGameRenderer {
     /*@Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
-    //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"' {
-    //~ if < 26.1 'graphics' -> 'guiGraphics'
+    //? if >= 26.1 {
     @ModifyVariable(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At("STORE"), name = "graphics")
+    //?} else {
+    /^@ModifyVariable(method = "render", at = @At("STORE"), name = "guiGraphics")
+    ^///?}
     private GuiGraphicsExtractor skyhanni$captureGuiGraphicsExtractor(GuiGraphicsExtractor graphics) {
         skyhanni$guiGraphics = graphics;
         return graphics;
     }
 
     @Inject(
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.1 {
             target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
-            //?} else {
-            /^target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
-            ^///?}
         )
+        //?} else {
+        /^method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
+        )
+        ^///?}
     )
     private void skyhanni$onRenderStartPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, true).post();
     }
 
     @Inject(
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        //?} else {
+        /^method = "render",
+        ^///?}
         at = @At(
             value = "INVOKE",
             //~ if < 26.1 'extractSavingIndicator' -> 'renderSavingIndicator'
@@ -72,17 +83,23 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderEndPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, false).post();
     }
 
     @Inject(
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        //?} else {
+        /^method = "render",
+        ^///?}
         at = @At(
             value = "INVOKE",
+            //~ if < 26.1 'extractRenderState' -> 'render'
             target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
             shift = At.Shift.AFTER
         )
@@ -90,12 +107,12 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderTail(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         GuiEditManager.renderLast(skyhanni$guiGraphics);
     }
-    //~}
     *///?}
 }

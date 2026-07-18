@@ -24,8 +24,9 @@ import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 
-//? if < 26.2
+//? if < 26.2 {
 //import net.minecraft.client.renderer.MultiBufferSource
+//?}
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
@@ -95,8 +96,9 @@ object GuiRendererHook {
 
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        //? if < 26.2
-        //bufferSource: MultiBufferSource.BufferSource,
+        //? if < 26.2 {
+        /*bufferSource: MultiBufferSource.BufferSource,
+        *///?}
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
@@ -111,8 +113,9 @@ object GuiRendererHook {
 
         SkyHanniItemRenderCoordinator.preRenderAtlas(
             states,
-            //? if < 26.2
-            //bufferSource,
+            //? if < 26.2 {
+            /*bufferSource,
+            *///?}
             featureRenderDispatcher,
             frameNumber
         )

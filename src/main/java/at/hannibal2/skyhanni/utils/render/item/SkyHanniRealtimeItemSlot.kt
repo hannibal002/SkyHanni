@@ -12,8 +12,9 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
-//? if >= 26.1
+//? if >= 26.1 {
 import org.joml.Matrix4f
+//?}
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -40,10 +41,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         // Clear before rendering
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture,
-            //? if >= 26.2
             GuiRenderer.CLEAR_COLOR,
-            //? if < 26.2
-            //0,
             depthTexture,
             1.0,
         )

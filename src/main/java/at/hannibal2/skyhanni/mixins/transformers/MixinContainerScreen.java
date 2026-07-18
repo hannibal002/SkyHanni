@@ -35,12 +35,14 @@ public abstract class MixinContainerScreen {
     @Inject(method = "extractBackground", at = @At(value = "HEAD"), cancellable = true)
     private void cancelWardrobeBackground(
         GuiGraphicsExtractor graphics,
-        //? if < 26.1
-        //float a,
+        //? if < 26.1 {
+        /*float a,
+        *///?}
         int mouseX,
         int mouseY,
-        //? if >= 26.1
+        //? if >= 26.1 {
         float a,
+        //?}
         CallbackInfo ci
     ) {
         if (GuiData.INSTANCE.getPreDrawEventCancelled()) {

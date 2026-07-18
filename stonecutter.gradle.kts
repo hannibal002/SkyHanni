@@ -146,7 +146,6 @@ stonecutter parameters {
             replace("gui.hud.chat", "gui.chat")
             replace("gui.hud.guiTicks", "gui.guiTicks")
             replace("gui.hud.tabList", "gui.tabList")
-            replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
             replace(
                 "net.minecraft.world.entity.monster.cubemob.MagmaCube",
                 "net.minecraft.world.entity.monster.MagmaCube",
@@ -181,11 +180,7 @@ stonecutter parameters {
         }
 
         string(current.parsed < "26.1") {
-            replace(";extractRenderState(", ";render(")
-            replace(";text(", ";drawString(")
-            replace("ContainerInput", "ClickType")
-            replace("GuiGraphicsExtractor", "GuiGraphics")
-            replace("InteractClickType", "InteractClickType") // prevent replacement
+            replace(";text", ";drawString")
             replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
             replace("\"extractSlot\"", "\"renderSlot\"")
             replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
@@ -195,9 +190,23 @@ stonecutter parameters {
             replace("extractSlotHighlight", "renderSlotHighlight")
             replace("lambda\$addMainPass\$0", "method_62214")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageSource", "net.minecraft.client.multiplayer.chat.GuiMessageSource")
-            replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
             replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
+        }
+
+        regex(current.parsed < "26.1") {
+            replace(
+                "\\bContainerInput\\b", "ClickType",
+                "\\bClickType\\b", "ContainerInput",
+            )
+            replace(
+                "\\bGuiGraphicsExtractor\\b", "GuiGraphics",
+                "\\bGuiGraphics\\b", "GuiGraphicsExtractor",
+            )
+            replace(
+                "\\bnet\\.minecraft\\.client\\.multiplayer\\.chat\\.GuiMessage\\b", "net.minecraft.client.GuiMessage",
+                "\\bnet\\.minecraft\\.client\\.GuiMessage\\b", "net.minecraft.client.multiplayer.chat.GuiMessage",
+            )
         }
     }
 

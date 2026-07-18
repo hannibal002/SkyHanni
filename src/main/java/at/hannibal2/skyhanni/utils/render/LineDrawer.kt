@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 
-//? if >= 26.2
+//? if >= 26.2 {
 import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives
+//?}
 
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 

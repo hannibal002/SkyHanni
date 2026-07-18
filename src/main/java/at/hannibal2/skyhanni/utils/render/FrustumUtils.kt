@@ -8,17 +8,19 @@ import net.minecraft.world.phys.AABB
 object FrustumUtils {
 
     private val frustum get() =
-        //? if >= 26.2
+        //? if >= 26.1 {
         Minecraft.getInstance().gameRenderer.mainCamera().cullFrustum
-        //? if < 26.2 && >= 26.1
-        //Minecraft.getInstance().gameRenderer.mainCamera().cullFrustum
-        //? if < 26.1
-        //Minecraft.getInstance().levelRenderer.capturedFrustum
+        //?} else {
+        /*Minecraft.getInstance().levelRenderer.capturedFrustum
+        *///?}
 
-    //~ if < 26.1 'frustum.isVisible(box)' -> 'frustum?.isVisible(box) ?: true'
-    fun isVisible(box: AABB): Boolean = frustum.isVisible(box)
+    fun isVisible(box: AABB): Boolean =
+        //? if >= 26.1 {
+        frustum.isVisible(box)
+        //?} else {
+        /*frustum?.isVisible(box) ?: true
+        *///?}
 
-    fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double) =
+    fun isVisible(minX: Double, minY: Double, minZ: Double, maxX: Double, maxY: Double, maxZ: Double): Boolean =
         isVisible(AABB(minX, minY, minZ, maxX, maxY, maxZ))
-
 }

@@ -10,15 +10,17 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-//? if >= 26.1 {
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-//?} else
-//import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+//? if >= 26.1 {
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+//?} else {
+/*import net.minecraft.client.renderer.state.CameraRenderState;
+*///?}
 
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher {
@@ -41,8 +43,7 @@ public class MixinEntityRenderDispatcher {
         method = "submit",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'state/level/CameraRenderState;' -> 'state/CameraRenderState;'
-            target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"
+            target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state"/*? if >= 26.1 {*/ + "/level"/*?}*/ + "CameraRenderState;)V"
         )
     )
     private <S extends EntityRenderState> void setCurrentEntityStateForSubmit(

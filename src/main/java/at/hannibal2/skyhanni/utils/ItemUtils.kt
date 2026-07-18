@@ -720,7 +720,7 @@ object ItemUtils {
         repoSkullProviders.forEach { it.reset() }
         coinSkullCache.clear()
         transientCoinSkullCache.clear()
-        // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
+        // If compactNames is null, we want the NPE to happen in onRepoReload(), not in getRepoCompactName()
         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION", "MapGetWithNotNullAssertionOperator")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }

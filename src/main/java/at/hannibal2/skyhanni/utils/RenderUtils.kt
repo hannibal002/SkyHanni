@@ -20,6 +20,7 @@ import net.minecraft.world.inventory.Slot
 import java.awt.Color
 import java.util.concurrent.CompletableFuture
 
+// TODO refactor
 @Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
 

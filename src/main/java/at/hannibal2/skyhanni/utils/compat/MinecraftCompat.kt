@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.User
@@ -11,10 +12,11 @@ import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
 
-//? if >= 26.2
+//? if >= 26.2 {
 import net.minecraft.client.gui.Hud
-//? else
-//import net.minecraft.client.gui.Gui
+//?} else {
+/*import net.minecraft.client.gui.Gui
+*///?}
 
 /**
  * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
@@ -97,15 +99,6 @@ object MinecraftCompat {
     var serverTime: Long = 0L
         private set
 
-    @JvmStatic
-    var screen: Screen?
-        //~ if < 26.2 'gui.screen()' -> 'screen'
-        get() = mc.gui.screen()
-        set(value) {
-            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
-            mc.gui.setScreen(value)
-        }
-
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
@@ -119,16 +112,34 @@ object MinecraftCompat {
     // </editor-fold>
 
 
-    //? if >= 26.2
+    // <editor-fold desc="Miscellaneous">
+    @JvmStatic
+    var screen: Screen?
+        //~ if < 26.2 'gui.screen()' -> 'screen'
+        get() = mc.gui.screen()
+        set(value) {
+            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
+            mc.gui.setScreen(value)
+        }
+
+    //? if >= 26.2 {
     val hud get(): Hud = mc.gui.hud
-    //? else
-    //val hud get(): Gui = mc.gui
+    //?} else {
+    /*val hud get(): Gui = mc.gui
+    *///?}
 
     val hideGui get(): Boolean =
-        //? if >= 26.2
+        //? if >= 26.2 {
         hud.isHidden()
-        //? else
-        //mc.options.hideGui
+        //?} else {
+        /*mc.options.hideGui
+        *///?}
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+
+    fun reloadChunks() = DelayedRun.runOrNextTick {
+        //~ if < 26.2 'levelExtractor' -> 'levelRenderer'
+        Minecraft.getInstance().levelExtractor.allChanged()
+    }
+    // </editor-fold>
 }

@@ -16,11 +16,15 @@ import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
-//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+//? if >= 26.1 {
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+*///?}
 
 @SkyHanniModule
 object RenderEvents {
+
     private val config get() = SkyHanniMod.feature.gui
 
     init {
@@ -31,18 +35,12 @@ object RenderEvents {
         )
 
         //? if >= 26.2 {
-        PictureInPictureRendererRegistry.register { _ ->
-        //?} else {
-        /*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
-        PictureInPictureRendererRegistry.register { ctx ->
+        PictureInPictureRendererRegistry.register { _ -> SkyHanniPipCoordinatorRenderer() }
+        //?} elif >= 26.1 {
+        /*PictureInPictureRendererRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.bufferSource()) }
+        *///?} else {
+        /*SpecialGuiElementRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers()) }
         *///?}
-            SkyHanniPipCoordinatorRenderer(
-                //? if >= 26.1 && < 26.2
-                //ctx.bufferSource(),
-                //? if < 26.1
-                //ctx.vertexConsumers(),
-            )
-        }
     }
 
     @HandleEvent
@@ -51,7 +49,7 @@ object RenderEvents {
         SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
-    // IntelliJ is wrong, the unused parameter is required to confirm to the HudElement interface
+    // The unused parameter is required to conform to the HudElement interface.
     @Suppress("unused")
     private fun postGui(context: GuiGraphicsExtractor, deltaTracker: DeltaTracker) {
         if (MinecraftCompat.hideGui) return

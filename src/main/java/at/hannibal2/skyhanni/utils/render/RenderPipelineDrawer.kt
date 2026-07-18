@@ -3,21 +3,21 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
-//? if >= 26.2
-import com.mojang.blaze3d.buffers.GpuBuffer
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.BufferBuilder
-//? if >= 26.2
-import com.mojang.blaze3d.vertex.ByteBufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
-//? if < 26.2 {
+import net.minecraft.client.Minecraft
+import org.joml.Matrix3x2f
+
+//? if >= 26.2 {
+import com.mojang.blaze3d.buffers.GpuBuffer
+import com.mojang.blaze3d.vertex.ByteBufferBuilder
+import net.minecraft.client.renderer.rendertype.RenderType
+//?} else {
 /*import com.mojang.blaze3d.vertex.Tesselator
 *///?}
-import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.rendertype.RenderType
-import org.joml.Matrix3x2f
 
 object RenderPipelineDrawer {
 

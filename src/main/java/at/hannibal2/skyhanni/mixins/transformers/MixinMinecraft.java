@@ -28,7 +28,7 @@ public abstract class MixinMinecraft {
     public HitResult hitResult;
 
     @Shadow
-    public int missTime;
+    protected int missTime;
 
     @Shadow
     @Nullable

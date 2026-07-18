@@ -27,8 +27,10 @@ import java.util.Optional
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 
-//~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
-//~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {
+//? if < 26.2 {
+/*typealias PrimitiveTopology = VertexFormat.Mode
+*///?}
+
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
@@ -201,10 +203,12 @@ enum class SkyHanniRenderPipeline(
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
-            //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
+            //? if >= 26.2 {
             .withVertexBinding(0, vFormat)
-            //? if >= 26.2
             .withPrimitiveTopology(vDrawMode)
+            //?} else {
+            /*.withVertexFormat(vFormat, vDrawMode)
+            *///?}
             .apply {
                 // One or the other, never both
                 //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
@@ -242,15 +246,15 @@ enum class SkyHanniRenderPipeline(
 
     operator fun invoke(): RenderPipeline = internalPipeline
 }
-//~}
-//~}
 
 private object SkyHanniRenderPipelineUtils {
+
     val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
-        //? if >= 26.2
+        //? if >= 26.2 {
         RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-        //? else
-        //RenderPipelines.MATRICES_PROJECTION_SNIPPET
+        //?} else {
+        /*RenderPipelines.MATRICES_PROJECTION_SNIPPET
+        *///?}
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)

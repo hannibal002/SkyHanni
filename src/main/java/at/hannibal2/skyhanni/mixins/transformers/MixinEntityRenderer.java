@@ -24,8 +24,9 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
-//?} else
-//import net.minecraft.client.renderer.state.CameraRenderState;
+//?} else {
+/*import net.minecraft.client.renderer.state.CameraRenderState;
+*///?}
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {
@@ -33,8 +34,9 @@ public abstract class MixinEntityRenderer {
     @Inject(
         //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else
-        //method = "submitNameTag",
+        //?} else {
+        /*method = "submitNameTag",
+        *///?}
         at = @At("HEAD"),
         cancellable = true
     )
@@ -56,8 +58,9 @@ public abstract class MixinEntityRenderer {
     @Inject(
         //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else
-        //method = "submitNameTag",
+        //?} else {
+        /*method = "submitNameTag",
+        *///?}
         at = @At("TAIL")
     )
     public void onRenderLabelTail(
@@ -120,8 +123,9 @@ public abstract class MixinEntityRenderer {
             value = "INVOKE",
             //? if >= 26.2 {
             target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-            //?} else
-            //target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
+            //?} else {
+            /*target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
+            *///?}
             ordinal = 0
         ),
         index = 3

@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import kotlin.concurrent.atomics.AtomicInt
-import kotlin.concurrent.atomics.fetchAndDecrement
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.ClientMannequin
 import net.minecraft.client.player.AbstractClientPlayer
@@ -10,6 +8,11 @@ import net.minecraft.world.entity.player.PlayerModelPart
 import net.minecraft.world.entity.player.PlayerSkin
 import net.minecraft.world.scores.PlayerTeam
 import net.minecraft.world.scores.Scoreboard
+
+//? if >= 26.2 {
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.fetchAndDecrement
+//?}
 
 class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
     player.level(),
@@ -31,8 +34,9 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
         player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
     companion object {
-        //? if >= 26.2
+        //? if >= 26.2 {
         private val nextFakeEntityId = AtomicInt(-1)
+        //?}
 
         fun fromLocalPlayer(): FakePlayer? = MinecraftCompat.localPlayerOrNull?.let { FakePlayer(it) }
 

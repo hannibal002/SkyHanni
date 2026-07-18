@@ -11,8 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
+//? if >= 26.2 {
 import net.minecraft.client.renderer.SubmitNodeCollector;
+//?} else {
+/*import net.minecraft.client.renderer.MultiBufferSource;
+*///?}
 
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
@@ -21,8 +24,11 @@ abstract class MixinScreenEffectRenderer {
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(
         PoseStack poseStack,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
+        //? if >= 26.2 {
         SubmitNodeCollector submitNodeCollector,
+        //?} else {
+        /*MultiBufferSource bufferSource,
+        *///?}
         TextureAtlasSprite sprite,
         CallbackInfo ci
 
@@ -35,8 +41,11 @@ abstract class MixinScreenEffectRenderer {
     private static void renderWater(
         Minecraft client,
         PoseStack matrices,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
+        //? if >= 26.2 {
         SubmitNodeCollector submitNodeCollector,
+        //?} else {
+        /*MultiBufferSource bufferSource,
+        *///?}
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
@@ -47,10 +56,12 @@ abstract class MixinScreenEffectRenderer {
     private static void renderBlock(
         TextureAtlasSprite sprite,
         PoseStack poseStack,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
+        //? if >= 26.2 {
         SubmitNodeCollector submitNodeCollector,
-        //? if >= 26.2
+        //?} else {
+        /*MultiBufferSource bufferSource,
         int color,
+        *///?}
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();

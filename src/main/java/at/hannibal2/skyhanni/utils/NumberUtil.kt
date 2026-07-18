@@ -182,14 +182,9 @@ object NumberUtil {
     fun Int.toRoman(): String {
         require(this > 0) { "$this must be positive!" }
 
-        val (value, symbol) = romanSymbols.floorEntry(this)
-            ?: error("No Roman symbol found for $this")
+        val (value, symbol) = romanSymbols.floorEntry(this) ?: error("No Roman symbol found for $this")
 
-        return if (this == value) {
-            symbol
-        } else {
-            symbol + (this - value).toRoman()
-        }
+        return if (this == value) symbol else symbol + (this - value).toRoman()
     }
 
     fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
