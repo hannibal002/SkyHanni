@@ -24,9 +24,7 @@ import net.minecraft.network.chat.Component
 
 //? if >= 26.1 {
 import net.minecraft.client.gui.components.PlayerFaceExtractor
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.gui.components.PlayerFaceRenderer
 *///?}
 

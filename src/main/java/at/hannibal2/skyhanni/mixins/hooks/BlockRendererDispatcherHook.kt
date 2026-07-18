@@ -8,9 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 //? if >= 26.1 {
 import net.minecraft.client.renderer.block.BlockStateModelSet
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.renderer.block.BlockRenderDispatcher
 import net.minecraft.client.renderer.block.model.BlockStateModel
 *///?}

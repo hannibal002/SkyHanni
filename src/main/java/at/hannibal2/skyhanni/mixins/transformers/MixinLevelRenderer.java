@@ -32,9 +32,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import org.joml.Matrix4fc;
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.Camera;
 import org.joml.Matrix4f;
 *///?}

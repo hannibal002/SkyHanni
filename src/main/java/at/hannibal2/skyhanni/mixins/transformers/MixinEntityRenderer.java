@@ -24,9 +24,7 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.renderer.state.CameraRenderState;
 *///?}
 

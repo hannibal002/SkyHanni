@@ -31,9 +31,7 @@ import java.util.concurrent.CompletableFuture
 //? if >= 26.1 {
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
 *///?}
 

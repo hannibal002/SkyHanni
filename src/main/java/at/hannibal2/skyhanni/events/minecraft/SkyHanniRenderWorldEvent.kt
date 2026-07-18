@@ -9,9 +9,7 @@ import org.joml.Quaternionf
 
 //? if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.Camera
 *///?}
 

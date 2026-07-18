@@ -18,9 +18,7 @@ import net.minecraft.resources.Identifier
 
 //? if >= 26.1 {
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
 *///?}
 

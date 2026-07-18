@@ -10,9 +10,7 @@ import org.spongepowered.asm.mixin.injection.At;
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.platform.CompareOp;
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import com.mojang.blaze3d.platform.DepthTestFunction;
 *///?}
 

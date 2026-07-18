@@ -17,9 +17,7 @@ import net.minecraft.resources.Identifier
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import java.util.Optional
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 

@@ -25,9 +25,7 @@ import java.util.ListIterator;
 
 //? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource;
-//?}
-
-//? if < 26.1 {
+//?} else {
 /*import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.util.FormattedCharSequence;
 *///?}
