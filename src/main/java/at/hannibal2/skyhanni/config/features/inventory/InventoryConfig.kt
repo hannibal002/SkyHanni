@@ -338,6 +338,7 @@ class InventoryConfig {
     @ConfigOption(name = "Oringo Pet in Calendar", desc = "Show the future legendary pet Oringo will offer in the Calendar.")
     @ConfigEditorBoolean
     @FeatureToggle
+    @SearchTag("traveling zoo")
     var oringoPetInCalendar: Boolean = true
 
     @Expose
