@@ -27,10 +27,6 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
-
-//? if >= 26.2
-//import net.minecraft.client.gui.Hud;
-//? else
 import net.minecraft.client.gui.Gui;
 
 @Mixin(ChatComponent.class)
@@ -47,11 +43,9 @@ public abstract class MixinChatComponent {
 
     @WrapOperation(
         method = "deleteMessageOrDelay",
-        //~ if < 26.2 '/Hud' -> '/Gui'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;getGuiTicks()I"),
         require = 0
     )
-    //~ if < 26.2 'Hud' -> 'Gui'
     private int clearChatHead(Gui instance, Operation<Integer> original) {
         return instance.getGuiTicks() + 90;
     }

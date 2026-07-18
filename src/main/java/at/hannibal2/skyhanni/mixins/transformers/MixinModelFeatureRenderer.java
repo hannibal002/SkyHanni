@@ -1,54 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if >= 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-
-@Mixin(ModelFeatureRenderer.class)
-public abstract class MixinModelFeatureRenderer {
-
-    @WrapOperation(
-        method = "prepareModel",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/feature/ModelFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-        )
-    )
-    private VertexConsumer wrapSkyHanniOutlineVertexConsumer(
-        ModelFeatureRenderer instance,
-        RenderType renderType,
-        Operation<VertexConsumer> original,
-        @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> submit
-    ) {
-        if (skyhanni$usesCustomOutline(submit)) {
-            SkyHanniOutlineHook.beginCustomOutlineBuild();
-            try {
-                return original.call(instance, renderType);
-            } finally {
-                SkyHanniOutlineHook.finishCustomOutlineBuild();
-            }
-        }
-        return original.call(instance, renderType);
-    }
-
-    @Unique
-    private boolean skyhanni$usesCustomOutline(SubmitNodeStorage.ModelSubmit<?> submit) {
-        Object obj = submit;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;
-        return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
-    }
-}
-*///?} else {
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -112,4 +63,3 @@ public abstract class MixinModelFeatureRenderer {
         return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
     }
 }
-//?}

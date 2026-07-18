@@ -33,7 +33,7 @@ plugins {
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
-val primaryTarget = ProjectTarget.MODERN_26200
+val primaryTarget = ProjectTarget.MODERN_26100
 val isDeobf = target.mappingStyle == MappingStyle.NONE
 
 if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
@@ -275,7 +275,6 @@ dependencies {
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
     val roughlyEnoughItemsVersion = when (target) {
-        ProjectTarget.MODERN_26200 -> "26.2.820"
         ProjectTarget.MODERN_26100 -> libs.versions.roughlyenoughitems.get()
         ProjectTarget.MODERN_12111 -> "19.0.806"
     }
@@ -290,12 +289,10 @@ dependencies {
     else modCompileOnly(libs.basicMath)
     "minecraftTestClientRuntimeLibraries"(libs.basicMath)
     val architecturyVersion = when (target) {
-        ProjectTarget.MODERN_26200 -> "21.0.2"
         ProjectTarget.MODERN_26100 -> "20.0.6"
         ProjectTarget.MODERN_12111 -> "15.0.3"
     }
     val clothConfigVersion = when (target) {
-        ProjectTarget.MODERN_26200 -> "26.2.155"
         ProjectTarget.MODERN_26100 -> "26.1.154"
         ProjectTarget.MODERN_12111 -> "19.0.147"
     }

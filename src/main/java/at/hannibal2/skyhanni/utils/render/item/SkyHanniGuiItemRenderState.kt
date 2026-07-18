@@ -16,10 +16,6 @@ import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
-
-//? if >= 26.2
-//import net.minecraft.client.renderer.SubmitNodeStorage
-//? else
 import net.minecraft.client.renderer.MultiBufferSource
 
 data class SkyHanniGuiItemRenderState(
@@ -94,9 +90,6 @@ data class SkyHanniGuiItemRenderState(
     private fun setAnimated() = trackingState.setAnimated()
 
     internal fun renderItemToTexture(
-        //? if >= 26.2
-        //submitNodeStorage: SubmitNodeStorage,
-        //? else
         bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         centerX: Float,
@@ -119,19 +112,12 @@ data class SkyHanniGuiItemRenderState(
 
         trackingState.submit(
             ps,
-            //? if >= 26.2
-            //submitNodeStorage,
-            //? else
             featureRenderDispatcher.submitNodeStorage,
             15728880,
             OverlayTexture.NO_OVERLAY,
             0,
         )
-        //? if >= 26.2
-        //featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
-        //? else {
         featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
-        //?}
     }
 }

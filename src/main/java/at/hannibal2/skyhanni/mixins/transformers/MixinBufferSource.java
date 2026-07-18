@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if < 26.2 {
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -38,4 +37,3 @@ public class MixinBufferSource {
         }
     }
 }
-//?}

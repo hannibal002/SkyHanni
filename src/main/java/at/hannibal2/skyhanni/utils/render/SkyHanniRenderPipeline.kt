@@ -14,12 +14,6 @@ import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 
-//? if >= 26.2 {
-/*import com.mojang.blaze3d.PrimitiveTopology
-import com.mojang.blaze3d.pipeline.BindGroupLayout
-import net.minecraft.client.renderer.BindGroupLayouts
-*///?}
-
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import java.util.Optional
@@ -27,8 +21,6 @@ import java.util.Optional
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 
-//~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
-//~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
@@ -201,10 +193,7 @@ enum class SkyHanniRenderPipeline(
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
-            //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
             .withVertexFormat(vFormat, vDrawMode)
-            //? if >= 26.2
-            //.withVertexFormat.Mode(vDrawMode)
             .apply {
                 // One or the other, never both
                 //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
@@ -218,16 +207,8 @@ enum class SkyHanniRenderPipeline(
                     )
                 }
 
-                //? if >= 26.2 {
-                /*if (sampler != null || uniforms.isNotEmpty()) withBindGroupLayout(
-                    BindGroupLayout.builder().apply {
-                *///?}
-                        sampler?.let(this::withSampler)
-                        uniforms.forEach(this::withUniform)
-                //? if >= 26.2 {
-                    /*}.build()
-                )
-                *///?}
+                sampler?.let(this::withSampler)
+                uniforms.forEach(this::withUniform)
 
                 if (!depthWrite) {
                     //? if >= 26.1 {
@@ -242,14 +223,9 @@ enum class SkyHanniRenderPipeline(
 
     operator fun invoke(): RenderPipeline = internalPipeline
 }
-//~}
-//~}
 
 private object SkyHanniRenderPipelineUtils {
     val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
-        //? if >= 26.2
-        //RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-        //? else
         RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)

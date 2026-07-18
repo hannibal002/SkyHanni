@@ -4,17 +4,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
-
-//? if >= 26.2
-//import net.minecraft.client.gui.Hud
-//? else
-import net.minecraft.client.gui.Gui
 
 /**
  * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
@@ -99,10 +95,8 @@ object MinecraftCompat {
 
     @JvmStatic
     var screen: Screen?
-        //~ if < 26.2 'gui.screen()' -> 'screen'
         get() = mc.screen
         set(value) {
-            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
             mc.setScreen(value)
         }
 
@@ -119,15 +113,9 @@ object MinecraftCompat {
     // </editor-fold>
 
 
-    //? if >= 26.2
-    //val hud get(): Hud = mc.gui.hud
-    //? else
     val hud get(): Gui = mc.gui
 
     val hideGui get(): Boolean =
-        //? if >= 26.2
-        //hud.isHidden()
-        //? else
         mc.options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible

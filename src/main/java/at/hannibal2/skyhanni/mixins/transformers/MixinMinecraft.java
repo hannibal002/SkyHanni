@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
 import at.hannibal2.skyhanni.utils.system.PlatformUtils;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -13,13 +17,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-//? if < 26.2 {
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.gui.screens.Screen;
-import org.objectweb.asm.Opcodes;
-//?}
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -37,7 +34,6 @@ public abstract class MixinMinecraft {
     @Shadow
     public abstract void stop();
 
-    //? if < 26.2 {
     @ModifyExpressionValue(
         method = "addInitialScreens",
         at = @At(
@@ -50,7 +46,6 @@ public abstract class MixinMinecraft {
         if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
         return original;
     }
-    //?}
 
     @Inject(
         method = "onGameLoadFinished",
@@ -100,7 +95,6 @@ public abstract class MixinMinecraft {
         return down;
     }
 
-    //? if < 26.2 {
     @Inject(
         method = "setScreen",
         at = @At(
@@ -112,5 +106,4 @@ public abstract class MixinMinecraft {
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         new GuiScreenOpenEvent(screen).post();
     }
-    //?}
 }

@@ -8,9 +8,7 @@ import net.minecraft.world.phys.AABB
 object FrustumUtils {
 
     private val frustum get() =
-        //? if >= 26.2
-        //Minecraft.getInstance().gameRenderer.mainCamera.cullFrustum
-        //? if < 26.2 && >= 26.1
+        //? if >= 26.1
         Minecraft.getInstance().gameRenderer.mainCamera.cullFrustum
         //? if < 26.1
         //Minecraft.getInstance().levelRenderer.capturedFrustum

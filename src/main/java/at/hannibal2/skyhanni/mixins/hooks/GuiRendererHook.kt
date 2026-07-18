@@ -17,15 +17,13 @@ import com.mojang.blaze3d.systems.RenderPass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph.GlyphInstance
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GlyphRenderState
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
-
-//? if < 26.2
-import net.minecraft.client.renderer.MultiBufferSource
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()
@@ -95,7 +93,6 @@ object GuiRendererHook {
 
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        //? if < 26.2
         bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
@@ -111,7 +108,6 @@ object GuiRendererHook {
 
         SkyHanniItemRenderCoordinator.preRenderAtlas(
             states,
-            //? if < 26.2
             bufferSource,
             featureRenderDispatcher,
             frameNumber

@@ -7,9 +7,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.zipWithNext3
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 
-//? if >= 26.2
-//import net.minecraft.client.renderer.gizmos.DrawableGizmoPrimitives
-
 class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent, val lineWidth: Int, val depth: Boolean) {
 
     private val queuedLines = mutableListOf<QueuedLine>()
@@ -18,13 +15,6 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     internal fun drawQueuedLines() {
         if (queuedLines.isEmpty()) return
 
-        //? if >= 26.2 {
-        /*val gizmos = DrawableGizmoPrimitives()
-        for (line in queuedLines) {
-            gizmos.addLine(line.p1.toVec3(), line.p2.toVec3(), line.color.rgb, lineWidth.toFloat())
-        }
-        gizmos.submit(event.submitNodeStorage, event.cameraState, !depth)
-        *///?} else {
         val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.bufferSource.getBuffer(layer)
         val matrix = event.matrices.last()
@@ -41,7 +31,6 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
                 .setColor(line.color.red, line.color.green, line.color.blue, line.color.alpha)
                 .setLineWidth(lineWidth.toFloat())
         }
-        //?}
 
         queuedLines.clear()
     }

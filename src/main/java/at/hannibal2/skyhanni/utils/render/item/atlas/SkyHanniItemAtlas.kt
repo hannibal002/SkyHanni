@@ -92,15 +92,11 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHa
                     node.x,
                     node.y,
                     pixelSize,
-                    //? if >= 26.2
-                    //submitNodeStorage,
-                    //? if < 26.2
                     bufferSource,
                     featureRenderDispatcher,
                 )
                 recordPosition(key, node.x, node.y, pixelSize)
             }
-            //? if < 26.2
             bufferSource.endBatch()
         }
     }

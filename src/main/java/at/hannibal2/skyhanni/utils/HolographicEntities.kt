@@ -13,8 +13,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.inWholeTicks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.associateNotNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
-//? if >= 26.2
-//import net.minecraft.client.renderer.SubmitNodeStorage
+import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.state.EntityRenderState
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState
@@ -27,12 +26,6 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.reflect.KClass
 import kotlin.reflect.full.isSuperclassOf
-
-//? if >= 26.2 {
-/*import net.minecraft.util.LightCoordsUtil
-*///?} else {
-import net.minecraft.client.renderer.LevelRenderer
-//?}
 
 /**
  * Utility for creating fake entities without an associated world to avoid contaminating the world state.
@@ -190,17 +183,12 @@ object HolographicEntities {
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
         val cameraRenderState =
-            //? if >= 26.2
-            //gameRenderer.getGameRenderState().levelRenderState.cameraRenderState
-            //? if < 26.2 && >= 26.1
+            //? if >= 26.1
             gameRenderer.getGameRenderState().levelRenderState.cameraRenderState
             //? if < 26.1
             //gameRenderer.getLevelRenderState().cameraRenderState
         val cameraPos = cameraRenderState.pos
         val submitNodeCollector =
-            //? if >= 26.2
-            //SubmitNodeStorage()
-            //? if < 26.2
             gameRenderer.getFeatureRenderDispatcher().submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
@@ -208,9 +196,7 @@ object HolographicEntities {
         client.level?.let { level ->
             val blockPos = mobPosition.toBlockPos()
             entityRenderState.lightCoords =
-                //? if >= 26.2
-                //LightCoordsUtil.getLightCoords(level, blockPos)
-                //? elif >= 26.1
+                //? if >= 26.1
                 LevelRenderer.getLightCoords(level, blockPos)
                 //? else
                 //LevelRenderer.getLightColor(level, blockPos)
@@ -228,8 +214,6 @@ object HolographicEntities {
                     matrices,
                     submitNodeCollector,
                 )
-                //? if >= 26.2
-                //gameRenderer.getFeatureRenderDispatcher().renderAllFeatures(submitNodeCollector)
             }
         } finally {
             activeHolographicEntities.remove(entity)

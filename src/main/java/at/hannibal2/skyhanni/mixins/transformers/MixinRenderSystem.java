@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if < 26.2 {
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
 import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -18,4 +17,3 @@ public abstract class MixinRenderSystem {
         RoundedShapeDrawer.INSTANCE.clearUniforms();
     }
 }
-//?}

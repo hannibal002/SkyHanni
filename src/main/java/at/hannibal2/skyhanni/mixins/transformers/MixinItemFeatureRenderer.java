@@ -17,27 +17,17 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-//? if >= 26.2 {
-/*import com.mojang.blaze3d.vertex.QuadInstance;
-*///?} else {
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
-//?}
 
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
     @WrapOperation(
-        //? if >= 26.2 {
-        /*method = "prepareOutlineSubmit",
-        *///?} else {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        //?}
-        //~ if < 26.2 'com/mojang/blaze3d/vertex/QuadInstance' -> 'net/minecraft/client/renderer/OutlineBufferSource'
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
-        //~ if < 26.2 'QuadInstance' -> 'OutlineBufferSource'
         OutlineBufferSource instance,
         int color,
         Operation<Void> original,
@@ -51,62 +41,37 @@ public abstract class MixinItemFeatureRenderer {
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-        //? if < 26.2 {
         if (hasCustomOutline) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
             return;
         }
-        //?}
         original.call(instance, color);
     }
 
     @WrapOperation(
-        //? if >= 26.2
-        //method = "prepareOutlineSubmit",
-        //? else
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.2
-            //target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-            //? else
             target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
         )
     )
     private VertexConsumer wrapOutlineVertexConsumer(
-        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
         OutlineBufferSource instance,
         RenderType renderType,
         Operation<VertexConsumer> original,
-        /*? if < 26.2 {*/@Local(argsOnly = true, name = "submit") /*?}*/SubmitNodeStorage.ItemSubmit submit
+        @Local(argsOnly = true, name = "submit") SubmitNodeStorage.ItemSubmit submit
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-        //? if < 26.2 {
         if (hasCustomOutline) {
             return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
         }
-        //?}
-        //? if >= 26.2 {
-        /*if (hasCustomOutline) {
-            SkyHanniOutlineHook.beginCustomOutlineBuild();
-            try {
-                return original.call(instance, renderType);
-            } finally {
-                SkyHanniOutlineHook.finishCustomOutlineBuild();
-            }
-        }
-        *///?}
         return original.call(instance, renderType);
     }
 
     //? if >= 26.1 {
     @ModifyArg(
-        //? if >= 26.2 {
-        /*method = "prepareOutlineSubmit",
-        *///?} else {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        //?}
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"),
         index = 0
     )
@@ -120,11 +85,7 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @ModifyExpressionValue(
-        //? if >= 26.2 {
-        /*method = "prepareOutlineSubmit",
-        *///?} else {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        //?}
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;")
     )
     private RenderType modifyRenderLayer(RenderType layer) {

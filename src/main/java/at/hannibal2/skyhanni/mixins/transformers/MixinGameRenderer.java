@@ -6,29 +6,16 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-//? if >= 26.2 {
-/*import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook;
-import at.hannibal2.skyhanni.utils.render.RoundedShapeDrawer;
-*///?} else {
 import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-//?}
 
 @Mixin(GameRenderer.class)
 public abstract class MixinGameRenderer {
 
-    //? if >= 26.2 {
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/render/GuiRenderer;endFrame()V", shift = At.Shift.AFTER))
-    private void skyhanni$clearChromaUniforms(DeltaTracker deltaTracker, boolean advanceGameTime, CallbackInfo ci) {
-        GuiRendererHook.INSTANCE.clearChromaUniforms();
-        RoundedShapeDrawer.INSTANCE.clearUniforms();
-    }
-    *///?} else {
     @Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
@@ -97,5 +84,4 @@ public abstract class MixinGameRenderer {
         GuiEditManager.renderLast(skyhanni$guiGraphics);
     }
     //~}
-    //?}
 }

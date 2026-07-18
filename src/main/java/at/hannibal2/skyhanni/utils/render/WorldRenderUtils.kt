@@ -39,13 +39,10 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if < 26.2
 import org.joml.Matrix4f
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.compat.position
-//? if < 26.2 {
 import at.hannibal2.skyhanni.utils.compat.rotation
-//?}
 //?}
 
 @Suppress("LargeClass")
@@ -54,9 +51,6 @@ object WorldRenderUtils {
     //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.2
-    //private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
-
     private fun getDisplayMode(seeThrough: Boolean) =
         if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
 
@@ -64,40 +58,8 @@ object WorldRenderUtils {
         layer: RenderType,
         crossinline render: (VertexConsumer) -> Unit,
     ) {
-        //? if >= 26.2 {
-        /*submitNodeStorage.submitCustomGeometry(matrices, layer) { _, buffer -> render(buffer) }
-        *///?} else {
         render(bufferSource.getBuffer(layer))
-        //?}
     }
-
-    //? if >= 26.2 {
-    /*private fun SkyHanniRenderWorldEvent.submitOrderedText(
-        x: Float,
-        y: Float,
-        text: FormattedCharSequence,
-        shadow: Boolean,
-        displayMode: DisplayMode,
-        light: Int,
-        color: Int,
-        backgroundColor: Int,
-        outlineColor: Int,
-    ) {
-        val order = SKYHANNI_TEXT_SUBMIT_ORDER + skyHanniTextSubmitOrder++
-        submitNodeStorage.order(order).submitText(
-            matrices,
-            x,
-            y,
-            text,
-            shadow,
-            displayMode,
-            light,
-            color,
-            backgroundColor,
-            outlineColor,
-        )
-    }
-    *///?}
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -117,9 +79,6 @@ object WorldRenderUtils {
         matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //? if >= 26.2
-            //submitNodeStorage,
-            //? if < 26.2
             Minecraft.getInstance().gameRenderer.getFeatureRenderDispatcher().submitNodeStorage,
             beaconBeam,
             1f,
@@ -316,29 +275,6 @@ object WorldRenderUtils {
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.2 {
-        /*matrices.pushPose()
-        matrices.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        )
-        matrices.mulPose(cameraState.orientation)
-        matrices.translate(0f, -yOffset * adjustedScale, 0f)
-        matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
-        submitOrderedText(
-            x,
-            0f,
-            Component.literal(text).visualOrderText,
-            shadow,
-            getDisplayMode(seeThroughBlocks),
-            15728880,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            backGroundColor,
-            0,
-        )
-        matrices.popPose()
-        *///?} else {
         val matrix = Matrix4f()
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -360,7 +296,6 @@ object WorldRenderUtils {
             backGroundColor,
             15728880,
         )
-        //?}
     }
 
     fun SkyHanniRenderWorldEvent.drawString(
@@ -396,29 +331,6 @@ object WorldRenderUtils {
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.2 {
-        /*matrices.pushPose()
-        matrices.translate(
-            (location.x - cameraPos.x()).toFloat(),
-            (location.y - cameraPos.y()).toFloat(),
-            (location.z - cameraPos.z()).toFloat(),
-        )
-        matrices.mulPose(cameraState.orientation)
-        matrices.translate(0f, -yOffset * adjustedScale, 0f)
-        matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
-        submitOrderedText(
-            x,
-            0f,
-            text.visualOrderText,
-            shadow,
-            getDisplayMode(seeThroughBlocks),
-            15728880,
-            color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
-            backGroundColor,
-            0,
-        )
-        matrices.popPose()
-        *///?} else {
         val matrix = Matrix4f()
         matrix.translate(
             (location.x - cameraPos.x()).toFloat(),
@@ -440,7 +352,6 @@ object WorldRenderUtils {
             backGroundColor,
             15728880,
         )
-        //?}
     }
 
     fun SkyHanniRenderWorldEvent.drawCircleWireframe(entity: Entity, rad: Double, color: Color) {

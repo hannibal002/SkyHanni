@@ -31,7 +31,6 @@ jobs:
                 minecraft_version:
                     - "1.21.11"
                     - "26.1"
-                    - "26.2"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v6

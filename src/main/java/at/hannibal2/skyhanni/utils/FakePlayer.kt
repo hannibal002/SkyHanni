@@ -15,11 +15,6 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
     player.level(),
     Minecraft.getInstance().playerSkinRenderCache(),
 ) {
-    //? if >= 26.2 {
-    /*init {
-        setId(nextFakeEntityId.fetchAndDecrement())
-    }
-    *///?}
 
     override fun getSkin(): PlayerSkin = player.skin
 
@@ -31,9 +26,6 @@ class FakePlayer(val player: AbstractClientPlayer) : ClientMannequin(
         player.isModelPartShown(part) && part != PlayerModelPart.CAPE
 
     companion object {
-        //? if >= 26.2
-        //private val nextFakeEntityId = AtomicInt(-1)
-
         fun fromLocalPlayer(): FakePlayer? = MinecraftCompat.localPlayerOrNull?.let { FakePlayer(it) }
 
         fun fromLocalPlayerOrThrow(): FakePlayer = fromLocalPlayer()

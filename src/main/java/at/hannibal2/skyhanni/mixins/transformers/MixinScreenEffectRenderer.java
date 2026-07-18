@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.render.BlockOverlayRenderEvent;
 import at.hannibal2.skyhanni.events.render.OverlayType;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
@@ -11,17 +12,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
-import net.minecraft.client.renderer.MultiBufferSource;
-
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
 
-    //~ if < 26.2 'submitFire' -> 'renderFire'
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(
         PoseStack poseStack,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         MultiBufferSource submitNodeCollector,
         TextureAtlasSprite sprite,
         CallbackInfo ci
@@ -30,27 +26,21 @@ abstract class MixinScreenEffectRenderer {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }
 
-    //~ if < 26.2 'submitWater' -> 'renderWater'
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
     private static void renderWater(
         Minecraft client,
         PoseStack matrices,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         MultiBufferSource submitNodeCollector,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
     }
 
-    //~ if < 26.2 'submitBlockSprite' -> 'renderTex'
     @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
     private static void renderBlock(
         TextureAtlasSprite sprite,
         PoseStack poseStack,
-        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         MultiBufferSource submitNodeCollector,
-        //? if >= 26.2
-        //int color,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();

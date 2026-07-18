@@ -1,8 +1,5 @@
-@file:Suppress("NoEmptyFile")
-
 package at.hannibal2.skyhanni.utils.render.layers
 
-//? if < 26.2 {
 import at.hannibal2.skyhanni.mixins.hooks.GuiRendererHook
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.createRenderPass
 import at.hannibal2.skyhanni.utils.compat.RenderCompat.drawIndexed
@@ -77,9 +74,7 @@ class ChromaRenderLayer(
 
                     renderPass.enableRenderPassScissorStateIfAble()
 
-                    //~ if < 26.2 'prepareTextures' -> 'getTextures'
                     for (entry in this.state.getTextures()) {
-                        //~ if < 26.2 'name' -> 'key'
                         renderPass.bindTexture(entry.key, entry.value.textureView, entry.value.sampler)
                     }
 
@@ -102,4 +97,3 @@ class ChromaRenderLayer(
         }
     }
 }
-//?}

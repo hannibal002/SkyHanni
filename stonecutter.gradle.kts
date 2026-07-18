@@ -131,55 +131,6 @@ stonecutter handlers {
 
 stonecutter parameters {
     replacements {
-        string(current.parsed < "26.2") {
-            replace(".gameRenderer.featureRenderDispatcher()", ".gameRenderer.getFeatureRenderDispatcher()")
-            replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
-            replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
-            replace("CompareOp.GREATER_THAN_OR_EQUAL", "CompareOp.LESS_THAN_OR_EQUAL")
-            replace(".gui.hud.isHidden", ".options.hideGui")
-            replace(".mainCamera()", ".mainCamera")
-            replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
-            replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
-            replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
-            replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
-            replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
-            replace("gui.hud.chat", "gui.chat")
-            replace("gui.hud.guiTicks", "gui.guiTicks")
-            replace("gui.hud.tabList", "gui.tabList")
-            replace("levelExtractor.allChanged()", "levelRenderer.allChanged()")
-            replace(
-                "net.minecraft.world.entity.monster.cubemob.MagmaCube",
-                "net.minecraft.world.entity.monster.MagmaCube",
-            )
-            replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
-
-            val dyeColors = mapOf(
-                "black" to "BLACK",
-                "blue" to "BLUE",
-                "brown" to "BROWN",
-                "cyan" to "CYAN",
-                "gray" to "GRAY",
-                "green" to "GREEN",
-                "lightBlue" to "LIGHT_BLUE",
-                "lightGray" to "LIGHT_GRAY",
-                "lime" to "LIME",
-                "magenta" to "MAGENTA",
-                "orange" to "ORANGE",
-                "pink" to "PINK",
-                "purple" to "PURPLE",
-                "red" to "RED",
-                "white" to "WHITE",
-                "yellow" to "YELLOW",
-            )
-            dyeColors.forEach { (lower, upper) ->
-                replace("DYE.$lower()", "${upper}_DYE")
-                replace("WOOL.$lower()", "${upper}_WOOL")
-                replace("STAINED_GLASS.$lower()", "${upper}_STAINED_GLASS")
-                replace("STAINED_GLASS_PANE.$lower()", "${upper}_STAINED_GLASS_PANE")
-                replace("DYED_TERRACOTTA.$lower()", "${upper}_TERRACOTTA")
-            }
-        }
-
         string(current.parsed < "26.1") {
             replace(";extractRenderState(", ";render(")
             replace(";text(", ";drawString(")

@@ -13,6 +13,7 @@ import com.mojang.blaze3d.systems.RenderPass;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.gui.render.GuiRenderer;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.state.gui.GuiRenderState;
@@ -27,48 +28,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 import java.util.function.Supplier;
 
-//? if < 26.2
-import net.minecraft.client.renderer.MultiBufferSource;
-
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
 
-    //? if >= 26.2 {
-    /*@Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
-        at = @At("HEAD")
-    )
-    public void computeChromaBufferSlice(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        int from,
-        int _to,
-        CallbackInfo ci
-    ) {
-        GuiRendererHook.INSTANCE.computeChromaBufferSlice();
-    }
-
-    @Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
-            shift = At.Shift.AFTER
-        )
-    )
-    public void insertChromaSetUniform(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        int from,
-        int _to,
-        CallbackInfo ci,
-        @Local RenderPass renderPass
-    ) {
-        GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
-    }
-    *///?} else {
     @Inject(
         method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
         at = @At("HEAD")
@@ -99,7 +61,6 @@ public abstract class MixinGuiRenderer {
         @Local RenderPass renderPass) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
-    //?}
 
     @WrapOperation(
         method = "addElementToMesh",
@@ -126,11 +87,9 @@ public abstract class MixinGuiRenderer {
     @Final
     private FeatureRenderDispatcher featureRenderDispatcher;
 
-    //? if < 26.2 {
     @Shadow
     @Final
     private MultiBufferSource.BufferSource bufferSource;
-    //?}
 
     @Shadow
     @Final
@@ -147,7 +106,6 @@ public abstract class MixinGuiRenderer {
     private void skyhanni$preRenderAtlas(CallbackInfo ci) {
         GuiRendererHook.INSTANCE.preRenderAtlas(
             pictureInPictureRenderers,
-            //? if < 26.2
             bufferSource,
             featureRenderDispatcher,
             //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
