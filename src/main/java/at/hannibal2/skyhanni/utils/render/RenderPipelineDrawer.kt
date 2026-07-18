@@ -10,7 +10,6 @@ import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.MeshData
 import com.mojang.blaze3d.vertex.Tesselator
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.rendertype.RenderType
 import org.joml.Matrix3x2f
 
 object RenderPipelineDrawer {

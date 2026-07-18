@@ -52,7 +52,7 @@ object SkyHanniRenderLayers {
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
         ChromaRenderLayer(
             "skyhanni_text_chroma",
-			texture = texture,
+            texture = texture,
         )
     }
 

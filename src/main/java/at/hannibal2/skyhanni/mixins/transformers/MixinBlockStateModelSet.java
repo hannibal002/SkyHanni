@@ -1,6 +1,6 @@
-//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;

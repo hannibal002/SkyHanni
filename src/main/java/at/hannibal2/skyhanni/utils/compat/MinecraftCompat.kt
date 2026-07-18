@@ -93,13 +93,6 @@ object MinecraftCompat {
     var serverTime: Long = 0L
         private set
 
-    @JvmStatic
-    var screen: Screen?
-        get() = mc.screen
-        set(value) {
-            mc.setScreen(value)
-        }
-
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
@@ -112,9 +105,18 @@ object MinecraftCompat {
     // </editor-fold>
 
 
+    // <editor-fold desc="Miscellaneous">
+    @JvmStatic
+    var screen: Screen?
+        get() = mc.screen
+        set(value) {
+            mc.setScreen(value)
+        }
+
     val hud get(): Gui = mc.gui
 
     val hideGui get(): Boolean = mc.options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+    // </editor-fold>
 }

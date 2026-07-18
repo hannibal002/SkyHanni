@@ -32,9 +32,10 @@ public abstract class MixinItemFeatureRenderer {
         int color,
         Operation<Void> original,
         @Local(
-            //? if >= 26.1
-            argsOnly = true, name = "submit"
-            //? else
+            //? if >= 26.1 {
+            argsOnly = true,
+            name = "submit"
+            //?} else
             //name = "itemSubmit"
         ) SubmitNodeStorage.ItemSubmit submit
     ) {

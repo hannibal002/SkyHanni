@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import kotlin.concurrent.atomics.AtomicInt
-import kotlin.concurrent.atomics.fetchAndDecrement
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.ClientMannequin
 import net.minecraft.client.player.AbstractClientPlayer

@@ -19,28 +19,29 @@ public abstract class MixinGameRenderer {
     @Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
-    @ModifyVariable(
-        //~ if < 26.1 'extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V' -> 'render'
-        method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
-        at = @At("STORE"),
-        //~ if < 26.1 'graphics' -> 'guiGraphics'
-        name = "graphics"
-    )
+    //? if >= 26.1
+    @ModifyVariable(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At("STORE"), name = "graphics")
+    //? else
+    //@ModifyVariable(method = "render", at = @At("STORE"), name = "guiGraphics")
     private GuiGraphicsExtractor skyhanni$captureGuiGraphicsExtractor(GuiGraphicsExtractor graphics) {
         skyhanni$guiGraphics = graphics;
         return graphics;
     }
 
     @Inject(
-        //~ if < 26.1 'extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V' -> 'render'
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
         at = @At(
             value = "INVOKE",
-            //? if >= 26.1
             target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
-            //? else
-            //target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
         )
+        //?} else {
+        /*method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"
+        )
+        *///?}
     )
     private void skyhanni$onRenderStartPhase(
         DeltaTracker deltaTracker,
@@ -53,8 +54,10 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(
-        //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"'
+        //? if >= 26.1
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        //? else
+        //method = "render",
         at = @At(
             value = "INVOKE",
             //~ if < 26.1 'extractSavingIndicator' -> 'renderSavingIndicator'
@@ -72,10 +75,13 @@ public abstract class MixinGameRenderer {
     }
 
     @Inject(
-        //~ if < 26.1 '"extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V"' -> '"render"'
+        //? if >= 26.1
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
+        //? else
+        //method = "render",
         at = @At(
             value = "INVOKE",
+            //~ if < 26.1 'extractRenderState' -> 'render'
             target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V",
             shift = At.Shift.AFTER
         )

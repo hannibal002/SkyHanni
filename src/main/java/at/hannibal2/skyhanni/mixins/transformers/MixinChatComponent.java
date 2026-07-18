@@ -92,8 +92,10 @@ public abstract class MixinChatComponent {
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
 
-    //~ if < 26.1 'addMessage' -> 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V'
-    @Inject(method = "addMessage", at = @At("HEAD"))
+    @Inject(
+        method = "addMessage"/*? if < 26.1 {*//* + "(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"*//*?}*/,
+        at = @At("HEAD")
+    )
     private void setChatLine(
         Component contents,
         MessageSignature signature,
@@ -113,7 +115,7 @@ public abstract class MixinChatComponent {
             target = "net/minecraft/client/GuiMessage$Line"
         )
     )
-    private GuiMessage.Line addMessageId(
+    private GuiMessage.Line addParent(
         int addedTime,
         FormattedCharSequence content,
         GuiMessageTag tag,
@@ -122,7 +124,7 @@ public abstract class MixinChatComponent {
         GuiMessage message
     ) {
         GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
-        line.skyhanni$setMessageId(message.skyhanni$getMessageId());
+        line.skyhanni$setParent(message);
         return line;
     }
     *///?}

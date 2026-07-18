@@ -21,7 +21,7 @@ object SafeItemStackUtils {
         item ?: return false
         //? if >= 26.1
         return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()
-        //? if < 26.1
+        //? else
         //return true
     }
 

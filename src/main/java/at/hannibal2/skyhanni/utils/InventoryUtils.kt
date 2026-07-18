@@ -28,7 +28,8 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
+// TODO refactor
+@Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE

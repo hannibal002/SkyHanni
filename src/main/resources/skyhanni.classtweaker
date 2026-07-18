@@ -91,19 +91,14 @@ accessible method net/minecraft/client/gui/components/ChatComponent addMessage (
 accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
 accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
 inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
-inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
-inject-interface net/minecraft/client/multiplayer/chat/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
 inject-interface net/minecraft/client/renderer/block/FluidModel at/hannibal2/skyhanni/mixins/hooks/FluidModelTransparencyOverride
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
-#?}
-
-#? if < 26.1 {
+#?} else {
 #accessible field net/minecraft/client/gui/GuiGraphicsExtractor guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
 #accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/GuiMessage;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/GuiMessage;)V
 #inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
-#inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
-#inject-interface net/minecraft/client/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
+#inject-interface net/minecraft/client/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageStore
 #?}

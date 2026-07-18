@@ -45,8 +45,7 @@ public class MixinEntityRenderDispatcher {
         method = "submit",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'state/level/CameraRenderState;' -> 'state/CameraRenderState;'
-            target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V"
+            target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submit(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state"/*? if >= 26.1 {*/ + "/level"/*?}*/ + "CameraRenderState;)V"
         )
     )
     private <S extends EntityRenderState> void setCurrentEntityStateForSubmit(

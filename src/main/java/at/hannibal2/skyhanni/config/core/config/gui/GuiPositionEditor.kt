@@ -37,11 +37,11 @@ import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
+import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
-import net.minecraft.client.Minecraft
 
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.utils.compat.RenderCompat

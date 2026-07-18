@@ -49,7 +49,15 @@ public abstract class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 
-    @Inject(method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1, shift = At.Shift.AFTER))
+    @Inject(
+        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
+        at = @At(
+            value = "INVOKE",
+            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
+            ordinal = 1,
+            shift = At.Shift.AFTER
+        )
+    )
     public void insertChromaSetUniform(
         Supplier<String> nameSupplier,
         RenderTarget framebuffer,
@@ -71,10 +79,13 @@ public abstract class MixinGuiRenderer {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    //~ if < 26.1 'Unique' -> 'Shadow'
+    //? if >= 26.1 {
     @Unique
-    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
     private int skyhanni$frameNumber;
+    //?} else {
+    /*@Shadow
+    private int frameNumber;
+    *///?}
 
     //? if >= 26.1 {
     @Inject(method = "render", at = @At("HEAD"))

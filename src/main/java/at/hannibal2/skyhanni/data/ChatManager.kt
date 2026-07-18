@@ -37,7 +37,8 @@ import kotlin.math.floor
 
 //? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?}
+//?} else
+//import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
 
 @SkyHanniModule
 object ChatManager {
@@ -254,6 +255,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
+        val mc = Minecraft.getInstance()
         val chatGui = MinecraftCompat.hud.chat
 
         val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
@@ -289,11 +291,7 @@ object ChatManager {
         while (iterator.hasNext()) {
             val lineIndex = iterator.nextIndex()
             val line = iterator.next()
-            //? if >= 26.1 {
             if (line.parent == message) {
-            //?} else {
-            /*if (line.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()) {
-            *///?}
                 if (targetIndex == null) targetIndex = lineIndex
                 iterator.remove()
             }
@@ -310,14 +308,14 @@ object ChatManager {
             return@runOrNextTick
         }
         val maxWidth = floor(chatGui.width / chatGui.scale).toInt()
-        val lines = newMessage.splitLines(Minecraft.getInstance().font, maxWidth)
+        val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
             //? if >= 26.1 {
             val newLine = GuiMessage.Line(message, line, endOfEntry)
             //?} else {
             /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.`skyhanni$setMessageId`(newMessage.`skyhanni$getMessageId`())
+            newLine.parent = newMessage
             *///?}
             chatGui.trimmedMessages.add(targetIndex++, newLine)
         }
@@ -353,12 +351,7 @@ object ChatManager {
             if (predicate(message)) {
                 iterator.remove()
 
-                val found = chatGui.trimmedMessages.removeIf {
-                    //? if >= 26.1
-                    it.parent == message
-                    //? if < 26.1
-                    //it.`skyhanni$getMessageId`() == message.`skyhanni$getMessageId`()
-                }
+                val found = chatGui.trimmedMessages.removeIf { it.parent == message }
                 if (!found) {
                     ErrorManager.logErrorWithData(
                         IllegalStateException("Failed to find associated chat lines"),
