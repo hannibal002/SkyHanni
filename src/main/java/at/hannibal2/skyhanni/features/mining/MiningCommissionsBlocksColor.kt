@@ -118,7 +118,7 @@ object MiningCommissionsBlocksColor {
 
         if (reload) {
             replaceBlocksMapCache = mutableMapOf()
-            Minecraft.getInstance().levelExtractor.allChanged()
+            Minecraft.getInstance().levelRenderer.allChanged()
             dirty = false
         }
     }

@@ -62,43 +62,43 @@ enum class DyeCompat(
     ),
     ORANGE(
         14,
-        Items.DYE.orange(),
+        Items.ORANGE_DYE,
     ),
     MAGENTA(
         13,
-        Items.DYE.magenta(),
+        Items.MAGENTA_DYE,
     ),
     LIGHT_BLUE(
         12,
-        Items.DYE.lightBlue(),
+        Items.LIGHT_BLUE_DYE,
     ),
     YELLOW(
         11,
-        Items.DYE.yellow(),
+        Items.YELLOW_DYE,
     ),
     LIME(
         10,
-        Items.DYE.lime(),
+        Items.LIME_DYE,
     ),
     PINK(
         9,
-        Items.DYE.pink(),
+        Items.PINK_DYE,
     ),
     GRAY(
         8,
-        Items.DYE.gray(),
+        Items.GRAY_DYE,
     ),
     LIGHT_GRAY(
         7,
-        Items.DYE.lightGray(),
+        Items.LIGHT_GRAY_DYE,
     ),
     CYAN(
         6,
-        Items.DYE.cyan(),
+        Items.CYAN_DYE,
     ),
     PURPLE(
         5,
-        Items.DYE.purple(),
+        Items.PURPLE_DYE,
     ),
     BLUE(
         4,
@@ -110,15 +110,15 @@ enum class DyeCompat(
     ),
     GREEN(
         2,
-        Items.DYE.green(),
+        Items.GREEN_DYE,
     ),
     RED(
         1,
-        Items.DYE.red(),
+        Items.RED_DYE,
     ),
     BLACK(
         0,
-        Items.DYE.black(),
+        Items.BLACK_DYE,
     )
     ;
 

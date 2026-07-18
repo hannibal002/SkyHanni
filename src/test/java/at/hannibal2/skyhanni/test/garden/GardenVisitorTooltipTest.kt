@@ -41,7 +41,7 @@ class GardenVisitorTooltipTest {
 
     @Test
     fun `visitor tooltip parses copper line and rare reward with heart suffix`() {
-        val offerItem = ItemUtils.createItemStack(Items.DYED_TERRACOTTA.green(), "§aAccept Offer", spacemanLore)
+        val offerItem = ItemUtils.createItemStack(Items.GREEN_TERRACOTTA, "§aAccept Offer", spacemanLore)
         val visitor = VisitorApi.Visitor(
             visitorName = "§cSpaceman",
             status = VisitorApi.VisitorStatus.NEW,

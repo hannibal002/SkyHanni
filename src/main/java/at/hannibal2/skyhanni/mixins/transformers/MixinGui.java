@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
-import at.hannibal2.skyhanni.data.GuiEditManager;
+/*import at.hannibal2.skyhanni.data.GuiEditManager;
 import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
@@ -109,4 +109,4 @@ public abstract class MixinGui {
         GuiEditManager.renderLast(skyhanni$graphics);
     }
 }
-//?}
+*///?}

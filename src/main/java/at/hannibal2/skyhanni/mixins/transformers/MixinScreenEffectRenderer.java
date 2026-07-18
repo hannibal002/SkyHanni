@@ -12,17 +12,17 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
 
     //~ if < 26.2 'submitFire' -> 'renderFire'
-    @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(
         PoseStack poseStack,
         //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
-        SubmitNodeCollector submitNodeCollector,
+        MultiBufferSource submitNodeCollector,
         TextureAtlasSprite sprite,
         CallbackInfo ci
 
@@ -31,26 +31,26 @@ abstract class MixinScreenEffectRenderer {
     }
 
     //~ if < 26.2 'submitWater' -> 'renderWater'
-    @Inject(method = "submitWater", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
     private static void renderWater(
         Minecraft client,
         PoseStack matrices,
         //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
-        SubmitNodeCollector submitNodeCollector,
+        MultiBufferSource submitNodeCollector,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
     }
 
     //~ if < 26.2 'submitBlockSprite' -> 'renderTex'
-    @Inject(method = "submitBlockSprite", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
     private static void renderBlock(
         TextureAtlasSprite sprite,
         PoseStack poseStack,
         //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
-        SubmitNodeCollector submitNodeCollector,
+        MultiBufferSource submitNodeCollector,
         //? if >= 26.2
-        int color,
+        //int color,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();

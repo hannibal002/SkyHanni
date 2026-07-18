@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
-import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -48,8 +48,8 @@ public class MixinSubmitNodeCollection {
         }
     }
 }
-//?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+*///?} else {
+import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -84,7 +84,7 @@ public class MixinSubmitNodeCollection<E> {
     private void onSubmitModel(
         ModelFeatureRenderer.Storage storage,
         RenderType renderType,
-        ModelFeatureRenderer.Submit<?> modelSubmit,
+        SubmitNodeStorage.ModelSubmit<?> modelSubmit,
         Operation<Void> original
     ) {
         skyhanni$markCustomOutline(modelSubmit);
@@ -116,4 +116,4 @@ public class MixinSubmitNodeCollection<E> {
         }
     }
 }
-*///?}
+//?}

@@ -8,10 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //~ if < 26.2 'extract.LevelExtractor' -> 'LevelRenderer'
-import net.minecraft.client.renderer.extract.LevelExtractor;
+import net.minecraft.client.renderer.LevelRenderer;
 
 //~ if < 26.2 'LevelExtractor' -> 'LevelRenderer'
-@Mixin(LevelExtractor.class)
+@Mixin(LevelRenderer.class)
 public abstract class MixinLevelExtractor {
 
     @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))

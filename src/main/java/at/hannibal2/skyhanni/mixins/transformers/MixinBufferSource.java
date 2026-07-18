@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if < 26.2 {
-/*import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,4 +38,4 @@ public class MixinBufferSource {
         }
     }
 }
-*///?}
+//?}

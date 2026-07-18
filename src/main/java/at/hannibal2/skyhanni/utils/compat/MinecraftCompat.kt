@@ -12,9 +12,9 @@ import net.minecraft.network.protocol.game.ClientboundSetTimePacket
 import net.minecraft.world.entity.Entity
 
 //? if >= 26.2
-import net.minecraft.client.gui.Hud
+//import net.minecraft.client.gui.Hud
 //? else
-//import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.Gui
 
 /**
  * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
@@ -100,10 +100,10 @@ object MinecraftCompat {
     @JvmStatic
     var screen: Screen?
         //~ if < 26.2 'gui.screen()' -> 'screen'
-        get() = mc.gui.screen()
+        get() = mc.screen
         set(value) {
             //~ if < 26.2 'gui.setScreen' -> 'setScreen'
-            mc.gui.setScreen(value)
+            mc.setScreen(value)
         }
 
     @HandleEvent
@@ -120,15 +120,15 @@ object MinecraftCompat {
 
 
     //? if >= 26.2
-    val hud get(): Hud = mc.gui.hud
+    //val hud get(): Hud = mc.gui.hud
     //? else
-    //val hud get(): Gui = mc.gui
+    val hud get(): Gui = mc.gui
 
     val hideGui get(): Boolean =
         //? if >= 26.2
-        hud.isHidden()
+        //hud.isHidden()
         //? else
-        //mc.options.hideGui
+        mc.options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
 }

@@ -52,7 +52,7 @@ object RenderUtils {
         block: () -> T,
     ): T {
         RenderSystem.assertOnRenderThread()
-        setupFor?.let { Minecraft.getInstance().gameRenderer.lighting().setupFor(it) }
+        setupFor?.let { Minecraft.getInstance().gameRenderer.getLighting().setupFor(it) }
         return block()
     }
 

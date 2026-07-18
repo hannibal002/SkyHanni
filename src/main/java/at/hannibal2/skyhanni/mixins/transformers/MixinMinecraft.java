@@ -15,11 +15,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 //? if < 26.2 {
-/*import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
+import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import net.minecraft.client.gui.screens.Screen;
 import org.objectweb.asm.Opcodes;
-*///?}
+//?}
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -38,7 +38,7 @@ public abstract class MixinMinecraft {
     public abstract void stop();
 
     //? if < 26.2 {
-    /*@ModifyExpressionValue(
+    @ModifyExpressionValue(
         method = "addInitialScreens",
         at = @At(
             value = "FIELD",
@@ -50,7 +50,7 @@ public abstract class MixinMinecraft {
         if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
         return original;
     }
-    *///?}
+    //?}
 
     @Inject(
         method = "onGameLoadFinished",
@@ -101,7 +101,7 @@ public abstract class MixinMinecraft {
     }
 
     //? if < 26.2 {
-    /*@Inject(
+    @Inject(
         method = "setScreen",
         at = @At(
             value = "FIELD",
@@ -112,5 +112,5 @@ public abstract class MixinMinecraft {
     private void onSetScreen(Screen screen, CallbackInfo ci) {
         new GuiScreenOpenEvent(screen).post();
     }
-    *///?}
+    //?}
 }

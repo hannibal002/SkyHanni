@@ -17,9 +17,9 @@ import org.joml.Matrix4f
 import kotlin.math.roundToInt
 
 //? if >= 26.2
-import net.minecraft.client.renderer.SubmitNodeStorage
+//import net.minecraft.client.renderer.SubmitNodeStorage
 //? else
-//import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.MultiBufferSource
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -62,9 +62,9 @@ internal class SkyHanniItemAtlasRenderer(
         slotY: Int,
         pixelSize: Int,
         //? if >= 26.2
-        submitNodeStorage: SubmitNodeStorage,
+        //submitNodeStorage: SubmitNodeStorage,
         //? else
-        //bufferSource: MultiBufferSource.BufferSource,
+        bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
         RenderSystem.enableScissorForRenderTypeDraws(
@@ -72,9 +72,9 @@ internal class SkyHanniItemAtlasRenderer(
         )
         shState.renderItemToTexture(
             //? if >= 26.2
-            submitNodeStorage,
+            //submitNodeStorage,
             //? else
-            //bufferSource,
+            bufferSource,
             featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
             centerY = slotY.toFloat() + pixelSize / 2.0f,
@@ -117,9 +117,9 @@ internal class SkyHanniItemAtlasRenderer(
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture,
             //? if >= 26.2
-            GuiRenderer.CLEAR_COLOR,
+            //GuiRenderer.CLEAR_COLOR,
             //? else
-            //0,
+            0,
             depthTexture,
             1.0,
             x, sizePixels - y - size, size, size,

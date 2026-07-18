@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils.render.item
 
 //? if >= 26.2
-import com.mojang.blaze3d.GpuFormat
+//import com.mojang.blaze3d.GpuFormat
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
@@ -9,7 +9,7 @@ import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.renderer.texture.AbstractTexture
 
 //? if < 26.2
-//import com.mojang.blaze3d.textures.TextureFormat
+import com.mojang.blaze3d.textures.TextureFormat
 
 abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
 
@@ -29,9 +29,9 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
             colorLabel,
             colorUsage,
             //? if >= 26.2
-            GpuFormat.RGBA8_UNORM,
+            //GpuFormat.RGBA8_UNORM,
             //? if < 26.2
-            //TextureFormat.RGBA8,
+            TextureFormat.RGBA8,
             size,
             size,
             1,
@@ -42,9 +42,9 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
             depthLabel,
             usageInt,
             //? if >= 26.2
-            GpuFormat.D32_FLOAT,
+            //GpuFormat.D32_FLOAT,
             //? if < 26.2
-            //TextureFormat.DEPTH32,
+            TextureFormat.DEPTH32,
             size,
             size,
             1,
@@ -54,9 +54,9 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
         device.createCommandEncoder().clearColorAndDepthTextures(
             texture!!,
             //? if >= 26.2
-            GuiRenderer.CLEAR_COLOR,
+            //GuiRenderer.CLEAR_COLOR,
             //? if < 26.2
-            //0,
+            0,
             depthTexture!!,
             1.0,
         )

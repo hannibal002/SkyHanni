@@ -230,7 +230,7 @@ object MoongladeBeacon {
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
-    private fun SafeItemStack.isPaused(): Boolean = this.`is`(Items.DYED_TERRACOTTA.red())
+    private fun SafeItemStack.isPaused(): Boolean = this.`is`(Items.RED_TERRACOTTA)
 
     @HandleEvent
     fun onTick() {

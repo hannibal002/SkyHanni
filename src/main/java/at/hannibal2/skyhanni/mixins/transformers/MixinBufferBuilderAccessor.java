@@ -11,13 +11,13 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface MixinBufferBuilderAccessor {
 
     //? if >= 26.2 {
-    @Accessor("vertexPointer")
+    /*@Accessor("vertexPointer")
     long getSkyHanniVertexPointer();
 
     @Accessor("format")
     VertexFormat getSkyHanniFormat();
-    //?} else {
-    /*@Invoker("beginElement")
+    *///?} else {
+    @Invoker("beginElement")
     long invokeBeginElement(VertexFormatElement element);
-    *///?}
+    //?}
 }

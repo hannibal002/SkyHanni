@@ -387,7 +387,7 @@ private class OldScreenRenderContext(
         renderInventoryPlayer(oldScreen, scaleX, scaleY, mouseX, mouseY)
         DrawContextUtils.pushPop {
             DrawContextUtils.scale(scaleX, scaleY)
-            oldScreen.renderContents(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
+            oldScreen.extractContents(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY, partialTicks)
             oldScreen.renderCarriedItem(DrawContextUtils.drawContext, oldScreenMouseX, oldScreenMouseY)
             oldScreen.renderSnapbackItem(DrawContextUtils.drawContext)
         }

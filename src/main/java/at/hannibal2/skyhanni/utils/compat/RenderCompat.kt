@@ -9,9 +9,9 @@ import net.minecraft.client.renderer.RenderPipelines
 import java.util.OptionalDouble
 
 //? if >= 26.2
-import java.util.Optional
+//import java.util.Optional
 //? else
-//import java.util.OptionalInt
+import java.util.OptionalInt
 
 object RenderCompat {
 
@@ -31,7 +31,7 @@ object RenderCompat {
             indices,
             1,
             //? if >= 26.2
-            0,
+            //0,
         )
     }
 
@@ -45,7 +45,7 @@ object RenderCompat {
             { name }, // label
             colorAttachment, // colorTexture
             //~ if < 26.2 'Optional' -> 'OptionalInt'
-            Optional.empty(),
+            OptionalInt.empty(),
             framebuffer.findDepthAttachment(), // depthTexture
             OptionalDouble.empty(), // clearDepth
         )

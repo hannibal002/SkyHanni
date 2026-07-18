@@ -38,11 +38,11 @@ accessible field net/minecraft/client/multiplayer/MultiPlayerGameMode destroyBlo
 #accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
 accessible field net/minecraft/client/renderer/RenderPipelines DEBUG_FILLED_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 #? if < 26.2
-#accessible field net/minecraft/client/renderer/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible field net/minecraft/client/renderer/RenderPipelines FOG_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines GUI_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines LINES_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 #? if < 26.2
-#accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
+accessible field net/minecraft/client/renderer/RenderPipelines MATRICES_PROJECTION_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 accessible field net/minecraft/client/renderer/RenderPipelines TEXT_SNIPPET Lcom/mojang/blaze3d/pipeline/RenderPipeline$Snippet;
 #? if >= 26.1
 accessible field net/minecraft/client/renderer/block/FluidStateModelSet WATER_MODEL Lnet/minecraft/client/renderer/block/FluidModel$Unbaked;
@@ -107,12 +107,12 @@ inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/s
 inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
 inject-interface net/minecraft/client/multiplayer/chat/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageIdStore
 #? if >= 26.2 {
-inject-interface net/minecraft/client/renderer/feature/ItemFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
-inject-interface net/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+#inject-interface net/minecraft/client/renderer/feature/ItemFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+#inject-interface net/minecraft/client/renderer/feature/ModelFeatureRenderer$Submit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #?} else {
-#inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
-#inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
-#inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelPartSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
+inject-interface net/minecraft/client/renderer/SubmitNodeStorage$ModelPartSubmit at/hannibal2/skyhanni/mixins/hooks/GlowingStateStore
 #?}
 #? if >= 26.1
 inject-interface net/minecraft/client/renderer/block/FluidModel at/hannibal2/skyhanni/mixins/hooks/FluidModelTransparencyOverride

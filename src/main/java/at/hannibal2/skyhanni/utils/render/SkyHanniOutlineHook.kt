@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils.render
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
 //? if >= 26.2 {
-import com.mojang.blaze3d.PrimitiveTopology
+/*import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.DepthStencilState
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.platform.CompareOp
@@ -14,27 +14,27 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import net.minecraft.client.renderer.BindGroupLayouts
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
-//?} else {
-/*import com.mojang.blaze3d.systems.RenderSystem
+*///?} else {
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
-*///?}
+//?}
 //? if < 26.2 {
-/*import com.mojang.blaze3d.vertex.VertexConsumer
+import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
-*///?}
+//?}
 import net.minecraft.client.Minecraft
 
 //~ if < 26.2 'GpuFormat' -> 'textures.TextureFormat'
-import com.mojang.blaze3d.GpuFormat
+import com.mojang.blaze3d.textures.TextureFormat
 
 // The idea and implementation for this class was inspired by Skyblocker. This implementation has
 // been modified from the original Skyblocker code to work across multiple versions.
 object SkyHanniOutlineHook {
 
     //? if < 26.2 {
-    /*@JvmStatic
+    @JvmStatic
     val vertexConsumers by lazy {
         SkyHanniOutlineVertexConsumerProvider()
     }
@@ -59,17 +59,17 @@ object SkyHanniOutlineHook {
             }
         }
     }
-    *///?}
+    //?}
 
     private var customDepthAttachment: GpuTexture? = null
 
     private var customDepthAttachmentView: GpuTextureView? = null
 
     //~ if < 26.2 'GpuFormat' -> 'TextureFormat'
-    private var customDepthAttachmentFormat: GpuFormat? = null
+    private var customDepthAttachmentFormat: TextureFormat? = null
 
     //? if >= 26.2 {
-    private val customOutlineCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_cull", true)
+    /*private val customOutlineCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_cull", true)
 
     private val customOutlineNoCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_no_cull", false)
 
@@ -126,11 +126,11 @@ object SkyHanniOutlineHook {
                 .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
                 .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
                 .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                .withDepthStencilState(DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
+                .withDepthStencilState(DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
                 .withCull(cull)
                 .build(),
         )
-    //?}
+    *///?}
 
     @JvmStatic
     var currentlyActive = false
@@ -154,7 +154,7 @@ object SkyHanniOutlineHook {
     @JvmStatic
     fun checkIfDepthAttachmentNeedsUpdating() {
         //~ if < 26.2 'gameRenderer.mainRenderTarget()' -> 'mainRenderTarget'
-        val gpuTexture = Minecraft.getInstance().gameRenderer.mainRenderTarget().depthTexture ?: return
+        val gpuTexture = Minecraft.getInstance().mainRenderTarget.depthTexture ?: return
         val width = gpuTexture.getWidth(0)
         val height = gpuTexture.getHeight(0)
         val format = gpuTexture.format
@@ -182,7 +182,7 @@ object SkyHanniOutlineHook {
     }
 
     //~ if < 26.2 'GpuFormat' -> 'TextureFormat'
-    private fun updateDepthAttachment(format: GpuFormat) {
+    private fun updateDepthAttachment(format: TextureFormat) {
         try {
             customDepthAttachment?.let {
                 it.close()

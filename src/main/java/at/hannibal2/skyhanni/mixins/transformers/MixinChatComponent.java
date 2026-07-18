@@ -10,7 +10,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
 //? if < 26.1 {
-/*import net.minecraft.client.GuiMessage;
+/*import net.minecraft.client.multiplayer.chat.GuiMessage;
 import net.minecraft.util.FormattedCharSequence;
 *///?}
 //? if >= 26.1
@@ -29,9 +29,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
 
 //? if >= 26.2
-import net.minecraft.client.gui.Hud;
+//import net.minecraft.client.gui.Hud;
 //? else
-//import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.Gui;
 
 @Mixin(ChatComponent.class)
 public abstract class MixinChatComponent {
@@ -48,11 +48,11 @@ public abstract class MixinChatComponent {
     @WrapOperation(
         method = "deleteMessageOrDelay",
         //~ if < 26.2 '/Hud' -> '/Gui'
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;getGuiTicks()I"),
         require = 0
     )
     //~ if < 26.2 'Hud' -> 'Gui'
-    private int clearChatHead(Hud instance, Operation<Integer> original) {
+    private int clearChatHead(Gui instance, Operation<Integer> original) {
         return instance.getGuiTicks() + 90;
     }
 

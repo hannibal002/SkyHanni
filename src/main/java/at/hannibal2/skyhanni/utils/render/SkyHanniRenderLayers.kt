@@ -7,7 +7,7 @@ import net.minecraft.resources.Identifier
 import net.minecraft.util.Util
 
 //? if < 26.2
-//import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
+import at.hannibal2.skyhanni.utils.render.layers.ChromaRenderLayer
 
 object SkyHanniRenderLayers {
 
@@ -53,14 +53,14 @@ object SkyHanniRenderLayers {
 
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
 		//~ if < 26.2 'RenderType.create' -> 'ChromaRenderLayer'
-        RenderType.create(
+        ChromaRenderLayer(
             "skyhanni_text_chroma",
 			//? if >= 26.2 {
-            RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT())
+            /*RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT())
                 .withTexture("Sampler0", texture)
                 .createRenderSetup(),
-			//?} else
-			//texture = texture,
+			*///?} else
+			texture = texture,
         )
     }
 

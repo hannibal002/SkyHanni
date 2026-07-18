@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
-import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -28,7 +28,7 @@ public abstract class MixinModelFeatureRenderer {
         ModelFeatureRenderer instance,
         RenderType renderType,
         Operation<VertexConsumer> original,
-        @Local(argsOnly = true) ModelFeatureRenderer.Submit<?> submit
+        @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> submit
     ) {
         if (skyhanni$usesCustomOutline(submit)) {
             SkyHanniOutlineHook.beginCustomOutlineBuild();
@@ -42,14 +42,14 @@ public abstract class MixinModelFeatureRenderer {
     }
 
     @Unique
-    private boolean skyhanni$usesCustomOutline(ModelFeatureRenderer.Submit<?> submit) {
+    private boolean skyhanni$usesCustomOutline(SubmitNodeStorage.ModelSubmit<?> submit) {
         Object obj = submit;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;
         return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
     }
 }
-//?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
+*///?} else {
+import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -76,7 +76,7 @@ public abstract class MixinModelFeatureRenderer {
         int color,
         Operation<Void> original,
         //~ if < 26.1 '"submit"' -> '"modelSubmit"'
-        @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
+        @Local(argsOnly = true, name = "submit") SubmitNodeStorage.ModelSubmit<S> submit
     ) {
         if (skyhanni$usesCustomOutline(submit)) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
@@ -97,7 +97,7 @@ public abstract class MixinModelFeatureRenderer {
         RenderType renderType,
         Operation<VertexConsumer> original,
         //~ if < 26.1 '"submit"' -> '"modelSubmit"'
-        @Local(argsOnly = true, name = "submit") ModelFeatureRenderer.Submit<S> submit
+        @Local(argsOnly = true, name = "submit") SubmitNodeStorage.ModelSubmit<S> submit
     ) {
         if (skyhanni$usesCustomOutline(submit)) {
             return original.call(SkyHanniOutlineHook.getVertexConsumers(), renderType);
@@ -106,10 +106,10 @@ public abstract class MixinModelFeatureRenderer {
     }
 
     @Unique
-    private boolean skyhanni$usesCustomOutline(ModelFeatureRenderer.Submit<?> submit) {
+    private boolean skyhanni$usesCustomOutline(SubmitNodeStorage.ModelSubmit<?> submit) {
         Object obj = submit;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;
         return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
     }
 }
-*///?}
+//?}

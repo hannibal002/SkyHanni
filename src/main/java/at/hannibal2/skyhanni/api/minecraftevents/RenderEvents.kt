@@ -31,14 +31,14 @@ object RenderEvents {
         )
 
         //? if >= 26.2 {
-        PictureInPictureRendererRegistry.register { _ ->
-        //?} else {
-        /*//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+        /*PictureInPictureRendererRegistry.register { _ ->
+        *///?} else {
+        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
         PictureInPictureRendererRegistry.register { ctx ->
-        *///?}
+        //?}
             SkyHanniPipCoordinatorRenderer(
                 //? if >= 26.1 && < 26.2
-                //ctx.bufferSource(),
+                ctx.bufferSource(),
                 //? if < 26.1
                 //ctx.vertexConsumers(),
             )

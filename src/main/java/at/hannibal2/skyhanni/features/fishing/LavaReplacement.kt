@@ -67,7 +67,7 @@ object LavaReplacement {
         if (newActive == isActive) return
         isActive = newActive
         DelayedRun.runNextTick {
-            Minecraft.getInstance().levelExtractor.allChanged()
+            Minecraft.getInstance().levelRenderer.allChanged()
         }
     }
 
@@ -166,7 +166,7 @@ object LavaReplacement {
         isActive = newActive
 
         DelayedRun.runNextTick {
-            Minecraft.getInstance().levelExtractor.allChanged()
+            Minecraft.getInstance().levelRenderer.allChanged()
         }
     }
 

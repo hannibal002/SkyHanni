@@ -1,5 +1,5 @@
 //? if >= 26.2 {
-package at.hannibal2.skyhanni.mixins.transformers;
+/*package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.utils.system.PlatformUtils;
 import net.minecraft.SharedConstants;
@@ -24,4 +24,4 @@ public abstract class MixinClientIntentionPacket {
         return SharedConstants.RELEASE_NETWORK_PROTOCOL_VERSION;
     }
 }
-//?}
+*///?}

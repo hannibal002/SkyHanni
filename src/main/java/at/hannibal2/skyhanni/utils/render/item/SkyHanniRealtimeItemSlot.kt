@@ -41,9 +41,9 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
             texture,
             //? if >= 26.2
-            GuiRenderer.CLEAR_COLOR,
+            //GuiRenderer.CLEAR_COLOR,
             //? if < 26.2
-            //0,
+            0,
             depthTexture,
             1.0,
         )
@@ -58,7 +58,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
 
         state.renderItemToTexture(
             //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
-            context.submitNodeStorage,
+            context.bufferSource,
             context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,

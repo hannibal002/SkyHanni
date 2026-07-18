@@ -418,7 +418,7 @@ object GuiRenderUtils {
             alpha = alpha,
         )
         //? if >= 26.1 {
-        Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
+        Minecraft.getInstance().gameRenderer.getGameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
         //?} else {
         /*Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         *///?}

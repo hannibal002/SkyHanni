@@ -24,15 +24,15 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >= 26.2 {
-import net.minecraft.client.renderer.SubmitNodeStorage;
+/*import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
-//?} else {
-/*import com.llamalad7.mixinextras.sugar.Local;
+*///?} else {
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
-*///?}
+//?}
 
 //? if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -48,16 +48,16 @@ import org.joml.Matrix4f;
 public abstract class MixinLevelRenderer {
 
     //? if < 26.2 {
-    /*@Final
-    @Shadow
-    private RenderBuffers renderBuffers;
-    *///?}
-
-    //? if >= 26.2 {
     @Final
     @Shadow
-    private SubmitNodeStorage submitNodeStorage;
+    private RenderBuffers renderBuffers;
     //?}
+
+    //? if >= 26.2 {
+    /*@Final
+    @Shadow
+    private SubmitNodeStorage submitNodeStorage;
+    *///?}
 
     //? if < 26.1 {
     /*@Unique
@@ -72,7 +72,7 @@ public abstract class MixinLevelRenderer {
     DeltaTracker skyhanni$currentDeltaTracker;
 
     //~ if < 26.2 'render' -> 'renderLevel'
-    @Inject(method = "render", at = @At("HEAD"))
+    @Inject(method = "renderLevel", at = @At("HEAD"))
     private void beginRender(
         GraphicsResourceAllocator resourceAllocator,
         DeltaTracker deltaTracker,
@@ -90,7 +90,7 @@ public abstract class MixinLevelRenderer {
         Vector4f fogColor,
         boolean shouldRenderSky,
         //? if = 26.1
-        //ChunkSectionsToRender chunkSectionsToRender,
+        ChunkSectionsToRender chunkSectionsToRender,
         CallbackInfo ci
     ) {
         skyhanni$currentCameraState = cameraState;
@@ -98,7 +98,7 @@ public abstract class MixinLevelRenderer {
     }
 
     //? if >= 26.2 {
-    @Inject(
+    /*@Inject(
         method = "render",
         at = @At(
             value = "INVOKE",
@@ -125,10 +125,10 @@ public abstract class MixinLevelRenderer {
         );
         event.post();
     }
-    //?}
+    *///?}
 
     //? if < 26.2 {
-    /*
+    
     @WrapOperation(
         method = "lambda$addMainPass$0",
         slice = @Slice(
@@ -157,24 +157,24 @@ public abstract class MixinLevelRenderer {
             new PoseStack(),
             skyhanni$currentCameraState,
             //? if >= 26.2
-            submitNodeStorage,
+            //submitNodeStorage,
             //? else
-            //renderBuffers.bufferSource(),
+            renderBuffers.bufferSource(),
             skyhanni$currentDeltaTracker.getGameTimeDeltaPartialTick(true),
             true
         );
         event.post();
     }
-    *///?}
+    //?}
 
     @Inject(
         method = "lambda$addMainPass$0",
         at = @At(
             value = "INVOKE",
             //? if >= 26.2
-            target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V",
+            //target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V",
             //? else
-            //target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
+            target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
             ordinal = 0,
             shift = At.Shift.AFTER
         )
@@ -185,7 +185,7 @@ public abstract class MixinLevelRenderer {
     }
 
     //? if < 26.2 {
-    /*@Inject(
+    @Inject(
         method = "lambda$addMainPass$0",
         at = @At(
             value = "INVOKE",
@@ -196,5 +196,5 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
     }
-    *///?}
+    //?}
 }

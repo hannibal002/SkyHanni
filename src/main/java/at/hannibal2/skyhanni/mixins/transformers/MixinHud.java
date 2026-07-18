@@ -24,12 +24,12 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //~ if < 26.2 'Hud' -> 'Gui'
-import net.minecraft.client.gui.Hud;
+import net.minecraft.client.gui.Gui;
 //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-import net.minecraft.client.gui.contextualbar.ContextualBar;
+import net.minecraft.client.gui.contextualbar.ContextualBarRenderer;
 
 //~ if < 26.2 'Hud.class' -> 'Gui.class'
-@Mixin(Hud.class)
+@Mixin(Gui.class)
 public abstract class MixinHud {
 
     @Inject(
@@ -83,13 +83,13 @@ public abstract class MixinHud {
         at = @At(value = "INVOKE",
             //~ if < 26.1 'extractBackground' -> 'renderBackground' {
             //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
+            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
             //~}
         )
     )
     public void renderExperienceBar(
         //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-        ContextualBar contextualBar,
+        ContextualBarRenderer contextualBar,
         GuiGraphicsExtractor graphics,
         DeltaTracker deltaTracker,
         Operation<Void> original
@@ -106,7 +106,7 @@ public abstract class MixinHud {
             value = "INVOKE",
             //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
             //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
-            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
+            target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
             //~}
         )
     )

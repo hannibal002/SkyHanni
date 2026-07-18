@@ -15,10 +15,10 @@ import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
 
 //? if >= 26.2 {
-import com.mojang.blaze3d.PrimitiveTopology
+/*import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
-//?}
+*///?}
 
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
@@ -32,7 +32,7 @@ import java.util.Optional
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
-    vDrawMode: PrimitiveTopology = PrimitiveTopology.QUADS,
+    vDrawMode: VertexFormat.Mode = VertexFormat.Mode.QUADS,
     blend: BlendFunction? = null,
     withCull: Boolean? = false,
     vertexShaderPath: String? = null,
@@ -45,41 +45,41 @@ enum class SkyHanniRenderPipeline(
     LINES(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
-        vDrawMode = PrimitiveTopology.LINES,
+        vDrawMode = VertexFormat.Mode.LINES,
         irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     LINES_XRAY(
         snippet = RenderPipelines.LINES_SNIPPET,
         vFormat = PosColorNormal,
-        vDrawMode = PrimitiveTopology.LINES,
+        vDrawMode = VertexFormat.Mode.LINES,
         depthWrite = false,
         irisProgram = IrisCompat.IrisProgram.LINES,
     ),
     FILLED(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLE_STRIP,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
     ),
     FILLED_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLE_STRIP,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_STRIP,
         depthWrite = false,
     ),
     TRIANGLES(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLES,
+        vDrawMode = VertexFormat.Mode.TRIANGLES,
     ),
     TRIANGLES_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLES,
+        vDrawMode = VertexFormat.Mode.TRIANGLES,
         depthWrite = false,
     ),
     TRIANGLE_FAN(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLE_FAN,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
     ),
     TRIANGLE_FAN_XRAY(
         snippet = RenderPipelines.DEBUG_FILLED_SNIPPET,
-        vDrawMode = PrimitiveTopology.TRIANGLE_FAN,
+        vDrawMode = VertexFormat.Mode.TRIANGLE_FAN,
         depthWrite = false,
     ),
     QUADS(
@@ -202,9 +202,9 @@ enum class SkyHanniRenderPipeline(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
             //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
-            .withVertexBinding(0, vFormat)
+            .withVertexFormat(vFormat, vDrawMode)
             //? if >= 26.2
-            .withPrimitiveTopology(vDrawMode)
+            //.withVertexFormat.Mode(vDrawMode)
             .apply {
                 // One or the other, never both
                 //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
@@ -219,15 +219,15 @@ enum class SkyHanniRenderPipeline(
                 }
 
                 //? if >= 26.2 {
-                if (sampler != null || uniforms.isNotEmpty()) withBindGroupLayout(
+                /*if (sampler != null || uniforms.isNotEmpty()) withBindGroupLayout(
                     BindGroupLayout.builder().apply {
-                //?}
+                *///?}
                         sampler?.let(this::withSampler)
                         uniforms.forEach(this::withUniform)
                 //? if >= 26.2 {
-                    }.build()
+                    /*}.build()
                 )
-                //?}
+                *///?}
 
                 if (!depthWrite) {
                     //? if >= 26.1 {
@@ -248,9 +248,9 @@ enum class SkyHanniRenderPipeline(
 private object SkyHanniRenderPipelineUtils {
     val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
         //? if >= 26.2
-        RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
+        //RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
         //? else
-        //RenderPipelines.MATRICES_PROJECTION_SNIPPET
+        RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)

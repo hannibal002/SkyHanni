@@ -28,13 +28,13 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 //? if < 26.2
-//import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource;
 
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
 
     //? if >= 26.2 {
-    @Inject(
+    /*@Inject(
         method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
         at = @At("HEAD")
     )
@@ -68,8 +68,8 @@ public abstract class MixinGuiRenderer {
     ) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
-    //?} else {
-    /*@Inject(
+    *///?} else {
+    @Inject(
         method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
         at = @At("HEAD")
     )
@@ -99,7 +99,7 @@ public abstract class MixinGuiRenderer {
         @Local RenderPass renderPass) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
-    *///?}
+    //?}
 
     @WrapOperation(
         method = "addElementToMesh",
@@ -127,10 +127,10 @@ public abstract class MixinGuiRenderer {
     private FeatureRenderDispatcher featureRenderDispatcher;
 
     //? if < 26.2 {
-    /*@Shadow
+    @Shadow
     @Final
     private MultiBufferSource.BufferSource bufferSource;
-    *///?}
+    //?}
 
     @Shadow
     @Final
@@ -148,7 +148,7 @@ public abstract class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.preRenderAtlas(
             pictureInPictureRenderers,
             //? if < 26.2
-            //bufferSource,
+            bufferSource,
             featureRenderDispatcher,
             //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
