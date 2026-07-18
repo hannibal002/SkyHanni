@@ -22,32 +22,37 @@ object HideMobNames {
         "\uE070\uE071\uE072\uE073\uE074\uE075\uE076\uE077\uE078\uE079\uE07A\uE07B" +
             "\uE07C\uE07D\uE07E\uE018\uE080\uE081\uE082\uE083\uE084\uE085\uE086\uE087"
 
+    /**
+     * REGEX-TEST: [Lv1]  Graveyard Zombie 100/100❤
+     * REGEX-TEST: [Lv30]  Crypt Ghoul 2,000/2,000❤
+     * REGEX-TEST: [Lv1]  Zombie Villager 120/120❤
+     */
     private val hideMobNamePatterns by RepoPattern.list(
         "slayer.hidemobname",
 
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie Villager ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Crypt Ghoul ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Graveyard Zombie ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie Villager (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Crypt Ghoul (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Graveyard Zombie (?<min>.+)/(?<max>.+)❤",
 
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Dasher Spider ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Weaver Spider ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Splitter Spider ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voracious Spider ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Silverfish ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Dasher Spider (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Weaver Spider (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Splitter Spider (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voracious Spider (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Silverfish (?<min>.+)/(?<max>.+)❤",
 
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Wolf ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Howling Spirit ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Pack Spirit ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Wolf (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Howling Spirit (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Pack Spirit (?<min>.+)/(?<max>.+)❤",
 
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Enderman ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voidling Fanatic ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Enderman (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voidling Fanatic (?<min>.+)/(?<max>.+)❤",
 
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Blaze ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Mutated Blaze ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Bezal ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Smoldering Blaze ae](?<min>.+)/(?<max>.+)❤",
-        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Flaming Spider ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Blaze (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Mutated Blaze (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Bezal (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Smoldering Blaze (?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Flaming Spider (?<min>.+)/(?<max>.+)❤",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
