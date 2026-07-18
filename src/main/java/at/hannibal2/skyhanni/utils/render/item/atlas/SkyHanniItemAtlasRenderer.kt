@@ -8,6 +8,7 @@ import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
@@ -15,7 +16,6 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import org.joml.Matrix4f
 import kotlin.math.roundToInt
-import net.minecraft.client.renderer.MultiBufferSource
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,

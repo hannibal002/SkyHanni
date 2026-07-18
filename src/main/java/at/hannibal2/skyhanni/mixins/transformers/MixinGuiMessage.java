@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import at.hannibal2.skyhanni.mixins.hooks.GuiMessageData;
 import at.hannibal2.skyhanni.utils.ChatUtils;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
-//? if >= 26.1
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
@@ -16,6 +14,10 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+//? if >= 26.1 {
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+//?}
 
 @Mixin(GuiMessage.class)
 public abstract class MixinGuiMessage implements GuiMessageData {

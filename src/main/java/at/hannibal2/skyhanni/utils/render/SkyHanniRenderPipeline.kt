@@ -17,7 +17,9 @@ import net.minecraft.resources.Identifier
 //? if >= 26.1 {
 import com.mojang.blaze3d.pipeline.ColorTargetState
 import java.util.Optional
-//?} else {
+//?}
+
+//? if < 26.1 {
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 
@@ -225,8 +227,8 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-    val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
-        RenderPipelines.MATRICES_PROJECTION_SNIPPET
+
+    val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)

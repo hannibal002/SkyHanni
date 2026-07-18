@@ -35,8 +35,9 @@ import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
 
-//? if >= 26.1
+//? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//?}
 
 @SkyHanniModule
 object ChatManager {

@@ -38,8 +38,7 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
 
     protected fun ensureAllocated() {
         if (texture != null) return
-        val maxTextureSize =
-            RenderSystem.getDevice().maxTextureSize
+        val maxTextureSize = RenderSystem.getDevice().maxTextureSize
         val size = 512.coerceAtMost(maxTextureSize)
         sizePixels = size
         allocateTextures(size, colorLabel, depthLabel, textureUsage)

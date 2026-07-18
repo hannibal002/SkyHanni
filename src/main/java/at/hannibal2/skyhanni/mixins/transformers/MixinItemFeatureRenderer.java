@@ -31,12 +31,11 @@ public abstract class MixinItemFeatureRenderer {
         OutlineBufferSource instance,
         int color,
         Operation<Void> original,
-        //~ if < 26.1 '"submit"' -> '"itemSubmit"'
         @Local(
             //? if >= 26.1
-            argsOnly = true,
-            //~ if < 26.1 'submit' -> 'itemSubmit'
-            name = "submit"
+            argsOnly = true, name = "submit"
+            //? else
+            //name = "itemSubmit"
         ) SubmitNodeStorage.ItemSubmit submit
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
@@ -63,10 +62,9 @@ public abstract class MixinItemFeatureRenderer {
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
 
-        if (hasCustomOutline) {
-            return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
-        }
-        return original.call(instance, renderType);
+        return hasCustomOutline
+            ? SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType)
+            : original.call(instance, renderType);
     }
 
     //? if >= 26.1 {

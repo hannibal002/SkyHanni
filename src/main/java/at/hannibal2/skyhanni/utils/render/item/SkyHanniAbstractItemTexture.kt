@@ -3,10 +3,9 @@ package at.hannibal2.skyhanni.utils.render.item
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
+import com.mojang.blaze3d.textures.TextureFormat
 import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.renderer.texture.AbstractTexture
-
-import com.mojang.blaze3d.textures.TextureFormat
 
 abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
 

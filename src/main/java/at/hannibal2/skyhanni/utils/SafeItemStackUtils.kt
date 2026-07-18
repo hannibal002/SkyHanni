@@ -2,9 +2,11 @@
 
 package at.hannibal2.skyhanni.utils
 
-//? if >= 26.1
-import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.item.Item
+
+//? if >= 26.1 {
+import net.minecraft.core.registries.BuiltInRegistries
+//?}
 
 /**
  * Central compatibility helpers for Minecraft item component binding.

@@ -4,19 +4,38 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import com.mojang.blaze3d.vertex.PoseStack
 import net.minecraft.client.renderer.MultiBufferSource
-//~ if < 26.1 'renderer.state.level.CameraRenderState' -> 'Camera'
+import net.minecraft.world.phys.Vec3
+import org.joml.Quaternionf
+
+//? if >= 26.1 {
 import net.minecraft.client.renderer.state.level.CameraRenderState
+//?}
+
+//? if < 26.1 {
+/*import net.minecraft.client.Camera
+*///?}
 
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
-    //~ if < 26.1 'CameraRenderState' -> 'Camera'
-    val cameraState: CameraRenderState,
+    //? if >= 26.1
+    cameraState: CameraRenderState,
+    //? else
+    //camera: Camera,
     val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent() {
 
-    val camera get() = cameraState
+    val cameraPos: Vec3 =
+        //? if >= 26.1
+        cameraState.pos
+        //? else
+        //camera.position
 
+    val cameraRotation: Quaternionf =
+        //? if >= 26.1
+        cameraState.orientation
+        //? else
+        //camera.rotation()
 }

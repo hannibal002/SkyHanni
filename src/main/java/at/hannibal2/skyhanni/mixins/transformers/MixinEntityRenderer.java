@@ -24,8 +24,11 @@ import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
-//?} else
-//import net.minecraft.client.renderer.state.CameraRenderState;
+//?}
+
+//? if < 26.1 {
+/*import net.minecraft.client.renderer.state.CameraRenderState;
+*///?}
 
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {

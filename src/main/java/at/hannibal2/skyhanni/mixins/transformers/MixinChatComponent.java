@@ -8,13 +8,8 @@ import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.ChatComponent;
-//? if < 26.1 {
-/*import net.minecraft.client.multiplayer.chat.GuiMessage;
-import net.minecraft.util.FormattedCharSequence;
-*///?}
-//? if >= 26.1
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
 import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
@@ -27,7 +22,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
-import net.minecraft.client.gui.Gui;
+
+//? if >= 26.1 {
+import net.minecraft.client.multiplayer.chat.GuiMessageSource;
+//?}
+
+//? if < 26.1 {
+/*import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.util.FormattedCharSequence;
+*///?}
 
 @Mixin(ChatComponent.class)
 public abstract class MixinChatComponent {

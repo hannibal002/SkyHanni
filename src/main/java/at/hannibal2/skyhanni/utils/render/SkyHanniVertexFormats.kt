@@ -70,8 +70,8 @@ object SkyHanniVertexFormats {
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
-        // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
-        //  but, technically possible, and something we should account for eventually.
+        // TODO it is rare that a user will have enough mods to register 27 more vertex format elements,
+        //  but it has happened to a couple people already, and is something we should account for eventually.
         val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
         if (id != desiredId && PlatformUtils.isDevEnvironment) ErrorManager.logErrorStateWithData(
             "VertexFormatElement ID $desiredId was already taken, using $id instead",

@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
-
 import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)

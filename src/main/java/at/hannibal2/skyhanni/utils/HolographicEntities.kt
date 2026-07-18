@@ -182,24 +182,16 @@ object HolographicEntities {
         val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
-        val cameraRenderState =
-            //? if >= 26.1
-            gameRenderer.getGameRenderState().levelRenderState.cameraRenderState
-            //? if < 26.1
-            //gameRenderer.getLevelRenderState().cameraRenderState
+        val cameraRenderState = gameRenderer/*? if >= 26.1 {*/.gameRenderState/*?}*/.levelRenderState.cameraRenderState
         val cameraPos = cameraRenderState.pos
-        val submitNodeCollector =
-            gameRenderer.getFeatureRenderDispatcher().submitNodeStorage
+        val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
         client.level?.let { level ->
             val blockPos = mobPosition.toBlockPos()
-            entityRenderState.lightCoords =
-                //? if >= 26.1
-                LevelRenderer.getLightCoords(level, blockPos)
-                //? else
-                //LevelRenderer.getLightColor(level, blockPos)
+            //~ if < 26.1 'getLightCoords' -> 'getLightColor'
+            entityRenderState.lightCoords = LevelRenderer.getLightCoords(level, blockPos)
         }
 
         activeHolographicEntities.add(entity)

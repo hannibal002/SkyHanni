@@ -36,11 +36,13 @@ import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
-//? if >= 26.1
+//? if >= 26.1 {
 import net.minecraft.network.protocol.game.ServerboundAttackPacket
+//?}
 
 @SkyHanniModule
 object VisitorListener {
+
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
         "§7Offers Accepted: §a(?<offersAccepted>\\d+)",

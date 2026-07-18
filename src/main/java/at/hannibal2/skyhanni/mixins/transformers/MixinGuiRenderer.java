@@ -130,5 +130,4 @@ public abstract class MixinGuiRenderer {
             skyhanni$frameNumber
         );
     }
-
 }

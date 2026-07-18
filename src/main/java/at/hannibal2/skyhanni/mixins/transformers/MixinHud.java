@@ -26,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Gui.class)
-public abstract class MixinGui {
+public abstract class MixinHud {
 
     @Inject(
         method = "displayScoreboardSidebar(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/world/scores/Objective;)V",
@@ -77,9 +77,8 @@ public abstract class MixinGui {
         //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations'
         method = "extractHotbarAndDecorations",
         at = @At(value = "INVOKE",
-            //~ if < 26.1 'extractBackground' -> 'renderBackground' {
+            //~ if < 26.1 'extractBackground' -> 'renderBackground'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
-            //~}
         )
     )
     public void renderExperienceBar(
@@ -98,9 +97,8 @@ public abstract class MixinGui {
         method = "extractHotbarAndDecorations",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
+            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
-            //~}
         )
     )
     public void renderExperienceLevel(
@@ -184,7 +182,7 @@ public abstract class MixinGui {
     }
     //~}
 
-    //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
+    //~ if < 26.1 'extractOverlayMessage' -> 'renderOverlayMessage'
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postActionBarLayerEventPre(graphics)) {
@@ -192,9 +190,9 @@ public abstract class MixinGui {
         }
     }
 
+    //~ if < 26.1 'extractOverlayMessage' -> 'renderOverlayMessage'
     @Inject(method = "extractOverlayMessage", at = @At("TAIL"))
     public void renderOverlayMessagePost(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(graphics);
     }
-    //~}
 }
