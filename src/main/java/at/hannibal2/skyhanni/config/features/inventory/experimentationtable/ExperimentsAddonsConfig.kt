@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.OnlyDebug
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.dev.DebugConfig
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -66,7 +65,6 @@ class ExperimentsAddonsConfig {
     var addonsDebug: Boolean = false
 
     @Expose
-    @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
-    @OnlyDebug
+    @ConfigLink(owner = ExperimentsAddonsConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
 }
