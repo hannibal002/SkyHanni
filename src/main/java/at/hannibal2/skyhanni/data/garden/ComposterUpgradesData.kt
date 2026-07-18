@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -23,9 +24,8 @@ object ComposterUpgradesData {
      */
     val composterUpgradePattern by RepoPattern.pattern(
         "composter.upgrade.name",
-        "(?<name>${regexValues()})(?: (?<level>.*))?",
+        "(?<name>${enumJoinToPattern<ComposterUpgrade> { it.displayName }})(?: (?<level>.*))?",
     )
-    private fun regexValues() = ComposterUpgrade.entries.joinToString("|") { it.displayName }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
