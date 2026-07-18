@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
@@ -32,8 +33,8 @@ object HideMobNames {
         addMobToHide("Silverfish")
 
         addMobToHide("Wolf")
-        addMobToHide("§bHowling Spirit")
-        addMobToHide("§bPack Spirit")
+        addMobToHide("Howling Spirit")
+        addMobToHide("Pack Spirit")
 
         addMobToHide("Enderman")
         addMobToHide("Voidling Fanatic")
@@ -46,7 +47,12 @@ object HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add("§8\\[§7Lv\\d+§8] (?<mobType>(§.[✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? §c$bossName§r §[ae](?<min>.+)§f\\/§a(?<max>.+)§c❤(§r)?".toPattern())
+        val patternName = bossName.lowercase().replace(" ", "-")
+        val pattern by RepoPattern.pattern(
+            "slayer.mobname.$patternName",
+            "\\[Lv\\d+] (?<mobType>([✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? $bossName ae](?<min>.+)/(?<max>.+)❤",
+        )
+        patterns.add(pattern)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -56,7 +62,7 @@ object HideMobNames {
         val entity = event.entity
         if (!entity.hasCustomName()) return
 
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = entity.cleanName
         val id = entity.id
         if (lastMobName[id] == name) {
             if (id in mobNamesHidden) {
