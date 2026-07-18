@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.decoration.ArmorStand
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -18,37 +17,36 @@ object HideMobNames {
     private val lastMobName = TimeLimitedCache<Int, String>(2.minutes)
     private val mobNamesHidden = mutableListOf<Int>()
 
-    private enum class HideNameBossType(bossName: String) {
-        ZOMBIE("Zombie"),
-        ZOMBIE_VILLAGER("Zombie Villager"),
-        CRYPT_GHOUL("Crypt Ghoul"),
-        GRAVEYARD_ZOMBIE("Graveyard Zombie"),
+    // TODO: use SkyblockIcons instead of hardcoding the mob types
+    private const val ALL_MOB_TYPES = "✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙"
 
-        DASHER_SPIDER("Dasher Spider"),
-        WEAVER_SPIDER("Weaver Spider"),
-        SPLITTER_SPIDER("Splitter Spider"),
-        VORACIOUS_SPIDER("Voracious Spider"),
-        SILVERFISH("Silverfish"),
+    private val hideMobNamePatterns by RepoPattern.list(
+        "slayer.hidemobname",
 
-        WOLF("Wolf"),
-        HOWLING_SPIRIT("Howling Spirit"),
-        PACK_SPIRIT("Pack Spirit"),
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Zombie Villager ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Crypt Ghoul ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Graveyard Zombie ae](?<min>.+)/(?<max>.+)❤",
 
-        ENDERMAN("Enderman"),
-        VOIDLING_FANATIC("Voidling Fanatic"),
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Dasher Spider ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Weaver Spider ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Splitter Spider ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voracious Spider ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Silverfish ae](?<min>.+)/(?<max>.+)❤",
 
-        BLAZE("Blaze"),
-        MUTATED_BLAZE("Mutated Blaze"),
-        BEZAL("Bezal"),
-        SMOLDERING_BLAZE("Smoldering Blaze"),
-        FLAMING_SPIDER("Flaming Spider");
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Wolf ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Howling Spirit ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Pack Spirit ae](?<min>.+)/(?<max>.+)❤",
 
-        private val patternName = bossName.lowercase().replace(" ", "-")
-        val pattern by RepoPattern.pattern(
-            "slayer.mobname.$patternName",
-            "\\[Lv\\d+] (?<mobType>([✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿\uE018⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? $bossName ae](?<min>.+)/(?<max>.+)❤",
-        )
-    }
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Enderman ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Voidling Fanatic ae](?<min>.+)/(?<max>.+)❤",
+
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Blaze ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Mutated Blaze ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Bezal ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Smoldering Blaze ae](?<min>.+)/(?<max>.+)❤",
+        "\\[Lv\\d+] (?<mobType>([$ALL_MOB_TYPES])+)? Flaming Spider ae](?<min>.+)/(?<max>.+)❤",
+    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
@@ -82,17 +80,13 @@ object HideMobNames {
     }
 
     private fun shouldNameBeHidden(name: String): Boolean {
-        for (mob in HideNameBossType.entries) {
-            val pattern = mob.pattern
-            pattern.matchMatcher(name) {
-                val min = group("min")
-                val max = group("max")
-                if (min == max || min == "0") {
-                    return true
-                }
+        hideMobNamePatterns.matchMatchers(name) {
+            val min = group("min")
+            val max = group("max")
+            if (min == max || min == "0") {
+                return true
             }
         }
-
         return false
     }
 }
