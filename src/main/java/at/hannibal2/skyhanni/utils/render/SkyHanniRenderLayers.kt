@@ -52,7 +52,7 @@ object SkyHanniRenderLayers {
     )
 
     private val CHROMA_TEXTURED: java.util.function.Function<Identifier, RenderType> = Util.memoize { texture ->
-		//~ if >= 26.2 'ChromaRenderLayer' -> 'RenderType.create'
+		//~ if < 26.2 'RenderType.create' -> 'ChromaRenderLayer'
         RenderType.create(
             "skyhanni_text_chroma",
 			//? if >= 26.2 {

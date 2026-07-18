@@ -60,13 +60,13 @@ object ClientEvents {
         }
 
         // World change event
-        //~ if >= 26.1 'ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE' -> 'ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE'
+        //~ if < 26.1 'ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE' -> 'ClientWorldEvents.AFTER_CLIENT_WORLD_CHANGE'
         ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register { _, _ ->
             EventListeners.markEventCacheDirty()
             WorldChangeEvent.post()
         }
 
-        //~ if >= 26.1 'registerReloader' -> 'registerReloadListener'
+        //~ if < 26.1 'registerReloadListener' -> 'registerReloader'
         ResourceLoader.get(PackType.CLIENT_RESOURCES).registerReloadListener(
             Identifier.fromNamespaceAndPath("skyhanni", "resources"),
         ) { currentReload, _, preparationBarrier, reloadExecutor ->

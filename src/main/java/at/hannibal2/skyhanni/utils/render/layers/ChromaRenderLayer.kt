@@ -77,9 +77,9 @@ class ChromaRenderLayer(
 
                     renderPass.enableRenderPassScissorStateIfAble()
 
-                    //~ if >= 26.2 'getTextures' -> 'prepareTextures'
+                    //~ if < 26.2 'prepareTextures' -> 'getTextures'
                     for (entry in this.state.prepareTextures()) {
-                        //~ if >= 26.2 'key' -> 'name'
+                        //~ if < 26.2 'name' -> 'key'
                         renderPass.bindTexture(entry.name, entry.value.textureView, entry.value.sampler)
                     }
 

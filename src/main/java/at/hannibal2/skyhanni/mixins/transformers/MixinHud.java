@@ -23,12 +23,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if >= 26.2 'Gui' -> 'Hud'
+//~ if < 26.2 'Hud' -> 'Gui'
 import net.minecraft.client.gui.Hud;
-//~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
+//~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
 import net.minecraft.client.gui.contextualbar.ContextualBar;
 
-//~ if >= 26.2 'Gui.class' -> 'Hud.class'
+//~ if < 26.2 'Hud.class' -> 'Gui.class'
 @Mixin(Hud.class)
 public abstract class MixinHud {
 
@@ -82,13 +82,13 @@ public abstract class MixinHud {
         method = "extractHotbarAndDecorations",
         at = @At(value = "INVOKE",
             //~ if < 26.1 'extractBackground' -> 'renderBackground' {
-            //~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
+            //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
             //~}
         )
     )
     public void renderExperienceBar(
-        //~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
+        //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
         ContextualBar contextualBar,
         GuiGraphicsExtractor graphics,
         DeltaTracker deltaTracker,
@@ -105,7 +105,7 @@ public abstract class MixinHud {
         at = @At(
             value = "INVOKE",
             //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel' {
-            //~ if >= 26.2 'ContextualBarRenderer' -> 'ContextualBar'
+            //~ if < 26.2 'ContextualBar' -> 'ContextualBarRenderer'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBar;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
             //~}
         )

@@ -33,11 +33,11 @@ public abstract class MixinItemFeatureRenderer {
         //?} else {
         /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         *///?}
-        //~ if >= 26.2 'net/minecraft/client/renderer/OutlineBufferSource' -> 'com/mojang/blaze3d/vertex/QuadInstance'
+        //~ if < 26.2 'com/mojang/blaze3d/vertex/QuadInstance' -> 'net/minecraft/client/renderer/OutlineBufferSource'
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
-        //~ if >= 26.2 'OutlineBufferSource' -> 'QuadInstance'
+        //~ if < 26.2 'QuadInstance' -> 'OutlineBufferSource'
         QuadInstance instance,
         int color,
         Operation<Void> original,
@@ -74,7 +74,7 @@ public abstract class MixinItemFeatureRenderer {
         )
     )
     private VertexConsumer wrapOutlineVertexConsumer(
-        //~ if >= 26.2 'OutlineBufferSource' -> 'ItemFeatureRenderer'
+        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
         ItemFeatureRenderer instance,
         RenderType renderType,
         Operation<VertexConsumer> original,

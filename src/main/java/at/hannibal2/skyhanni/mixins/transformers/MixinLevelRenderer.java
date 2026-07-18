@@ -71,7 +71,7 @@ public abstract class MixinLevelRenderer {
     @Unique
     DeltaTracker skyhanni$currentDeltaTracker;
 
-    //~ if >= 26.2 'renderLevel' -> 'render'
+    //~ if < 26.2 'render' -> 'renderLevel'
     @Inject(method = "render", at = @At("HEAD"))
     private void beginRender(
         GraphicsResourceAllocator resourceAllocator,

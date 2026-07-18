@@ -44,7 +44,7 @@ object RenderCompat {
         return this.createCommandEncoder().createRenderPass(
             { name }, // label
             colorAttachment, // colorTexture
-            //~ if >= 26.2 'OptionalInt' -> 'Optional'
+            //~ if < 26.2 'Optional' -> 'OptionalInt'
             Optional.empty(),
             framebuffer.findDepthAttachment(), // depthTexture
             OptionalDouble.empty(), // clearDepth

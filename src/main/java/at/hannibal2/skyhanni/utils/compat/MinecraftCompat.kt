@@ -99,10 +99,10 @@ object MinecraftCompat {
 
     @JvmStatic
     var screen: Screen?
-        //~ if >= 26.2 'screen' -> 'gui.screen()'
+        //~ if < 26.2 'gui.screen()' -> 'screen'
         get() = mc.gui.screen()
         set(value) {
-            //~ if >= 26.2 'setScreen' -> 'gui.setScreen'
+            //~ if < 26.2 'gui.setScreen' -> 'setScreen'
             mc.gui.setScreen(value)
         }
 

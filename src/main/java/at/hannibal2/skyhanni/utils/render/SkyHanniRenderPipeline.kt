@@ -27,8 +27,8 @@ import java.util.Optional
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 
-//~ if >= 26.2 'VertexFormat.Mode' -> 'PrimitiveTopology' {
-//~ if >= 26.2 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' -> 'BindGroupLayouts.MATRICES_PROJECTION' {
+//~ if < 26.2 'PrimitiveTopology' -> 'VertexFormat.Mode' {
+//~ if < 26.2 'BindGroupLayouts.MATRICES_PROJECTION' -> 'RenderPipelines.MATRICES_PROJECTION_SNIPPET' {
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
     vFormat: VertexFormat = DefaultVertexFormat.POSITION_COLOR,
@@ -201,7 +201,7 @@ enum class SkyHanniRenderPipeline(
     private val internalPipeline: RenderPipeline = RenderPipelines.register(
         RenderPipeline.builder(snippet)
             .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, this.name.lowercase()))
-            //~ if >= 26.2 'withVertexFormat(vFormat, vDrawMode)' -> 'withVertexBinding(0, vFormat)'
+            //~ if < 26.2 'withVertexBinding(0, vFormat)' -> 'withVertexFormat(vFormat, vDrawMode)'
             .withVertexBinding(0, vFormat)
             //? if >= 26.2
             .withPrimitiveTopology(vDrawMode)

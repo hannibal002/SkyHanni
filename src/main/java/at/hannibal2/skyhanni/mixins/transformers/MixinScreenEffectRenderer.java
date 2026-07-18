@@ -11,17 +11,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-//~ if >= 26.2 'MultiBufferSource' -> 'SubmitNodeCollector'
+//~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
 import net.minecraft.client.renderer.SubmitNodeCollector;
 
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
 
-    //~ if >= 26.2 'renderFire' -> 'submitFire'
+    //~ if < 26.2 'submitFire' -> 'renderFire'
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(
         PoseStack poseStack,
-        //~ if >= 26.2 'MultiBufferSource' -> 'SubmitNodeCollector'
+        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         SubmitNodeCollector submitNodeCollector,
         TextureAtlasSprite sprite,
         CallbackInfo ci
@@ -30,24 +30,24 @@ abstract class MixinScreenEffectRenderer {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
     }
 
-    //~ if >= 26.2 'renderWater' -> 'submitWater'
+    //~ if < 26.2 'submitWater' -> 'renderWater'
     @Inject(method = "submitWater", at = @At("HEAD"), cancellable = true)
     private static void renderWater(
         Minecraft client,
         PoseStack matrices,
-        //~ if >= 26.2 'MultiBufferSource' -> 'SubmitNodeCollector'
+        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         SubmitNodeCollector submitNodeCollector,
         CallbackInfo ci
     ) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
     }
 
-    //~ if >= 26.2 'renderTex' -> 'submitBlockSprite'
+    //~ if < 26.2 'submitBlockSprite' -> 'renderTex'
     @Inject(method = "submitBlockSprite", at = @At("HEAD"), cancellable = true)
     private static void renderBlock(
         TextureAtlasSprite sprite,
         PoseStack poseStack,
-        //~ if >= 26.2 'MultiBufferSource' -> 'SubmitNodeCollector'
+        //~ if < 26.2 'SubmitNodeCollector' -> 'MultiBufferSource'
         SubmitNodeCollector submitNodeCollector,
         //? if >= 26.2
         int color,
