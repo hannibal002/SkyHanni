@@ -66,5 +66,6 @@ class ExperimentsAddonsConfig {
 
     @Expose
     @ConfigLink(owner = ExperimentsAddonsConfig::class, field = "addonsDebug")
+    @OnlyDebug
     val addonsDebugPosition: Position = Position(300, 300)
 }
