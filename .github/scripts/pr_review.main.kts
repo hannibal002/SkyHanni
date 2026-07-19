@@ -291,6 +291,10 @@ fun parseStackTrace(logContent: String): String {
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
+
+fun parseAllErrors(logContent: String): List<String> =
+    logContent.lines().filter { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+
 fun parseErrorContinuation(logContent: String, errorLine: String): String? {
     if (!errorLine.trimEnd().endsWith(":")) return null
     val lines = logContent.lines()
@@ -354,17 +358,31 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
-        val oneLiner = parseOneLiner(logContent)
-        if (oneLiner != null) {
-            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-            appendLine("`$displayLine`")
-            parseErrorContinuation(logContent, oneLiner)?.let { continuation ->
-                appendLine("`${continuation.take(300)}`")
+        val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
+        val rawErrorLines = parseAllErrors(logContent)
+        if (rawErrorLines.isNotEmpty()) {
+            for (rawLine in rawErrorLines.take(5)) {
+                val display = rawLine.trimStart().removePrefix("e: ")
+                    .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "") else it }
+                    .take(300)
+                appendLine("`$display`")
             }
-            if ("warnings found and -Werror specified" in logContent) {
-                appendLine()
-                appendLine("_Warning elevated to error by `-Werror`_")
+            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
+            if (rawErrorLines.size == 1) {
+                parseErrorContinuation(logContent, rawErrorLines[0])?.let { continuation ->
+                    appendLine("`${continuation.take(300)}`")
+                }
             }
+        } else {
+            val oneLiner = parseOneLiner(logContent)
+            if (oneLiner != null) {
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+                appendLine("`$displayLine`")
+            }
+        }
+        if ("warnings found and -Werror specified" in logContent) {
+            appendLine()
+            appendLine("_Warning elevated to error by `-Werror`_")
         }
         appendLine()
         val versionParts = version.split(" and ").map { it.trim() }
