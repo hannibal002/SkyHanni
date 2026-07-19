@@ -11,8 +11,8 @@ import org.jetbrains.kotlin.psi.KtImportList
 class CustomImportOrdering(config: Config) :
     SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
-    @JvmInline
-    private value class ImportLine(
+    private data class ImportLine(
+        val import: KtImportDirective,
         val lineIndex: Int,
     )
 
@@ -21,7 +21,7 @@ class CustomImportOrdering(config: Config) :
         val importLines: List<ImportLine>,
     )
 
-    private fun createImportBlocks(rawLines: List<String>): List<ImportBlock> {
+    private fun createImportBlocks(rawLines: List<String>, imports: Iterator<KtImportDirective>): List<ImportBlock> {
         val blocks = mutableListOf<ImportBlock>()
         var currentImports = mutableListOf<ImportLine>()
         var inPreprocessingBlock = false
@@ -54,7 +54,7 @@ class CustomImportOrdering(config: Config) :
                 }
 
                 trimmed.startsWith("import ") -> {
-                    currentImports += ImportLine(index)
+                    currentImports += ImportLine(imports.next(), index)
                 }
             }
         }
@@ -92,36 +92,11 @@ class CustomImportOrdering(config: Config) :
         }
     }
 
-    private fun isBlockOrdered(
-        block: ImportBlock,
-        imports: Iterator<KtImportDirective>,
-    ): Boolean {
-        val blockImports = buildList {
-            repeat(block.importLines.size) {
-                if (!imports.hasNext()) {
-                    return false
-                }
-                add(imports.next())
-            }
+    private fun areImportsOrdered(blocks: List<ImportBlock>): Boolean =
+        blocks.all { block ->
+            val imports = block.importLines.map { it.import }
+            imports == imports.sortedWith(ImportOrdering.getOrdering())
         }
-
-        val expected = blockImports
-            .sortedWith(ImportOrdering.getOrdering())
-            .map { it.importPath }
-
-        return blockImports.map { it.importPath } == expected
-    }
-
-    private fun areImportsOrdered(
-        imports: List<KtImportDirective>,
-        blocks: List<ImportBlock>,
-    ): Boolean {
-        val iterator = imports.iterator()
-
-        return blocks.all { block ->
-            isBlockOrdered(block, iterator)
-        } && !iterator.hasNext()
-    }
 
     private fun isPreprocessingBlocksLast(blocks: List<ImportBlock>): Boolean {
         var preprocessingStart = false
@@ -141,7 +116,7 @@ class CustomImportOrdering(config: Config) :
             return
         }
 
-        val blocks = createImportBlocks(rawText)
+        val blocks = createImportBlocks(rawText, importList.imports.iterator())
 
         // Should never happen unless import processing is broken.
         require(blocks.isNotEmpty()) { "No import blocks found in the import list." }
@@ -164,7 +139,7 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        if (!areImportsOrdered(importList.imports, blocks)) {
+        if (!areImportsOrdered(blocks)) {
             importList.reportIssue(
                 "Imports must be ordered in lexicographic order " +
                     "with \"java\", \"javax\", \"kotlin\", \"kotlinx\" and aliases in the end."
