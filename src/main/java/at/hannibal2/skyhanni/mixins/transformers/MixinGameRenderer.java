@@ -76,7 +76,7 @@ public abstract class MixinGameRenderer {
         ^///?}
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'extractSavingIndicator' -> 'renderSavingIndicator'
+            //~ if < 26.1 'extract' -> 'render'
             target = "Lnet/minecraft/client/gui/Gui;extractSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
         )
     )
