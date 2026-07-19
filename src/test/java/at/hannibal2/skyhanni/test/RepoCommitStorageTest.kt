@@ -12,9 +12,18 @@ import java.nio.file.Path
 class RepoCommitStorageTest {
 
     @Test
-    fun `readFromFile deletes malformed current commit json`(@TempDir tempDir: Path) {
+    fun `readFromFile deletes current commit json if getJson fails`(@TempDir tempDir: Path) {
         val file = tempDir.resolve("currentCommit.json").toFile()
         file.writeText("{")
+
+        assertNull(RepoCommitStorage(file).readFromFile())
+        assertFalse(file.exists())
+    }
+
+    @Test
+    fun `readFromFile deletes current commit json if fromJson fails`(@TempDir tempDir: Path) {
+        val file = tempDir.resolve("currentCommit.json").toFile()
+        file.writeText("\u0001")
 
         assertNull(RepoCommitStorage(file).readFromFile())
         assertFalse(file.exists())
