@@ -65,10 +65,11 @@ object FarmingContestApi {
     /**
      * REGEX-TEST: (1/2) Your Contests
      * REGEX-TEST: (2/2) Your Contests
+     * REGEX-TEST: Your Contests
      */
     val yourContestsPattern by patternGroup.pattern(
         "yourcontests",
-        "\\(\\d+/\\d+\\) Your Contests",
+        "(?:\\(\\d+/\\d+\\) )?Your Contests",
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
