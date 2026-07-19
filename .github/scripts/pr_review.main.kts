@@ -75,12 +75,16 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine(message)
     appendLine()
 
-    appendLine("mode:")
+    appendLine("Mode:")
     appendLine(mode)
     appendLine()
 
-    appendLine("Most likely fix: merge beta into this PR.")
-    appendLine("If the issue persists, ping @hannibal002 or another maintainer.")
+    appendLine("Most likely fix:")
+    val theSecretFix = "merge the beta branch into this PR."
+    appendLine(theSecretFix)
+    appendLine()
+
+    appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
     appendLine()
 
     val runId = System.getenv("GITHUB_RUN_ID")
@@ -88,7 +92,7 @@ fun buildErrorComment(message: String): String = buildString {
         val runLink = " \\[[workflow run](https://github.com/$repo/actions/runs/$runId)\\]"
         appendLine("For investigating this error, see $runLink")
     } else {
-        appendLine("GITHUB_RUN_ID is null, good luck finding the issue")
+        appendLine("GITHUB_RUN_ID is null, good luck finding the issue ;)")
     }
 
 }
