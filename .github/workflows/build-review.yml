@@ -14,8 +14,36 @@ permissions:
     issues: write
     pull-requests: write
     actions: read
+    statuses: write
 
 jobs:
+    verify:
+        name: Publish build status
+        runs-on: ubuntu-latest
+        if: github.event.workflow_run.conclusion != 'cancelled'
+        steps:
+            -   name: Publish Verify build results status
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+                    WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+                    WORKFLOW_URL: ${{ github.event.workflow_run.html_url }}
+                run: |
+                    if [ "$WORKFLOW_CONCLUSION" = "success" ]; then
+                        STATE="success"
+                        DESCRIPTION="All build jobs succeeded"
+                    else
+                        STATE="failure"
+                        DESCRIPTION="Build workflow finished with $WORKFLOW_CONCLUSION"
+                    fi
+
+                    gh api --method POST \
+                        "repos/$GITHUB_REPOSITORY/statuses/$HEAD_SHA" \
+                        -f state="$STATE" \
+                        -f context="Verify build results" \
+                        -f description="$DESCRIPTION" \
+                        -f target_url="$WORKFLOW_URL"
+
     review:
         name: Post build failure comment
         runs-on: ubuntu-latest
