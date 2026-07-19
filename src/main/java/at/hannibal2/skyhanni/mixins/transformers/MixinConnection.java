@@ -37,8 +37,8 @@ public class MixinConnection {
         boolean flush,
         CallbackInfo ci
     ) {
-        if (new PacketSentEvent(packet).post()) {
-            ci.cancel();
+        if (new PacketSentEvent(packet).post().isCancelled()) {
+           ci.cancel();
         }
     }
 }

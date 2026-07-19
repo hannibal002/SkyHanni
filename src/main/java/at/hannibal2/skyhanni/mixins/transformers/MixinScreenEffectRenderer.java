@@ -23,7 +23,7 @@ abstract class MixinScreenEffectRenderer {
         CallbackInfo ci
 
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
@@ -33,7 +33,7 @@ abstract class MixinScreenEffectRenderer {
         MultiBufferSource submitNodeCollector,
         CallbackInfo ci
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.WATER).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
@@ -43,6 +43,6 @@ abstract class MixinScreenEffectRenderer {
         MultiBufferSource submitNodeCollector,
         CallbackInfo ci
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post().isCancelled()) ci.cancel();
     }
 }

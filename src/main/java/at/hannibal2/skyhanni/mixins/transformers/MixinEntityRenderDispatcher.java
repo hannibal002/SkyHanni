@@ -34,7 +34,7 @@ public class MixinEntityRenderDispatcher {
         double camZ,
         CallbackInfoReturnable<Boolean> cir
     ) {
-        if (EntityData.onRenderCheck(entity, camX, camY, camZ)) {
+        if (!EntityData.shouldRender(entity, camX, camY, camZ)) {
             cir.setReturnValue(false);
         }
     }

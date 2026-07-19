@@ -268,7 +268,7 @@ object PestFinder {
         }
     }
 
-    fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
+    private fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
