@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.Re
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
+import at.hannibal2.skyhanni.data.garden.ComposterUpgradesData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -142,7 +143,7 @@ object ComposterOverlay {
         for (upgrade in ComposterUpgrade.entries) {
             val name = event.itemStack.cleanName
             if (name.contains(upgrade.displayName)) {
-                maxLevel = ComposterUpgrade.composterUpgradePattern.matchMatcher(name) {
+                maxLevel = ComposterUpgradesData.composterUpgradePattern.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
                 } == 25
                 extraComposterUpgrade = upgrade
