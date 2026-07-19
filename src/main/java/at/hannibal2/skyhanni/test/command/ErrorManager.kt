@@ -183,6 +183,7 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
+        logOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ): Boolean {
         if (extraData.isNotEmpty()) {
@@ -195,6 +196,7 @@ object ErrorManager {
             noStackTrace,
             *extraData,
             betaOnly = betaOnly,
+            logOnly = logOnly,
             condition = condition,
         ).crashIfNotYetOnAServer()
     }
@@ -207,7 +209,15 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
-    ): Boolean = logError(throwable, message, ignoreErrorCache, noStackTrace, *extraData, betaOnly = betaOnly).crashIfNotYetOnAServer()
+        logOnly: Boolean = false,
+    ): Boolean =
+        logError(
+            throwable,
+            message, ignoreErrorCache,
+            noStackTrace, *extraData,
+            betaOnly = betaOnly,
+            logOnly = logOnly
+        ).crashIfNotYetOnAServer()
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
@@ -228,6 +238,7 @@ object ErrorManager {
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
+        logOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ): ErrorStateT {
         if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
@@ -266,18 +277,38 @@ object ErrorManager {
             "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"
 
         val isConnected = MinecraftCompat.localPlayerOrNull != null
+        val displayResult = buildFinalMessage(message)
 
-        val finalMessage = buildFinalMessage(message) ?: return ErrorState.BLOCKED_CAN_NOT_SHOW
         if (!isConnected) {
-            errorsToShowOnJoin[randomId] = finalMessage
+            when (displayResult) {
+                is ErrorDisplayResult.Chat ->
+                    errorsToShowOnJoin[randomId] = displayResult.message
+                is ErrorDisplayResult.UserError ->
+                    errorsToShowOnJoin[randomId] = displayResult.message
+                ErrorDisplayResult.Hidden ->
+                    return ErrorState.BLOCKED_CAN_NOT_SHOW
+            }
             return ErrorState.BLOCKED_CAN_NOT_SHOW
         }
-        ChatUtils.clickableChat(
-            "§c[$label]: $finalMessage Click here to copy the error into the clipboard.",
-            onClick = { copyError(randomId) },
-            "§eClick to copy!",
-            prefix = false,
-        )
+
+        if (!logOnly) {
+            when (displayResult) {
+                is ErrorDisplayResult.Chat ->
+                    ChatUtils.clickableChat(
+                        "§c[$label]: ${displayResult.message} Click here to copy the error into the clipboard.",
+                        onClick = { copyError(randomId) },
+                        "§eClick to copy!",
+                        prefix = false,
+                    )
+
+                is ErrorDisplayResult.UserError ->
+                    ChatUtils.userError(displayResult.message)
+
+                ErrorDisplayResult.Hidden ->
+                    return ErrorState.BLOCKED_CAN_NOT_SHOW
+            }
+        }
+
         return ErrorState.LOGGED
     }
 
@@ -336,7 +367,13 @@ object ErrorManager {
         return buildExtraDataString(extraData).orEmpty()
     }
 
-    private fun buildFinalMessage(message: String): String? {
+    sealed interface ErrorDisplayResult {
+        data class Chat(val message: String) : ErrorDisplayResult
+        data class UserError(val message: String) : ErrorDisplayResult
+        object Hidden : ErrorDisplayResult
+    }
+
+    private fun buildFinalMessage(message: String): ErrorDisplayResult {
         var finalMessage = message
         val rawMessage = message.removeColor()
 
@@ -364,8 +401,7 @@ object ErrorManager {
                         hideError = false
                     }
                     repoError.customMessage?.let {
-                        ChatUtils.userError(it)
-                        return null
+                        return ErrorDisplayResult.UserError(it)
                     }
                     break
                 }
@@ -375,14 +411,19 @@ object ErrorManager {
                 "§cFailed to format error message! " +
                     "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord.",
             )
-            // can not use error manager inside error manager
+            // cannot use ErrorManager inside ErrorManager
             Error("Failed to format error message", e).printStackTrace()
+        }
+
+        if (hideError) {
+            return ErrorDisplayResult.Hidden
         }
 
         if (finalMessage.last() !in ".?!") {
             finalMessage += "§c."
         }
-        return if (hideError) null else finalMessage
+
+        return ErrorDisplayResult.Chat(finalMessage)
     }
 
     @HandleEvent
