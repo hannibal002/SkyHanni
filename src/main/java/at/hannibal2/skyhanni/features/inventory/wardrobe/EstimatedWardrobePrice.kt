@@ -49,7 +49,7 @@ object EstimatedWardrobePrice {
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
-        (config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe()) &&
+        ((config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe())) &&
         (!ArmorWardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent

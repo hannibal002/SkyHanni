@@ -195,12 +195,7 @@ object LoadoutApi {
         data.hotm = itemsList[HOTM_SLOT].parseCurrentSelection()
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
 
-        EquipmentSlot.entries.forEach {
-            val itemStack = data.equipment[it.ordinal]
-            if (itemStack != null && !itemStack.isStainedGlassPane()) {
-                EquipmentApi.setEquipment(it, itemStack)
-            } else EquipmentApi.setEquipment(it, null)
-        }
+        EquipmentSlot.entries.forEach { EquipmentApi.setEquipment(it, data.equipment[it.ordinal]) }
     }
 
     // This is for Hotm, Hotf and Powerstone

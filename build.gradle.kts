@@ -51,9 +51,11 @@ fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependency
 fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
 fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
 fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
 fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
@@ -86,7 +88,7 @@ loom.apply {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G")
+            vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
@@ -432,7 +434,7 @@ if (isDeobf) {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
-                           else target.minecraftVersion.formattedJavaLanguageVersion
+        else target.minecraftVersion.formattedJavaLanguageVersion
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
         allWarningsAsErrors = true
         optIn.addAll(
@@ -548,7 +550,7 @@ afterEvaluate {
     tasks.findByName("check")?.setDependsOn(
         tasks.getByName("check").dependsOn.filterNot { dep ->
             (dep is Task && dep.name.startsWith("detekt")) ||
-            (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
+                (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
         }
     )
 }

@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
-import kotlin.collections.forEach
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
 object EquipmentWardrobeApi : WardrobeApi() {
@@ -37,20 +36,12 @@ object EquipmentWardrobeApi : WardrobeApi() {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) = handleInventoryUpdated(event)
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        handleInventoryClose()
-
-        val currentEquipped = currentSlot?.let {
-            slots[it]
-        }?.getData()?.armor ?: return
-        EquipmentSlot.entries.forEach {
-            val itemStack = currentEquipped[it.ordinal]
-            if (itemStack != null && !itemStack.isStainedGlassPane()) {
-                EquipmentApi.setEquipment(it, itemStack)
-            } else EquipmentApi.setEquipment(it, null)
-        }
-    }
+    fun onInventoryClose(event: InventoryCloseEvent) = handleInventoryClose()
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
+
+    override fun onEquippedSlotUpdated(items: List<SafeItemStack?>) {
+        EquipmentSlot.entries.forEach { EquipmentApi.setEquipment(it, items[it.ordinal]) }
+    }
 }
