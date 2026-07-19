@@ -33,7 +33,7 @@ abstract class MixinScreenEffectRenderer {
         CallbackInfo ci
 
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
     //~ if < 26.2 'submitWater' -> 'renderWater'
@@ -48,7 +48,7 @@ abstract class MixinScreenEffectRenderer {
         *///?}
         CallbackInfo ci
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.WATER).post().isCancelled()) ci.cancel();
     }
 
     //~ if < 26.2 'submitBlockSprite' -> 'renderTex'
@@ -64,6 +64,6 @@ abstract class MixinScreenEffectRenderer {
         *///?}
         CallbackInfo ci
     ) {
-        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post().isCancelled()) ci.cancel();
     }
 }

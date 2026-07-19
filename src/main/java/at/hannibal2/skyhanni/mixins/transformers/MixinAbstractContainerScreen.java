@@ -140,7 +140,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (GlobalRender.INSTANCE.getRenderDisabled()) return;
         AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post()) {
+        if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post().isCancelled()) {
             GuiData.INSTANCE.setPreDrawEventCancelled(true);
             ci.cancel();
         } else {
@@ -154,7 +154,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
+        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post().isCancelled()) ci.cancel();
     }
 
     @Inject(
@@ -186,7 +186,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         int keyCode = input.input();
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
-        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
+        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post().isCancelled() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }
@@ -194,10 +194,10 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiKeyPressEvent(screen).post()) {
+        if (new GuiKeyPressEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
-        if (new GuiMouseInputEvent(screen).post()) {
+        if (new GuiMouseInputEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
     }

@@ -46,7 +46,7 @@ public abstract class MixinHud {
     //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postHotbarLayerEventPre(graphics)) {
+        if (RenderEvents.postHotbarLayerEventPre(graphics).isCancelled()) {
             ci.cancel();
         }
     }
@@ -73,7 +73,7 @@ public abstract class MixinHud {
         Objective displayObjective,
         Operation<Void> original
     ) {
-        if (RenderEvents.postTablistLayerEventPre(graphics)) return;
+        if (RenderEvents.postTablistLayerEventPre(graphics).isCancelled()) return;
         original.call(tabList, graphics, screenWidth, scoreboard, displayObjective);
     }
 
@@ -94,7 +94,7 @@ public abstract class MixinHud {
         DeltaTracker deltaTracker,
         Operation<Void> original
     ) {
-        if (RenderEvents.postExperienceBarLayerEventPre(graphics)) return;
+        if (RenderEvents.postExperienceBarLayerEventPre(graphics).isCancelled()) return;
         original.call(contextualBar, graphics, deltaTracker);
         RenderEvents.postExperienceBarLayerEventPost(graphics);
     }
@@ -116,7 +116,7 @@ public abstract class MixinHud {
         int experienceLevel,
         Operation<Void> original
     ) {
-        if (RenderEvents.postExperienceNumberLayerEventPre(graphics)) return;
+        if (RenderEvents.postExperienceNumberLayerEventPre(graphics).isCancelled()) return;
         original.call(graphics, font, experienceLevel);
         RenderEvents.postExperienceNumberLayerEventPost(graphics);
     }
@@ -165,7 +165,7 @@ public abstract class MixinHud {
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, false).post()) {
+        if (!new TitleReceivedEvent(formattedText, false).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -173,7 +173,7 @@ public abstract class MixinHud {
     @WrapMethod(method = "setSubtitle")
     private void handleSubtitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, true).post()) {
+        if (!new TitleReceivedEvent(formattedText, true).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -181,7 +181,7 @@ public abstract class MixinHud {
     //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor graphics, CallbackInfo ci) {
-        if (RenderEvents.postHeldItemTooltipLayerEventPre(graphics)) {
+        if (RenderEvents.postHeldItemTooltipLayerEventPre(graphics).isCancelled()) {
             ci.cancel();
         }
     }
@@ -195,7 +195,7 @@ public abstract class MixinHud {
     //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postActionBarLayerEventPre(graphics)) {
+        if (RenderEvents.postActionBarLayerEventPre(graphics).isCancelled()) {
             ci.cancel();
         }
     }

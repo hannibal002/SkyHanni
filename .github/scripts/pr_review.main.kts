@@ -43,7 +43,7 @@ val dependencyLabel = "Waiting on Dependency PR"
 
 val warningIcon = "⚠\uFE0F"
 
-val maxDirectFindings = 8
+val maxDirectFindings = 15
 val maxLogChars = 10_000
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
@@ -176,15 +176,28 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    appendAll(direct)
+    appendCompact(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        appendAll(overflow)
+        appendCompact(overflow)
         appendLine("\n</details>")
+    }
+    appendLine("\n<details><summary>More Details</summary>\n")
+    appendFull(findings)
+    appendLine("\n</details>")
+}
+
+fun StringBuilder.appendCompact(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        appendLine("- ```$className:$line```: $message")
     }
 }
 
-fun StringBuilder.appendAll(findings: List<Finding>) {
+fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
         val ruleId = sanitize(finding.ruleId)
@@ -192,8 +205,11 @@ fun StringBuilder.appendAll(findings: List<Finding>) {
         val className = sanitize(fileName)
         val line = finding.line
         val path = sanitize(finding.path)
-        appendLine("- ```$className``` at line $line: $message")
-        appendLine("  rule: `$ruleId`, path: `$path`")
+        appendLine("- ```$className:$line```")
+        appendLine("  message: `$message`")
+        appendLine("  rule: `$ruleId`")
+        appendLine("  path: `$path`")
+        appendLine()
     }
 }
 
@@ -295,20 +311,26 @@ fun parseStackTrace(logContent: String): String {
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
-
 fun parseAllErrors(logContent: String): List<String> =
-    logContent.lines().filter { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+    logContent.lines()
+        .filter { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+        .distinct()
 
-fun parseErrorContinuation(logContent: String, errorLine: String): String? {
-    if (!errorLine.trimEnd().endsWith(":")) return null
+fun parseErrorContinuations(logContent: String, errorLine: String): List<String> {
     val lines = logContent.lines()
     val idx = lines.indexOf(errorLine)
-    if (idx < 0 || idx + 1 >= lines.size) return null
-    val next = lines[idx + 1]
-    if (next.isBlank()) return null
-    if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) return null
-    if (next.startsWith(">") || next.startsWith("FAILURE") || next.startsWith("*")) return null
-    return next.trim()
+    if (idx < 0) return emptyList()
+    val result = mutableListOf<String>()
+    var i = idx + 1
+    while (i < lines.size) {
+        val next = lines[i]
+        if (next.isBlank()) break
+        if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
+        if (next.startsWith(">") || next.startsWith("FAILURE") || next.startsWith("*")) break
+        result.add(next.trim())
+        i++
+    }
+    return result
 }
 
 fun isStonecutterOneLiner(oneLiner: String): Boolean {
@@ -369,14 +391,12 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                 val display = rawLine.trimStart().removePrefix("e: ")
                     .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "") else it }
                     .take(300)
-                appendLine("`$display`")
-            }
-            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
-            if (rawErrorLines.size == 1) {
-                parseErrorContinuation(logContent, rawErrorLines[0])?.let { continuation ->
-                    appendLine("`${continuation.take(300)}`")
+                appendLine("- `$display`")
+                for (cont in parseErrorContinuations(logContent, rawLine)) {
+                    appendLine("  - `${cont.take(300)}`")
                 }
             }
+            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
         } else {
             val oneLiner = parseOneLiner(logContent)
             if (oneLiner != null) {
