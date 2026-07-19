@@ -18,7 +18,7 @@ class CustomImportOrdering(config: Config) :
 
     private data class ImportBlock(
         val inPreprocessingBlock: Boolean,
-        val imports: List<ImportLine>,
+        val importLines: List<ImportLine>,
     )
 
     private fun createImportBlocks(rawLines: List<String>): List<ImportBlock> {
@@ -72,8 +72,8 @@ class CustomImportOrdering(config: Config) :
             current.inPreprocessingBlock != next.inPreprocessingBlock &&
                 rawLines
                     .subList(
-                        current.imports.last().lineIndex + 1,
-                        next.imports.first().lineIndex,
+                        current.importLines.last().lineIndex + 1,
+                        next.importLines.first().lineIndex,
                     )
                     .none(String::isBlank)
         }
@@ -84,7 +84,7 @@ class CustomImportOrdering(config: Config) :
         blocks: List<ImportBlock>,
     ): Boolean {
         return blocks.all { block ->
-            block.imports.zipWithNext().none { (current, next) ->
+            block.importLines.zipWithNext().none { (current, next) ->
                 rawLines
                     .subList(current.lineIndex + 1, next.lineIndex)
                     .any(String::isBlank)
