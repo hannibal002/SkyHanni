@@ -49,7 +49,7 @@ object CurrentEquipmentApi {
     fun getSlots(): Map<EquipmentSlot, SafeItemStack?> =
         EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
 
-    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
+    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull().orEmpty()
 
     fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
