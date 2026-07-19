@@ -32,7 +32,7 @@ object FarmingContestApi {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
     /**
-     * REGEX-TEST: June 1st, Year 400
+     * REGEX-TEST: Spring 31st, Year 494
      */
     private val timePattern by patternGroup.pattern(
         "time.colorless",
