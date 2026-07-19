@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
 import at.hannibal2.skyhanni.config.features.pets.display.PetDisplayConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import io.github.notenoughupdates.moulconfig.gui.GuiElementComponent
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
@@ -55,8 +55,8 @@ object PetDisplayConfigGuiManager {
     fun isOpen(): Boolean {
         val currentEditor = editor ?: return false
         val screen = MinecraftCompat.screen as? MoulConfigScreenComponent ?: return false
-        val root = screen.guiContext.root as? GuiElementComponent ?: return false
-        return root.element === currentEditor
+        val root = screen.guiContext.root as? MoulConfigEditorComponent ?: return false
+        return root.editor === currentEditor
     }
 
     fun renderPreview(renderable: Renderable) {
