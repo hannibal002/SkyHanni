@@ -70,7 +70,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Inject(
-        //? if < 26.1 'extract' -> 'render'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractContents",
         at = @At(
             value = "INVOKE",
@@ -94,7 +94,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Inject(
-        //? if < 26.1 'extract' -> 'render'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractContents",
         at = @At(
             value = "INVOKE",
@@ -126,7 +126,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Inject(
-        //? if < 26.1 'extract' -> 'render'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractContents",
         at = @At(
             value = "INVOKE",
@@ -161,7 +161,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     }
 
     @Inject(
-        //? if < 26.1 'extract' -> 'render'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractContents",
         at = @At(
             value = "INVOKE",
