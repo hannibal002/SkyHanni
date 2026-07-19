@@ -174,7 +174,7 @@ dependencies {
 
     target.modMenuVersion?.let {
         if (isDeobf) implementation("maven.modrinth:modmenu:$it")
-        else modImplementation("maven.modrinth:modmenu:$it")
+        else modImplementation("maven.modrinth:modmenux:$it")
     }
 
     if (isDeobf) runtimeOnly(libs.devauth)
