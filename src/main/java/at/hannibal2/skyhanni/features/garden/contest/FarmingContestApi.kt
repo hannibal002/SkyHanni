@@ -48,11 +48,11 @@ object FarmingContestApi {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " ○ Carrot - 14:32"
+     * WRAPPED-REGEX-TEST: " ○ Cocoa Beans 15m14s"
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>[^-]+) .*",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
     )
 
     /**
