@@ -31,30 +31,44 @@ import kotlin.time.Duration.Companion.minutes
 object FarmingContestApi {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
+    /**
+     * REGEX-TEST: June 1st, Year 400
+     */
     private val timePattern by patternGroup.pattern(
         "time.colorless",
         "(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)",
     )
+
+    /**
+     * REGEX-TEST: Carrot Contest
+     */
     private val cropPattern by patternGroup.pattern(
         "crop.colorless",
         "(?<crop>.*) Contest",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: " ○ Carrot - 14:32"
+     */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>[^-]+) .*",
     )
+
+    /**
+     * REGEX-TEST: Claim multiple farming contest
+     */
     private val bulkClaimFarmingPattern by patternGroup.pattern(
         "bulkclaim.colorless",
         "Claim multiple farming contest",
     )
-
     /**
      * REGEX-TEST: (1/2) Your Contests
      * REGEX-TEST: (2/2) Your Contests
      */
     val yourContestsPattern by patternGroup.pattern(
         "yourcontests",
-        "\\(\\d+//\\d+\\) Your Contests",
+        "\\(\\d+/\\d+\\) Your Contests",
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
