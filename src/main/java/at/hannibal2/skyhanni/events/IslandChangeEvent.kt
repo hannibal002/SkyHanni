@@ -15,15 +15,15 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
  * When switching islands, the event fires twice: first with [newIsland] =[IslandType.NONE]
  * (leaving the old island), then with [oldIsland] = [IslandType.NONE] (entering the new one).
  */
-@Thread(NETWORK, RENDER)
+@Thread(RENDER)
 @Deprecated("use IslandJoinEvent or IslandLeaveEvent instead")
 @PrimaryFunction("onIslandChange")
 class IslandChangeEvent(val newIsland: IslandType, val oldIsland: IslandType) : SkyHanniEvent()
 
-@Thread(NETWORK, RENDER)
+@Thread(RENDER)
 @PrimaryFunction("onIslandJoin")
 class IslandJoinEvent(val island: IslandType, val previousIsland: IslandType) : SkyHanniEvent()
 
-@Thread(NETWORK, RENDER)
+@Thread(RENDER)
 @PrimaryFunction("onIslandLeave")
 class IslandLeaveEvent(val island: IslandType) : SkyHanniEvent()
