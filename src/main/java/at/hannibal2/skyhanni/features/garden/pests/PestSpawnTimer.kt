@@ -91,8 +91,9 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+        val widgetLines = event.widget.lines.map { it.string }
 
-        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+        pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
@@ -113,7 +114,6 @@ object PestSpawnTimer {
                 pestSpawned = false
             }
         } ?: run {
-            val widgetLines = event.widget.lines.map { it.string }
             if (widgetLines.all { it.isBlank() }) return
 
             ErrorManager.logErrorStateWithData(
