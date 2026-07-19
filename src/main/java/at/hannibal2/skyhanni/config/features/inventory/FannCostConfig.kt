@@ -19,7 +19,6 @@ class FannCostConfig {
     @FeatureToggle
     var xpPerBit: Boolean = false
 
-    @Suppress("StorageVarOrVal")
     @ConfigOption(
         name = "Why not Bits/XP?",
         desc = "One, it's fixed 500 Bits a day, and two, the result would have lots of zeros after decimal."

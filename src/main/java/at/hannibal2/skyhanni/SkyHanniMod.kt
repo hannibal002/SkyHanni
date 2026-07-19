@@ -48,6 +48,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -96,7 +97,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
         if (screenTicks != 5) return
         val title = InventoryUtils.openInventoryName()
         if (shouldCloseScreen) {
-            MinecraftCompat.localPlayer.closeContainer()
+            MinecraftCompat.localPlayerOrThrow.closeContainer()
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
@@ -118,6 +119,8 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
 
     const val MODID: String = "skyhanni"
     const val VERSION: String = VersionConstants.MOD_VERSION
+
+    fun id(path: String): Identifier = Identifier.fromNamespaceAndPath(MODID, path)
 
     val modVersion: ModVersion = ModVersion.fromString(VERSION)
 

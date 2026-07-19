@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+// this is not unused
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -232,7 +233,7 @@ object EnoughUpdatesManager {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {
-            val freshStack = SafeItemStack(baseItem, countVal)
+            val freshStack = ItemStackTemplate(baseItem, countVal).create()
             ComponentUtils.convertToComponents(freshStack, neuItemRef.neuNbt)
             var innerReplacements = emptyMap<String, String>()
             if (useReplacements) {

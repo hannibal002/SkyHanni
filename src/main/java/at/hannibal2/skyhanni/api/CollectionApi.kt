@@ -38,7 +38,7 @@ object CollectionApi {
     )
 
     /**
-     * REGEX-TEST:                           43,649/50k
+     * WRAPPED-REGEX-TEST: "                          43,649/50k"
      * REGEX-TEST: Total collected: 277,252
      */
     private val counterPattern by patternGroup.pattern(
@@ -115,7 +115,7 @@ object CollectionApi {
 
         if (inventoryName.endsWith("s") && inventoryName != "Boss Collections") {
             for ((_, stack) in event.inventoryItems) {
-                val name = stack.cleanName()
+                val name = stack.cleanName
                 if ("Collections" in name) continue
 
                 val lore = stack.getLoreComponent()

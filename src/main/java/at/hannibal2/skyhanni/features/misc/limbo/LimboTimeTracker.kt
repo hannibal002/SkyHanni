@@ -76,7 +76,7 @@ object LimboTimeTracker {
         inFakeLimbo = inBedWarsLobby && bedWarsLobbyLimbo.isPlayerInside()
         updateLimboState(wasInLimbo)
         if (inLimbo) {
-            onFire = MinecraftCompat.localPlayer.isOnFire
+            onFire = MinecraftCompat.localPlayerOrThrow.isOnFire
         }
     }
 
@@ -135,21 +135,21 @@ object LimboTimeTracker {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Forgot to turn off the PC".asComponent(),
-            componentBuilder {
+            name = "Forgot to turn off the PC".asComponent(),
+            description = componentBuilder {
                 append("Spend 6 hours in limbo at once! ")
                 append("What a waste of electricity :(") {
                     withColor(ChatFormatting.DARK_GRAY)
                 }
             },
-            6f,
+            userLuckAmount = 6f,
         )
         event.register(achievement, LIMBO_ACHIEVEMENT)
     }
 
     private fun enterLimbo() {
         limboJoinTime = SimpleTimeMark.now()
-        onFire = MinecraftCompat.localPlayer.isOnFire
+        onFire = MinecraftCompat.localPlayerOrThrow.isOnFire
     }
 
     private fun leaveLimbo() {
