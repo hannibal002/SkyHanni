@@ -14,10 +14,11 @@ import net.minecraft.client.renderer.block.model.BlockStateModel
 *///?}
 
 fun modifyGetModelFromBlockState(
-    //? if >= 26.1
+    //? if >= 26.1 {
     modelSet: BlockStateModelSet,
-    //? else
-    //blockRenderDispatcher: BlockRenderDispatcher,
+    //?} else {
+    /*blockRenderDispatcher: BlockRenderDispatcher,
+    *///?}
     state: BlockState?,
     cir: CallbackInfoReturnable<BlockStateModel>,
 ) {
@@ -26,9 +27,10 @@ fun modifyGetModelFromBlockState(
 
     if (returnState != state) {
         cir.returnValue =
-            //? if >= 26.1
+            //? if >= 26.1 {
             modelSet.get(returnState)
-            //? else
-            //blockRenderDispatcher.blockModelShaper.getBlockModel(returnState)
+            //?} else {
+            /*blockRenderDispatcher.blockModelShaper.getBlockModel(returnState)
+            *///?}
     }
 }

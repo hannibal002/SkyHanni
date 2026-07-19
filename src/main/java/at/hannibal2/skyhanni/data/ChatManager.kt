@@ -37,8 +37,9 @@ import kotlin.math.floor
 
 //? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?} else
-//import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
+//?} else {
+/*import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
+*///?}
 
 @SkyHanniModule
 object ChatManager {
@@ -280,8 +281,9 @@ object ChatManager {
             counter,
             newComponent,
             id,
-            //? if >= 26.1
+            //? if >= 26.1 {
             GuiMessageSource.SYSTEM_CLIENT,
+            //?}
             GuiMessageTag.system(),
         )
         chatGui.allMessages[messageIndex] = newMessage

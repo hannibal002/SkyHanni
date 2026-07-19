@@ -34,10 +34,11 @@ object RenderEvents {
             RenderEvents::postGui,
         )
 
-        //? if >= 26.1
+        //? if >= 26.1 {
         PictureInPictureRendererRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.bufferSource()) }
-        //? else
-        //SpecialGuiElementRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers()) }
+        //?} else {
+        /*SpecialGuiElementRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers()) }
+        *///?}
     }
 
     @HandleEvent

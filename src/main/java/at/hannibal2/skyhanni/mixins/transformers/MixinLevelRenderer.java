@@ -75,8 +75,9 @@ public abstract class MixinLevelRenderer {
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
-        //? if = 26.1
+        //? if = 26.1 {
         ChunkSectionsToRender chunkSectionsToRender,
+        //?}
         CallbackInfo ci
     ) {
         skyhanni$currentCameraState = cameraState;

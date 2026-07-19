@@ -35,8 +35,9 @@ public abstract class MixinItemFeatureRenderer {
             //? if >= 26.1 {
             argsOnly = true,
             name = "submit"
-            //?} else
-            //name = "itemSubmit"
+            //?} else {
+            /*name = "itemSubmit"
+            *///?}
         ) SubmitNodeStorage.ItemSubmit submit
     ) {
         boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();

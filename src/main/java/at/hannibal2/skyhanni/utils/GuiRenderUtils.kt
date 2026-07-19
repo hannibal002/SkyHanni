@@ -394,8 +394,9 @@ object GuiRenderUtils {
             return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
         val guiItemRenderState = GuiItemRenderState(
-            //? if < 26.1
-            //this.item.name.toString(),
+            //? if < 26.1 {
+            /*this.item.name.toString(),
+            *///?}
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,
@@ -417,10 +418,11 @@ object GuiRenderUtils {
         )
 
         val renderer = Minecraft.getInstance().gameRenderer
-        //? if >= 26.1
+        //? if >= 26.1 {
         renderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
-        //? else
-        //renderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        //?} else {
+        /*renderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        *///?}
 
         return newRenderState.stableId
     }

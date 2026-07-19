@@ -168,10 +168,11 @@ object TabListRenderer {
                         //~ if < 26.1 'texturePath' -> 'id'
                         val texture = playerInfo.skin.body().texturePath()
 
-                        //? if >= 26.1
+                        //? if >= 26.1 {
                         PlayerFaceExtractor.extractRenderState(
-                        //?else
-                        //PlayerFaceRenderer.draw(
+                        //?} else {
+                        /*PlayerFaceRenderer.draw(
+                        *///?}
                             DrawContextUtils.drawContext,
                             texture,
                             middleX,

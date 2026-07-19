@@ -9,8 +9,9 @@ import com.mojang.blaze3d.vertex.VertexFormatElement
 import org.lwjgl.system.MemoryUtil
 
 private typealias VFEType = VertexFormatElement.Type
-//? if < 26.1
-//private typealias VFEUsage = VertexFormatElement.Usage
+//? if < 26.1 {
+/*private typealias VFEUsage = VertexFormatElement.Usage
+*///?}
 
 object SkyHanniVertexFormats {
 

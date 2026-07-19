@@ -43,8 +43,9 @@ public abstract class MixinGuiMessage implements GuiMessageData {
         int addedTime,
         Component content,
         MessageSignature signature,
-        //? if >= 26.1
+        //? if >= 26.1 {
         GuiMessageSource source,
+        //?}
         GuiMessageTag tag,
         CallbackInfo ci
     ) {

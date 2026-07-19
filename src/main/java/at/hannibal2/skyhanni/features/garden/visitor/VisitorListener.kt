@@ -62,8 +62,9 @@ object VisitorListener {
     fun onSendEvent(event: PacketSentEvent) {
         val packetEntityId = when (val packet = event.packet) {
             is ServerboundInteractPacket -> packet.entityId
-            //? if >= 26.1
+            //? if >= 26.1 {
             is ServerboundAttackPacket -> packet.entityId
+            //?}
             else -> return
         }
 

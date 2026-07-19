@@ -16,24 +16,27 @@ import net.minecraft.client.renderer.state.level.CameraRenderState
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
-    //? if >= 26.1
+    //? if >= 26.1 {
     cameraState: CameraRenderState,
-    //? else
-    //camera: Camera,
+    //?} else {
+    /*camera: Camera,
+    *///?}
     val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent() {
 
     val cameraPos: Vec3 =
-        //? if >= 26.1
+        //? if >= 26.1 {
         cameraState.pos
-        //? else
-        //camera.position
+        //?} else {
+        /*camera.position
+        *///?}
 
     val cameraRotation: Quaternionf =
-        //? if >= 26.1
+        //? if >= 26.1 {
         cameraState.orientation
-        //? else
-        //camera.rotation()
+        //?} else {
+        /*camera.rotation()
+        *///?}
 }

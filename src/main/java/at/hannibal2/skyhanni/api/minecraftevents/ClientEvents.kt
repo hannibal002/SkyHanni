@@ -108,8 +108,9 @@ object ClientEvents {
                 //? if >= 26.1 {
                 GuiMessageSource.SYSTEM_CLIENT,
                 GuiMessageTag.system(),
-                //?} else
-                //GuiMessageTag.system(),
+                //?} else {
+                /*GuiMessageTag.system(),
+                *///?}
             )
             MinecraftCompat.hud.chat.logChatMessage(chatHudLine)
         }

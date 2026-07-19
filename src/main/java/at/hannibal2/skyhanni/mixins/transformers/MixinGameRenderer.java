@@ -19,10 +19,11 @@ public abstract class MixinGameRenderer {
     @Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
-    //? if >= 26.1
+    //? if >= 26.1 {
     @ModifyVariable(method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At("STORE"), name = "graphics")
-    //? else
-    //@ModifyVariable(method = "render", at = @At("STORE"), name = "guiGraphics")
+    //?} else {
+    /*@ModifyVariable(method = "render", at = @At("STORE"), name = "guiGraphics")
+    *///?}
     private GuiGraphicsExtractor skyhanni$captureGuiGraphicsExtractor(GuiGraphicsExtractor graphics) {
         skyhanni$guiGraphics = graphics;
         return graphics;
@@ -46,18 +47,20 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderStartPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, true).post();
     }
 
     @Inject(
-        //? if >= 26.1
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
-        //? else
-        //method = "render",
+        //?} else {
+        /*method = "render",
+        *///?}
         at = @At(
             value = "INVOKE",
             //~ if < 26.1 'extractSavingIndicator' -> 'renderSavingIndicator'
@@ -67,18 +70,20 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderEndPhase(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(skyhanni$guiGraphics, false).post();
     }
 
     @Inject(
-        //? if >= 26.1
+        //? if >= 26.1 {
         method = "extractGui(Lnet/minecraft/client/DeltaTracker;ZZ)V",
-        //? else
-        //method = "render",
+        //?} else {
+        /*method = "render",
+        *///?}
         at = @At(
             value = "INVOKE",
             //~ if < 26.1 'extractRenderState' -> 'render'
@@ -89,8 +94,9 @@ public abstract class MixinGameRenderer {
     private void skyhanni$onRenderTail(
         DeltaTracker deltaTracker,
         boolean shouldRenderLevel,
-        //? if >= 26.1
+        //? if >= 26.1 {
         boolean resourcesLoaded,
+        //?}
         CallbackInfo ci
     ) {
         GuiEditManager.renderLast(skyhanni$guiGraphics);

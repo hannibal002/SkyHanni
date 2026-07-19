@@ -34,8 +34,9 @@ public abstract class MixinEntityRenderer {
     @Inject(
         //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else
-        //method = "submitNameTag",
+        //?} else {
+        /*method = "submitNameTag",
+        *///?}
         at = @At("HEAD"),
         cancellable = true
     )
@@ -57,8 +58,9 @@ public abstract class MixinEntityRenderer {
     @Inject(
         //? if >= 26.1 {
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else
-        //method = "submitNameTag",
+        //?} else {
+        /*method = "submitNameTag",
+        *///?}
         at = @At("TAIL")
     )
     public void onRenderLabelTail(

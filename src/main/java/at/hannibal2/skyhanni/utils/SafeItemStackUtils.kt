@@ -19,17 +19,19 @@ object SafeItemStackUtils {
 
     fun canBindComponents(item: Item?): Boolean {
         item ?: return false
-        //? if >= 26.1
+        //? if >= 26.1 {
         return BuiltInRegistries.ITEM.wrapAsHolder(item).areComponentsBound()
-        //? else
-        //return true
+        //?} else {
+        /*return true
+        *///?}
     }
 
     fun canReadComponents(stack: SafeItemStack): Boolean = canBindComponents(stack.itemType)
 }
 
 fun SafeItemStack.ensureComponentsBound(): SafeItemStack {
-    //? if >= 26.1
+    //? if >= 26.1 {
     (this as? DeferredItemStack)?.bindComponentsIfReady()
+    //?}
     return this
 }

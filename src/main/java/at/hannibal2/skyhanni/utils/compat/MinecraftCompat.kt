@@ -99,8 +99,9 @@ object MinecraftCompat {
         //? if >= 26.1 {
         val defaultClock = localWorldOrNull?.dimensionType()?.defaultClock()?.orElse(null) ?: return
         serverTime = packet.clockUpdates[defaultClock]?.totalTicks() ?: serverTime
-        //?} else
-        //serverTime = packet.dayTime
+        //?} else {
+        /*serverTime = packet.dayTime
+        *///?}
     }
     // </editor-fold>
 

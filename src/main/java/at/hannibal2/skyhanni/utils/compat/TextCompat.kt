@@ -282,8 +282,9 @@ fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages:
             chat.addMessage(
                 component,
                 idToMessageSignature(id),
-                //? if >= 26.1
+                //? if >= 26.1 {
                 GuiMessageSource.SYSTEM_CLIENT,
+                //?}
                 GuiMessageTag.system(),
             )
         }

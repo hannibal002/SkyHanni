@@ -91,14 +91,15 @@ public abstract class MixinChatComponent {
     }
 
     @Inject(
-        method = "addMessage"/*? if < 26.1 {*//* + "(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"*//*?}*/,
+        method = "addMessage"/*? if < 26.1 {*/ /*+ "(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"*//*?}*/,
         at = @At("HEAD")
     )
     private void setChatLine(
         Component contents,
         MessageSignature signature,
-        //? if >= 26.1
+        //? if >= 26.1 {
         GuiMessageSource source,
+        //?}
         GuiMessageTag tag,
         CallbackInfo ci
     ) {
