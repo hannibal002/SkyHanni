@@ -36,7 +36,7 @@ object EquipmentWardrobeApi : WardrobeApi() {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) = handleInventoryUpdated(event)
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) = handleInventoryClose()
+    fun onInventoryClose() = handleInventoryClose()
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)

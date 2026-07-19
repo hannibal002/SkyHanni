@@ -55,7 +55,7 @@ object DungeonApi {
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        " . The Catacombs \\((?<floor>.*)\\)",
+        " ⏣ The Catacombs \\((?<floor>.*)\\)",
     )
 
     /**

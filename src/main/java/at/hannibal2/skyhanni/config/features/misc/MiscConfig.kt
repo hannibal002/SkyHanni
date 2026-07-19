@@ -417,6 +417,7 @@ class MiscConfig {
     @FeatureToggle
     var gfsPiggyBank: Boolean = true
 
+    @FeatureToggle
     @Expose
     @ConfigOption(
         name = "Move Insert Into Sack Button",
