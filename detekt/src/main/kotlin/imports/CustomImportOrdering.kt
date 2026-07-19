@@ -158,16 +158,14 @@ class CustomImportOrdering(config: Config) :
 
         if (!isValidSpacingBetweenBlocks(rawText, blocks)) {
             importList.reportIssue(
-                "Preprocessed import blocks must be separated by empty lines. " +
-                    "There should not be any empty lines between non-preprocessed imports.",
+                "Preprocessed and non-preprocessed import blocks must be separated by an empty line."
             )
         }
 
         if (!areImportsOrdered(importList.imports, blocks)) {
             importList.reportIssue(
-                "Imports must be ordered in lexicographic order without any empty lines in-between " +
-                    "with \"java\", \"javax\", \"kotlin\", \"kotlinx\" and aliases in the end. " +
-                    "Preprocessed import blocks must also be separated by empty lines.",
+                "Imports must be ordered in lexicographic order " +
+                    "with \"java\", \"javax\", \"kotlin\", \"kotlinx\" and aliases in the end."
             )
         }
 
