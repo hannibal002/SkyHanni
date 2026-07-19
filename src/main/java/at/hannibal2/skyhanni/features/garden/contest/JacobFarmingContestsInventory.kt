@@ -60,7 +60,7 @@ object JacobFarmingContestsInventory {
     )
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         realTime.clear()
         hideEverything = true
     }

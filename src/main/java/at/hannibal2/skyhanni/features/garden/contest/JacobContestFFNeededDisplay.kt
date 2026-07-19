@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.RenderItemTooltipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrueFarmingFortune
@@ -54,7 +52,7 @@ object JacobContestFFNeededDisplay {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         cache.clear()
     }
 
@@ -142,7 +140,7 @@ object JacobContestFFNeededDisplay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!config.ffForContest) return
         if (!FarmingContestApi.inInventory) return
         if (lastToolTipTime.passedSince() > 200.milliseconds) return
@@ -152,7 +150,5 @@ object JacobContestFFNeededDisplay {
 
 private fun CropType.getRealBlocksPerSecond(): Double {
     val bps = getLatestBlocksPerSecond() ?: 20.0
-    return if (bps < 15.0) {
-        return 19.9
-    } else bps
+    return if (bps < 15.0) 19.9 else bps
 }
