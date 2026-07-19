@@ -22,12 +22,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object InfernoMinionFeatures {
     private val config get() = SkyHanniMod.feature.misc.minions
 
-    // TODO: proper roman numeral regex
     /**
      * REGEX-TEST: Inferno Minion I
      * REGEX-TEST: Inferno Minion II
      * REGEX-TEST: Inferno Minion IX
      * REGEX-TEST: Inferno Minion VIII
+     * REGEX-TEST: Inferno Minion 1
      * REGEX-FAIL: Inferno Minion Recipes
      * REGEX-FAIL: Inferno Minion -> Capsaicin Eyed
      */
