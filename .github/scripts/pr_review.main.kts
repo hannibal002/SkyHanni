@@ -391,9 +391,9 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                 val display = rawLine.trimStart().removePrefix("e: ")
                     .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "") else it }
                     .take(300)
-                appendLine("`$display`")
+                appendLine("- `$display`")
                 for (cont in parseErrorContinuations(logContent, rawLine)) {
-                    appendLine("`${cont.take(300)}`")
+                    appendLine("  - `${cont.take(300)}`")
                 }
             }
             if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
