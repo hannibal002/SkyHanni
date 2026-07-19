@@ -113,12 +113,13 @@ object PestSpawnTimer {
                 pestSpawned = false
             }
         } ?: run {
-            if (event.widget.lines.all { it.string.isBlank() }) return
+            val widgetLines = event.widget.lines.map { it.string }
+            if (widgetLines.all { it.isBlank() }) return
 
             ErrorManager.logErrorStateWithData(
                 "Could not find pest cooldown time in widget update event.",
                 internalMessage = "Could not find pest cooldown time in widget update event.",
-                "widgetLines" to event.widget.lines.map { it.string },
+                "widgetLines" to widgetLines,
             )
         }
     }
