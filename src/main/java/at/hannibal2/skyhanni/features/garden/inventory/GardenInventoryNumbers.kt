@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.garden.ComposterUpgradesData
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getMaxTier
-import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -54,7 +54,7 @@ object GardenInventoryNumbers {
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (!config.composterUpgrades) return
 
-            ComposterUpgrade.composterUpgradePattern.matchMatcher(event.stack.cleanName) {
+            ComposterUpgradesData.composterUpgradePattern.matchMatcher(event.stack.cleanName) {
                 val level = group("level")?.romanToDecimalIfNecessary() ?: 0
                 event.stackTip = "$level"
             }
