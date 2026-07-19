@@ -145,8 +145,9 @@ object GardenPlotApi {
     private var currentPlot: Plot? = null
 
     fun checkCurrentPlot() {
-        if (getCurrentPlot() != currentPlot) {
-            currentPlot = getCurrentPlot()
+        val plot = getCurrentPlot()
+        if (plot != currentPlot) {
+            currentPlot = plot
             updateCurrentPlot()
         }
     }
