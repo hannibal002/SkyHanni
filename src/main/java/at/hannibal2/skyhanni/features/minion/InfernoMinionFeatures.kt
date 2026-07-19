@@ -22,13 +22,17 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object InfernoMinionFeatures {
     private val config get() = SkyHanniMod.feature.misc.minions
 
+    // TODO: proper roman numeral regex
     /**
+     * REGEX-TEST: Inferno Minion I
      * REGEX-TEST: Inferno Minion II
      * REGEX-TEST: Inferno Minion IX
+     * REGEX-FAIL: Inferno Minion Recipes
+     * REGEX-FAIL: Inferno Minion -> Capsaicin Eyed
      */
     val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
-        "Inferno Minion .*",
+        "Inferno Minion ..?.?$",
     )
     var fuelItemIds = setOf<NeuInternalName>()
         private set
