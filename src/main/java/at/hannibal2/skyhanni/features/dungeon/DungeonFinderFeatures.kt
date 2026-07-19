@@ -354,7 +354,6 @@ object DungeonFinderFeatures {
                                 appendWithColor(dungeonClass.displayName, ChatFormatting.GRAY)
                             }
 
-                            // Add comma and space between items
                             if (index < missingClasses.size - 1) {
                                 appendWithColor(", ", ChatFormatting.GRAY)
                             }
