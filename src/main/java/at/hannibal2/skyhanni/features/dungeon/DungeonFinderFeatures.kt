@@ -379,7 +379,7 @@ object DungeonFinderFeatures {
 
         val toolTip = toolTipMap[event.slot.index]
         if (toolTip.isNullOrEmpty()) return
-        val oldToolTip = event.toolTip
+        val oldToolTip = event.toolTip.toList()
         for ((index, line) in toolTip.withIndex()) {
             if (index >= event.toolTip.size - 1) {
                 event.toolTip.add(line)
