@@ -114,7 +114,7 @@ object PestSpawnTimer {
                 pestSpawned = false
             }
         } ?: run {
-            if (widgetLines.isEmpty() || widgetLines.all { it.isBlank() }) return
+            if (widgetLines.all { it.isBlank() }) return
 
             ErrorManager.logErrorStateWithData(
                 "Could not find pest cooldown time from widget.",
