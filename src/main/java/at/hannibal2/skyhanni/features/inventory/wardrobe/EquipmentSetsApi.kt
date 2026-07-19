@@ -6,30 +6,30 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
-object ArmorWardrobeApi : WardrobeApi() {
+object EquipmentSetsApi : AbstractWardrobeApi() {
 
     /**
-     * REGEX-TEST: (1/3) Armor Sets
+     * REGEX-TEST: (1/2) Equipment Sets
      */
     override val inventoryPattern by patternGroup.pattern(
-        "armor.name",
-        "\\((?<currentPage>\\d+)/\\d+\\) Armor Sets",
+        "equipment.name",
+        "\\((?<currentPage>\\d+)/\\d+\\) Equipment Sets",
     )
 
-    override val valueName = "Armor"
-    override val debugTitle = "Wardrobe"
+    override val valueName = "Equipment"
+    override val debugTitle = "Equipment Wardrobe"
 
-    override val storage get() = ProfileStorageData.profileSpecific?.wardrobe
-
-    var inCustomWardrobe = false
+    override val storage get() = ProfileStorageData.profileSpecific?.equipmentWardrobe
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        val matched = handleInventoryOpen(event.inventoryName)
-        if (CustomWardrobe.config.enabled) inCustomWardrobe = matched
+        handleInventoryOpen(event.inventoryName)
     }
 
     @HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true)
@@ -40,4 +40,8 @@ object ArmorWardrobeApi : WardrobeApi() {
 
     @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) = handleDebugDataCollect(event)
+
+    override fun onEquippedSlotUpdated(items: List<SafeItemStack?>) {
+        EquipmentSlot.entries.forEach { CurrentEquipmentApi.setEquipment(it, items[it.ordinal]) }
+    }
 }

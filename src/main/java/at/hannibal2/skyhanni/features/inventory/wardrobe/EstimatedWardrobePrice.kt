@@ -42,15 +42,15 @@ object EstimatedWardrobePrice {
         }
     }
 
-    private fun activeWardrobeApi(): WardrobeApi? = when {
-        config.armor && ArmorWardrobeApi.inWardrobe() -> ArmorWardrobeApi
-        config.equipment && EquipmentWardrobeApi.inWardrobe() -> EquipmentWardrobeApi
+    private fun activeWardrobeApi(): AbstractWardrobeApi? = when {
+        config.armor && WardrobeApi.inWardrobe() -> WardrobeApi
+        config.equipment && EquipmentSetsApi.inWardrobe() -> EquipmentSetsApi
         else -> null
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
-        ((config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe())) &&
-        (!ArmorWardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
+        ((config.armor && WardrobeApi.inWardrobe()) || (config.equipment && EquipmentSetsApi.inWardrobe())) &&
+        (!WardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
