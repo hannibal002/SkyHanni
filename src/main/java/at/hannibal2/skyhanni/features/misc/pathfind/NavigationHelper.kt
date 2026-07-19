@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
@@ -108,7 +109,7 @@ object NavigationHelper {
             // no need to navigate to the current area
             if (node.name == SkyBlockUtils.graphArea) continue
             val tag = node.tags.first { it in allowedTags }
-            val name = "${node.name} §7(${tag.displayName}§7)"
+            val name = "${node.cleanName} §7(${tag.displayName}§7)"
             if (name in names) continue
             names[name] = node
         }
@@ -124,7 +125,7 @@ object NavigationHelper {
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in graph) {
             if (!node.enabled) continue
-            val name = node.name ?: continue
+            val name = node.cleanName ?: continue
             val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
@@ -148,7 +149,7 @@ object NavigationHelper {
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
                 SkyHanniMod.launchCoroutine("shnavigate command") {
-                    doCommandAsync(it.lowercase())
+                    doCommandAsync(it.lowercase().removeColor())
                 }
             }
             simpleCallback {
@@ -159,7 +160,7 @@ object NavigationHelper {
 
     private fun getNames(): List<String> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyList()
-        return graph.filterByActive { it.isValidAreaNode() }.mapNotNull { it.name }
+        return graph.filterByActive { it.isValidAreaNode() }.mapNotNull { it.cleanName }
     }
 
     private fun GraphNode.isValidAreaNode(): Boolean {

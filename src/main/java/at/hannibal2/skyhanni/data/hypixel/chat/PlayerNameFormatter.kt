@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.chat.TextHelper.style
 import at.hannibal2.skyhanni.utils.compat.changeColor
-import at.hannibal2.skyhanni.utils.compat.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -73,7 +72,7 @@ object PlayerNameFormatter {
         val privateIslandGuest = event.privateIslandGuest
 
         val shouldFilter = config.chatFilter && PlayerChatFilter.shouldChatFilter(message.intoComponent())
-        val chatColor = if (shouldFilter) "§7" else if (config.sameChatColor) "§f" else event.chatColor
+        val chatColor = if (shouldFilter) "§7" else event.chatColor
 
         val name = nameFormat(
             authorComponent,
@@ -86,7 +85,10 @@ object PlayerNameFormatter {
         all.append(name)
         all.append(": ")
         all.append(chatColor.asComponent())
-        all.append(message.intoComponent())
+        all.append(
+            if (config.sameChatColor) message.intoComponent().changeColor(LorenzColor.WHITE)
+            else message.intoComponent(),
+        )
         val component = StringUtils.replaceIfNeeded(event.chatComponent, all) ?: return
         event.replaceComponent(component, "player_chat_formatting")
     }
@@ -142,7 +144,10 @@ object PlayerNameFormatter {
                 append(" ")
                 append(nameFormat(event.authorComponent))
                 append("§f: ")
-                append(event.messageComponent.intoComponent())
+                append(
+                    if (config.sameChatColor) event.messageComponent.intoComponent().changeColor(LorenzColor.WHITE)
+                    else event.messageComponent.intoComponent(),
+                )
             },
         ) ?: return
         event.replaceComponent(component, "private_chat_formatting")
@@ -259,7 +264,7 @@ object PlayerNameFormatter {
         removeColor: String,
         rankColor: String,
     ): ComponentSpan {
-        val style = name.sampleStyleAtStart().takeUnlessEmpty() ?: error("style is empty")
+        val style = name.sampleStyleAtStart()
         return when {
             MarkedPlayerManager.isMarkedPlayer(removeColor) && MarkedPlayerManager.config.highlightInChat ->
                 (MarkedPlayerManager.replaceInChat(rankColor + removeColor)).asComponent()
