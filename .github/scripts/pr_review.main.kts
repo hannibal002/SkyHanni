@@ -43,7 +43,7 @@ val dependencyLabel = "Waiting on Dependency PR"
 
 val warningIcon = "⚠\uFE0F"
 
-val maxDirectFindings = 8
+val maxDirectFindings = 15
 val maxLogChars = 10_000
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
@@ -176,15 +176,28 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    appendAll(direct)
+    appendCompact(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        appendAll(overflow)
+        appendCompact(overflow)
         appendLine("\n</details>")
+    }
+    appendLine("\n<details><summary>More Details</summary>\n")
+    appendFull(findings)
+    appendLine("\n</details>")
+}
+
+fun StringBuilder.appendCompact(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        appendLine("- ```$className:$line```: $message")
     }
 }
 
-fun StringBuilder.appendAll(findings: List<Finding>) {
+fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
         val ruleId = sanitize(finding.ruleId)
@@ -192,8 +205,11 @@ fun StringBuilder.appendAll(findings: List<Finding>) {
         val className = sanitize(fileName)
         val line = finding.line
         val path = sanitize(finding.path)
-        appendLine("- ```$className``` at line $line: $message")
-        appendLine("  rule: `$ruleId`, path: `$path`")
+        appendLine("- ```$className:$line```")
+        appendLine("  message: `$message`")
+        appendLine("  rule: `$ruleId`")
+        appendLine("  path: `$path`")
+        appendLine()
     }
 }
 
