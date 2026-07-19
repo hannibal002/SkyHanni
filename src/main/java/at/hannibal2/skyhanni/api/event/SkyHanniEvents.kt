@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventVersionedJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.lang.reflect.Method
 
 @SkyHanniModule
@@ -96,19 +98,15 @@ object SkyHanniEvents {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
-        val versionedHandlers = data.disabledHandlersVersioned.filter {
-            (it.minVersion == null || version >= it.minVersion) &&
-                (it.maxVersion == null || version <= it.maxVersion)
-        }.map { it.name }.toSet()
-        val versionedInvokers = data.disabledInvokersVersioned.filter {
-            (it.minVersion == null || version >= it.minVersion) &&
-                (it.maxVersion == null || version <= it.maxVersion)
-        }.map { it.name }.toSet()
-
-        disabledHandlers = data.disabledHandlers + versionedHandlers
-        disabledHandlerInvokers = data.disabledInvokers + versionedInvokers
+        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version)
+        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version)
         EventListeners.markEventCacheDirty()
     }
+
+
+    private fun Set<DisabledEventVersionedJson>.activeNames(version: ModVersion): Set<String> =
+        filter { (it.minVersion == null || version >= it.minVersion) && (it.maxVersion == null || version <= it.maxVersion) }
+            .map { it.name }.toSet()
 
     val seconds = listOf(10, 60, 60 * 5)
 
