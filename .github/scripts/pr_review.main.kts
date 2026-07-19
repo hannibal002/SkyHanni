@@ -291,6 +291,17 @@ fun parseStackTrace(logContent: String): String {
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
+fun parseErrorContinuation(logContent: String, errorLine: String): String? {
+    if (!errorLine.trimEnd().endsWith(":")) return null
+    val lines = logContent.lines()
+    val idx = lines.indexOf(errorLine)
+    if (idx < 0 || idx + 1 >= lines.size) return null
+    val next = lines[idx + 1]
+    if (next.isBlank()) return null
+    if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) return null
+    if (next.startsWith(">") || next.startsWith("FAILURE") || next.startsWith("*")) return null
+    return next.trim()
+}
 
 fun isStonecutterOneLiner(oneLiner: String): Boolean {
     if (!oneLiner.startsWith("e: ")) return false
@@ -347,6 +358,9 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         if (oneLiner != null) {
             val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
             appendLine("`$displayLine`")
+            parseErrorContinuation(logContent, oneLiner)?.let { continuation ->
+                appendLine("`${continuation.take(300)}`")
+            }
             if ("warnings found and -Werror specified" in logContent) {
                 appendLine()
                 appendLine("_Warning elevated to error by `-Werror`_")
