@@ -13,8 +13,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.toRenderables
+import net.minecraft.ChatFormatting
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.seconds
@@ -118,12 +124,36 @@ object LegionBobbinOverlay {
     }
 
     private fun createRenderable() = buildList {
-        if (!config.hideWithoutEnchant || wearingLegion) add(
-            "§d§lLegion: §r§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)",
-        )
-        if (!config.hideWithoutEnchant || wearingBobbin) add(
-            "§3§lBobbin': §r§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)",
-        )
+        if (!config.hideWithoutEnchant || wearingLegion) {
+            add(
+                componentBuilder {
+                    append("Legion: ") {
+                        withColor(ChatFormatting.LIGHT_PURPLE)
+                        bold = true
+                    }
+                    appendWithColor("$nearbyPlayers ", ChatFormatting.AQUA)
+                    appendWithColor(
+                        "(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)",
+                        ChatFormatting.GRAY,
+                    )
+                }
+            )
+        }
+        if (!config.hideWithoutEnchant || wearingBobbin) {
+            add(
+                componentBuilder {
+                    append("Bobbin': ") {
+                        withColor(ChatFormatting.DARK_AQUA)
+                        bold = true
+                    }
+                    appendWithColor("$nearbyBobbers ", ChatFormatting.AQUA)
+                    appendWithColor(
+                        "(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)",
+                        ChatFormatting.GRAY,
+                    )
+                }
+            )
+        }
     }.toRenderables()
 
     private fun isEnabled() = config.enabled
