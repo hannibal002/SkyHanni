@@ -97,7 +97,7 @@ class CustomImportOrdering(config: Config) :
         imports: Iterator<KtImportDirective>,
     ): Boolean {
         val blockImports = buildList {
-            repeat(block.imports.size) {
+            repeat(block.importLines.size) {
                 if (!imports.hasNext()) {
                     return false
                 }
