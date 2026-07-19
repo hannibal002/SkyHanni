@@ -64,12 +64,31 @@ class CustomImportOrdering(config: Config) :
         return blocks
     }
 
-    private fun isValidImportSpacing(rawLines: List<String>, blocks: List<ImportBlock>): Boolean {
-        if (blocks.size <= 1) return true
-
+    private fun isValidSpacingBetweenBlocks(
+        rawLines: List<String>,
+        blocks: List<ImportBlock>,
+    ): Boolean {
         return blocks.zipWithNext().none { (current, next) ->
             current.inPreprocessingBlock != next.inPreprocessingBlock &&
-                rawLines.getOrNull(current.imports.last().lineIndex + 1)?.isNotBlank() == true
+                rawLines
+                    .subList(
+                        current.imports.last().lineIndex + 1,
+                        next.imports.first().lineIndex,
+                    )
+                    .none(String::isBlank)
+        }
+    }
+
+    private fun isValidSpacingInsideBlocks(
+        rawLines: List<String>,
+        blocks: List<ImportBlock>,
+    ): Boolean {
+        return blocks.all { block ->
+            block.imports.zipWithNext().none { (current, next) ->
+                rawLines
+                    .subList(current.lineIndex + 1, next.lineIndex)
+                    .any(String::isBlank)
+            }
         }
     }
 
@@ -130,7 +149,13 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        if (!isValidImportSpacing(rawText, blocks)) {
+        if (!isValidSpacingInsideBlocks(rawText, blocks)) {
+            importList.reportIssue(
+                "import blocks must not contain empty lines between imports.",
+            )
+        }
+
+        if (!isValidSpacingBetweenBlocks(rawText, blocks)) {
             importList.reportIssue(
                 "Preprocessed import blocks must be separated by empty lines. " +
                     "There should not be any empty lines between non-preprocessed imports.",
