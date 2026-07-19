@@ -24,7 +24,7 @@ object ParticleUtils {
                 speed = packet.maxSpeed,
                 offset = packet.toOffset(),
                 longDistance = packet.isOverrideLimiter,
-            ).post()
+            ).post().isCancelled
         ) {
             cancelled.set(true)
         }
