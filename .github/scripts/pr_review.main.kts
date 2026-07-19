@@ -43,7 +43,7 @@ val dependencyLabel = "Waiting on Dependency PR"
 
 val warningIcon = "⚠\uFE0F"
 
-val maxDirectFindings = 8
+val maxDirectFindings = 15
 val maxLogChars = 10_000
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
@@ -75,12 +75,16 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine(message)
     appendLine()
 
-    appendLine("mode:")
+    appendLine("Mode:")
     appendLine(mode)
     appendLine()
 
-    appendLine("Most likely fix: merge beta into this PR.")
-    appendLine("If the issue persists, ping @hannibal002 or another maintainer.")
+    appendLine("Most likely fix:")
+    val theSecretFix = "merge the beta branch into this PR."
+    appendLine(theSecretFix)
+    appendLine()
+
+    appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
     appendLine()
 
     val runId = System.getenv("GITHUB_RUN_ID")
@@ -88,7 +92,7 @@ fun buildErrorComment(message: String): String = buildString {
         val runLink = " \\[[workflow run](https://github.com/$repo/actions/runs/$runId)\\]"
         appendLine("For investigating this error, see $runLink")
     } else {
-        appendLine("GITHUB_RUN_ID is null, good luck finding the issue")
+        appendLine("GITHUB_RUN_ID is null, good luck finding the issue ;)")
     }
 
 }
@@ -172,15 +176,28 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    appendAll(direct)
+    appendCompact(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        appendAll(overflow)
+        appendCompact(overflow)
         appendLine("\n</details>")
+    }
+    appendLine("\n<details><summary>More Details</summary>\n")
+    appendFull(findings)
+    appendLine("\n</details>")
+}
+
+fun StringBuilder.appendCompact(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        appendLine("- ```$className:$line```: $message")
     }
 }
 
-fun StringBuilder.appendAll(findings: List<Finding>) {
+fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
         val ruleId = sanitize(finding.ruleId)
@@ -188,8 +205,11 @@ fun StringBuilder.appendAll(findings: List<Finding>) {
         val className = sanitize(fileName)
         val line = finding.line
         val path = sanitize(finding.path)
-        appendLine("- ```$className``` at line $line: $message")
-        appendLine("  rule: `$ruleId`, path: `$path`")
+        appendLine("- ```$className:$line```")
+        appendLine("  message: `$message`")
+        appendLine("  rule: `$ruleId`")
+        appendLine("  path: `$path`")
+        appendLine()
     }
 }
 
@@ -292,6 +312,21 @@ fun parseStackTrace(logContent: String): String {
 }
 
 
+fun parseAllErrors(logContent: String): List<String> =
+    logContent.lines().filter { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+
+fun parseErrorContinuation(logContent: String, errorLine: String): String? {
+    if (!errorLine.trimEnd().endsWith(":")) return null
+    val lines = logContent.lines()
+    val idx = lines.indexOf(errorLine)
+    if (idx < 0 || idx + 1 >= lines.size) return null
+    val next = lines[idx + 1]
+    if (next.isBlank()) return null
+    if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) return null
+    if (next.startsWith(">") || next.startsWith("FAILURE") || next.startsWith("*")) return null
+    return next.trim()
+}
+
 fun isStonecutterOneLiner(oneLiner: String): Boolean {
     if (!oneLiner.startsWith("e: ")) return false
     val path = oneLiner.removePrefix("e: ").substringBefore(" ")
@@ -343,14 +378,31 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
-        val oneLiner = parseOneLiner(logContent)
-        if (oneLiner != null) {
-            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-            appendLine("`$displayLine`")
-            if ("warnings found and -Werror specified" in logContent) {
-                appendLine()
-                appendLine("_Warning elevated to error by `-Werror`_")
+        val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
+        val rawErrorLines = parseAllErrors(logContent)
+        if (rawErrorLines.isNotEmpty()) {
+            for (rawLine in rawErrorLines.take(5)) {
+                val display = rawLine.trimStart().removePrefix("e: ")
+                    .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "") else it }
+                    .take(300)
+                appendLine("`$display`")
             }
+            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
+            if (rawErrorLines.size == 1) {
+                parseErrorContinuation(logContent, rawErrorLines[0])?.let { continuation ->
+                    appendLine("`${continuation.take(300)}`")
+                }
+            }
+        } else {
+            val oneLiner = parseOneLiner(logContent)
+            if (oneLiner != null) {
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+                appendLine("`$displayLine`")
+            }
+        }
+        if ("warnings found and -Werror specified" in logContent) {
+            appendLine()
+            appendLine("_Warning elevated to error by `-Werror`_")
         }
         appendLine()
         val versionParts = version.split(" and ").map { it.trim() }
