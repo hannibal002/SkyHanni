@@ -40,7 +40,6 @@ object MinecraftCompat {
     val localWorldExists get(): Boolean = localWorldOrNull != null
     // </editor-fold>
 
-
     // <editor-fold desc="User">
     /**
      * The local user's information, such as the username and UUID.
