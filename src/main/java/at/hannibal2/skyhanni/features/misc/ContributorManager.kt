@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
@@ -366,15 +367,16 @@ object ContributorManager {
     fun shouldSpin(uuid: UUID): Boolean = contributors[uuid]?.spinny ?: false
     fun shouldBeUpsideDown(uuid: UUID): Boolean = contributors[uuid]?.upsideDown ?: false
 
-    // Due to using PlayerUtils.getRawUuid(), this will only work if logged in
-    // which is why it HAS to be a lazy-loaded value instead of being calculated on repo load
     fun isSelfContributor(): Boolean {
         isContributor?.let { return it }
+        if (contributors.isEmpty()) return false
 
         val result = PlayerUtils.getRawUuid() in contributors
         isContributor = result
         return result
     }
+
+    fun isSelfDeveloper(): Boolean = PlatformUtils.isDevEnvironment || SkyHanniMod.feature.dev.debug.enabled || isSelfContributor()
 
     private fun saveConfig(reason: String) {
         SkyHanniMod.configManager.saveConfig(
