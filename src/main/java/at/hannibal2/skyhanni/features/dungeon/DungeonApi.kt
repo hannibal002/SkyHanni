@@ -245,7 +245,7 @@ object DungeonApi {
         val formatting: ChatFormatting = when {
             level >= 45 -> RED
             level >= 40 -> GOLD
-            level >= 35 -> LIGHT_PURPLE
+            level >= 35 -> DARK_PURPLE
             level >= 30 -> BLUE
             level >= 25 -> AQUA
             level >= 20 -> DARK_GREEN
