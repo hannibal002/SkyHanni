@@ -8,6 +8,9 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.ItemFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -17,14 +20,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
     @WrapOperation(
+        //? if >= 26.1 {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        //?} else {
+        /*method = "render",
+        *///?}
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
@@ -49,6 +53,7 @@ public abstract class MixinItemFeatureRenderer {
         original.call(instance, color);
     }
 
+    //? if >= 26.1 {
     @WrapOperation(
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
         at = @At(
@@ -62,12 +67,27 @@ public abstract class MixinItemFeatureRenderer {
         Operation<VertexConsumer> original,
         @Local(argsOnly = true, name = "submit") SubmitNodeStorage.ItemSubmit submit
     ) {
-        boolean hasCustomOutline = submit.skyhanni$isUsingCustomOutline();
-
-        return hasCustomOutline
+        return submit.skyhanni$isUsingCustomOutline()
             ? SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType)
             : original.call(instance, renderType);
     }
+    //?} else {
+    /*@ModifyArg(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V",
+            ordinal = 1
+        ),
+        index = 2
+    )
+    private MultiBufferSource useSkyHanniOutlineBuffer(
+        MultiBufferSource original,
+        @Local(name = "itemSubmit") SubmitNodeStorage.ItemSubmit submit
+    ) {
+        return submit.skyhanni$isUsingCustomOutline() ? SkyHanniOutlineHook.getVertexConsumers() : original;
+    }
+    *///?}
 
     //? if >= 26.1 {
     @ModifyArg(

@@ -75,7 +75,7 @@ public abstract class MixinGuiGraphicsExtractor {
             //? if >= 26.1 {
             target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addText(Lnet/minecraft/client/renderer/state/gui/GuiTextRenderState;)V"
             //?} else {
-            /*target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;submitText(Lnet/minecraft/client/renderer/state/gui/GuiTextRenderState;)V"
+            /*target = "Lnet/minecraft/client/gui/render/state/GuiRenderState;submitText(Lnet/minecraft/client/gui/render/state/GuiTextRenderState;)V"
             *///?}
         ),
         index = 0
