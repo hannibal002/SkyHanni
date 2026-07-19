@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
@@ -31,20 +32,29 @@ object FarmingContestApi {
 
     private val patternGroup = RepoPattern.group("garden.farming.contest")
     private val timePattern by patternGroup.pattern(
-        "time",
-        "§a(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)",
+        "time.colorless",
+        "(?<month>.*) (?<day>.*)(?:rd|st|nd|th), Year (?<year>.*)",
     )
     private val cropPattern by patternGroup.pattern(
-        "crop",
-        "§8(?<crop>.*) Contest",
+        "crop.colorless",
+        "(?<crop>.*) Contest",
     )
     private val sidebarCropPattern by patternGroup.pattern(
-        "sidebarcrop",
-        "\\s*(?:§e○|§6${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) §f(?<crop>.*) §a.*",
+        "sidebarcrop.colorless",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
     )
     private val bulkClaimFarmingPattern by patternGroup.pattern(
-        "bulkclaim",
-        "§7Claim multiple farming contest",
+        "bulkclaim.colorless",
+        "Claim multiple farming contest",
+    )
+
+    /**
+     * REGEX-TEST: (1/2) Your Contests
+     * REGEX-TEST: (2/2) Your Contests
+     */
+    val yourContestsPattern by patternGroup.pattern(
+        "yourcontests",
+        "\\(\\d+//\\d+\\) Your Contests",
     )
 
     private val contests = mutableMapOf<Long, FarmingContest>()
@@ -97,18 +107,18 @@ object FarmingContestApi {
     }
 
     private fun readCurrentCrop(): CropType? {
-        val line = ScoreboardData.sidebarLinesFormatted.nextAfter("§eJacob's Contest") ?: return null
+        val scoreboard = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
+        val line = scoreboard.nextAfter("Jacob's Contest") ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
             try {
                 CropType.getByName(cropName)
             } catch (e: IllegalStateException) {
-                ScoreboardData.sidebarLinesFormatted
                 ErrorManager.logErrorWithData(
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
+                    "sidebarLinesFormatted" to scoreboard
                 )
                 null
             }
@@ -117,10 +127,10 @@ object FarmingContestApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (event.inventoryName != "Your Contests") return
+        if (!yourContestsPattern.matches(event.inventoryName)) return
         if (inInventory) return
         val bulkClaimStack = event.inventoryItems[50] ?: return
-        val firstLine = bulkClaimStack.getLore().firstOrNull() ?: return
+        val firstLine = bulkClaimStack.getCleanLore().firstOrNull() ?: return
         if (!bulkClaimFarmingPattern.matches(firstLine)) return
         inInventory = true
     }
@@ -146,7 +156,7 @@ object FarmingContestApi {
     }
 
     private fun createContest(time: Long, item: SafeItemStack): FarmingContest {
-        val lore = item.getLore()
+        val lore = item.getCleanLore()
 
         val crop = cropPattern.firstMatcher(lore) {
             CropType.getByName(group("crop"))
