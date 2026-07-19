@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SafeItemStack
 
 @SkyHanniModule
-object EquipmentSetsApi : AbstractWardrobeApi() {
+object EquipmentWardrobeApi : AbstractWardrobeApi() {
 
     /**
      * REGEX-TEST: (1/2) Equipment Sets
