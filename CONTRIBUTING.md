@@ -287,7 +287,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation. Extension functions are an exception to this rule.
+  readability and maintain encapsulation. Extension functions and unqualified enum entries in `when` blocks are exceptions to this rule.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -502,8 +502,8 @@ Two dependency formats are supported:
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
-The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
-label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
+The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
+carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
 dependent PR remains until the PR itself is edited or another supported event occurs.
