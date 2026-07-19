@@ -160,8 +160,9 @@ object HypixelLocationApi {
             }
         }
         if (island != IslandType.NONE) {
+            val captured = previousIsland
             DelayedRun.runOrNextTick {
-                IslandJoinEvent(island = island, previousIsland = previousIsland).post()
+                IslandJoinEvent(island = island, previousIsland = captured).post()
             }
             previousIsland = island
         }
