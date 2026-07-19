@@ -43,8 +43,7 @@ object ArrowGuessBurrow {
     fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 
-        val distance = event.distanceToPlayer ?: return
-        if (distance > 6) return
+        if (event.distanceToPlayer > 6) return
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0) return
         if (event.speed != 1.0f) return
