@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
-import skyhannibuildsystem.SetMixinRequired
 import org.gradle.jvm.tasks.Jar as GradleJar
 
 plugins {
@@ -135,22 +134,7 @@ val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 val skyHanniSystemProperties = providers.systemPropertiesPrefixedBy("skyhanni.")
 
-val processedMixinConfig = layout.buildDirectory.file("resources/main/mixins.skyhanni.json")
-
-val setDevelopmentMixinConfig by tasks.registering(SetMixinRequired::class) {
-    dependsOn(tasks.processResources)
-    mixinConfigFile.set(processedMixinConfig)
-    required.set(true)
-}
-
-val setProductionMixinConfig by tasks.registering(SetMixinRequired::class) {
-    dependsOn(tasks.processResources)
-    mixinConfigFile.set(processedMixinConfig)
-    required.set(false)
-}
-
 tasks.named<JavaExec>("runClient") {
-    dependsOn(setDevelopmentMixinConfig)
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     systemProperties(skyHanniSystemProperties.get())
     val runModsDirectoryFile = runModsDirectory.asFile
@@ -403,7 +387,6 @@ if (target == primaryTarget) {
     }
     tasks.register("generateRepoPatterns", ClientProductionRunTask::class.java).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-        dependsOn(setDevelopmentMixinConfig)
         dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
 
@@ -494,12 +477,10 @@ tasks.shadowJar {
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.hypixel.modapi.tweaker")
-    dependsOn(setProductionMixinConfig)
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-    dependsOn(setProductionMixinConfig)
 }
 
 if (isDeobf) {
