@@ -22,9 +22,11 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         ListenerCollection(listeners),
     )
 
-    fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
+    fun post(event: T, onError: ((Throwable) -> Unit)? = null) {
         invokeLog.invokeCount++
-        if (SkyHanniEvents.isDisabledHandler(name)) return false
+        if (listeners.isEmpty()) return
+
+        if (SkyHanniEvents.isDisabledHandler(name)) return
 
         var errors = 0
         listenerCollection.forEachCurrent { listener ->
@@ -56,6 +58,5 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
             )
         }
-        return event.isCancelled
     }
 }
