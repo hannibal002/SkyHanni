@@ -20,7 +20,7 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
     ) {
-        val itemName = event.itemStack.cleanName()
+        val itemName = event.itemStack.cleanName
         val perk = hotx.getPerkByNameOrNull(itemName) ?: return
 
         if (perk.getLevelUpCost() == null) return

@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -236,7 +235,7 @@ object MaxwellApi {
     private fun loadThaumaturgyTuningsFromTuning(inventoryItems: Map<Int, SafeItemStack>) {
         val map = mutableListOf<ThaumaturgyPowerTuning>()
         for (stack in inventoryItems.values) {
-            val stackName = stack.takeUnlessEmpty()?.cleanName() ?: continue
+            val stackName = stack.takeUnlessEmpty()?.cleanName ?: continue
             for (line in stack.getLore()) {
                 statsTuningDataPattern.readTuningFromLine(line)?.let {
                     it.name = tuningNamePattern.matchMatcher(stackName) {
@@ -268,7 +267,7 @@ object MaxwellApi {
             inventoryItems.values.find {
                 powerSelectedPattern.matches(it.getLore().lastOrNull())
             } ?: return
-        val displayName = selectedPowerStack.hoverName.string.removeColor().trim()
+        val displayName = selectedPowerStack.cleanName.trim()
 
         currentPower = getPowerByNameOrNull(displayName) ?: run {
             ErrorManager.logErrorWithData(

@@ -20,6 +20,8 @@ jobs:
             -   name: Check out the repository
                 uses: actions/checkout@v7
                 with:
+                    # Avoid treating the trusted merge commit as fork code on merged PRs.
+                    ref: ${{ github.event.pull_request.base.ref }}
                     persist-credentials: false
 
             -   name: Evaluate dependency PRs

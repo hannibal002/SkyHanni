@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -90,7 +91,7 @@ object TestCopyBestiaryValues {
         val mobs = mutableListOf<String>()
         for (i in 10..43) {
             val stack = inventoryItems[i] ?: continue
-            bestiaryTypePattern.matchMatcher(stack.hoverName.string.removeColor()) {
+            bestiaryTypePattern.matchMatcher(stack.cleanName) {
                 val lvl = group("lvl").toInt()
                 var text = group("text").lowercase().replace(" ", "_")
 

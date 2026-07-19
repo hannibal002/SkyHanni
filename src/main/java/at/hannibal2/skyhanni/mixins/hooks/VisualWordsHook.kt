@@ -12,17 +12,18 @@ object VisualWordsHook {
     val caxtonLoaded by lazy { PlatformUtils.isModInstalled("caxton") }
 
     @JvmStatic
-    fun modifyOrderedText(value: FormattedCharSequence): FormattedCharSequence =
+    fun modifyOrderedText(value: FormattedCharSequence?): FormattedCharSequence? =
         ModifyVisualWords.transformText(value) ?: value
 
     @JvmStatic
-    fun modifyString(value: String): String {
+    fun modifyString(value: String?): String? {
+        if (value == null) return null
         val replaced = ModifyVisualWords.transformText(OrderedTextUtils.legacyTextToOrderedText(value)) ?: return value
         return OrderedTextUtils.orderedTextToLegacyString(replaced)
     }
 
     @JvmStatic
-    fun modifyFormattedText(value: FormattedText): FormattedText =
+    fun modifyFormattedText(value: FormattedText?): FormattedText? =
         ModifyVisualWords.transformFormattedText(value) ?: value
 
     @JvmStatic
