@@ -186,12 +186,12 @@ stonecutter parameters {
             replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
             replace("classTweaker v1 official", "classTweaker v1 named")
             replace("drawContext.text", "drawContext.drawString")
-            replace("extractContents", "renderContents")
             replace("extractSlotHighlight", "renderSlotHighlight")
             replace("lambda\$addMainPass\$0", "method_62214")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageSource", "net.minecraft.client.multiplayer.chat.GuiMessageSource")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
             replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
+            replace("net/minecraft/client/renderer/state/gui", "net/minecraft/client/gui/render/state")
         }
 
         regex(current.parsed < "26.1") {

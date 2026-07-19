@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
 
-    //~ if < 26.2 'submitFire' -> 'renderFire'
+    //~ if < 26.2 'submit' -> 'render'
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(
         PoseStack poseStack,
@@ -36,7 +36,7 @@ abstract class MixinScreenEffectRenderer {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
-    //~ if < 26.2 'submitWater' -> 'renderWater'
+    //~ if < 26.2 'submit' -> 'render'
     @Inject(method = "submitWater", at = @At("HEAD"), cancellable = true)
     private static void renderWater(
         Minecraft client,

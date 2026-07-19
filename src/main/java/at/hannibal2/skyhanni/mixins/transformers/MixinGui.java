@@ -69,7 +69,7 @@ public abstract class MixinGui {
     )
     private void onRenderStartPhase(
         DeltaTracker deltaTracker,
-        boolean shouldRenderLevel, 
+        boolean shouldRenderLevel,
         boolean resourcesLoaded,
         CallbackInfo ci
     ) {
