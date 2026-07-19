@@ -122,7 +122,7 @@ object ItemAbilityCooldown {
                 ItemAbility.SHADOW_FURY.sound()
             }
             // Giant's Sword
-            event.soundName == "block.anvil.land" && event.pitch == 0.4920635f && event.volume == 1f -> {
+            event.soundName == "block.anvil.land" && event.pitch == 0.4920635f && event.volume == 0.5f -> {
                 ItemAbility.GIANTS_SWORD.sound()
             }
             // Atomsplit Katana
