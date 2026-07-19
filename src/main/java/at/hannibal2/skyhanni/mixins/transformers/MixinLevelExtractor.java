@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 //? if >= 26.2 {
 import net.minecraft.client.renderer.extract.LevelExtractor;
 //?} else {
-/*import net.minecraft.client.renderer.extract.LevelRenderer;
+/*import net.minecraft.client.renderer.LevelRenderer;
 *///?}
 
 //~ if < 26.2 'LevelExtractor' -> 'LevelRenderer'
