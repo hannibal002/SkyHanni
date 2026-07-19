@@ -9,8 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.renderables.toRenderables
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.seconds
 
@@ -45,7 +44,7 @@ object CFTooltipCompact {
         if (!CFApi.inChocolateFactory) return
         if (config.tooltipMove) {
             if (lastHover.passedSince() < 1.seconds) {
-                config.tooltipMovePosition.renderRenderables(tooltipToHover.map { Renderable.text(it) }, posLabel = "Tooltip Move")
+                config.tooltipMovePosition.renderRenderables(tooltipToHover.toRenderables(), posLabel = "Tooltip Move")
             }
         }
     }

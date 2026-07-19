@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -15,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantme
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.renderables.toRenderables
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.entity.projectile.FishingHook
 import kotlin.time.Duration.Companion.seconds
@@ -112,22 +111,20 @@ object LegionBobbinOverlay {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val renderables = display ?: createRenderable().also { display = it }
         config.position.renderRenderables(renderables, posLabel = "Legion Bobbin Display")
     }
 
-    private fun createRenderable(): List<Renderable> {
-        return buildList {
-            if (!config.hideWithoutEnchant || wearingLegion) add(
-                Renderable.text("§d§lLegion: §r§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)"),
-            )
-            if (!config.hideWithoutEnchant || wearingBobbin) add(
-                Renderable.text("§3§lBobbin': §r§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)"),
-            )
-        }
-    }
+    private fun createRenderable() = buildList {
+        if (!config.hideWithoutEnchant || wearingLegion) add(
+            "§d§lLegion: §r§b$nearbyPlayers §7(${(armorLegionBuff * nearbyPlayers).roundTo(2)}%)",
+        )
+        if (!config.hideWithoutEnchant || wearingBobbin) add(
+            "§3§lBobbin': §r§b$nearbyBobbers §7(${(armorBobbinBuff * nearbyBobbers).roundTo(2)}%)",
+        )
+    }.toRenderables()
 
     private fun isEnabled() = config.enabled
 }

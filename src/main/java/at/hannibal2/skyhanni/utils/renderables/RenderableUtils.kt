@@ -466,3 +466,6 @@ fun MutableList<Renderable>.addLine(builderAction: MutableList<Renderable>.() ->
 fun MutableList<Renderable>.addLine(tips: List<String>, builderAction: MutableList<Renderable>.() -> Unit) {
     add(hoverTips(Renderable.horizontal(buildList { builderAction() }, 0), tips = tips))
 }
+
+fun List<String>.toRenderables(): List<Renderable> = map { Renderable.text(it) }
+fun List<Component>.toRenderables(): List<Renderable> = map { Renderable.text(it) }
