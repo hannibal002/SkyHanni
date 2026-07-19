@@ -27,6 +27,7 @@ object InfernoMinionFeatures {
      * REGEX-TEST: Inferno Minion I
      * REGEX-TEST: Inferno Minion II
      * REGEX-TEST: Inferno Minion IX
+     * REGEX-TEST: Inferno Minion XIII
      * REGEX-FAIL: Inferno Minion Recipes
      * REGEX-FAIL: Inferno Minion -> Capsaicin Eyed
      */
