@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.WhenT
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -17,12 +16,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPlayerInside
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.sendTeleportTo
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -49,8 +43,8 @@ object PestFinder {
 
     private var display = emptyList<Renderable>()
 
-    @HandleEvent
-    fun onPestUpdate(event: PestUpdateEvent) {
+    @HandleEvent(PestUpdateEvent::class)
+    fun onPestUpdate() {
         update()
     }
 
@@ -124,7 +118,7 @@ object PestFinder {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    fun onIslandChange() {
         display = listOf()
         update()
     }

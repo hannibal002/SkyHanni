@@ -109,7 +109,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         config.markOwnName.whenChanged { _, new ->
             val name = PlayerUtils.getName()
             if (new) {
@@ -143,7 +143,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onTablistUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
         if (!event.isWidget(TabWidget.PLAYER_LIST)) return

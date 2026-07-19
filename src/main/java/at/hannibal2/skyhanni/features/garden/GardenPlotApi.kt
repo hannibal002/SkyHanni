@@ -132,18 +132,121 @@ object GardenPlotApi {
     )
     var plots = listOf<Plot>()
 
-    fun getCurrentPlot(): Plot? {
-        return getPlot(playerLocation())
-    }
+    fun getCurrentPlot(): Plot? = getPlot(playerLocation())
 
     fun inGreenhouse(): Boolean {
         return currentPlot?.greenhouse ?: false
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec)
+    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec) {
+
+        var name: String
+            get() = getData()?.name ?: "$id"
+            set(value) {
+                getData()?.name = value
+            }
+
+        var pests: Int
+            get() = getData()?.pests ?: 0
+            set(value) {
+                getData()?.pests = value
+            }
+
+        val currentSpray: SprayData?
+            get() = this.getData()?.let { plot ->
+                val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
+                val type = plot.sprayType ?: return null
+                return SprayData(expiry, type)
+            }
+
+        val isSprayExpired: Boolean
+            get() = this.getData()?.let {
+                !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
+            } == true
+
+        var isBeingPasted: Boolean
+            get() = this.getData()?.isBeingPasted ?: false
+            set(value) {
+                this.getData()?.isBeingPasted = value
+            }
+
+        var isPestCountInaccurate: Boolean
+            get() = this.getData()?.isPestCountInaccurate ?: false
+            set(value) {
+                this.getData()?.isPestCountInaccurate = value
+            }
+
+        var uncleared: Boolean
+            get() = this.getData()?.uncleared ?: false
+            set(value) {
+                this.getData()?.uncleared = value
+            }
+
+        var locked: Boolean
+            get() = this.getData()?.locked ?: false
+            set(value) {
+                this.getData()?.locked = value
+            }
+
+        var greenhouse: Boolean
+            get() = this.getData()?.greenhouse ?: false
+            set(value) {
+                this.getData()?.greenhouse = value
+            }
+
+        val tpName get() = if (isBarn()) "barn" else name
+
+        fun markExpiredSprayAsNotified() {
+            getData()?.sprayHasNotified = true
+        }
+
+        fun setSpray(spray: SprayType, duration: Duration) {
+            getData()?.apply {
+                sprayType = spray
+                sprayExpiryTime = SimpleTimeMark.now() + duration
+                sprayHasNotified = false
+            }
+        }
+
+        fun isBarn() = id == 0
+
+        fun removeSpray() {
+            getData()?.apply {
+                sprayType = null
+                sprayExpiryTime = SimpleTimeMark.now()
+                sprayHasNotified = true
+            }
+        }
+
+        fun isPlayerInside() = getCurrentPlot() == this
+
+        fun sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
+
+        private fun getData() = GardenApi.storage?.plotData?.getOrPut(id) {
+            PlotData(
+                id = id,
+                name = "$id",
+                pests = 0,
+                sprayExpiryTime = null,
+                sprayType = null,
+                sprayHasNotified = false,
+                isBeingPasted = false,
+                isPestCountInaccurate = false,
+                locked = true,
+                uncleared = false,
+                greenhouse = false,
+            )
+        }
+    }
 
     private var currentPlot: Plot? = null
 
+    /**
+     * Checks whether the player has moved to a different plot and fires [PlotChangeEvent] if so.
+     *
+     * [currentPlot] holds the last known plot and is updated only here.
+     * [getCurrentPlot] computes the plot from the current player position without caching.
+     */
     fun checkCurrentPlot() {
         val plot = getCurrentPlot()
         if (plot != currentPlot) {
@@ -196,96 +299,6 @@ object GardenPlotApi {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenApi.storage?.plotData?.getOrPut(id) {
-        PlotData(
-            id,
-            "$id",
-            0,
-            null,
-            null,
-            sprayHasNotified = false,
-            isBeingPasted = false,
-            isPestCountInaccurate = false,
-            locked = true,
-            uncleared = false,
-            greenhouse = false,
-        )
-    }
-
-    var Plot.name: String
-        get() = getData()?.name ?: "$id"
-        set(value) {
-            getData()?.name = value
-        }
-
-    var Plot.pests: Int
-        get() = getData()?.pests ?: 0
-        set(value) {
-            getData()?.pests = value
-        }
-
-    val Plot.currentSpray: SprayData?
-        get() = this.getData()?.let { plot ->
-            val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
-            val type = plot.sprayType ?: return null
-            return SprayData(expiry, type)
-        }
-
-    val Plot.isSprayExpired: Boolean
-        get() = this.getData()?.let {
-            !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
-        } == true
-
-    var Plot.isBeingPasted: Boolean
-        get() = this.getData()?.isBeingPasted ?: false
-        set(value) {
-            this.getData()?.isBeingPasted = value
-        }
-
-    var Plot.isPestCountInaccurate: Boolean
-        get() = this.getData()?.isPestCountInaccurate ?: false
-        set(value) {
-            this.getData()?.isPestCountInaccurate = value
-        }
-
-    var Plot.uncleared: Boolean
-        get() = this.getData()?.uncleared ?: false
-        set(value) {
-            this.getData()?.uncleared = value
-        }
-
-    var Plot.locked: Boolean
-        get() = this.getData()?.locked ?: false
-        set(value) {
-            this.getData()?.locked = value
-        }
-
-    var Plot.greenhouse: Boolean
-        get() = this.getData()?.greenhouse ?: false
-        set(value) {
-            this.getData()?.greenhouse = value
-        }
-
-    fun Plot.markExpiredSprayAsNotified() {
-        getData()?.sprayHasNotified = true
-    }
-
-    private fun Plot.setSpray(spray: SprayType, duration: Duration) {
-        getData()?.apply {
-            sprayType = spray
-            sprayExpiryTime = SimpleTimeMark.now() + duration
-            sprayHasNotified = false
-        }
-    }
-
-    private fun Plot.removeSpray() {
-        getData()?.apply {
-            sprayType = null
-            sprayExpiryTime = SimpleTimeMark.now()
-            sprayHasNotified = true
-        }
-    }
-
     private fun sendSprayMessage(plot: String, spray: String, time: String) {
         ChatUtils.chat("§r§aPlot §r§7- §r§b$plot §r§7was sprayed with §r§a$spray§r§7!§r")
         ChatUtils.chat("§r§7This will expire in §r§a$time§r§7!§r")
@@ -298,10 +311,6 @@ object GardenPlotApi {
             (config.newSprayNotification && sprayExpiryTime >= SimpleTimeMark.now() + 1.minutes)
     }
 
-    fun Plot.isBarn() = id == 0
-
-    fun Plot.isPlayerInside() = getCurrentPlot() == this
-
     fun getPlot(location: LorenzVec): Plot? {
         if (location.y !in 0.0..<256.0) return null
         val plotX = location.x.toPlotIndex() ?: return null
@@ -310,14 +319,10 @@ object GardenPlotApi {
     }
 
     private fun Double.toPlotIndex(): Int? {
-        if (this < PLOT_GRID_MIN || this > PLOT_GRID_MAX) return null
+        if (this !in PLOT_GRID_MIN..PLOT_GRID_MAX) return null
         if (this >= PLOT_GRID_MAX) return PLOT_GRID_SIZE - 1
         return floor((this - PLOT_GRID_MIN) / PLOT_SIZE).toInt().coerceIn(0, PLOT_GRID_SIZE - 1)
     }
-
-    val Plot.tpName get() = if (isBarn()) "barn" else name
-
-    fun Plot.sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
 
     init {
         val list = mutableListOf<Plot>()
@@ -407,14 +412,14 @@ object GardenPlotApi {
     }
 
     @HandleEvent
-    fun onTabListUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
         val plot = getCurrentPlot() ?: return
         if (plot.isBarn()) return
 
         plotSprayedTablistPattern.firstMatcher(event.lines.map { it.string.trim() }) {
             val sprayName = group("spray").trim()
-            val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.getData()?.sprayExpiryTime) }
+            val time = groupOrNull("time")?.let { getTablistEndTime(it, plot.currentSpray?.expiry) }
             if (time == null) {
                 plot.removeSpray()
                 return
@@ -422,17 +427,13 @@ object GardenPlotApi {
 
             val newSpray: SprayType? = SprayType.getByNameOrNull(sprayName)
 
-            if (plot.currentSpray != null) {
-                val data = plot.getData() ?: return
-
-                val sprayExpiryTime = data.sprayExpiryTime ?: return
-                val currentSpray = data.sprayType ?: return
-
+            val spray = plot.currentSpray
+            if (spray != null) {
                 if (newSpray == null) {
                     plot.removeSpray()
                     return
                 } else {
-                    if (sprayMessageEligible(sprayExpiryTime, time, currentSpray, newSpray)) {
+                    if (sprayMessageEligible(spray.expiry, time, spray.type, newSpray)) {
                         sendSprayMessage(plot.name, sprayName, time.timeUntil().format())
                     }
                     plot.setSpray(newSpray, time.timeUntil())

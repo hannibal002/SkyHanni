@@ -6,10 +6,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBeingPasted
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -21,8 +17,8 @@ object GardenPlotMenuHighlighting {
 
     private val highlightedPlots = mutableMapOf<GardenPlotApi.Plot, PlotStatusType>()
 
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    @HandleEvent(InventoryUpdatedEvent::class)
+    fun onInventoryFullyOpened() {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
