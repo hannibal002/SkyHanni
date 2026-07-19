@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
+@Suppress("EmptyDefaultConstructor")
 class SkyHanniPipCoordinatorRenderer(
     //? if < 26.2 {
     /*bufferSource: MultiBufferSource.BufferSource,

@@ -29,7 +29,7 @@ object SkyHanniVertexFormats {
     }
     *///?}
 
-    @Suppress("UnusedPrivateProperty")
+    @Suppress("EmptyDefaultConstructor", "UnusedPrivateProperty")
     internal enum class VertexElement(
         //? if < 26.2 {
         /*private val index: Int = 0,
