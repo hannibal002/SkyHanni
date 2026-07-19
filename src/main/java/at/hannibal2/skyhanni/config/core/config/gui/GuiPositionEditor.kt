@@ -420,7 +420,7 @@ private class OldScreenRenderContext(
         val top = oldScreen.containerTop()
         val entityScale = (30 * ((scaleX + scaleY) / 2f)).roundToInt()
 
-        //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
+        //~ if < 26.1 'extract' -> 'render'
         InventoryScreen.extractEntityInInventoryFollowsMouse(
             DrawContextUtils.drawContext,
             ((left + 26) * scaleX).roundToInt(),

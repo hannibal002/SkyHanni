@@ -39,7 +39,7 @@ public abstract class MixinGui {
         }
     }
 
-    //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postHotbarLayerEventPre(graphics).isCancelled()) {
@@ -47,14 +47,14 @@ public abstract class MixinGui {
         }
     }
 
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractItemHotbar", at = @At("TAIL"))
     public void renderHotbarTail(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postHotbarLayerEventPost(graphics);
     }
-    //~}
 
     @WrapOperation(
-        //~ if < 26.1 'extractTabList' -> 'renderTabList'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractTabList",
         at = @At(
             value = "INVOKE",
@@ -74,10 +74,10 @@ public abstract class MixinGui {
     }
 
     @WrapOperation(
-        //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractHotbarAndDecorations",
         at = @At(value = "INVOKE",
-            //~ if < 26.1 'extractBackground' -> 'renderBackground'
+            //~ if < 26.1 'extract' -> 'render'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"
         )
     )
@@ -93,11 +93,11 @@ public abstract class MixinGui {
     }
 
     @WrapOperation(
-        //~ if < 26.1 'extractHotbarAndDecorations' -> 'renderHotbarAndDecorations'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractHotbarAndDecorations",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'extractExperienceLevel' -> 'renderExperienceLevel'
+            //~ if < 26.1 'extract' -> 'render'
             target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V"
         )
     )
@@ -134,7 +134,7 @@ public abstract class MixinGui {
     }
 
     @ModifyArg(
-        //~ if < 26.1 'extractChat' -> 'renderChat'
+        //~ if < 26.1 'extract' -> 'render'
         method = "extractChat",
         at = @At(
             value = "INVOKE",
@@ -169,7 +169,7 @@ public abstract class MixinGui {
         }
     }
 
-    //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         if (RenderEvents.postHeldItemTooltipLayerEventPre(graphics).isCancelled()) {
@@ -177,13 +177,13 @@ public abstract class MixinGui {
         }
     }
 
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractSelectedItemName", at = @At("TAIL"))
     public void renderSelectedItemNamePost(GuiGraphicsExtractor graphics, CallbackInfo ci) {
         RenderEvents.postHeldItemTooltipLayerEventPost(graphics);
     }
-    //~}
 
-    //~ if < 26.1 'extractOverlayMessage' -> 'renderOverlayMessage'
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         if (RenderEvents.postActionBarLayerEventPre(graphics).isCancelled()) {
@@ -191,7 +191,7 @@ public abstract class MixinGui {
         }
     }
 
-    //~ if < 26.1 'extractOverlayMessage' -> 'renderOverlayMessage'
+    //~ if < 26.1 'extract' -> 'render'
     @Inject(method = "extractOverlayMessage", at = @At("TAIL"))
     public void renderOverlayMessagePost(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker, CallbackInfo ci) {
         RenderEvents.postActionBarLayerEventPost(graphics);

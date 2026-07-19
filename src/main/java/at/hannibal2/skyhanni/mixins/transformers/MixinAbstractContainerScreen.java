@@ -80,17 +80,17 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         skyhanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render' {
+    //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
     private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
     }
 
+    //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At("TAIL"))
     private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         skyhanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
     }
-    //~}
 
     @Inject(
         method = "extractContents",
@@ -172,8 +172,15 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    //~ if < 26.1 'extractTooltip' -> 'renderTooltip'
-    @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
+    @ModifyArg(
+        //~ if < 26.1 'extract' -> 'render'
+        method = "extractTooltip",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"
+        ),
+        index = 1
+    )
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {
         if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
@@ -202,8 +209,15 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    //~ if < 26.1 'extractLabels' -> 'renderLabels'
-    @ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
+    @ModifyArg(
+        //~ if < 26.1 'extract' -> 'render'
+        method = "extractLabels",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
+        ),
+        index = 4
+    )
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
     }

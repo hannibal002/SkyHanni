@@ -163,7 +163,7 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
     open fun onInitGui() {}
 
     fun drawDefaultBackground(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
+        //~ if < 26.1 'extract' -> 'render'
         extractMenuBackground(DrawContextUtils.drawContext)
     }
 }

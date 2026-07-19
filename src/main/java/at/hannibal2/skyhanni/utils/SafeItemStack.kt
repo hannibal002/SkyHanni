@@ -1,4 +1,4 @@
-@file:Suppress("VanillaItemStackImport", "UnsafeCAllOnNullableType")
+@file:Suppress("UnsafeCallOnNullableType", "VanillaItemStackImport")
 
 package at.hannibal2.skyhanni.utils
 
@@ -30,8 +30,12 @@ typealias SafeItemStack = ItemStack
  */
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
     if (count <= 0 || item == Items.AIR) return ItemStack.EMPTY
-    //~ if < 26.1 'DeferredItemStack(item, { ItemStackTemplate(item, count) }, count)' -> 'ItemStack(item, count)'
+
+    //? if >= 26.1 {
     return DeferredItemStack(item, { ItemStackTemplate(item, count) }, count)
+    //?} else {
+    /*return ItemStack(item, count)
+    *///?}
 }
 
 /**
@@ -40,8 +44,12 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
  */
 fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
     if (count <= 0 || item == Items.AIR) return ItemStack.EMPTY
-    //~ if < 26.1 'DeferredItemStack(item, { createItemStackTemplate(item, count, extraOps) }, count)' -> 'ItemStack(item, count).also(extraOps)'
+
+    //? if >= 26.1 {
     return DeferredItemStack(item, { createItemStackTemplate(item, count, extraOps) }, count)
+    //?} else {
+    /*return ItemStack(item, count).also(extraOps)
+    *///?}
 }
 
 //? if >= 26.1 {
