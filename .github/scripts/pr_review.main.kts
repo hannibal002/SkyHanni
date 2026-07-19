@@ -80,7 +80,7 @@ fun buildErrorComment(message: String): String = buildString {
     appendLine()
 
     appendLine("Most likely fix: merge beta into this PR.")
-    appendLine("If the issue persists, ping @hannibal002 or another maintainer.")
+    appendLine("If the issue persists, ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
     appendLine()
 
     val runId = System.getenv("GITHUB_RUN_ID")
