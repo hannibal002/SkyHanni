@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
-import net.minecraft.client.User
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.screens.Screen
+import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
@@ -118,5 +119,9 @@ object MinecraftCompat {
     val hideGui get(): Boolean = mc.options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+
+    fun reloadChunks() = DelayedRun.runOrNextTick {
+        Minecraft.getInstance().levelRenderer.allChanged()
+    }
     // </editor-fold>
 }
