@@ -141,6 +141,7 @@ class CustomImportOrdering(config: Config) :
 
         val blocks = createImportBlocks(rawText)
 
+        // Should never happen unless import processing is broken.
         require(blocks.isNotEmpty()) { "No import blocks found in the import list." }
 
         if (!isPreprocessingBlocksLast(blocks)) {
