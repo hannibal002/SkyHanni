@@ -5,7 +5,8 @@ import at.hannibal2.skyhanni.config.features.garden.PlotMenuHighlightingConfig.P
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -15,7 +16,7 @@ object GardenPlotMenuHighlighting {
 
     private val config get() = GardenApi.config.plotMenuHighlighting
 
-    private val highlightedPlots = mutableMapOf<GardenPlotApi.Plot, PlotStatusType>()
+    private val highlightedPlots = mutableMapOf<GardenPlot, PlotStatusType>()
 
     @HandleEvent(InventoryUpdatedEvent::class)
     fun onInventoryFullyOpened() {
@@ -55,7 +56,7 @@ object GardenPlotMenuHighlighting {
         }
     }
 
-    private fun handleStackSize(plot: GardenPlotApi.Plot, status: PlotStatusType): Int {
+    private fun handleStackSize(plot: GardenPlot, status: PlotStatusType): Int {
         return when (status.name) {
             "§cPests" -> return plot.pests
             "§eSprays" -> return plot.currentSpray?.expiry?.timeUntil()?.inWholeMinutes?.toInt() ?: 1
@@ -63,7 +64,7 @@ object GardenPlotMenuHighlighting {
         }
     }
 
-    private fun handleCurrent(plot: GardenPlotApi.Plot, status: PlotStatusType) {
+    private fun handleCurrent(plot: GardenPlot, status: PlotStatusType) {
         val isHighlighted = highlightedPlots.containsKey(plot)
         val isCurrent = highlightedPlots[plot] == status
         if (!isHighlighted || isCurrent) {

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.events.garden
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 
 /**
- * Fired when the player moves from one [GardenPlotApi.Plot] to another, or leaves all plots.
+ * Fired when the player moves from one [at.hannibal2.skyhanni.features.garden.plot.GardenPlot] to another, or leaves all plots.
  *
  * @param plot the plot the player entered, or `null` if the player left all plots.
  */
-class PlotChangeEvent(val plot: GardenPlotApi.Plot?) : SkyHanniEvent()
+class PlotChangeEvent(val plot: GardenPlot?) : SkyHanniEvent()

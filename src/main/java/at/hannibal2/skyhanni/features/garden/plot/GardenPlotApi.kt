@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.garden.plot
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -29,10 +28,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.client.player.LocalPlayer
-import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.math.floor
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -130,116 +127,15 @@ object GardenPlotApi {
         "tablist.spraytime-nocolor",
         "Spray: (?<spray>[\\w\\s]+)(?:\\((?<time>.*)\\))?",
     )
-    var plots = listOf<Plot>()
+    var plots = listOf<GardenPlot>()
 
-    fun getCurrentPlot(): Plot? = getPlot(playerLocation())
+    fun getCurrentPlot(): GardenPlot? = getPlot(playerLocation())
 
     fun inGreenhouse(): Boolean {
         return currentPlot?.greenhouse ?: false
     }
 
-    class Plot(val id: Int, var inventorySlot: Int, val box: AABB, val middle: LorenzVec) {
-
-        var name: String
-            get() = getData()?.name ?: "$id"
-            set(value) {
-                getData()?.name = value
-            }
-
-        var pests: Int
-            get() = getData()?.pests ?: 0
-            set(value) {
-                getData()?.pests = value
-            }
-
-        val currentSpray: SprayData?
-            get() = this.getData()?.let { plot ->
-                val expiry = plot.sprayExpiryTime?.takeIf { !it.isInPast() } ?: return null
-                val type = plot.sprayType ?: return null
-                return SprayData(expiry, type)
-            }
-
-        val isSprayExpired: Boolean
-            get() = this.getData()?.let {
-                !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
-            } == true
-
-        var isBeingPasted: Boolean
-            get() = this.getData()?.isBeingPasted ?: false
-            set(value) {
-                this.getData()?.isBeingPasted = value
-            }
-
-        var isPestCountInaccurate: Boolean
-            get() = this.getData()?.isPestCountInaccurate ?: false
-            set(value) {
-                this.getData()?.isPestCountInaccurate = value
-            }
-
-        var uncleared: Boolean
-            get() = this.getData()?.uncleared ?: false
-            set(value) {
-                this.getData()?.uncleared = value
-            }
-
-        var locked: Boolean
-            get() = this.getData()?.locked ?: false
-            set(value) {
-                this.getData()?.locked = value
-            }
-
-        var greenhouse: Boolean
-            get() = this.getData()?.greenhouse ?: false
-            set(value) {
-                this.getData()?.greenhouse = value
-            }
-
-        val tpName get() = if (isBarn()) "barn" else name
-
-        fun markExpiredSprayAsNotified() {
-            getData()?.sprayHasNotified = true
-        }
-
-        fun setSpray(spray: SprayType, duration: Duration) {
-            getData()?.apply {
-                sprayType = spray
-                sprayExpiryTime = SimpleTimeMark.now() + duration
-                sprayHasNotified = false
-            }
-        }
-
-        fun isBarn() = id == 0
-
-        fun removeSpray() {
-            getData()?.apply {
-                sprayType = null
-                sprayExpiryTime = SimpleTimeMark.now()
-                sprayHasNotified = true
-            }
-        }
-
-        fun isPlayerInside() = getCurrentPlot() == this
-
-        fun sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
-
-        private fun getData() = GardenApi.storage?.plotData?.getOrPut(id) {
-            PlotData(
-                id = id,
-                name = "$id",
-                pests = 0,
-                sprayExpiryTime = null,
-                sprayType = null,
-                sprayHasNotified = false,
-                isBeingPasted = false,
-                isPestCountInaccurate = false,
-                locked = true,
-                uncleared = false,
-                greenhouse = false,
-            )
-        }
-    }
-
-    private var currentPlot: Plot? = null
+    private var currentPlot: GardenPlot? = null
 
     /**
      * Checks whether the player has moved to a different plot and fires [PlotChangeEvent] if so.
@@ -311,7 +207,7 @@ object GardenPlotApi {
             (config.newSprayNotification && sprayExpiryTime >= SimpleTimeMark.now() + 1.minutes)
     }
 
-    fun getPlot(location: LorenzVec): Plot? {
+    fun getPlot(location: LorenzVec): GardenPlot? {
         if (location.y !in 0.0..<256.0) return null
         val plotX = location.x.toPlotIndex() ?: return null
         val plotZ = location.z.toPlotIndex() ?: return null
@@ -325,7 +221,7 @@ object GardenPlotApi {
     }
 
     init {
-        val list = mutableListOf<Plot>()
+        val list = mutableListOf<GardenPlot>()
         var slot = 2
         for ((y, rows) in plotMap.withIndex()) {
             for ((x, id) in rows.withIndex()) {
@@ -337,7 +233,7 @@ object GardenPlotApi {
                 val b = LorenzVec(maxX, 256.0, maxY)
                 val middle = a.middle(b).copy(y = 10.0)
                 val box = a.axisAlignedTo(b).inflate(0.0001, 0.0, 0.0001)
-                list.add(Plot(id, slot, box, middle))
+                list.add(GardenPlot(id, slot, box, middle))
                 slot++
             }
             slot += 4
@@ -465,7 +361,7 @@ object GardenPlotApi {
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
 
     fun SkyHanniRenderWorldEvent.renderPlot(
-        plot: Plot,
+        plot: GardenPlot,
         lineColor: Color,
         cornerColor: Color,
         showBuildLimit: Boolean = false,

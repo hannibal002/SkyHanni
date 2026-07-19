@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.isTimeFlower
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.checkCurrentPlot
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.checkCurrentPlot
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.features.garden.farming.GardenBestCropTime
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.patternGroup
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot

@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.renderPlot
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.renderPlot
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -190,7 +190,7 @@ object PestFinder {
     }
 
     private fun drawName(
-        plot: GardenPlotApi.Plot,
+        plot: GardenPlot,
         playerLocation: LorenzVec,
         event: SkyHanniRenderWorldEvent,
     ) {

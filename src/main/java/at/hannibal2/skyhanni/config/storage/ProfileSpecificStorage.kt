@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage

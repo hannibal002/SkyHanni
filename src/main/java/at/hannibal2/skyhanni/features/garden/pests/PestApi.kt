@@ -18,7 +18,8 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -59,7 +60,7 @@ object PestApi {
             storage?.scoreboardPests = value
         }
 
-    private val gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
+    private val gardenPestTypes = mutableMapOf<GardenPlot, List<PestType>>()
     private var lastCheckedPlot = 0
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -333,11 +334,11 @@ object PestApi {
         lastCheckedPlot = plot.id
     }
 
-    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.addToPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+    private fun MutableMap<GardenPlot, List<PestType>>.addToPlot(plot: GardenPlot, pestType: PestType) {
         this[plot] = this.getOrDefault(plot, emptyList()) + pestType
     }
 
-    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.removeFromPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+    private fun MutableMap<GardenPlot, List<PestType>>.removeFromPlot(plot: GardenPlot, pestType: PestType) {
         val currentList = this[plot].orEmpty()
         val indexToRemove = currentList.indexOfFirst { it == pestType }
         if (indexToRemove != -1) {
@@ -359,7 +360,7 @@ object PestApi {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 
-    fun GardenPlotApi.Plot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
+    fun GardenPlot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return
