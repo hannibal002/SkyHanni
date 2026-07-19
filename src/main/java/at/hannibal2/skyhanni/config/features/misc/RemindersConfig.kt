@@ -21,8 +21,13 @@ class RemindersConfig {
         name = "Reminder Interval",
         desc = "The interval in minutes in which reminders are shown again, after they have been shown once."
     )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 60f, minStep = 1f)
+    @ConfigEditorSlider(minValue = 1f, maxValue = 60f, minStep = 1f)
     var interval: Float = 5f
+
+    @Expose
+    @ConfigOption(name = "Show Title", desc = "Show a title on screen when a reminder is due.")
+    @ConfigEditorBoolean
+    var showTitle: Boolean = true
 
     @Expose
     @ConfigOption(
