@@ -120,7 +120,7 @@ object SkyHanniEvents {
         REPO_RELOAD,
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         disabledHandlers = data.disabledHandlers
