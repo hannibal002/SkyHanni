@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.particles.ParticleType
 import net.minecraft.core.registries.BuiltInRegistries
 
@@ -17,6 +16,7 @@ import net.minecraft.core.registries.BuiltInRegistries
  * had a chance to process it.
  *
  * Runs on the network thread.
+ * Will only fire if the player is in the world
  *
  * @param type the particle type
  * @param location the particle spawn location
@@ -37,13 +37,11 @@ class ParticleEvent(
     val particleArgs: IntArray? = null,
 ) : CancellableWorldEvent() {
 
-    val distanceToPlayer: Double? by lazy {
-        if (MinecraftCompat.localPlayerExists) location.distanceToPlayer() else null
-    }
+    val distanceToPlayer by lazy { location.distanceToPlayer() }
 
     override fun toString(): String {
         return "${javaClass.simpleName}(type='${BuiltInRegistries.PARTICLE_TYPE.getKey(type)}', location=${location.roundTo(1)}, count=$count, speed=$speed, offset=$offset, longDistance=$longDistance, distanceToPlayer=${
-            distanceToPlayer?.roundTo(1)
+            distanceToPlayer.roundTo(1)
         })"
     }
 }
