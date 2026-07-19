@@ -20,6 +20,15 @@ class TabCompletionEvent(
         suggestions.forEach(this::addSuggestion)
     }
 
+    fun addSuggestionUnchecked(suggestion: String) {
+        val adjustedSuggestion = suggestion.removePrefix("/")
+        additionalSuggestions.add(adjustedSuggestion)
+    }
+
+    fun addSuggestionsUnchecked(suggestions: Iterable<String>) {
+        suggestions.forEach(this::addSuggestionUnchecked)
+    }
+
     val command = if (leftOfCursor.startsWith("/"))
         leftOfCursor.substring(1).substringBefore(" ").lowercase()
     else ""

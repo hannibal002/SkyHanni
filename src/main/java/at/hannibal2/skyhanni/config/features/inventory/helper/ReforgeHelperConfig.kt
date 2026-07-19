@@ -24,6 +24,12 @@ class ReforgeHelperConfig {
     var reforgeStonesOnlyHex: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Block Rare Reforge", desc = "Blocks overwriting non-Blacksmith reforges")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var blockNonBasicReforge: Boolean = true
+
+    @Expose
     @ConfigOption(
         name = "Show Diff",
         desc = "Shows the difference of the new reforge to the current one in the selection list."

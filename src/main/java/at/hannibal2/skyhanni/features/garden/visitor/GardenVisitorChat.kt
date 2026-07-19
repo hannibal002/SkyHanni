@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -110,7 +110,7 @@ object GardenVisitorChat {
      * Determines if a chat message should be hidden.
      * Hides messages from visitors but keeps messages from permanent NPCs like Jacob.
      */
-    private fun hideVisitorMessage(message: String) = visitorChatMessagePattern.matchMatcher(message) {
+    private fun hideVisitorMessage(message: String): Boolean = visitorChatMessagePattern.matchMatcher(message) {
         val color = group("color")
         if (color == null || color == "§e") return false // Non-visitor NPC, probably Jacob
 

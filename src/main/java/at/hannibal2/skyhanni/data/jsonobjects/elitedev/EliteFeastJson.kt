@@ -53,17 +53,13 @@ data class EliteFeastData(
 ) {
     val next: Map<String, SimpleTimeMark?> = _next.mapValues { it.value?.let(SimpleTimeMark::fromUnixSeconds) }
 
-    private val feastEndTime: SimpleTimeMark
-        get() = if (isGrandFeast) {
-            SkyBlockTime(year, GRAND_FEAST_END_MONTH, GRAND_FEAST_END_DAY).toTimeMark()
-        } else {
-            SkyBlockTime(year, HARVEST_FEAST_END_MONTH, HARVEST_FEAST_END_DAY).toTimeMark()
-        }
+    private val monthEndTime: SimpleTimeMark
+        get() = SkyBlockTime(year, month + 1, 1).toTimeMark()
 
     fun getBody(): String = ApiUtils.serializeNullsGson.toJson(this)
 
     private fun getDurations(): List<Duration> {
-        return next.map { it.value?.timeUntil() ?: Duration.INFINITE }
+        return next.mapNotNull { it.value?.takeIfInitialized()?.timeUntil() }
     }
 
     private fun getDuration(): Duration {
@@ -72,8 +68,12 @@ data class EliteFeastData(
     }
 
     fun getActiveDuration(): Duration {
-        if (next.values.all { it == null }) return feastEndTime.timeUntil()
-        return getDurations().filter { it.isPositive() }.minByOrNull { it.inWholeMilliseconds } ?: Duration.ZERO
+        if (next.values.all { it == null }) return monthEndTime.timeUntil()
+
+        return getDurations()
+            .filter(Duration::isPositive)
+            .minByOrNull { it.inWholeMilliseconds }
+            ?: monthEndTime.timeUntil()
     }
 
     fun getCurrentCrops(): List<CropType> {
@@ -93,11 +93,6 @@ data class EliteFeastData(
     private fun List<String>.toCropTypes(): List<CropType> = map { CropType.getByName(it) }
 
     companion object {
-        private const val HARVEST_FEAST_END_MONTH = 10
-        private const val HARVEST_FEAST_END_DAY = 1
-        private const val GRAND_FEAST_END_MONTH = 3
-        private const val GRAND_FEAST_END_DAY = 27
-
         fun of(
             year: Int,
             month: Int,

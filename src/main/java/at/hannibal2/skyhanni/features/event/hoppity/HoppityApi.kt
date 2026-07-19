@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.LorenzRarity.LEGENDARY
@@ -250,7 +250,8 @@ object HoppityApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         // Remove any processed stray slots that are no longer in the inventory.
         processedStraySlots.entries.removeIf {
-            it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
+            !event.inventoryItems.containsKey(it.key) ||
+                event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value
         }
 
         // Only process if we're in the Chocolate Factory.
@@ -271,7 +272,7 @@ object HoppityApi {
                     else -> return@matchMatcher
                 }
             }
-            CFStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getSingleLineLore()) {
+            CFStrayTracker.strayDoradoPattern.matchMatcher(itemStack.getLore().toSingleLineLore()) {
                 // If the lore contains the escape pattern, we don't want to fire the event.
                 // There are also 3 separate messages that can match, which is why we need to check the time since the last fire.
                 if (CFStrayTracker.doradoEscapeStrayPattern.anyMatches(itemStack.getLore())) return@matchMatcher

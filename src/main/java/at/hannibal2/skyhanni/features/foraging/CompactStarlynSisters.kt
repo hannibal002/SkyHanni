@@ -174,9 +174,9 @@ object CompactStarlynSisters {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Very Special Contest".asComponent(),
-            Component.literal("Get 20,000 Agatha points in a contest").withColor(ChatFormatting.RED),
-            20f,
+            name = "Very Special Contest".asComponent(),
+            description = Component.literal("Get 20,000 Agatha points in a contest").withColor(ChatFormatting.RED),
+            userLuckAmount = 20f,
         )
         event.register(achievement, AGATHA_ACHIEVEMENT)
     }
