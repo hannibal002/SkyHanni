@@ -11,9 +11,9 @@ import org.jetbrains.kotlin.psi.KtImportList
 class CustomImportOrdering(config: Config) :
     SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
-    private data class ImportLine(
+    @JvmInline
+    private value class ImportLine(
         val lineIndex: Int,
-        val text: String,
     )
 
     private data class ImportBlock(
@@ -54,7 +54,7 @@ class CustomImportOrdering(config: Config) :
                 }
 
                 trimmed.startsWith("import ") -> {
-                    currentImports += ImportLine(index, trimmed)
+                    currentImports += ImportLine(index)
                 }
             }
         }
@@ -96,7 +96,7 @@ class CustomImportOrdering(config: Config) :
         block: ImportBlock,
         imports: Iterator<KtImportDirective>,
     ): Boolean {
-        val expected = buildList {
+        val blockImports = buildList {
             repeat(block.imports.size) {
                 if (!imports.hasNext()) {
                     return false
@@ -104,10 +104,12 @@ class CustomImportOrdering(config: Config) :
                 add(imports.next())
             }
         }
-            .sortedWith(ImportOrdering.getOrdering())
-            .map { "import ${it.importPath}" }
 
-        return block.imports.map { it.text } == expected
+        val expected = blockImports
+            .sortedWith(ImportOrdering.getOrdering())
+            .map { it.importPath }
+
+        return blockImports.map { it.importPath } == expected
     }
 
     private fun areImportsOrdered(
