@@ -64,8 +64,10 @@ class CustomImportOrdering(config: Config) :
         return blocks
     }
 
-    private fun hasInvalidSpacing(rawLines: List<String>, blocks: List<ImportBlock>): Boolean {
-        return blocks.zipWithNext().any { (current, next) ->
+    private fun isValidImportSpacing(rawLines: List<String>, blocks: List<ImportBlock>): Boolean {
+        if (blocks.size <= 1) return true
+
+        return blocks.zipWithNext().none { (current, next) ->
             current.inPreprocessingBlock != next.inPreprocessingBlock &&
                 rawLines.getOrNull(current.imports.last().lineIndex + 1)?.isNotBlank() == true
         }
@@ -128,7 +130,7 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        if (hasInvalidSpacing(rawText, blocks)) {
+        if (!isValidImportSpacing(rawText, blocks)) {
             importList.reportIssue(
                 "Preprocessed import blocks must be separated by empty lines. " +
                     "There should not be any empty lines between non-preprocessed imports.",

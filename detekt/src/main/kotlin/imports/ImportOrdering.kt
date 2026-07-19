@@ -9,7 +9,7 @@ object ImportOrdering {
         return importOrder
     }
 
-    private val packageImportOrdering = listOf("java.", "javax.", "kotlinx.", "kotlin.")
+    private val packageImportOrdering = listOf("java.", "javax.", "kotlin.", "kotlinx.")
 
     private class ImportSorter : Comparator<KtImportDirective> {
         override fun compare(
