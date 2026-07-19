@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -93,8 +94,19 @@ object SkyHanniEvents {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers
-        disabledHandlerInvokers = data.disabledInvokers
+        val version = SkyHanniMod.modVersion
+
+        val versionedHandlers = data.disabledHandlersVersioned.filter {
+            (it.minVersion == null || version >= it.minVersion) &&
+                (it.maxVersion == null || version <= it.maxVersion)
+        }.map { it.name }.toSet()
+        val versionedInvokers = data.disabledInvokersVersioned.filter {
+            (it.minVersion == null || version >= it.minVersion) &&
+                (it.maxVersion == null || version <= it.maxVersion)
+        }.map { it.name }.toSet()
+
+        disabledHandlers = data.disabledHandlers + versionedHandlers
+        disabledHandlerInvokers = data.disabledInvokers + versionedInvokers
         EventListeners.markEventCacheDirty()
     }
 
