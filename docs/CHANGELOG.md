@@ -183,6 +183,7 @@
 + Improved Garden Shopping List to ignore any Visitor. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5661)
 + Lock on Mousemat is no longer enabled by default. - Luna (https://github.com/hannibal002/SkyHanni/pull/6045)
     + If you're an existing user, you will have to manually disable it if you don't want it.
++ Added option to show Harvest Feast Display outside of the Garden. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5835)
 
 #### Combat
 
@@ -321,6 +322,9 @@
 + Fixed Jacob Contest Personal Bests not being detected from chat because of the Farming Fortune icon change. - Luna (https://github.com/hannibal002/SkyHanni/pull/6059)
 + Fixed bonus pest chance display not working. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6056)
 + Fixed crop money display error when switching farming tools. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6090)
++ Fixed active Garden plot being detected wrong on plot edges (e.g. with Disco Destination). - Luna (https://github.com/hannibal002/SkyHanni/pull/5846)
++ Fixed Pest Finder giving an error when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6104)
++ Fixed Pest Profit Tracker saying Praying Mantiss instead of Praying Mantises. - Luna (https://github.com/hannibal002/SkyHanni/pull/6114)
 
 #### Combat
 
@@ -354,6 +358,9 @@
 + Fixed Remaining Slayer Kills Display not detecting decimal Combat Wisdom. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
 + Fixed ghost tracker not detecting rare drops. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6034)
 + Fixed ConcurrentModificationException error in Hide Slayer Spawn Particles. - Luna (https://github.com/hannibal002/SkyHanni/pull/6051)
++ Fixed not detecting Auto Pet Rule message for Golden Dragon overflow skin. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6117)
++ Fixed rare error/crash with Crimson Isle Miniboss Timer (likely a mod conflict). - Avrg (https://github.com/hannibal002/SkyHanni/pull/6096)
++ Fixed the item ability cooldown detection for the Giant's Sword. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/6116)
 
 #### GUI
 
@@ -376,6 +383,7 @@
 + Fixed Pet Display requiring Pet widget overflow XP when exact total/overflow XP text is not enabled. - akinsoft (https://github.com/hannibal002/SkyHanni/pull/6003)
 + Fixed custom wardrobe freezing after the first click. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6036)
 + Fixed Pet Display visually keeping removed pet items. - Akinsoft (https://github.com/hannibal002/SkyHanni/pull/6066)
++ Fixed tab widget highlight not working in multi-page settings pages. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6103)
 
 #### Item Ability
 
@@ -439,6 +447,7 @@
 + Fixed Dungeon Finder features not working outside of dungeon hub. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6014)
 + Fixed dungeon floor detection being broken due to new update. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6018)
 + Fixed dungeon chat filter not filter certain blessings. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6053)
++ Fixed Dungeon Party Finder features making tooltip colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6095)
 
 #### Foraging
 
@@ -486,6 +495,7 @@
 + Fixed tab list and inventory detection for stats with the new official SkyBlock resource pack. - Luna (https://github.com/hannibal002/SkyHanni/pull/6023)
 + Fixed non-book ultra rare items in Superpairs not triggering the mid-game notification immediately when uncovered. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6071)
 + Fixed prevent missing rabbit the fish sometimes causing you to not be able to close other inventories. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6087)
++ Fixed Estimated Armor Wardrobe Price showing while using Custom Wardrobe. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
 
 #### Commands
 
@@ -511,6 +521,7 @@
 + Fixed glacite tunnels auto commision not working due to hypixel update. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6015)
 + Fixed mineshaft mayham perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
 + Fixed gemstones not being detected in treasure chests. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6030)
++ Fixed SkyMall/Mayhem perks not being detected from the inventory. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6108)
 
 #### Chat
 
@@ -633,6 +644,11 @@
 + Fixed cold detection not working due to skyblock NOT using the new cold icon. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6074)
 + Fixed fusion display not showing outside Galatea (for when calling Kysha). - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6065)
 + Fixed Overflow Skill Level in tooltip showing inaccurate XP & not calculating level properly. - Rain (https://github.com/hannibal002/SkyHanni/pull/6082)
++ Fixed `/shnav` command not properly handling color codes in location names. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6099)
++ Fixed Manually Download button opening Modrinth multiple times. - Luna (https://github.com/hannibal002/SkyHanni/pull/5842)
++ Fixed Minion Upgrade Helper not appearing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6110)
++ Fixed typo in Crimson Isle rescue mission config. - jejebecarte (https://github.com/hannibal002/SkyHanni/pull/6121)
++ Fixed Zorro's Cape protection not working due to Equipment change. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
 
 ### Technical Details
 
