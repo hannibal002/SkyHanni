@@ -1,6 +1,5 @@
 package imports
 
-import PreprocessingPattern.Companion.containsPreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtImportDirective
@@ -9,40 +8,63 @@ import org.jetbrains.kotlin.psi.KtImportList
 /**
  * This rule enforces correct import ordering, while ignoring preprocessed comments and imports that are in a preprocessed block.
  */
-class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
+class CustomImportOrdering(config: Config) :
+    SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
     private fun isImportsCorrectlyOrdered(imports: List<KtImportDirective>, rawText: List<String>): Boolean {
-        if (rawText.any { it.isBlank() }) {
+        if (rawText.any(String::isBlank)) {
             return false
         }
 
-        var inPreprocess = false
-        val linesToIgnore = mutableListOf<String>()
+        val ordering = ImportOrdering.getOrdering()
+        val importIterator = imports.iterator()
+        val currentBlock = mutableListOf<String>()
+
+        fun flushBlock(): Boolean {
+            if (currentBlock.isEmpty()) {
+                return true
+            }
+
+            val expected = buildList {
+                repeat(currentBlock.size) {
+                    if (!importIterator.hasNext()) {
+                        return false
+                    }
+                    add(importIterator.next())
+                }
+            }
+                .sortedWith(ordering)
+                .map { "import ${it.importPath}" }
+
+            val matches = currentBlock == expected
+            currentBlock.clear()
+            return matches
+        }
 
         for (line in rawText) {
-            if (line.contains(PreprocessingPattern.IF.asComment)) {
-                inPreprocess = true
-                continue
-            }
-            if (line.contains(PreprocessingPattern.ENDIF.asComment)) {
-                inPreprocess = false
-                continue
-            }
-            if (line.contains(PreprocessingPattern.DOLLAR_DOLLAR.asComment)) {
-                continue
-            }
-            if (inPreprocess) {
-                linesToIgnore.add(line)
+            val trimmed = line.trim()
+
+            when {
+                PreprocessingPattern.IF.matches(trimmed) ||
+                    PreprocessingPattern.ELSEIF.matches(trimmed) ||
+                    PreprocessingPattern.ELSE.matches(trimmed) ||
+                    PreprocessingPattern.ENDIF.matches(trimmed) -> {
+                    if (!flushBlock()) {
+                        return false
+                    }
+                }
+
+                trimmed.startsWith("import ") -> {
+                    currentBlock += trimmed
+                }
             }
         }
 
-        val originalImports = rawText.filter { !it.containsPreprocessingPattern() && !linesToIgnore.contains(it) }
-        val formattedOriginal = originalImports.joinToString("\n") { it }
+        if (!flushBlock()) {
+            return false
+        }
 
-        val expectedImports = imports.sortedWith(ImportOrdering.getOrdering()).map { "import ${it.importPath}" }
-        val formattedExpected = expectedImports.filter { !linesToIgnore.contains(it) }.joinToString("\n")
-
-        return formattedOriginal == formattedExpected
+        return !importIterator.hasNext()
     }
 
     override fun visitImportList(importList: KtImportList) {
