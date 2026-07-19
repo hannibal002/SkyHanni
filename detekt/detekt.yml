@@ -33,7 +33,7 @@ RepoRules:
 
 ImportRules:
     CustomImportOrdering:
-        active: false
+        active: true
 
 SkyHanniStyle:
     InSkyBlockEarlyReturn:
