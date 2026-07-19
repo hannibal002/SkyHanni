@@ -33,7 +33,7 @@ object InfernoMinionFeatures {
      */
     val infernoMinionTitlePattern by RepoPattern.pattern(
         "minion.infernominiontitle",
-        "Inferno Minion ..?.?$",
+        "Inferno Minion ..?.?.?$",
     )
     var fuelItemIds = setOf<NeuInternalName>()
         private set
