@@ -10,16 +10,19 @@ import java.io.File
 
 class RepoCommitStorage(val file: File) {
 
-    fun readFromFile(): RepoCommit? = file.getJson()?.let { currentCommitJson ->
-        runCatching { ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson) }.getOrDefault(null)
-    } ?: run {
-        file.delete()
-        null
+    fun readFromFile(): RepoCommit? {
+        val currentCommitJson = file.getJson() ?: return deleteFile()
+        return runCatching { ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson) }.getOrElse { deleteFile() }
     }
 
     fun writeToFile(commit: RepoCommit): Boolean {
         val newCurrentCommitJson = ConfigManager.gson.toJsonTree(commit).asJsonObject
         return file.writeJson(newCurrentCommitJson)
+    }
+
+    private fun deleteFile(): Nothing? {
+        file.delete()
+        return null
     }
 }
 
