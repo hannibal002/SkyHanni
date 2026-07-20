@@ -3,6 +3,7 @@ package imports
 import PreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
+import org.jetbrains.kotlin.KtPsiSourceFileLinesMapping
 import org.jetbrains.kotlin.psi.KtFile
 
 /**
@@ -171,12 +172,15 @@ class CustomImportOrdering(config: Config) :
         }
 
         val fileLines by lazy { file.text.lines() }
+        val sourceFileLinesMapping by lazy { KtPsiSourceFileLinesMapping(file) }
+
         findPreprocessingBlockOrderViolation(blocks)?.let {
             reportIssue(
                 "Preprocessed import blocks must be at the end of the import list.",
                 it.lineIndex,
                 fileLines[it.lineIndex],
                 file,
+                sourceFileLinesMapping
             )
         }
 
@@ -186,6 +190,7 @@ class CustomImportOrdering(config: Config) :
                 it.lineIndex,
                 fileLines[it.lineIndex],
                 file,
+                sourceFileLinesMapping
             )
         }
 
@@ -195,6 +200,7 @@ class CustomImportOrdering(config: Config) :
                 it.lineIndex,
                 fileLines[it.lineIndex],
                 file,
+                sourceFileLinesMapping
             )
         }
 
@@ -204,6 +210,7 @@ class CustomImportOrdering(config: Config) :
                 it.lineIndex,
                 fileLines[it.lineIndex],
                 file,
+                sourceFileLinesMapping
             )
         }
 
