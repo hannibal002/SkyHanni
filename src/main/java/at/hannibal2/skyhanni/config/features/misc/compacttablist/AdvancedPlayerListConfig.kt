@@ -10,7 +10,7 @@ class AdvancedPlayerListConfig {
     @Expose
     @ConfigOption(name = "Player Sort", desc = "Change the sort order of player names in the tab list.")
     @ConfigEditorDropdown
-    var playerSortOrder: Property<PlayerSortEntry> = Property.of(PlayerSortEntry.RANK)
+    val playerSortOrder: Property<PlayerSortEntry> = Property.of(PlayerSortEntry.RANK)
 
     enum class PlayerSortEntry(private val displayName: String) {
         RANK("Rank (Default)"),
