@@ -28,11 +28,11 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         } else null
     )
 
-    fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
+    fun post(event: T, onError: ((Throwable) -> Unit)? = null) {
         invokeLog.invokeCount++
-        if (listeners.isEmpty()) return false
+        if (listeners.isEmpty()) return
 
-        if (SkyHanniEvents.isDisabledHandler(name)) return false
+        if (SkyHanniEvents.isDisabledHandler(name)) return
 
         EventThreadSanitizer.checkThread(name, allowedThreads)
 
@@ -65,6 +65,5 @@ class EventHandler<T : SkyHanniEvent> private constructor(
                 }
             )
         }
-        return event.isCancelled
     }
 }
