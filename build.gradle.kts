@@ -188,6 +188,7 @@ tasks.register<ClientProductionRunTask>("prodClient") {
     notCompatibleWithConfigurationCache("Interactive client launches must start a new process every time.")
     outputs.upToDateWhen { false }
     runDir = file("run")
+    programArgs.addAll("--quickPlayMultiplayer", "hypixel.net")
 }
 
 if (target == primaryTarget) {
