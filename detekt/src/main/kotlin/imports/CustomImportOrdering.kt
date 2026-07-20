@@ -151,7 +151,7 @@ class CustomImportOrdering(config: Config) :
     // Cannot use visitImportList(importList: KtImportList) since it does not count the last commented out preprocessed block as part of the import list.
     override fun visitKtFile(file: KtFile) {
         val rawText = parseImportSection(file)
-        if (rawText.isEmpty()) {
+        if (rawText.all(String::isBlank)) {
             return
         }
 
