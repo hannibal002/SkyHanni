@@ -5,6 +5,5 @@
     "compatibilityLevel": "JAVA_21",
     "injectors": {
         "maxShiftBy": 2
-    },
-    "required": true
+    }
 }

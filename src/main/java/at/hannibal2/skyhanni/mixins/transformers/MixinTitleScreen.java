@@ -6,7 +6,6 @@ import kotlin.Unit;
 import net.minecraft.client.gui.components.LogoRenderer;
 import net.minecraft.client.gui.screens.TitleScreen;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.MixinEnvironment;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,7 +20,7 @@ public abstract class MixinTitleScreen {
     @Inject(method = "<init>(ZLnet/minecraft/client/gui/components/LogoRenderer;)V", at = @At("RETURN"))
     private void onCreate(boolean doBackgroundFade, LogoRenderer logoRenderer, CallbackInfo ci) {
         if (!skyhanni$hasInited && PlatformUtils.isDevEnvironment()) {
-            MixinEnvironment.getCurrentEnvironment().audit();
+            at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests.loadAllMixinClasses();
         }
         skyhanni$hasInited = true;
     }

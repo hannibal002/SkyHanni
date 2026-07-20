@@ -31,30 +31,6 @@ public abstract class MixinMinecraft {
     @Nullable
     public MultiPlayerGameMode gameMode;
 
-    @Shadow
-    public abstract void stop();
-
-    @ModifyExpressionValue(
-        method = "addInitialScreens",
-        at = @At(
-            value = "FIELD",
-            target = "Lnet/minecraft/client/Options;onboardAccessibility:Z",
-            opcode = Opcodes.GETFIELD
-        )
-    )
-    public boolean onboardAccessibility(boolean original) {
-        if (PlatformUtils.isDevEnvironment() && !Boolean.getBoolean("skyhanni.accessibilityOnboarding")) return false;
-        return original;
-    }
-
-    @Inject(
-        method = "onGameLoadFinished",
-        at = @At(value = "INVOKE", target = "Ljava/lang/Runnable;run()V", shift = At.Shift.AFTER)
-    )
-    private void autoQuitAfterInitialScreen(CallbackInfo ci) {
-        if (PlatformUtils.isDevEnvironment() && Boolean.getBoolean("skyhanni.autoQuit")) this.stop();
-    }
-
     @Inject(
         at = @At("HEAD"),
         method = "startUseItem",

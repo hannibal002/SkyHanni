@@ -132,11 +132,8 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
 
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
-val skyHanniSystemProperties = providers.systemPropertiesPrefixedBy("skyhanni.")
-
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    systemProperties(skyHanniSystemProperties.get())
     val runModsDirectoryFile = runModsDirectory.asFile
     val reiRunSupportModFiles = reiRunSupportMods.incoming.files
     inputs.files(fileTree(runModsDirectory.asFile) { include("*.jar") })
@@ -391,7 +388,8 @@ if (target == primaryTarget) {
         dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
 
-        jvmArgs.add("-Dskyhanni.dumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
+        jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
         jvmArgs.add("-Dfabric.client.gametest=true")
         useXVFB = System.getProperty("os.name").startsWith("Linux", ignoreCase = true)
     }
