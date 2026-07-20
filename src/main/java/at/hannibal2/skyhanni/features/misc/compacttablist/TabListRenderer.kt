@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,7 +45,7 @@ object TabListRenderer {
     private var isTabToggled = false
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
         if (Minecraft.getInstance().screen != null) return
 
@@ -143,7 +142,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.SUB_TITLE) {
                     lastSubTitle = tabLine
                 }
-                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post().isCancelled
             }.let(::RenderColumn)
 
             GuiRenderUtils.drawRect(
