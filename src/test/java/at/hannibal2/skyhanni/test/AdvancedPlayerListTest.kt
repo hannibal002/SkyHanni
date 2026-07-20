@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList.Cri
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
@@ -77,81 +78,81 @@ class AdvancedPlayerListTest {
             )
             playerData = listOf(
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("LoooonZ")),
-                    Component.literal("§7🐸"),
-                    Component.literal("§d333"),
+                    "§b".asComponent { append("LoooonZ") },
+                    "§7🐸".asComponent(),
+                    "§d333".asComponent(),
                     333
                 ),
 
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("IntenseEnderman")),
-                    Component.literal("§b🐸§7♲"),
-                    Component.literal("§c464"),
+                    "§b".asComponent { append("IntenseEnderman") },
+                    "§b🐸§7♲".asComponent(),
+                    "§c464".asComponent(),
                     464,
                     ironman = true
                 ),
 
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("kaifktx")),
-                    Component.literal("§6§lᛝ"),
-                    Component.literal("§2199"),
+                    "§b".asComponent { append("kaifktx") },
+                    "§6§lᛝ".asComponent(),
+                    "§2199".asComponent(),
                     199
                 ),
 
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("Scoobag_")),
-                    Component.literal("§b♔"),
-                    Component.literal("§5377"),
+                    "§b".asComponent { append("Scoobag_") },
+                    "§b♔".asComponent(),
+                    "§5377".asComponent(),
                     377
                 ),
 
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("Swedosh")),
-                    Component.literal(""),
-                    Component.literal("§f72"),
+                    "§b".asComponent { append("Swedosh") },
+                    "".asComponent(),
+                    "§f72".asComponent(),
                     72
                 ),
 
                 createPlayerData(
-                    Component.literal("§b").append(Component.literal("Namaser")),
-                    Component.literal("§7Σ"),
-                    Component.literal("§9314"),
+                    "§b".asComponent { append("Namaser") },
+                    "§7Σ".asComponent(),
+                    "§9314".asComponent(),
                     314
                 ),
 
                 createPlayerData(
-                    Component.literal("§a").append(Component.literal("valnus")),
-                    Component.literal(""),
-                    Component.literal("§e114"),
+                    "§a".asComponent { append("valnus") },
+                    "".asComponent(),
+                    "§e114".asComponent(),
                     114
                 ),
 
                 createPlayerData(
-                    Component.literal("§a").append(Component.literal("liron150")),
-                    Component.literal("§b§lᛝ§7♲"),
-                    Component.literal("§6400"),
+                    "§a".asComponent { append("liron150") },
+                    "§b§lᛝ§7♲".asComponent(),
+                    "§6400".asComponent(),
                     400,
                     ironman = true
                 ),
 
                 createPlayerData(
-                    Component.literal("§a").append(Component.literal("gouroumaster")),
-                    Component.literal("§7☃"),
-                    Component.literal("§a135"),
+                    "§a".asComponent { append("gouroumaster") },
+                    "§7☃".asComponent(),
+                    "§a135".asComponent(),
                     135
                 ),
 
                 createPlayerData(
-                    Component.literal("§7").append(Component.literal("angelstuff")),
-                    Component.literal(""),
-                    Component.literal("§a143"),
+                    "§7".asComponent { append("angelstuff") },
+                    "".asComponent(),
+                    "§a143".asComponent(),
                     143
                 ),
 
                 createPlayerData(
-                    Component.literal("§7").append(Component.literal("Swaimz")),
-                    Component.literal("§7§l⚝"),
-                    Component.literal("§a137"),
+                    "§7".asComponent { append("Swaimz") },
+                    "§7§l⚝".asComponent(),
+                    "§a137".asComponent(),
                     137
                 ),
 
