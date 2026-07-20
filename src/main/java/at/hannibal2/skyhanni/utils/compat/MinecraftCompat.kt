@@ -3,7 +3,10 @@ package at.hannibal2.skyhanni.utils.compat
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
@@ -16,6 +19,9 @@ import net.minecraft.world.entity.Entity
  */
 @SkyHanniModule
 object MinecraftCompat {
+
+    private val mc = Minecraft.getInstance()
+
     // <editor-fold desc="World">
     /**
      * Returns the active [ClientLevel] or throws an exception if it doesn't exist.
@@ -45,7 +51,7 @@ object MinecraftCompat {
      * The local user's information, such as the username and UUID.
      * This is always non-null, even if the player is not in a world / singleplayer.
      */
-    val localUser get(): User = Minecraft.getInstance().user
+    val localUser get(): User = mc.user
     // </editor-fold>
 
 
@@ -99,8 +105,22 @@ object MinecraftCompat {
     }
     // </editor-fold>
 
+    // <editor-fold desc="Miscellaneous">
+    @JvmStatic
+    var screen: Screen?
+        get() = mc.screen
+        set(value) {
+            mc.setScreen(value)
+        }
 
-    val hideGui get(): Boolean = Minecraft.getInstance().options.hideGui
+    val hud get(): Gui = mc.gui
+
+    val hideGui get(): Boolean = mc.options.hideGui
 
     val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+
+    fun reloadChunks() = DelayedRun.runOrNextTick {
+        Minecraft.getInstance().levelRenderer.allChanged()
+    }
+    // </editor-fold>
 }
