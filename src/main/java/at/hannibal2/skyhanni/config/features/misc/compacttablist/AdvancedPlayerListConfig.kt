@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class AdvancedPlayerListConfig {
     @Expose
@@ -22,31 +23,30 @@ class AdvancedPlayerListConfig {
 
         override fun toString() = displayName
     }
-
     @Expose
     @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
     @ConfigEditorBoolean
-    var reverseSort: Boolean = false
+    val reverseSort: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of players in the tab list.")
     @ConfigEditorBoolean
-    var hidePlayerIcons: Boolean = false
+    val hidePlayerIcons: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Rank Color", desc = "Hide the player rank color.")
     @ConfigEditorBoolean
-    var hideRankColor: Boolean = false
+    val hideRankColor: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Emblems", desc = "Hide the emblems behind the player name.")
     @ConfigEditorBoolean
-    var hideEmblem: Boolean = false
+    val hideEmblem: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Level", desc = "Hide the SkyBlock level numbers.")
     @ConfigEditorBoolean
-    var hideLevel: Boolean = false
+    val hideLevel: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -54,12 +54,12 @@ class AdvancedPlayerListConfig {
         desc = "Hide the gray brackets in front of and behind the level numbers."
     )
     @ConfigEditorBoolean
-    var hideLevelBrackets: Boolean = false
+    val hideLevelBrackets: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Level Color As Name", desc = "Use the color of the SkyBlock level for the player color.")
     @ConfigEditorBoolean
-    var useLevelColorForName: Boolean = false
+    val useLevelColorForName: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -67,12 +67,12 @@ class AdvancedPlayerListConfig {
         desc = "Show the number of the bingo rank next to the icon. Useful if you are not so familiar with bingo."
     )
     @ConfigEditorBoolean
-    var showBingoRankNumber: Boolean = false
+    val showBingoRankNumber: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Hide Factions", desc = "Hide the icon of the Crimson Isle Faction in the tab list.")
     @ConfigEditorBoolean
-    var hideFactions: Boolean = false
+    val hideFactions: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(
@@ -80,5 +80,5 @@ class AdvancedPlayerListConfig {
         desc = "Show special icons behind the name of guild members, party members, friends, and marked players."
     )
     @ConfigEditorBoolean
-    var markSpecialPersons: Boolean = false
+    val markSpecialPersons: Property<Boolean> = Property.of(false)
 }

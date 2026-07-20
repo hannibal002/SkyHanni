@@ -1,33 +1,40 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.misc.compacttablist.AdvancedPlayerListConfig.PlayerSortEntry
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ComponentMatcher
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
+import at.hannibal2.skyhanni.utils.ComponentSpan
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.copyIfNeeded
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.flow.merge
+import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
-import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
@@ -50,11 +57,31 @@ object AdvancedPlayerList {
         "^(?!SB Level).*\\[(?<level>(?:§.)*[\\d,]+)(?:§.)*] (?<name>.*)",
     )
 
-    private var playerData = mutableMapOf<Component, PlayerData>()
+    internal var playerData = mutableMapOf<Component, PlayerData>()
 
     fun createTabLine(component: Component, type: TabStringType) = playerData[component]?.let {
         TabLine(component, type, it.createCustomName())
     } ?: TabLine(component, type)
+
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(
+            config.hideEmblem,
+            config.hideFactions,
+            config.hideLevel,
+            config.hideLevelBrackets,
+            config.hideRankColor,
+            config.markSpecialPersons,
+            config.reverseSort,
+            config.showBingoRankNumber,
+            config.useLevelColorForName,
+            SkyHanniMod.feature.dev.fancyContributors
+        ) {
+            playerData.clear()
+            tabPlayerData.clear()
+        }
+    }
 
     // Todo split up into smaller functions
     @Suppress("CyclomaticComplexMethod")
@@ -63,107 +90,142 @@ object AdvancedPlayerList {
         if (DungeonApi.inDungeon()) return original
 
         if (ignoreCustomTabList()) return original
+
         val newList = mutableListOf<Component>()
         val currentData = mutableMapOf<Component, PlayerData>()
-        newList.add(original.first())
+
+        newList += original.first()
 
         var extraTitles = 0
-        var i = 0
 
-        for (component in original) {
-            val line = component.formattedTextCompat()
-            i++
-            if (i == 1) continue
-            if (line.isEmpty() || line.contains("Server Info")) break
-            if (line == "               Info") break
-            if (line.contains("Players")) {
+        for ((index, component) in original.withIndex()) {
+            if (index == 0) continue
+
+            val span = component.intoSpan()
+
+            // We only use plain text for detecting section headers.
+            // Player parsing itself stays entirely on ComponentSpan.
+            val plain = span.getText().removeColor()
+
+            if (plain.isEmpty() || plain.contains("Server Info")) break
+            if (plain == "               Info") break
+
+            if (plain.contains("Players")) {
                 extraTitles++
                 continue
             }
-            val playerData: PlayerData? = levelPattern.matchMatcher(line) {
-                val levelText = group("level")
-                val sbLevel = levelText.removeColor().formatIntOrNull() ?: return@matchMatcher null
-                readPlayerData(sbLevel, levelText, line)
+
+            val data = levelPattern.matchStyledMatcher(span) {
+                val levelText = groupOrThrow("level")
+                val sbLevel = levelText.getText().removeColor().formatIntOrNull()
+                    ?: return@matchStyledMatcher null
+
+                readPlayerData(sbLevel, levelText, component)
             }
-            playerData?.let {
-                val name = it.name
-                if (name != "?") {
-                    tabPlayerData[name] = it
+
+            data?.let {
+                if (it.name != "?") {
+                    tabPlayerData[it.name] = it
                 }
                 currentData[component] = it
             }
         }
+
         playerData = currentData
-        val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
-            // SB Level
-            PlayerSortEntry.SB_LEVEL -> prepare.sortedBy { -(it.value.sbLevel) }
+            PlayerSortEntry.SB_LEVEL ->
+                currentData.entries.sortedByDescending { it.value.sbLevel }
 
-            // Name (Abc)
-            PlayerSortEntry.NAME -> prepare.sortedBy {
-                it.value.name.lowercase().replace("_", "")
-            }
+            PlayerSortEntry.NAME ->
+                currentData.entries.sortedBy {
+                    it.value.name.lowercase().replace("_", "")
+                }
 
-            // Ironman/Bingo
-            PlayerSortEntry.PROFILE_TYPE -> prepare.sortedBy {
-                -if (it.value.ironman) 10 else it.value.bingoLevel ?: -1
-            }
+            PlayerSortEntry.PROFILE_TYPE ->
+                currentData.entries.sortedByDescending {
+                    if (it.value.ironman) 10 else it.value.bingoLevel ?: -1
+                }
 
-            // Party/Friends/Guild First
-            PlayerSortEntry.SOCIAL_STATUS -> prepare.sortedBy { -getSocialIcon(it.value.name).score }
+            PlayerSortEntry.SOCIAL_STATUS ->
+                currentData.entries.sortedByDescending {
+                    getSocialIcon(it.value.name).score
+                }
 
-            // Random
-            PlayerSortEntry.RANDOM -> prepare.sortedBy { getRandomOrder(it.value.name) }
+            PlayerSortEntry.RANDOM ->
+                currentData.entries.sortedBy {
+                    getRandomOrder(it.value.name)
+                }
 
-            // Rank (Default)
-            else -> prepare
+            else ->
+                currentData.entries.toList()
         }
 
-        var newPlayerList = sorted.map { it.key }.toMutableList()
-        if (config.reverseSort) {
-            newPlayerList = newPlayerList.reversed().toMutableList()
+        val newPlayerList = sorted.map { it.key }.toMutableList()
+
+        if (config.reverseSort.get()) {
+            newPlayerList.reverse()
         }
+
         if (extraTitles > 0 && newPlayerList.size >= 19) {
             newPlayerList.add(19, original.first())
         }
-        newList.addAll(newPlayerList)
 
-        val rest = original.drop(playerData.size + extraTitles + 1)
-        newList.addAll(rest)
+        newList += newPlayerList
+        newList += original.drop(currentData.size + extraTitles + 1)
+
         return newList
     }
 
-    private fun Matcher.readPlayerData(
+    private fun ComponentMatcher.readPlayerData(
         sbLevel: Int,
-        levelText: String,
-        line: String,
+        levelText: ComponentSpan,
+        line: Component,
     ): PlayerData = PlayerData(sbLevel).apply {
+        val fullName = groupOrThrow("name")
+
+        val words = fullName.split(' ')
+        require(words.isNotEmpty())
+
         var index = 0
-        val fullName = group("name")
-        if (fullName.contains("[")) index++
+        if (words.first().getText().startsWith("[")) {
+            index = 1
+        }
 
-        val name = fullName.split(" ")
-        val coloredName = name[index]
-        this.coloredName = if (index == 1) name[0] + " " + coloredName else coloredName
-        this.name = coloredName.removeColor()
+        val coloredName = words[index]
+        this.coloredName = if (index == 1) {
+            words[0] + " ".asComponent().intoSpan() + coloredName
+        } else {
+            coloredName
+        }
+
+        this.name = coloredName.getText().removeColor()
         this.levelText = levelText
+
         index++
-        this.nameSuffix = if (name.size > index) {
-            var nameSuffix = name.drop(index).joinToString(" ")
 
-            if (nameSuffix.contains("♲")) ironman = true
-            else bingoLevel = BingoApi.getRank(line)
-
-            if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                CrimsonIsleFaction.entries.firstOrNull { it.isLine(line) }?.let {
-                    faction = it
-                    nameSuffix = nameSuffix.replace(it.pattern, "")
+        if (words.size > index) {
+            this.nameSuffix = words
+                .subList(index, words.size)
+                .reduce { left, right ->
+                    left + " ".asComponent().intoSpan() + right
                 }
+
+            if (nameSuffix.getText().contains("♲")) {
+                ironman = true
+            } else {
+                bingoLevel = BingoApi.getRank(line.string)
             }
 
-            nameSuffix
-        } else ""
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
+                CrimsonIsleFaction.entries.firstOrNull { it.isLine(line.string) }?.let {
+                    faction = it
+                    nameSuffix = nameSuffix.removeSuffix(it.symbol ?: "")
+                }
+            }
+        } else {
+            nameSuffix = ComponentSpan.empty()
+        }
     }
 
     fun ignoreCustomTabList(): Boolean {
@@ -177,42 +239,54 @@ object AdvancedPlayerList {
                 add(it.asComponent())
             }
         }
+        fun MutableList<Component>.add(span: Component?) {
+            span?.let {
+                add(it)
+            }
+        }
 
-        if (!config.hideLevel) {
-            val level = if (config.hideLevelBrackets) levelText else "§8[$levelText§8]"
+        if (!config.hideLevel.get()) {
+            val level = if (config.hideLevelBrackets.get()) levelText.intoComponent() else {
+                componentBuilder {
+                    appendWithColor("[", ChatFormatting.DARK_GRAY)
+                    append(levelText.intoComponent())
+                    appendWithColor("]", ChatFormatting.DARK_GRAY)
+                }
+            }
             add(level)
         }
 
-        val playerName = if (config.useLevelColorForName) {
-            levelText.getOrNull(3)?.let { "§$it" + name } ?: coloredName
-        } else if (config.hideRankColor) {
-            "§b" + name
+        val playerName: Component = if (config.useLevelColorForName.get()) {
+            val style = levelText.sampleStyleAtStart()
+            name.asComponent().withStyle(style)
+        } else if (config.hideRankColor.get()) {
+            "§b$name".asComponent()
         } else {
-            coloredName
+            coloredName.intoComponent()
         }
         add(playerName)
 
-        if (config.hideEmblem) {
+        if (config.hideEmblem.get()) {
             if (ironman) {
                 add("§7♲")
             } else {
                 bingoLevel?.let {
-                    add(BingoApi.getBingoIcon(if (config.showBingoRankNumber) it else -1))
+                    add(BingoApi.getBingoIcon(if (config.showBingoRankNumber.get()) it else -1))
                 }
             }
         } else {
-            add(nameSuffix)
+            add(nameSuffix.intoComponent())
         }
 
-        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions.get()) {
             add(faction.icon)
         }
 
-        if (config.markSpecialPersons) {
+        if (config.markSpecialPersons.get()) {
             add(getSocialIcon(name).icon())
         }
 
-        if (SkyHanniMod.feature.dev.fancyContributors) {
+        if (SkyHanniMod.feature.dev.fancyContributors.get()) {
             Minecraft.getInstance().connection?.getPlayerInfo(name)?.let { playerInfo ->
                 ContributorManager.getSuffix(playerInfo.profile.id)?.let {
                     add(it)
@@ -239,15 +313,25 @@ object AdvancedPlayerList {
 
     class PlayerData(val sbLevel: Int) {
         var name: String = "?"
-        var coloredName: String = "?"
-        var nameSuffix: String = "?"
-        var levelText: String = "?"
+        var coloredName: ComponentSpan = "?".asComponent().intoSpan()
+        var nameSuffix: ComponentSpan = "?".asComponent().intoSpan()
+        var levelText: ComponentSpan = "?".asComponent().intoSpan()
         var ironman: Boolean = false
         var bingoLevel: Int? = null
         var faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE
+
+        override fun toString(): String {
+            return "PlayerData(name='$name', " +
+                "coloredName=${coloredName.intoComponent()}, " +
+                "nameSuffix=${nameSuffix.intoComponent()}, " +
+                "levelText=${levelText.intoComponent()}, " +
+                "ironman=$ironman, " +
+                "bingoLevel=$bingoLevel, " +
+                "faction=${faction.name})"
+        }
     }
 
-    enum class CrimsonIsleFaction(color: String?, private val symbol: String?) {
+    enum class CrimsonIsleFaction(color: String?, val symbol: String?) {
         BARBARIAN("§c", "⚒"),
         MAGE("§5", "ቾ"),
         NONE(null, null)

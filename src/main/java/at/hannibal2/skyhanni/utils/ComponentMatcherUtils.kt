@@ -317,6 +317,77 @@ class ComponentSpan internal constructor(
         left.append(right)
         return left.intoSpan()
     }
+    /**
+     * Split this span on the first occurrence of [delimiter].
+     *
+     * The delimiter itself is not included in either returned span.
+     *
+     * Returns `null` if the delimiter does not exist.
+     */
+    fun splitOnce(delimiter: Char): Pair<ComponentSpan, ComponentSpan>? {
+        val index = getText().indexOf(delimiter)
+        if (index == -1) return null
+        return slice(end = index) to slice(start = index + 1)
+    }
+
+    /**
+     * Split this span on the first occurrence of [delimiter].
+     *
+     * The delimiter itself is not included in either returned span.
+     *
+     * Returns `null` if the delimiter does not exist.
+     */
+    fun splitOnce(delimiter: String): Pair<ComponentSpan, ComponentSpan>? {
+        val index = getText().indexOf(delimiter)
+        if (index == -1) return null
+        return slice(end = index) to slice(start = index + delimiter.length)
+    }
+
+    /**
+     * Split this span on every occurrence of [delimiter].
+     *
+     * The delimiters themselves are omitted from the returned spans.
+     */
+    fun split(delimiter: Char): List<ComponentSpan> {
+        val text = getText()
+        val result = mutableListOf<ComponentSpan>()
+
+        var partStart = 0
+        while (true) {
+            val index = text.indexOf(delimiter, partStart)
+            if (index == -1) {
+                result += slice(partStart, text.length)
+                return result
+            }
+
+            result += slice(partStart, index)
+            partStart = index + 1
+        }
+    }
+
+    /**
+     * Split this span on every occurrence of [delimiter].
+     *
+     * The delimiters themselves are omitted from the returned spans.
+     */
+    fun split(delimiter: String): List<ComponentSpan> {
+        require(delimiter.isNotEmpty())
+
+        val text = getText()
+        val result = mutableListOf<ComponentSpan>()
+
+        var partStart = 0
+        while (true) {
+            val index = text.indexOf(delimiter, partStart)
+            if (index == -1) {
+                result += slice(partStart, text.length)
+                return result
+            }
+
+            result += slice(partStart, index)
+            partStart = index + delimiter.length
+        }
+    }
 
     companion object {
         fun empty(): ComponentSpan {

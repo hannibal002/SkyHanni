@@ -12,6 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
 class DevConfig {
@@ -95,7 +96,7 @@ class DevConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var fancyContributors: Boolean = true
+    var fancyContributors: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Contributor Nametags", desc = "Makes SkyHanni contributors' nametags fancy too.")
