@@ -96,6 +96,11 @@ object HoppityRabbitTheFishChecker {
         event.sendPreventClosureTitle()
     }
 
+    @HandleEvent
+    fun onInventoryClose() {
+        rabbitTheFishIndex = null
+    }
+
     private fun SkyHanniEvent.Cancellable.sendPreventClosureTitle() {
         TitleManager.sendTitle(
             "§cRabbit the Fish Prevented Close",

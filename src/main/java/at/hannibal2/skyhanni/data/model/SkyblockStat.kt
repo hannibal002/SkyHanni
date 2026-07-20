@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -89,6 +89,7 @@ enum class SkyblockStat(
     FORAGING_FORTUNE(GOLD, '\uE054'),
     FIG_FORTUNE(GOLD, '\uE054'),
     MANGROVE_FORTUNE(GOLD, '\uE054'),
+    HELIX_FORTUNE(GOLD, '\uE054'),
     // </editor-fold>
 
     // <editor-fold desc="Fishing Stats">
@@ -116,6 +117,7 @@ enum class SkyblockStat(
     // <editor-fold desc="Hunting Stats">
     PULL(AQUA, '\uE02D'),
     HUNTER_FORTUNE(LIGHT_PURPLE, '\uE05B'),
+    CHARM_CHANCE(AQUA, '❣'),
     // </editor-fold>
 
     // <editor-fold desc="Wisdom Stats">
@@ -140,8 +142,8 @@ enum class SkyblockStat(
     RIFT_SPEED(WHITE, '\uE022', displayName = "Speed", hypixelId = "RIFT_WALK_SPEED"),
     RIFT_INTELLIGENCE(AQUA, '\uE003', displayName = "Intelligence"),
     // MAGIC_FIND is just the overworld stat
-    MANA_REGEN(AQUA, '⚡'),
-    HEARTS(RED, '♥'),
+    MANA_REGEN(AQUA, '\uE004'),
+    HEARTS(RED, '\uE01F'),
     // </editor-fold>
 
     UNKNOWN(GRAY, '?', generatePatterns = false),
@@ -179,7 +181,7 @@ enum class SkyblockStat(
 
     val menuPattern by patternGroup.pattern(
         "menu.no-color.$keyName",
-        if (generatePatterns) "$hypixelIcon ${this@SkyblockStat.displayName} $VALUE_PATTERN" else "",
+        if (generatePatterns) "\\s*$hypixelIcon ${this@SkyblockStat.displayName} $VALUE_PATTERN" else "",
     )
 
     fun asString(value: Int) = (if (value > 0) "+" else "") + value.toString() + " " + this.icon
@@ -226,17 +228,19 @@ enum class SkyblockStat(
 
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
             if (event.inventoryName != "SkyBlock Menu") return
-            val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getLore() ?: return
+            val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getCleanLore() ?: return
             DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }
             }
         }
 
-        private val statsMenuRelevantSlotIndexes = listOf(15, 16, 24, 25, 33)
+        private val statsMenuRelevantSlotIndexes = listOf(14, 15, 16, 23, 24, 25, 32, 33, 34)
 
         private fun onStatsMenu(event: InventoryFullyOpenedEvent) {
             if (event.inventoryName != "Your Equipment and Stats") return
-            val list = statsMenuRelevantSlotIndexes.mapNotNull { event.inventoryItems[it]?.getLore() }.flatten()
+            val list = statsMenuRelevantSlotIndexes
+                .mapNotNull { event.inventoryItems[it]?.getCleanLore() }
+                .flatten()
             if (list.isEmpty()) return
             DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
