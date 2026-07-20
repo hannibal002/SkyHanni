@@ -41,6 +41,7 @@ import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
+
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
