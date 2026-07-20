@@ -121,10 +121,13 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
-            if (chestSlots.any { it.contains(slot.containerSlot) }) {
-                val color = (OpenedState.getOpenState(slot.item.getCleanLore()) ?: return@forEach).color ?: return@forEach
-                slot.highlight(color)
-            }
+            if (chestSlots.none { it.contains(slot.containerSlot) }) return@forEach
+
+            val lore = slot.item.getCleanLore()
+            if (lore.isEmpty()) return@forEach
+
+            val color = (OpenedState.getOpenState(lore) ?: return@forEach).color ?: return@forEach
+            slot.highlight(color)
         }
     }
 
