@@ -62,7 +62,7 @@ object PhantomleafSolver {
         if (!isSearchingForPhantomleaf) return
 
         if (event.pitch !in 0.61..0.62) return
-        if (!event.soundName.contains("basedrum")) return
+        if (event.soundName != "block.note_block.basedrum") return
 
         val currentPos = PlayerUtils.getLocation()
 
