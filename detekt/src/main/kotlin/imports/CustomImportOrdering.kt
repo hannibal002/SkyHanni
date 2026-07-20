@@ -21,7 +21,7 @@ class CustomImportOrdering(config: Config) :
         val importLines: List<ImportLine>,
     )
 
-    private fun parseImportSection(lines: List<String>): List<String> {
+    private fun parseImportSection(file: KtFile): List<String> {
         val imports = mutableListOf<String>()
         var inImports = false
 
@@ -34,8 +34,9 @@ class CustomImportOrdering(config: Config) :
                 PreprocessingPattern.ENDIF.matches(line) ||
                 line.isBlank()
 
-        for (rawLine in lines) {
+        for (rawLine in file.text.lineSequence()) {
             val line = rawLine.trim()
+
             when {
                 line.startsWith("package ") -> continue
                 !inImports && line.isBlank() -> continue
@@ -46,6 +47,7 @@ class CustomImportOrdering(config: Config) :
                 inImports -> break
             }
         }
+
         return imports
     }
 
@@ -148,7 +150,7 @@ class CustomImportOrdering(config: Config) :
 
     // Cannot use visitImportList(importList: KtImportList) since it does not count the last commented out preprocessed block as part of the import list.
     override fun visitKtFile(file: KtFile) {
-        val rawText = parseImportSection(file.text.lines())
+        val rawText = parseImportSection(file)
         if (rawText.isEmpty()) {
             return
         }
