@@ -37,7 +37,7 @@ public class MixinGui {
     //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postHotbarLayerEventPre(context)) {
+        if (RenderEvents.postHotbarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -51,7 +51,7 @@ public class MixinGui {
     //~ if < 26.1 'extractTabList' -> 'renderTabList'
     @Inject(method = "extractTabList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderPlayerList(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postTablistLayerEventPre(context)) {
+        if (RenderEvents.postTablistLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -60,7 +60,7 @@ public class MixinGui {
     //~ if < 26.1 'extractBackground' -> 'renderBackground' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceBar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postExperienceBarLayerEventPre(context)) {
+        if (RenderEvents.postExperienceBarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -74,7 +74,7 @@ public class MixinGui {
     //~if < 26.1 'extractExperienceLevel(' -> 'renderExperienceLevel(' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceLevelHead(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
+        if (RenderEvents.postExperienceNumberLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -108,7 +108,7 @@ public class MixinGui {
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, false).post()) {
+        if (!new TitleReceivedEvent(formattedText, false).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -116,7 +116,7 @@ public class MixinGui {
     @WrapMethod(method = "setSubtitle")
     private void handleSubtitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, true).post()) {
+        if (!new TitleReceivedEvent(formattedText, true).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -124,7 +124,7 @@ public class MixinGui {
     //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor context, CallbackInfo ci) {
-        if (RenderEvents.postHeldItemTooltipLayerEventPre(context)) {
+        if (RenderEvents.postHeldItemTooltipLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -138,7 +138,7 @@ public class MixinGui {
     //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postActionBarLayerEventPre(context)) {
+        if (RenderEvents.postActionBarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
