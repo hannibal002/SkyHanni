@@ -4,15 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.renderables.toRenderables
 
 enum class TabWidgetDisplay(
     private val configName: String?,
@@ -73,13 +70,13 @@ enum class TabWidgetDisplay(
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
         @HandleEvent
-        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay() {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
             config.display.get().forEach { widget ->
                 widget.position.renderRenderables(
                     widget.widgets.flatMap { subWidget ->
-                        subWidget.lines.map { Renderable.text(it) }
+                        subWidget.lines.toRenderables()
                     },
                     posLabel = "Display Widget: ${widget.name}",
                     extraSpace = -2
@@ -88,7 +85,7 @@ enum class TabWidgetDisplay(
         }
 
         @HandleEvent
-        fun onJoin(event: ProfileJoinEvent) {
+        fun onProfileJoin() {
             // Validation that the displayPositions in the config is correct
             val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
             if (sizeDiff == 0) return
