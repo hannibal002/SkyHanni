@@ -35,7 +35,7 @@ object KeyboardManager {
     const val RIGHT_MOUSE = InputConstants.MOUSE_BUTTON_RIGHT
     const val MIDDLE_MOUSE = InputConstants.MOUSE_BUTTON_MIDDLE
 
-    // These constant isn't defined in InputConstants for some reason
+    // This constant isn't defined in InputConstants for some reason
     const val KEY_KP_SUBTRACT = InputConstants.KEY_ADD - 1
     // This constant is renamed in 26.3
     const val KEY_KP_ADD = InputConstants.KEY_ADD
