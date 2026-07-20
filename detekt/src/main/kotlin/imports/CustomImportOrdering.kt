@@ -3,6 +3,7 @@ package imports
 import PreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
+import org.jetbrains.kotlin.psi.KtFile
 
 /**
  * This rule enforces correct import ordering, while taking preprocessed imports into account.
