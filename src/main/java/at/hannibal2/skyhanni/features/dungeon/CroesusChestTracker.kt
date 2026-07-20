@@ -59,6 +59,10 @@ object CroesusChestTracker {
      * REGEX-TEST: Floor V
      */
     private val floorPattern by patternGroup.pattern("chest.floor.colorless", "Floor (?<floor>[IV]+)")
+
+    /**
+     * REGEX-TEST: Master Mode The Catacombs
+     */
     private val masterPattern by patternGroup.pattern("chest.master.colorless", ".*Master.*")
 
     /**
