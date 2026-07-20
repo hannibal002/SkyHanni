@@ -125,7 +125,7 @@ object GhostTracker {
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop.colorless",
-        "RARE DROP! (?<item>[^*) \\([+](?:)*(?<mf>\\d*)%? ${MAGIC_FIND.hypixelIcon} Magic Find\\)",
+        "RARE DROP! (?<item>.+?) \\(\\+\\s*(?<mf>\\d+)%?.*?Magic Find\\)",
     )
 
     /**
