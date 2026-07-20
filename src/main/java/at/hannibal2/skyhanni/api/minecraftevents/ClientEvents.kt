@@ -21,6 +21,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.fabric.api.resource.v1.ResourceLoader
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
@@ -30,7 +31,6 @@ import java.util.concurrent.CompletableFuture
 
 //? if >= 26.1 {
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 //?} else {
 /*import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents
