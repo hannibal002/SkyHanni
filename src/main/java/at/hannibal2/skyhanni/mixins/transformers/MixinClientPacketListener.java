@@ -44,5 +44,4 @@ public class MixinClientPacketListener {
         particleChangeEvent.post();
         return particleChangeEvent.getParticleOptions();
     }
-
 }
