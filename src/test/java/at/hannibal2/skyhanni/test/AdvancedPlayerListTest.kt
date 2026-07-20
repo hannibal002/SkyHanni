@@ -4,13 +4,9 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList.CrimsonIsleFaction
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import com.google.gson.JsonParser
+import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.google.gson.TypeAdapter
-import com.google.gson.stream.JsonReader
-import com.google.gson.stream.JsonWriter
-import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
-import net.minecraft.network.chat.ComponentSerialization
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,14 +28,8 @@ class AdvancedPlayerListTest {
         @JvmStatic
         @BeforeAll
         fun setup() {
-            adapter = object : TypeAdapter<Component>() {
-                override fun write(out: JsonWriter, value: Component) {
-                    out.jsonValue(ComponentSerialization.CODEC.encodeStart(JsonOps.INSTANCE, value).getOrThrow().toString())
-                }
-
-                override fun read(reader: JsonReader): Component =
-                    ComponentSerialization.CODEC.decode(JsonOps.INSTANCE, JsonParser.parseReader(reader)).getOrThrow().first
-            }
+            @Suppress("UNCHECKED_CAST")
+            adapter = SkyHanniTypeAdapters.COMPONENT.adapter as TypeAdapter<Component>
             createData()
         }
 
