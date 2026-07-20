@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.misc.ContributorManager
@@ -64,7 +63,7 @@ object AdvancedPlayerList {
 
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.hideEmblem,
             config.hideFactions,
@@ -73,6 +72,7 @@ object AdvancedPlayerList {
             config.hideRankColor,
             config.markSpecialPersons,
             config.reverseSort,
+            config.playerSortOrder,
             config.showBingoRankNumber,
             config.useLevelColorForName,
             SkyHanniMod.feature.dev.fancyContributors
@@ -132,7 +132,7 @@ object AdvancedPlayerList {
 
         playerData = currentData
 
-        val sorted = when (config.playerSortOrder) {
+        val sorted = when (config.playerSortOrder.get()) {
             PlayerSortEntry.SB_LEVEL ->
                 currentData.entries.sortedByDescending { it.value.sbLevel }
 
