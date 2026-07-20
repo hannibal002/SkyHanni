@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.render.gui.DrawBackgroundEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
@@ -27,7 +26,7 @@ object RenderData {
     }
 
     @HandleEvent
-    fun onBackgroundDraw(event: DrawBackgroundEvent) {
+    fun onBackgroundDraw() {
         if (GlobalRender.renderDisabled) return
         if (GuiEditManager.isInGui() || VisualWordGui.isInGui()) return
         val currentScreen = Minecraft.getInstance().screen ?: return
