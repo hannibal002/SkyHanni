@@ -1,6 +1,5 @@
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
 import dev.detekt.api.Config
 import dev.detekt.api.Entity
 import dev.detekt.api.Finding
@@ -10,6 +9,7 @@ import dev.detekt.api.SourceLocation
 import dev.detekt.api.TextLocation
 import org.jetbrains.kotlin.KtPsiSourceFileLinesMapping
 import org.jetbrains.kotlin.diagnostics.DiagnosticUtils.getLineAndColumnRangeInPsiFile
+import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
 import java.nio.file.Path
@@ -25,7 +25,7 @@ abstract class SkyHanniRule(config: Config, description: String) : Rule(config, 
         message: String,
         lineIndex: Int,
         line: String,
-        file: PsiFile,
+        file: KtFile,
         sourceFileLinesMapping: KtPsiSourceFileLinesMapping? = null,
     ) {
         val sourceFileLinesMapping = sourceFileLinesMapping ?: KtPsiSourceFileLinesMapping(file)
@@ -50,16 +50,16 @@ abstract class SkyHanniRule(config: Config, description: String) : Rule(config, 
         private val BLANK_OR_QUOTES = """[\s"]*""".toRegex()
 
         private fun findFirstMeaningfulKtElementInParents(
-            file: PsiFile,
+            file: KtFile,
             offset: Int,
             line: String,
         ): PsiElement? =
             findKtElementInParents(file, offset, line)
                 .firstOrNull { !BLANK_OR_QUOTES.matches(it.text) }
 
-        private fun PsiFile.absolutePath(): Path = Path(virtualFile.path)
+        private fun KtFile.absolutePath(): Path = Path(virtualFilePath)
 
-        private fun findKtElementInParents(file: PsiFile, offset: Int, line: String): Sequence<PsiElement> =
+        private fun findKtElementInParents(file: KtFile, offset: Int, line: String): Sequence<PsiElement> =
             file.elementsInRange(TextRange.create(offset, offset + line.length))
                 .asSequence()
                 .plus(file.findElementAt(offset))
