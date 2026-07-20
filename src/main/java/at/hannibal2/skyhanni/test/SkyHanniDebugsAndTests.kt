@@ -128,6 +128,40 @@ object SkyHanniDebugsAndTests {
         LorenzDebug.log(text)
     }
 
+    // Taken from Firmament
+    @JvmStatic
+    fun loadAllMixinClasses() {
+        val allMixinClasses = mutableSetOf<String>()
+        SkyHanniMixinPlugin.instances.forEach { plugin ->
+            val prefix = "${plugin.mixinPackage}."
+            val classes = plugin.mixins.map { prefix + it }
+            allMixinClasses.addAll(classes)
+            for (mixinClass in classes) {
+                val targets = readMixinTargets(mixinClass)
+                for (target in targets) {
+                    try {
+                        SkyHanniMod.logger.debug("Loading $target to force instantiate $mixinClass")
+                        Class.forName(target, true, javaClass.classLoader)
+                    } catch (exception: Throwable) {
+                        SkyHanniMod.logger.error(
+                            "Could not load class $target that has been mixed into by $mixinClass",
+                            exception,
+                        )
+                    }
+                }
+            }
+        }
+
+        SkyHanniMod.logger.info("Force-loaded all SkyHanni mixins:")
+        val applied = SkyHanniMixinPlugin.instances.flatMap { it.appliedMixins }.toSet()
+        applied.forEach { SkyHanniMod.logger.info(" - $it") }
+
+        val failed = allMixinClasses.size - applied.size
+        if (failed > 0) {
+            ErrorManager.crashInDevEnv("Failed to apply $failed ${"mixin".pluralize(failed)}")
+        }
+    }
+
     private fun readMixinTargets(mixinClass: String): List<String> {
         val resource = "${mixinClass.replace(".", "/")}.class"
         val classNode = ClassNode()

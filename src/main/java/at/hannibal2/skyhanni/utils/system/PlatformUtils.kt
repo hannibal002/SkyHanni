@@ -52,7 +52,7 @@ object PlatformUtils {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    fun onDebug(event: DebugDataCollectEvent) {
         event.title("Loaded Mods")
         event.addIrrelevant {
             getLoadedMods().forEach { (_, name, version, origin) ->
@@ -104,7 +104,12 @@ object PlatformUtils {
         return version < MCVersion.currentMcVersion
     }
 
-    fun getRepoPatternDumpLocation(): String? = System.getProperty("skyhanni.dumpRegex")
+    fun getRepoPatternDumpLocation(): String? {
+        if (System.getProperty("SkyHanniDumpRegex.enabled") != "true") return null
+        val dumpDirective = System.getProperty("SkyHanniDumpRegex")
+        if (dumpDirective.isNullOrBlank()) return null
+        return dumpDirective
+    }
 }
 
 data class ModInstance(val id: String, val name: String, val version: String, val sourceJar: String)
