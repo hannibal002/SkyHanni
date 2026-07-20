@@ -219,7 +219,6 @@ object AdvancedPlayerList {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 CrimsonIsleFaction.entries.firstOrNull { it.isLine(line.string) }?.let {
                     faction = it
-                    nameSuffix = nameSuffix.removeSuffix(it.symbol ?: "")
                 }
             }
         } else {
@@ -330,7 +329,7 @@ object AdvancedPlayerList {
         }
     }
 
-    enum class CrimsonIsleFaction(color: String?, val symbol: String?) {
+    enum class CrimsonIsleFaction(color: String?, private val symbol: String?) {
         BARBARIAN("§c", "⚒"),
         MAGE("§5", "ቾ"),
         NONE(null, null)
