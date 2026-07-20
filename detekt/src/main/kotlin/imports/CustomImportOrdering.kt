@@ -149,6 +149,7 @@ class CustomImportOrdering(config: Config) :
         }
 
     // Each block must be ordered according to the ordering defined in ImportOrdering.
+    // Returns the first out of order import in order to not spam a lot of issues for the same block.
     private fun findOrderingViolations(
         blocks: List<ImportBlock>,
     ): List<ImportLine> =
@@ -178,6 +179,7 @@ class CustomImportOrdering(config: Config) :
                 file,
             )
         }
+
         findSpacingInsideBlockViolations(fileLines, blocks).forEach {
             reportIssue(
                 "Import blocks must not contain empty lines between imports.",
