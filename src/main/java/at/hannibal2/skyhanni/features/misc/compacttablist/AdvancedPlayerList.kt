@@ -219,7 +219,7 @@ object AdvancedPlayerList {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 CrimsonIsleFaction.entries.firstOrNull { it.isLine(line.string) }?.let {
                     faction = it
-                    nameSuffix = nameSuffix.removeSuffix(it.symbol ?: "")
+                    nameSuffix = nameSuffix.removeSuffix(it.symbol.orEmpty())
                 }
             }
         } else {

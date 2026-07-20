@@ -96,7 +96,7 @@ class DevConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var fancyContributors: Property<Boolean> = Property.of(true)
+    val fancyContributors: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Contributor Nametags", desc = "Makes SkyHanni contributors' nametags fancy too.")
