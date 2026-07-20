@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.spongepowered.asm.mixin.MixinEnvironment
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer
 
+// Inspired by Skyblocker
 class MixinTest {
 
     @Test
