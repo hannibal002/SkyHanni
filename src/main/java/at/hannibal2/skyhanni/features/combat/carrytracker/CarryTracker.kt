@@ -6,12 +6,13 @@ import at.hannibal2.skyhanni.data.PartyApi
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.combat.CrimsonMinibossKilledEvent
+import at.hannibal2.skyhanni.events.combat.CrimsonMinibossEvent
 import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
+import at.hannibal2.skyhanni.features.nether.miniboss.CrimsonMiniBoss
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -48,7 +49,6 @@ import net.minecraft.client.Minecraft
 import kotlin.math.roundToInt
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
-import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss as CrimsonMiniboss
 
 @SkyHanniModule
 object CarryTracker {
@@ -563,7 +563,7 @@ object CarryTracker {
 
     private data class CrimsonMinibossCarryType(
         override val id: String,
-        val crimsonMiniboss: CrimsonMiniboss,
+        val crimsonMiniboss: CrimsonMiniBoss,
         override val displayName: String = crimsonMiniboss.displayName,
         override val shortName: String = displayName,
     ) : CarryType()
@@ -582,11 +582,11 @@ object CarryTracker {
 
         for (i in 1..5) add(KuudraCarryType("k$i", KuudraTier.entries[i - 1]))
 
-        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniboss.BLADESOUL))
-        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniboss.MAGE_OUTLAW))
-        add(CrimsonMinibossCarryType("barb_duke", CrimsonMiniboss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
-        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniboss.ASHFANG))
-        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniboss.MAGMA_BOSS))
+        add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL))
+        add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
+        add(CrimsonMinibossCarryType("barb_duke", CrimsonMiniBoss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
+        add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG))
+        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_BOSS))
     }
 
     @HandleEvent
@@ -636,7 +636,7 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onCrimsonMinibossKilled(event: CrimsonMinibossKilledEvent) {
+    fun onCrimsonMinibossDeath(event: CrimsonMinibossEvent.Death) {
         val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniboss } ?: return
 
         // party members is the best method i could think of here
