@@ -56,6 +56,7 @@ class AdvancedPlayerListTest {
 
         private var playerData: List<AdvancedPlayerList.PlayerData> = emptyList()
 
+        @Suppress("LongMethod", "MaxLineLength")
         fun createData() {
             val rawData = listOf(
                 """{"text":"","extra":["§8[§d333§8] §b","LoooonZ"," §7🐸"],"color":"aqua"}""",
@@ -164,7 +165,7 @@ class AdvancedPlayerListTest {
 
                 createPlayerData(
                     componentBuilder { appendWithColor("__Leafs__", ChatFormatting.AQUA) },
-                    componentBuilder { appendWithColor("⸕", ChatFormatting.GOLD) { bold = true} },
+                    componentBuilder { appendWithColor("⸕", ChatFormatting.GOLD) { bold = true } },
                     componentBuilder { appendWithColor("345", ChatFormatting.LIGHT_PURPLE) },
                     345,
                     faction = CrimsonIsleFaction.BARBARIAN
