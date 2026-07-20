@@ -106,7 +106,7 @@ object MaxwellApi {
         "gui.thaumaturgy.start",
         "§7Your tuning:",
     )
-    private val thaumaturgyDataPattern by patternGroup.pattern(
+    val thaumaturgyDataPattern by patternGroup.pattern(
         "gui.thaumaturgy.data",
         "§(?<color>.)\\+(?<amount>[^ ]+)(?<icon>.) (?<name>.+)",
     )
@@ -118,7 +118,7 @@ object MaxwellApi {
         "gui.thaumaturgy.magicalpower",
         "§7Total: §6(?<mp>[\\d.,]+) Magical Power",
     )
-    private val statsTuningGuiPattern by patternGroup.pattern(
+    val statsTuningGuiPattern by patternGroup.pattern(
         "gui.thaumaturgy.statstuning",
         "Stats Tuning",
     )
@@ -252,7 +252,7 @@ object MaxwellApi {
         tunings = map
     }
 
-    private fun Pattern.readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
+    fun Pattern.readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
         return matchMatcher(line) {
             val color = "§" + group("color")
             val icon = group("icon")

@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.MaxwellApi
+import at.hannibal2.skyhanni.data.MaxwellApi.readTuningFromLine
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -196,6 +198,11 @@ object LoadoutApi {
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
 
         EquipmentSlot.entries.forEach { EquipmentApi.setEquipment(it, data.equipment[it.ordinal]) }
+
+        MaxwellApi.currentPower = data.powerstone
+        data.tunings?.let { tuningLines ->
+            MaxwellApi.tunings = tuningLines.mapNotNull { MaxwellApi.thaumaturgyDataPattern.readTuningFromLine(it) }
+        }
     }
 
     // This is for Hotm, Hotf and Powerstone
