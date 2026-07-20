@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList.CrimsonIsleFaction
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
@@ -48,9 +47,9 @@ class AdvancedPlayerListTest {
 
         lateinit var adapter: TypeAdapter<Component>
 
-        private var playerData : List<AdvancedPlayerList.PlayerData> = emptyList()
+        private var playerData: List<AdvancedPlayerList.PlayerData> = emptyList()
 
-        fun createData(){
+        fun createData() {
             val rawData = listOf(
                 """{"text":"","extra":["§8[§d333§8] §b","LoooonZ"," §7🐸"],"color":"aqua"}""",
                 """{"text":"","extra":["§8[§c464§8] §b","IntenseEnderman"," §b🐸§7♲"],"color":"aqua"}""",
@@ -146,7 +145,7 @@ class AdvancedPlayerListTest {
             )
             val componentData: MutableList<Component> = mutableListOf()
             componentData.add(Component.literal(""))
-            componentData.addAll(rawData.map { adapter.fromJson(it) ?: Component.literal("Invalid")})
+            componentData.addAll(rawData.map { adapter.fromJson(it) ?: Component.literal("Invalid") })
             inputData = componentData
         }
 
@@ -157,7 +156,8 @@ class AdvancedPlayerListTest {
             sbLevel: Int,
             ironman: Boolean = false,
             bingoLevel: Int? = null,
-            faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE): AdvancedPlayerList.PlayerData {
+            faction: CrimsonIsleFaction = CrimsonIsleFaction.NONE,
+        ): AdvancedPlayerList.PlayerData {
 
             val data = AdvancedPlayerList.PlayerData(sbLevel)
             data.name = coloredName.string.removeColor()
