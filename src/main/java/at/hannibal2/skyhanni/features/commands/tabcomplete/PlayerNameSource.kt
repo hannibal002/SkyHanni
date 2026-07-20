@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.GuildApi
 import at.hannibal2.skyhanni.data.PartyApi
-import at.hannibal2.skyhanni.features.misc.CarryTracker
+import at.hannibal2.skyhanni.features.combat.carrytracker.CarryTracker
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
 
