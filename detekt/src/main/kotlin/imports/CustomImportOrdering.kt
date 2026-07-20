@@ -124,11 +124,11 @@ class CustomImportOrdering(config: Config) :
     }
 
     // Must have empty lines between preprocessed and non-preprocessed blocks.
-    private fun findSpacingBetweenBlocksViolation(
+    private fun findSpacingBetweenBlocksViolations(
         fileLines: List<String>,
         blocks: List<ImportBlock>,
-    ): ImportLine? =
-        blocks.zipWithNext().firstNotNullOfOrNull { (current, next) ->
+    ): List<ImportLine> =
+        blocks.zipWithNext().mapNotNull { (current, next) ->
             if (
                 current.inPreprocessingBlock != next.inPreprocessingBlock &&
                 fileLines
@@ -145,12 +145,12 @@ class CustomImportOrdering(config: Config) :
         }
 
     // Must not have empty lines inside a block.
-    private fun findSpacingInsideBlockViolation(
+    private fun findSpacingInsideBlockViolations(
         fileLines: List<String>,
         blocks: List<ImportBlock>,
-    ): ImportLine? =
-        blocks.firstNotNullOfOrNull { block ->
-            block.importLines.zipWithNext().firstNotNullOfOrNull { (current, next) ->
+    ): List<ImportLine> =
+        blocks.flatMap { block ->
+            block.importLines.zipWithNext().mapNotNull { (current, next) ->
                 if (
                     fileLines
                         .subList(
@@ -167,16 +167,18 @@ class CustomImportOrdering(config: Config) :
         }
 
     // Each block must be ordered according to the ordering defined in ImportOrdering.
-    private fun findOrderingViolation(
+    private fun findOrderingViolations(
         blocks: List<ImportBlock>,
-    ): ImportLine? =
-        blocks.firstNotNullOfOrNull { block ->
+    ): List<ImportLine> =
+        blocks.mapNotNull { block ->
             val imports = block.importLines.map { it.text }
             val sortedImports = imports.sortedWith(ImportOrdering.getOrdering())
 
-            block.importLines.zip(sortedImports).firstOrNull { (actual, expected) ->
-                actual.text != expected
-            }?.first
+            block.importLines.zip(sortedImports)
+                .firstOrNull { (actual, expected) ->
+                    actual.text != expected
+                }
+                ?.first
         }
 
     override fun visitKtFile(file: KtFile) {
@@ -200,8 +202,7 @@ class CustomImportOrdering(config: Config) :
                 file,
             )
         }
-
-        findSpacingInsideBlockViolation(fileLines, blocks)?.let {
+        findSpacingInsideBlockViolations(fileLines, blocks).forEach {
             reportIssue(
                 "Import blocks must not contain empty lines between imports.",
                 it.lineIndex,
@@ -210,7 +211,7 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        findSpacingBetweenBlocksViolation(fileLines, blocks)?.let {
+        findSpacingBetweenBlocksViolations(fileLines, blocks).forEach {
             reportIssue(
                 "Preprocessed and non-preprocessed import blocks must be separated by an empty line.",
                 it.lineIndex,
@@ -219,7 +220,7 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        findOrderingViolation(blocks)?.let {
+        findOrderingViolations(blocks).forEach {
             reportIssue(
                 "Imports must be ordered in lexicographic order with \"java\", \"javax\", \"kotlin\", \"kotlinx\" and aliases in the end.",
                 it.lineIndex,
