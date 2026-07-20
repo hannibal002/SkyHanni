@@ -1,11 +1,20 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList.CrimsonIsleFaction
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters
 import com.google.gson.TypeAdapter
+import io.mockk.every
+import io.mockk.mockkObject
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeAll
@@ -28,6 +37,14 @@ class AdvancedPlayerListTest {
         @JvmStatic
         @BeforeAll
         fun setup() {
+            mockkObject(SkyBlockUtils)
+            every { SkyBlockUtils.inSkyBlock } returns true
+            every { SkyBlockUtils.onHypixel } returns true
+            every { SkyBlockUtils.currentIsland } returns IslandType.CRIMSON_ISLE
+
+            mockkObject(HypixelLocationApi)
+            every { HypixelLocationApi.inSkyblock } returns true
+
             @Suppress("UNCHECKED_CAST")
             adapter = SkyHanniTypeAdapters.COMPONENT.adapter as TypeAdapter<Component>
             createData()
@@ -51,7 +68,11 @@ class AdvancedPlayerListTest {
                 """{"text":"","extra":["§8[§6400§8] §a","liron150"," §b§lᛝ§7♲"],"color":"green"}""",
                 """{"text":"","extra":["§8[§a135§8] §a","gouroumaster"," §7☃"],"color":"green"}""",
                 """{"text":"","extra":["§8[§a143§8] §7","angelstuff",{"text":"","color":"white"}],"color":"gray"}""",
-                """{"text":"","extra":["§8[§a137§8] §7","Swaimz"," §7§l⚝"],"color":"gray"}"""
+                """{"text":"","extra":["§8[§a137§8] §7","Swaimz"," §7§l⚝"],"color":"gray"}""",
+
+                """{"text":"","extra":[{"text":"[","color":"dark_gray"},{"text":"446","color":"red"},{"text":"] ","color":"dark_gray"},{"text":"Anrok ","color":"aqua"},{"text":"♫","color":"gold"},{"text":"ቾ","color":"dark_purple"}],"italic":false}""",
+                """{"text":"","extra":[{"text":"[","color":"dark_gray"},{"text":"345","color":"light_purple"},{"text":"] ","color":"dark_gray"},{"text":"__Leafs__ ","color":"aqua"},{"text":"⸕","color":"gold","bold":true},{"text":"⚒","color":"red"}],"italic":false}""",
+                """{"text":"","extra":[{"text":"[","color":"dark_gray"},{"text":"369","color":"dark_purple"},{"text":"] ","color":"dark_gray"},{"text":"Ant_e ","color":"gray"},{"text":"⛂","color":"gold"},{"text":"⚒","color":"red"}],"italic":false}"""
             )
             playerData = listOf(
                 createPlayerData(
@@ -131,7 +152,31 @@ class AdvancedPlayerListTest {
                     Component.literal("§7§l⚝"),
                     Component.literal("§a137"),
                     137
-                )
+                ),
+
+                createPlayerData(
+                    componentBuilder { appendWithColor("Anrok", ChatFormatting.AQUA) },
+                    componentBuilder { appendWithColor("♫", ChatFormatting.GOLD) },
+                    componentBuilder { appendWithColor("446", ChatFormatting.RED) },
+                    446,
+                    faction = CrimsonIsleFaction.MAGE
+                ),
+
+                createPlayerData(
+                    componentBuilder { appendWithColor("__Leafs__", ChatFormatting.AQUA) },
+                    componentBuilder { appendWithColor("⸕", ChatFormatting.GOLD) { bold = true} },
+                    componentBuilder { appendWithColor("345", ChatFormatting.LIGHT_PURPLE) },
+                    345,
+                    faction = CrimsonIsleFaction.BARBARIAN
+                ),
+
+                createPlayerData(
+                    componentBuilder { appendWithColor("Ant_e", ChatFormatting.GRAY) },
+                    componentBuilder { appendWithColor("⛂", ChatFormatting.GOLD) },
+                    componentBuilder { appendWithColor("369", ChatFormatting.DARK_PURPLE) },
+                    369,
+                    faction = CrimsonIsleFaction.BARBARIAN
+                ),
             )
             val componentData: MutableList<Component> = mutableListOf()
             componentData.add(Component.literal(""))
