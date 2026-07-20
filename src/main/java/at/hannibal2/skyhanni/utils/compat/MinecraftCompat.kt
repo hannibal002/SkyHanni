@@ -35,7 +35,7 @@ object MinecraftCompat {
     /**
      * Returns the active [ClientLevel] or null if it doesn't exist.
      */
-    val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
+    val localWorldOrNull get(): ClientLevel? = mc.level
 
     /**
      * Returns whether there is an active [ClientLevel].
@@ -68,7 +68,7 @@ object MinecraftCompat {
     /**
      * Returns the active [LocalPlayer] or null if it doesn't exist.
      */
-    val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
+    val localPlayerOrNull get(): LocalPlayer? = mc.player
 
     /**
      * Returns whether there is an active [LocalPlayer].
@@ -117,10 +117,10 @@ object MinecraftCompat {
 
     val hideGui get(): Boolean = mc.options.hideGui
 
-    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+    val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
 
     fun reloadChunks() = DelayedRun.runOrNextTick {
-        Minecraft.getInstance().levelRenderer.allChanged()
+        mc.levelRenderer.allChanged()
     }
     // </editor-fold>
 }
