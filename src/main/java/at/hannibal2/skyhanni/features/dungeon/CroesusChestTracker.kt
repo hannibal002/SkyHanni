@@ -84,7 +84,7 @@ object CroesusChestTracker {
     /**
      * WRAPPED-REGEX-TEST: " Kismet Feather"
      */
-    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.colorless", " Kismet Feather")
+    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.colorless", "\\s+Kismet Feather")
 
     private const val EMPTY_SLOT = 22
     private const val FRONT_ARROW_SLOT = 53
