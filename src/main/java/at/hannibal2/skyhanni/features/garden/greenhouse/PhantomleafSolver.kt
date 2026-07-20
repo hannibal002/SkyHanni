@@ -25,7 +25,7 @@ object PhantomleafSolver {
     private const val HYPIXEL_VOLUME_SCALING_FACTOR = 30
     private const val MUTATION_Y_LEVEL = 74.0
 
-    private val SEARCH_RANGE = -HYPIXEL_VOLUME_SCALING_FACTOR - 1..HYPIXEL_VOLUME_SCALING_FACTOR + 1
+    private val SEARCH_RANGE = (-HYPIXEL_VOLUME_SCALING_FACTOR - 1)..(HYPIXEL_VOLUME_SCALING_FACTOR + 1)
 
     private var isSearchingForPhantomleaf = false
 
