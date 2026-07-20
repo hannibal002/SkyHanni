@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
@@ -11,15 +13,18 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
  * Implements §#RRGGBB§/ and §#RRGGBBAA§/ hex color codes by hooking into
  * {@link StringDecomposer#iterateFormatted}. Each hex digit is encoded as a
  * §-prefixed character, e.g. §#§6§a§e§e§4§8§/ renders text in RGB(0x6a, 0xee, 0x48).
+ *
+ * Also includes some chroma handling.
  */
 @Mixin(StringDecomposer.class)
-public class MixinStringDecomposer {
+public abstract class MixinStringDecomposer {
 
     @Unique private static final String HEX_CHARS = "0123456789abcdef";
 
@@ -114,5 +119,17 @@ public class MixinStringDecomposer {
     private static Style skyhanni$applyActiveHexColor(Style style) {
         if (skyhanni$activeHexColor == -1) return style;
         return style.withColor(TextColor.fromRgb(skyhanni$activeHexColor));
+    }
+
+    @ModifyVariable(
+        method = "iterateFormatted(Ljava/lang/String;ILnet/minecraft/network/chat/Style;Lnet/minecraft/network/chat/Style;Lnet/minecraft/util/FormattedCharSink;)Z",
+        at = @At(
+            value = "INVOKE_ASSIGN",
+            target = "Lnet/minecraft/ChatFormatting;getByCode(C)Lnet/minecraft/ChatFormatting;"
+        ),
+        ordinal = 2
+    )
+    private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(index = 9) char colorCode) {
+        return ChromaFontManagerKt.setChromaColorStyle(style, text, colorCode);
     }
 }

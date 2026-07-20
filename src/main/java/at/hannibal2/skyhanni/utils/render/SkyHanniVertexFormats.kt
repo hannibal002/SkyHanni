@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.render
 
-import at.hannibal2.skyhanni.mixins.transformers.renderer.MixinBufferBuilderAccessor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.vertex.BufferBuilder
@@ -116,7 +115,7 @@ object SkyHanniVertexFormats {
         format: VertexElement,
     ) {
         val element = format.element
-        val ptr = (this@writeParams as MixinBufferBuilderAccessor).invokeBeginElement(element).takeIf {
+        val ptr = beginElement(element).takeIf {
             it != -1L
         } ?: return
         MemoryUtil.memPutFloat(ptr, x)
