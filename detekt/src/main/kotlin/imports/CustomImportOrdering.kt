@@ -64,6 +64,19 @@ class CustomImportOrdering(config: Config) :
         return blocks
     }
 
+    // Preprocessed blocks must be at the end of the import list.
+    private fun isPreprocessingBlocksLast(blocks: List<ImportBlock>): Boolean {
+        var preprocessingStart = false
+        for (block in blocks) {
+            if (block.inPreprocessingBlock) {
+                preprocessingStart = true
+            } else if (preprocessingStart) {
+                return false
+            }
+        }
+        return true
+    }
+
     // Must have empty lines between preprocessed and non-preprocessed blocks.
     private fun isValidSpacingBetweenBlocks(
         rawLines: List<String>,
@@ -100,19 +113,6 @@ class CustomImportOrdering(config: Config) :
             val imports = block.importLines.map { it.import }
             imports == imports.sortedWith(ImportOrdering.getOrdering())
         }
-
-    // Preprocessed blocks must be at the end of the import list.
-    private fun isPreprocessingBlocksLast(blocks: List<ImportBlock>): Boolean {
-        var preprocessingStart = false
-        for (block in blocks) {
-            if (block.inPreprocessingBlock) {
-                preprocessingStart = true
-            } else if (preprocessingStart) {
-                return false
-            }
-        }
-        return true
-    }
 
     override fun visitImportList(importList: KtImportList) {
         val rawText = importList.text.lines()
