@@ -169,7 +169,7 @@ object TabListRenderer {
 
                         //? if >= 26.1 {
                         PlayerFaceExtractor.extractRenderState(
-                        //?} else {
+                            //?} else {
                         /*PlayerFaceRenderer.draw(
                         *///?}
                             DrawContextUtils.drawContext,
