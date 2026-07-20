@@ -23,6 +23,7 @@ class AdvancedPlayerListConfig {
 
         override fun toString() = displayName
     }
+
     @Expose
     @ConfigOption(name = "Invert Sort", desc = "Flip the player list order on its head (also works with default rank).")
     @ConfigEditorBoolean
