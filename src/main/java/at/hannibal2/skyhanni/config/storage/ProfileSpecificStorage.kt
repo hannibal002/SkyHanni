@@ -425,6 +425,13 @@ class ProfileSpecificStorage(
     @Expose
     var communityShopProfileUpgrade: CommunityShopUpgrade? = null
 
+    // - stock exchange
+    @Expose
+    var stonksAuctionRoundEnd: SimpleTimeMark = farPast()
+
+    @Expose
+    var stonksAuctionLastBidRoundEnd: SimpleTimeMark = farPast()
+
     // - fishing
     @Expose
     var fishing: FishingStorage = FishingStorage()
