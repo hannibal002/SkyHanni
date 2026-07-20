@@ -33,27 +33,27 @@ class CustomImportOrdering(config: Config) :
             }
         }
 
-        for ((index, line) in rawLines.withIndex()) {
-            val trimmed = line.trim()
+        for ((index, rawLine) in rawLines.withIndex()) {
+            val line = rawLine.trim()
 
             when {
-                PreprocessingPattern.IF.matches(trimmed) -> {
+                PreprocessingPattern.IF.matches(line) -> {
                     flush()
                     inPreprocessingBlock = true
                 }
 
-                PreprocessingPattern.ELSEIF.matches(trimmed) ||
-                    PreprocessingPattern.ELSE.matches(trimmed) -> {
+                PreprocessingPattern.ELSEIF.matches(line) ||
+                    PreprocessingPattern.ELSE.matches(line) -> {
                     flush()
                     inPreprocessingBlock = true
                 }
 
-                PreprocessingPattern.ENDIF.matches(trimmed) -> {
+                PreprocessingPattern.ENDIF.matches(line) -> {
                     flush()
                     inPreprocessingBlock = false
                 }
 
-                trimmed.startsWith("import ") -> {
+                line.startsWith("import ") -> {
                     currentImports += ImportLine(imports.next(), index)
                 }
             }
@@ -64,6 +64,7 @@ class CustomImportOrdering(config: Config) :
         return blocks
     }
 
+    // Must have empty lines between preprocessed and non-preprocessed blocks.
     private fun isValidSpacingBetweenBlocks(
         rawLines: List<String>,
         blocks: List<ImportBlock>,
@@ -79,6 +80,7 @@ class CustomImportOrdering(config: Config) :
         }
     }
 
+    // Must not have empty lines inside a block.
     private fun isValidSpacingInsideBlocks(
         rawLines: List<String>,
         blocks: List<ImportBlock>,
@@ -92,12 +94,14 @@ class CustomImportOrdering(config: Config) :
         }
     }
 
+    // Each block must be ordered according to the ordering defined in ImportOrdering.
     private fun areImportsOrdered(blocks: List<ImportBlock>): Boolean =
         blocks.all { block ->
             val imports = block.importLines.map { it.import }
             imports == imports.sortedWith(ImportOrdering.getOrdering())
         }
 
+    // Preprocessed blocks must be at the end of the import list.
     private fun isPreprocessingBlocksLast(blocks: List<ImportBlock>): Boolean {
         var preprocessingStart = false
         for (block in blocks) {
