@@ -1,39 +1,29 @@
 package imports
 
-import org.jetbrains.kotlin.psi.KtImportDirective
-
 object ImportOrdering {
-    private val importOrder = ImportSorter()
-
-    fun getOrdering(): Comparator<KtImportDirective> {
-        return importOrder
-    }
-
     private val packageImportOrdering = listOf("java.", "javax.", "kotlin.", "kotlinx.")
 
-    private class ImportSorter : Comparator<KtImportDirective> {
-        override fun compare(
-            import1: KtImportDirective,
-            import2: KtImportDirective,
-        ): Int {
-            val importPath1 = import1.importPath!!.pathStr
-            val importPath2 = import2.importPath!!.pathStr
+    fun getOrdering(): Comparator<String> = Comparator(::compareImports)
 
-            val isTypeAlias1 = import1.aliasName != null
-            val isTypeAlias2 = import2.aliasName != null
+    private fun compareImports(import1: String, import2: String): Int {
+        val path1 = import1.removePrefix("import ").substringBefore(" as ")
+        val path2 = import2.removePrefix("import ").substringBefore(" as ")
 
-            val index1 = packageImportOrdering.indexOfFirst { importPath1.startsWith(it) }
-            val index2 = packageImportOrdering.indexOfFirst { importPath2.startsWith(it) }
+        val alias1 = import1.contains(" as ")
+        val alias2 = import2.contains(" as ")
 
-            return when {
-                isTypeAlias1 && isTypeAlias2 -> importPath1.compareTo(importPath2)
-                isTypeAlias1 && !isTypeAlias2 -> 1
-                !isTypeAlias1 && isTypeAlias2 -> -1
-                index1 == -1 && index2 == -1 -> importPath1.compareTo(importPath2)
-                index1 == -1 -> -1
-                index2 == -1 -> 1
-                else -> index1.compareTo(index2)
-            }
+        val index1 = packageImportOrdering.indexOfFirst(path1::startsWith)
+        val index2 = packageImportOrdering.indexOfFirst(path2::startsWith)
+
+        return when {
+            alias1 && alias2 -> path1.compareTo(path2)
+            alias1 -> 1
+            alias2 -> -1
+            index1 == -1 && index2 == -1 -> path1.compareTo(path2)
+            index1 == -1 -> -1
+            index2 == -1 -> 1
+            index1 != index2 -> index1.compareTo(index2)
+            else -> path1.compareTo(path2)
         }
     }
 }

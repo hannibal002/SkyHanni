@@ -1,8 +1,8 @@
 package imports
 
+import PreprocessingPattern
 import SkyHanniRule
 import dev.detekt.api.Config
-import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtImportList
 
 /**
@@ -12,7 +12,7 @@ class CustomImportOrdering(config: Config) :
     SkyHanniRule(config, "Enforces correct import ordering, taking into account preprocessed imports.") {
 
     private data class ImportLine(
-        val import: KtImportDirective,
+        val text: String,
         val lineIndex: Int,
     )
 
@@ -21,7 +21,7 @@ class CustomImportOrdering(config: Config) :
         val importLines: List<ImportLine>,
     )
 
-    private fun createImportBlocks(rawLines: List<String>, imports: Iterator<KtImportDirective>): List<ImportBlock> {
+    private fun createImportBlocks(rawLines: List<String>): List<ImportBlock> {
         val blocks = mutableListOf<ImportBlock>()
         var currentImports = mutableListOf<ImportLine>()
         var inPreprocessingBlock = false
@@ -53,8 +53,12 @@ class CustomImportOrdering(config: Config) :
                     inPreprocessingBlock = false
                 }
 
+                line.startsWith("/*import ") -> {
+                    currentImports += ImportLine(line.removePrefix("/*"), index)
+                }
+
                 line.startsWith("import ") -> {
-                    currentImports += ImportLine(imports.next(), index)
+                    currentImports += ImportLine(line, index)
                 }
             }
         }
@@ -110,7 +114,7 @@ class CustomImportOrdering(config: Config) :
     // Each block must be ordered according to the ordering defined in ImportOrdering.
     private fun areImportsOrdered(blocks: List<ImportBlock>): Boolean =
         blocks.all { block ->
-            val imports = block.importLines.map { it.import }
+            val imports = block.importLines.map { it.text }
             imports == imports.sortedWith(ImportOrdering.getOrdering())
         }
 
@@ -120,7 +124,7 @@ class CustomImportOrdering(config: Config) :
             return
         }
 
-        val blocks = createImportBlocks(rawText, importList.imports.iterator())
+        val blocks = createImportBlocks(rawText)
 
         // Should never happen unless import processing is broken.
         require(blocks.isNotEmpty()) { "No import blocks found in the import list." }
