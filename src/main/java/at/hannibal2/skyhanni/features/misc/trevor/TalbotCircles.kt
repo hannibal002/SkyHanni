@@ -1,10 +1,17 @@
 package at.hannibal2.skyhanni.features.misc.trevor
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawCircleWireframe
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import net.minecraft.world.phys.AABB
 import java.awt.Color
 import kotlin.math.absoluteValue
@@ -12,6 +19,7 @@ import kotlin.math.atan2
 import kotlin.math.sqrt
 import kotlin.math.tan
 
+@SkyHanniModule
 object TalbotCircles {
 
     private const val MAX_CONSTRAINTS_USED = 3
@@ -22,9 +30,13 @@ object TalbotCircles {
 
     private val constraints = mutableListOf<Constraint>()
     private val candidateBlocks = mutableListOf<LorenzVec>()
+    private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
     @Suppress("HandleEventInspection")
+    @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun drawGuesses(event: SkyHanniRenderWorldEvent) {
+        val mobFound = findMob(event)
+        if (!(config.talbotCircles && !mobFound)) return
         if (constraints.isEmpty()) return
 
         if (candidateBlocks.isEmpty()) {
@@ -59,6 +71,28 @@ object TalbotCircles {
             constraints.removeAt(0)
         }
         recalculateCandidates()
+    }
+    private fun findMob(event: SkyHanniRenderWorldEvent): Boolean {
+        if (!config.solver) return false
+        if (TrevorSolver.mobLocation == TrapperMobArea.NONE) return false
+
+        var location = TrevorSolver.mobLocation.coordinates
+        if (TrevorSolver.averageHeight != 0.0) {
+            location = LorenzVec(location.x, TrevorSolver.averageHeight, location.z)
+        }
+
+        val found = TrevorSolver.mobLocation == TrapperMobArea.FOUND
+        if (found) {
+            val displayName = TrevorSolver.currentMob?.mobName ?: "Mob Location"
+            location = TrevorSolver.mobCoordinates
+            event.drawWaypointFilled(location.down(2), LorenzColor.GREEN.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawDynamicText(location.up(), displayName, 1.5)
+        } else {
+            event.drawWaypointFilled(location, LorenzColor.GOLD.toColor(), seeThroughBlocks = true, beacon = true)
+            event.drawDynamicText(location.up(), TrevorSolver.mobLocation.location, 1.5)
+        }
+
+        return found
     }
 
     private fun recalculateCandidates() {
