@@ -21,42 +21,11 @@ class CustomImportOrdering(config: Config) :
         val importLines: List<ImportLine>,
     )
 
-    private fun parseImportSection(file: KtFile): List<Pair<Int, String>> {
-        val imports = mutableListOf<Pair<Int, String>>()
-        var inImports = false
-
-        fun isImportSectionLine(line: String): Boolean =
-            line.startsWith("import ") ||
-                line.startsWith("/*import ") ||
-                PreprocessingPattern.IF.matches(line) ||
-                PreprocessingPattern.ELSEIF.matches(line) ||
-                PreprocessingPattern.ELSE.matches(line) ||
-                PreprocessingPattern.ENDIF.matches(line) ||
-                line.isBlank()
-
-        for ((index, rawLine) in file.text.lineSequence().withIndex()) {
-            val line = rawLine.trim()
-
-            when {
-                line.startsWith("package ") -> continue
-                !inImports && line.isBlank() -> continue
-
-                isImportSectionLine(line) -> {
-                    inImports = true
-                    imports += index to rawLine
-                }
-
-                inImports -> break
-            }
-        }
-
-        return imports
-    }
-
-    private fun createImportBlocks(rawLines: List<Pair<Int, String>>): List<ImportBlock> {
+    private fun createImportBlocks(file: KtFile): List<ImportBlock> {
         val blocks = mutableListOf<ImportBlock>()
         var currentImports = mutableListOf<ImportLine>()
         var inPreprocessingBlock = false
+        var inImportSection = false
 
         fun flush() {
             if (currentImports.isNotEmpty()) {
@@ -65,11 +34,20 @@ class CustomImportOrdering(config: Config) :
             }
         }
 
-        for ((index, rawLine) in rawLines) {
+        fun isImportLine(line: String): Boolean =
+            line.startsWith("import ") ||
+                line.startsWith("/*import ")
+
+        for ((index, rawLine) in file.text.lineSequence().withIndex()) {
             val line = rawLine.trim()
 
             when {
+                line.startsWith("package ") -> continue
+
+                !inImportSection && line.isBlank() -> continue
+
                 PreprocessingPattern.IF.matches(line) -> {
+                    inImportSection = true
                     flush()
                     inPreprocessingBlock = true
                 }
@@ -85,18 +63,22 @@ class CustomImportOrdering(config: Config) :
                     inPreprocessingBlock = false
                 }
 
-                line.startsWith("/*import ") -> {
+                isImportLine(line) -> {
+                    inImportSection = true
+
                     currentImports += ImportLine(
                         line.removePrefix("/*"),
                         index,
                     )
                 }
 
-                line.startsWith("import ") -> {
-                    currentImports += ImportLine(
-                        line,
-                        index,
-                    )
+                line.isBlank() && inImportSection -> {
+                    // Keep blank lines because spacing validation needs them.
+                }
+
+                inImportSection -> {
+                    flush()
+                    break
                 }
             }
         }
@@ -182,18 +164,12 @@ class CustomImportOrdering(config: Config) :
         }
 
     override fun visitKtFile(file: KtFile) {
-        val rawText = parseImportSection(file)
-
-        if (rawText.all { (_, line) -> line.isBlank() }) {
+        val blocks = createImportBlocks(file)
+        if (blocks.isEmpty()) {
             return
         }
 
-        val blocks = createImportBlocks(rawText)
-
-        require(blocks.isNotEmpty()) { "No import blocks found in the import list." }
-
-        val fileLines = file.text.lines()
-
+        val fileLines by lazy { file.text.lines() }
         findPreprocessingBlockOrderViolation(blocks)?.let {
             reportIssue(
                 "Preprocessed import blocks must be at the end of the import list.",
