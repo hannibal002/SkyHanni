@@ -93,8 +93,8 @@ public abstract class MixinLevelRenderer {
         Vector4f fogColor,
         boolean shouldRenderSky,
         //? if = 26.1 {
-        //ChunkSectionsToRender chunkSectionsToRender,
-        //?}
+        /*ChunkSectionsToRender chunkSectionsToRender,
+        *///?}
         CallbackInfo ci
     ) {
         //? if >= 26.1 {

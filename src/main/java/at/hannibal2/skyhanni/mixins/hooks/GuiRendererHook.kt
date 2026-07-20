@@ -25,8 +25,8 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 
 //? if < 26.2 {
-//import net.minecraft.client.renderer.MultiBufferSource
-//?}
+/*import net.minecraft.client.renderer.MultiBufferSource
+*///?}
 
 object GuiRendererHook {
     var chromaUniform = SkyHanniChromaUniform()

@@ -136,7 +136,6 @@ stonecutter parameters {
             replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
             replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
             replace("CompareOp.GREATER_THAN_OR_EQUAL", "CompareOp.LESS_THAN_OR_EQUAL")
-            replace(".gui.hud.isHidden", ".options.hideGui")
             replace(".mainCamera()", ".mainCamera")
             replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
             replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")

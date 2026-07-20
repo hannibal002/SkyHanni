@@ -112,7 +112,7 @@ inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/s
 inject-interface net/minecraft/client/renderer/block/FluidModel at/hannibal2/skyhanni/mixins/hooks/FluidModelTransparencyOverride
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 #?} else {
-#accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/gui/render/state/GuiRenderState;
+#accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/GuiMessage;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/GuiMessage;)V
