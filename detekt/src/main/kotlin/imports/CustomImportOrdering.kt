@@ -2,6 +2,7 @@ package imports
 
 import PreprocessingPattern
 import SkyHanniRule
+import com.intellij.psi.PsiFile
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtFile
 
@@ -21,7 +22,7 @@ class CustomImportOrdering(config: Config) :
         val importLines: List<ImportLine>,
     )
 
-    private fun createImportBlocks(file: KtFile): List<ImportBlock> {
+    private fun createImportBlocks(file: PsiFile): List<ImportBlock> {
         val blocks = mutableListOf<ImportBlock>()
         var currentImports = mutableListOf<ImportLine>()
         var inPreprocessingBlock = false
@@ -163,7 +164,7 @@ class CustomImportOrdering(config: Config) :
                 ?.first
         }
 
-    override fun visitKtFile(file: KtFile) {
+    override fun visitFile(file: PsiFile) {
         val blocks = createImportBlocks(file)
         if (blocks.isEmpty()) {
             return
@@ -205,6 +206,6 @@ class CustomImportOrdering(config: Config) :
             )
         }
 
-        super.visitKtFile(file)
+        super.visitFile(file)
     }
 }
