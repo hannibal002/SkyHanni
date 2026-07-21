@@ -40,9 +40,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -398,13 +396,13 @@ object TrevorFeatures {
 
     private fun Pattern.checkTalbot(formattedMessage: String, below: Boolean) {
         this.matchMatcher(formattedMessage) {
-            val height = group("height").toInt().let {
-                if (below) return@let -it
-                return@let it
+            val height : Int = group("height").toInt().let {
+                if (below) -it
+                else it
             }
             val angle = group("angle").toInt()
             val playerPosition = lastTheodoliteClickPosition ?: LocationUtils.playerLocation()
-            TrevorSolver.findMobHeight(height)
+            TrevorSolver.findMobHeight(height, playerPosition)
             TalbotCircles.addResult(height, angle, playerPosition)
             lastTheodoliteClickPosition = null
         }
