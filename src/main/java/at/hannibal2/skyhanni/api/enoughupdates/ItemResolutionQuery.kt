@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.ensureComponentsBound
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.core.component.DataComponentMap
@@ -194,7 +194,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = Minecraft.getInstance().screen
+        this.guiContext = MinecraftCompat.screen
         return this
     }
 
