@@ -244,7 +244,7 @@ object CrimsonMinibossRespawnTimer {
         override fun toString() = displayName
 
         companion object {
-            fun fromName(spawnName: String) = entries.firstOrNull {
+            fun fromName(spawnName: String): MiniBoss? = entries.firstOrNull {
                 it.displayName.removeColor().equals(spawnName, ignoreCase = true)
             }
 
