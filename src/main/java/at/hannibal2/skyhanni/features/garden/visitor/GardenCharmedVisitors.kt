@@ -42,8 +42,11 @@ object GardenCharmedVisitors {
 
         val isAlreadyCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
             ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
+        val rewardsGratitude = visitor.allRewards.any {
+            VisitorReward.getByInternalName(it) == VisitorReward.VISITORS_GRATITUDE
+        }
         visitor.charmed = isAlreadyCharmed
-        if (!isAlreadyCharmed) {
+        if (!isAlreadyCharmed && !rewardsGratitude) {
             removeCharmed(visitor)
         }
     }
@@ -65,7 +68,7 @@ object GardenCharmedVisitors {
         val visitor = openVisitor ?: return
         val isCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
             ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
-        if (isCharmed && !visitor.charmed) {
+        if (isCharmed) {
             addCharmed(visitor)
         }
     }
