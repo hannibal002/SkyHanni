@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -194,9 +193,10 @@ object CalendarApi {
     // visiting SkyBlock with pets to trade!
     fun parseMainCalendarTooltip(rawTooltip: MutableList<Component>): MainCalendarEvent? {
         val tooltip = rawTooltip.map { it.string.removeColor().trim() }
-        val eventName = tooltip.getOrNull(0) ?: return null
-        val startTimeLine = tooltip.getOrNull(1) ?: return null
-        val durationLine = tooltip.getOrNull(2) ?: return null
+        if (tooltip.size < 3) return null
+        val eventName = tooltip[0]
+        val startTimeLine = tooltip[1]
+        val durationLine = tooltip[2]
 
         val startTime = mainCalendarStartsInPattern.matchMatcher(startTimeLine) {
             val timeString = group("time")
