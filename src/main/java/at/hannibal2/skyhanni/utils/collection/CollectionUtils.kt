@@ -2,9 +2,6 @@ package at.hannibal2.skyhanni.utils.collection
 
 import at.hannibal2.skyhanni.utils.MinMaxNumber
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import java.util.Collections
 import java.util.EnumMap
 import java.util.PriorityQueue
@@ -15,6 +12,9 @@ import kotlin.collections.filterNot
 import kotlin.math.ceil
 import kotlin.reflect.KClass
 import kotlin.time.Duration
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 
 @Suppress("TooManyFunctions")
 object CollectionUtils {
