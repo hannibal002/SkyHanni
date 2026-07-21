@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -102,19 +104,20 @@ public abstract class MixinAbstractContainerScreen {
         return BetterContainers.getTextColor(colour);
     }
 
-    @ModifyExpressionValue(
+    @WrapOperation(
         method = "extractSlotHighlightBack",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
     )
-    private boolean canBeHighlightedBack(boolean original, Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot, original);
+    private boolean canBeHighlightedBack(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
-    @ModifyExpressionValue(
-        method = "extractSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
+    @WrapOperation(
+        method = "extractSlotHighlightFront",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
     )
-    private boolean canBeHighlightedFront(boolean original, Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot, original);
+    private boolean canBeHighlightedFront(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
     @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;hasInfiniteMaterials()Z"))

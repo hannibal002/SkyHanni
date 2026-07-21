@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
+import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
@@ -91,7 +92,7 @@ public class MixinGui {
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
         ),
-        index = 2
+        index = 1
     )
     private Component renderItemOverlayPost(Component str) {
         return ScoreboardData.tryToReplaceScoreboardLine(str);

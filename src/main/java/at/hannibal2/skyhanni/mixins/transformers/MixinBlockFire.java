@@ -6,6 +6,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BaseFireBlock.class)
 public class MixinBlockFire {
@@ -18,17 +20,7 @@ public class MixinBlockFire {
         ),
         cancellable = true
     )
-    private void onRandomDisplayTick(
-        Level world,
-        ParticleOptions particle,
-        double x,
-        double y,
-        double z,
-        double xd,
-        double yd,
-        double zd,
-        CallbackInfo ci
-    ) {
+    private void onRandomDisplayTick(CallbackInfo ci) {
         if (ParticleHider.shouldHideFireParticles()) ci.cancel();
     }
 }
