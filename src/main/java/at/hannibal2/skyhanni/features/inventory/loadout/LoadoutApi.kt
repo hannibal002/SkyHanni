@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.loadout
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.MaxwellApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -195,11 +196,11 @@ object LoadoutApi {
         data.hotm = itemsList[HOTM_SLOT].parseCurrentSelection()
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
 
-        EquipmentSlot.entries.forEach {
-            val itemStack = data.equipment[it.ordinal]
-            if (itemStack != null && !itemStack.isStainedGlassPane()) {
-                EquipmentApi.setEquipment(it, itemStack)
-            } else EquipmentApi.setEquipment(it, null)
+        EquipmentSlot.entries.forEach { EquipmentApi.setEquipment(it, data.equipment[it.ordinal]) }
+
+        MaxwellApi.currentPower = data.powerstone
+        data.tunings?.let { tuningLines ->
+            MaxwellApi.tunings = tuningLines.mapNotNull { MaxwellApi.readTuningFromLine(it) }
         }
     }
 
