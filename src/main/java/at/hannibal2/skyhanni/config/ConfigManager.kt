@@ -14,15 +14,16 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringFileHandler
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -293,6 +294,8 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
+    val isDev by lazy { ContributorManager.isSelfDeveloper() }
+
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
@@ -312,6 +315,12 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
+        }
+
+        if (!isDev) {
+            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
         }
 
         return default

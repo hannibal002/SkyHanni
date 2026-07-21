@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.api.pet
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import java.util.UUID
 
 object PetStorageExpShare {

@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSkillLevelJson
-import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.AccessoryBagUpdateEvent
+import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
@@ -38,6 +38,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -128,6 +129,14 @@ object SkillApi {
     private val skillTabNoPercentPattern by patternGroup.pattern(
         "skill.tab.nopercent.colorless",
         " (?<type>\\w+)(?: (?<level>\\d+))?: (?<current>[0-9,.]+)/(?<needed>[\\d,.]+[kMB]?+)",
+    )
+
+    /**
+     * Regex-TEST: Max Skill level reached!
+     */
+    private val skillMaxLevelMenuPattern by patternGroup.pattern(
+        "skill.menu.maxreached",
+        "Max Skill level reached!"
     )
 
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
@@ -326,7 +335,7 @@ object SkillApi {
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue
-            val cleanName = stack.cleanName()
+            val cleanName = stack.cleanName
             val split = cleanName.split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: continue
@@ -336,9 +345,9 @@ object SkillApi {
             lore@ for ((index, line) in lore.withIndex()) {
                 val cleanLine = line.removeColor()
                 if (!cleanLine.startsWith("                    ")) continue@lore
-                val previousLine = lore.getOrNull(index - 1) ?: continue@lore
+                val previousLine = lore.getOrNull(index - 1)?.removeColor() ?: continue@lore
                 val progress = cleanLine.substring(cleanLine.lastIndexOf(' ') + 1)
-                if (previousLine == "§7§8Max Skill level reached!") {
+                if (skillMaxLevelMenuPattern.matches(previousLine)) {
                     onUpdateMax(progress, skill, skillInfo, skillLevel)
                 } else {
                     onUpdateNotMax(progress, skillLevel, skillInfo)
