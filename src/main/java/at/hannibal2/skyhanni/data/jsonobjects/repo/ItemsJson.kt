@@ -21,7 +21,6 @@ data class ItemsJson(
     @Expose @SerializedName("hunting_blackholes") val huntingBlackholes: List<NeuInternalName>?,
     @Expose @SerializedName("hunting_axes") val huntingAxes: List<NeuInternalName>?,
     @Expose @SerializedName("has_legacy_gemstone_slots") val hasLegacyGemstoneSlots: List<NeuInternalName>?,
-    @Expose @SerializedName("slayer_weapons") val slayerWeapons: List<NeuInternalName>?,
 )
 
 data class ItemValueCalculationDataJson(

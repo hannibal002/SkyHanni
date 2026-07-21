@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -43,11 +41,11 @@ object GummyWarning {
         inSmolderingArea = smolderingAreaPattern.matcher(SkyBlockUtils.graphArea ?: "").find()
     }
 
-    private var slayerWeapons: List<NeuInternalName> = emptyList()
+    private var slayerData: RemainingSlayerKills.SlayerData? = null
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        slayerWeapons = event.getConstant<ItemsJson>("Items").slayerWeapons ?: emptyList()
+        slayerData = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -57,7 +55,7 @@ object GummyWarning {
         if (SlayerApi.activeType == null) return
 
         val id = event.itemInHand?.getInternalNameOrNull() ?: return
-        if (id !in slayerWeapons) return
+        if (slayerData?.weapons?.get(SlayerApi.activeType)?.containsKey(id) != true) return
 
         val armor = InventoryUtils.getArmor()
         val hasHabanero = armor.any { piece ->
