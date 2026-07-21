@@ -31,10 +31,8 @@ enum class Deployable(
     UMBERELLA("Umberella", "§9Umberella", 30, DeployableType.UMBERELLA),
     ;
 
-    private val group = RepoPattern.group("deployable")
-
-    val pattern by group.pattern(
-        name.lowercase().replace("_", "-"),
+    val pattern by RepoPattern.pattern(
+        "combat.deployable.${name.lowercase().replace("_", "-")}",
         "$deployableName (?<time>\\d+)s",
     )
 
