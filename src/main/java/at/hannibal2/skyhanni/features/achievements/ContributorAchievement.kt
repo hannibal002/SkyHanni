@@ -20,54 +20,74 @@ object ContributorAchievement {
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
     private const val CONTRIBUTOR_NOBODY_ACHIEVEMENT = "Contrib Stranger"
     private const val CONTRIBUTOR_REJECTED_ACHIEVEMENT = "Contrib Rejected"
+    private const val CONTRIBUTOR_FAMOUS_ACHIEVEMENT = "Contrib Famous"
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
             Achievement(
-                "EEEEKK!".asComponent(),
-                componentBuilder {
+                name = "EEEEKK!".asComponent(),
+                description = componentBuilder {
                     append("Be in the same lobby as a")
                     appendWithColor(" SkyHanni ", TextHelper.chromaStyle)
                     append("contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_ACHIEVEMENT
+            CONTRIBUTOR_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "I Know a Guy".asComponent(),
-                componentBuilder {
+                name = "I Know a Guy".asComponent(),
+                description = componentBuilder {
                     append("Have a ")
                     appendWithColor("SkyHanni ", TextHelper.chromaStyle)
                     append("contributor as a friend")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_FRIEND_ACHIEVEMENT
+            CONTRIBUTOR_FRIEND_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "Notice Me Senpai".asComponent(),
-                componentBuilder {
-                    append("Have your friend request ignored by ")
+                name = "Notice Me Senpai".asComponent(),
+                description = componentBuilder {
+                    append("Have your friend request ignored by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
-                }
+                    append(" contributor")
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_NOBODY_ACHIEVEMENT
+            CONTRIBUTOR_NOBODY_ACHIEVEMENT,
         )
 
         event.register(
             Achievement(
-                "Rejected".asComponent(),
-                componentBuilder {
+                name = "Rejected".asComponent(),
+                description = componentBuilder {
                     append("Have your friend request declined by a ")
                     appendWithColor("SkyHanni", TextHelper.chromaStyle)
                     append(" contributor")
-                }
+                },
+                userLuckAmount = 0f,
             ),
-            CONTRIBUTOR_REJECTED_ACHIEVEMENT
+            CONTRIBUTOR_REJECTED_ACHIEVEMENT,
+        )
+
+        event.register(
+            Achievement(
+                name = "(Contributor Only Achievement) Am I famous yet?".asComponent(),
+                description = componentBuilder {
+                    append("Be mentioned by other players as a ")
+                    appendWithColor("SkyHanni", TextHelper.chromaStyle)
+                    append(" contributor")
+                },
+                userLuckAmount = 0f,
+                tiers = listOf(1, 10, 25, 50, 100)
+            ),
+            CONTRIBUTOR_FAMOUS_ACHIEVEMENT,
         )
     }
 
@@ -102,5 +122,9 @@ object ContributorAchievement {
 
     fun onUniqueContributorSeen() {
         AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+    }
+
+    fun onContributorMention(amount: Int) {
+        AchievementManager.updateTieredAchievement(CONTRIBUTOR_FAMOUS_ACHIEVEMENT, amount)
     }
 }

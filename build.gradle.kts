@@ -26,7 +26,6 @@ plugins {
     id("net.fabricmc.fabric-loom") apply false
     kotlin("jvm")
     id("com.google.devtools.ksp")
-    kotlin("plugin.power-assert")
     `maven-publish`
     id("dev.detekt")
 }
@@ -43,17 +42,19 @@ else apply(plugin = "net.fabricmc.fabric-loom-remap")
 // plugins applied in the plugins block. Since both loom plugins are declared with
 // apply false, no accessors are auto-generated, so we define them explicitly.
 val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
+fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
 fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
 fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
-fun DependencyHandler.include(dep: Any): Dependency? = add("include", dep)
-fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dep)
+fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
+fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modImplementation", dep).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dep)
-fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modCompileOnly", dep).also { (it as? ExternalModuleDependency)?.configure() }
-fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dep)
+    add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
 
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
+fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
+    add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
+fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -85,7 +86,7 @@ loom.apply {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G")
+            vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
@@ -133,9 +134,11 @@ tasks.register<ClientProductionRunTask>("prodClient") {
 
 if (target == primaryTarget) {
     tasks.register("checkPrDescription", ChangelogVerification::class) {
-        this.outputDirectory.set(layout.buildDirectory)
         this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
         this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+        this.outputDirectory.set(
+            layout.buildDirectory.dir("changelog-verification")
+        )
     }
 }
 
@@ -236,13 +239,11 @@ dependencies {
 }
 
 fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
-    fun dependencyNotation(): Any = (dep as? Provider<*>)?.get() ?: dep
-
     if (isDeobf) {
-        add("shadowImpl", dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
     } else {
-        include(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
-        modImplementation(dependencyNotation()).also { (it as? ExternalModuleDependency)?.configure() }
+        include(dep).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dep).also { (it as? ExternalModuleDependency)?.configure() }
     }
 }
 
@@ -283,7 +284,7 @@ tasks.withType<Test> {
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.2"
+            languageVersion = "2.4"
         }
     }
 }
@@ -352,13 +353,23 @@ if (isDeobf) {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
-                           else target.minecraftVersion.formattedJavaLanguageVersion
+        else target.minecraftVersion.formattedJavaLanguageVersion
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
-        optIn.addAll("kotlin.concurrent.atomics.ExperimentalAtomicApi")
-        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
-        // leaving corrupt .class files that break subsequent incremental builds.
-        // see: https://youtrack.jetbrains.com/issue/KT-85498/
-        freeCompilerArgs.addAll("-Xbackend-threads=1")
+        allWarningsAsErrors = true
+        optIn.addAll(
+            "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "kotlin.time.ExperimentalTime"
+        )
+        freeCompilerArgs.addAll(
+            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.4.x,
+            // leaving corrupt .class files that break subsequent incremental builds.
+            // see: https://youtrack.jetbrains.com/issue/KT-85498/
+            "-Xbackend-threads=1",
+            // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
+            "-Xwarning-level=DEPRECATION:disabled",
+            "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
+        )
     }
 }
 
@@ -390,12 +401,14 @@ tasks.shadowJar {
         destinationDirectory.set(layout.buildDirectory.dir("badjars"))
         archiveClassifier.set("all-dev")
     }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     configurations = buildList {
         add(shadowImpl)
         if (!isDeobf) add(shadowModImpl)
         if (isDeobf) add(shadowOnly)
     }
     exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
@@ -419,6 +432,7 @@ val sourcesJar by tasks.registering(Jar::class) {
 publishing.publications {
     create<MavenPublication>("maven") {
         if (!isDeobf) artifact(tasks.named("remapJar"))
+        else artifact(tasks.shadowJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
@@ -453,7 +467,7 @@ afterEvaluate {
     tasks.findByName("check")?.setDependsOn(
         tasks.getByName("check").dependsOn.filterNot { dep ->
             (dep is Task && dep.name.startsWith("detekt")) ||
-            (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
+                (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
         }
     )
 }
@@ -497,8 +511,7 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    if (isDeobf) enabled = false
-    else dependsOn("stonecutterPrepare")
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {

@@ -17,7 +17,7 @@ class FarmingLaneConfig {
         desc = "In order for those features to work, you first need to create a lane with §e/shlanedetection§7!",
     )
     @ConfigEditorInfoText(infoTitle = "Tutorial")
-    var tutorial: Boolean = false
+    val tutorial: Boolean = false
 
     @Expose
     @ConfigOption(name = "Lane Switch Notification", desc = "")

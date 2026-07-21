@@ -272,7 +272,6 @@ object GraphEditorInput {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (!event.isLocalPlayer) return
         val location = moveToStart ?: return
         if (!GraphEditor.isEnabled()) {
             moveToStart = null

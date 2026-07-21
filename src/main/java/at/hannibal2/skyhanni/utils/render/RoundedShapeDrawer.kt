@@ -7,24 +7,24 @@ import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
+import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
+import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
+import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
+import com.mojang.blaze3d.ProjectionType
+import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.vertex.BufferBuilder
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.resources.Identifier
-import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniCircleUniform
-import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRadialGradientCircleUniform
-import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedOutlineUniform
-import at.hannibal2.skyhanni.utils.render.uniforms.SkyHanniRoundedUniform
-import com.mojang.blaze3d.buffers.GpuBufferSlice
-import com.mojang.blaze3d.ProjectionType
 import org.joml.Matrix4f
-import org.joml.Vector4f
 import org.joml.Vector3f
-import com.mojang.blaze3d.textures.FilterMode
+import org.joml.Vector4f
 
 object RoundedShapeDrawer {
 

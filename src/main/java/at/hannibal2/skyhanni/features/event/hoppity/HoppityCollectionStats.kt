@@ -25,7 +25,9 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -102,11 +104,11 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §2§l§m                      §f§l§m   §r §e395§6/§e457
+     * WRAPPED-REGEX-TEST: "                          395/457"
      */
     private val rabbitsFoundPattern by patternGroup.pattern(
-        "rabbits.found",
-        "§.§l§m[ §a-z]+§r §.(?<current>[0-9]+)§./§.(?<total>[0-9]+)",
+        "rabbits.found.colorless",
+        "\\s+(?<current>\\d+)/(?<total>\\d+)",
     )
 
     /**
@@ -424,7 +426,7 @@ object HoppityCollectionStats {
 
         residentRabbitPattern.firstMatcher(lore) {
             val island = IslandType.getByNameOrNull(group("island")) ?: return@firstMatcher
-            stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().takeIfKnownRabbit()?.let { residentName ->
+            stack.cleanName.takeIfKnownRabbit()?.let { residentName ->
                 residentRabbitData.getOrPut(island) {
                     mutableMapOf()
                 }[residentName] = !rabbitNotFoundPattern.anyMatches(lore)
@@ -439,7 +441,7 @@ object HoppityCollectionStats {
         val hotspotData = hotspotRabbitData ?: return
         hotspotLocationPattern.firstMatcher(lore) {
             val location = IslandType.getByNameOrNull(group("location")) ?: return@firstMatcher
-            stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().takeIfKnownRabbit()?.let { rabbitName ->
+            stack.cleanName.takeIfKnownRabbit()?.let { rabbitName ->
                 hotspotData.hotspotRabbits.getOrPut(location) {
                     mutableMapOf()
                 }[rabbitName] = !rabbitNotFoundPattern.anyMatches(lore)
@@ -645,7 +647,11 @@ object HoppityCollectionStats {
         addHotspotRabbitsInformationToHud(newList)
 
         val loggedRabbitCount = loggedRabbits.size
-        val foundRabbitCount = getFoundRabbitsFromHypixel(event)
+        val foundRabbitCount = getFoundRabbitsFromHypixel(event) ?: run {
+            newList.addString("")
+            newList.addString("§cError: Failed to read rabbit progress from the inventory.")
+            return newList
+        }
 
         if (loggedRabbitCount < foundRabbitCount) {
             newList.addString("")
@@ -774,9 +780,9 @@ object HoppityCollectionStats {
 
     // Gets the found rabbits according to the Hypixel progress bar
     // used to make sure that mod data is synchronized with Hypixel
-    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
-        return event.inventoryItems.firstNotNullOf {
-            rabbitsFoundPattern.firstMatcher(it.value.getLore()) {
+    private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int? {
+        return event.inventoryItems.values.firstNotNullOfOrNull { item ->
+            rabbitsFoundPattern.firstMatcher(item.getLoreComponent().map { it.string.removeColor() }) {
                 group("current").formatInt()
             }
         }
@@ -806,7 +812,7 @@ object HoppityCollectionStats {
 
     private fun logRabbits(event: InventoryFullyOpenedEvent) {
         for (item in event.inventoryItems.values) {
-            val itemName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().takeIfKnownRabbit() ?: continue
+            val itemName = item.cleanName.takeIfKnownRabbit() ?: continue
 
             val itemLore = item.getLore()
             saveLocationRabbit(itemName, itemLore)

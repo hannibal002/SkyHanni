@@ -28,14 +28,6 @@ data class CachedItemData(
 
     var itemCategory: ItemCategory? = null,
 
-    var lastInternalName: NeuInternalName? = null,
-
-    var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-
-    var lastLore: List<String> = listOf(),
-
-    var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-
     var lastExtraAttributes: CompoundTag? = null,
 
     var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
@@ -45,8 +37,8 @@ data class CachedItemData(
     var identifier: String? = null,
 ) {
     companion object {
-        private val cache = TimeLimitedCache<IdentityCharacteristics<SafeItemStack>, CachedItemData>(expireAfterWrite = 2.minutes)
-        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(IdentityCharacteristics(this)) { CachedItemData() }
+        private val cache = TimeLimitedCache<SafeItemStack, CachedItemData>(expireAfterWrite = 2.minutes, useWeakKeys = true)
+        val SafeItemStack.cachedData: CachedItemData get() = cache.getOrPut(this) { CachedItemData() }
 
         fun forEachValue(action: (CachedItemData) -> Unit) {
             cache.map { action(it.value) }
