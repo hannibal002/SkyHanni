@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityLevel
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
@@ -156,14 +157,15 @@ object EntityUtils {
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
-    fun ArmorStand.hasSkullTexture(skin: String): Boolean {
+    fun ArmorStand.hasSkullTexture(skin: String?): Boolean {
+        skin ?: return false
         val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
     fun ArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
-    fun ArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
-    fun ArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
+    fun ArmorStand.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
+    fun ArmorStand.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
 
     internal fun Player.isNpc() = !isRealPlayer()
 
@@ -207,7 +209,11 @@ object EntityUtils {
             if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
         }.asSequence()
 
-        return blockEntityTickers.mapNotNull { invoker -> world.getBlockEntity(invoker.pos) }
+        return blockEntityTickers.mapNotNull { invoker ->
+            // This can be null due to other mods
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            invoker.pos?.let(world::getBlockEntity)
+        }
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
@@ -223,7 +229,8 @@ object EntityUtils {
     fun LivingEntity.isRunic() = baseMaxHealth == findHealthReal().toInt().derpy() * 4 || isRunicAndCorrupt()
     fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.string.removeColor()
+    val Entity.cleanName
+        get() = this.name.string.removeColor()
 
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int
@@ -231,4 +238,7 @@ object EntityUtils {
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
 
+    fun LivingEntity.hasVisibleEquipment(): Boolean = EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
+
+    fun Entity.isEmptyInvisibleArmorStand(): Boolean = this is ArmorStand && isInvisible && !hasVisibleEquipment()
 }

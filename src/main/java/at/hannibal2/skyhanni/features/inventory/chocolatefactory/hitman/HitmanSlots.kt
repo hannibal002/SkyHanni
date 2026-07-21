@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.hitmanInventoryPa
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -60,8 +60,9 @@ object HitmanSlots {
     private fun handleSlotStorageUpdate(event: InventoryOpenEvent) {
         if (!config.hitmanCosts) return
         val leftToPurchase = event.inventoryItems.filterNotBorderSlots().count { (_, item) ->
-            item.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && item.getLore().isNotEmpty() &&
-                slotCostPattern.matches(item.getSingleLineLore())
+            val lore = item.getLore()
+            item.hoverName.formattedTextCompatLeadingWhiteLessResets().isNotEmpty() && lore.isNotEmpty() &&
+                slotCostPattern.matches(lore.toSingleLineLore())
         }
         val ownedSlots = CFApi.hitmanCosts.size - leftToPurchase
 

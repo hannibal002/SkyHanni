@@ -56,7 +56,7 @@ class CustomImportOrdering(config: Config) : SkyHanniRule(config, "Enforces corr
         if (!importsCorrect) {
             importList.reportIssue(
                 "Imports must be ordered in lexicographic order without any empty lines in-between " +
-                    "with \"java\", \"javax\", \"kotlin\" and aliases in the end. This should then be followed by " +
+                    "with \"java\", \"javax\", \"kotlin\", \"kotlinx\" and aliases in the end. This should then be followed by " +
                     "pre-processed imports.",
             )
         }

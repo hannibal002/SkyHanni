@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import kotlin.math.pow
+import kotlin.time.Duration.Companion.seconds
 
 class PolynomialFitter(private val degree: Int) {
     private val xPointMatrix: ArrayList<DoubleArray> = ArrayList()
@@ -70,6 +71,31 @@ open class BezierFitter(private val degree: Int) {
         fitters.forEach { it.reset() }
         lastCurve = null
     }
+
+    @Suppress("ReturnCount")
+    fun tryAdd(
+        location: LorenzVec,
+        maxDistanceToLast: Double,
+        lastAbilityUse: SimpleTimeMark? = null,
+        emptyCondition: (LorenzVec) -> Boolean = { false },
+        endCondition: (LorenzVec) -> Boolean = { false },
+    ): Boolean {
+        lastAbilityUse?.let {
+            if (it.passedSince() > 1.seconds) return false
+        }
+        if (isEmpty()) {
+            if (emptyCondition(location)) return false
+            addPoint(location)
+            return false
+        }
+        val distToLast = getLastPoint()?.distance(location) ?: return false
+        if (distToLast == 0.0) return false
+        if (distToLast > maxDistanceToLast) return false
+        if (endCondition(location)) return false
+
+        addPoint(location)
+        return true
+    }
 }
 
 class ParticlePathBezierFitter(degree: Int) : BezierFitter(degree) {
@@ -92,25 +118,21 @@ class BezierCurve(private val coefficients: List<DoubleArray>) {
         require(coefficients.size == 3) { "Coefficients must be for a 3d curve!" }
     }
 
-    fun derivativeAt(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversedArray().dropLast(1)
-            for ((i, coeff) in reversed.withIndex()) {
-                result = result * t + coeff * (reversed.size - i)
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun derivativeAt(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversedArray().dropLast(1)
+        for ((i, coefficient) in reversed.withIndex()) {
+            result = result * t + coefficient * (reversed.size - i)
+        }
+        result
+    }.toLorenzVec()
 
-    fun at(t: Double): LorenzVec {
-        return coefficients.map {
-            var result = 0.0
-            val reversed = it.reversed()
-            for (coeff in reversed) {
-                result = result * t + coeff
-            }
-            result
-        }.toLorenzVec()
-    }
+    fun at(t: Double): LorenzVec = coefficients.map {
+        var result = 0.0
+        val reversed = it.reversed()
+        for (coefficient in reversed) {
+            result = result * t + coefficient
+        }
+        result
+    }.toLorenzVec()
 }
