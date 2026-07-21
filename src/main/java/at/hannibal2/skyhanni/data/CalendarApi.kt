@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.parse12HourTime
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
@@ -79,20 +80,20 @@ object CalendarApi {
     )
 
     /**
-     * REGEX-TEST: 12:00 am
-     * REGEX-TEST: 11:59 pm
-     * REGEX-TEST: 12:41 am
+     * REGEX-TEST: Starts in: 1h 58m 40s
+     * REGEX-TEST: Starts in: 58m 40s
+     * REGEX-TEST: Starts in: 40s
+     * REGEX-TEST: Starts in: 1d 2h 58m 40s
      */
-    val skyblockTimePattern by group.pattern(
-        "skyblock-time",
-        "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
-    )
-
     val mainCalendarStartsInPattern by group.pattern(
         "main.startsin",
-        "Starts in: (?<time>(?:\\d\\d?[hms] ?)+)"
+        "Starts in: (?<time>(?:\\d\\d?[dhms] ?)+)"
     )
 
+    /**
+     * REGEX-TEST: Event lasts for: 1h
+     * REGEX-TEST: Event lasts for: 2h 40m
+     */
     val mainCalendarDurationPattern by group.pattern(
         "main.duration",
         "Event lasts for: (?<time>(?:\\d\\d?[hms] ?)+)"
@@ -112,7 +113,7 @@ object CalendarApi {
                     val timePrefix = group("timePrefix") ?: return@matchMatcher null
                     val eventName = group("eventName")?.trim() ?: return@matchMatcher null
                     if (eventName.isBlank()) return@matchMatcher null
-                    val (start, end) = parseEventTimes(currentDay, timePrefix)
+                    val (start, end) = parseEventTimes(currentDay, timePrefix) ?: return@matchMatcher null
 
                     CalendarEvent(
                         name = eventName,
@@ -123,7 +124,7 @@ object CalendarApi {
             }.toList()
     }
 
-    private fun parseEventTimes(day: Int, prefix: String): Pair<SkyBlockTime, SkyBlockTime> {
+    private fun parseEventTimes(day: Int, prefix: String): Pair<SkyBlockTime, SkyBlockTime>? {
         if (prefix == "All day") {
             return SkyBlockTime(
                 year = calendarYear,
@@ -146,8 +147,8 @@ object CalendarApi {
             return parseEventTimes(day, "All day")
         }
 
-        val start = parseTime(split[0])
-        val end = parseTime(split[1])
+        val start = split[0].parse12HourTime() ?: return null
+        val end = split[1].parse12HourTime() ?: return null
 
         return SkyBlockTime(
             year = calendarYear,
@@ -162,28 +163,6 @@ object CalendarApi {
             hour = end.first,
             minute = end.second
         )
-    }
-
-    private fun parseTime(input: String): Pair<Int, Int> {
-        var result = 0 to 0
-
-        skyblockTimePattern.matchMatcher(input.trim()) {
-            var hour = group("hour").toInt()
-            val minute = group("minute").toInt()
-            val period = group("period")
-
-            if (period == "pm" && hour != 12) {
-                hour += 12
-            }
-
-            if (period == "am" && hour == 12) {
-                hour = 0
-            }
-
-            result = hour to minute
-        }
-
-        return result
     }
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH)
@@ -220,7 +199,7 @@ object CalendarApi {
         val startTime = mainCalendarStartsInPattern.firstMatcher(tooltip) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)?.fromNow()
-        }  ?: return null
+        } ?: return null
 
         val duration = mainCalendarDurationPattern.firstMatcher(tooltip) {
             val timeString = group("time")
