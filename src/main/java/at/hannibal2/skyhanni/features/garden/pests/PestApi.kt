@@ -58,7 +58,7 @@ object PestApi {
 
     private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
     private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
-    private val GROOVY_SPRAYONATOR = "GROOVY_SPRAYONATOR".toInternalName()
+    private val SALTY_SPRAYONATOR = "SALTY_SPRAYONATOR".toInternalName()
 
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
@@ -84,7 +84,7 @@ object PestApi {
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
 
-    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, GROOVY_SPRAYONATOR)
+    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, SALTY_SPRAYONATOR)
     fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
