@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Blaze.class)
-public class MixinEntityBlaze {
+public class MixinBlaze {
 
     @Inject(
         method = "aiStep",

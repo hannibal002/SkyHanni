@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BaseFireBlock.class)
-public class MixinBlockFire {
+public class MixinBaseFireBlock {
 
     @Inject(
         method = "animateTick",
