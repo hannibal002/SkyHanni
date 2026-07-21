@@ -46,7 +46,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.resources.Identifier
 import org.apache.logging.log4j.Level
@@ -101,7 +100,7 @@ object SkyHanniMod : CompatCoroutineManager by SkyHanniCoroutineManager(
             OtherInventoryData.close(title)
         }
         shouldCloseScreen = true
-        Minecraft.getInstance().setScreen(screenToOpen)
+        MinecraftCompat.screen = screenToOpen
         screenTicks = 0
         this.screenToOpen = null
     }
