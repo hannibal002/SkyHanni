@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
@@ -85,10 +86,11 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         if (this.handleCurrency()) return
 
-        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName()) } ?: return
+        val entry = data.firstOrNull { it.guiNamePattern.matches(item.cleanName) } ?: return
         entry.slot = this
         entry.item = item
 
+        val rawLore = item.getLore()
         val lore = item.getLoreComponent().takeIf { it.isNotEmpty() }?.map { it.string.removeColor() } ?: return
 
         if (entry != core && notUnlockedPattern.matches(lore.last())) {
@@ -100,7 +102,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
         entry.isUnlocked = true
 
-        entry.rawLevel = levelPattern.matchMatcher(lore.first(), readingLevelTransform) ?: entry.maxLevel
+        // This needs color codes
+        entry.rawLevel = levelPattern.matchMatcher(rawLore.first(), readingLevelTransform) ?: entry.maxLevel
 
         // raw level to ignore the blue egg buff
         if (entry.rawLevel > entry.maxLevel) {
@@ -140,8 +143,8 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
         val item = this.item.takeUnlessEmpty() ?: return false
 
         val isHeartItem = when {
-            heartItemPattern.matches(item.cleanName()) -> true
-            resetItemPattern.matches(item.cleanName()) -> false
+            heartItemPattern.matches(item.cleanName) -> true
+            resetItemPattern.matches(item.cleanName) -> false
             else -> return false
         }
 

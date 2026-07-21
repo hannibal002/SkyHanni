@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
-import at.hannibal2.skyhanni.data.ElectionApi
+import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -43,11 +43,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object HarvestFeastManager {
@@ -268,12 +268,12 @@ object HarvestFeastManager {
     }
 
     private fun assumeGrandFeast(): Boolean {
-        val mayorGrandFeast = ElectionApi.currentMayor?.let { Perk.GRAND_FEAST in it.perks } ?: false
-        val ministerGrandFeast = ElectionApi.currentMinister?.let { Perk.GRAND_FEAST in it.perks } ?: false
+        // TODO remove Jerry guard once we fix Perkpocalypse to only set actually active perks
+        val perkBasedGrandFeast = Perk.GRAND_FEAST.isActive && !ElectionCandidate.JERRY.isActive()
         val timeBasedGrandFeast = currentFeastData?.let {
             it.month !in 7..9 && it.year == SkyBlockTime.now().year && it.current.isNotEmpty()
         } ?: false
-        return mayorGrandFeast || ministerGrandFeast || timeBasedGrandFeast
+        return perkBasedGrandFeast || timeBasedGrandFeast
     }
 
     private fun getTimeStamp(time: Duration): SimpleTimeMark {
@@ -285,10 +285,12 @@ object HarvestFeastManager {
             ).asTimeMark()
     }
 
-    private fun fetch() {
-        if (!config.fetchAutomatically) return
-        if (!isCurrentOutdated) return
-        if (lastFetched.passedSince() < 10.minutes) return
+    private fun fetch(force: Boolean = false) {
+        if (!force) {
+            if (!config.fetchAutomatically) return
+            if (!isCurrentOutdated) return
+            if (lastFetched.passedSince() < 10.minutes) return
+        }
         if (fetchingFeastDataMutex.isLocked) return
 
         CoroutineSettings("harvest feast data fetch").withIOContext().withMutex(fetchingFeastDataMutex).launchCoroutine {
@@ -340,6 +342,7 @@ object HarvestFeastManager {
         lastSubmit = null
         profileStorage.lastHarvestFeastSubmitYear = -1
         profileStorage.lastHarvestFeastSubmitMonth = -1
+        fetch(force = true)
     }
 
     private fun updateDisplay() {
@@ -374,10 +377,12 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return
+        @Suppress("IsInIslandEarlyReturn")
+        if (!GardenApi.inGarden() && !config.showOutsideGarden) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")
