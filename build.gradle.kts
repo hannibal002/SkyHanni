@@ -10,6 +10,7 @@ import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
 import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -104,6 +105,15 @@ val shadowModImpl: Configuration by configurations.creating {
 
 val shadowOnly: Configuration by configurations.creating
 
+// The REI API artifact is a fake mod; keep it compile-only and load these only when a real REI jar is enabled.
+val reiRunSupportMods: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+    isTransitive = false
+}
+
+val runModsDirectory = rootProject.layout.projectDirectory.dir("versions/${target.projectName}/run/mods")
+
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
@@ -124,6 +134,35 @@ val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+    val runModsDirectoryFile = runModsDirectory.asFile
+    val reiRunSupportModFiles = reiRunSupportMods.incoming.files
+    inputs.files(fileTree(runModsDirectory.asFile) { include("*.jar") })
+        .withPropertyName("enabledRunMods")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    doFirst {
+        val enabledRunMods = runModsDirectoryFile.listFiles()
+            ?.filter { it.isFile && it.extension.equals("jar", ignoreCase = true) }
+            ?.map { it.name.lowercase() }
+            .orEmpty()
+        if (enabledRunMods.none { it.contains("roughlyenoughitems") }) return@doFirst
+
+        val supportMods = reiRunSupportModFiles.files.filterNot { supportMod ->
+            val supportModName = supportMod.name.lowercase()
+            enabledRunMods.any { runModName ->
+                when {
+                    supportModName.contains("architectury") -> runModName.contains("architectury")
+                    supportModName.contains("cloth-config") -> runModName.contains("cloth-config")
+                    else -> false
+                }
+            }
+        }
+        if (supportMods.isEmpty()) return@doFirst
+
+        val currentAddMods = systemProperties["fabric.addMods"]?.toString()?.takeIf { it.isNotBlank() }
+        val reiSupportMods = supportMods.joinToString(File.pathSeparator) { it.absolutePath }
+        systemProperty("fabric.addMods", listOfNotNull(currentAddMods, reiSupportMods).joinToString(File.pathSeparator))
+    }
 }
 
 tasks.register<ClientProductionRunTask>("prodClient") {
@@ -217,8 +256,29 @@ dependencies {
     }
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    val reiVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "26.1.819"
+        ProjectTarget.MODERN_12111 -> "19.0.806"
+    }
+    val reiApi = "me.shedaniel:RoughlyEnoughItems-api-fabric:$reiVersion"
+    if (isDeobf) compileOnly(reiApi) { exclude(group = "net.fabricmc.fabric-api") }
+    else modCompileOnly(reiApi) { exclude(group = "net.fabricmc.fabric-api") }
+    "minecraftTestClientRuntimeLibraries"(reiApi) {
+        exclude(group = "net.fabricmc")
+        exclude(group = "net.fabricmc.fabric-api")
+    }
+    compileOnly(libs.basicMath)
+    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
+    val architecturyVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "20.0.6"
+        ProjectTarget.MODERN_12111 -> "15.0.3"
+    }
+    val clothConfigVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "26.1.154"
+        ProjectTarget.MODERN_12111 -> "19.0.147"
+    }
+    add(reiRunSupportMods.name, "dev.architectury:architectury-fabric:$architecturyVersion")
+    add(reiRunSupportMods.name, "me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion")
 
     // getting clock offset
     includeImplementation(libs.commons.net)

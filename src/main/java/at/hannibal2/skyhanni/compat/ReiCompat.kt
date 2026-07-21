@@ -1,11 +1,9 @@
-@file:Suppress("NoEmptyFile")
-
 package at.hannibal2.skyhanni.compat
-// TODO 26.1 rei compat needed
-//? if < 26.1 {
-/*import at.hannibal2.skyhanni.utils.SafeItemStack
+
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
-import me.shedaniel.math.impl.PointHelper
+import me.shedaniel.math.Point
 import me.shedaniel.rei.api.client.REIRuntime
 import me.shedaniel.rei.api.client.gui.widgets.Slot
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
@@ -47,20 +45,20 @@ object ReiCompat {
 
 
     private fun getItemStackFromRecipe(screen: AbstractContainerScreen<*>): SafeItemStack? {
-        val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, PointHelper.ofMouse())
+        val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, currentMousePoint())
             ?: return null
         return entryStack.value as? SafeItemStack ?: entryStack.cheatsAs().value
     }
 
     private fun getItemStackFromItemList(): SafeItemStack? {
         var baseElement: GuiEventListener? = REIRuntime.getInstance().overlay.orElse(null)
-        val mx = PointHelper.getMouseFloatingX()
-        val my = PointHelper.getMouseFloatingY()
+        val mousePoint = currentMousePoint()
         while (true) {
             if (baseElement is Slot) return baseElement.currentEntry.cheatsAs().value
             if (baseElement !is ContainerEventHandler) return null
-            baseElement = baseElement.getChildAt(mx, my).orElse(null)
+            baseElement = baseElement.getChildAt(mousePoint.x.toDouble(), mousePoint.y.toDouble()).orElse(null)
         }
     }
+
+    private fun currentMousePoint(): Point = Point(MouseCompat.getX(), MouseCompat.getY())
 }
-*///?}
