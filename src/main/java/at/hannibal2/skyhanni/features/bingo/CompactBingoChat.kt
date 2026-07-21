@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,11 +25,11 @@ object CompactBingoChat {
     private val patternGroup = RepoPattern.group("bingo.compactchat")
     private val healthPattern by patternGroup.pattern(
         "health",
-        " {3}§r§7§8\\+§a.* §c❤ Health"
+        " {3}§r§7§8\\+§a.* §c${SkyblockStat.HEALTH.hypixelIcon} Health"
     )
     private val strengthPattern by patternGroup.pattern(
         "strength",
-        " {3}§r§7§8\\+§a. §c❁ Strength"
+        " {3}§r§7§8\\+§a. §c${SkyblockStat.STRENGTH.hypixelIcon} Strength"
     )
     private val borderPattern by patternGroup.pattern(
         "border",

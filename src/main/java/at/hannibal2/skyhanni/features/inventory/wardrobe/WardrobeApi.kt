@@ -53,6 +53,8 @@ abstract class WardrobeApi {
 
     abstract val storage: ProfileSpecificStorage.WardrobeStorage?
 
+    protected open fun onEquippedSlotUpdated(items: List<SafeItemStack?>) {}
+
     var slots: List<WardrobeSlot> = emptyList()
         private set
 
@@ -145,15 +147,17 @@ abstract class WardrobeApi {
         var foundCurrentSlot = false
 
         for (slot in slots.filter { it.isInCurrentPage() }) {
-            slot.getData()?.armor = listOf(
+            val items = listOf(
                 getWardrobeItem(itemsList[slot.item1Slot]),
                 getWardrobeItem(itemsList[slot.item2Slot]),
                 getWardrobeItem(itemsList[slot.item3Slot]),
                 getWardrobeItem(itemsList[slot.item4Slot]),
             )
-            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName())) {
+            slot.getData()?.armor = items
+            if (equippedSlotPattern.matches(itemsList[slot.inventorySlot]?.cleanName)) {
                 currentSlot = slot.id
                 foundCurrentSlot = true
+                onEquippedSlotUpdated(items)
             }
             slot.locked = (itemsList[slot.inventorySlot]?.isDye(DyeCompat.RED) == true)
             if (slot.locked) slots.forEach { if (it.id > slot.id) it.locked = true }
