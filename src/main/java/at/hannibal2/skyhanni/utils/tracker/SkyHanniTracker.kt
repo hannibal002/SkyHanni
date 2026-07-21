@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.time.LocalDate
@@ -126,7 +126,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     fun renderDisplay(position: Position) {
         if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return
 
-        var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
+        var currentlyOpen = MinecraftCompat.screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
         if (!currentlyOpen && hideOutsideInventory() && this is SkyHanniItemTracker) {
             return
         }
