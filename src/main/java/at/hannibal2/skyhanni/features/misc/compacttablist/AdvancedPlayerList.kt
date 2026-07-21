@@ -259,7 +259,9 @@ object AdvancedPlayerList {
             val style = levelText.sampleStyleAtStart()
             name.asComponent().withStyle(style)
         } else if (config.hideRankColor.get()) {
-            "§b$name".asComponent()
+            componentBuilder {
+                appendWithColor(name, ChatFormatting.AQUA)
+            }
         } else {
             coloredName.intoComponent()
         }
@@ -267,7 +269,9 @@ object AdvancedPlayerList {
 
         if (config.hideEmblem.get()) {
             if (ironman) {
-                add("§7♲")
+                add(
+                    componentBuilder { appendWithColor("♲", ChatFormatting.GRAY) }
+                )
             } else {
                 bingoLevel?.let {
                     add(BingoApi.getBingoIcon(if (config.showBingoRankNumber.get()) it else -1))
@@ -337,8 +341,6 @@ object AdvancedPlayerList {
         ;
 
         val icon: String? = color?.let { "$it$symbol" }
-
-        val pattern = Regex("(?:§.)*$symbol")
 
         fun isLine(line: String): Boolean {
             return line.contains(this.symbol ?: return false)
