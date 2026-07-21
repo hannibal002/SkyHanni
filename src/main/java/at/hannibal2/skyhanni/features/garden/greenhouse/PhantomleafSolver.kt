@@ -30,7 +30,7 @@ object PhantomleafSolver {
 
     private val SEARCH_RANGE = (-HYPIXEL_VOLUME_SCALING_FACTOR - 1)..(HYPIXEL_VOLUME_SCALING_FACTOR + 1)
 
-    private var isSearchingForPhantomleaf = false
+    private var isSearching = false
 
     private var lastPos: LorenzVec? = null
     private val candidates = mutableListOf<LorenzVec>()
@@ -72,7 +72,7 @@ object PhantomleafSolver {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!config.phantomleafSolver) return
-        if (!isSearchingForPhantomleaf) return
+        if (!isSearching) return
 
         if (event.pitch !in MINIMUM_ALLOWED_PITCH..MAXIMUM_ALLOWED_PITCH) return
         if (event.soundName != "block.note_block.basedrum") return
@@ -113,7 +113,7 @@ object PhantomleafSolver {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.phantomleafSolver) return
-        if (!isSearchingForPhantomleaf) return
+        if (!isSearching) return
 
         candidates.forEach { pos ->
             event.drawWaypointFilled(
@@ -131,7 +131,7 @@ object PhantomleafSolver {
 
         val msg = event.cleanMessage
         if (startPattern.find(msg)) {
-            isSearchingForPhantomleaf = true
+            isSearching = true
         } else if (failPattern.find(msg) || successPattern.find(msg)) {
             resetData()
         }
@@ -143,7 +143,7 @@ object PhantomleafSolver {
     }
 
     private fun resetData() {
-        isSearchingForPhantomleaf = false
+        isSearching = false
         candidates.clear()
         lastPos = null
     }
