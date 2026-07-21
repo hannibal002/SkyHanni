@@ -43,8 +43,8 @@ object GardenVisitorTooltip {
     private val patternGroup = RepoPattern.group("garden.visitor.tooltip")
 
     /**
-     * REGEX-TEST:  §8+§c20 Copper
-     * REGEX-TEST:  §8+§c150 Copper §d❤
+     * WRAPPED-REGEX-TEST: " §8+§c20 Copper"
+     * WRAPPED-REGEX-TEST: " §8+§c150 Copper §d❤"
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -52,7 +52,7 @@ object GardenVisitorTooltip {
     )
 
     /**
-     * REGEX-TEST:  §8+§215 §7Garden Experience
+     * WRAPPED-REGEX-TEST: " §8+§215 §7Garden Experience"
      */
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",
@@ -111,7 +111,7 @@ object GardenVisitorTooltip {
      * Modifies the tooltip to show calculated prices and times.
      */
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
-        if (itemStack.cleanName() != "Accept Offer") return
+        if (itemStack.cleanName != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)

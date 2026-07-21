@@ -6,25 +6,32 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.MinecraftData
+import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ChangedChatErrorsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ErrorManagerJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
+import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.CrashReport
 import net.minecraft.client.Minecraft
+import java.util.Collections
+import java.util.IdentityHashMap
 import kotlin.time.Duration.Companion.minutes
 
 /** Crashes if [value] is false and in developer environment */
+@Suppress("unused")
 fun requireDevEnv(value: Boolean) = requireDevEnv(value, null)
 
 /** Crashes if [value] is false and in developer environment */
@@ -118,6 +125,17 @@ object ErrorManager {
         }
     }
 
+    private const val COPY_ERROR_ACHIEVEMENT = "Copy Error"
+
+    @HandleEvent
+    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+        val achievement = Achievement(
+            "I'm Helping!!!".asComponent(),
+            "Copy an error message to the clipboard to help the developers fix it.".asComponent(),
+            100f,
+        )
+        event.register(achievement, COPY_ERROR_ACHIEVEMENT)
+    }
 
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
@@ -142,8 +160,12 @@ object ErrorManager {
         ChatUtils.chat(
             errorMessage?.let {
                 val copied = ClipboardUtils.copyToClipboardAsync(it).await() ?: false
-                if (copied) "$name copied into the clipboard, please report it on the SkyHanni discord!"
-                else "$name could not be copied to clipboard!"
+                if (copied) {
+                    AchievementManager.completeAchievement(COPY_ERROR_ACHIEVEMENT)
+                    "$name copied into the clipboard, please report it on the SkyHanni discord!"
+                } else {
+                    "$name could not be copied to clipboard!"
+                }
             } ?: "Error id not found!",
         )
     }
@@ -189,10 +211,13 @@ object ErrorManager {
 
     data class CachedError(val className: String, val lineNumber: Int, val errorMessage: String)
 
-    enum class ErrorState {
-        LOGGED,
-        BLOCKED_NOT_NEEDED,
-        BLOCKED_CAN_NOT_SHOW,
+    // This is intentionally not an enum, because unnecessary object allocation can be problematic
+    // if we're dealing with a stack overflow.
+    private typealias ErrorStateT = Int
+    private object ErrorState {
+        const val LOGGED = 0
+        const val BLOCKED_NOT_NEEDED = 1
+        const val BLOCKED_CAN_NOT_SHOW = 2
     }
 
     @Suppress("ReturnCount")
@@ -204,7 +229,7 @@ object ErrorManager {
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
-    ): ErrorState {
+    ): ErrorStateT {
         if (!condition()) return ErrorState.BLOCKED_NOT_NEEDED
 
         // TODO add missing debug enabled check
@@ -265,7 +290,7 @@ object ErrorManager {
     // random id -> final message
     private val errorsToShowOnJoin = mutableMapOf<String, String>()
 
-    private fun ErrorState.crashIfNotYetOnAServer(): Boolean {
+    private fun ErrorStateT.crashIfNotYetOnAServer(): Boolean {
         if (this == ErrorState.BLOCKED_NOT_NEEDED) return false
 
         // TODO find way to properly do this before the config loads
@@ -348,7 +373,7 @@ object ErrorManager {
         } catch (e: NullPointerException) {
             ChatUtils.chat(
                 "§cFailed to format error message! " +
-                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord."
+                    "Probably a JSON error in ChangedChatErrorsJson. Please report this on the discord.",
             )
             // can not use error manager inside error manager
             Error("Failed to format error message", e).printStackTrace()
@@ -399,7 +424,13 @@ object ErrorManager {
     private fun Throwable.getCustomStackTrace(
         fullStackTrace: Boolean,
         parent: List<String> = emptyList(),
+        seenThrowables: MutableSet<Throwable> = Collections.newSetFromMap(IdentityHashMap()),
     ): List<String> = buildList {
+        if (!seenThrowables.add(this@getCustomStackTrace)) {
+            add("<Infinite recurring causes>")
+            return@buildList
+        }
+
         add("Caused by ${this@getCustomStackTrace.javaClass.name}: $message")
 
         for (traceElement in stackTrace) {
@@ -427,13 +458,8 @@ object ErrorManager {
             add(visualText)
         }
 
-        if (this === cause) {
-            add("<Infinite recurring causes>")
-            return@buildList
-        }
-
         cause?.let {
-            addAll(it.getCustomStackTrace(fullStackTrace, this))
+            addAll(it.getCustomStackTrace(fullStackTrace, this, seenThrowables))
         }
     }
 

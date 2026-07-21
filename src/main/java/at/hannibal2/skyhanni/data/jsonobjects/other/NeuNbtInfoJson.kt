@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.data.jsonobjects.other
 
+import com.google.common.collect.ImmutableMultimap
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.mojang.authlib.GameProfile
 import com.mojang.authlib.properties.Property
-import java.util.UUID
-import com.google.common.collect.ImmutableMultimap
 import com.mojang.authlib.properties.PropertyMap
+import java.util.UUID
 
 data class NeuNbtInfoJson(
     @Expose @SerializedName("HideFlags") val hideFlags: Int?,

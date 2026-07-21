@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -32,6 +32,8 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.patternGroup
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,8 +48,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCultivatingCounter
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
@@ -58,7 +60,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -68,6 +70,8 @@ object GardenApi {
 
     private const val GARDEN_OVERFLOW_EXP = 10000
     private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
+    val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
+    val SUNS_GRASP = "SUNS_GRASP".toInternalName()
 
     var toolInHand: String? = null
     var itemInHand: SafeItemStack? = null
@@ -119,7 +123,7 @@ object GardenApi {
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getInstance().screen ?: return
+            MinecraftCompat.screen ?: return
             checkItemInHand()
         }
     }
@@ -132,7 +136,7 @@ object GardenApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden API")
         if (!inGarden()) return event.addIrrelevant("Not in garden")
 
@@ -180,7 +184,8 @@ object GardenApi {
 
     fun inGarden() = IslandType.GARDEN.isInIsland()
 
-    fun isCurrentlyFarming() = inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && hasFarmingToolInHand()
+    fun isCurrentlyFarming() =
+        inGarden() && GardenCropSpeed.averageBlocksPerSecond > 0.0 && (hasFarmingToolInHand() || hasActiveSunsGrasp())
 
     fun hasFarmingToolInHand() = InventoryUtils.getItemInHand()?.let {
         val crop = it.getCropType()
@@ -189,6 +194,12 @@ object GardenApi {
 
     fun isHoldingCropFever(): Boolean =
         InventoryUtils.getItemInHand()?.getHypixelEnchantments()?.containsKeys("ultimate_crop_fever") == true
+
+    fun hasMousematInHand(): Boolean = InventoryUtils.getItemInHand()?.getInternalName() == SQUEAKY_MOUSEMAT
+
+    fun hasActiveSunsGrasp(): Boolean =
+        EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
+            InventoryUtils.getItemInHand()?.isEmpty == true
 
     fun NeuInternalName.getCropType(): CropType? =
         if (this.startsWith("THEORETICAL_HOE_SUNFLOWER")) CropType.getTimeFlower()
@@ -212,8 +223,8 @@ object GardenApi {
         HoppityCollectionStats.inInventory ||
         PesthunterProfit.isInInventory()
 
-    @HandleEvent
-    fun onProfileDataReady(event: ProfileDataReadyEvent) {
+    @HandleEvent(ProfileDataReadyEvent::class)
+    fun onProfileDataReady() {
         GardenBestCropTime.reset()
     }
 

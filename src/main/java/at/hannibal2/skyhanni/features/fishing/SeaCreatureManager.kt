@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -92,7 +91,12 @@ object SeaCreatureManager {
             }
 
             if (config.compactDoubleHook && doubleHook) {
-                edited = Component.literal("§e§lDOUBLE HOOK! ").append(edited)
+                edited = when (config.compactDoubleHookPosition) {
+                    CompactDoubleHookPosition.LEFT ->
+                        "§e§lDOUBLE HOOK! ".asComponent().append(edited)
+                    CompactDoubleHookPosition.RIGHT ->
+                        edited.append(" §e§lDOUBLE HOOK!".asComponent())
+                }
             }
 
             if (original == edited) return
@@ -138,8 +142,9 @@ object SeaCreatureManager {
                 val rarity = seaCreature.rarity
                 val rare = seaCreature.rare
                 val lootshareSphere = seaCreature.lootshareSphereOverride
+                val oldNames = seaCreature.oldNames.orEmpty()
 
-                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere)
+                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere, oldNames)
                 seaCreatureMap[chatMessage] = creature
                 for (alternateMessage in seaCreature.alternateMessages.orEmpty()) {
                     seaCreatureMap[alternateMessage] = creature
@@ -156,5 +161,13 @@ object SeaCreatureManager {
 
     private fun getSeaCreatureFromMessage(message: String): SeaCreature? {
         return seaCreatureMap.getOrDefault(message, null)
+    }
+
+    enum class CompactDoubleHookPosition(private val displayName: String) {
+        LEFT("Left"),
+        RIGHT("Right"),
+        ;
+
+        override fun toString() = displayName
     }
 }
