@@ -46,7 +46,6 @@ abstract class SkyHanniRule(config: Config, description: String) : Rule(config, 
         report(Finding(Entity.from(ktElement, location), message))
     }
 
-
     companion object {
         private val BLANK_OR_QUOTES = """[\s"]*""".toRegex()
 
