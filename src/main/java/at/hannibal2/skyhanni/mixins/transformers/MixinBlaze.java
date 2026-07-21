@@ -6,15 +6,21 @@ import net.minecraft.world.entity.monster.Blaze;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Blaze.class)
-public abstract class MixinBlaze {
+public class MixinEntityBlaze {
 
-    @Redirect(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"))
-    private void onLivingUpdate(Level world, ParticleOptions particleType, double x, double y, double z, double xOffset, double yOffset, double zOffset) {
-        if (!ParticleHider.shouldHideBlazeParticles()) {
-            world.addParticle(particleType, x, y, z, xOffset, yOffset, zOffset);
-        }
+    @Inject(
+        method = "aiStep",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+        ),
+        cancellable = true
+    )
+    private void onLivingUpdate(CallbackInfo ci) {
+        if (ParticleHider.shouldHideBlazeParticles()) ci.cancel();
     }
 }

@@ -6,15 +6,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseFireBlock;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(BaseFireBlock.class)
-public abstract class MixinBaseFireBlock {
+public class MixinBlockFire {
 
-    @Redirect(method = "animateTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"))
-    private void onRandomDisplayTick(Level world, ParticleOptions particleType, double x, double y, double z, double xOffset, double yOffset, double zOffset) {
-        if (!ParticleHider.shouldHideFireParticles()) {
-            world.addParticle(particleType, x, y, z, xOffset, yOffset, zOffset);
-        }
+    @Inject(
+        method = "animateTick",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
+        ),
+        cancellable = true
+    )
+    private void onRandomDisplayTick(CallbackInfo ci) {
+        if (ParticleHider.shouldHideFireParticles()) ci.cancel();
     }
 }

@@ -60,16 +60,6 @@ public abstract class MixinChatComponent {
     }
     *///?}
 
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;getGuiTicks()I"), require = 0)
-    private int clearChatHead(Gui instance) {
-        return instance.getGuiTicks() + 90;
-    }
-
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"), require = 0)
-    private <E> void clearChatTail(ListIterator<E> instance, E e) {
-        instance.remove();
-    }
-
     @Inject(method = "getHeight()I", at = @At("HEAD"), cancellable = true)
     private void getHeight(CallbackInfoReturnable<Integer> cir) {
         if (ChatPeek.peek()) {
