@@ -18,8 +18,8 @@ object GardenPlotMenuHighlighting {
 
     private val highlightedPlots = mutableMapOf<GardenPlot, PlotStatusType>()
 
-    @HandleEvent(InventoryUpdatedEvent::class)
-    fun onInventoryFullyOpened() {
+    @HandleEvent
+    fun onInventoryUpdated() {
         if (!isEnabled()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {

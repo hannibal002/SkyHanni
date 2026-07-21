@@ -42,7 +42,7 @@ object PestFinder {
 
     private var display = emptyList<Renderable>()
 
-    @HandleEvent()
+    @HandleEvent
     fun onPestUpdate() {
         update()
     }

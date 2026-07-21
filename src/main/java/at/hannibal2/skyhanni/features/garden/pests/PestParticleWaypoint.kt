@@ -133,7 +133,7 @@ object PestParticleWaypoint {
         reset()
     }
 
-    @HandleEvent()
+    @HandleEvent
     fun onPestUpdate() {
         if (PestApi.scoreboardPests == 0) reset()
     }
