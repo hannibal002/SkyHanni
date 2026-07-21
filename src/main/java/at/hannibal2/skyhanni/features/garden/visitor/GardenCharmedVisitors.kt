@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.garden.visitor
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -39,37 +38,24 @@ object GardenCharmedVisitors {
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         openVisitor = visitor
-
-        val isAlreadyCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
-            ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
-        val rewardsGratitude = visitor.allRewards.any {
-            VisitorReward.getByInternalName(it) == VisitorReward.VISITORS_GRATITUDE
-        }
-        visitor.charmed = isAlreadyCharmed
-        if (!isAlreadyCharmed && !rewardsGratitude) {
-            removeCharmed(visitor)
-        }
-    }
-
-    @HandleEvent
-    fun onVisitorOpen(event: VisitorAcceptedEvent) {
-        val visitor = event.visitor
-        val rewardedGratitude = visitor.allRewards.any {
-            VisitorReward.getByInternalName(it) == VisitorReward.VISITORS_GRATITUDE
-        }
-        if (rewardedGratitude) {
-            removeCharmed(visitor)
-        }
+        checkCharmed(visitor)
     }
 
     @HandleEvent(InventoryUpdatedEvent::class)
     fun onInventoryUpdate() {
         if (!VisitorApi.inInventory) return
         val visitor = openVisitor ?: return
+        checkCharmed(visitor)
+    }
+
+    private fun checkCharmed(visitor: VisitorApi.Visitor) {
         val isCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
             ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
+
         if (isCharmed) {
             addCharmed(visitor)
+        } else {
+            removeCharmed(visitor)
         }
     }
 
@@ -93,7 +79,6 @@ object GardenCharmedVisitors {
         val storage = storage ?: return
         val name = visitor.visitorName
         storage.charmedVisitors.add(name)
-        visitor.charmed = true
         updateDisplay()
     }
 
@@ -101,7 +86,6 @@ object GardenCharmedVisitors {
         val storage = storage ?: return
         val name = visitor.visitorName
         storage.charmedVisitors.remove(name)
-        visitor.charmed = false
         updateDisplay()
     }
 

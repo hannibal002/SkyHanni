@@ -154,7 +154,6 @@ object VisitorApi {
         var lastLore = listOf<String>()
         var blockedLore = listOf<Component>()
         var blockReason: VisitorBlockReason? = null
-        var charmed = false
 
         var ignoreShoppingList: Boolean
             get() = GardenApi.storage?.ignoredVisitors?.contains(visitorName.removeColor()) == true
