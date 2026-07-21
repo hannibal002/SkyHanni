@@ -91,12 +91,12 @@ object CalendarApi {
     )
 
     /**
-     * REGEX-TEST: Event lasts for: 1h
-     * REGEX-TEST: Event lasts for: 2h 40m
+     * REGEX-TEST: Event lasts for 1h!
+     * REGEX-TEST: Event lasts for 2h 40m!
      */
     val mainCalendarDurationPattern by group.pattern(
         "main.duration",
-        "Event lasts for: (?<time>(?:\\d\\d?[hms] ?)+)"
+        "Event lasts for (?<time>(?:\\d\\d?[hms] ?)+)!"
     )
 
     fun parseCalendarTooltip(tooltipLines: List<Component>): List<CalendarEvent>? {
@@ -188,20 +188,22 @@ object CalendarApi {
     // Example:
     // Traveling Zoo
     // Starts in: 1h 58m 40s
-    // Event lasts for: 1h
+    // Event lasts for 1h!
     //
     // Oringo The Taveling Zookeeper is
     // visiting SkyBlock with pets to trade!
     fun parseMainCalendarTooltip(rawTooltip: MutableList<Component>): MainCalendarEvent? {
         val tooltip = rawTooltip.map { it.string.removeColor().trim() }
         val eventName = tooltip.getOrNull(0) ?: return null
+        val startTimeLine = tooltip.getOrNull(1) ?: return null
+        val durationLine = tooltip.getOrNull(2) ?: return null
 
-        val startTime = mainCalendarStartsInPattern.firstMatcher(tooltip) {
+        val startTime = mainCalendarStartsInPattern.matchMatcher(startTimeLine) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)?.fromNow()
         } ?: return null
 
-        val duration = mainCalendarDurationPattern.firstMatcher(tooltip) {
+        val duration = mainCalendarDurationPattern.matchMatcher(durationLine) {
             val timeString = group("time")
             TimeUtils.getDurationOrNull(timeString)
         } ?: return null
