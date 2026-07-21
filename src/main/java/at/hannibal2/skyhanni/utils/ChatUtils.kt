@@ -472,12 +472,6 @@ object ChatUtils {
             `skyhanni$setCreated`(value)
         }
 
-    var GuiMessage.fullComponent: Component
-        get() = `skyhanni$getFullComponent`()
-        set(value) {
-            `skyhanni$setFullComponent`(value)
-        }
-
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
     fun GuiMessage.passedSinceSent() = (MinecraftCompat.hud.guiTicks - addedTime()).ticks
 
