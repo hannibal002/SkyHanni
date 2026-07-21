@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
@@ -51,7 +52,7 @@ object TabListRenderer {
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
     fun onGuiRenderOverlay() {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
 
         val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
         if (playerListKeyActive && !isPressed) {
@@ -169,8 +170,8 @@ object TabListRenderer {
                         //? if >= 26.1 {
                         PlayerFaceExtractor.extractRenderState(
                             //?} else {
-                            /*PlayerFaceRenderer.draw(
-                            *///?}
+                        /*PlayerFaceRenderer.draw(
+                        *///?}
                             DrawContextUtils.drawContext,
                             texture,
                             middleX,

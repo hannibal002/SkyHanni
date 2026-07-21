@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.MoulConfigEditorComponent
 import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import io.github.notenoughupdates.moulconfig.common.text.StructuredText
@@ -12,7 +13,6 @@ import io.github.notenoughupdates.moulconfig.gui.GuiContext
 import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor
 import io.github.notenoughupdates.moulconfig.platform.MoulConfigScreenComponent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.network.chat.Component
 import java.lang.reflect.Field
@@ -110,7 +110,7 @@ object ConfigUtils {
         MoulConfigScreenComponent(Component.empty(), GuiContext(MoulConfigEditorComponent(editor)), previousScreen)
 
     val configScreenCurrentlyOpen: Boolean
-        get() = Minecraft.getInstance().screen is MoulConfigScreenComponent
+        get() = MinecraftCompat.screen is MoulConfigScreenComponent
 
     fun String.asStructuredText() = StructuredText.of(this)
 }
