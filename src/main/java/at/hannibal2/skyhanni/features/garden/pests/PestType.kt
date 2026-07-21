@@ -49,7 +49,7 @@ enum class PestType(
         "PEST_FIELD_MOUSE_MONSTER".toInternalName(),
         crop = null,
         pluralName = "Field Mice",
-        eliteLbName = "mouse"
+        eliteLbName = "mouse",
     ),
     FLY(
         "Fly",
@@ -67,6 +67,15 @@ enum class PestType(
         VinylType.CICADA_SYMPHONY,
         "PEST_LOCUST_MONSTER".toInternalName(),
         CropType.POTATO,
+    ),
+    LUNAR_MOTH(
+        "Lunar Moth",
+        BossType.GARDEN_PEST_LUNAR_MOTH,
+        SprayType.MOONDEW,
+        vinyl = null,
+        "PEST_LUNAR_MOTH_MONSTER".toInternalName(),
+        crop = null, // Always drops Sunflower, Moonflower, *and* Wild Rose
+        eliteLbName = "lunar-moth",
     ),
     MITE(
         "Mite",
@@ -116,7 +125,8 @@ enum class PestType(
         VinylType.PRAY_FOR_ME,
         "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
         CropType.WILD_ROSE,
-        eliteLbName = "mantis"
+        pluralName = "Praying Mantises",
+        eliteLbName = "mantis",
     ),
     FIREFLY(
         "Firefly",
@@ -134,6 +144,7 @@ enum class PestType(
         "PEST_DRAGONFLY_MONSTER".toInternalName(),
         CropType.SUNFLOWER,
     ),
+
     // TODO replace with null
     // For use in the Pest Profit Tracker, in cases where an item cannot have an identified PestType
     // Display name intentionally omitted to aid in filtering out this entry.
@@ -193,7 +204,7 @@ enum class PestType(
             "BEADY_EYES" to FLY,
             "VINYL_PRETTY_FLY" to FLY,
             "ENCHANTED_HAY_BALE" to FLY,
-            // Old fly drops
+            // Old Fly drops
             "TIGHTLY_TIED_HAY_BALE" to FLY,
             "ENCHANTED_HAY_BLOCK" to FLY,
 
@@ -201,6 +212,8 @@ enum class PestType(
             "ENCHANTED_POTATO" to LOCUST,
             "VINYL_CICADA_SYMPHONY" to LOCUST,
             "ENCHANTED_BAKED_POTATO" to LOCUST,
+            "LOCUST_LARVA" to LOCUST,
+            // Old Locust drops
             "SUNDER;6" to LOCUST,
 
             // Mite deterministic drops
@@ -254,6 +267,9 @@ enum class PestType(
             "FIRE_IN_A_BOTTLE" to FIREFLY,
             "VINYL_FIREFLY" to FIREFLY,
 
+            // Lunar Moth deterministic drops
+            "ULTIMATE_SUNSET;1" to LUNAR_MOTH,
+
             // Spray drops only send chat message from mice
             "COMPOST" to FIELD_MOUSE,
             "HONEY_JAR" to FIELD_MOUSE,
@@ -268,6 +284,6 @@ enum class PestType(
             it.key.toInternalName() to it.value
         }.toMap()
 
-        fun getByInternalNameItemOrNull(internalName: NeuInternalName): PestType? = internalNameRareDropMap[internalName]
+        fun getByItemInternalNameOrNull(internalName: NeuInternalName): PestType? = internalNameRareDropMap[internalName]
     }
 }

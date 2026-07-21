@@ -24,7 +24,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetLevel
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -35,10 +37,10 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ChestValue {
@@ -49,6 +51,16 @@ object ChestValue {
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
     private val scrollValue = ScrollValue()
+
+    /**
+     * REGEX-TEST: Personal Vault
+     * REGEX-TEST: Chest Storage
+     * REGEX-TEST: Wood Chest+
+     */
+    private val relevantChestValuePattern by RepoPattern.pattern(
+        "inventory.chestvalue.relevant",
+        "Personal Vault|Chest Storage|Wood Chest\\+"
+    )
 
     @HandleEvent
     fun onChestGuiRender() {
@@ -191,7 +203,7 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasItem() && it.container != MinecraftCompat.localPlayer.inventory && (!isMinion || it.index % 9 != 1)
+                it.hasItem() && it.container != MinecraftCompat.localPlayerOrThrow.inventory && (!isMinion || it.index % 9 != 1)
             }
         }
         val stacks = buildMap {
@@ -202,7 +214,7 @@ object ChestValue {
         chestItems = createItems(stacks)
     }
 
-    fun createItems(stacks: Map<Int, ItemStack>) = buildMap<String, ChestItem> {
+    fun createItems(stacks: Map<Int, SafeItemStack>) = buildMap<String, ChestItem> {
         for ((i, stack) in stacks) {
             val internalName = stack.getInternalNameOrNull() ?: continue
             if (internalName.getItemStackOrNull() == null) continue
@@ -243,8 +255,7 @@ object ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
-        // TODO: Use repo for this
-        return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
+        return InventoryUtils.isInNormalChest() || inMinion || relevantChestValuePattern.matches(name)
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
@@ -273,7 +284,7 @@ object ChestValue {
     data class ChestItem(
         val index: MutableList<Int>,
         var amount: Int,
-        val stack: ItemStack,
+        val stack: SafeItemStack,
         var total: Double,
         val tips: List<String>,
     )

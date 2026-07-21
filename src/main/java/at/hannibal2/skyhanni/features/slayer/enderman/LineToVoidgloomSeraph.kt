@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToEye
 
 @SkyHanniModule
@@ -39,7 +40,7 @@ object LineToVoidgloomSeraph {
         if (!SlayerApi.isInAnyArea || !config.lineToBoss) return
         val seenMobs = bosses.filter { it.baseEntity.canBeSeen(30) && it.isAlive }
         seenMobs.forEach { mob ->
-            event.drawLineToEye(
+            event.drawLineToCrosshair(
                 mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toChromaColor(),
                 config.slayerLineWidth,
@@ -48,4 +49,3 @@ object LineToVoidgloomSeraph {
         }
     }
 }
-

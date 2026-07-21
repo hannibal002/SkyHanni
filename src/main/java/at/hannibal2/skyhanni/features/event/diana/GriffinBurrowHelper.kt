@@ -29,11 +29,11 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -179,7 +179,7 @@ object GriffinBurrowHelper {
         val inaccurate = allGuesses.filter { it.spadeGuess }.toSet()
         val toDelete = mutableSetOf<GuessEntry>()
         for (item in inaccurate) {
-            val player = MinecraftCompat.localPlayer
+            val player = MinecraftCompat.localPlayerOrThrow
             val eyePos = player.eyePosition.toLorenzVec()
             val lookAngle = player.lookAngle.toLorenzVec()
             val toTarget = item.getCurrent().minus(eyePos)
@@ -191,7 +191,7 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
         if (!DianaApi.isDoingDiana()) {
@@ -268,7 +268,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
@@ -283,7 +283,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val burrowLocation = event.burrowLocation
         val currentEntry = getGuess(burrowLocation)
 
@@ -314,8 +314,7 @@ object GriffinBurrowHelper {
             val nearby = allGuesses.filter { it.getCurrent().distanceSq(location) < 10 }.toSet()
             removeGuess(nearby, "chain finished with leftover burrow within 3 blocks")
             if (config.warnOnChainComp) {
-                val playerLoc = PlayerUtils.getLocation()
-                val anyClose = allGuesses.filter { it.getCurrent().distanceSq(playerLoc) < 8100 }
+                val anyClose = allGuesses.filter { it.getCurrent().distanceSqToPlayer() < 8100 }
                 if (anyClose.isEmpty()) showUseSpadeTitle()
             }
         }
@@ -336,7 +335,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.isLocalPlayer) {
+        if (event.distance > 10) {
             update()
         }
     }
@@ -621,7 +620,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val location = LocationUtils.playerLocation().roundLocation()
         addGuess(GuessEntry(listOf(location), burrowType = type), "added test burrow from command")
         update()

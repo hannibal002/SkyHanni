@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.test
 
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.mining.GlaciteMineshaftDetectEvent
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 
@@ -13,9 +16,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 object SkyBlockIslandTest {
 
     var testIsland: IslandType? = null
+        set(value) {
+            field = value
+            EventListeners.markEventCacheDirty()
+        }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Island Test")
         testIsland?.let {
             event.addData {
@@ -42,9 +49,24 @@ object SkyBlockIslandTest {
                 ChatUtils.chat("Test island was not set.")
             }
 
-            argCallback("island", EnumArgumentType.lowercase<IslandType>(isGreedy = true)) {
-                testIsland = it
-                ChatUtils.chat("Set test island to ${it.displayName}")
+            literal("mineshaft") {
+                MineshaftDetection.MineshaftType.entries.forEach { mineshaftType ->
+                    literalCallback(mineshaftType.name.lowercase()) {
+                        testIsland = IslandType.MINESHAFT
+                        ChatUtils.chat("Set test island to ${IslandType.MINESHAFT.displayName}")
+                        GlaciteMineshaftDetectEvent(mineshaftType).post()
+                    }
+                }
+                callback {
+                    testIsland = IslandType.MINESHAFT
+                    ChatUtils.chat("Set test island to ${IslandType.MINESHAFT.displayName}")
+                    GlaciteMineshaftDetectEvent(MineshaftDetection.MineshaftType.TOPA_1).post()
+                }
+            }
+
+            argCallback("island", EnumArgumentType.lowercase<IslandType>(isGreedy = true)) { islandType ->
+                testIsland = islandType
+                ChatUtils.chat("Set test island to ${islandType.displayName}")
             }
             simpleCallback { ChatUtils.userError("Usage: /shtestisland <island name>/reset") }
         }

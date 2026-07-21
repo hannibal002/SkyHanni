@@ -151,7 +151,7 @@ object PestFinder {
     private fun shouldShowBasedOnHeldItem(): Boolean {
         return when (config.whenToShow) {
             WhenToShow.ALWAYS -> true
-            WhenToShow.BOTH -> PestApi.hasVacuumInHand() || PestApi.hasLassoInHand()
+            WhenToShow.BOTH -> PestApi.hasVacuumOrLassoInHand()
             WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> PestApi.hasVacuumInHand()
             WhenToShow.ONLY_WITH_LASSO_IN_HAND -> PestApi.hasLassoInHand()
         }
@@ -268,7 +268,7 @@ object PestFinder {
         }
     }
 
-    fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
+    private fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

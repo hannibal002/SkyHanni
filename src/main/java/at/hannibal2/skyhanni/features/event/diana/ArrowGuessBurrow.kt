@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
@@ -40,7 +40,7 @@ object ArrowGuessBurrow {
     private var failures = 0
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
 
         if (event.distanceToPlayer > 6) return
@@ -80,7 +80,7 @@ object ArrowGuessBurrow {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Arrow Burrow Guess")
 
         if (!DianaApi.isDoingDiana()) {
@@ -105,7 +105,7 @@ object ArrowGuessBurrow {
     @Suppress("ReturnCount")
     private fun addGuessFromRay(ray: RaycastUtils.Ray, range: IntRange): LorenzVec? {
         val bounds = IslandType.HUB.islandData?.boundingBox ?: run {
-            GriffinBurrowHelper.addDebug("couldnt get hub bounds")
+            GriffinBurrowHelper.addDebug("couldn't get hub bounds")
             return null
         }
         if (!bounds.isInside(ray.origin)) { // guarantees exit point is first intersect
@@ -114,7 +114,7 @@ object ArrowGuessBurrow {
         }
         // you technically don't need to find the endpoint for this, but it makes it simpler so why not
         val endPoint = RaycastUtils.intersectAABBWithRay(bounds, ray)?.second ?: run {
-            GriffinBurrowHelper.addDebug("couldnt find endpoint")
+            GriffinBurrowHelper.addDebug("couldn't find endpoint")
             return null
         }
 
@@ -124,7 +124,7 @@ object ArrowGuessBurrow {
             .minByOrNull { (_, value) -> abs(value) } // find the axis with the least change
             ?.index
             ?: run {
-                GriffinBurrowHelper.addDebug("couldnt find axis index")
+                GriffinBurrowHelper.addDebug("couldn't find axis index")
                 return null
             }
 
@@ -151,7 +151,7 @@ object ArrowGuessBurrow {
         }
 
         if (candidates.isEmpty()) {
-            GriffinBurrowHelper.addDebug("candidates is empty")
+            GriffinBurrowHelper.addDebug("candidates list is empty")
             return null
         }
         val minValue = candidates.values.minOf { it.first }

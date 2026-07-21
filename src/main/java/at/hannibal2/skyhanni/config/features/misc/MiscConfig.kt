@@ -332,15 +332,6 @@ class MiscConfig {
     @FeatureToggle
     var lesserOrbHider: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Lock Mouse Message", desc = "Show a message in chat when toggling §e/shmouselock§7.")
-    @ConfigEditorBoolean
-    var lockMouseLookChatMessage: Boolean = true
-
-    @Expose
-    @NoConfigLink
-    val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
-
     // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
@@ -427,6 +418,14 @@ class MiscConfig {
     var gfsPiggyBank: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Move Insert Into Sack Button",
+        desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
+    )
+    @ConfigEditorBoolean
+    var moveInsertIntoSackButton: Boolean = false
+
+    @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -441,6 +440,11 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
@@ -489,7 +493,7 @@ class MiscConfig {
     @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(
@@ -517,4 +521,20 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var achievementMessages: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Mute Stereo Pants",
+        desc = "Mutes music played by Stereo Pants."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteStereoPants: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @SearchTag("century cake slice")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var giftCleanDisplay: Boolean = false
 }

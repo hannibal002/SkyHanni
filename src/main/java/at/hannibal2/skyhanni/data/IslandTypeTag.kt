@@ -11,9 +11,9 @@ import java.util.EnumSet
 
 // TODO maybe rename this class to IslandTypeGroup
 /**
- * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
+ * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
-enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
+enum class IslandTypeTag(vararg types: Any) {
 
     PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
@@ -25,10 +25,10 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
     MINING(NORMAL_MINING, ADVANCED_MINING),
     CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
 
-    FORAGING(IslandType.THE_PARK, IslandType.GALATEA),
-    FORAGING_CUSTOM_TREES(IslandType.GALATEA),
+    FORAGING_CUSTOM_TREES(IslandType.GALATEA, IslandType.TORRHUS_CANYON),
+    FORAGING(FORAGING_CUSTOM_TREES, IslandType.THE_PARK),
 
-    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT),
+    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
 
@@ -48,10 +48,16 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
     ),
     FISHING_HOTSPOT(
         IslandType.BACKWATER_BAYOU,
+        IslandType.LOTUS_ATOLL,
         IslandType.HUB,
+        IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
-    )
+    ),
+    WORMHOLE(
+        IslandType.LOTUS_ATOLL,
+        IslandType.CRIMSON_ISLE,
+    ),
     ;
 
     private val types: EnumSet<IslandType> = types.fold(
@@ -71,7 +77,7 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+    fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
 

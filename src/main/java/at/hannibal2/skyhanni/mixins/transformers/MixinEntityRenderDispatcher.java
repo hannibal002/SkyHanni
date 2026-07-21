@@ -11,8 +11,10 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+
+//~ if < 26.1 'state.level.CameraRenderState' -> 'state.CameraRenderState'
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 
 @Mixin(EntityRenderDispatcher.class)
 public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRenderState> {
@@ -24,7 +26,7 @@ public class MixinEntityRenderDispatcher<E extends Entity, S extends EntityRende
         if (entity instanceof LivingEntity livingEntity
             && !EntityRenderDispatcherHookKt.getActiveHolographicEntities().contains(livingEntity)) {
             //noinspection deprecation
-            if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post()) {
+            if (new SkyHanniRenderEntityEvent.Pre<>(livingEntity, d, e, f).post().isCancelled()) {
                 ci.cancel();
             }
         }

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -119,12 +120,12 @@ object GhostTracker {
     private val patternGroup = RepoPattern.group("combat.ghosttracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b✯ Magic Find§r§b)
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b✯ Magic Find§r§b)
+     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b Magic Find§r§b)
+     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b Magic Find§r§b)
      */
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b✯ Magic Find§r§b\\)",
+        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b${MAGIC_FIND.hypixelIcon} Magic Find§r§b\\)",
     )
 
     /**
@@ -141,8 +142,8 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 21: 29,614/40,000
-     * REGEX-TEST:  Ghost 15: 12,449/12,500
+     * WRAPPED-REGEX-TEST: " Ghost 21: 29,614/40,000"
+     * WRAPPED-REGEX-TEST: " Ghost 15: 12,449/12,500"
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary-no-color",
@@ -150,7 +151,7 @@ object GhostTracker {
     )
 
     /**
-     * REGEX-TEST:  Ghost 25: MAX
+     * WRAPPED-REGEX-TEST: " Ghost 25: MAX"
      */
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax-no-color",

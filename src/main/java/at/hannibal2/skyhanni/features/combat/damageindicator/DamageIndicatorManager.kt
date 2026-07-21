@@ -55,8 +55,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -92,7 +92,8 @@ object DamageIndicatorManager {
     private var mobFinder: MobFinder? = null
     private val data = mutableMapOf<UUID, EntityData>()
     private val maxHealth = mutableMapOf<UUID, Long>()
-    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds)
+    // EntityData is owned by the field 'data', so we can use weak keys
+    private val iconCache = TimeLimitedCache<EntityData, List<String>>(1.seconds, useWeakKeys = true)
 
     private var tarantulaFoundTime = SimpleTimeMark.farPast()
     private val tarantulaErrored = mutableSetOf<UUID>()
@@ -101,7 +102,7 @@ object DamageIndicatorManager {
         if (entity.tickCount > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.deceased) return false
-        val name = entity.cleanName().replace(",", "")
+        val name = entity.cleanName.replace(",", "")
 
         return damagePattern.matcher(name).matches()
     }
@@ -793,7 +794,6 @@ object DamageIndicatorManager {
                 BossType.SLAYER_ENDERMAN_2 -> 30
                 BossType.SLAYER_ENDERMAN_3 -> 60
                 BossType.SLAYER_ENDERMAN_4 -> 100
-                else -> 100
             }
             val hits = enderSlayerHitsNumberPattern.matchMatcher(armorStandHits.name.formattedTextCompatLessResets()) {
                 group("hits").toInt()
@@ -974,11 +974,11 @@ object DamageIndicatorManager {
     }
 
     private fun setMaxHealth(entity: LivingEntity, currentMaxHealth: Long) {
-        maxHealth[entity.uuid!!] = currentMaxHealth
+        maxHealth[entity.uuid] = currentMaxHealth
     }
 
     private fun getMaxHealthFor(entity: LivingEntity): Long {
-        return maxHealth.getOrDefault(entity.uuid!!, 0L)
+        return maxHealth.getOrDefault(entity.uuid, 0L)
     }
 
     @HandleEvent
@@ -1000,7 +1000,7 @@ object DamageIndicatorManager {
 
         val showNameAndHealth = entityData.shouldShowNameAndHealth()
         if (isDamageSplash(entity)) {
-            val name = entity.cleanName().replace(",", "")
+            val name = entity.cleanName.replace(",", "")
 
             if (showNameAndHealth && config.hideDamageSplash) {
                 event.cancel()
@@ -1041,6 +1041,7 @@ object DamageIndicatorManager {
                         tarantulaFoundTime = data.foundTime
                     }
                 }
+
                 BossType.SLAYER_SPIDER_5_2 -> if (!tarantulaFoundTime.isFarPast()) {
                     if (data.foundTime > tarantulaFoundTime) {
                         ChatUtils.debug("Setting foundTime to $tarantulaFoundTime")
@@ -1094,7 +1095,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Damage Indicator")
         if (!DevApi.mainToggles.damageIndicator) {
             event.addData("Damage Indicator is manually disabled!")

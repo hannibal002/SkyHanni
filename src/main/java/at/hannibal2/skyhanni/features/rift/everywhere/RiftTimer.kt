@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.everywhere
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
@@ -32,11 +32,11 @@ object RiftTimer {
     private val patternGroup = RepoPattern.group("rift.everywhere")
 
     /**
-     * REGEX-TEST: 3150 ф
+     * REGEX-TEST: 3150 
      */
     private val nametagPattern by patternGroup.pattern(
         "nametag.timer",
-        "(?<time>\\d+) ф",
+        "(?<time>\\d+) ${SkyblockStat.RIFT_TIME.hypixelIcon}",
     )
 
     private var display = emptyList<String>()
@@ -72,7 +72,7 @@ object RiftTimer {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftApi.inRiftRace) return
         if (!event.isMod(5)) return
-        val newTime = TimeUtils.getDuration(MinecraftCompat.localPlayer.experienceLevel.toString() + " s")
+        val newTime = TimeUtils.getDuration(MinecraftCompat.localPlayerOrThrow.experienceLevel.toString() + " s")
         currentTime = newTime
         update()
     }
@@ -140,7 +140,7 @@ object RiftTimer {
         val time = nametagPattern.matchMatcher(nametag) {
             group("time")?.toIntOrNull()
         } ?: return
-        event.text = Component.literal("${time.seconds.format()} §aф")
+        event.text = Component.literal("${time.seconds.format()} §a${SkyblockStat.RIFT_TIME.hypixelIcon}")
     }
 
     fun isEnabled() = RiftApi.inRift() && config.enabled
