@@ -58,7 +58,7 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (!FishingApi.isTrophyFishing()) return
         val deployableType = getActiveDeployableType(WarningType.TROPHY_FISHING) ?: return
-        showWarning("Place Down Umbrella!", deployableType)
+        showWarning("Place Down Umberella!", deployableType)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

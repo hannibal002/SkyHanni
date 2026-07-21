@@ -47,7 +47,10 @@ class DeployableConfig {
     var warnMissingDeployable: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Deployable Warnings", desc = "Which deployables to warn for.")
+    @ConfigOption(
+        name = "Deployable Warnings",
+        desc = "Warn when the required deployable is missing: Flux for Slayer, Umberella for Trophy Fishing, and Lantern for Mineshafts.",
+    )
     @ConfigEditorDraggableList
     val warningTypes: MutableList<WarningType> = mutableListOf(
         WarningType.SLAYER,
