@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -32,7 +33,10 @@ object GummyWarning {
 
     private var lastWarned = SimpleTimeMark.farPast()
     private var lastWarningShown = SimpleTimeMark.farPast()
-    private val smolderingAreaPattern = "Smoldering Tomb|The Wasteland".toPattern()
+    private val smolderingAreaPattern by RepoPattern.pattern(
+        "slayer.gummy.smoldering-area",
+        "Smoldering Tomb|The Wasteland"
+    )
     private var inSmolderingArea = false
     private val display = Renderable.text("§4§lNo Polar Bear Active!", scale = 2.0)
 
@@ -43,7 +47,7 @@ object GummyWarning {
 
     private var slayerData: RemainingSlayerKills.SlayerData? = null
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         slayerData = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
     }
