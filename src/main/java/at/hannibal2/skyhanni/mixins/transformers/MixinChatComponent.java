@@ -9,9 +9,6 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.multiplayer.chat.GuiMessageTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,11 +19,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ListIterator;
 
-//? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
-//?} else {
+//? if < 26.1 {
 /*import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.util.FormattedCharSequence;
 *///?}
 
@@ -106,12 +102,5 @@ public abstract class MixinChatComponent {
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
-    }
-
-    //~ if < 26.1 'addMessage' -> 'addMessage(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V'
-    @Inject(method = "addMessage", at = @At("HEAD"))
-    //~ if < 26.1 'GuiMessageSource source, GuiMessageTag indicator' -> 'GuiMessageTag indicator'
-    private void setChatLine(Component chatComponent, MessageSignature signatureData, GuiMessageSource source, GuiMessageTag indicator, CallbackInfo ci) {
-        GuiChatHook.setCurrentComponent(chatComponent);
     }
 }
