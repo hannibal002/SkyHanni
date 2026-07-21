@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import com.mojang.blaze3d.platform.InputConstants
-import kotlinx.coroutines.runBlocking
 import net.minecraft.client.KeyMapping
 import org.apache.commons.lang3.SystemUtils
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import kotlinx.coroutines.runBlocking
 
 open class TextInput {
 
