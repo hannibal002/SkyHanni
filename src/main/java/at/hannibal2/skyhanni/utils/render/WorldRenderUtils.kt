@@ -24,7 +24,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
-//import net.minecraft.client.gui.Font.DisplayMode
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
@@ -57,6 +56,7 @@ object WorldRenderUtils {
     // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
     private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
 
+    @JvmStatic
     fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
         if (deferredSeeThroughText.isEmpty()) return
         try {

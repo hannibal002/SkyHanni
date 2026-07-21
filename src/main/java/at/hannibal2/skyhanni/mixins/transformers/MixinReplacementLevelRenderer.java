@@ -115,7 +115,7 @@ public class MixinReplacementLevelRenderer {
         )
     )
     private void renderDeferredSeeThroughText(CallbackInfo ci, @Local MultiBufferSource.BufferSource bufferSource) {
-        WorldRenderUtils.INSTANCE.renderDeferredSeeThroughText(bufferSource);
+        WorldRenderUtils.renderDeferredSeeThroughText(bufferSource);
     }
     //?}
 }
