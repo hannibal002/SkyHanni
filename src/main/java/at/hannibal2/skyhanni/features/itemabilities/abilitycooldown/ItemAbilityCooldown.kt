@@ -77,7 +77,7 @@ object ItemAbilityCooldown {
     fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Wither Shield Sound Solo and Wither Impact
-            event.soundName == "entity.zombie_villager.cure" &&  event.pitch == 0.6984127f && event.volume == 1f -> {
+            event.soundName == "entity.zombie_villager.cure" && event.pitch == 0.6984127f && event.volume == 1f -> {
                 val scrolls = ItemAbility.getAllAbilityScrolls(InventoryUtils.getItemInHand())
                 if (scrolls.singleOrNull() == ItemAbility.WITHER_IMPACT) {
                     ItemAbility.WITHER_IMPACT.sound()
