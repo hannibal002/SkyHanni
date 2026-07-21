@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.KEY_UNKNOWN
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 
 @SkyHanniModule
 object GardenPlotBorders {
@@ -19,7 +19,7 @@ object GardenPlotBorders {
     @HandleEvent
     fun onKeyDown(event: KeyDownEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         if (event.keyCode == config.plotBorderKey) {
             showBorders = !showBorders
         }

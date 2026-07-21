@@ -30,12 +30,12 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import com.mojang.blaze3d.platform.InputConstants
-import net.minecraft.client.Minecraft
 import kotlin.math.roundToLong
 
 private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String, List<String>>>
@@ -63,7 +63,7 @@ object EstimatedItemValue {
     internal var stackingEnchants: Map<String, Enchant.Stacking> = emptyMap()
         private set
 
-    fun isCurrentlyShowing() = currentlyShowing && Minecraft.getInstance().screen != null
+    fun isCurrentlyShowing() = currentlyShowing && MinecraftCompat.screen != null
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) = neuRepoReloadCoroutine.launch {
