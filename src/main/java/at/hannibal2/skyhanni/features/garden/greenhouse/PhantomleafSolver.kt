@@ -25,6 +25,9 @@ object PhantomleafSolver {
     private const val HYPIXEL_VOLUME_SCALING_FACTOR = 30
     private const val MUTATION_Y_LEVEL = 74.0
 
+    private const val MINIMUM_ALLOWED_PITCH = 0.61
+    private const val MAXIMUM_ALLOWED_PITCH = 0.62
+
     private val SEARCH_RANGE = (-HYPIXEL_VOLUME_SCALING_FACTOR - 1)..(HYPIXEL_VOLUME_SCALING_FACTOR + 1)
 
     private var isSearchingForPhantomleaf = false
@@ -37,17 +40,27 @@ object PhantomleafSolver {
     /**
      * REGEX-TEST: [CROP] Phantomleaf: Poof! Try and find me!
      */
-    private val startPattern by patternGroup.pattern("poof", "Phantomleaf: Poof! Try and find me!")
+    private val startPattern by patternGroup.pattern(
+        "poof",
+        "Phantomleaf: Poof! Try and find me!",
+    )
 
     /**
      * REGEX-TEST: [CROP] Phantomleaf: You found me!
      */
-    private val successPattern by patternGroup.pattern("found", "Phantomleaf: You found me!")
+    private val successPattern by patternGroup.pattern(
+        "found",
+        "Phantomleaf: You found me!",
+    )
 
     /**
      * REGEX-TEST: [CROP] Phantomleaf: That's not me! Better luck next time!
      */
-    private val failPattern by patternGroup.pattern("failure", "Phantomleaf: That's not me! Better luck next time!")
+    private val failPattern by patternGroup.pattern(
+        "failure",
+        "Phantomleaf: " +
+            "That's not me! Better luck next time!",
+    )
 
     /**
      * When a note is played with a pitch between 0.61 and 0.62, its volume follows the formula:
@@ -61,7 +74,7 @@ object PhantomleafSolver {
         if (!config.phantomleafSolver) return
         if (!isSearchingForPhantomleaf) return
 
-        if (event.pitch !in 0.61..0.62) return
+        if (event.pitch !in MINIMUM_ALLOWED_PITCH..MAXIMUM_ALLOWED_PITCH) return
         if (event.soundName != "block.note_block.basedrum") return
 
         val currentPos = PlayerUtils.getLocation()
