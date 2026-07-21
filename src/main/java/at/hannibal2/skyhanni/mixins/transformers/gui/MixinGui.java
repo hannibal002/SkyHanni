@@ -18,7 +18,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >= 26.1
@@ -86,9 +85,16 @@ public class MixinGui {
     //~}
     //~}
 
-    @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
-    private void renderItemOverlayPost(GuiGraphicsExtractor drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
-        GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
+    @ModifyArg(
+        method = "displayScoreboardSidebar",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
+        ),
+        index = 2
+    )
+    private Component renderItemOverlayPost(Component str) {
+        return ScoreboardData.tryToReplaceScoreboardLine(str);
     }
 
     //? if >= 26.1 {
