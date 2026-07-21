@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
+import net.minecraft.client.User
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.screens.Screen
-import net.minecraft.client.User
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
