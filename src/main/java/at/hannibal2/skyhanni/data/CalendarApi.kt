@@ -4,12 +4,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
+import kotlin.time.Duration
 
 @SkyHanniModule
 object CalendarApi {
@@ -49,14 +54,6 @@ object CalendarApi {
     )
 
     /**
-     * REGEX-TEST: 1d 4h 20m
-     */
-    val timeComponentPattern by group.pattern(
-        "time-component",
-        "(?<amount>\\d+)(?<unit>[dhms])"
-    )
-
-    /**
      * REGEX-TEST: Day 3
      * REGEX-TEST: Day 2
      * REGEX-TEST: Day 1
@@ -91,7 +88,17 @@ object CalendarApi {
         "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
     )
 
-    fun parseTooltip(tooltipLines: List<Component>): List<CalendarEvent>? {
+    val mainCalendarStartsInPattern by group.pattern(
+        "main.startsin",
+        "Starts in: (?<time>(?:\\d\\d?[hms] ?)+)"
+    )
+
+    val mainCalendarDurationPattern by group.pattern(
+        "main.duration",
+        "Event lasts for: (?<time>(?:\\d\\d?[hms] ?)+)"
+    )
+
+    fun parseCalendarTooltip(tooltipLines: List<Component>): List<CalendarEvent>? {
         val line = tooltipLines.firstOrNull()?.string?.removeColor()?.trim() ?: return null
         val currentDay = dayHeaderPattern.matchMatcher(line) {
             group("dayNum")?.toInt()
@@ -198,7 +205,42 @@ object CalendarApi {
             inCalendar = false
         }
     }
+
+    // Example:
+    // Traveling Zoo
+    // Starts in: 1h 58m 40s
+    // Event lasts for: 1h
+    //
+    // Oringo The Taveling Zookeeper is
+    // visiting SkyBlock with pets to trade!
+    fun parseMainCalendarTooltip(rawTooltip: MutableList<Component>): MainCalendarEvent? {
+        val tooltip = rawTooltip.map { it.string.removeColor().trim() }
+        val eventName = tooltip.getOrNull(0) ?: return null
+
+        val startTime = mainCalendarStartsInPattern.firstMatcher(tooltip) {
+            val timeString = group("time")
+            TimeUtils.getDurationOrNull(timeString)?.fromNow()
+        }  ?: return null
+
+        val duration = mainCalendarDurationPattern.firstMatcher(tooltip) {
+            val timeString = group("time")
+            TimeUtils.getDurationOrNull(timeString)
+        } ?: return null
+
+        return MainCalendarEvent(
+            name = eventName,
+            startTime = startTime,
+            duration = duration
+        )
+    }
 }
+
+// Notice that this does not give an exact time and is an approximation of the event start time
+data class MainCalendarEvent(
+    val name: String,
+    val startTime: SimpleTimeMark,
+    val duration: Duration,
+)
 
 data class CalendarEvent(
     val name: String,
