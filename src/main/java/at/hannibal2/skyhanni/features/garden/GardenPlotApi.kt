@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
@@ -104,11 +105,13 @@ object GardenPlotApi {
     )
 
     /**
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b6 §r§7with §r§aCompost§r§7!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 6 with Compost!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 7 with 3 Plant Matter!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 8 with 5 Jelly!
      */
     private val plotSprayedPattern by patternGroup.pattern(
-        "spray.target",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
+        "spray.target.colorless",
+        "SPRAYONATOR! You sprayed Plot - (?<plot>.+) with (?:(?<amount>\\d+) )?(?<spray>.+)!",
     )
 
     /**
@@ -117,6 +120,15 @@ object GardenPlotApi {
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher-nocolor",
         "SPLASH! Your Garden was cleared of all active Sprayonator effects!",
+    )
+
+    /**
+     * REGEX-TEST: SPRAYONATOR! The smell of Compost on Plot - 5 ran out!
+     * REGEX-TEST: SPRAYONATOR! The smell of Compost on Plot - test plot name ran out!
+     */
+    private val plotSprayExpiredPattern by patternGroup.pattern(
+        "spray.expired",
+        "SPRAYONATOR! The smell of (?<spray>[\\w+ ]+) on Plot - (?<plot>.+) ran out!"
     )
 
     /**
@@ -344,15 +356,24 @@ object GardenPlotApi {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
 
-        plotSprayedPattern.matchMatcher(event.message) {
+        plotSprayedPattern.matchMatcher(event.cleanMessage) {
             val sprayName = group("spray")
             val plotName = group("plot")
 
             val plot = getPlotByName(plotName)
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
+            GardenPlotSprayEvent.GardenPlotSprayAddedEvent(plot, spray).post()
             plot?.setSpray(spray, 30.minutes)
 
+        }
+        plotSprayExpiredPattern.matchMatcher(event.cleanMessage) {
+            val sprayName = group("spray")
+            val plotName = group("plot")
+
+            val plot = getPlotByName(plotName)
+            val spray = SprayType.getByNameOrNull(sprayName) ?: return
+            GardenPlotSprayEvent.GardenPlotSprayExpiredEvent(plot, spray).post()
         }
         cleanPlotChatPattern.matchMatcher(event.message) {
             val plotId = group("plot").toInt()
