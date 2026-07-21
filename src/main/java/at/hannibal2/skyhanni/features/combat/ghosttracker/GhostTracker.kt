@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDropsJson
-import at.hannibal2.skyhanni.data.model.SkyblockStat.MAGIC_FIND
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -120,25 +120,29 @@ object GhostTracker {
     private val patternGroup = RepoPattern.group("combat.ghosttracker")
 
     /**
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210% §r§b Magic Find§r§b)
-     * REGEX-TEST: §6§lRARE DROP! §r§9Sorrow §r§b(+§r§b210 §r§b Magic Find§r§b)
+     * REGEX-TEST: RARE DROP! Sorrow (+210%  Magic Find)
+     * REGEX-TEST: RARE DROP! Sorrow (+210  Magic Find)
      */
     private val itemDropPattern by patternGroup.pattern(
-        "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)%? §r§b${MAGIC_FIND.hypixelIcon} Magic Find§r§b\\)",
+        "itemdrop.colorless",
+        "RARE DROP! (?<item>.+) \\(\\+(?<mf>\\d+)%? ${SkyblockStat.MAGIC_FIND.hypixelIcon} Magic Find\\)",
     )
 
     /**
-     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 32 Kill Combo!
-     * REGEX-TEST: §cYour Kill Combo has expired! You reached a 1,187 Kill Combo!
+     * REGEX-TEST: Your Kill Combo has expired! You reached a 32 Kill Combo!
+     * REGEX-TEST: Your Kill Combo has expired! You reached a 1,187 Kill Combo!
      */
     private val killComboEndPattern by patternGroup.pattern(
-        "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
+        "killcombo.end.colorless",
+        "Your Kill Combo has expired! You reached a (?<kill>[\\d,.]+) Kill Combo!",
     )
+
+    /**
+     * REGEX-TEST: The ghost's death materialized 1,000,000 coins from the mists!
+     */
     private val bagOfCashPattern by patternGroup.pattern(
-        "bagofcash",
-        "§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!",
+        "bagofcash.colorless",
+        "The ghost's death materialized 1,000,000 coins from the mists!",
     )
 
     /**
@@ -242,7 +246,7 @@ object GhostTracker {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
-        itemDropPattern.matchMatcher(event.message) {
+        itemDropPattern.matchMatcher(event.cleanMessage) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
             val mf = group("mf").formatInt()
             if (internalName !in allowedDrops) return
@@ -258,14 +262,14 @@ object GhostTracker {
             }
             return
         }
-        killComboEndPattern.matchMatcher(event.message) {
+        killComboEndPattern.matchMatcher(event.cleanMessage) {
             val kill = group("kill").formatLong()
             tracker.modify {
                 it.maxKillCombo = kill.coerceAtLeast(it.maxKillCombo)
             }
             return
         }
-        if (bagOfCashPattern.matches(event.message)) {
+        if (bagOfCashPattern.matches(event.cleanMessage)) {
             tracker.addCoins(1_000_000, false)
             return
         }
