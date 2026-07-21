@@ -2,7 +2,8 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -41,24 +42,32 @@ object GardenCharmedVisitors {
 
         val isAlreadyCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
             ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
-        if (isAlreadyCharmed) {
-            addCharmed(visitor)
-        }
-
-        val offersGratitude = visitor.allRewards.any {
-            VisitorReward.getByInternalName(it) == VisitorReward.VISITORS_GRATITUDE
-        }
-        if (offersGratitude) {
+        visitor.charmed = isAlreadyCharmed
+        if (!isAlreadyCharmed) {
             removeCharmed(visitor)
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onVisitorOpen(event: VisitorAcceptedEvent) {
+        val visitor = event.visitor
+        val rewardedGratitude = visitor.allRewards.any {
+            VisitorReward.getByInternalName(it) == VisitorReward.VISITORS_GRATITUDE
+        }
+        if (rewardedGratitude) {
+            removeCharmed(visitor)
+        }
+    }
+
+    @HandleEvent(InventoryUpdatedEvent::class)
+    fun onInventoryUpdate() {
         if (!VisitorApi.inInventory) return
-        if (event.slotId != VINYL_SLOT) return
         val visitor = openVisitor ?: return
-        addCharmed(visitor)
+        val isCharmed = InventoryUtils.getItemAtSlotIndex(VINYL_SLOT)
+            ?.let { charmedItemNamePattern.matches(it.hoverName) } == true
+        if (isCharmed && !visitor.charmed) {
+            addCharmed(visitor)
+        }
     }
 
     @HandleEvent
@@ -81,6 +90,7 @@ object GardenCharmedVisitors {
         val storage = storage ?: return
         val name = visitor.visitorName
         storage.charmedVisitors.add(name)
+        visitor.charmed = true
         updateDisplay()
     }
 
@@ -88,6 +98,7 @@ object GardenCharmedVisitors {
         val storage = storage ?: return
         val name = visitor.visitorName
         storage.charmedVisitors.remove(name)
+        visitor.charmed = false
         updateDisplay()
     }
 
