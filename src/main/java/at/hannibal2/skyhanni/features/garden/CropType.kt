@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.item.Items
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.level.block.state.BlockState
 
@@ -21,6 +21,7 @@ enum class CropType(
     val eliteLbName: String = simpleName,
     val cropColor: LorenzColor = LorenzColor.GREEN,
     val cropShortName: String = cropName.substring(0..1),
+    val cropSurface: Block = Blocks.FARMLAND,
 ) {
 
     WHEAT(
@@ -49,6 +50,7 @@ enum class CropType(
         enchantName = "warts",
         eliteLbName = "netherwart",
         cropColor = LorenzColor.RED,
+        cropSurface = Blocks.SOUL_SAND,
     ),
     PUMPKIN(
         "Pumpkin", "PUMPKIN_DICER", "SQUASH", 1.0,
@@ -81,12 +83,14 @@ enum class CropType(
         "Cactus", "CACTUS_KNIFE", "FERMENTO", 2.0,
         { SafeItemStack(Items.CACTUS).overrideId("CACTUS") }, "cactus",
         cropColor = LorenzColor.GREEN,
+        cropSurface = Blocks.SAND
     ),
     MUSHROOM(
         "Mushroom", "FUNGI_CUTTER", "FERMENTO", 1.0,
         { SafeItemStack(Items.RED_MUSHROOM_BLOCK).overrideId("HUGE_MUSHROOM_2") }, "mushroom",
         enchantName = "mushrooms",
         cropColor = LorenzColor.RED,
+        cropSurface = Blocks.MYCELIUM,
     ),
     SUNFLOWER(
         "Sunflower",
@@ -141,14 +145,14 @@ enum class CropType(
             return entries.firstOrNull {
                 it.cropName.equals(itemName, ignoreCase = true) || it.simpleName.equals(
                     itemName,
-                    ignoreCase = true
+                    ignoreCase = true,
                 ) || it.enchantName.equals(itemName, ignoreCase = true)
             }
         }
 
         fun getByName(name: String) = getByNameOrNull(name) ?: error("No valid crop type '$name'")
 
-        fun BlockState.getCropType(pos: LorenzVec): CropType? {
+        fun BlockState.getCropType(): CropType? {
             return when (block) {
                 Blocks.WHEAT -> WHEAT
                 Blocks.CARROTS -> CARROT
@@ -164,6 +168,24 @@ enum class CropType(
                 Blocks.SUNFLOWER -> getTimeFlower()
                 else -> null
             }
+        }
+
+        fun CropType.getBlockState(): BlockState {
+            return when (this) {
+                WHEAT -> Blocks.WHEAT
+                CARROT -> Blocks.CARROTS
+                POTATO -> Blocks.POTATOES
+                NETHER_WART -> Blocks.NETHER_WART
+                PUMPKIN -> Blocks.PUMPKIN
+                MELON -> Blocks.MELON
+                COCOA_BEANS -> Blocks.COCOA
+                SUGAR_CANE -> Blocks.SUGAR_CANE
+                CACTUS -> Blocks.CACTUS
+                MUSHROOM -> Blocks.RED_MUSHROOM
+                SUNFLOWER -> Blocks.SUNFLOWER
+                MOONFLOWER -> Blocks.BLUE_ORCHID
+                WILD_ROSE -> Blocks.ROSE_BUSH
+            }.defaultBlockState()
         }
 
         fun getTimeFlower(): CropType {

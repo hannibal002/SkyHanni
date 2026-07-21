@@ -25,10 +25,17 @@ import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Font
+import net.minecraft.client.model.`object`.skull.SkullModelBase
+import net.minecraft.client.renderer.LightTexture
+import net.minecraft.client.renderer.ShapeRenderer
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.client.renderer.blockentity.SkullBlockRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
+import net.minecraft.world.item.component.ResolvableProfile
+import net.minecraft.world.level.block.SkullBlock
+import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
@@ -1077,6 +1084,71 @@ object WorldRenderUtils {
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
         vertexConsumer.addVertex(matrix4f, i, j, k).setColor(l, m, n, o)
+    }
+
+    fun SkyHanniRenderWorldEvent.renderFakeBlock(
+        state: BlockState,
+        pos: LorenzVec,
+        overlay: Int,
+    ) {
+        val mc = Minecraft.getInstance()
+        val dispatcher = mc.blockRenderer
+
+        matrices.pushPose()
+
+        matrices.translate(
+            pos.x - camera.position().x,
+            pos.y - camera.position().y,
+            pos.z - camera.position().z,
+        )
+
+        dispatcher.renderSingleBlock(
+            state,
+            matrices,
+            vertexConsumers,
+            LightTexture.FULL_BRIGHT,
+            overlay,
+        )
+
+        matrices.popPose()
+    }
+
+    fun SkyHanniRenderWorldEvent.renderFakeSkullBlock(
+        profile: ResolvableProfile,
+        pos: LorenzVec,
+        overlay: Int,
+    ) {
+        matrices.pushPose()
+
+        matrices.translate(
+            pos.x - camera.position().x,
+            pos.y - camera.position().y,
+            pos.z - camera.position().z,
+        )
+
+        val mc = Minecraft.getInstance()
+        val gameRenderer = mc.gameRenderer
+        val submitNodeCollector = gameRenderer.featureRenderDispatcher.submitNodeStorage
+
+        val model = SkullBlockRenderer.createModel(mc.entityModels, SkullBlock.Types.PLAYER) ?: return
+        val renderType = mc.playerSkinRenderCache().getOrDefault(profile).renderType()
+
+        val state = SkullModelBase.State()
+        state.animationPos = 0f
+        model.setupAnim(state)
+
+        submitNodeCollector.submitModel(
+            model,
+            state,
+            matrices,
+            renderType,
+            LightTexture.FULL_BRIGHT,
+            overlay,
+            0,
+            null,
+        )
+
+        matrices.popPose()
     }
 
     // returns true if the camera is underwater
