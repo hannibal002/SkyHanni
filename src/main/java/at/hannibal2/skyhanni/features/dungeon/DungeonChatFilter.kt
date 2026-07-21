@@ -73,7 +73,7 @@ object DungeonChatFilter {
         ".* struck you for .* damage!",
         ".* struck you for .*!",
         "The Mage's Magma burnt you for .* true damage.",
-        "Your .* hit .* (enemy|enemies) for .* damage.",
+        "Your .* hit .* (?:enemy|enemies) for .* damage.",
         "Mute silenced you!"
     )
 
@@ -100,9 +100,9 @@ object DungeonChatFilter {
         ".* has obtained Blessing of .*!",
         " {5}Granted you .* & .*x ${SkyblockStat.STRENGTH.hypixelIcon} Strength.",
         " {5}Also granted you .* & .*x ${SkyblockStat.CRIT_DAMAGE.hypixelIcon} Crit Damage.",
-        " {5}(Grants|Granted) you .* Defense and .* Damage.",
+        " {5}(?:Grants|Granted) you .* Defense and .* Damage.",
         " {5}Granted you .*x HP and .*x ${SkyblockStat.HEALTH_REGEN.hypixelIcon} Health Regen.",
-        " {5}(Grants|Granted) you .* Intelligence and .* Speed.",
+        " {5}(?:Grants|Granted) you .* Intelligence and .* Speed.",
         " {5}Granted you .* HP, .* Defense, .* Intelligence, and .* Strength.",
         "BUFF! You have gained Healing V!"
     )
@@ -158,7 +158,7 @@ object DungeonChatFilter {
      */
     private val startPatterns by patternGroup.list(
         "start",
-        ".* .* \\d+%? -> .*",
+        ".* .* \\d+%? -> \\d+%?",
         "\\[NPC] Mort: Here, I found this map when I first entered the dungeon.",
         "\\[NPC] Mort: You should find it useful if you get lost.",
         "\\[NPC] Mort: Good luck.",
