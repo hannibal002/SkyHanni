@@ -379,25 +379,29 @@ object FishingApi {
             emberArmorNames.matches(it?.getInternalName()?.asString())
         }
 
-    fun isTrophyFishing(): Boolean {
-        if (wearingTrophyArmor ||
-            wearingEmberArmor ||
+    fun isTrophyFishing(requireArmor: Boolean = false): Boolean {
+        val wearingArmor = wearingTrophyArmor || wearingEmberArmor
+        if (requireArmor && !wearingArmor) {
+            return false
+        }
+
+        if (wearingArmor ||
             currentBait?.internalName == HOT_BAIT ||
             hasTrophyLine
         ) {
             return true
         }
+
         if (!holdingRod) return false
 
-        // TODO: repofiy the levels numbers
-        val fishingLevel = SkillApi.storage?.get(SkillType.FISHING)?.level ?: return false
-        if (IslandType.CRIMSON_ISLE.isInIsland()) {
-            // FIXME: crimson isles hotspot mobs are minimum level 14
-            return fishingLevel < 27
-        } else if (IslandType.LOTUS_ATOLL.isInIsland()) {
-            // FIXME: lotus atoll hotspot mobs are minimum level 5
-            return fishingLevel < 10
+        // TODO: repofiy the levels numbers/islands
+        // TODO: Check if hotspot fishing since those have lower level requirements
+        val fishingLevel = SkillApi.storage?.get(SkillType.FISHING)?.level
+        return when {
+            fishingLevel == null -> false
+            IslandType.CRIMSON_ISLE.isInIsland() -> fishingLevel < 27
+            IslandType.LOTUS_ATOLL.isInIsland() -> fishingLevel < 10
+            else -> false
         }
-        return false
     }
 }

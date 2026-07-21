@@ -277,7 +277,7 @@ object TrophyFishDisplay {
         if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (FishingApi.hasTreasureHook) return
-        if (!FishingApi.isTrophyFishing()) return
+        if (!FishingApi.isTrophyFishing(requireArmor = config.requireArmor.get())) return
 
         config.position.renderRenderables(
             display,
