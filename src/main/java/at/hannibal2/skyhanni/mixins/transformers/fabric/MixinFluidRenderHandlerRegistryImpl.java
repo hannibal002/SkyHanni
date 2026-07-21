@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.skyhanni.mixins.transformers.fabric;
 
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
