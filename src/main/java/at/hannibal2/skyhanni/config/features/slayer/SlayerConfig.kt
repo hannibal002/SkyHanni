@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
@@ -15,6 +16,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -136,7 +138,7 @@ class SlayerConfig {
     var questWarningTitle: Boolean = true
 
     @Expose
-    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have Smoldering Polarization active.")
+    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have a Re-Heated Gummy Polar Bear active.")
     @ConfigEditorBoolean
     @FeatureToggle
     var gummyWarning: Boolean = true
