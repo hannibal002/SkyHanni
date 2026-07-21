@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -31,9 +33,10 @@ import kotlin.time.Duration.Companion.seconds
 object GummyWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
-
     private var lastWarned = SimpleTimeMark.farPast()
     private var lastWarningShown = SimpleTimeMark.farPast()
+    private var hasHabanero = false
+
     /**
      * REGEX-TEST: Smoldering Tomb
      * REGEX-TEST: The Wasteland
@@ -42,7 +45,10 @@ object GummyWarning {
         "slayer.gummy.smoldering-area",
         "Smoldering Tomb|The Wasteland"
     )
+
     private var inSmolderingArea = false
+    private var holdingSlayerWeapon = false
+    private var slayerWeapons: Map<SlayerType, Set<NeuInternalName>> = emptyMap()
     private val display = Renderable.text("§4§lNo Polar Bear Active!", scale = 2.0)
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -50,29 +56,39 @@ object GummyWarning {
         inSmolderingArea = smolderingAreaPattern.matcher(SkyBlockUtils.graphArea ?: "").find()
     }
 
-    private var slayerWeapons: Map<SlayerType, Set<NeuInternalName>> = emptyMap()
-
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
         slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
-
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityClick(event: EntityClickEvent) {
-        if (event.action != EntityClickEvent.ActionType.ATTACK) return
-        if (!config.gummyWarning) return
-        if (SlayerApi.activeType == null) return
-
-        val id = event.itemInHand?.getInternalNameOrNull() ?: return
-        if (slayerWeapons[SlayerApi.activeType]?.contains(id) != true) return
-
+    fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
         val armor = InventoryUtils.getArmor()
-        val hasHabanero = armor.any { piece ->
+        hasHabanero = armor.any { piece ->
             if (piece == null) return@any false
             val enchants = piece.getHypixelEnchantments() ?: return@any false
             enchants.containsKey("ultimate_habanero_tactics")
         }
+    }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onItemChange(event: OwnInventoryItemUpdateEvent) {
+        if (!isEnabled()) return
+        val activeSlayer = SlayerApi.activeType ?: run {
+            holdingSlayerWeapon = false
+            return
+        }
+        val id = event.itemStack.getInternalNameOrNull() ?: run {
+            holdingSlayerWeapon = false
+            return
+        }
+        holdingSlayerWeapon = slayerWeapons[activeSlayer]?.contains(id) == true
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityClick(event: EntityClickEvent) {
+        if (event.action != EntityClickEvent.ActionType.ATTACK) return
+        if (!isEnabled()) return
+        if (!holdingSlayerWeapon) return
 
         if (!hasHabanero && !inSmolderingArea) return
 
@@ -91,12 +107,13 @@ object GummyWarning {
             )
         }
     }
-        @HandleEvent(onlyOnSkyblock = true)
-        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-            if (!config.gummyWarning) return
-            if (lastWarningShown.passedSince() > 3.seconds) return
-
-            config.gummyWarningPosition.renderRenderable(display, posLabel = "Gummy Warning")
-        }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.gummyWarning) return
+        if (lastWarningShown.passedSince() > 3.seconds) return
+        config.gummyWarningPosition.renderRenderable(display, posLabel = "Gummy Warning")
     }
+
+    private fun isEnabled() = config.gummyWarning && SlayerApi.activeType != null
+}
 
