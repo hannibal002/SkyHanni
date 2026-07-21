@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -33,6 +34,10 @@ object GummyWarning {
 
     private var lastWarned = SimpleTimeMark.farPast()
     private var lastWarningShown = SimpleTimeMark.farPast()
+    /**
+     * REGEX-TEST: Smoldering Tomb
+     * REGEX-TEST: The Wasteland
+     */
     private val smolderingAreaPattern by RepoPattern.pattern(
         "slayer.gummy.smoldering-area",
         "Smoldering Tomb|The Wasteland"
@@ -45,11 +50,12 @@ object GummyWarning {
         inSmolderingArea = smolderingAreaPattern.matcher(SkyBlockUtils.graphArea ?: "").find()
     }
 
-    private var slayerData: RemainingSlayerKills.SlayerData? = null
+    private var slayerWeapons: Map<SlayerType, Set<NeuInternalName>> = emptyMap()
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        slayerData = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
+        val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
+        slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -59,7 +65,7 @@ object GummyWarning {
         if (SlayerApi.activeType == null) return
 
         val id = event.itemInHand?.getInternalNameOrNull() ?: return
-        if (slayerData?.weapons?.get(SlayerApi.activeType)?.containsKey(id) != true) return
+        if (slayerWeapons[SlayerApi.activeType]?.contains(id) != true) return
 
         val armor = InventoryUtils.getArmor()
         val hasHabanero = armor.any { piece ->
