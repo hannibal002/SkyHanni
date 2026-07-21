@@ -88,10 +88,8 @@ object ChestValue {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
-        val inInv = Minecraft.getInstance().screen is InventoryScreen
-        inOwnInventory = inInv && StorageType.OWN_INVENTORY in config.enabledIn.get()
         val inInv = MinecraftCompat.screen is InventoryScreen
-        inOwnInventory = inInv && config.enableInOwnInventory
+        inOwnInventory = inInv && StorageType.OWN_INVENTORY in config.enabledIn.get()
         if (!inInventory) return
         update()
     }
