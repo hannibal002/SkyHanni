@@ -21,6 +21,7 @@ abstract class SkyHanniRule(config: Config, description: String) : Rule(config, 
         report(Finding(Entity.from(this), message))
     }
 
+    // Reference: https://github.com/detekt/detekt/
     protected fun reportIssue(
         message: String,
         lineIndex: Int,
