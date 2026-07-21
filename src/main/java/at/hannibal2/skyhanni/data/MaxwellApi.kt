@@ -262,6 +262,10 @@ object MaxwellApi {
         }
     }
 
+    fun readTuningFromLine(line: String): ThaumaturgyPowerTuning? {
+        return thaumaturgyDataPattern.readTuningFromLine(line) ?: statsTuningDataPattern.readTuningFromLine(line)
+    }
+
     private fun loadThaumaturgyCurrentPower(inventoryItems: Map<Int, SafeItemStack>) {
         val selectedPowerStack =
             inventoryItems.values.find {
