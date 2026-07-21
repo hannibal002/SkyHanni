@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
-import kotlinx.coroutines.runBlocking
 import org.apache.commons.lang3.SystemUtils
 import org.lwjgl.glfw.GLFW
+import kotlinx.coroutines.runBlocking
 
 open class TextInput {
 

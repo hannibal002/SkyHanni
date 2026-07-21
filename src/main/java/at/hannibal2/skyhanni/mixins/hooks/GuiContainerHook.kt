@@ -18,7 +18,7 @@ class GuiContainerHook(guiAny: Any) {
     private val gui: SkyHanniGuiContainer = guiAny as SkyHanniGuiContainer
     private val container: AbstractContainerMenu get() = gui.menu
 
-    fun shouldCancelCloseWindow(): Boolean = CloseWindowEvent(gui, container).post()
+    fun shouldCancelCloseWindow(): Boolean = CloseWindowEvent(gui, container).post().isCancelled
 
     fun backgroundDrawn(context: GuiGraphicsExtractor, mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (GlobalRender.renderDisabled) return
@@ -32,7 +32,9 @@ class GuiContainerHook(guiAny: Any) {
         partialTicks: Float,
     ): Boolean {
         if (GlobalRender.renderDisabled) return false
-        return if (GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post()) {
+        return if (
+            GuiContainerEvent.PreDraw(context, gui, container, mouseX, mouseY, partialTicks).post().isCancelled
+        ) {
             GuiData.preDrawEventCancelled = true
             true
         } else {
@@ -58,7 +60,7 @@ class GuiContainerHook(guiAny: Any) {
     }
 
     fun shouldCancelDrawSlot(slot: Slot) =
-        GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, container, slot).post()
+        GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPre(gui, container, slot).post().isCancelled
 
     fun onDrawSlotPost(slot: Slot) {
         GuiContainerEvent.DrawSlotEvent.GuiContainerDrawSlotPost(gui, container, slot).post()
@@ -66,6 +68,6 @@ class GuiContainerHook(guiAny: Any) {
 
     fun shouldCancelMouseClick(slot: Slot?, slotId: Int, clickedButton: Int, clickType: ContainerInput): Boolean {
         val item = container.items.takeIf { it.size > slotId && slotId >= 0 }?.get(slotId)
-        return SlotClickEvent(gui, container, item, slot, slotId, clickedButton, clickType).post()
+        return SlotClickEvent(gui, container, item, slot, slotId, clickedButton, clickType).post().isCancelled
     }
 }

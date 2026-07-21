@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.gui.components.PlayerTabOverlay
 import kotlin.reflect.KProperty
 
 fun <T> tabListGuarded(block: (PlayerTabOverlay) -> T): T {
     tabListGuard = true
     try {
-        return block(Minecraft.getInstance().gui.tabList)
+        return block(MinecraftCompat.hud.tabList)
     } finally {
         tabListGuard = false
     }

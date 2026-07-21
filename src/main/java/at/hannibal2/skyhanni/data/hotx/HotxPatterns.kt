@@ -23,10 +23,11 @@ object HotxPatterns {
      * REGEX-TEST: ■ -20% Pickaxe Ability cooldowns.
      * REGEX-TEST: ■ 10x chance to find Golden and
      * REGEX-TEST: ■ Gain 5x Titanium drops.
+     * WRAPPED-REGEX-TEST: " ■ -20% Pickaxe Ability cooldowns."
      */
     val rotatingPerkPattern by patternGroup.pattern(
         "perk.generic",
-        """(?:New buff: |■ )(?<perk>.*)"""
+        """ ?(?:New buff: |■ )(?<perk>.*)"""
     )
 
     // The line that appears before the "current" perk effect in the item tooltip.
