@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
@@ -50,11 +51,25 @@ object NavigationHelper {
         }
         val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
-        if (config.allowInstantNavigation && locations.size == 1) {
-            val (name, node) = locations.first()
-            node.pathFind(label = name, allowRerouting = true, condition = { true })
-            sendNavigateMessageWithContent("§7Only one location found, navigating to §r$name", goBack)
-            return
+        if (config.allowInstantNavigation) {
+            val exactMatch = locations.firstOrNull { (name, _) ->
+                name.substringBefore(" §7(").equals(searchTerm, ignoreCase = true)
+            }
+
+            val target = exactMatch ?: locations.takeIf { it.size == 1 }?.first()
+
+            if (target != null) {
+                val (name, node) = target
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
+
+                val message = if (exactMatch != null) {
+                    "§7Exact match found, navigating to §r$name"
+                } else {
+                    "§7Only one location found, navigating to §r$name"
+                }
+                sendNavigateMessageWithContent(message, goBack)
+                return
+            }
         }
 
         TextHelper.displayPaginatedList(
@@ -94,7 +109,7 @@ object NavigationHelper {
             // no need to navigate to the current area
             if (node.name == SkyBlockUtils.graphArea) continue
             val tag = node.tags.first { it in allowedTags }
-            val name = "${node.name} §7(${tag.displayName}§7)"
+            val name = "${node.cleanName} §7(${tag.displayName}§7)"
             if (name in names) continue
             names[name] = node
         }
@@ -110,7 +125,7 @@ object NavigationHelper {
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in graph) {
             if (!node.enabled) continue
-            val name = node.name ?: continue
+            val name = node.cleanName ?: continue
             val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
@@ -134,7 +149,7 @@ object NavigationHelper {
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
                 SkyHanniMod.launchCoroutine("shnavigate command") {
-                    doCommandAsync(it.lowercase())
+                    doCommandAsync(it.lowercase().removeColor())
                 }
             }
             simpleCallback {
@@ -145,7 +160,7 @@ object NavigationHelper {
 
     private fun getNames(): List<String> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyList()
-        return graph.filterByActive { it.isValidAreaNode() }.mapNotNull { it.name }
+        return graph.filterByActive { it.isValidAreaNode() }.mapNotNull { it.cleanName }
     }
 
     private fun GraphNode.isValidAreaNode(): Boolean {

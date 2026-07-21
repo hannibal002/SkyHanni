@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.deferredItemRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -125,14 +126,14 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = SafeItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = deferredItemRenderable { SafeItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET") },
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
         "Gourmand", 10.minutes,
         color = LorenzColor.AQUA,
         dwarvenSpecific = true,
-        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND"),
+        iconInput = deferredItemRenderable { DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND") },
     ),
     ;
 

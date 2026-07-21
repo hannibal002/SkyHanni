@@ -34,8 +34,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.command
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.roundedUpSeconds
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.milliseconds
@@ -106,6 +105,10 @@ object TrevorFeatures {
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
         "Trapper's Den",
+    )
+    private val clickArmorStandPattern by patternGroup.pattern(
+        "click.armorstand",
+        "CLICK",
     )
     // </editor-fold>
 
@@ -331,7 +334,7 @@ object TrevorFeatures {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
 
         if (event.keyCode != config.keyBind) return
 
@@ -355,7 +358,7 @@ object TrevorFeatures {
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onCheckRender(event: CheckRenderEntityEvent<ArmorStand>) {
         if (!inTrapperDen || !config.cooldown) return
-        if (event.entity.name.formattedTextCompatLessResets() == "§e§lCLICK") event.cancel()
+        if (clickArmorStandPattern.matches(event.entity.name.string)) event.cancel()
     }
 
     private fun resetTrapper() {

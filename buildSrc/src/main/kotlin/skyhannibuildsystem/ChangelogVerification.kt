@@ -47,13 +47,13 @@ abstract class ChangelogVerification : DefaultTask() {
             val errorFile = File(outputDirectory.get().asFile, "changelog_errors.txt")
             println("saved error file to: ${errorFile.path}")
 
-            errorFile.appendText("I have detected some issues with your pull request:\n\n")
+            errorFile.appendText("Detected issues with the pull request description:\n\n")
 
             if (bodyErrors.isNotEmpty()) {
-                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n") { it.formatLine() }}\n\n")
+                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n", prefix = "- ") { it.formatLine() }}\n\n")
             }
             if (titleErrors.isNotEmpty()) {
-                errorFile.appendText("Title issues:\n${titleErrors.joinToString("\n") { it.message }}\n\n")
+                errorFile.appendText("Title issues:\n${titleErrors.joinToString("\n", prefix = "- ") { it.message }}\n\n")
             }
 
             errorFile.appendText("Please fix these issues. For the correct format, refer to the [pull request template]($templateLocation).")

@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.subtract
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -237,6 +237,11 @@ object ExperimentationTableApi {
     var miscRepoRewards: List<NeuInternalName> = emptyList()
         private set
 
+    // "Endcap Upgrade" items (Hypixel wiki) — same Ultra Rare RNG cost as T7 books (500k XP) but
+    // no in-game "ULTRA-RARE" lore header at flip time, so detected via internal-name matching instead.
+    var ultraRareMiscItems: List<NeuInternalName> = emptyList()
+        private set
+
     enum class ExperimentationMessages(private val displayName: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
         EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
@@ -326,7 +331,9 @@ object ExperimentationTableApi {
 
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        miscRepoRewards = event.getConstant<ExperimentsJson>("ExperimentationTable").miscRewards
+        val experiments = event.getConstant<ExperimentsJson>("ExperimentationTable")
+        miscRepoRewards = experiments.miscRewards
+        ultraRareMiscItems = experiments.ultraRareRewards.orEmpty()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -433,8 +440,9 @@ object ExperimentationTableApi {
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND, priority = HandleEvent.HIGH)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inTable) return
-        event.tryFireRareBookUncovered()
         event.tryUpdateCurrentActivity()
+        event.tryFireRareBookUncovered()
+        event.tryFireRareItemUncovered()
         refreshBottlesInInventory()
     }
 
@@ -486,7 +494,7 @@ object ExperimentationTableApi {
             it != lastExpOverHash && it != currentExpOverHash && it != 0
         } ?: return
 
-        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.hoverName.string.removeColor()) ?: return
+        currentExperimentData.type = ExperimentationTaskType.fromStringOrNull(item.cleanName) ?: return
         currentExperimentData.tier = expOverStakesLorePattern.firstMatcher(lore) {
             ExperimentationTier.byNameOrNull(group("stakes"))
         } ?: return
@@ -537,6 +545,18 @@ object ExperimentationTableApi {
                 currentExperimentData.rareFoundFired = true
                 return
             }
+        }
+    }
+
+    private fun InventoryOpenEvent.tryFireRareItemUncovered() {
+        if (currentExperimentData.rareFoundFired) return
+        if (!inSuperpairs) return
+        for ((_, item) in inventoryItems) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (internalName !in ultraRareMiscItems) continue
+            TableRareUncoverEvent(item.cleanName, isBook = false).post()
+            currentExperimentData.rareFoundFired = true
+            return
         }
     }
 

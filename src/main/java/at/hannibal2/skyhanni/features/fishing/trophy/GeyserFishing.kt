@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +25,7 @@ object GeyserFishing {
     private var geyserBox: AABB? = null
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!shouldProcessParticles()) return
         with(event) {
             if (type != ParticleTypes.CLOUD || count != 15 || speed != 0.05f || offset != geyserOffset) return
@@ -61,7 +61,7 @@ object GeyserFishing {
         event.drawFilledBoundingBox(geyserBox, color)
     }
 
-    private fun hideGeyserParticles(event: ReceiveParticleEvent) {
+    private fun hideGeyserParticles(event: ParticleEvent) {
         val bobber = FishingApi.bobber ?: return
         val geyser = geyser ?: return
 
