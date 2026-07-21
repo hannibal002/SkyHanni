@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.features.combat.DeployableConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -41,10 +40,9 @@ object DeployableReminder {
         )
     }
 
-    @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    @HandleEvent(onlyOnIsland = MINESHAFT)
+    fun onIslandJoin() {
         if (!isEnabled()) return
-        if (event.newIsland != IslandType.MINESHAFT) return
         val deployableType = getActiveDeployableType(WarningType.MINESHAFT) ?: return
         scheduleWarning(
             message = "Place Down Lantern!",
