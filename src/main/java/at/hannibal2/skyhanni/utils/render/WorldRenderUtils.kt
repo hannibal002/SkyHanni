@@ -40,6 +40,7 @@ import kotlin.math.sqrt
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.utils.compat.position
 import at.hannibal2.skyhanni.utils.compat.rotation
+import net.minecraft.client.renderer.MultiBufferSource
 //?}
 
 @Suppress("LargeClass")
@@ -47,6 +48,22 @@ object WorldRenderUtils {
 
     //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
+
+    //? if >= 26.1 {
+    // 26.1 composites entity render targets over the main target after the normal world-render hook.
+    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
+    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
+
+    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
+        if (deferredSeeThroughText.isEmpty()) return
+        try {
+            deferredSeeThroughText.forEach { it(bufferSource) }
+            bufferSource.endBatch()
+        } finally {
+            deferredSeeThroughText.clear()
+        }
+    }
+    //?}
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -271,6 +288,26 @@ object WorldRenderUtils {
 
         val x = -fr.width(text) / 2f
 
+        //? if >= 26.1 {
+        if (seeThroughBlocks) {
+            deferredSeeThroughText.add { bufferSource ->
+                fr.drawInBatch(
+                    text,
+                    x,
+                    0f,
+                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+                    shadow,
+                    matrix,
+                    bufferSource,
+                    Font.DisplayMode.SEE_THROUGH,
+                    backGroundColor,
+                    15728880,
+                )
+            }
+            return
+        }
+        //?}
+
         fr.drawInBatch(
             text,
             x,
@@ -327,6 +364,26 @@ object WorldRenderUtils {
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         val x = -fr.width(text) / 2f
+
+        //? if >= 26.1 {
+        if (seeThroughBlocks) {
+            deferredSeeThroughText.add { bufferSource ->
+                fr.drawInBatch(
+                    text,
+                    x,
+                    0f,
+                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+                    shadow,
+                    matrix,
+                    bufferSource,
+                    Font.DisplayMode.SEE_THROUGH,
+                    backGroundColor,
+                    15728880,
+                )
+            }
+            return
+        }
+        //?}
 
         fr.drawInBatch(
             text,
