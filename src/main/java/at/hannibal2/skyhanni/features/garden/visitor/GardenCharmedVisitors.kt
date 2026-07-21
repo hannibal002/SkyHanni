@@ -78,14 +78,16 @@ object GardenCharmedVisitors {
     private fun addCharmed(visitor: VisitorApi.Visitor) {
         val storage = storage ?: return
         val name = visitor.visitorName
-        storage.charmedVisitors.add(name)
+        val changed = storage.charmedVisitors.add(name)
+        if (!changed) return
         updateDisplay()
     }
 
     private fun removeCharmed(visitor: VisitorApi.Visitor) {
         val storage = storage ?: return
         val name = visitor.visitorName
-        storage.charmedVisitors.remove(name)
+        val changed = storage.charmedVisitors.remove(name)
+        if (!changed) return
         updateDisplay()
     }
 
