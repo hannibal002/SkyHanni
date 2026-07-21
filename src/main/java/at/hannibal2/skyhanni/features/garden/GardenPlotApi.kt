@@ -158,7 +158,7 @@ object GardenPlotApi {
         private set
 
     fun checkCurrentPlot() {
-        val plot = getCurrentPlot()
+        val plot = fetchCurrentPlot()
         if (plot != currentPlot) {
             currentPlot = plot
             updateCurrentPlot()
@@ -313,7 +313,7 @@ object GardenPlotApi {
 
     fun Plot.isBarn() = id == 0
 
-    fun Plot.isPlayerInside() = getCurrentPlot() == this
+    fun Plot.isPlayerInside() = fetchCurrentPlot() == this
 
     fun getPlot(location: LorenzVec): Plot? {
         if (location.y !in 0.0..<256.0) return null

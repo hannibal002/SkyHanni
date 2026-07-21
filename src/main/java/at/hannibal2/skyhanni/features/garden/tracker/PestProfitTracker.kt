@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.GardenPlotSprayedEvent
+import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.item.ShardGainEvent
 import at.hannibal2.skyhanni.features.garden.CropCollectionType
@@ -256,7 +256,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onGardenPlotSprayed(event: GardenPlotSprayedEvent) {
+    fun onGardenPlotSprayAddedEvent(event: GardenPlotSprayEvent.GardenPlotSprayAddedEvent) {
         event.type.addSprayUsed()
     }
 
