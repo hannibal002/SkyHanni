@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -43,7 +42,7 @@ object PestFinder {
 
     private var display = emptyList<Renderable>()
 
-    @HandleEvent(PestUpdateEvent::class)
+    @HandleEvent()
     fun onPestUpdate() {
         update()
     }
