@@ -34,7 +34,7 @@ object DeployableReminder {
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         if (!isEnabled()) return
-        if (!isWarningActive(SLAYER)) return
+        if (!isWarningEnabled(SLAYER)) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
 
         scheduleWarning(
@@ -47,7 +47,7 @@ object DeployableReminder {
     @HandleEvent(onlyOnIsland = MINESHAFT)
     fun onIslandJoin() {
         if (!isEnabled()) return
-        if (!isWarningActive(MINESHAFT)) return
+        if (!isWarningEnabled(MINESHAFT)) return
 
         scheduleWarning(
             warningType = MINESHAFT,
@@ -59,7 +59,7 @@ object DeployableReminder {
     @HandleEvent
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
-        if (!isWarningActive(TROPHY_FISHING)) return
+        if (!isWarningEnabled(TROPHY_FISHING)) return
         if (!FishingApi.isTrophyFishing()) return
 
         showWarning(
@@ -123,7 +123,7 @@ object DeployableReminder {
         }
     }
 
-    private fun isWarningActive(warningType: WarningType) = activeWarnings.any { it.type == warningType }
+    private fun isWarningEnabled(warningType: WarningType) = config.warningTypes.contains(warningType)
 
     private fun isEnabled() = config.enabled && config.warningTypes.isNotEmpty()
 }
