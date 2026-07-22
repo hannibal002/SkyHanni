@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -63,10 +62,17 @@ object PestSpawnTimer {
      * WRAPPED-REGEX-TEST: " Cooldown: 58s"
      * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
-
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldowntime-no-color",
         "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Alive: 8"
+     */
+    private val maxPestsAlivePattern by patternGroup.pattern(
+        "max-pests-alive",
+        "\\sAlive: 8",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -93,6 +99,15 @@ object PestSpawnTimer {
         if (!event.isWidget(TabWidget.PESTS)) return
         val widgetLines = event.widget.lines.map { it.string }
 
+        // Hypixel can sometimes send partial widget.
+        // so we first check if the maximum number of pests is present as a workaround that.
+        maxPestsAlivePattern.firstMatcher(widgetLines) {
+            maxPests = true
+            pestCooldownEndTime = SimpleTimeMark.farPast()
+            shouldRepeatWarning = false
+            return
+        }
+
         pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
@@ -113,14 +128,6 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
-        } ?: run {
-            if (widgetLines.all { it.isBlank() }) return
-
-            ErrorManager.logErrorStateWithData(
-                "Could not find pest cooldown time from widget.",
-                internalMessage = "Could not find pest cooldown time in widget update event.",
-                "widgetLines" to widgetLines,
-            )
         }
     }
 
