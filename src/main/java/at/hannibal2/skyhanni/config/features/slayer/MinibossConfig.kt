@@ -24,7 +24,7 @@ class MinibossConfig {
     @Expose
     @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Mobs when your own Slayer Boss is active.")
     @ConfigEditorBoolean
-    val shouldBossInterruptLine: Boolean = true
+    var shouldBossInterruptLine: Boolean = true
 
     @Expose
     @ConfigOption(name = "Miniboss Highlight", desc = "Highlight Slayer Miniboss cocoons in line color below (even when line is disabled).")
@@ -40,5 +40,5 @@ class MinibossConfig {
     @Expose
     @ConfigOption(name = "Disable when Boss", desc = "Disables Line to Miniboss Cocoon when your own Slayer Boss is active.")
     @ConfigEditorBoolean
-    val shouldBossInterruptCocoonLine: Boolean = true
+    var shouldBossInterruptCocoonLine: Boolean = true
 }
