@@ -21,7 +21,9 @@ class ChestValueConfig {
     @Expose
     @ConfigOption(name = "Enabled in", desc = "Select where to show the Chest Value display.")
     @ConfigEditorDraggableList
-    val enabledIn: Property<MutableList<StorageType>> = Property.of(mutableListOf())
+    val enabledIn: Property<MutableList<StorageType>> = Property.of(
+        mutableListOf(StorageType.ENDER_CHEST, StorageType.BACKPACK),
+    )
 
     enum class StorageType(private val displayName: String) {
         OWN_INVENTORY("Own Inventory"),

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.SortingTypeEntry
 import at.hannibal2.skyhanni.config.features.inventory.ChestValueConfig.StorageType
@@ -39,6 +40,8 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonArray
+import com.google.gson.JsonPrimitive
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
@@ -287,6 +290,21 @@ object ChestValue {
         var total: Double,
         val tips: List<String>,
     )
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(
+            139,
+            "inventory.chestValueConfig.enableInOwnInventory",
+            "inventory.chestValueConfig.enabledIn",
+        ) { element ->
+            JsonArray().apply {
+                add(JsonPrimitive(StorageType.ENDER_CHEST.name))
+                add(JsonPrimitive(StorageType.BACKPACK.name))
+                if (element.asBoolean) add(JsonPrimitive(StorageType.OWN_INVENTORY.name))
+            }
+        }
+    }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
