@@ -99,7 +99,7 @@ object DeployableReminder {
         message: String,
         type: DeployableType,
     ) {
-        if (!scheduledWarnings.remove(warningType) && activeWarnings.any { it.type == warningType }) return
+        if (activeWarnings.any { it.type == warningType }) return
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
 
         SoundUtils.playErrorSound()
