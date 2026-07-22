@@ -379,13 +379,9 @@ object FishingApi {
             emberArmorNames.matches(it?.getInternalName()?.asString())
         }
 
-    fun isTrophyFishing(requireArmor: Boolean = false): Boolean {
-        val wearingArmor = wearingTrophyArmor || wearingEmberArmor
-        if (requireArmor && !wearingArmor) {
-            return false
-        }
-
-        if (wearingArmor ||
+    fun isTrophyFishing(): Boolean {
+        if (wearingTrophyArmor ||
+            wearingEmberArmor ||
             currentBait?.internalName == HOT_BAIT ||
             hasTrophyLine
         ) {

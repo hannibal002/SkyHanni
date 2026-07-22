@@ -89,6 +89,7 @@ object TrophyFishDisplay {
                 showCheckmark,
                 onlyShowMissing,
                 showCaughtHigher,
+                requireArmor
             ) {
                 TrophyFishManager.loadMissingTrophyFish()
                 update()
@@ -277,7 +278,9 @@ object TrophyFishDisplay {
         if (!isEnabled() || !canRender()) return
         if (EstimatedItemValue.isCurrentlyShowing()) return
         if (FishingApi.hasTreasureHook) return
-        if (!FishingApi.isTrophyFishing(requireArmor = config.requireArmor.get())) return
+        if (config.requireArmor.get()) {
+            if (!FishingApi.isTrophyFishing()) return
+        }
 
         config.position.renderRenderables(
             display,
