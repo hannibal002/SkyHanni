@@ -297,6 +297,7 @@ fun parseOneLiner(logContent: String): String? {
         ?: lines.firstOrNull { it.trimStart().startsWith("e: ") }
         ?: lines.firstOrNull { "Received status code" in it }
         ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
+        ?: lines.firstOrNull { ": error:" in it && ".java:" in it }
         ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
     if (line == null || workspace.isNullOrEmpty()) return line
     return line.replace("file://$workspace/", "")
@@ -319,7 +320,10 @@ fun parseStackTrace(logContent: String): String {
 
 fun parseAllErrors(logContent: String): List<String> =
     logContent.lines()
-        .filter { it.trimStart().startsWith("e: ") && "warnings found and -Werror specified" !in it }
+        .filter {
+            (it.trimStart().startsWith("e: ") || (": error:" in it && ".java:" in it)) &&
+                "warnings found and -Werror specified" !in it
+        }
         .distinct()
 
 fun parseErrorContinuations(logContent: String, errorLine: String): List<String> {
@@ -332,7 +336,7 @@ fun parseErrorContinuations(logContent: String, errorLine: String): List<String>
         val next = lines[i]
         if (next.isBlank()) break
         if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
-        if (next.startsWith(">") || next.startsWith("FAILURE") || next.startsWith("*")) break
+        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
         result.add(next.trim())
         i++
     }
@@ -395,11 +399,16 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         if (rawErrorLines.isNotEmpty()) {
             for (rawLine in rawErrorLines.take(5)) {
                 val display = rawLine.trimStart().removePrefix("e: ")
-                    .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "") else it }
+                    .let {
+                        if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
+                        else it
+                    }
                     .take(300)
                 appendLine("- `$display`")
-                for (cont in parseErrorContinuations(logContent, rawLine)) {
-                    appendLine("  - `${cont.take(300)}`")
+                if (rawLine.trimStart().startsWith("e: ")) {
+                    for (cont in parseErrorContinuations(logContent, rawLine)) {
+                        appendLine("  - `${cont.take(300)}`")
+                    }
                 }
             }
             if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
