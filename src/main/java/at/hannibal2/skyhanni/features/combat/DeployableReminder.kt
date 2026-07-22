@@ -85,11 +85,10 @@ object DeployableReminder {
 
     private fun showWarning(
         warningType: WarningType,
-        message: String,
-        type: DeployableType = warningType.deployableType,
+        message: String
     ) {
         if (activeWarnings.any { it.type == warningType }) return
-        if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
+        if (DeployableDisplay.getActiveDeployables().any { it.type == warningType.deployableType }) return
 
         SoundUtils.playErrorSound()
         activeWarnings.add(
