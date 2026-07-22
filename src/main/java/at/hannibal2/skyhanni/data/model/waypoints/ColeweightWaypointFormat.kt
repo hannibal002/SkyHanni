@@ -9,6 +9,7 @@ import com.google.gson.reflect.TypeToken
 
 @AutoService(WaypointFormat::class)
 class ColeweightWaypointFormat : WaypointFormat {
+
     data class ColeweightWaypoint(
         @Expose
         val x: Int,

@@ -3,16 +3,16 @@ import dev.detekt.gradle.DetektCreateBaselineTask
 import org.gradle.api.artifacts.ComponentMetadataContext
 import org.gradle.api.artifacts.ComponentMetadataRule
 
-
 plugins {
     kotlin("jvm")
     id("com.google.devtools.ksp")
     id("dev.detekt")
 }
 
-// TODO remove this class once Detekt 2.0.0-alpha.6 is out
+// TODO remove this once Detekt 2.0.0-alpha.6 is out
 // https://github.com/detekt/detekt/issues/9409
 abstract class DetektTestMetadataRule : ComponentMetadataRule {
+
     override fun execute(context: ComponentMetadataContext) {
         val version = context.details.id.version
         if (version != "2.0.0-alhpa.4" && version != "2.0.0-alpha.5") return

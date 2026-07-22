@@ -5,6 +5,7 @@ package at.hannibal2.skyhanni.utils.render.atlas
  * Two draw calls with the same key will share a single atlas slot.
  */
 sealed interface SkyHanniRoundedShapeAtlasKey {
+
     val pixelWidth: Int
     val pixelHeight: Int
     val smoothness: Float

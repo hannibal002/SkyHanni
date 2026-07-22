@@ -1,4 +1,3 @@
-import at.skyhanni.sharedvariables.MappingStyle
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
@@ -33,7 +32,7 @@ plugins {
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 val primaryTarget = ProjectTarget.MODERN_26200
-val isDeobf = target.mappingStyle == MappingStyle.NONE
+val isDeobf = target.minecraftVersion.versionNumber >= 260100
 
 if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
 else apply(plugin = "net.fabricmc.fabric-loom-remap")
@@ -80,8 +79,7 @@ loom.apply {
 
     runs {
         named("client") {
-            isIdeConfigGenerated = true
-            appendProjectPathToConfigName.set(true)
+            appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
@@ -154,11 +152,7 @@ dependencies {
     minecraft("com.mojang:minecraft:$versionName")
     @Suppress("UnstableApiUsage")
     if (!isDeobf) {
-        if (target.mappingDependency == "official") {
-            mappings(loom.officialMojangMappings())
-        } else {
-            mappings(target.mappingDependency)
-        }
+        mappings(loom.officialMojangMappings())
     }
 
     compileOnly(libs.jbAnnotations)
