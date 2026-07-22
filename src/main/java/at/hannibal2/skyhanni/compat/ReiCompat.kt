@@ -7,6 +7,9 @@ import me.shedaniel.math.Point
 import me.shedaniel.rei.api.client.REIRuntime
 import me.shedaniel.rei.api.client.gui.widgets.Slot
 import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
+import me.shedaniel.rei.api.common.entry.type.EntryTypeRegistry
+import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes
+import me.shedaniel.rei.api.common.plugins.PluginManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.events.ContainerEventHandler
 import net.minecraft.client.gui.components.events.GuiEventListener
@@ -18,7 +21,7 @@ object ReiCompat {
 
     @JvmStatic
     fun searchHasFocus(): Boolean {
-        if (!isReiLoaded) return false
+        if (!isReiReady()) return false
         if (Minecraft.getInstance().screen == null) return false
         return try {
             (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
@@ -28,21 +31,24 @@ object ReiCompat {
     }
 
     fun getHoveredStackFromRei(): SafeItemStack? {
-        if (!isReiLoaded) return null
-        try {
-            REIRuntime.getInstance()
+        if (!isReiReady()) return null
+        return try {
+            getItemStackFromItemList() ?: (Minecraft.getInstance().screen as? AbstractContainerScreen<*>)
+                ?.let(::getItemStackFromRecipe)
         } catch (e: Throwable) {
-            return null
+            null
         }
-        var stack = getItemStackFromItemList()
-        if (stack == null) {
-            val screen = Minecraft.getInstance().screen
-            if (screen !is AbstractContainerScreen<*>) return null
-            stack = getItemStackFromRecipe(screen)
-        }
-        return stack
     }
 
+    private fun isReiReady(): Boolean {
+        if (!isReiLoaded) return false
+        return try {
+            !PluginManager.areAnyReloading() &&
+                EntryTypeRegistry.getInstance().get(VanillaEntryTypes.ITEM.id) != null
+        } catch (e: Throwable) {
+            false
+        }
+    }
 
     private fun getItemStackFromRecipe(screen: AbstractContainerScreen<*>): SafeItemStack? {
         val entryStack = ScreenRegistry.getInstance().getFocusedStack(screen, currentMousePoint())
