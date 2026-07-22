@@ -131,6 +131,8 @@ object PestSpawnTimer {
             }
         } ?: run {
             if (widgetLines.all { it.isBlank() }) return
+            // If somehow only the "Pests: " line is visible.
+            if (widgetLines.size == 1) return
 
             ErrorManager.logErrorStateWithData(
                 "Could not find pest cooldown time from widget.",
