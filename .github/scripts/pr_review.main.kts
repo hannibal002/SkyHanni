@@ -393,11 +393,16 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         if (rawErrorLines.isNotEmpty()) {
             for (rawLine in rawErrorLines.take(5)) {
                 val display = rawLine.trimStart().removePrefix("e: ")
-                    .let { if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "") else it }
+                    .let {
+                        if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
+                        else it
+                    }
                     .take(300)
                 appendLine("- `$display`")
-                for (cont in parseErrorContinuations(logContent, rawLine)) {
-                    appendLine("  - `${cont.take(300)}`")
+                if (rawLine.trimStart().startsWith("e: ")) {
+                    for (cont in parseErrorContinuations(logContent, rawLine)) {
+                        appendLine("  - `${cont.take(300)}`")
+                    }
                 }
             }
             if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
