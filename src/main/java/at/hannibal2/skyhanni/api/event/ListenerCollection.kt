@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.api.event
 import at.hannibal2.skyhanni.api.event.EventListeners.Listener
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 
 class ListenerCollection(
     listeners: List<Listener>,
@@ -116,11 +115,7 @@ class ListenerCollection(
 
             islandTypes += options.onlyOnIslands
 
-            options.onlyOnIslandTypeTag
-                .takeIfNotEmpty()
-                ?.forEach { tag ->
-                    islandTypes += tag.getTypes()
-                }
+            options.onlyOnIslandTypeTag.forEach { tag -> islandTypes += tag.getTypes() }
 
             return islandTypes.toList()
         }
