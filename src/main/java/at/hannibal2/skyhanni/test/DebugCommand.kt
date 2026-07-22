@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesRepoManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.data.repo.SkyHanniRepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.TpsCounter
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -130,11 +130,11 @@ object DebugCommand {
             return
         }
 
-        if (SkyBlockUtils.currentIsland != HypixelData.skyBlockIsland) {
+        if (SkyBlockUtils.currentIsland != HypixelLocationApi.island) {
             event.addData {
                 add("using a test island!")
                 add("test island: ${SkyBlockIslandTest.testIsland}")
-                add("real island: ${HypixelData.skyBlockIsland}")
+                add("real island: ${HypixelLocationApi.island}")
             }
             return
         }
@@ -231,7 +231,7 @@ object DebugCommand {
                 add("previousPings: ${CurrentPing.previousPings.map { it.formatTime() }}")
             }
 
-            if (LimboTimeTracker.inLimbo) {
+            if (HypixelData.inLimbo) {
                 add("currently in limbo!")
             }
         }

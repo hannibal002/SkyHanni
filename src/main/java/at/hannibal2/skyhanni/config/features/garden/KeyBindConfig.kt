@@ -29,6 +29,15 @@ class KeyBindConfig {
 
     @Expose
     @ConfigOption(
+        name = "Include Vacuum",
+        desc = "Also use custom keybinds while holding a Vacuum in your hand.\n" +
+            "§eRequires main toggle to be enabled!",
+    )
+    @ConfigEditorBoolean
+    var vacuum: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Include Fishing Rod",
         desc = "Also use custom keybinds while holding a fishing rod in your hand.\n" +
             "§eRequires main toggle to be enabled!",

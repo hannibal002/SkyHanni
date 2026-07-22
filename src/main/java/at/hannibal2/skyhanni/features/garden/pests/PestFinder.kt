@@ -35,11 +35,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -151,7 +151,7 @@ object PestFinder {
     private fun shouldShowBasedOnHeldItem(): Boolean {
         return when (config.whenToShow) {
             WhenToShow.ALWAYS -> true
-            WhenToShow.BOTH -> PestApi.hasVacuumInHand() || PestApi.hasLassoInHand()
+            WhenToShow.BOTH -> PestApi.hasVacuumOrLassoInHand()
             WhenToShow.ONLY_WITH_VACUUM_IN_HAND -> PestApi.hasVacuumInHand()
             WhenToShow.ONLY_WITH_LASSO_IN_HAND -> PestApi.hasLassoInHand()
         }
@@ -222,7 +222,7 @@ object PestFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onKeyPress(event: KeyPressEvent) {
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
 
         if (event.keyCode != config.teleportHotkey) return
         if (lastKeyPress.passedSince() < 2.seconds) return
@@ -268,7 +268,7 @@ object PestFinder {
         }
     }
 
-    fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
+    private fun isEnabled() = GardenApi.inGarden() && (config.showDisplay || config.showPlotInWorld)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

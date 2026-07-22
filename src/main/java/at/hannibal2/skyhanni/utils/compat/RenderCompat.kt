@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils.compat
 
+import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.pipeline.RenderTarget
 import com.mojang.blaze3d.systems.GpuDevice
 import com.mojang.blaze3d.systems.RenderPass
 import com.mojang.blaze3d.systems.RenderSystem
+import net.minecraft.client.renderer.RenderPipelines
 import java.util.OptionalDouble
 import java.util.OptionalInt
-import com.mojang.blaze3d.pipeline.RenderPipeline
-import net.minecraft.client.renderer.RenderPipelines
 
 object RenderCompat {
 

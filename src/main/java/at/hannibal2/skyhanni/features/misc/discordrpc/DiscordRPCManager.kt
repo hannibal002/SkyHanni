@@ -4,6 +4,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.feature
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.api.EliteDevApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,6 +16,9 @@ import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.misc.items.enchants.Enchant
+import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantsJson
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -28,10 +32,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object DiscordRPCManager {
@@ -56,10 +60,14 @@ object DiscordRPCManager {
     private var retryJob: Job? = null
     private var lastDebugInfo: Map<String, String> = emptyMap()
 
+    private val repoReloadCoroutine = CoroutineSettings("discord RPC manager repo reload")
     private val startCoroutine = CoroutineSettings("discord RPC start", timeout = Duration.INFINITE).withIOContext()
     private val presenceCoroutine = CoroutineSettings("discord RPC updatePresence", timeout = Duration.INFINITE).withIOContext()
     private val stopCoroutine = CoroutineSettings("discord RPC stop", timeout = Duration.INFINITE).withIOContext()
     private val manualStartCoroutine = CoroutineSettings("discord RPC manual start", timeout = Duration.INFINITE).withIOContext()
+
+    internal var stackingEnchants: Map<String, Enchant.Stacking> = emptyMap()
+        private set
 
     private fun isConnected() = client?.isConnected == true
     private fun isEnabled() = config.enabled.get()
@@ -111,6 +119,11 @@ object DiscordRPCManager {
     fun onKeyPress() {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return
         beenAfkFor = SimpleTimeMark.now()
+    }
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        stackingEnchants = event.getConstantAsync<EnchantsJson>("Enchants").stacking
     }
 
     @HandleEvent
@@ -178,7 +191,7 @@ object DiscordRPCManager {
     private fun start(progress: ChatProgressUpdates, fromCommand: Boolean = false) {
         progress.update("call start")
         if (isConnected()) {
-            progress.end("alr connected")
+            progress.end("already connected")
             return
         }
         updateDebugStatus("Starting...")

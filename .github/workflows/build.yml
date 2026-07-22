@@ -1,0 +1,125 @@
+# Execution context: PR branch code
+name: Build
+
+on:
+    push:
+        branches:
+            - "**"
+        paths-ignore:
+            - ".gitignore"
+    pull_request:
+        branches:
+            - "**"
+        paths-ignore:
+            - ".gitignore"
+    workflow_dispatch: { }
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        name: Build and test
+        strategy:
+            fail-fast: false
+            matrix:
+                minecraft_version:
+                    - "1.21.11"
+                    - "26.1"
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.pull_request.head.ref }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
+            -   name: Build with Gradle w/retry
+                id: assemble_main
+                if: github.repository == 'hannibal002/SkyHanni'
+                continue-on-error: true
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
+            -   name: Build with Gradle w/retry
+                id: assemble_fork
+                if: github.repository != 'hannibal002/SkyHanni'
+                continue-on-error: true
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:assemble -x ${{ matrix.minecraft_version }}:test --stacktrace
+            -   name: Save assemble log on failure
+                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                run: |
+                    cp "$GITHUB_WORKSPACE/gradle-output.log" \
+                       "assemble-failure-${{ matrix.minecraft_version }}.log" 2>/dev/null || true
+            -   name: Upload assemble failure artifact
+                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                uses: actions/upload-artifact@v7
+                with:
+                    name: build-failure-output-${{ matrix.minecraft_version }}
+                    path: assemble-failure-${{ matrix.minecraft_version }}.log
+                    if-no-files-found: warn
+            -   name: Upload development build
+                uses: actions/upload-artifact@v7
+                with:
+                    path: build/libs/SkyHanni-*-mc${{ matrix.minecraft_version }}.jar
+                    archive: false
+            -   name: Test with Gradle w/retry
+                if: github.repository == 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Test with Gradle w/retry
+                if: github.repository != 'hannibal002/SkyHanni'
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: ${{ matrix.minecraft_version }}:test
+            -   name: Upload test report
+                uses: actions/upload-artifact@v7
+                if: ${{ !cancelled() }}
+                with:
+                    name: Test Results (${{ matrix.minecraft_version }})
+                    path: versions/${{ matrix.minecraft_version }}/build/reports/tests/test/
+                    if-no-files-found: warn
+            -   name: Fail job if assemble failed
+                if: steps.assemble_main.outcome == 'failure' || steps.assemble_fork.outcome == 'failure'
+                run: exit 1
+
+    verify:
+        runs-on: ubuntu-latest
+        name: Verify build results
+        needs: build
+        if: ${{ always() && !cancelled() && !contains(needs.*.result, 'cancelled') }}
+        steps:
+            -   name: Check matrix result
+                env:
+                    REQUIRED_JOBS: ${{ toJSON(needs) }}
+                run: |
+                    python3 <<'PY'
+                    import json
+                    import os
+                    import sys
+
+                    jobs = json.loads(os.environ["REQUIRED_JOBS"])
+                    failed_jobs = []
+
+                    for name, job in jobs.items():
+                        result = job["result"]
+                        print(f"{name}: {result}")
+                        if result != "success":
+                            failed_jobs.append((name, result))
+
+                    for name, result in failed_jobs:
+                        print(f"::error title=Required job did not succeed::{name} finished with result '{result}'")
+
+                    sys.exit(1 if failed_jobs else 0)
+                    PY

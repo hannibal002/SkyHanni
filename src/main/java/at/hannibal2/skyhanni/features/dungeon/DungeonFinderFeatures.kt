@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi.DungeonClass
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
@@ -18,13 +19,14 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 // TODO also fix up this all being coded very poorly and having the same patterns in multiple places
 @SkyHanniModule
@@ -56,16 +58,16 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST:  4sn_: Archer (29)
-     * REGEX-TEST:  kaydo_odyak: Berserk (26)
-     * REGEX-TEST:  ItsKind: §eBerserk§b (§e38§b)
-     * REGEX-TEST:  sphxia: §eTank§b (§e36§b)
-     * REGEX-TEST:  Skept1x: §eMage§b (§e35§b)
-     * REGEX-TEST:  Mewlius: §eArcher§b (§e41§b)
+     * WRAPPED-REGEX-TEST: " 4sn_: Archer (29)"
+     * WRAPPED-REGEX-TEST: " kaydo_odyak: Berserk (26)"
+     * WRAPPED-REGEX-TEST: " ItsKind: Berserk (38)"
+     * WRAPPED-REGEX-TEST: " sphxia: Tank (36)"
+     * WRAPPED-REGEX-TEST: " Skept1x: Mage (35)"
+     * WRAPPED-REGEX-TEST: " Mewlius: Archer (41)"
      */
     private val memberPattern by patternGroup.pattern(
-        "member",
-        " (?<playerName>.*): (?<className>.*) \\((?<level>.*)\\)",
+        "member.colorless",
+        " (?<playerName>.*): (?<className>.*?) \\(.*?(?<level>\\d+).*?\\)",
     )
 
     /**
@@ -114,10 +116,10 @@ object DungeonFinderFeatures {
     )
 
     /**
-     * REGEX-TEST: §a§aThe Catacombs §8- §eEntrance
+     * REGEX-TEST: The Catacombs - Entrance
      */
     private val entranceFloorPattern by patternGroup.pattern(
-        "entrance",
+        "entrance.colorless",
         ".*Entrance",
     )
 
@@ -172,16 +174,14 @@ object DungeonFinderFeatures {
     )
 
     //  Variables used
-    private var selectedClass = ""
+    private var selectedClass: DungeonClass? = null
     private var floorStackSize = mapOf<Int, String>()
     private var highlightParty = mapOf<Int, LorenzColor>()
     private var toolTipMap = mapOf<Int, List<Component>>()
     private var inInventory = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (!isEnabled()) return
-
         floorStackSize = stackTip(event)
         highlightParty = highlightingHandler(event)
         toolTipMap = toolTipHandler(event)
@@ -197,10 +197,10 @@ object DungeonFinderFeatures {
         return map
     }
 
-    private fun selectFloorStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun selectFloorStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.hoverName.string.removeColor()
+            val name = stack.cleanName
             map[slot] = if (anyFloorPattern.matches(name)) {
                 "A"
             } else if (entranceFloorPattern.matches(name)) {
@@ -213,35 +213,36 @@ object DungeonFinderFeatures {
         }
     }
 
-    private fun partyFinderStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun partyFinderStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         inInventory = true
         for ((slot, stack) in inventoryItems) {
-            val name = stack.cleanName()
+            val name = stack.cleanName
             if (!checkIfPartyPattern.matches(name)) continue
-            val lore = stack.getLoreComponent()
-            val floor = lore.find { floorPattern.matches(it.string) } ?: continue
-            val dungeon = lore.find { dungeonFloorPattern.matches(it.string) } ?: continue
+            val lore = stack.getCleanLore()
+            val floor = lore.find { floorPattern.matches(it) } ?: continue
+            val dungeon = lore.find { dungeonFloorPattern.matches(it) } ?: continue
             val floorNum = floorNumberPattern.matchMatcher(floor) {
                 group("floorNum").romanToDecimalIfNecessary()
             }
-            map[slot] = getFloorName(floor.string, dungeon.string, floorNum)
+            map[slot] = getFloorName(floor, dungeon, floorNum)
         }
     }
 
-    private fun catacombsGateStackTip(inventoryItems: Map<Int, ItemStack>, map: MutableMap<Int, String>) {
+    private fun catacombsGateStackTip(inventoryItems: Map<Int, SafeItemStack>, map: MutableMap<Int, String>) {
         val dungeonClassItemIndex = 45
         inInventory = true
-        inventoryItems[dungeonClassItemIndex]?.getLoreComponent()?.let {
+        inventoryItems[dungeonClassItemIndex]?.getCleanLore()?.let {
             if (it.size > 3 && detectDungeonClassPattern.matches(it[0])) {
-                getDungeonClassPattern.matchMatcher(it[2].string) {
-                    selectedClass = group("class")
+                getDungeonClassPattern.matchMatcher(it[2]) {
+                    // This intentionally does not get cleared between lobbies
+                    selectedClass = DungeonClass.getByClassName(group("class"))
                 }
             }
         }
 
         if (!config.floorAsStackSize) return
         for ((slot, stack) in inventoryItems) {
-            val name = stack.hoverName.string.removeColor()
+            val name = stack.cleanName
             if (!floorTypePattern.matches(name)) continue
             val floorNum = floorNumberPattern.matchMatcher(name) {
                 group("floorNum").romanToDecimalIfNecessary()
@@ -265,9 +266,9 @@ object DungeonFinderFeatures {
         // TODO: Refactor this to not have so many continue statements
         @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
-            val lore = stack.getLoreComponent()
-            if (!checkIfPartyPattern.matches(stack.cleanName())) continue
-            if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore.map { it.string })) {
+            val lore = stack.getCleanLore()
+            if (!checkIfPartyPattern.matches(stack.cleanName)) continue
+            if (config.markIneligibleGroups && ineligiblePattern.anyMatches(lore)) {
                 map[slot] = LorenzColor.DARK_RED
                 continue
             }
@@ -298,7 +299,7 @@ object DungeonFinderFeatures {
             }
             val memberClasses = members.map {
                 memberPattern.matchMatcher(it) {
-                    group("className")
+                    DungeonClass.getByClassName(group("className"))
                 }
             }
             if (config.markBelowClassLevel != 0) {
@@ -322,26 +323,43 @@ object DungeonFinderFeatures {
         if (!partyFinderTitlePattern.matches(inventoryName)) return map
         inInventory = true
         for ((slot, stack) in event.inventoryItems) {
-            // TODO use enum
-            val classNames = mutableListOf("Healer", "Mage", "Berserk", "Archer", "Tank")
+            val missingClasses = DungeonClass.entries.toMutableList()
+            val cleanLore = stack.getCleanLore()
             val toolTip = stack.getLoreComponent().toMutableList()
-            for ((index, line) in stack.getLoreComponent().withIndex()) {
+            for ((index, line) in cleanLore.withIndex()) {
                 memberPattern.matchMatcher(line) {
                     val playerName = group("playerName")
                     val className = group("className")
                     val level = group("level").toInt()
-                    val color = DungeonApi.getColor(level)
-                    if (config.coloredClassLevel) toolTip[index] = " §b$playerName§f: §e$className $color$level".asComponent()
-                    classNames.remove(className)
+                    val levelComponent = DungeonApi.getLevelComponent(level)
+                    if (config.coloredClassLevel) toolTip[index] = componentBuilder {
+                        appendWithColor(" $playerName", ChatFormatting.AQUA)
+                        appendWithColor(": ", ChatFormatting.WHITE)
+                        appendWithColor("$className ", ChatFormatting.YELLOW)
+                        append(levelComponent)
+                    }
+                    missingClasses.remove(DungeonClass.getByClassName(className))
                 }
             }
-            val name = stack.getLoreComponent().firstOrNull()
+            val name = cleanLore.firstOrNull()
             if (config.showMissingClasses && dungeonFloorPattern.matches(name)) {
-                if (classNames.contains(selectedClass)) {
-                    classNames[classNames.indexOf(selectedClass)] = "§a$selectedClass§7"
-                }
                 toolTip.add("")
-                toolTip.add("§cMissing: §7" + classNames.createCommaSeparatedList())
+                toolTip.add(
+                    componentBuilder {
+                        appendWithColor("Missing: ", ChatFormatting.RED)
+                        missingClasses.forEachIndexed { index, dungeonClass ->
+                            if (dungeonClass == selectedClass) {
+                                appendWithColor(dungeonClass.displayName, ChatFormatting.GREEN)
+                            } else {
+                                appendWithColor(dungeonClass.displayName, ChatFormatting.GRAY)
+                            }
+
+                            if (index < missingClasses.size - 1) {
+                                appendWithColor(", ", ChatFormatting.GRAY)
+                            }
+                        }
+                    }
+                )
             }
             if (toolTip.isNotEmpty()) {
                 map[slot] = toolTip
@@ -361,13 +379,15 @@ object DungeonFinderFeatures {
 
         val toolTip = toolTipMap[event.slot.index]
         if (toolTip.isNullOrEmpty()) return
-        val oldToolTip = event.toolTip
+        val oldToolTip = event.toolTip.toList()
         for ((index, line) in toolTip.withIndex()) {
             if (index >= event.toolTip.size - 1) {
                 event.toolTip.add(line)
                 continue
             }
-            if (oldToolTip[index] != line) event.toolTip[index + 1] = line
+            if (oldToolTip[index].string.removeColor() != line.string.removeColor()) {
+                event.toolTip[index + 1] = line
+            }
         }
     }
 
@@ -403,6 +423,9 @@ object DungeonFinderFeatures {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
 
-    // todo use graph area
-    fun isEnabled() = SkyBlockUtils.inSkyBlock && SkyBlockUtils.scoreboardArea == "Dungeon Hub"
+    // TODO: move this somewhere else
+    private fun SafeItemStack.getCleanLore() = getLoreComponent().map { it.string.removeColor() }
+
+    // Since you can call Mort from anywhere, or use the command, this should not check for being in DUNGEON_HUB
+    fun isEnabled() = SkyBlockUtils.inSkyBlock && selectedClass != null
 }

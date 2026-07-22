@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addDeletableMessageToChat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.command
@@ -65,7 +66,7 @@ object TextHelper {
 
     fun Component.fitToChat(): Component {
         val width = this.width()
-        val maxWidth = Minecraft.getInstance().gui.chat.width
+        val maxWidth = MinecraftCompat.hud.chat.width
         if (width < maxWidth) {
             val repeat = maxWidth / width
             val component = "".asComponent()
@@ -75,10 +76,10 @@ object TextHelper {
         return this
     }
 
-    fun Component.center(width: Int = Minecraft.getInstance().gui.chat.width): Component {
+    fun Component.center(width: Int = MinecraftCompat.hud.chat.width): Component {
         val textWidth = this.width()
-        val spaceWidth = SPACE.width()
-        val padding = (width - textWidth) / 2
+        val spaceWidth = SPACE.width().coerceAtLeast(1)
+        val padding = (width - textWidth).coerceAtLeast(0) / 2
         return join(" ".repeat(padding / spaceWidth), this)
     }
 
@@ -207,11 +208,12 @@ object TextHelper {
         var done = false
 
         component.forEachNonEmpty { style, string ->
+            fun String.newText() = asComponent().withStyle(style)
             if (done) return@forEachNonEmpty
             for (c in string) {
                 if (index >= match.length) {
                     if (currentString.isNotEmpty()) {
-                        newComponent.append(Component.literal(currentString).withStyle(style))
+                        newComponent.append(currentString.newText())
                     }
                     currentString = ""
                     done = true
@@ -227,7 +229,7 @@ object TextHelper {
                 }
             }
             if (currentString.isNotEmpty()) {
-                newComponent.append(Component.literal(currentString).withStyle(style))
+                newComponent.append(currentString.newText())
             }
             currentString = ""
         }
@@ -239,16 +241,17 @@ object TextHelper {
         var currentComponent = Component.empty()
 
         component.forEachNonEmpty { style, string ->
+            fun String.toStyledComponent() = this.asComponent().withStyle(style)
             val split = string.split(delimiter)
             if (split.isEmpty() || split.size == 1) {
-                currentComponent.append(Component.literal(string).withStyle(style))
+                currentComponent.append(string.toStyledComponent())
             } else {
-                currentComponent.append(Component.literal(split.first()).withStyle(style))
+                currentComponent.append(split.first().toStyledComponent())
                 if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                 currentComponent = Component.empty()
                 for ((index, str) in split.withIndex()) {
                     if (index == 0) continue
-                    currentComponent.append(Component.literal(str).withStyle(style))
+                    currentComponent.append(str.toStyledComponent())
                     if (currentComponent.string.isNotEmpty()) newComponents.add(currentComponent)
                     currentComponent = Component.empty()
                 }
@@ -272,9 +275,9 @@ object TextHelper {
         }
     }
 
-    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit<T>(
+    private fun <T : Any> Component.visitNonEmpty(visitor: (Style, String) -> Optional<T>): Optional<T> = this.visit(
         { style, string ->
-            if (string.isNullOrEmpty()) Optional.empty()
+            if (string.isEmpty()) Optional.empty()
             else visitor(style, string)
         },
         Style.EMPTY,

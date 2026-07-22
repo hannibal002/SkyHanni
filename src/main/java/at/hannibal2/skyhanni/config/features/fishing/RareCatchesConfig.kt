@@ -47,7 +47,7 @@ class RareCatchesConfig {
 
     @ConfigOption(name = "Custom Party Chat List", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Highlight", desc = "Highlight nearby rare sea creatures.")

@@ -3,30 +3,19 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cacheInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.UtilsPatterns
-import net.minecraft.SharedConstants
-import net.minecraft.server.Bootstrap
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.Items
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 
 class ItemUtilsTest {
-
-    companion object {
-        @JvmStatic
-        @BeforeAll
-        fun bootstrapMinecraftRegistries() {
-            SharedConstants.tryDetectVersion()
-            Bootstrap.bootStrap()
-        }
-    }
 
     // <editor-fold desc="Item Amount Test">
     private val items: MutableMap<String, Pair<String, Int>> = mutableMapOf(
@@ -171,8 +160,7 @@ class ItemUtilsTest {
         expectedCategory: ItemCategory,
     ) {
         val stack = ItemUtils.createItemStack(item, displayName, lore)
-        stack.cachedData.lastInternalName = internalName.toInternalName()
-        stack.cachedData.lastInternalNameFetchTime = SimpleTimeMark.now()
+        stack.cacheInternalName(internalName.toInternalName())
 
         assertEquals(expectedRarity, stack.getItemRarityOrNull())
         assertEquals(expectedCategory, stack.getItemCategoryOrNull())

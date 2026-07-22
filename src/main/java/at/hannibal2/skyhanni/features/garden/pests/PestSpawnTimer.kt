@@ -25,8 +25,10 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -89,8 +91,9 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+        val widgetLines = event.widget.lines.map { it.string }
 
-        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+        pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
@@ -110,6 +113,14 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
+        } ?: run {
+            if (widgetLines.all { it.isBlank() }) return
+
+            ErrorManager.logErrorStateWithData(
+                "Could not find pest cooldown time from widget.",
+                internalMessage = "Could not find pest cooldown time in widget update event.",
+                "widgetLines" to widgetLines,
+            )
         }
     }
 
@@ -158,7 +169,9 @@ object PestSpawnTimer {
         if (shouldRepeatWarning) {
             countdownTitleContext?.stop()
             countdownTitleContext = null
-            if (!pestCooldownEndTime.isInPast()) {
+            if (pestCooldownEndTime.isInPast()) {
+                shouldRepeatWarning = false
+            } else {
                 countdownWarn(pestCooldownEndTime.timeUntil())
             }
         }
@@ -179,7 +192,7 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (shouldRepeatWarning) {
-            if (WardrobeApi.inWardrobe()) {
+            if (ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
                 shouldRepeatWarning = false
                 countdownTitleContext?.stop()
                 countdownTitleContext = null
@@ -286,6 +299,7 @@ object PestSpawnTimer {
             option = config::cooldownOverWarning,
             messageId = cooldownOverMessageId,
         )
+        hasWarned = true
         hasReminderShown = true
 
         if (config.repeatWarning) {

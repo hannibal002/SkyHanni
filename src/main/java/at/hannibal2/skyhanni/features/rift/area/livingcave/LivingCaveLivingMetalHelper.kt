@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
@@ -30,7 +30,7 @@ object LivingCaveLivingMetalHelper {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType == ClickType.LEFT_CLICK) {
+        if (event.clickType == InteractClickType.LEFT_CLICK) {
             val name = event.blockState.block.toString()
             if (name.contains("lapis_ore")) {
                 lastClicked = event.position
@@ -79,7 +79,7 @@ object LivingCaveLivingMetalHelper {
     }
 
     @HandleEvent
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return
 

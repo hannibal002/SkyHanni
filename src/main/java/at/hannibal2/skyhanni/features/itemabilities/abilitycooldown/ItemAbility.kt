@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.inPartialSeconds
-import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -35,7 +35,7 @@ enum class ItemAbility(
     GYROKINETIC_WAND_LEFT(30, "GYROKINETIC_WAND", alternativePosition = true),
     GYROKINETIC_WAND_RIGHT(10, "GYROKINETIC_WAND"),
     GIANTS_SWORD(30),
-    ICE_SPRAY_WAND(5),
+    ICE_SPRAY_WAND(5, "STARRED_ICE_SPRAY_WAND"),
     RAGNAROCK_AXE(20),
     WAND_OF_ATONEMENT(7, "WAND_OF_HEALING", "WAND_OF_MENDING", "WAND_OF_RESTORATION"),
     SOS_FLARE(10),
@@ -135,7 +135,7 @@ enum class ItemAbility(
             return entries.firstOrNull { it.newVariant && internalName in it.internalNames }
         }
 
-        fun getAllAbilityScrolls(itemStack: ItemStack?): Set<ItemAbility> =
+        fun getAllAbilityScrolls(itemStack: SafeItemStack?): Set<ItemAbility> =
             itemStack?.getAbilityScrolls()?.takeIfNotEmpty()?.getAllAbilityScrolls().orEmpty()
 
         private fun List<NeuInternalName>.getAllAbilityScrolls(): Set<ItemAbility> = WITHER_SCROLLS

@@ -3,11 +3,11 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -24,7 +24,7 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val bezierFitter = ParticlePathBezierFitter(3)
-    fun getBezierFitterCount(): Int { return bezierFitter.count() }
+    fun getBezierFitterCount() = bezierFitter.count()
 
     private var lastGuess: GuessEntry? = null
 
@@ -34,25 +34,17 @@ object PreciseGuessBurrow {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         val type = event.type
         if (type != ParticleTypes.DRIPPING_LAVA) return
         if (event.count != 2) return
         if (event.speed != -0.5f) return
         lastLavaParticle = SimpleTimeMark.now()
-        val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         GriffinBurrowHelper.removeSpadeWarnTitle()
-        if (bezierFitter.isEmpty()) {
-            bezierFitter.addPoint(currLoc)
-            return
-        }
-        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
 
-        if (distToLast == 0.0 || distToLast > 3.0) return
-
-        bezierFitter.addPoint(currLoc)
+        if (!bezierFitter.tryAdd(event.location, maxDistanceToLast = 3.0)) return
 
         if (bezierFitter.count() < 6) {
             val duration = (6 - bezierFitter.count()) * 100
@@ -82,11 +74,11 @@ object PreciseGuessBurrow {
     private var lastLavaParticle = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onUseAbility(event: ItemClickEvent) {
+    fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
-        if (event.clickType != ClickType.RIGHT_CLICK) {
+        if (event.clickType != InteractClickType.RIGHT_CLICK) {
             DelayedRun.runOrNextTick { GriffinBurrowHelper.removeInaccurateIfLooking() }
             return
         }
@@ -100,7 +92,7 @@ object PreciseGuessBurrow {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Precise Burrow Guess")
 
         if (!DianaApi.isDoingDiana()) {
