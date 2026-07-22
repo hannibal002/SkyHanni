@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -108,37 +109,37 @@ object HotmApi {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(
-        override val perkDescription: String,
+        override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            perkDescription = "+100⸕ Mining Speed",
-            chatFallback = "Gain \\+100⸕ Mining Speed\\.",
-            itemFallback = "Gain \\+100⸕ Mining Speed\\.",
+            displayDescription = "§6+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed",
+            chatFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
+            itemFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            perkDescription = "+50☘ Mining Fortune",
-            chatFallback = "Gain \\+50☘ Mining Fortune\\.",
-            itemFallback = "Gain \\+50☘ Mining Fortune\\.",
+            displayDescription = "§6+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune",
+            chatFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
         ),
         EXTRA_POWDER(
-            perkDescription = "+15% more Powder",
+            displayDescription = "§a+15% §7more Powder",
             chatFallback = "Gain \\+15% more Powder while mining\\.",
             itemFallback = "Gain \\+15% more Powder while mining\\.",
         ),
         ABILITY_COOLDOWN(
-            perkDescription = "-20% Pickaxe Ability cooldowns",
+            displayDescription = "§a-20% §7Pickaxe Ability cooldowns",
             chatFallback = "-20% Pickaxe Ability cooldowns\\.",
             itemFallback = "-20% Pickaxe Ability cooldowns\\.",
         ),
         GOBLIN_CHANCE(
-            perkDescription = "10x Gold & Diamond Goblin chance",
+            displayDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
             chatFallback = "10x chance to find Golden and Diamond Goblins\\.",
             itemFallback = "10x chance to find Golden and",
         ),
         TITANIUM(
-            perkDescription = "5x Titanium drops",
+            displayDescription = "§a5x §9Titanium §7drops",
             chatFallback = "Gain 5x Titanium drops",
             itemFallback = "Gain 5x Titanium drops\\.",
         ),
@@ -149,13 +150,14 @@ object HotmApi {
         override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
+    @Suppress("MaxLineLength")
     enum class MayhemPerk(
         @field:Language("RegExp") val chatFallback: String,
     ) {
         SCRAP_CHANCE("Your Suspicious Scrap chance was buffed by your Mineshaft Mayhem perk!"),
-        MINING_FORTUNE("You received a Mining Fortune buff from your Mineshaft Mayhem perk!"),
-        MINING_SPEED("You received a Mining Speed buff from your Mineshaft Mayhem perk!"),
-        COLD_RESISTANCE("You received a ❄ Cold Resistance buff from your Mineshaft Mayhem perk!"),
+        MINING_FORTUNE("You received a ${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune buff from your Mineshaft Mayhem perk!"),
+        MINING_SPEED("You received a ${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed buff from your Mineshaft Mayhem perk!"),
+        COLD_RESISTANCE("You received a ${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold Resistance buff from your Mineshaft Mayhem perk!"),
         ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!"),
         ;
 

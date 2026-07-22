@@ -14,10 +14,14 @@ permissions:
 jobs:
     check-dependencies:
         runs-on: ubuntu-latest
+        # 511310721 is the Repository ID for SkyHanni
+        if: ${{ github.repository_id == '511310721' }}
         steps:
             -   name: Check out the repository
                 uses: actions/checkout@v7
                 with:
+                    # Avoid treating the trusted merge commit as fork code on merged PRs.
+                    ref: ${{ github.event.pull_request.base.ref }}
                     persist-credentials: false
 
             -   name: Evaluate dependency PRs

@@ -18,13 +18,8 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isPestCountInaccurate
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.locked
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.pests
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.uncleared
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -65,7 +60,7 @@ object PestApi {
             storage?.scoreboardPests = value
         }
 
-    private val gardenPestTypes = mutableMapOf<GardenPlotApi.Plot, List<PestType>>()
+    private val gardenPestTypes = mutableMapOf<GardenPlot, List<PestType>>()
     private var lastCheckedPlot = 0
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
@@ -81,26 +76,30 @@ object PestApi {
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
     val patternGroup = RepoPattern.group("garden.pests-api")
+
+    /**
+     * WRAPPED-REGEX-TEST: " §7 §aThe Garden §4§l§7 x1"
+     */
     private val pestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.pests",
-        " §7⏣ §[ac]The Garden §4§lൠ§7 x(?<pests>.*)",
+        " §7. §[ac]The Garden §4§l\uE018§7 x(?<pests>.*)",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " §7⏣ §aPlot §7- §b22a"
-     * WRAPPED-REGEX-TEST: " §7⏣ §aThe Garden"
+     * WRAPPED-REGEX-TEST: " §7 §aPlot §7- §b22a"
+     * WRAPPED-REGEX-TEST: " §7 §aThe Garden"
      */
     private val noPestsInScoreboardPattern by patternGroup.pattern(
         "scoreboard.no-pests",
-        " §7⏣ §a(?:The Garden|Plot §7- §b.+)$",
+        " §7. §a(?:The Garden|Plot §7- §b.+)$",
     )
 
     /**
-     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b4 §4§lൠ§7 x1"
+     * WRAPPED-REGEX-TEST: "   §aPlot §7- §b4 §4§l§7 x1"
      */
     private val pestsInPlotScoreboardPattern by patternGroup.pattern(
         "scoreboard.plot.pests",
-        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*ൠ(?:§.)* x(?<pests>\\d+)",
+        "\\s*(?:§.)*Plot (?:§.)*- (?:§.)*(?<plot>.+) (?:§.)*(?:§.)* x(?<pests>\\d+)",
     )
 
     /**
@@ -112,11 +111,11 @@ object PestApi {
     )
 
     /**
-     * REGEX-TEST: §4§lൠ §cThis plot has §25 §2ൠ Pests§c!
+     * REGEX-TEST: §4§l §cThis plot has §25 §2 Pests§c!
      */
     private val pestInventoryPattern by patternGroup.pattern(
         "inventory",
-        "§4§lൠ §cThis plot has §.(?<amount>\\d+) §2ൠ Pests?§c!",
+        "§4§l §cThis plot has §.(?<amount>\\d+) §2 Pests?§c!",
     )
 
     /**
@@ -335,11 +334,11 @@ object PestApi {
         lastCheckedPlot = plot.id
     }
 
-    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.addToPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+    private fun MutableMap<GardenPlot, List<PestType>>.addToPlot(plot: GardenPlot, pestType: PestType) {
         this[plot] = this.getOrDefault(plot, emptyList()) + pestType
     }
 
-    private fun MutableMap<GardenPlotApi.Plot, List<PestType>>.removeFromPlot(plot: GardenPlotApi.Plot, pestType: PestType) {
+    private fun MutableMap<GardenPlot, List<PestType>>.removeFromPlot(plot: GardenPlot, pestType: PestType) {
         val currentList = this[plot].orEmpty()
         val indexToRemove = currentList.indexOfFirst { it == pestType }
         if (indexToRemove != -1) {
@@ -361,7 +360,7 @@ object PestApi {
         pestTrapPattern.matches(it.displayName.formattedTextCompat())
     }
 
-    fun GardenPlotApi.Plot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
+    fun GardenPlot.getPestTypesInPlot() = gardenPestTypes.getOrDefault(this, listOf())
 
     private fun removePests(removedPests: Int) {
         if (removedPests < 1) return

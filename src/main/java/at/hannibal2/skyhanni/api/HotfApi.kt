@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import org.intellij.lang.annotations.Language
@@ -12,24 +13,24 @@ object HotfApi {
     var lottery: LotteryPerk? = null
 
     enum class LotteryPerk(
-        override val perkDescription: String,
+        override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         SWEEP(
-            perkDescription = "+5% ∮ Sweep",
-            chatFallback = """Gain \+5% ∮ Sweep\.""",
-            itemFallback = """Gain \+5% ∮ Sweep\.""",
+            displayDescription = "§a+5% §r§2${SkyblockStat.SWEEP.hypixelIcon} Sweep",
+            chatFallback = "Gain \\+5% ${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
+            itemFallback = "Gain \\+5% ${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
         ),
         MANGROVE_FORTUNE(
-            perkDescription = "+50 ☘ Mangrove Fortune",
-            chatFallback = """Gain \+50 ☘ Mangrove Fortune\.""",
-            itemFallback = """Gain \+50 ☘ Mangrove Fortune\.""",
+            displayDescription = "§a+50 §r§6${SkyblockStat.MANGROVE_FORTUNE.hypixelIcon} Mangrove Fortune",
+            chatFallback = "Gain \\+50 ${SkyblockStat.MANGROVE_FORTUNE.hypixelIcon} Mangrove Fortune\\.",
+            itemFallback = "Gain \\+50 ${SkyblockStat.MANGROVE_FORTUNE.hypixelIcon} Mangrove Fortune\\.",
         ),
         FIG_FORTUNE(
-            perkDescription = "+50 ☘ Fig Fortune",
-            chatFallback = """Gain \+50 ☘ Fig Fortune\.""",
-            itemFallback = """Gain \+50 ☘ Fig Fortune\.""",
+            displayDescription = "§a+50 §r§6${SkyblockStat.FIG_FORTUNE.hypixelIcon} Fig Fortune",
+            chatFallback = "Gain \\+50 ${SkyblockStat.FIG_FORTUNE.hypixelIcon} Fig Fortune\\.",
+            itemFallback = "Gain \\+50 ${SkyblockStat.FIG_FORTUNE.hypixelIcon} Fig Fortune\\.",
         ),
         ;
 
