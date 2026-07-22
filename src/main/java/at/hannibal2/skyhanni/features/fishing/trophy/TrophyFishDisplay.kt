@@ -89,7 +89,7 @@ object TrophyFishDisplay {
                 showCheckmark,
                 onlyShowMissing,
                 showCaughtHigher,
-                requireArmor
+                requireArmor,
             ) {
                 TrophyFishManager.loadMissingTrophyFish()
                 update()

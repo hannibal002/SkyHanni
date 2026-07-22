@@ -380,6 +380,8 @@ object FishingApi {
         }
 
     fun isTrophyFishing(): Boolean {
+        if (hasTreasureHook) return false
+
         if (wearingTrophyArmor ||
             wearingEmberArmor ||
             currentBait?.internalName == HOT_BAIT ||
