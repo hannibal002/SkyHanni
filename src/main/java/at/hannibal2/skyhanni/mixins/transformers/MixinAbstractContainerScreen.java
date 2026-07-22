@@ -60,6 +60,9 @@ public abstract class MixinAbstractContainerScreen {
         if (new DrawScreenAfterEvent(context, mouseX, mouseY).post().isCancelled()) ci.cancel();
     }
 
+  >>>>>>> origin/beta
+
+
     @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (MinecraftCompat.getLocalWorldExists() && MinecraftCompat.getLocalPlayerExists()) {
