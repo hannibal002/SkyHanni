@@ -12,7 +12,7 @@ import java.nio.file.Path
 class RepoCommitStorageTest {
 
     @Test
-    fun `readFromFile deletes current commit json if getJson fails`(@TempDir tempDir: Path) {
+    fun `readFromFile deletes invalid current commit json`(@TempDir tempDir: Path) {
         val file = tempDir.resolve("currentCommit.json").toFile()
         file.writeText("{")
 
@@ -21,18 +21,18 @@ class RepoCommitStorageTest {
     }
 
     @Test
-    fun `readFromFile deletes current commit json if fromJson fails`(@TempDir tempDir: Path) {
+    fun `readFromFile deletes non-object (string) current commit json`(@TempDir tempDir: Path) {
         val file = tempDir.resolve("currentCommit.json").toFile()
-        file.writeText("\u0001")
+        file.writeText("\"not an object\"")
 
         assertNull(RepoCommitStorage(file).readFromFile())
         assertFalse(file.exists())
     }
 
     @Test
-    fun `readFromFile deletes non-object current commit json`(@TempDir tempDir: Path) {
+    fun `readFromFile deletes non-object (array) current commit json`(@TempDir tempDir: Path) {
         val file = tempDir.resolve("currentCommit.json").toFile()
-        file.writeText("\"not an object\"")
+        file.writeText("[1,2,3]")
 
         assertNull(RepoCommitStorage(file).readFromFile())
         assertFalse(file.exists())
