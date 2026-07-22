@@ -167,6 +167,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 add(buildSessionResetButton())
+                add(buildSessionPauseButton())
             }
         }
     }
@@ -205,7 +206,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     open fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
+        sharedTracker.modify { it.getActiveStopwatch()?.pause(false) }
         if (!customUptimeControl) unpausedTrackers.remove(this)
         update()
     }
@@ -255,6 +256,29 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()
+            }
+        },
+    )
+    protected fun buildSessionPauseButton() = Renderable.clickable(
+        if (isPaused()) "§aResume session!" else "§cPause session!",
+        tips = if (isPaused()) {
+            listOf(
+                "§aThis will resume your",
+                "§acurrent session of",
+                "§a$name",
+            )
+        } else {
+            listOf(
+                "§cThis will pause your",
+                "§ccurrent session of",
+                "§c$name",
+            )
+        },
+        onLeftClick = {
+            if (isPaused()) {
+                startSessionUptime()
+            } else {
+                pauseSessionUptime()
             }
         },
     )
