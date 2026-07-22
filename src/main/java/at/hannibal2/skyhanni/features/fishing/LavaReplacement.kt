@@ -7,11 +7,10 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.OpaqueWaterFluid
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.level.material.Fluid
@@ -24,8 +23,7 @@ import net.minecraft.client.renderer.block.FluidModel
 import net.minecraft.client.renderer.block.FluidStateModelSet
 import net.minecraft.client.resources.model.sprite.MaterialBaker
 //?} else {
-/*import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
+/*import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap
 import net.minecraft.client.renderer.BiomeColors
@@ -99,9 +97,7 @@ object LavaReplacement {
         val newActive = shouldReplace()
         if (newActive == isActive) return
         isActive = newActive
-        DelayedRun.runNextTick {
-            Minecraft.getInstance().levelRenderer.allChanged()
-        }
+        MinecraftCompat.reloadChunks()
     }
 
     private fun shouldReplace(): Boolean {
