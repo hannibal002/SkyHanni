@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
-import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -73,17 +72,13 @@ object GummyWarning {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemChange(event: OwnInventoryItemUpdateEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!isEnabled()) return
         val activeSlayer = SlayerApi.activeType ?: run {
             holdingSlayerWeapon = false
             return
         }
-        val id = event.itemStack.getInternalNameOrNull() ?: run {
-            holdingSlayerWeapon = false
-            return
-        }
-        holdingSlayerWeapon = slayerWeapons[activeSlayer]?.contains(id) == true
+        holdingSlayerWeapon = slayerWeapons[activeSlayer]?.contains(event.newItem) == true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
