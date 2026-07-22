@@ -35,9 +35,10 @@ object DeployableReminder {
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
+        if (!isWarningActive(SLAYER)) return
 
         scheduleWarning(
-            warningType = WarningType.SLAYER,
+            warningType = SLAYER,
             message = "Place Down Power Orb!",
             condition = { SlayerApi.isInBossFight() },
         )
@@ -46,9 +47,10 @@ object DeployableReminder {
     @HandleEvent(onlyOnIsland = MINESHAFT)
     fun onIslandJoin() {
         if (!isEnabled()) return
+        if (!isWarningActive(MINESHAFT)) return
 
         scheduleWarning(
-            warningType = WarningType.MINESHAFT,
+            warningType = MINESHAFT,
             message = "Place Down Lantern!",
             condition = { IslandType.MINESHAFT.isInIsland() },
         )
@@ -58,9 +60,10 @@ object DeployableReminder {
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
         if (!FishingApi.isTrophyFishing()) return
+        if (!isWarningActive(TROPHY_FISHING)) return
 
         showWarning(
-            warningType = WarningType.TROPHY_FISHING,
+            warningType = TROPHY_FISHING,
             message = "Place Down Umberella!",
         )
     }
@@ -69,6 +72,7 @@ object DeployableReminder {
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         activeWarnings.removeIf { it.startTime.passedSince() > config.warningDuration.seconds }
+
         val renderables = activeWarnings.map { it.renderable }
         config.warningPosition.renderRenderables(
             renderables,
@@ -87,7 +91,6 @@ object DeployableReminder {
         message: String,
         type: DeployableType = warningType.deployableType,
     ) {
-        if (!isWarningActive(warningType)) return
         if (activeWarnings.any { it.type == warningType }) return
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
 
@@ -105,7 +108,6 @@ object DeployableReminder {
         message: String,
         condition: () -> Boolean = { true },
     ) {
-        if (!isWarningActive(warningType)) return
         if (!scheduledWarnings.add(warningType)) return
 
         DelayedRun.runDelayed(warningDelay) {
