@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -21,32 +21,44 @@ object DeployableReminder {
     private val config get() = SkyHanniMod.feature.combat.deployable
     private val warningDelay get() = config.warningDelay.seconds
 
-    private var warningActiveTime = SimpleTimeMark.farPast()
-    private var display: Renderable? = null
+    private data class ActiveWarning(
+        val type: WarningType,
+        val renderable: Renderable,
+        val startTime: SimpleTimeMark = SimpleTimeMark.now(),
+    )
 
-    // To prevent multiple warnings from being scheduled at the same time
-    private var scheduledWarningGeneration = 0
+    // Prevents duplicate warnings from being scheduled/shown.
+    private val activeWarnings = mutableListOf<ActiveWarning>()
+    private val scheduledWarnings = mutableSetOf<WarningType>()
 
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
-        val deployableType = getActiveDeployableType(WarningType.SLAYER) ?: return
+
+        val warningType = WarningType.SLAYER
+        val deployableType = getActiveDeployableType(warningType) ?: return
+
         scheduleWarning(
+            warningType = warningType,
             message = "Place Down Power Orb!",
             type = deployableType,
-            condition = { SlayerApi.isInBossFight() }
+            condition = { SlayerApi.isInBossFight() },
         )
     }
 
     @HandleEvent(onlyOnIsland = MINESHAFT)
     fun onIslandJoin() {
         if (!isEnabled()) return
-        val deployableType = getActiveDeployableType(WarningType.MINESHAFT) ?: return
+
+        val warningType = WarningType.MINESHAFT
+        val deployableType = getActiveDeployableType(warningType) ?: return
+
         scheduleWarning(
+            warningType = warningType,
             message = "Place Down Lantern!",
             type = deployableType,
-            condition = { IslandType.MINESHAFT.isInIsland() }
+            condition = { IslandType.MINESHAFT.isInIsland() },
         )
     }
 
@@ -54,45 +66,70 @@ object DeployableReminder {
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
         if (!FishingApi.isTrophyFishing()) return
-        val deployableType = getActiveDeployableType(WarningType.TROPHY_FISHING) ?: return
-        showWarning("Place Down Umberella!", deployableType)
+
+        val warningType = WarningType.TROPHY_FISHING
+        val deployableType = getActiveDeployableType(warningType) ?: return
+
+        showWarning(
+            warningType = warningType,
+            message = "Place Down Umberella!",
+            type = deployableType,
+        )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
-        val activeDisplay = display ?: return
-        if (warningActiveTime.passedSince() > 3.seconds) {
-            display = null
-            return
-        }
-        config.warningPosition.renderRenderable(activeDisplay, posLabel = "Deployable Warning")
+        activeWarnings.removeIf { it.startTime.passedSince() > 3.seconds }
+        val renderables = activeWarnings.map { it.renderable }
+        config.warningPosition.renderRenderables(
+            renderables,
+            posLabel = "Deployable Warning",
+        )
     }
 
     @HandleEvent
     fun onWorldChange() {
-        warningActiveTime = SimpleTimeMark.farPast()
-        display = null
+        activeWarnings.clear()
+        scheduledWarnings.clear()
     }
 
-    private fun showWarning(message: String, type: DeployableType) {
+    private fun showWarning(
+        warningType: WarningType,
+        message: String,
+        type: DeployableType,
+    ) {
+        if (!scheduledWarnings.remove(warningType) && activeWarnings.any { it.type == warningType }) return
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
+
         SoundUtils.playErrorSound()
-        display = Renderable.text("§4§l$message", scale = 2.0)
-        warningActiveTime = SimpleTimeMark.now()
+        activeWarnings.add(
+            ActiveWarning(
+                type = warningType,
+                renderable = Renderable.text("§4§l$message", scale = 2.0),
+            )
+        )
     }
 
     private fun scheduleWarning(
+        warningType: WarningType,
         message: String,
         type: DeployableType,
         condition: () -> Boolean = { true },
     ) {
-        val currentGeneration = ++scheduledWarningGeneration
+        if (!scheduledWarnings.add(warningType)) return
+
         DelayedRun.runDelayed(warningDelay) {
-            if (currentGeneration != scheduledWarningGeneration) return@runDelayed
+            scheduledWarnings.remove(warningType)
+
             if (!isEnabled()) return@runDelayed
             if (!condition()) return@runDelayed
-            showWarning(message, type)
+
+            showWarning(
+                warningType = warningType,
+                message = message,
+                type = type,
+            )
         }
     }
 
