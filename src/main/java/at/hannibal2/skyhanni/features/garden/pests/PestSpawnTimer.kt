@@ -100,8 +100,8 @@ object PestSpawnTimer {
         if (!event.isWidget(TabWidget.PESTS)) return
         val widgetLines = event.widget.lines.map { it.string }
 
-        // Hypixel can sometimes send partial widget.
-        // so we first check if the maximum number of pests is present as a workaround that.
+        // Hypixel can sometimes send partial widget
+        // so we first check if the maximum number of pests is present as a workaround
         maxPestsAlivePattern.firstMatcher(widgetLines) {
             maxPests = true
             pestCooldownEndTime = SimpleTimeMark.farPast()
