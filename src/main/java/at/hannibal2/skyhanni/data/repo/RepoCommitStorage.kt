@@ -7,8 +7,9 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.annotations.Expose
 import java.io.File
 
-class RepoCommitStorage(file: File) {
-    val fileHandler = StringFileHandler(file)
+@JvmInline
+value class RepoCommitStorage private constructor(private val fileHandler: StringFileHandler) {
+    constructor(file: File) : this(StringFileHandler(file))
 
     fun readFromFile(): RepoCommit? {
         return runCatching {
