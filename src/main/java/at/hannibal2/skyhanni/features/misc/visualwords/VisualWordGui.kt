@@ -10,32 +10,30 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
-import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
-import at.hannibal2.skyhanni.utils.renderables.primitives.ItemRenderableConfig
+import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.Minecraft
 import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment as HA
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment as VA
 
 /**
  * Constructs the full Renderable display for [VisualWordScreen].
@@ -62,31 +60,32 @@ object VisualWordGui {
     // TODO regex tests (idk hanni asked for the todo)
     private val replacementLinePattern = "(?<from>.*)@-(?<to>.*)@:-(?<state>false|true)".toPattern()
 
-    private val upSkull by lazy {
-        ItemUtils.createSkull(
-            displayName = "§aMove Up",
-            uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
-            value = SkullTextureHolder.getTexture("UP_ARROW"),
-        )
+    private val upSkull = ItemUtils.repoSkullProvider(
+        displayName = "§aMove Up",
+        uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
+        repoSkullId = "UP_ARROW",
+    )
+    private val downSkull = ItemUtils.repoSkullProvider(
+        displayName = "§aMove Down",
+        uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
+        repoSkullId = "DOWN_ARROW",
+    )
+    private val upItem by lazy { Renderable.item(upSkull) { scale = 1.0 } }
+    private val upItemDimmed by lazy {
+        Renderable.item(upSkull) {
+            scale = 1.0
+            alpha = 0.4f
+        }
     }
-    private val downSkull by lazy {
-        ItemUtils.createSkull(
-            displayName = "§aMove Down",
-            uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
-            value = SkullTextureHolder.getTexture("DOWN_ARROW"),
-        )
+    private val downItem by lazy { Renderable.item(downSkull) { scale = 1.0 } }
+    private val downItemDimmed by lazy {
+        Renderable.item(downSkull) {
+            scale = 1.0
+            alpha = 0.4f
+        }
     }
-    private val defaultConfig = ItemRenderableConfig { scale = 1.0 }
-    private val dimmedConfig = ItemRenderableConfig {
-        scale = 1.0
-        alpha = 0.4f
-    }
-    private val upItem by lazy { Renderable.item(upSkull, defaultConfig) }
-    private val upItemDimmed by lazy { Renderable.item(upSkull, dimmedConfig) }
-    private val downItem by lazy { Renderable.item(downSkull, defaultConfig) }
-    private val downItemDimmed by lazy { Renderable.item(downSkull, dimmedConfig) }
 
-    fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
+    fun isInGui(): Boolean = MinecraftCompat.screen is VisualWordScreen
 
     fun onCommand() {
         if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {
@@ -137,6 +136,7 @@ object VisualWordGui {
                 screen.modifiedWords.mapIndexed { index, word -> buildWordRow(screen, index, word) },
                 height = 150,
                 scrollValue = screen.listScrollValue,
+                velocity = 4.0,
                 bypassChecks = true,
                 showScrollableTipsInList = false,
                 showScrollbar = true,

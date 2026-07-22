@@ -1,3 +1,5 @@
+# Execution context: base branch code (push to beta)
+
 name: Run detekt on push
 
 on:

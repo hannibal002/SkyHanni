@@ -28,13 +28,13 @@ object SpookyAchievement {
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val netheriteIngot = TextHelper.createAtlasSprite("item/netherite_ingot", "items", "minecraft")
         val achievement = Achievement(
-            "Netherite Spooky Bracket".asComponent(),
-            componentBuilder {
+            name = "Netherite Spooky Bracket".asComponent(),
+            description = componentBuilder {
                 append(netheriteIngot)
                 append(" Get 10,000 Candy Score in a Spooky Festival ")
                 append(netheriteIngot)
             },
-            15f,
+            userLuckAmount = 15f,
         )
         event.register(achievement, SPOOKY_ACHIEVEMENT)
     }

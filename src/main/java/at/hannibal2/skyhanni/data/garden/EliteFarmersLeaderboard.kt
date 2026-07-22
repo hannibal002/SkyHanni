@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.config.features.garden.leaderboards.EliteLeaderboar
 import at.hannibal2.skyhanni.config.features.garden.leaderboards.generics.EliteDisplayGenericConfig.LeaderboardTextEntry
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.achievements.Achievement
-import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.getCollection
+import at.hannibal2.skyhanni.data.garden.CropCollectionApi.setCollectionCounter
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.getWeight
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.profileId
 import at.hannibal2.skyhanni.data.garden.FarmingWeightData.setWeight
@@ -42,15 +42,14 @@ import at.hannibal2.skyhanni.utils.compat.command
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.withColor
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import kotlin.math.abs
 import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 @SkyHanniModule
 object EliteFarmersLeaderboard {
@@ -144,7 +143,7 @@ object EliteFarmersLeaderboard {
                             }
                             append(" Leaderboard!")
                             withColor(ChatFormatting.YELLOW)
-                        }
+                        },
                     )
                 }
             } else {
@@ -542,14 +541,15 @@ object EliteFarmersLeaderboard {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Better than the devs".asComponent(),
-            componentBuilder {
+            name = "Better than the devs".asComponent(),
+            description = componentBuilder {
                 append("Pass one of the")
                 append(" SkyHanni ") {
                     withColor(TextHelper.chromaStyle)
                 }
                 append("contributors in the farming leaderboards")
-            }
+            },
+            userLuckAmount = 0f,
         )
         event.register(achievement, BETTER_THAN_DEV_ACHIEVEMENT)
     }
