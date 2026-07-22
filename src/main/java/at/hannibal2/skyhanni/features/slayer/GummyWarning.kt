@@ -43,7 +43,7 @@ object GummyWarning {
      */
     private val smolderingAreaPattern by RepoPattern.pattern(
         "slayer.gummy.smoldering-area",
-        "Smoldering Tomb|The Wasteland"
+        "Smoldering Tomb|The Wasteland",
     )
 
     private var inSmolderingArea = false
@@ -61,6 +61,7 @@ object GummyWarning {
         val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
         slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
         val armor = InventoryUtils.getArmor()
@@ -70,6 +71,7 @@ object GummyWarning {
             enchants.containsKey("ultimate_habanero_tactics")
         }
     }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onItemChange(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled()) return
@@ -107,6 +109,7 @@ object GummyWarning {
             )
         }
     }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gummyWarning) return
