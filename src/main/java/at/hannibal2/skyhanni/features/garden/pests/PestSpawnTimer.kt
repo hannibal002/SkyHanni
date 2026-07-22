@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -90,8 +91,9 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+        val widgetLines = event.widget.lines.map { it.string }
 
-        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+        pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
@@ -111,6 +113,14 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
+        } ?: run {
+            if (widgetLines.all { it.isBlank() }) return
+
+            ErrorManager.logErrorStateWithData(
+                "Could not find pest cooldown time from widget.",
+                internalMessage = "Could not find pest cooldown time in widget update event.",
+                "widgetLines" to widgetLines,
+            )
         }
     }
 

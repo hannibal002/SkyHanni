@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.minecraftevents.ClientEvents
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventVersionedJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -9,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.lang.reflect.Method
 
 @SkyHanniModule
@@ -115,10 +118,17 @@ object SkyHanniEvents {
     @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
-        disabledHandlers = data.disabledHandlers
-        disabledHandlerInvokers = data.disabledInvokers
+        val version = SkyHanniMod.modVersion
+
+        disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version)
+        disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version)
         EventListeners.markEventCacheDirty()
     }
+
+
+    private fun Set<DisabledEventVersionedJson>.activeNames(version: ModVersion): Set<String> =
+        filter { (it.minVersion == null || version >= it.minVersion) && (it.maxVersion == null || version <= it.maxVersion) }
+            .map { it.name }.toSet()
 
     val seconds = listOf(10, 60, 60 * 5)
 
