@@ -39,6 +39,9 @@ object CorpseLoot {
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
+    /**
+     * REGEX-TEST: LUCKY! Your Resourceful perk saved your key from being consumed!
+     */
     private val resourceFulPerkProcPattern by chatPatternGroup.pattern(
         "resourceful",
         "LUCKY! Your Resourceful perk saved your key from being consumed!"
