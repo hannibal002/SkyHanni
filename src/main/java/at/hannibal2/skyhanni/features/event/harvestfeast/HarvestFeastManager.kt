@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastData
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFeastJson
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.GardenApi.getItemStackCopy
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -43,11 +44,11 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.network.chat.Component
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object HarvestFeastManager {
@@ -161,11 +162,7 @@ object HarvestFeastManager {
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next
-                .mapNotNull { (crop, value) ->
-                    value?.let { crop.cropName to it }
-                }
-                .toMap(),
+            next = next.filterNotNullValues().map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
@@ -377,10 +374,12 @@ object HarvestFeastManager {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!config.displayCurrentCrops) return
         if (isCurrentOutdated) return
+        @Suppress("IsInIslandEarlyReturn")
+        if (!GardenApi.inGarden() && !config.showOutsideGarden) return
         if (!isDataAvailable()) return
         val display = display ?: return
         config.position.renderRenderable(display, posLabel = "Current Active Crops")

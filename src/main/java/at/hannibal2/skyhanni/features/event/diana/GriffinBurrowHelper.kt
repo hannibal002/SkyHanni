@@ -179,7 +179,7 @@ object GriffinBurrowHelper {
         val inaccurate = allGuesses.filter { it.spadeGuess }.toSet()
         val toDelete = mutableSetOf<GuessEntry>()
         for (item in inaccurate) {
-            val player = MinecraftCompat.localPlayer
+            val player = MinecraftCompat.localPlayerOrThrow
             val eyePos = player.eyePosition.toLorenzVec()
             val lookAngle = player.lookAngle.toLorenzVec()
             val toTarget = item.getCurrent().minus(eyePos)
@@ -268,7 +268,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         val newLocation = event.guess.getCurrent()
         val playerLocation = LocationUtils.playerLocation()
@@ -283,7 +283,7 @@ object GriffinBurrowHelper {
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val burrowLocation = event.burrowLocation
         val currentEntry = getGuess(burrowLocation)
 
@@ -620,7 +620,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        EntityMovementData.addToTrack(MinecraftCompat.localPlayer)
+        EntityMovementData.addToTrack(MinecraftCompat.localPlayerOrThrow)
         val location = LocationUtils.playerLocation().roundLocation()
         addGuess(GuessEntry(listOf(location), burrowType = type), "added test burrow from command")
         update()

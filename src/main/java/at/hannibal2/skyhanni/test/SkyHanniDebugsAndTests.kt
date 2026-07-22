@@ -25,9 +25,7 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.mixins.init.SkyHanniMixinPlugin
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -60,7 +58,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -129,40 +126,6 @@ object SkyHanniDebugsAndTests {
 
     private fun print(text: String) {
         LorenzDebug.log(text)
-    }
-
-    // Taken from Firmament
-    @JvmStatic
-    fun loadAllMixinClasses() {
-        val allMixinClasses = mutableSetOf<String>()
-        SkyHanniMixinPlugin.instances.forEach { plugin ->
-            val prefix = "${plugin.mixinPackage}."
-            val classes = plugin.mixins.map { prefix + it }
-            allMixinClasses.addAll(classes)
-            for (mixinClass in classes) {
-                val targets = readMixinTargets(mixinClass)
-                for (target in targets) {
-                    try {
-                        SkyHanniMod.logger.debug("Loading $target to force instantiate $mixinClass")
-                        Class.forName(target, true, javaClass.classLoader)
-                    } catch (exception: Throwable) {
-                        SkyHanniMod.logger.error(
-                            "Could not load class $target that has been mixed into by $mixinClass",
-                            exception,
-                        )
-                    }
-                }
-            }
-        }
-
-        SkyHanniMod.logger.info("Force-loaded all SkyHanni mixins:")
-        val applied = SkyHanniMixinPlugin.instances.flatMap { it.appliedMixins }.toSet()
-        applied.forEach { SkyHanniMod.logger.info(" - $it") }
-
-        val failed = allMixinClasses.size - applied.size
-        if (failed > 0) {
-            ErrorManager.crashInDevEnv("Failed to apply $failed ${"mixin".pluralize(failed)}")
-        }
     }
 
     private fun readMixinTargets(mixinClass: String): List<String> {
@@ -562,7 +525,7 @@ object SkyHanniDebugsAndTests {
         val skullTexture = stack.getSkullTexture()
         val skullOwner = stack.getSkullOwner() ?: "unknown"
         val skull = if (skullTexture != null) "\"$skullOwner:$skullTexture\"" else ""
-        val skinColor = stack.cleanName().uppercase(Locale.getDefault()).replace(" ", "_")
+        val skinColor = stack.cleanName.uppercase(Locale.getDefault()).replace(" ", "_")
         val formatted = "\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [$skull]},"
 
         OSUtils.copyToClipboard(formatted)
