@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.combat.DeployableConfig.WarningType
+import at.hannibal2.skyhanni.config.features.combat.DeployableReminderConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object DeployableReminder {
-    private val config get() = SkyHanniMod.feature.combat.deployable
+    private val config get() = SkyHanniMod.feature.combat.deployable.deployableReminder
     private val warningDelay get() = config.warningDelay.seconds
 
     private data class ActiveWarning(
@@ -80,7 +80,7 @@ object DeployableReminder {
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
-        activeWarnings.removeIf { it.startTime.passedSince() > 3.seconds }
+        activeWarnings.removeIf { it.startTime.passedSince() > config.warningDuration.seconds }
         val renderables = activeWarnings.map { it.renderable }
         config.warningPosition.renderRenderables(
             renderables,
@@ -136,5 +136,5 @@ object DeployableReminder {
     private fun getActiveDeployableType(type: WarningType): DeployableType? =
         type.deployableType.takeIf { config.warningTypes.contains(type) }
 
-    private fun isEnabled() = config.warnMissingDeployable
+    private fun isEnabled() = config.enabled && config.warningTypes.isNotEmpty()
 }
