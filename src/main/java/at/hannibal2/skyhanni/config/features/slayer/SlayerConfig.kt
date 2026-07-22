@@ -138,16 +138,6 @@ class SlayerConfig {
     var questWarningTitle: Boolean = true
 
     @Expose
-    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have a Re-Heated Gummy Polar Bear active.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var gummyWarning: Boolean = true
-
-    @Expose
-    @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
-    val gummyWarningPosition: Position = Position(2, 100)
-
-    @Expose
     @ConfigOption(
         name = "Hide Irrelevant Mobs",
         desc = "Makes mobs partially transparent so that they don't annoy while having an active slayer quest. " +
@@ -186,6 +176,16 @@ class SlayerConfig {
     @ConfigOption(name = "Hide Damage Splashes Near Slayer Boss", desc = "Hides Damage Splashes Near Slayer Boss.")
     @ConfigEditorBoolean
     var damageSplashHider: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "No Gummy Warning", desc = "Send a warning when you don't have a Re-Heated Gummy Polar Bear active.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var gummyWarning: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
+    val gummyWarningPosition: Position = Position(2, 100)
 
     @SkyHanniModule
     companion object {

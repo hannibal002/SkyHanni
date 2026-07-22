@@ -63,6 +63,7 @@ object GummyWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
+        if (!isEnabled()) return
         val armor = InventoryUtils.getArmor()
         hasHabanero = armor.any { piece ->
             if (piece == null) return@any false
@@ -83,8 +84,8 @@ object GummyWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
-        if (event.action != EntityClickEvent.ActionType.ATTACK) return
         if (!isEnabled()) return
+        if (event.action != EntityClickEvent.ActionType.ATTACK) return
         if (!holdingSlayerWeapon) return
 
         if (!hasHabanero && !inSmolderingArea) return
@@ -107,7 +108,7 @@ object GummyWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.gummyWarning) return
+        if (!isEnabled()) return
         if (lastWarningShown.passedSince() > 3.seconds) return
         config.gummyWarningPosition.renderRenderable(display, posLabel = "Gummy Warning")
     }
