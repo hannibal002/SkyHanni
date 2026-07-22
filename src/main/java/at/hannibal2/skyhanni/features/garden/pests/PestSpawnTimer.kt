@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
 import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -129,16 +128,6 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
-        } ?: run {
-            if (widgetLines.all { it.isBlank() }) return
-            // If somehow only the "Pests: " line is visible.
-            if (widgetLines.size == 1) return
-
-            ErrorManager.logErrorStateWithData(
-                "Could not find pest cooldown time from widget.",
-                internalMessage = "Could not find pest cooldown time in widget update event.",
-                "widgetLines" to widgetLines,
-            )
         }
     }
 
