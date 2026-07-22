@@ -109,7 +109,7 @@ object DeployableReminder {
         DelayedRun.runDelayed(warningDelay) {
             scheduledWarnings.remove(warningType)
 
-            if (!isEnabled()) return@runDelayed
+            if (!isActive(warningType)) return@runDelayed
             if (!condition()) return@runDelayed
 
             showWarning(
