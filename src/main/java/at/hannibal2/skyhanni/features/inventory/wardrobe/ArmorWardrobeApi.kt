@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object ArmorWardrobeApi : WardrobeApi() {
+object ArmorWardrobeApi : AbstractWardrobeApi() {
 
     /**
      * REGEX-TEST: (1/3) Armor Sets
