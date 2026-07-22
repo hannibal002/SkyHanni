@@ -2,17 +2,10 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandJoinEvent
-import at.hannibal2.skyhanni.events.garden.GardenPlotSprayEvent
-import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.plots
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.plots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -64,7 +57,7 @@ object SprayDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.displayEnabled) return
         val display = Renderable.text(
             componentBuilder {
