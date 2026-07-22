@@ -24,9 +24,8 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
-import net.minecraft.client.multiplayer.chat.GuiMessage
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
+import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import java.util.LinkedList
@@ -47,6 +46,15 @@ object ChatUtils {
     // TODO log based on chat category (error, warning, debug, user error, normal)
     private val log = SkyHanniLogger("chat/mod_sent")
     var lastButtonClicked = 0L
+
+    fun Component.hoverTextLines(): List<String> = buildList {
+        addHoverTextLines(this@hoverTextLines)
+    }
+
+    private fun MutableList<String>.addHoverTextLines(component: Component) {
+        component.hover?.formattedTextCompat()?.split("\n")?.let(::addAll)
+        component.siblings.forEach { addHoverTextLines(it) }
+    }
 
     /**
      * Sends a debug message to the chat and the console.
@@ -335,7 +343,7 @@ object ChatUtils {
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
-    private val chatGui get() = Minecraft.getInstance().gui.chat
+    private val chatGui get() = MinecraftCompat.hud.chat
 
     val chatMessages: MutableList<GuiMessage>
         get() = chatGui.allMessages
@@ -376,7 +384,7 @@ object ChatUtils {
     fun onTick() {
         if (lastMessageSent.passedSince() > messageDelay) {
             val message = sendQueue.poll() ?: return
-            MinecraftCompat.localPlayer.connection.dispatchMessage(message)
+            MinecraftCompat.localPlayerOrThrow.connection.dispatchMessage(message)
         }
     }
 
@@ -397,18 +405,6 @@ object ChatUtils {
     }
 
     private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
-
-    fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
-        it.isNotEmpty()
-    }?.get(0) == commandWithSlash
-
-    fun MessageSendToServerEvent.isCommand(commandsWithSlash: Collection<String>) =
-        splitMessage.takeIf { it.isNotEmpty() }?.get(0) in commandsWithSlash
-
-    fun MessageSendToServerEvent.senderIsSkyhanni() = originatingModContainer?.id == "skyhanni"
-
-    fun MessageSendToServerEvent.eventWithNewMessage(message: String) =
-        MessageSendToServerEvent(message, message.split(" "), this.originatingModContainer)
 
     fun chatAndOpenConfig(message: String, property: KProperty0<*>) {
         clickableChat(
@@ -476,14 +472,8 @@ object ChatUtils {
             `skyhanni$setCreated`(value)
         }
 
-    var GuiMessage.fullComponent: Component
-        get() = `skyhanni$getFullComponent`()
-        set(value) {
-            `skyhanni$setFullComponent`(value)
-        }
-
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
+    fun GuiMessage.passedSinceSent() = (MinecraftCompat.hud.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

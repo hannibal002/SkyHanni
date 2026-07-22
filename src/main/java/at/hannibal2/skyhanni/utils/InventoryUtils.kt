@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.resources.language.I18n
@@ -26,9 +25,11 @@ import net.minecraft.world.entity.player.Inventory
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerInput
 import net.minecraft.world.inventory.Slot
+import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
+// TODO refactor
+@Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
@@ -65,7 +66,7 @@ object InventoryUtils {
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
-        val guiChest = Minecraft.getInstance().screen as? ContainerScreen ?: return emptyList()
+        val guiChest = MinecraftCompat.screen as? ContainerScreen ?: return emptyList()
         return guiChest.slots()
             .filter { it.container !is Inventory }
     }
@@ -76,20 +77,20 @@ object InventoryUtils {
 
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return emptyList()
+        val guiInventory = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
             .filter { it.container is Inventory && it.item.isNotEmpty() }
     }
 
     fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
-    fun inInventory() = Minecraft.getInstance().screen is ContainerScreen
+    fun inInventory() = MinecraftCompat.screen is ContainerScreen
 
-    fun inOwnInventory() = Minecraft.getInstance().screen is InventoryScreen
+    fun inOwnInventory() = MinecraftCompat.screen is InventoryScreen
 
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
-    fun inContainer() = Minecraft.getInstance().screen is SkyHanniGuiContainer
+    fun inContainer() = MinecraftCompat.screen is SkyHanniGuiContainer
 
     fun getItemsInOwnInventory(): List<SafeItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
@@ -104,15 +105,22 @@ object InventoryUtils {
     fun containsInLowerInventory(predicate: (SafeItemStack) -> Boolean): Boolean =
         countItemsInLowerInventory(predicate) > 0
 
+    fun containsInLowerInventoryInternalName(predicate: (NeuInternalName) -> Boolean): Boolean =
+        countItemsInLowerInventoryInternalName(predicate) > 0
+
     fun countItemsInLowerInventory(predicate: (SafeItemStack) -> Boolean): Int =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.count }
+
+    fun countItemsInLowerInventoryInternalName(predicate: (NeuInternalName) -> Boolean): Int =
+        countItemsInLowerInventory { it.getInternalNameOrNull()?.let(predicate) ?: false }
 
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage")) ||
             it.contains("Ender Chest") || it.contains("Backpack")
     }
 
-    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem
+    // mainHandItem can be AIR, since equipment in EntityLiving is an array of item stacks that can be AIR as well.
+    fun getItemInHand(): SafeItemStack? = MinecraftCompat.localPlayerOrNull?.mainHandItem?.takeIf { it.item != Items.AIR }
 
     fun getArmor(): Array<SafeItemStack?> = MinecraftCompat.localPlayerOrNull?.getArmorInventory() ?: arrayOfNulls(4)
     fun getArmorInternalNames(): Set<NeuInternalName> = getArmor().mapNotNull { it?.getInternalNameOrNull() }.toSet()
@@ -174,7 +182,7 @@ object InventoryUtils {
 
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.containerSlot == slotIndex }
 
-    fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+    fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventoryInternalName { it == this }
 
     fun NeuInternalName.getAmountInInventoryAndSacks(): Int = getAmountInInventory() + getAmountInSacks()
 
@@ -183,7 +191,7 @@ object InventoryUtils {
     fun Container.isTopInventory() = this is SimpleContainer
 
     fun closeInventory() {
-        Minecraft.getInstance().screen = null
+        MinecraftCompat.screen = null
     }
 
     fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }

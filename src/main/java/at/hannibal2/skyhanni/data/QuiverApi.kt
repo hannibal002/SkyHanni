@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.item.BowItem
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import java.util.regex.Matcher
 
 @SkyHanniModule
@@ -251,9 +251,8 @@ object QuiverApi {
         val achievement = Achievement(
             "Arrowslinger".asComponent(),
             "Shoot 100,000 Arrows".asComponent(),
-            50f,
-            false,
-            listOf(100_000)
+            userLuckAmount = 50f,
+            tiers = listOf(100_000),
         )
         event.register(achievement, ARROW_ACHIEVEMENT)
     }
@@ -282,7 +281,7 @@ object QuiverApi {
         if (!isQuiverPreview) return
 
         val currentArrowType = stack.getQuiverPreviewArrowTypeOrNull() ?: run {
-            val type = stack.cleanName()
+            val type = stack.cleanName
             logUnknownArrowType(type, "item name" to type, "lore" to lore)
             return
         }
@@ -299,7 +298,7 @@ object QuiverApi {
     }
 
     private fun SafeItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
-        getArrowByNameOrNull(cleanName().trimWhiteSpace())?.let { return it }
+        getArrowByNameOrNull(cleanName.trimWhiteSpace())?.let { return it }
         return getLoreComponent().firstNotNullOfOrNull { line ->
             getArrowByNameOrNull(line.string.trimWhiteSpace())
         }
