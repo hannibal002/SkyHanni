@@ -2,9 +2,8 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.plots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -25,7 +24,7 @@ object SprayDisplay {
 
     private val config get() = PestApi.config.spray
     private var display: Component = Component.empty()
-    private var currentSprayPlot: GardenPlotApi.Plot? = null
+    private var currentSprayPlot: GardenPlot? = null
 
     @HandleEvent
     fun onSecondPassed() {
@@ -46,12 +45,12 @@ object SprayDisplay {
     }
 
     @HandleEvent
-    fun onGardenPlotSprayChanged(event: GardenPlotSprayEvent) {
+    fun onGardenPlotSprayChanged() {
         if (config.displayEnabled) display = buildDisplay()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandJoin(event: IslandJoinEvent) {
+    fun onIslandJoin() {
         if (!config.expiryNotification) return
         sendExpiredPlotsToChat(true)
     }
