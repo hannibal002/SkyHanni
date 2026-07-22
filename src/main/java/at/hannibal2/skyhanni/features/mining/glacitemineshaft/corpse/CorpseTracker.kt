@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
+import kotlin.enums.enumEntries
 
 @SkyHanniModule
 object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.BucketData>(
@@ -43,7 +44,8 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
     data class BucketData(
-        @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf()
+        @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf(),
+        @Expose var keysSaved: MutableMap<CorpseType, Long> = enumMapOf()
     ) : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>(CorpseType::class, SessionUptime.Normal::class) {
         override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
@@ -67,7 +69,14 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
         fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
-    private fun addLootedCorpse(type: CorpseType) = modify { it.corpsesLooted.addOrPut(type, 1) }
+    private fun addLootedCorpse(type: CorpseType, keyConsumed: Boolean) {
+        modify {
+            it.corpsesLooted.addOrPut(type, 1)
+            if (!keyConsumed) {
+                it.keysSaved.addOrPut(type, 1)
+            }
+        }
+    }
 
     @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
@@ -78,7 +87,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     @HandleEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
-        addLootedCorpse(event.corpseType)
+        addLootedCorpse(event.corpseType, event.keyConsumed)
         for ((itemName, amount) in event.loot) {
             if (itemName.removeColor().trim() == "Glacite Powder") continue
             NeuInternalName.fromItemNameOrNull(itemName)?.let { item ->
@@ -96,7 +105,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
         var profit = drawItems(bucketData, { true }, this)
         val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
             listOf(it)
-        } ?: enumValues<CorpseType>().toList()
+        } ?: enumEntries<CorpseType>()
             .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
@@ -106,12 +115,14 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
                     val keyName = key.repoItemName
                     val price = getPricePer(key)
                     val count = bucketData.corpsesLooted[keyData] ?: 0
-                    val totalPrice = price * count
+                    val saved = bucketData.keysSaved[keyData] ?: 0
+                    val consumedCount = (count - saved).coerceAtLeast(0)
+                    val totalPrice = price * consumedCount
                     if (totalPrice > 0) {
                         profit -= totalPrice
                         totalKeyCost += totalPrice
-                        totalKeyCount += count.toInt()
-                        add("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
+                        totalKeyCount += consumedCount.toInt()
+                        add("§7${consumedCount}x $keyName§7: §c-${totalPrice.shortFormat()}")
                     }
                 }
             }
