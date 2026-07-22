@@ -102,6 +102,11 @@ val shadowModImpl: Configuration by configurations.creating {
 
 val shadowOnly: Configuration by configurations.creating
 
+val mixinTestRuntime: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    extendsFrom(configurations.testRuntimeClasspath.get())
+}
+
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
@@ -157,6 +162,7 @@ dependencies {
     target.fabricLoaderVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
         "productionRuntimeMods"(it)
+        mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
     target.fabricApiVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
@@ -273,6 +279,21 @@ tasks.withType<Test> {
         // Tests start NPE-ing without this on Java 25
         "-Dnet.bytebuddy.experimental=true",
     )
+}
+
+val mixinTest by tasks.registering(Test::class) {
+    description = "Audits mixin application under Fabric Loader."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().output + sourceSets.main.get().output + mixinTestRuntime
+    filter {
+        includeTestsMatching("at.hannibal2.skyhanni.test.MixinTest")
+    }
+}
+
+tasks.test {
+    dependsOn(mixinTest)
+    exclude("at/hannibal2/skyhanni/test/MixinTest.class")
 }
 
 kotlin {
