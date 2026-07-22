@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.expandBlock
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.level.block.Blocks
 import java.awt.Color
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -43,7 +44,7 @@ object RiftWiltedBerberisHelper {
     private val berberisSounds = setOf("entity.donkey.death", "entity.donkey.hurt")
 
     // NOTE: Do not make this a set, it breaks identity checks
-    private val list = mutableListOf<WiltedBerberis>()
+    private val list = CopyOnWriteArrayList<WiltedBerberis>()
 
     private var isOnFarmland = false
     private var hasFarmingToolInHand = false
@@ -151,8 +152,7 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
-        list.toList()
-            .filter { it.currentParticles.distanceSq(location) < 8 }
+        list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
     private fun nearestFieldCenter(location: LorenzVec, maxDistance: Double = 50.0): LorenzVec? =
@@ -295,7 +295,7 @@ object RiftWiltedBerberisHelper {
             fieldSequences.values.any { it.isRendering && !it.isAway && it.currentTarget != null }
         if (sequenceIsGuiding) return
 
-        list.toList().forEach { it.renderParticleBerberis(event) }
+        list.forEach { it.renderParticleBerberis(event) }
     }
 
     private fun WiltedBerberis.renderParticleBerberis(event: SkyHanniRenderWorldEvent) {
