@@ -15,7 +15,6 @@ import com.google.common.collect.ComparisonChain
 import com.google.common.collect.Ordering
 import net.fabricmc.api.EnvType
 import net.fabricmc.api.Environment
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.PlayerInfo
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket
@@ -99,7 +98,7 @@ object TabListData {
         tablistCache = newTablistCache
         TabListUpdateEvent(newTablistCache).post()
 
-        val tabListOverlay = Minecraft.getInstance().gui.tabList
+        val tabListOverlay = MinecraftCompat.hud.tabList
         header = tabListOverlay.header
         val newFooter = tabListOverlay.footer
         if (newFooter != footer) {
