@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -161,11 +162,7 @@ object HarvestFeastManager {
 
         val sendData = EliteFeastJson.of(
             current = current.map { it.cropName },
-            next = next
-                .mapNotNull { (crop, value) ->
-                    value?.let { crop.cropName to it }
-                }
-                .toMap(),
+            next = next.filterNotNullValues().map { it.key.cropName to it.value }.toMap(),
             isGrandFeast = assumeGrandFeast(),
         )
 
