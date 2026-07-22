@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MiningApi
@@ -163,6 +164,15 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             description = "Resets the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
             simpleCallback { resetCommand() }
+        }
+        event.registerBrigadier("shremovecorpsekey") {
+            description = "Removes a corpse key from the Glacite Mineshaft Corpse Tracker"
+            category = CommandCategory.USERS_RESET
+            argCallback("corpseType", EnumArgumentType.custom<CorpseType>({ it.type }, isGreedy = true)) { type ->
+                modify {
+                    it.keysSaved.addOrPut(type, 1)
+                }
+            }
         }
     }
 
