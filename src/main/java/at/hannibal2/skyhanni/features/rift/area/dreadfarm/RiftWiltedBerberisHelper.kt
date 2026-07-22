@@ -294,7 +294,7 @@ object RiftWiltedBerberisHelper {
             fieldSequences.values.any { it.isRendering && !it.isAway && it.currentTarget != null }
         if (sequenceIsGuiding) return
 
-        list.forEach { it.renderParticleBerberis(event) }
+        list.toList().forEach { it.renderParticleBerberis(event) }
     }
 
     private fun WiltedBerberis.renderParticleBerberis(event: SkyHanniRenderWorldEvent) {
