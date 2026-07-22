@@ -512,6 +512,9 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
+        var charmedVisitors: MutableSet<String> = mutableSetOf()
+
+        @Expose
         var ignoredVisitors: MutableSet<String> = mutableSetOf()
 
         @Expose
