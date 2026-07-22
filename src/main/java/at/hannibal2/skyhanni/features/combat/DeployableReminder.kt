@@ -34,8 +34,8 @@ object DeployableReminder {
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         if (!isEnabled()) return
-        if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
         if (!isWarningActive(SLAYER)) return
+        if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
 
         scheduleWarning(
             warningType = SLAYER,
@@ -59,8 +59,8 @@ object DeployableReminder {
     @HandleEvent
     fun onTrophyFishCaught() {
         if (!isEnabled()) return
-        if (!FishingApi.isTrophyFishing()) return
         if (!isWarningActive(TROPHY_FISHING)) return
+        if (!FishingApi.isTrophyFishing()) return
 
         showWarning(
             warningType = TROPHY_FISHING,
