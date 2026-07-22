@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object PestSpawnSound {

@@ -24,7 +24,10 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.guide.GuideGui
@@ -302,14 +305,14 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getInstance().screen.takeIf { it != null } ?: return false
+            val guiScreen = MinecraftCompat.screen ?: return false
 
             // Never support grayed out inventories
             if (RenderData.outsideInventory) return false
 
             if (bypassChecks) return true
 
-            val inMenu = Minecraft.getInstance().screen !is PauseScreen
+            val inMenu = MinecraftCompat.screen !is PauseScreen
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is SignEditScreen && guiScreen !is GuideGui<*>) {
                 ToolTipData.lastSlot == null
@@ -1004,7 +1007,7 @@ interface Renderable {
         private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
             val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
             val set = map.keys.toMutableSet()
-            if (map.filter { it.value != null }.isEmpty()) {
+            if (map.filterNotNullValues().isEmpty()) {
                 if (textBox.isNotEmpty()) {
                     set.add(empty)
                 }
