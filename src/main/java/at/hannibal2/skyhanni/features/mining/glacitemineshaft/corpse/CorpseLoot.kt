@@ -74,7 +74,7 @@ object CorpseLoot {
         if (endPattern.matches(message)) {
             corpseType?.let {
                 val finalLoot = loot.toList()
-                DelayedRun.runNextTick {
+                DelayedRun.runNextTickOld {
                     CorpseLootedEvent(it, finalLoot, keyConsumed = pendingKeyConsumed).post()
                     pendingKeyConsumed = true
                 }
