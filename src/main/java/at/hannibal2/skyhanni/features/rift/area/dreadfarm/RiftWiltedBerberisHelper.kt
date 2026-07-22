@@ -151,7 +151,8 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
-        list.filter { it.currentParticles.distanceSq(location) < 8 }
+        list.toList()
+            .filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
 
     private fun nearestFieldCenter(location: LorenzVec, maxDistance: Double = 50.0): LorenzVec? =
