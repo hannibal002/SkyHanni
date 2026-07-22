@@ -196,8 +196,7 @@
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt:ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
+    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "update", " {3}§dRNG Meter §f- §d(?&lt;exp&gt;.*) Stored XP", )</ID>
