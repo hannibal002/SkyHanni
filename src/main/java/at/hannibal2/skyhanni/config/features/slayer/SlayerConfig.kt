@@ -145,7 +145,7 @@ class SlayerConfig {
 
     @Expose
     @ConfigLink(owner = SlayerConfig::class, field = "gummyWarning")
-    var gummyWarningPosition: Position = Position(2, 100)
+    val gummyWarningPosition: Position = Position(2, 100)
 
     @Expose
     @ConfigOption(

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
-
 
 @SkyHanniModule
 object GummyWarning {
@@ -53,7 +53,7 @@ object GummyWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onAreaChange(event: GraphAreaChangeEvent) {
-        inSmolderingArea = smolderingAreaPattern.matcher(SkyBlockUtils.graphArea ?: "").find()
+        inSmolderingArea = smolderingAreaPattern.matches(SkyBlockUtils.graphArea)
     }
 
     @HandleEvent
@@ -105,7 +105,7 @@ object GummyWarning {
             SoundUtils.createSound("block.anvil.land", 0.5f).playSound()
             ChatUtils.notifyOrDisable(
                 message = "You do not have an active Re-Heated Gummy Polar Bear!",
-                option = SkyHanniMod.feature.slayer::gummyWarning,
+                option = config::gummyWarning,
             )
         }
     }
