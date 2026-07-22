@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,7 +30,7 @@ object DeployableReminder {
 
     // Prevents duplicate warnings from being scheduled/shown.
     private val activeWarnings = mutableListOf<ActiveWarning>()
-    private val scheduledWarnings = mutableSetOf<WarningType>()
+    private val scheduledWarnings = ConcurrentHashMap.newKeySet<WarningType>()
 
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
