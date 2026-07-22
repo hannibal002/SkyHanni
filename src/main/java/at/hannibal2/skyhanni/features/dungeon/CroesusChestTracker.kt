@@ -23,6 +23,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -36,6 +38,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -88,7 +91,7 @@ object CroesusChestTracker {
     /**
      * WRAPPED-REGEX-TEST: " Kismet Feather"
      */
-    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.colorless", "(?:\\s+)?Kismet Feather")
+    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.styled", " §mKismet Feather")
 
     private const val EMPTY_SLOT = 22
     private const val FRONT_ARROW_SLOT = 53
@@ -242,7 +245,8 @@ object CroesusChestTracker {
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
         croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getCleanLore())) return
+        val styledLore = event.stack.getLore().map { it.removeColor(keepFormatting = true) }
+        if (!kismetUsedInCroesusPattern.anyMatches(styledLore)) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"
