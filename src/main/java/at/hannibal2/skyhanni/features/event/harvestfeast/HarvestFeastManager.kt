@@ -57,8 +57,7 @@ object HarvestFeastManager {
     private val config get() = SkyHanniMod.feature.event.feast
 
     private const val MONTH_MIDDLE_DAY = 18
-    // TODO: Make this the real 4 slots once harvest feast comes
-    private val CURRENT_CROPS_SLOTS = 0..26
+    private val CURRENT_CROPS_SLOTS = listOf(11, 12, 14, 15)
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
