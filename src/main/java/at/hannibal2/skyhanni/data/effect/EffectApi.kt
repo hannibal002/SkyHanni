@@ -123,6 +123,10 @@ object EffectApi {
     )
     // </editor-fold>
 
+    init {
+        NonGodPotEffect.entries.forEach { it.tabListName }
+    }
+
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     // Todo: Add support for poison candy I, and add support for splash / other formats
