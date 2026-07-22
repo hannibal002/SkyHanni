@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.mojang.blaze3d.buffers.GpuBufferSlice;
@@ -30,6 +31,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 /*import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 *///?}
@@ -205,6 +207,20 @@ public abstract class MixinLevelRenderer {
     private void renderSkyHanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
         SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
+    }
+    *///?}
+
+    //? if = 26.1 {
+    /*@Inject(
+        method = "lambda$addLateDebugPass$0",
+        at = @At(
+            value = "FIELD",
+            target = "Lcom/mojang/blaze3d/systems/RenderSystem;outputDepthTextureOverride:Lcom/mojang/blaze3d/textures/GpuTextureView;",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void renderDeferredSeeThroughText(CallbackInfo ci, @Local MultiBufferSource.BufferSource bufferSource) {
+        WorldRenderUtils.renderDeferredSeeThroughText(bufferSource);
     }
     *///?}
 }

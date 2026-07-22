@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.List;
 
 @Mixin(SplashManager.class)
-public class MixinSplashManager {
+public abstract class MixinSplashManager {
 
     @Shadow
     @Final

@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDis
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.TrophySorting
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishDisplayConfig.WhenToShow
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -51,9 +50,8 @@ object TrophyFishDisplay {
 
     private var display = emptyList<Renderable>()
 
-    @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
-        if (event.island != IslandType.CRIMSON_ISLE) return
+    @HandleEvent(onlyOnIsland = CRIMSON_ISLE)
+    fun onIslandJoin() {
         DelayedRun.runDelayed(200.milliseconds) {
             TrophyFishManager.loadMissingTrophyFish()
             update()
@@ -299,7 +297,7 @@ object TrophyFishDisplay {
         WhenToShow.ONLY_WITH_KEYBIND -> config.keybind.isKeyHeld()
     }
 
-    fun isEnabled() = (IslandType.CRIMSON_ISLE.isInIsland() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
+    private fun isEnabled() = (IslandType.CRIMSON_ISLE.isInIsland() || SkyBlockUtils.isStrandedProfile) && config.enabled.get()
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

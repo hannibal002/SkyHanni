@@ -41,8 +41,13 @@ import kotlin.math.sqrt
 //? if >= 26.2 {
 import net.minecraft.util.FormattedCharSequence
 //?} else {
-/*import org.joml.Matrix4f
+/*import net.minecraft.client.renderer.MultiBufferSource
+import org.joml.Matrix4f
 *///?}
+//? if = 26.1
+/*import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT*/
+//? if < 26.1
+/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT*/
 
 // TODO refactor
 @Suppress("LargeClass")
@@ -54,6 +59,21 @@ object WorldRenderUtils {
     //? if >= 26.2 {
     private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
     //?}
+
+    //? if = 26.1 {
+    /*private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
+
+    @JvmStatic
+    fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
+        if (deferredSeeThroughText.isEmpty()) return
+        try {
+            deferredSeeThroughText.forEach { it(bufferSource) }
+            bufferSource.endBatch()
+        } finally {
+            deferredSeeThroughText.clear()
+        }
+    }
+    *///?}
 
     private fun getDisplayMode(seeThrough: Boolean) =
         if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
@@ -346,6 +366,26 @@ object WorldRenderUtils {
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
+        //? if = 26.1 {
+        if (seeThroughBlocks) {
+            deferredSeeThroughText.add { deferredBufferSource ->
+                fr.drawInBatch(
+                    text,
+                    x,
+                    0f,
+                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+                    shadow,
+                    matrix,
+                    deferredBufferSource,
+                    DisplayMode.SEE_THROUGH,
+                    backGroundColor,
+                    FULL_BRIGHT,
+                )
+            }
+            return
+        }
+        //?}
+
         fr.drawInBatch(
             text,
             x,
@@ -356,7 +396,7 @@ object WorldRenderUtils {
             bufferSource,
             getDisplayMode(seeThroughBlocks),
             backGroundColor,
-            15728880,
+            FULL_BRIGHT,
         )
         *///?}
     }
@@ -425,6 +465,26 @@ object WorldRenderUtils {
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
+        //? if = 26.1 {
+        if (seeThroughBlocks) {
+            deferredSeeThroughText.add { deferredBufferSource ->
+                fr.drawInBatch(
+                    text,
+                    x,
+                    0f,
+                    color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
+                    shadow,
+                    matrix,
+                    deferredBufferSource,
+                    DisplayMode.SEE_THROUGH,
+                    backGroundColor,
+                    FULL_BRIGHT,
+                )
+            }
+            return
+        }
+        //?}
+
         fr.drawInBatch(
             text,
             x,
@@ -435,7 +495,7 @@ object WorldRenderUtils {
             bufferSource,
             getDisplayMode(seeThroughBlocks),
             backGroundColor,
-            15728880,
+            FULL_BRIGHT,
         )
         *///?}
     }

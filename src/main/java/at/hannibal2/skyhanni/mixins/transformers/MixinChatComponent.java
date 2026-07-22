@@ -3,35 +3,21 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ChatComponent;
-import net.minecraft.client.multiplayer.chat.GuiMessageTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MessageSignature;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.Redirect;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import java.util.ListIterator;
 
-//? if >= 26.2 {
-import net.minecraft.client.gui.Hud;
-//?} else {
-/*import net.minecraft.client.gui.Gui;
-*///?}
-
-//? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource;
-//?} else {
-/*import net.minecraft.client.multiplayer.chat.GuiMessage;
+//? if < 26.1 {
+/*import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import net.minecraft.client.multiplayer.chat.GuiMessage;
+import net.minecraft.client.multiplayer.chat.GuiMessageTag;
 import net.minecraft.util.FormattedCharSequence;
 *///?}
 
@@ -45,23 +31,7 @@ public abstract class MixinChatComponent {
 
     @Shadow
     @Final
-    /*? if >= 26.1 {*/private /*?}*/Minecraft minecraft;
-
-    @WrapOperation(
-        method = "deleteMessageOrDelay",
-        //~ if < 26.2 '/Hud' -> '/Gui'
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;getGuiTicks()I"),
-        require = 0
-    )
-    //~ if < 26.2 'Hud' -> 'Gui'
-    private int clearChatHead(Hud instance, Operation<Integer> original) {
-        return instance.getGuiTicks() + 90;
-    }
-
-    @Redirect(method = "deleteMessageOrDelay", at = @At(value = "INVOKE", target = "Ljava/util/ListIterator;set(Ljava/lang/Object;)V"), require = 0)
-    private <E> void clearChatTail(ListIterator<E> instance, E e) {
-        instance.remove();
-    }
+    private Minecraft minecraft;
 
     @Inject(method = "getHeight()I", at = @At("HEAD"), cancellable = true)
     private void getHeight(CallbackInfoReturnable<Integer> cir) {
@@ -76,7 +46,7 @@ public abstract class MixinChatComponent {
     /*@WrapMethod(method = "render(Lnet/minecraft/client/gui/components/ChatComponent$ChatGraphicsAccess;IIZ)V")
     *///?}
     private void wrapRender(
-        ChatComponent.ChatGraphicsAccess graphics,
+        ChatComponent.ChatGraphicsAccess chatGraphicsAccess,
         int screenHeight,
         int ticks,
         //~ if < 26.1 'ChatComponent.DisplayMode' -> 'boolean'
@@ -87,7 +57,7 @@ public abstract class MixinChatComponent {
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
         original.call(
-            graphics,
+            chatGraphicsAccess,
             screenHeight,
             ticks,
             displayMode
@@ -95,22 +65,6 @@ public abstract class MixinChatComponent {
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
-    }
-
-    @Inject(
-        method = "addMessage"/*? if < 26.1 {*/ /*+ "(Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V"*//*?}*/,
-        at = @At("HEAD")
-    )
-    private void setChatLine(
-        Component contents,
-        MessageSignature signature,
-        //? if >= 26.1 {
-        GuiMessageSource source,
-        //?}
-        GuiMessageTag tag,
-        CallbackInfo ci
-    ) {
-        GuiChatHook.setCurrentComponent(contents);
     }
 
     //? if < 26.1 {

@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import net.minecraft.client.gui.Font.PreparedTextBuilder;
+import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.gui.font.glyphs.BakedSheetGlyph;
-import net.minecraft.client.gui.Font;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
 import org.spongepowered.asm.mixin.Mixin;
@@ -13,10 +14,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import net.minecraft.client.gui.font.TextRenderable;
 
-@Mixin(Font.PreparedTextBuilder.class)
-public class MixinPreparedTextBuilder {
+@Mixin(PreparedTextBuilder.class)
+public abstract class MixinPreparedTextBuilder {
 
     @Inject(
         method = "visit",

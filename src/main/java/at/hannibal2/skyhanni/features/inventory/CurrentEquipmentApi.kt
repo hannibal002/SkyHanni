@@ -36,7 +36,7 @@ enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
 }
 
 @SkyHanniModule
-object EquipmentApi {
+object CurrentEquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
 

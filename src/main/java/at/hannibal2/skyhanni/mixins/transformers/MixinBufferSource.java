@@ -4,7 +4,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 /*import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -12,8 +12,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(MultiBufferSource.BufferSource.class)
-public class MixinBufferSource {
+@Mixin(BufferSource.class)
+public abstract class MixinBufferSource {
 
     @Shadow
     protected RenderType lastSharedType;
@@ -32,7 +32,9 @@ public class MixinBufferSource {
         CallbackInfoReturnable<VertexConsumer> cir,
         @Local BufferBuilder bufferBuilder
     ) {
-        if (!renderType.name.contains("skyhanni")) return;
+        if (!renderType.name.contains("skyhanni")) {
+            return;
+        }
         if (renderType.name.equals(this.lastSharedType.name)) {
             cir.setReturnValue(bufferBuilder);
         }

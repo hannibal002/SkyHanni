@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(KeyMapping.class)
-public class MixinKeyMapping {
+public abstract class MixinKeyMapping {
 
     @Shadow
     private boolean isDown;

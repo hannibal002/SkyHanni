@@ -23,7 +23,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 *///?}
 
 @Mixin(EntityRenderDispatcher.class)
-public class MixinEntityRenderDispatcher {
+public abstract class MixinEntityRenderDispatcher {
 
     @Inject(method = "shouldRender", at = @At("HEAD"), cancellable = true)
     private void shouldRender(
@@ -62,4 +62,5 @@ public class MixinEntityRenderDispatcher {
             EntityRenderDispatcherHookKt.clearEntity();
         }
     }
+
 }

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SoundEngine.class)
-public class MixinSoundEngine {
+public abstract class MixinSoundEngine {
 
     @Inject(
         method = "play",
@@ -33,5 +33,4 @@ public class MixinSoundEngine {
             cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);
         }
     }
-
 }

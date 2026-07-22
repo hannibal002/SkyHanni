@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(CustomHeadLayer.class)
-public class MixinCustomHeadLayer {
+public abstract class MixinCustomHeadLayer {
 
     @WrapWithCondition(
         method = "submit(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;ILnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;FF)V",

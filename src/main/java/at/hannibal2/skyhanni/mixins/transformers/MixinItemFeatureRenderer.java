@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -20,7 +21,8 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 //? if >= 26.2 {
 import com.mojang.blaze3d.vertex.QuadInstance;
 //?} else {
-/*import net.minecraft.client.renderer.OutlineBufferSource;
+/*import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 *///?}
 
@@ -76,6 +78,7 @@ public abstract class MixinItemFeatureRenderer {
     }
     //?}
 
+    //? if >= 26.1 {
     @WrapOperation(
         //? if >= 26.2 {
         method = "prepareOutlineSubmit",
@@ -111,4 +114,25 @@ public abstract class MixinItemFeatureRenderer {
         /*return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
         *///?}
     }
+    //?} else {
+    /*@ModifyArg(
+        method = "render",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V",
+            ordinal = 1
+        ),
+        index = 2
+    )
+    private MultiBufferSource wrapOutlineVertexConsumer(
+        MultiBufferSource bufferSource,
+        @Local SubmitNodeStorage.ItemSubmit submit
+    ) {
+        Object value = submit;
+        if (value instanceof GlowingStateStore state && state.skyhanni$isUsingCustomOutline()) {
+            return SkyHanniOutlineHook.getVertexConsumers();
+        }
+        return bufferSource;
+    }
+    *///?}
 }

@@ -65,7 +65,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import java.util.List;
 
 @Mixin(SubmitNodeCollection.class)
-public class MixinSubmitNodeCollection<E> {
+public abstract class MixinSubmitNodeCollection<E> {
 
     @WrapOperation(method = "submitItem", at = @At(value = "INVOKE", target = "Ljava/util/List;add(Ljava/lang/Object;)Z"))
     private boolean onSubmitItem(List<E> list, E itemCommand, Operation<Boolean> original) {

@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.User
+import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.multiplayer.ClientLevel
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.network.protocol.game.ClientboundSetTimePacket
@@ -40,7 +40,7 @@ object MinecraftCompat {
     /**
      * Returns the active [ClientLevel] or null if it doesn't exist.
      */
-    val localWorldOrNull get(): ClientLevel? = Minecraft.getInstance().level
+    val localWorldOrNull get(): ClientLevel? = mc.level
 
     /**
      * Returns whether there is an active [ClientLevel].
@@ -73,7 +73,7 @@ object MinecraftCompat {
     /**
      * Returns the active [LocalPlayer] or null if it doesn't exist.
      */
-    val localPlayerOrNull get(): LocalPlayer? = Minecraft.getInstance().player
+    val localPlayerOrNull get(): LocalPlayer? = mc.player
 
     /**
      * Returns whether there is an active [LocalPlayer].
@@ -110,7 +110,6 @@ object MinecraftCompat {
     }
     // </editor-fold>
 
-
     // <editor-fold desc="Miscellaneous">
     @JvmStatic
     var screen: Screen?
@@ -134,11 +133,11 @@ object MinecraftCompat {
         /*mc.options.hideGui
         *///?}
 
-    val showDebugHud get(): Boolean = Minecraft.getInstance().debugEntries.isOverlayVisible
+    val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
 
     fun reloadChunks() = DelayedRun.runOrNextTick {
         //~ if < 26.2 'levelExtractor' -> 'levelRenderer'
-        Minecraft.getInstance().levelExtractor.allChanged()
+        mc.levelExtractor.allChanged()
     }
     // </editor-fold>
 }

@@ -13,10 +13,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Connection.class)
-public class MixinConnection {
+public abstract class MixinConnection {
 
     @Inject(method = "genericsFtw", at = @At("HEAD"))
-    private static void handlePacket(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
+    private static void handlePacket$Inject$HEAD(Packet<?> packet, PacketListener listener, CallbackInfo ci) {
         if (packet instanceof BundlePacket<?> bundle) {
             for (Packet<?> subPacket : bundle.subPackets()) {
                 new PacketReceivedEvent(subPacket).post();
@@ -31,7 +31,7 @@ public class MixinConnection {
         at = @At("HEAD"),
         cancellable = true
     )
-    private void sendPacket(
+    private void sendPacketNew(
         Packet<?> packet,
         ChannelFutureListener channelFutureListener,
         boolean flush,

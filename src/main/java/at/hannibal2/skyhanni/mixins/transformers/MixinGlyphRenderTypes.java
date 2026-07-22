@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(GlyphRenderTypes.class)
-public class MixinGlyphRenderTypes {
+public abstract class MixinGlyphRenderTypes {
 
     @Unique
     private Identifier skyhanni$identifier;

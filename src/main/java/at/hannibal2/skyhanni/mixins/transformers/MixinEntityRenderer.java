@@ -19,11 +19,11 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >= 26.1 {
+import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import at.hannibal2.skyhanni.data.EntityData;
-import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 //?} else {
 /*import net.minecraft.client.renderer.state.CameraRenderState;
 *///?}

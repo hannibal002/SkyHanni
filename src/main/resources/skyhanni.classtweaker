@@ -7,9 +7,7 @@ accessible class net/minecraft/client/gui/GuiGraphicsExtractor$ScissorStack
 accessible class net/minecraft/client/gui/components/ChatComponent$DelayedMessageDeletion
 accessible class net/minecraft/client/gui/font/glyphs/BakedSheetGlyph$GlyphInstance
 accessible class net/minecraft/client/renderer/rendertype/RenderSetup$TextureBinding
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
-accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
+accessible class net/minecraft/world/level/entity/TransientEntitySectionManager$Callback
 accessible field net/minecraft/client/Camera position Lnet/minecraft/world/phys/Vec3;
 accessible field net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
 accessible field net/minecraft/client/Minecraft deltaTracker Lnet/minecraft/client/DeltaTracker$Timer;
@@ -46,9 +44,7 @@ accessible field net/minecraft/client/renderer/rendertype/RenderType name Ljava/
 accessible field net/minecraft/client/renderer/rendertype/RenderType state Lnet/minecraft/client/renderer/rendertype/RenderSetup;
 accessible field net/minecraft/core/particles/ColorParticleOption color I
 accessible field net/minecraft/network/chat/TextColor name Ljava/lang/String;
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
 accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket entityId I
-accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
 accessible field net/minecraft/world/entity/Avatar POSES Ljava/util/Map;
 accessible field net/minecraft/world/entity/Entity DATA_CUSTOM_NAME Lnet/minecraft/network/syncher/EntityDataAccessor;
 accessible field net/minecraft/world/entity/EntityEquipment items Ljava/util/EnumMap;
@@ -59,18 +55,15 @@ accessible field net/minecraft/world/item/Item descriptionId Ljava/lang/String;
 accessible field net/minecraft/world/item/ItemStack components Lnet/minecraft/core/component/PatchedDataComponentMap;
 accessible field net/minecraft/world/level/Level blockEntityTickers Ljava/util/List;
 accessible field net/minecraft/world/phys/BlockHitResult miss Z
-accessible method com/mojang/blaze3d/vertex/BufferBuilder beginElement (Lcom/mojang/blaze3d/vertex/VertexFormatElement;)J
 accessible method net/minecraft/client/gui/GuiGraphicsExtractor fill (Lcom/mojang/blaze3d/pipeline/RenderPipeline;IIIII)V
 accessible method net/minecraft/client/gui/components/ChatComponent getLineHeight ()I
 accessible method net/minecraft/client/gui/components/ChatComponent getScale ()D
 accessible method net/minecraft/client/gui/components/ChatComponent getWidth ()I
 accessible method net/minecraft/client/gui/components/ChatComponent refreshTrimmedMessages ()V
-accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FII)V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V
 accessible method net/minecraft/client/gui/screens/inventory/AbstractSignEditScreen setMessage (Ljava/lang/String;)V
 accessible method net/minecraft/client/renderer/rendertype/RenderType <init> (Ljava/lang/String;Lnet/minecraft/client/renderer/rendertype/RenderSetup;)V
 accessible method net/minecraft/network/chat/TextColor <init> (ILjava/lang/String;)V
-accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$Action getType ()Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType;
 extendable class net/minecraft/world/item/ItemStack
 inject-interface net/minecraft/client/renderer/entity/state/EntityRenderState at/hannibal2/skyhanni/mixins/hooks/EntityRenderStateStore
 inject-interface net/minecraft/network/chat/MutableComponent at/hannibal2/skyhanni/mixins/hooks/ComponentCreatedStore
@@ -108,14 +101,19 @@ accessible method net/minecraft/client/gui/GuiGraphicsExtractor innerFill (Lcom/
 accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/multiplayer/chat/GuiMessageSource;Lnet/minecraft/client/multiplayer/chat/GuiMessageTag;)V
 accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
 accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/multiplayer/chat/GuiMessage;)V
-inject-interface net/minecraft/client/multiplayer/chat/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
 inject-interface net/minecraft/client/renderer/block/FluidModel at/hannibal2/skyhanni/mixins/hooks/FluidModelTransparencyOverride
 mutable field net/minecraft/world/item/ItemStack item Lnet/minecraft/core/Holder;
 #?} else {
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction
+#accessible class net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAtLocationAction
 #accessible field net/minecraft/client/renderer/GameRenderer guiRenderState Lnet/minecraft/client/renderer/state/gui/GuiRenderState;
+#accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket action Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$Action;
+#accessible field net/minecraft/network/protocol/game/ServerboundInteractPacket$InteractionAction hand Lnet/minecraft/world/InteractionHand;
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessage (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/MessageSignature;Lnet/minecraft/client/GuiMessageTag;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent addMessageToDisplayQueue (Lnet/minecraft/client/GuiMessage;)V
 #accessible method net/minecraft/client/gui/components/ChatComponent logChatMessage (Lnet/minecraft/client/GuiMessage;)V
-#inject-interface net/minecraft/client/GuiMessage at/hannibal2/skyhanni/mixins/hooks/GuiMessageData
+#accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderBg (Lnet/minecraft/client/gui/GuiGraphicsExtractor;FII)V
+#accessible method net/minecraft/network/protocol/game/ServerboundInteractPacket$Action getType ()Lnet/minecraft/network/protocol/game/ServerboundInteractPacket$ActionType;
 #inject-interface net/minecraft/client/GuiMessage$Line at/hannibal2/skyhanni/mixins/hooks/MessageStore
 #?}

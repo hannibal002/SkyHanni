@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
-import at.hannibal2.skyhanni.utils.system.PlatformUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;

@@ -29,8 +29,8 @@ fun modifyGetModelFromBlockState(
         cir.returnValue =
             //? if >= 26.1 {
             modelSet.get(returnState)
-            //?} else {
-            /*blockRenderDispatcher.blockModelShaper.getBlockModel(returnState)
-            *///?}
+        //?} else {
+        /*blockRenderDispatcher.blockModelShaper.getBlockModel(returnState)
+        *///?}
     }
 }

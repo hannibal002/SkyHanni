@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(SimpleContainer.class)
-public class MixinSimpleContainer {
+public abstract class MixinSimpleContainer {
 
     @ModifyExpressionValue(
         method = "getItem",

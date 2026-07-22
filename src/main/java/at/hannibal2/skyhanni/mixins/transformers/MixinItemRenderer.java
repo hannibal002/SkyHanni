@@ -3,16 +3,16 @@ package at.hannibal2.skyhanni.mixins.transformers;
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 
 @Mixin(ItemRenderer.class)
-public class MixinItemRenderer {
+public abstract class MixinItemRenderer {
 
     @ModifyArg(method = "renderQuadList", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/VertexConsumer;putBulkData(Lcom/mojang/blaze3d/vertex/PoseStack$Pose;Lnet/minecraft/client/renderer/block/model/BakedQuad;FFFFII)V"), index = 5)
     private static float modifyAlpha(float originalAlpha) {

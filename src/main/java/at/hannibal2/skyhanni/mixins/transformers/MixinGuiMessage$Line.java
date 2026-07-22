@@ -7,7 +7,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
 @Mixin(GuiMessage.Line.class)
-public abstract class MixinGuiMessageLine implements MessageStore {
+public abstract class MixinGuiMessage$Line implements MessageStore {
 
     @Unique
     private GuiMessage skyhanni$parent;

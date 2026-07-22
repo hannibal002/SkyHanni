@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(HumanoidArmorLayer.class)
-public class MixinHumanoidArmorLayer {
+public abstract class MixinHumanoidArmorLayer {
 
     @Inject(method = "renderArmorPiece", at = @At("HEAD"), cancellable = true)
     private void onRenderArmor(

@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Screen.class)
-public class MixinScreen {
+public abstract class MixinScreen {
 
     @WrapOperation(
         //~ if < 26.1 'extractRenderState' -> 'render'

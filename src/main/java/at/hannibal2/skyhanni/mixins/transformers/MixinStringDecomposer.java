@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Also implements some chroma handling.
  */
 @Mixin(StringDecomposer.class)
-public class MixinStringDecomposer {
+public abstract class MixinStringDecomposer {
 
     @Unique private static final String HEX_CHARS = "0123456789abcdef";
 

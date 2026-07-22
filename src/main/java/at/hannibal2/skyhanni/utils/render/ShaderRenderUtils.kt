@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.shader.RoundedRectangleShader
 import at.hannibal2.skyhanni.shader.RoundedTextureShader
 *///?}
 
-// TODO refactor
 @Suppress("TooManyFunctions")
 object ShaderRenderUtils {
 

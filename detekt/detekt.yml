@@ -33,8 +33,6 @@ RepoRules:
 
 ImportRules:
     CustomImportOrdering:
-        active: false
-    PreprocessingImportOrdering:
         active: true
 
 SkyHanniStyle:
