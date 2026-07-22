@@ -88,6 +88,7 @@ object PestSpawnTimer {
     private var shouldRepeatWarning = false
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var cooldownNotDetected = false
 
     private fun getCustomCooldownTime(): Duration = with(config) {
         if (Perk.PEST_ERADICATOR.isActive) customCooldownTimeFinnegan
@@ -105,6 +106,7 @@ object PestSpawnTimer {
             maxPests = true
             pestCooldownEndTime = SimpleTimeMark.farPast()
             shouldRepeatWarning = false
+            cooldownNotDetected = false
             return
         }
 
@@ -112,6 +114,7 @@ object PestSpawnTimer {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
+            cooldownNotDetected = false
 
             if (ready || maxPests) {
                 pestCooldownEndTime = SimpleTimeMark.farPast()
@@ -128,6 +131,8 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
+        } ?: run {
+            cooldownNotDetected = true
         }
     }
 
@@ -248,6 +253,7 @@ object PestSpawnTimer {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
             val cooldownValue = when {
+                cooldownNotDetected -> "§cUnknown"
                 maxPests -> "§cMax Pests!"
                 ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
