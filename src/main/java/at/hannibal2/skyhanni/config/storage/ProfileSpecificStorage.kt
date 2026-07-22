@@ -45,11 +45,11 @@ import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.loadout.LoadoutApi.LoadoutData
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
@@ -743,10 +743,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
+        var slots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
+        var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
     // - foraging
