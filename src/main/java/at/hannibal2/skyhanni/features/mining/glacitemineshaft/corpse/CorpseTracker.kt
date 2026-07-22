@@ -45,7 +45,7 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
 
     data class BucketData(
         @Expose var corpsesLooted: MutableMap<CorpseType, Long> = enumMapOf(),
-        @Expose var keysSaved: MutableMap<CorpseType, Long> = enumMapOf()
+        @Expose var keysSaved: MutableMap<CorpseType, Long> = enumMapOf(),
     ) : BucketedItemTrackerData<CorpseType, SessionUptime.Normal>(CorpseType::class, SessionUptime.Normal::class) {
         override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(
