@@ -40,7 +40,7 @@ object EstimatedWardrobePrice {
         }
     }
 
-    private fun activeWardrobeApi(): WardrobeApi? {
+    private fun activeWardrobeApi(): AbstractWardrobeApi? {
         if (!SkyBlockUtils.inSkyBlock) return null
         if (ArmorWardrobeApi.inCustomWardrobe && !CustomWardrobe.editMode) return null
         return when {
