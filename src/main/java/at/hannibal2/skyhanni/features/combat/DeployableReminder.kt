@@ -36,13 +36,9 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (event.state != SlayerApi.ActiveQuestState.BOSS_FIGHT) return
 
-        val warningType = WarningType.SLAYER
-        val deployableType = getActiveDeployableType(warningType) ?: return
-
         scheduleWarning(
-            warningType = warningType,
+            warningType = WarningType.SLAYER,
             message = "Place Down Power Orb!",
-            type = deployableType,
             condition = { SlayerApi.isInBossFight() },
         )
     }
@@ -51,13 +47,9 @@ object DeployableReminder {
     fun onIslandJoin() {
         if (!isEnabled()) return
 
-        val warningType = WarningType.MINESHAFT
-        val deployableType = getActiveDeployableType(warningType) ?: return
-
         scheduleWarning(
-            warningType = warningType,
+            warningType = WarningType.MINESHAFT,
             message = "Place Down Lantern!",
-            type = deployableType,
             condition = { IslandType.MINESHAFT.isInIsland() },
         )
     }
@@ -67,13 +59,9 @@ object DeployableReminder {
         if (!isEnabled()) return
         if (!FishingApi.isTrophyFishing()) return
 
-        val warningType = WarningType.TROPHY_FISHING
-        val deployableType = getActiveDeployableType(warningType) ?: return
-
         showWarning(
-            warningType = warningType,
+            warningType = WarningType.TROPHY_FISHING,
             message = "Place Down Umberella!",
-            type = deployableType,
         )
     }
 
@@ -97,8 +85,9 @@ object DeployableReminder {
     private fun showWarning(
         warningType: WarningType,
         message: String,
-        type: DeployableType,
+        type: DeployableType = warningType.deployableType,
     ) {
+        if (!isWarningActive(warningType)) return
         if (activeWarnings.any { it.type == warningType }) return
         if (DeployableDisplay.getActiveDeployables().any { it.type == type }) return
 
@@ -114,9 +103,9 @@ object DeployableReminder {
     private fun scheduleWarning(
         warningType: WarningType,
         message: String,
-        type: DeployableType,
         condition: () -> Boolean = { true },
     ) {
+        if (!isWarningActive(warningType)) return
         if (!scheduledWarnings.add(warningType)) return
 
         DelayedRun.runDelayed(warningDelay) {
@@ -128,13 +117,11 @@ object DeployableReminder {
             showWarning(
                 warningType = warningType,
                 message = message,
-                type = type,
             )
         }
     }
 
-    private fun getActiveDeployableType(type: WarningType): DeployableType? =
-        type.deployableType.takeIf { config.warningTypes.contains(type) }
+    private fun isWarningActive(warningType: WarningType) = activeWarnings.any { it.type == warningType }
 
     private fun isEnabled() = config.enabled && config.warningTypes.isNotEmpty()
 }
