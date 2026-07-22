@@ -16,8 +16,11 @@ import net.minecraft.client.DeltaTracker
 import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.resources.Identifier
 
-//~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+//? if >= 26.1 {
 import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegistry
+//?} else {
+/*import net.fabricmc.fabric.api.client.rendering.v1.SpecialGuiElementRegistry
+*///?}
 
 @SkyHanniModule
 object RenderEvents {
@@ -54,61 +57,50 @@ object RenderEvents {
     // GameOverlayRenderPreEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
-    }
+    fun postHotbarLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
 
     @JvmStatic
-    fun postExperienceBarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
-    }
+    fun postExperienceBarLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_BAR).post()
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
-    }
+    fun postExperienceNumberLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
 
     @JvmStatic
-    fun postTablistLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
-    }
+    fun postTablistLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
 
     // GameOverlayRenderPostEvent
     // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
-    fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) {
+    fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
-    }
 
     @JvmStatic
-    fun postExperienceBarLayerEventPost(context: GuiGraphicsExtractor) {
+    fun postExperienceBarLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_BAR).post()
-    }
 
     @JvmStatic
-    fun postExperienceNumberLayerEventPost(context: GuiGraphicsExtractor) {
+    fun postExperienceNumberLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.EXPERIENCE_NUMBER).post()
-    }
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
-    }
+    fun postHeldItemTooltipLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
 
     @JvmStatic
-    fun postHeldItemTooltipLayerEventPost(context: GuiGraphicsExtractor) {
+    fun postHeldItemTooltipLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.HELD_ITEM_TOOLTIP).post()
-    }
 
     @JvmStatic
-    fun postActionBarLayerEventPre(context: GuiGraphicsExtractor): Boolean {
-        return GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
-    }
+    fun postActionBarLayerEventPre(context: GuiGraphicsExtractor) =
+        GameOverlayRenderPreEvent(context, RenderLayer.ACTION_BAR).post()
 
     @JvmStatic
-    fun postActionBarLayerEventPost(context: GuiGraphicsExtractor) {
+    fun postActionBarLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
-    }
 }
 
 enum class RenderLayer {
@@ -131,7 +123,5 @@ enum class RenderLayer {
     DEBUG,
     HELD_ITEM_TOOLTIP,
     ACTION_BAR,
-
-    // Not a real forge layer but is used on modern Minecraft versions
     EXPERIENCE_NUMBER,
 }

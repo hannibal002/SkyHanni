@@ -42,14 +42,14 @@ object EstimatedWardrobePrice {
         }
     }
 
-    private fun activeWardrobeApi(): WardrobeApi? = when {
+    private fun activeWardrobeApi(): AbstractWardrobeApi? = when {
         config.armor && ArmorWardrobeApi.inWardrobe() -> ArmorWardrobeApi
         config.equipment && EquipmentWardrobeApi.inWardrobe() -> EquipmentWardrobeApi
         else -> null
     }
 
     private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
-        (config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe()) &&
+        ((config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe())) &&
         (!ArmorWardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent

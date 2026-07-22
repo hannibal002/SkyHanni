@@ -36,7 +36,13 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -220,6 +226,7 @@ object DungeonApi {
     private const val WATER_ROOM_ID = "-60,-60"
     val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
 
+    @Deprecated("Use getLevelComponent instead for better formatting", replaceWith = ReplaceWith("getLevelComponent(level)"))
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
         level >= 45 -> "§c"
@@ -232,6 +239,27 @@ object DungeonApi {
         level >= 10 -> "§e"
         level >= 5 -> "§f"
         else -> "§7"
+    }
+
+    fun getLevelComponent(level: Int): Component {
+        val formatting: ChatFormatting = when {
+            level >= 45 -> RED
+            level >= 40 -> GOLD
+            level >= 35 -> DARK_PURPLE
+            level >= 30 -> BLUE
+            level >= 25 -> AQUA
+            level >= 20 -> DARK_GREEN
+            level >= 15 -> GREEN
+            level >= 10 -> YELLOW
+            level >= 5 -> WHITE
+            else -> GRAY
+        }
+        return componentBuilder {
+            append("$level") {
+                withColor(formatting)
+                if (level >= 50) bold = true
+            }
+        }
     }
 
     @HandleEvent
@@ -263,7 +291,7 @@ object DungeonApi {
 
         val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
-            if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
+            if (playerTeam.contains("(${dungeonClass.displayName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                 playerClass = dungeonClass
                 playerClassLevel = level
@@ -422,7 +450,7 @@ object DungeonApi {
         }
     }
 
-    enum class DungeonClass(val scoreboardName: String) {
+    enum class DungeonClass(val displayName: String) {
         ARCHER("Archer"),
         BERSERK("Berserk"),
         HEALER("Healer"),
@@ -432,7 +460,7 @@ object DungeonApi {
 
         companion object {
             fun getByClassName(className: String): DungeonClass? {
-                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+                return DungeonClass.entries.firstOrNull { it.displayName.equals(className, ignoreCase = true) }
             }
         }
     }

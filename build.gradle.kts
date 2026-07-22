@@ -49,9 +49,11 @@ fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependency
 fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
 fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
 fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
     add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
 fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
@@ -84,7 +86,7 @@ loom.apply {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G")
+            vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
@@ -101,6 +103,11 @@ val shadowModImpl: Configuration by configurations.creating {
 }
 
 val shadowOnly: Configuration by configurations.creating
+
+val mixinTestRuntime: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    extendsFrom(configurations.testRuntimeClasspath.get())
+}
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
@@ -161,6 +168,7 @@ dependencies {
     target.fabricLoaderVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
         "productionRuntimeMods"(it)
+        mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
     target.fabricApiVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
@@ -279,6 +287,21 @@ tasks.withType<Test> {
     )
 }
 
+val mixinTest by tasks.registering(Test::class) {
+    description = "Audits mixin application under Fabric Loader."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().output + sourceSets.main.get().output + mixinTestRuntime
+    filter {
+        includeTestsMatching("at.hannibal2.skyhanni.test.MixinTest")
+    }
+}
+
+tasks.test {
+    dependsOn(mixinTest)
+    exclude("at/hannibal2/skyhanni/test/MixinTest.class")
+}
+
 kotlin {
     sourceSets.all {
         languageSettings {
@@ -351,7 +374,7 @@ if (isDeobf) {
 tasks.withType<KotlinCompile> {
     compilerOptions {
         val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
-                           else target.minecraftVersion.formattedJavaLanguageVersion
+        else target.minecraftVersion.formattedJavaLanguageVersion
         jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
         allWarningsAsErrors = true
         optIn.addAll(
@@ -465,7 +488,7 @@ afterEvaluate {
     tasks.findByName("check")?.setDependsOn(
         tasks.getByName("check").dependsOn.filterNot { dep ->
             (dep is Task && dep.name.startsWith("detekt")) ||
-            (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
+                (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
         }
     )
 }

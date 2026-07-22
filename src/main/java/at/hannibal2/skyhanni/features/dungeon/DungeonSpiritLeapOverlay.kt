@@ -130,7 +130,7 @@ object DungeonSpiritLeapOverlay {
         val player = playerStackInfo.playerInfo ?: return null
         val classInfo = buildString {
             player.dungeonClass?.let {
-                append(it.scoreboardName)
+                append(it.displayName)
                 if (config.showDungeonClassLevel) append(" ${player.classLevel}")
                 if (player.playerDead) append(" (Dead)")
             }

@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.features.garden.inventory.SkyMartCopperPrice
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.patternGroup
 import at.hannibal2.skyhanni.features.garden.pests.PesthunterProfit
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFShopPrice
@@ -60,7 +60,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.addSkyHanniUtm
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.containsKeys
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.world.phys.AABB
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -123,7 +123,7 @@ object GardenApi {
             if (cropInHand.isTimeFlower()) checkItemInHand()
 
             // We ignore random hypixel moments
-            Minecraft.getInstance().screen ?: return
+            MinecraftCompat.screen ?: return
             checkItemInHand()
         }
     }
@@ -198,7 +198,7 @@ object GardenApi {
     fun hasMousematInHand(): Boolean = InventoryUtils.getItemInHand()?.getInternalName() == SQUEAKY_MOUSEMAT
 
     fun hasActiveSunsGrasp(): Boolean =
-        EquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
+        CurrentEquipmentApi.getEquipment(EquipmentSlot.GLOVES)?.getInternalName() == SUNS_GRASP &&
             InventoryUtils.getItemInHand()?.isEmpty == true
 
     fun NeuInternalName.getCropType(): CropType? =
