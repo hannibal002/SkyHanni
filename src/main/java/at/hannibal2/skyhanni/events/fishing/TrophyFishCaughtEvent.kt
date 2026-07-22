@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 
 /**
- * Event that is fired when a trophy fish is caught.
+ * Fired when the player catches a trophy fish.
  *
- * the trophyFishName is the name of the trophy fish, and is NOT the [NeuInternalName] of it.
- * and rarity is the rarity of the caught trophy fish. from bronze to diamond.
+ * @param trophyFishName The internal name of the caught trophy fish, not a NEU Internal Name.
+ * @param rarity The rarity of the caught trophy fish.
  */
 @PrimaryFunction("onTrophyFishCaught")
 class TrophyFishCaughtEvent(val trophyFishName: String, val rarity: TrophyRarity) : SkyHanniEvent()
