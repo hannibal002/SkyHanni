@@ -83,6 +83,9 @@
 + Hide annoying messages about Kernels getting added to your purse while farming. - Shana (https://github.com/hannibal002/SkyHanni/pull/5679)
 + Added current Harvest Feast in-season crop display. - Marie (https://github.com/hannibal002/SkyHanni/pull/5653)
     + Displays the currently in-season Harvest Feast crops and how long they will be in season for.
++ Added Phantomleaf Solver. - mzhaodev (https://github.com/hannibal002/SkyHanni/pull/6101)
+    + When harvesting Phantomleaf in the Garden, highlight the hiding spot in green.
+    + Stand still for best results.
 
 #### Chat
 
@@ -96,6 +99,9 @@
     + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
 + Added option to mute treasure chest sounds. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5896)
 + Added a clickable chat reminder to teleport to Don Expresso when he is full. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5580)
++ Added Mute when all Mineshaft Corpses are found. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5929)
+    + Mutes the sounds made from the Organ Donor accessory once all Frozen Corpses in the Mineshaft have been found.
+    + Requires Corpse Locator to be enabled.
 
 #### Slayer
 
@@ -112,6 +118,8 @@
 + Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 + Added Lotus Atoll island support. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5745)
 + Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
++ Added Oringo Pet in Calendar. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5931)
+    + Show the future legendary pet Oringo will offer in the Calendar.
 
 ### Improvements
 
@@ -257,6 +265,7 @@
 + Pet Display will now display best-effort cached data even if some tab list information is missing. - Luna (https://github.com/hannibal002/SkyHanni/pull/6035)
 + Added title and sound notification when a `/shremind` reminder is due. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6072)
 + Compressed island beacon buff display. - T0R0NT0 (https://github.com/hannibal002/SkyHanni/pull/6081)
++ Added Way to Pause and Resume Tracker. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5952)
 
 ### Fixes
 
@@ -325,6 +334,7 @@
 + Fixed active Garden plot being detected wrong on plot edges (e.g. with Disco Destination). - Luna (https://github.com/hannibal002/SkyHanni/pull/5846)
 + Fixed Pest Finder giving an error when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6104)
 + Fixed Pest Profit Tracker saying Praying Mantiss instead of Praying Mantises. - Luna (https://github.com/hannibal002/SkyHanni/pull/6114)
++ Fixed paginated Jacob Contest menu not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6128)
 
 #### Combat
 
@@ -361,6 +371,7 @@
 + Fixed not detecting Auto Pet Rule message for Golden Dragon overflow skin. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6117)
 + Fixed rare error/crash with Crimson Isle Miniboss Timer (likely a mod conflict). - Avrg (https://github.com/hannibal002/SkyHanni/pull/6096)
 + Fixed the item ability cooldown detection for the Giant's Sword. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/6116)
++ Fixed Fragged Ice Spray Wand not showing item ability cooldown. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6157)
 
 #### GUI
 
@@ -384,6 +395,7 @@
 + Fixed custom wardrobe freezing after the first click. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6036)
 + Fixed Pet Display visually keeping removed pet items. - Akinsoft (https://github.com/hannibal002/SkyHanni/pull/6066)
 + Fixed tab widget highlight not working in multi-page settings pages. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6103)
++ Fixed changing loadouts not updating Power Stone and tunings in Custom Scoreboard. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6146)
 
 #### Item Ability
 
@@ -428,6 +440,7 @@
 + Fixed Fishing Tracker disappearing while killing mobs occasionally. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5708)
 + Fixed Obfuscated Fish 1 and 2 not counting as bait. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5833)
 + Fixed Trophy Fish related features not working. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6022)
++ Fixed Legion/Bobbin Time text being too cramped. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6069)
 
 #### Item
 
@@ -448,6 +461,7 @@
 + Fixed dungeon floor detection being broken due to new update. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6018)
 + Fixed dungeon chat filter not filter certain blessings. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6053)
 + Fixed Dungeon Party Finder features making tooltip colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6095)
++ Fixed Livid Finder occasionally not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6154)
 
 #### Foraging
 
@@ -496,6 +510,7 @@
 + Fixed non-book ultra rare items in Superpairs not triggering the mid-game notification immediately when uncovered. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6071)
 + Fixed prevent missing rabbit the fish sometimes causing you to not be able to close other inventories. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6087)
 + Fixed Estimated Armor Wardrobe Price showing while using Custom Wardrobe. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
++ Fixed Inferno Profit Tracker detecting Bazaar + recipe menus as minion menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6129)
 
 #### Commands
 
@@ -649,6 +664,8 @@
 + Fixed Minion Upgrade Helper not appearing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6110)
 + Fixed typo in Crimson Isle rescue mission config. - jejebecarte (https://github.com/hannibal002/SkyHanni/pull/6121)
 + Fixed Zorro's Cape protection not working due to Equipment change. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
++ Fixed skill progress features not correctly counting overflow skill XP. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6155)
++ Fixed some text (e.g. Damage Indicator) rendering behind entities on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6149)
 
 ### Technical Details
 
@@ -964,6 +981,20 @@
 + Moved some old stat icons regex usage to new ones. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6068)
 + Renamed MinecraftCompat.localPlayer to MinecraftCompat.localPlayerOrThrow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5887)
 + Renamed MinecraftCompat.localWorld to MinecraftCompat.localWorldOrThrow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5887)
++ Added feedback when manually requesting Bazaar data. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6156)
++ Added MinecraftCompat helpers to ease 26.2 transition. - Luna (https://github.com/hannibal002/SkyHanni/pull/6144)
++ Changed SkyHanniEvent.post to now return the event itself instead of a boolean. - Luna (https://github.com/hannibal002/SkyHanni/pull/5414)
+    + Callers now check cancellation via isCancelled.
++ Fixed particle events being fired while the player hadn't finished loading. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6037)
++ Fixed the CustomImportOrdering detekt rule. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6136)
++ Made CroesusChestTracker detection colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6142)
++ Made GhostTracker regex colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6143)
++ Made it possible to disable listeners/invokers per version range. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6131)
++ Made TrophyFishManager colorless. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6118)
++ Marked long-running threads as daemon to ensure they don't hold up client shutdown. - Luna (https://github.com/hannibal002/SkyHanni/pull/6151)
++ Marked SkyHanni as incompatible with the mods OpSec and Spoofifed. - Luna (https://github.com/hannibal002/SkyHanni/pull/6085)
+    + These mods break our ability to communicate with the Hypixel Mod API.
++ Removed legacy fullComponent field from GuiMessage and ChatUtils. - Luna (https://github.com/hannibal002/SkyHanni/pull/5954)
 
 ### Removed Features
 
