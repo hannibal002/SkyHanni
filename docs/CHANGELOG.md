@@ -234,7 +234,7 @@
 #### Foraging
 
 + Improved Clear Tree View support for Torrhus Canyon. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6076)
-+ Made all existing skyhanni foraging features work on Torrhus Canyon. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6170)
++ Made all existing SkyHanni foraging features work on Torrhus Canyon. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6170)
     + If any feature doesn't work on the new island and you think it should, make a bug report.
 
 #### Commands
@@ -347,7 +347,7 @@
 + Fixed Pest Finder giving an error when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6104)
 + Fixed Pest Profit Tracker saying Praying Mantiss instead of Praying Mantises. - Luna (https://github.com/hannibal002/SkyHanni/pull/6114)
 + Fixed paginated Jacob Contest menu not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6128)
-+ Fixed skyhanni not detecting the 4th harvest feast in-season crop. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6113)
++ Fixed SkyHanni not detecting the 4th Harvest Feast in-season crop. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6113)
 + Fixed Pest Spawn Timer giving error when Tab List is still loading when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6165)
 + Fixed an error message when opening the Visitor menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6135)
 
@@ -492,7 +492,7 @@
   + It should now remain accurate even if the server is lagging.
 + Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 + Fixed rift time features not working with the hypixel resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6050)
-+ Fixed rare error while using the rift berberis helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
++ Fixed rare error while using the Rift Berberis Helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
 
 #### Inventory
 
@@ -1020,7 +1020,7 @@
 + Moved GardenPlotApi.Plot into its own class GardenPlot, with all members (properties and functions) as class members. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6138)
 + Removed ModernPatterns and moved the patterns into their respective files. - Luna (https://github.com/hannibal002/SkyHanni/pull/5254)
     + We only support modern now, so there is no point in this file existing.
-+ Rename wardrobe and equipment API classes for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6137)
++ Renamed wardrobe and equipment API classes for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6137)
 
 ### Removed Features
 
