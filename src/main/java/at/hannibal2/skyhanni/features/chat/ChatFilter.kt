@@ -112,7 +112,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val guildEventExpPatterns by eventPatternGroup.list(
         "guild-event",
-        "You earned 0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:\\+ 0-9a-f][\\d,]+ Event EXP )?from playing SkyBlock!",
+        "You earned (?:[0-9a-f][\\d,]+ GEXP(?: \\+ [0-9a-f][\\d,]+ Event EXP)?|[0-9a-f][\\d,]+ Event EXP) from playing SkyBlock!",
     )
 
     // Kill Combo
@@ -175,7 +175,7 @@ object ChatFilter {
         " {2}NICE! SLAYER BOSS SLAIN!", "You received kill credit for assisting on a slayer miniboss!",
 
         "✆ RING... .*",
-        )
+    )
 
     // Slayer Drop
     @Suppress("MaxLineLength")
@@ -422,11 +422,11 @@ object ChatFilter {
 
     /**
      * REGEX-TEST: Your Healer stats are doubled because you are the only player using this class!
-     * REGEX-TEST: Your Mage stats are doubled because you are the only player using
+     * REGEX-TEST: Your Mage stats are doubled because you are the only player using this class!
      */
     private val soloClassPatterns by dungeonPatternGroup.list(
         "solo-class",
-        "Your (Healer|Mage|Berserk|Archer|Tank) stats are doubled because you are the only player using this class!",
+        "Your (?:Healer|Mage|Berserk|Archer|Tank) stats are doubled because you are the only player using this class!",
     )
 
     /**
@@ -434,7 +434,7 @@ object ChatFilter {
      */
     private val soloStatsPatterns by dungeonPatternGroup.list(
         "solo-stats",
-        "\\[(Healer|Mage|Berserk|Archer|Tank)].*",
+        "\\[(?:Healer|Mage|Berserk|Archer|Tank)].*",
     )
 
     /**
@@ -492,7 +492,7 @@ object ChatFilter {
         "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
         "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
     )
-    
+
     /**
      ** REGEX-TEST: You haven't claimed your Summer Rewards yet!
      ** REGEX-TEST: Talk to the Summer Sloth in the Hub!
