@@ -165,7 +165,6 @@ object UnknownLinesHandler {
         return filtered
     }
 
-
     private fun warn(line: String, reason: String) {
         if (!CustomScoreboard.config.unknownLinesWarning) return
         ErrorManager.logErrorWithData(
