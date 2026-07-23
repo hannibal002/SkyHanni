@@ -279,6 +279,7 @@ object CustomScoreboard {
                     prefixColor = "§c"
                 )
             }
+            config.enabled.set(false)
             JsonPrimitive(false)
         }
     }
