@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat.carrytracker
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -45,41 +46,43 @@ class CarryTrackerConfig {
 
     @Expose
     @ConfigOption(
-        name = "Slayer Boss Spawned Chat Message",
-        desc = "Send a chat message when a customer's slayer boss spawns.",
+        name = "Slayer Boss Spawned Notification",
+        desc = "Show a notification when a customer's slayer boss spawns.",
     )
-    @ConfigEditorBoolean
-    var slayerSpawnedMessage: Boolean = true
+    @Accordion
+    val slayerSpawnedNotification: NotificationConfig = NotificationConfig()
 
     @Expose
     @ConfigOption(
-        name = "Slayer Boss Spawned Title",
-        desc = "Show a title when a customer's slayer boss spawns.",
+        name = "Carry Finished Notification",
+        desc = "Show a notification when a carry is finished.",
     )
-    @ConfigEditorBoolean
-    var slayerSpawnedTitle: Boolean = true
+    @Accordion
+    val carryFinishedNotification: NotificationConfig = NotificationConfig()
 
-    @Expose
-    @ConfigOption(
-        name = "Slayer Boss Spawned Sound",
-        desc = "Play a sound when a customer's slayer boss spawns.",
-    )
-    @ConfigEditorBoolean
-    var slayerSpawnedSound: Boolean = true
+    class NotificationConfig {
+        @Expose
+        @ConfigOption(
+            name = "Notification Chat Message",
+            desc = "Send a chat message for the notification.",
+        )
+        @ConfigEditorBoolean
+        var chat: Boolean = true
 
-    @Expose
-    @ConfigOption(
-        name = "Carry Finished Title",
-        desc = "Show a title for carry finished notifications.",
-    )
-    @ConfigEditorBoolean
-    var carryFinishedTitle: Boolean = true
+        @Expose
+        @ConfigOption(
+            name = "Notification Title",
+            desc = "Show a title for the notification.",
+        )
+        @ConfigEditorBoolean
+        var title: Boolean = true
 
-    @Expose
-    @ConfigOption(
-        name = "Carry Finished Sound",
-        desc = "Play a sound for carry finished notifications.",
-    )
-    @ConfigEditorBoolean
-    var carryFinishedSound: Boolean = true
+        @Expose
+        @ConfigOption(
+            name = "Notification Sound",
+            desc = "Play a sound for the notification.",
+        )
+        @ConfigEditorBoolean
+        var sound: Boolean = true
+    }
 }
