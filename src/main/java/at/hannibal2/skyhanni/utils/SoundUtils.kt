@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.compat.SoundCompat
-import kotlinx.coroutines.delay
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.sounds.SimpleSoundInstance
 import net.minecraft.client.resources.sounds.SoundInstance
@@ -17,6 +16,7 @@ import net.minecraft.client.sounds.SoundBufferLibrary
 import net.minecraft.resources.Identifier
 import net.minecraft.sounds.SoundSource
 import java.util.concurrent.CompletableFuture
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object SoundUtils {
