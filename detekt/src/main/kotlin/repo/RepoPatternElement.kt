@@ -29,7 +29,7 @@ class RepoPatternElement private constructor(
     }
 
     companion object {
-        val SENTINEL_VALUE = RepoPatternElement("SENTINAL", null, "", emptyList(), emptyList())
+        val SENTINEL_VALUE = RepoPatternElement("SENTINEL", null, "", emptyList(), emptyList())
 
         private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
         private val wrappedRegexFailPattern = "WRAPPED-REGEX-FAIL: \"(?<test>.*)\"".toPattern()
