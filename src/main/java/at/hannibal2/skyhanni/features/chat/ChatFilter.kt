@@ -42,8 +42,8 @@ object ChatFilter {
     private val eventPatternGroup = chatFilterGroup.group("event")
     private val dungeonPatternGroup = chatFilterGroup.group("dungeon")
 
-    // <editor-fold desc="Regex Patterns & Messages">
-    // Lobby Messages
+    // <editor-fold desc="Regex Patterns">
+    // Lobby Patterns
     @Suppress("MaxLineLength")
     private val lobbyPatterns by miscPatternGroup.list(
         // player join
@@ -98,7 +98,7 @@ object ChatFilter {
     )
 
     // Welcome
-    private val welcomeMessages by miscPatternGroup.list(
+    private val welcomePatterns by miscPatternGroup.list(
         "welcome",
         "Welcome to Hypixel SkyBlock!",
     )
@@ -136,7 +136,7 @@ object ChatFilter {
 
     // OTHERS
     // Bazaar And AH Mini
-    private val miniBazaarAndAHMessages by miscPatternGroup.list(
+    private val miniBazaarAndAHPatterns by miscPatternGroup.list(
         "bazzar-and-ah-mini",
         "Putting item in escrow...",
         "Putting coins in escrow...",
@@ -255,14 +255,14 @@ object ChatFilter {
     )
 
     // Party
-    private val partyMessages by miscPatternGroup.list(
+    private val partyPatterns by miscPatternGroup.list(
         "party",
         "-----------------------------------------------------",
     )
 
     // MONEY
     // Auction House
-    private val auctionHouseMessages by miscPatternGroup.list(
+    private val auctionHousePatterns by miscPatternGroup.list(
         "auction-house",
         "-----------------------------------------------------",
         "Visit the Auction House to collect your item!",
@@ -287,7 +287,7 @@ object ChatFilter {
     )
 
     // Useless Warning
-    private val uselessWarningMessages by miscPatternGroup.list(
+    private val uselessWarningPatterns by miscPatternGroup.list(
         "useless-warning",
         "You are sending commands too fast! Please slow down.", // TODO prevent in the future
         "You can't use this while in combat!",
@@ -329,13 +329,13 @@ object ChatFilter {
         "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
     )
 
-    private val skymallMessages by miningPatternGroup.list(
+    private val skymallPatterns by miningPatternGroup.list(
         "skymall",
         "New day! Your Sky Mall buff changed!",
         "You can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
-    private val lotteryMessages by foragingPatternGroup.list(
+    private val lotteryPatterns by foragingPatternGroup.list(
         "lottery",
         "New day! Your Lottery buff changed!",
         "You can disable this messaging by toggling Lottery in your /hotf!",
@@ -345,7 +345,7 @@ object ChatFilter {
      * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
      */
     @Suppress("MaxLineLength")
-    private val anitaFortunePattern by farmingPatternGroup.list(
+    private val anitaFortunePatterns by farmingPatternGroup.list(
         "jacobevent.accessory",
         "\\[NPC] Jacob: Your Anita's \\w+ is giving you \\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE.hypixelIcon} .+ Fortune during the contest!",
     )
@@ -405,7 +405,7 @@ object ChatFilter {
     /**
      * REGEX-TEST: RARE REWARD! Leebys found a Recombobulator 3000 in their Obsidian Chest!
      */
-    private val rareDropsMessages by dungeonPatternGroup.list(
+    private val rareDropsPatterns by dungeonPatternGroup.list(
         "rare-drops",
         "RARE REWARD! .* found a .* in their .* Chest!",
     )
@@ -558,7 +558,7 @@ object ChatFilter {
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
         "sacrifice" to sacrificePatterns,
-        "rare_drops" to rareDropsMessages,
+        "rare_drops" to rareDropsPatterns,
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
@@ -573,13 +573,13 @@ object ChatFilter {
         "hoppity_appear" to hoppityAppearPatterns,
         "hoppity_begin" to hoppityBeginPatterns,
         "profile_join" to profileJoinPatterns,
-        "welcome" to welcomeMessages,
-        "bz_ah_minis" to miniBazaarAndAHMessages,
-        "party" to partyMessages,
-        "money" to auctionHouseMessages,
-        "useless_warning" to uselessWarningMessages,
-        "skymall" to skymallMessages,
-        "lottery" to lotteryMessages
+        "welcome" to welcomePatterns,
+        "bz_ah_minis" to miniBazaarAndAHPatterns,
+        "party" to partyPatterns,
+        "money" to auctionHousePatterns,
+        "useless_warning" to uselessWarningPatterns,
+        "skymall" to skymallPatterns,
+        "lottery" to lotteryPatterns
     )
 
     // </editor-fold>
@@ -632,7 +632,7 @@ object ChatFilter {
         config.hoppityEggs && message.isPresent("hoppity_appear") -> "hoppity_appear"
         config.hoppityBegun && message.isPresent("hoppity_begin") -> "hoppity_begin"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
-        generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePattern.matches(message) -> "jacob_event"
+        generalConfig.hideJacob && !GardenApi.inGarden() && anitaFortunePatterns.matches(message) -> "jacob_event"
         generalConfig.hideSkyMall && !IslandTypeTag.MINING.isInIsland() && message.isPresent("skymall") -> "skymall"
         generalConfig.hideLottery && !IslandTypeTag.FORAGING.isInIsland() && message.isPresent("lottery") -> "lottery"
         dungeonConfig.rareDrops && message.isPresent("rare_drops") -> "rare_drops"
