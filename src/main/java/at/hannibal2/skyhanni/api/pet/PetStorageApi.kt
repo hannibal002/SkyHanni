@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
@@ -27,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -210,7 +212,12 @@ object PetStorageApi {
                 PetUtils.petWithRarityToInternalName(petName, rarity)
             }
             val petSkin = getPetSkinOrNull(petInternalName)
-            val lore = getLoreComponent().toColorlessText()
+            val lore = getCleanLore()
+            // The forge "Pets" gets detected here, but has "Items Required"
+            if(PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)) {
+                return@matchStyledMatcher null
+            }
+
             val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(lore) {
                 val currentValue = group("current").formatDouble()
                 when (groupOrNull("next")) {

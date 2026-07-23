@@ -153,4 +153,12 @@ internal object PetStoragePatterns {
         "chat.removedhelditem",
         "You removed (?<item>.+?) from your pet!",
     )
+
+    /**
+     * REGEX-TEST: Items Required
+     */
+    val petMenuPetStackLoreFalsePattern by patternGroup.list(
+        "menu.petstack.lore.falsepositive",
+        "Items Required",
+    )
 }

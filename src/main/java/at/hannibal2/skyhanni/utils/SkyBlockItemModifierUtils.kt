@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.pet.PetStoragePatterns
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
@@ -150,6 +152,9 @@ object SkyBlockItemModifierUtils {
         }?.getStringOrDefault("petInfo")?.takeIf {
             it.isNotEmpty()
         } ?: return null
+
+        // The forge "Pets" menu may get here, but has "Items Required"
+        if (PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(getCleanLore())) return null
 
         return try {
             ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)
