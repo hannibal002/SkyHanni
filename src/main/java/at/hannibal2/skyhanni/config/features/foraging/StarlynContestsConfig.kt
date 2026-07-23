@@ -14,8 +14,7 @@ class StarlynContestsConfig {
     @ConfigOption(name = "Coupon Prices", desc = "Help to identify profitable items to buy at Starlyn Sister shops.")
     @ConfigEditorBoolean
     @FeatureToggle
-    // TODO: RENAME and config fix
-    var agathaCouponProfitEnabled = true
+    var starlynCouponProfitEnabled = true
 
     @Expose
     @ConfigOption(name = "Compact Results", desc = "Compacts the messages for your placement in a §dStarlyn Sister §7contest.")
@@ -32,8 +31,7 @@ class StarlynContestsConfig {
     var compactPersonalBest = false
 
     @Expose
-    // TODO: RENAME and config fix
-    @ConfigLink(owner = StarlynContestsConfig::class, field = "agathaCouponProfitEnabled")
-    val agathaCouponProfitPos: Position = Position(206, 158)
+    @ConfigLink(owner = StarlynContestsConfig::class, field = "starlynCouponProfitEnabled")
+    val starlynCouponProfitPos: Position = Position(206, 158)
 
 }

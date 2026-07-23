@@ -945,7 +945,6 @@ object ScoreboardPattern {
      * REGEX-TEST: Whispers: §3141§b (+1)
      * REGEX-TEST: Whispers: §317.5k§b (+50)
      * REGEX-TEST: §fWhispers: §317k§b (+40)
-     * REGEX-TEST: §fWhispers: §317k§b (+40)
      * REGEX-TEST: §fWhispers: §64.2k§b (+44)
      */
     val whispersPattern by galateaSB.pattern(

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,7 +49,7 @@ object StarlynSisterCouponProfit {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!config.agathaCouponProfitEnabled) return
+        if (!config.starlynCouponProfitEnabled) return
         StarlynSisterType.entries.forEach { sisterType ->
             if (event.inventoryName == sisterType.inventoryName) currentSisterType = sisterType
         }
@@ -166,10 +167,16 @@ object StarlynSisterCouponProfit {
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (currentSisterType == null) return
-        config.agathaCouponProfitPos.renderRenderables(
+        config.starlynCouponProfitPos.renderRenderables(
             display,
             extraSpace = 5,
             posLabel = "Starlyn Sister Coupon Profit",
         )
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(139, "foraging.starlynContest.agathaCouponProfitEnabled", "foraging.starlynContest.starlynCouponProfitEnabled")
+        event.move(139, "foraging.starlynContest.agathaCouponProfitPos", "foraging.starlynContest.starlynCouponProfitPos")
     }
 }

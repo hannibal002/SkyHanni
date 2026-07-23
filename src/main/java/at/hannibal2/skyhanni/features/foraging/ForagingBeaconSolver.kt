@@ -55,7 +55,7 @@ import kotlin.time.times
 @SkyHanniModule
 object ForagingBeaconSolver {
 
-    private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
+    private val config get() = SkyHanniMod.feature.foraging.foragingBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
 
     private val patternGroup = RepoPattern.group("foraging.beacon")
