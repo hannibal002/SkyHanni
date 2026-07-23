@@ -4,16 +4,17 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.parse12HourTime
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.network.chat.Component
 import kotlin.time.Duration
 
 @SkyHanniModule
@@ -98,16 +99,13 @@ object CalendarApi {
         "Event lasts for (?<time>(?:\\d\\d?[hms] ?)+)!"
     )
 
-    fun parseCalendarTooltip(tooltipLines: List<Component>): List<CalendarEvent>? {
-        val line = tooltipLines.firstOrNull()?.string?.removeColor()?.trim() ?: return null
-        val currentDay = dayHeaderPattern.matchMatcher(line) {
+    fun parseCalendarItem(item: SafeItemStack): List<CalendarEvent>? {
+        val currentDay = dayHeaderPattern.matchMatcher(item.cleanName) {
             group("dayNum")?.toInt()
         } ?: return null
 
-        return tooltipLines.asSequence()
-            .drop(1)
-            .mapNotNull { component: Component ->
-                val line = component.string.removeColor().trim()
+        return item.getCleanLore()
+            .mapNotNull { line ->
                 eventLinePattern.matchMatcher(line) {
                     val timePrefix = group("timePrefix") ?: return@matchMatcher null
                     val eventName = group("eventName")?.trim() ?: return@matchMatcher null
@@ -191,12 +189,12 @@ object CalendarApi {
     //
     // Oringo The Taveling Zookeeper is
     // visiting SkyBlock with pets to trade!
-    fun parseMainCalendarTooltip(rawTooltip: MutableList<Component>): MainCalendarEvent? {
-        val tooltip = rawTooltip.map { it.string.removeColor().trim() }
-        if (tooltip.size < 3) return null
-        val eventName = tooltip[0]
-        val startTimeLine = tooltip[1]
-        val durationLine = tooltip[2]
+    fun parseMainCalendarItem(item: SafeItemStack): MainCalendarEvent? {
+        val lore = item.getCleanLore()
+        if (lore.size < 2) return null
+        val eventName = item.cleanName
+        val startTimeLine = lore[0]
+        val durationLine = lore[1]
 
         val startTime = mainCalendarStartsInPattern.matchMatcher(startTimeLine) {
             val timeString = group("time")
