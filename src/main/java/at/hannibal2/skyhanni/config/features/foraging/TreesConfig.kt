@@ -13,7 +13,7 @@ class TreesConfig {
     @ConfigOption(name = "Clean Tree View", desc = "Hides the floating blocks when mining trees in galatea.")
     @ConfigEditorBoolean
     @FeatureToggle
-    @SearchTag("fig mangrove")
+    @SearchTag("fig mangrove helix")
     var cleanView = true
 
     @Expose
@@ -34,7 +34,8 @@ class TreesConfig {
     var muteBreaking = true
 
     @Expose
-    @ConfigOption(name = "Also on Galatea", desc = "Also mutes tree breaking sounds on Galatea.")
+    @ConfigOption(name = "Also on Galatea", desc = "Also mute tree breaking sounds on Galatea.")
+    @SearchTag("fig mangrove helix")
     @ConfigEditorBoolean
     var muteBreakingOnGalatea = false
 
