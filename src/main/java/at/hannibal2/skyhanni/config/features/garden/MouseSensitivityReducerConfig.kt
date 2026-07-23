@@ -19,7 +19,7 @@ class MouseSensitivityReducerConfig {
         desc = "You can type §e/shmouselock §rto lock your mouse rotation, and §e/shsensreduce §rto reduce your sensitivity.",
     )
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Auto Enable", desc = "Automatically lower mouse sensitivity while in the garden.")
@@ -64,7 +64,7 @@ class MouseSensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Lock on Mousemat", desc = "Lock mouse when snapping to Squeaky Mousemat.")
     @ConfigEditorBoolean
-    var lockOnMousemat: Boolean = true
+    var lockOnMousemat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Only on Ground", desc = "When enabled, lower sensitivity only while on or near the ground.")

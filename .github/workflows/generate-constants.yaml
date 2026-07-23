@@ -1,3 +1,4 @@
+# Execution context: base branch code (push to beta / workflow_dispatch)
 # Read the Javadoc of RepoPatternDump for more info
 
 name: RepoPattern

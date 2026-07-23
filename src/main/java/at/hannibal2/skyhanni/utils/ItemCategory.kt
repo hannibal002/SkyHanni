@@ -76,6 +76,7 @@ enum class ItemCategory {
     WATERING_CAN,
     FARMING_TOOL,
     TROPHY,
+    CAPSULE,
 
     NONE,
     ;

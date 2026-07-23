@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.DyeCompat.Companion.isDye
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -237,7 +237,7 @@ object BetterContainers {
 
     fun getTextureIdentifier(original: Identifier): Identifier {
         if (!chestOpen) return original
-        val inv = (Minecraft.getInstance().screen as? ContainerScreen)?.container
+        val inv = (MinecraftCompat.screen as? ContainerScreen)?.container
             ?: return original
         if (inv !is ChestMenu) return original
         val invHash = inv.hashCode()
@@ -291,7 +291,8 @@ object BetterContainers {
         val isSuperpairs = unformattedLower.startsWith("Superpairs") && !containsStakes
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index).takeUnlessEmpty() ?: continue
+            // Intentionally counts empty slots as well, since we want to render them as well
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             // Column and row index
             val cI = index % 9
             val rI = index / 9
@@ -310,7 +311,8 @@ object BetterContainers {
         }
 
         for (index in 0..<size) {
-            val stack: SafeItemStack = handlerInventory.getItem(index).takeUnlessEmpty() ?: continue
+            // Intentionally counts empty slots as well, since we want to render them as well
+            val stack: SafeItemStack = handlerInventory.getItem(index)
             val xi = index % 9
             val yi = index / 9
 

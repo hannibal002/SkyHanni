@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -59,7 +60,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Blocks
@@ -98,6 +98,22 @@ object MinionFeatures {
     )
 
     /**
+     * REGEX-TEST: You picked up a minion!
+     */
+    private val minionPickupPattern by patternGroup.pattern(
+        "chat.pickup",
+        "You picked up a minion!",
+    )
+
+    /**
+     * REGEX-TEST: You placed a minion!
+     */
+    private val minionPlacePattern by patternGroup.pattern(
+        "chat.place",
+        "You placed a minion!",
+    )
+
+    /**
      * REGEX-TEST: Redstone Minion IV
      * REGEX-TEST: Chicken Minion XI
      */
@@ -106,8 +122,8 @@ object MinionFeatures {
         "Minion [^➜]",
     )
     private val minionCollectItemPattern by patternGroup.pattern(
-        "item.collect",
-        "^§aCollect All$",
+        "item.collect.colorless",
+        "^Collect All$",
     )
 
     /**
@@ -136,32 +152,29 @@ object MinionFeatures {
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
-            newMinionName = getMinionName(equipped.cleanName())
+            newMinionName = getMinionName(equipped.cleanName)
         } else {
             newMinion = null
             newMinionName = null
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onEntityClick(event: EntityClickEvent) {
-        if (!enableWithHub()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastClickedEntity = event.clickedEntity.getLorenzVec()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onBlockClick(event: BlockClickEvent) {
-        if (!enableWithHub()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastStorage = event.position
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
-        if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
         val color = config.lastClickedMinion.color.toColor()
@@ -182,14 +195,13 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!enableWithHub()) return
         val inventoryName = event.inventoryName
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (minionCollectItemPattern.matches(it.cleanName)) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -199,9 +211,8 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!enableWithHub()) return
         if (minionInventoryOpen) {
             MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
         }
@@ -293,7 +304,7 @@ object MinionFeatures {
     fun onTick() {
         if (display != null) return
 
-        if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
+        if (MinecraftCompat.screen is ContainerScreen && config.hopperProfitDisplay) {
             display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
@@ -347,18 +358,16 @@ object MinionFeatures {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Inflation Contributor".asComponent(),
-            "Gain Coins from a single Minion Hopper".asComponent(),
-            10f,
-            false,
-            listOf(1_000_000, 5_000_000, 10_000_000),
+            name = "Inflation Contributor".asComponent(),
+            description = "Gain Coins from a single Minion Hopper".asComponent(),
+            userLuckAmount = 10f,
+            tiers = listOf(1_000_000, 5_000_000, 10_000_000),
         )
         event.register(achievement, MINION_COIN_ACHIEVEMENT)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        // TODO use repo patterns
         val message = event.cleanMessage
         minionCoinPattern.matchMatcher(message) {
             if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
@@ -372,14 +381,14 @@ object MinionFeatures {
                 AchievementManager.updateTieredAchievement(MINION_COIN_ACHIEVEMENT, coins)
             }
         }
-        if (message.startsWith("You picked up a minion!") && lastMinion != null) {
+        if (minionPickupPattern.find(message) && lastMinion != null) {
             minions?.remove(lastMinion)
             lastClickedEntity = null
             lastMinion = null
             lastMinionOpened = 0L
         }
 
-        if (message.startsWith("You placed a minion!")) newMinion?.let {
+        if (minionPlacePattern.find(message)) newMinion?.let {
             minions?.put(
                 it,
                 ProfileSpecificStorage.MinionConfig().apply {
@@ -442,8 +451,6 @@ object MinionFeatures {
             event.cancel()
         }
     }
-
-    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isInIsland() || IslandType.HUB.isInIsland()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
