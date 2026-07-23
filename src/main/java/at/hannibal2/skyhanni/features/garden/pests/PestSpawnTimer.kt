@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -62,10 +61,17 @@ object PestSpawnTimer {
      * WRAPPED-REGEX-TEST: " Cooldown: 58s"
      * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
-
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldowntime-no-color",
         "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Alive: 8"
+     */
+    private val maxPestsAlivePattern by patternGroup.pattern(
+        "max-pests-alive",
+        "\\sAlive: 8",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -81,6 +87,7 @@ object PestSpawnTimer {
     private var shouldRepeatWarning = false
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var cooldownNotDetected = false
 
     private fun getCustomCooldownTime(): Duration = with(config) {
         if (Perk.PEST_ERADICATOR.isActive) customCooldownTimeFinnegan
@@ -90,11 +97,23 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+        val widgetLines = event.widget.lines.map { it.string }
 
-        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+        // Hypixel can sometimes send partial widget
+        // so we first check if the maximum number of pests is present as a workaround
+        maxPestsAlivePattern.firstMatcher(widgetLines) {
+            maxPests = true
+            pestCooldownEndTime = SimpleTimeMark.farPast()
+            shouldRepeatWarning = false
+            cooldownNotDetected = false
+            return
+        }
+
+        pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
+            cooldownNotDetected = false
 
             if (ready || maxPests) {
                 pestCooldownEndTime = SimpleTimeMark.farPast()
@@ -111,6 +130,8 @@ object PestSpawnTimer {
                 hasReminderShown = false
                 pestSpawned = false
             }
+        } ?: run {
+            cooldownNotDetected = true
         }
     }
 
@@ -142,7 +163,7 @@ object PestSpawnTimer {
     }
 
     @HandleEvent
-    fun onCropBreak(event: CropClickEvent) {
+    fun onCropClick() {
         val timeDiff = lastCropBrokenTime.passedSince()
 
         if (timeDiff > longestCropBrokenTime) {
@@ -231,6 +252,7 @@ object PestSpawnTimer {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
             val cooldownValue = when {
+                cooldownNotDetected -> "§cUnknown"
                 maxPests -> "§cMax Pests!"
                 ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
