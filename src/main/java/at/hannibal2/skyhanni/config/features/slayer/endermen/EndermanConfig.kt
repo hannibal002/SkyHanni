@@ -52,4 +52,3 @@ class EndermanConfig {
     @ConfigEditorSlider(minStep = 1f, minValue = 1f, maxValue = 10f)
     var slayerLineWidth: Int = 3
 }
-
