@@ -11,11 +11,11 @@ class RepoPatternContext {
         val cachedValue = cache[property]
 
         if (cachedValue != null) {
-            return cachedValue.takeUnless { it === RepoPatternElement.SENTINAL_VALUE }
+            return cachedValue.takeUnless { it === RepoPatternElement.SENTINEL_VALUE }
         }
 
         val element = property.asRepoPatternElement()
-        cache[property] = element ?: RepoPatternElement.SENTINAL_VALUE
+        cache[property] = element ?: RepoPatternElement.SENTINEL_VALUE
         return element
     }
 }
