@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -61,11 +62,30 @@ object ExperimentationSuperpairApi {
         "powerups.lore",
         "(?i).*powerup.*",
     )
+
+    /**
+     * REGEX-TEST: Remaining Clicks: 22
+     * REGEX-TEST: Remaining Clicks: 0
+     */
+    private val remainingClicksPattern by ExperimentationTableApi.patternGroup.pattern(
+        "clicks",
+        "Remaining Clicks: (?<clicks>\\d+)",
+    )
     // </editor-fold>
+
+    private const val CLICKS_SLOT = 4
 
     private val superpairsSlotMap: MutableMap<Int, SafeItemStack> = mutableMapOf()
     private var lastClickedSlot = -1
     private var currentFoundData = mapOf<FoundType, List<FoundData>>()
+
+    // True once "Remaining Clicks" has read 0 for two updates in a row: the first 0-reading is the
+    // player's genuine last click (still processed normally), but Hypixel then reveals every
+    // remaining card for the round-end summary, which would otherwise get misclassified as
+    // collected. Tracking stops from the second consecutive 0-reading until clicks are seen above
+    // 0 again (e.g. a +Clicks powerup bouncing the count back up), so a false trigger self-corrects
+    // instead of getting stuck.
+    private var frozen = false
 
     val foundData: Map<FoundType, List<FoundData>> get() = currentFoundData
     fun found(type: FoundType): List<FoundData> = currentFoundData[type].orEmpty()
@@ -82,6 +102,7 @@ object ExperimentationSuperpairApi {
         superpairsSlotMap.clear()
         currentFoundData = emptyMap()
         lastClickedSlot = -1
+        frozen = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
@@ -96,6 +117,14 @@ object ExperimentationSuperpairApi {
         if (!ExperimentationTableApi.inSuperpairs) return
         if (ExperimentationTableApi.expOverInventoryPattern.matches(event.inventoryName)) return
         val tier = ExperimentationTableApi.currentExperimentTier ?: return
+
+        val remainingClicks = event.inventoryItems[CLICKS_SLOT]?.let { clicksItem ->
+            remainingClicksPattern.matchMatcher(clicksItem.cleanName) { group("clicks").toIntOrNull() }
+        }
+        val wasFrozen = frozen
+        frozen = remainingClicks == 0
+        if (frozen && wasFrozen) return
+
         scan(event.inventoryItems, tier)
     }
 
