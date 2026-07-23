@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -191,7 +190,10 @@ object CustomScoreboard {
         ) {
             updateIslandEntries()
         }
-        config.enabled.onEnable {
+        config.enabled.whenChanged { old, new ->
+            // TODO: figure out why onEnabled call the callback 3 times instead of once
+            if (old == new || !new) return@whenChanged
+
             ChatUtils.clickableLinkChat(
                 message = "Custom Scoreboard is deprecated and no longer supported. " +
                     "Please use the replacement mod instead. " +
