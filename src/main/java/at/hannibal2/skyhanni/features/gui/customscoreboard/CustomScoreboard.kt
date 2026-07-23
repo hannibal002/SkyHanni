@@ -193,7 +193,9 @@ object CustomScoreboard {
         }
         config.enabled.onEnable {
             ChatUtils.clickableLinkChat(
-                message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
+                message = "Custom Scoreboard is deprecated and no longer supported. " +
+                    "Please use the replacement mod instead. " +
+                    "This feature will be removed completely in a future update.",
                 url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
                 prefixColor = "§c"
             )
@@ -268,7 +270,9 @@ object CustomScoreboard {
         event.transform(140, "gui.customScoreboard.enabled") { element ->
             if (element.asBoolean) {
                 ChatUtils.clickableLinkChat(
-                    message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
+                    message = "Custom Scoreboard has been disabled in this update. " +
+                        "A replacement mod is available and recommended. " +
+                        "The old feature will be removed completely in a future update.",
                     url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
                     prefixColor = "§c"
                 )
