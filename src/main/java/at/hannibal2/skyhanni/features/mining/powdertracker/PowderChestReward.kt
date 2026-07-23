@@ -117,7 +117,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
 
     // TODO: Fix typo
-    ELECTRON_TRANSIMTTER(
+    ELECTRON_TRANSMITTER(
         "§9Electron Transmitter",
         " {4}Electron Transmitter(?: x(?<amount>[\\d,]+))?",
     ),

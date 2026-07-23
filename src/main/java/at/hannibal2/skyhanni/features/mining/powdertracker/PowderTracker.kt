@@ -296,7 +296,7 @@ object PowderTracker {
         var totalParts = 0L
         for (reward in listOf(
             PowderChestReward.FTX_3070,
-            PowderChestReward.ELECTRON_TRANSIMTTER,
+            PowderChestReward.ELECTRON_TRANSMITTER,
             PowderChestReward.ROBOTRON_REFLECTOR,
             PowderChestReward.SUPERLITE_MOTOR,
             PowderChestReward.CONTROL_SWITCH,
