@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.foraging
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -32,7 +33,7 @@ object TreeProgressDisplay {
         "(?<treeType>\\w+) TREE (?<percent>\\d+)%",
     )
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onGuiRenderOverlay() {
         if (!config.enabled) return
         display?.let {
@@ -42,7 +43,7 @@ object TreeProgressDisplay {
 
     // TODO: optimize to not use getEntities
     @OptIn(AllEntitiesGetter::class)
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onTick() {
         if (!config.enabled) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
@@ -50,7 +51,7 @@ object TreeProgressDisplay {
             return
         }
         for (entity in EntityUtils.getEntities<ArmorStand>()) {
-            val name = entity.displayName.formattedTextCompat()
+            val name = entity.displayName.formattedTextCompat().removeColor()
             currentTreeProgressPattern.matchMatcher(name) {
                 display = if (config.compact) {
                     Renderable.text("${group("treeType")} §b§l${group("percent")}%")

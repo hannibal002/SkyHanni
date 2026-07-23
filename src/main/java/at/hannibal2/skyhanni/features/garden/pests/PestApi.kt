@@ -74,12 +74,12 @@ object PestApi {
     var lastTimeVacuumHeld = SimpleTimeMark.farPast()
     var lastTimeLassoHeld = SimpleTimeMark.farPast()
 
-
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
 
     private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, SALTY_SPRAYONATOR)
+
     fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
@@ -164,7 +164,7 @@ object PestApi {
      */
     private val stereoInventoryPattern by patternGroup.pattern(
         "stereo.inventory",
-        "Stereo Harmony"
+        "Stereo Harmony",
     )
     val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
 
@@ -174,7 +174,7 @@ object PestApi {
      */
     val stereoPlayingPattern by patternGroup.pattern(
         "stereo.playing",
-        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*"
+        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*",
     )
 
     /**

@@ -9,16 +9,14 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi.isFishingRod
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import com.google.gson.JsonArray
 
 @SkyHanniModule
 object NoBreak {
-
-    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     private val config get() = GardenApi.config
 
@@ -50,7 +48,7 @@ object NoBreak {
         val predicate: (NeuInternalName) -> Boolean,
     ) {
         FISHING_ROD("Fishing Rod", { it.isFishingRod() }),
-        SPRAYONATOR("Sprayonator", { it == SPRAYONATOR_ITEM }),
+        SPRAYONATOR("Sprayonator", { PestApi.hasSprayonatorInHand() }),
         ;
 
         override fun toString() = displayName
