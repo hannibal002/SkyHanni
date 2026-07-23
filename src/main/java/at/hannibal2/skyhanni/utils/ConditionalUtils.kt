@@ -40,16 +40,16 @@ object ConditionalUtils {
     }
 
     fun Property<out Boolean>.onEnable(observer: Runnable) {
-        whenChanged { old, new ->
-            if (!old && new) {
+        whenChanged { _, _ ->
+            if (this.get()) {
                 observer.run()
             }
         }
     }
 
     fun Property<out Boolean>.onDisable(observer: Runnable) {
-        whenChanged { old, new ->
-            if (old && !new) {
+        whenChanged { _, _ ->
+            if (!this.get()) {
                 observer.run()
             }
         }
