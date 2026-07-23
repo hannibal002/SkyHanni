@@ -20,6 +20,7 @@ object UtilsPatterns {
      * REGEX-TEST: EPIC BOOTS
      * REGEX-TEST: COMMON
      * REGEX-TEST: COMMON COMBAT SHARD (ID C9)
+     * REGEX-TEST: EPIC WATER SHARD (ID E5)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
      * REGEX-TEST: a DIVINE a
@@ -88,7 +89,7 @@ object UtilsPatterns {
 
     /**
      * REGEX-TEST: 8x Enchanted Pork
-     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     * WRAPPED-REGEX-TEST: "  §810x §r§bGlacite Jewel"
      */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",

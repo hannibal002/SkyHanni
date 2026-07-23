@@ -351,17 +351,23 @@ enum class TabWidget(
         // language=RegExp
         "Agatha's Contest:.*",
     ),
+    MIRIA_CONTEST(
+        // language=RegExp
+        "Miria's Contest:.*",
+    ),
+    // TODO rename to FORAGING_BEACON
     MOONGLADE_BEACON(
         // language=RegExp
-        "Moonglade Beacon: (?<stacks>\\d+) Stacks?",
+        "(?<beaconType>\\w+) Beacon: (?<stacks>\\d+) Stacks?",
     ),
     SALTS(
         // language=RegExp
         "Salts:",
     ),
+    // TODO rename to WHISPERS
     FOREST_WHISPERS(
         // language=RegExp
-        "Forest Whispers: (?<amount>.*)",
+        "(?<whisperType>\\w+) Whispers: (?<amount>.*)",
     ),
     SHARD_TRAPS(
         // language=RegExp
@@ -387,7 +393,7 @@ enum class TabWidget(
     /** The current active information from tab list.
      *
      * When the widget isn't visible, it will be empty
-     * */
+     */
     var lines: List<Component> = emptyList()
         private set
 

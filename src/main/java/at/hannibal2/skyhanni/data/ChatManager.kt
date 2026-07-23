@@ -21,21 +21,25 @@ import at.hannibal2.skyhanni.utils.StringUtils.stripHypixelMessage
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.ChatFormatting
+import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
-import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
 
-//? if >= 26.1
+//? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
+//?} else {
+/*import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
+*///?}
 
 @SkyHanniModule
 object ChatManager {
@@ -138,7 +142,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer,
-            ).post()
+            ).post().isCancelled
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
@@ -253,7 +257,7 @@ object ChatManager {
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat
+        val chatGui = MinecraftCompat.hud.chat
 
         val (messageIndex, message) = chatGui.allMessages.withIndex().firstOrNull {
             predicate(it.value)
@@ -277,8 +281,9 @@ object ChatManager {
             counter,
             newComponent,
             id,
-            //? if >= 26.1
+            //? if >= 26.1 {
             GuiMessageSource.SYSTEM_CLIENT,
+            //?}
             GuiMessageTag.system(),
         )
         chatGui.allMessages[messageIndex] = newMessage
@@ -334,8 +339,7 @@ object ChatManager {
         reason: String? = null,
         predicate: (GuiMessage) -> Boolean = { true },
     ) = DelayedRun.runOrNextTick {
-        val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat
+        val chatGui = MinecraftCompat.hud.chat
 
         val iterator = chatGui.allMessages.iterator()
         var removed = 0
@@ -406,7 +410,7 @@ object ChatManager {
             description = "Force Minecraft to refresh chat lines"
             category = CommandCategory.DEVELOPER_TEST
             simpleCallback {
-                Minecraft.getInstance().gui.chat.refreshTrimmedMessages()
+                MinecraftCompat.hud.chat.refreshTrimmedMessages()
                 ChatUtils.chat("Refreshed chat.")
             }
         }

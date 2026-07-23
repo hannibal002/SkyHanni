@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
-import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
@@ -11,6 +10,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
@@ -23,11 +23,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -35,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -43,8 +46,8 @@ import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
@@ -98,6 +101,17 @@ object FishingApi {
         "fishing.bait.inventory",
         "Bait Remaining: (?<amount>[\\d,]+)",
     )
+
+    private val obfuscatedBaits = setOf(
+        "OBFUSCATED_FISH_1_BRONZE",
+        "OBFUSCATED_FISH_1_SILVER",
+        "OBFUSCATED_FISH_1_GOLD",
+        "OBFUSCATED_FISH_1_DIAMOND",
+        "OBFUSCATED_FISH_2_BRONZE",
+        "OBFUSCATED_FISH_2_SILVER",
+        "OBFUSCATED_FISH_2_GOLD",
+        "OBFUSCATED_FISH_2_DIAMOND",
+    ).toInternalNames()
 
     const val babySlugName = "Baby Magma Slug"
 
@@ -207,8 +221,7 @@ object FishingApi {
     }
 
     private fun extractAndPostBaitUpdate(stack: SafeItemStack) {
-        val category = stack.getItemCategoryOrNull()
-        if (category == null || (category != ItemCategory.BAIT && category != ItemCategory.FISHING_BAIT)) {
+        if (!stack.isBait()) {
             postEmptyBaitUpdate()
             return
         }
@@ -235,8 +248,8 @@ object FishingApi {
     }
 
     private fun hasGuiOpen(): Boolean {
-        val screen = Minecraft.getInstance().screen
-        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
+        val screen = MinecraftCompat.screen
+        return (screen is AbstractContainerScreen<*> || screen is AbstractSignEditScreen) && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -265,7 +278,12 @@ object FishingApi {
         return rodPartName.toInternalName()
     }
 
-    fun SafeItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun SafeItemStack.isBait(): Boolean {
+        val category = getItemCategoryOrNull() ?: return false
+        if (category == ItemCategory.BAIT) return true
+        val internalName = getInternalNameOrNull() ?: return false
+        return internalName in obfuscatedBaits
+    }
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {

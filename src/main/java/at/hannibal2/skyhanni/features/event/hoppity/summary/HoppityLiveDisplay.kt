@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDi
 import at.hannibal2.skyhanni.config.features.event.hoppity.summary.HoppityLiveDisplayConfig.HoppityLiveDisplayInventoryType
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
@@ -41,6 +40,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.getCountdownFormat
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addCenteredString
 import at.hannibal2.skyhanni.utils.renderables.container.ContainerRenderable
@@ -48,7 +49,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRend
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import org.lwjgl.glfw.GLFW
@@ -132,7 +132,7 @@ object HoppityLiveDisplay {
         if (!config.enabled) return
         if (config.toggleKeybind == GLFW.GLFW_KEY_UNKNOWN || config.toggleKeybind != event.keyCode) return
         // Only toggle from inventory if the user is in the Chocolate Factory
-        if (Minecraft.getInstance().screen != null && !CFApi.inChocolateFactory) return
+        if (MinecraftCompat.screen != null && !CFApi.inChocolateFactory) return
         if (lastToggleMark.passedSince() < 250.milliseconds) return
         val storage = storage ?: return
         storage.hoppityStatLiveDisplayToggledOff = !storage.hoppityStatLiveDisplayToggledOff
@@ -141,8 +141,8 @@ object HoppityLiveDisplay {
 
     private var inventoryOpen = false
 
-    @HandleEvent(GuiRenderEvent::class, onlyOnSkyblock = true)
-    fun onGuiRender() {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onGuiRenderTop() {
         if (!liveDisplayEnabled()) return
 
         val stats = getYearStats(HoppityEventSummary.statYear) ?: return
@@ -158,6 +158,16 @@ object HoppityLiveDisplay {
             displayCardRenderables = buildDisplayRenderables(stats, HoppityEventSummary.statYear)
         }
 
+        if (invCurrentlyOpen) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         eventConfig.eventSummary.liveDisplayPosition.renderRenderables(
             displayCardRenderables,
             posLabel = "Hoppity's Hunt Stats",
@@ -182,7 +192,7 @@ object HoppityLiveDisplay {
 
     private fun inMatchingInventory(): Boolean {
         val setting = config.specificInventories
-        val currentScreen = Minecraft.getInstance().screen
+        val currentScreen = MinecraftCompat.screen
             ?: return HoppityLiveDisplayInventoryType.NO_INVENTORY in setting
 
         // Get the inventory name and check if it matches any of the specific inventories
@@ -202,7 +212,7 @@ object HoppityLiveDisplay {
     }
 
     private fun isInInventory(): Boolean =
-        Minecraft.getInstance().screen is InventoryScreen || Minecraft.getInstance().screen is ContainerScreen
+        MinecraftCompat.screen is InventoryScreen || MinecraftCompat.screen is ContainerScreen
 
     private fun HoppityEventStats.buildMealEggHover(statYear: Int): List<String> = buildList {
         val spawnedEggs: Map<HoppityEggType, Int> = getSpawnedEggCountsWithInfPossible(statYear).takeIfNotEmpty() ?: return@buildList
