@@ -13,8 +13,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrNull
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
@@ -162,7 +163,7 @@ object SuperCraftingInventory {
     }
 
     private fun getSuperCraftingCount(slots: List<Slot>): Long? {
-        val lore = slots[PICKAXE_SLOT].item.getSingleLineLore().removeColor()
+        val lore = slots[PICKAXE_SLOT].item.getCleanLore().toSingleLineLore()
         return craftingCount.matchMatcher(lore) {
             groupOrNull("count")?.formatLongOrNull()
         }

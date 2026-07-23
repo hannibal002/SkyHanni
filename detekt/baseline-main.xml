@@ -228,8 +228,7 @@
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt:ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
+    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$by RepoPattern.pattern( "slayer.bosswarning.progress", " \\(?(?&lt;progress&gt;[0-9.,k]+)/(?&lt;total&gt;[0-9.,k]+)\\)?.*" )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter", )</ID>
@@ -530,10 +529,8 @@
     <ID>UseOrEmpty:ItemUtils.kt:ItemUtils$lore ?: emptyList()</ID>
     <ID>UselessCallOnNotNull:EssenceShopHelper.kt:EssenceShopHelper$essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()</ID>
     <ID>UselessCallOnNotNull:IslandExceptions.kt:IslandExceptions$armorStand?.name.formattedTextCompatLessResets().orEmpty()</ID>
-    <ID>UselessCallOnNotNull:MoongladeBeacon.kt:MoongladeBeacon$listOfNotNull(normalTuning, enchantedTuning)</ID>
     <ID>UselessCallOnNotNull:ScoreboardData.kt:ScoreboardData$MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()</ID>
     <ID>VarCouldBeVal:CommandBuilder.kt:ComplexCommandBuilder$private var realDescription: String = ""</ID>
-    <ID>VarCouldBeVal:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private var recentTicks: MutableList&lt;Int&gt; = mutableListOf()</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt:RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt:RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
     <ID>VarCouldBeVal:SkyHanniItemTracker.kt:SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>

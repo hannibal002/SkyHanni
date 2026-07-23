@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.events.ParticleEvent
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket
 import net.minecraft.resources.Identifier
@@ -16,6 +17,7 @@ object ParticleUtils {
 
     @JvmStatic
     fun postParticleEvent(packet: ClientboundLevelParticlesPacket) {
+        if (!MinecraftCompat.localPlayerExists) return
         cancelled.set(false)
         if (ParticleEvent(
                 type = packet.particle.type,
@@ -24,7 +26,7 @@ object ParticleUtils {
                 speed = packet.maxSpeed,
                 offset = packet.toOffset(),
                 longDistance = packet.isOverrideLimiter,
-            ).post()
+            ).post().isCancelled
         ) {
             cancelled.set(true)
         }

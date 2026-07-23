@@ -36,7 +36,7 @@ enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
 }
 
 @SkyHanniModule
-object EquipmentApi {
+object CurrentEquipmentApi {
 
     val inventory = InventoryDetector { it == "Your Equipment and Stats" }
 
@@ -49,9 +49,9 @@ object EquipmentApi {
     fun getSlots(): Map<EquipmentSlot, SafeItemStack?> =
         EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
 
-    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
+    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull().orEmpty()
 
-    private fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
+    fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
         equipment[slot.ordinal] = itemStack
         SkyblockEquipmentDataUpdateEvent(slot, itemStack).post()
@@ -95,7 +95,7 @@ object EquipmentApi {
             if (lastClickedEquipmentTime.passedSince() > 1.seconds) return@matchMatcher
             val chatItem = group("item").removeColor()
             val (item, slot) = lastClickedEquipment ?: return@matchMatcher
-            if (item.cleanName() != chatItem) return@matchMatcher
+            if (item.cleanName != chatItem) return@matchMatcher
             setEquipment(slot, item)
             lastClickedEquipment = null
         }

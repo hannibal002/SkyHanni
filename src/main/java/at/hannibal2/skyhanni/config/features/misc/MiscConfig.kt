@@ -417,6 +417,15 @@ class MiscConfig {
     @FeatureToggle
     var gfsPiggyBank: Boolean = true
 
+    // Not a FeatureToggle: moving a Hypixel UI element is a personal preference, not a feature to auto-enable.
+    @Expose
+    @ConfigOption(
+        name = "Move Insert Into Sack Button",
+        desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
+    )
+    @ConfigEditorBoolean
+    var moveInsertIntoSackButton: Boolean = false
+
     @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
@@ -482,7 +491,10 @@ class MiscConfig {
     var fixDoubleClicks: Boolean = true
 
 
-    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigOption(
+        name = "Color Particle Warning",
+        desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.",
+    )
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
     val notice: String = ""
@@ -490,7 +502,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Fix Colored Particles",
-        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -500,7 +512,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Rainbow Action Bar",
-        desc = "Makes the Action bar rainbow. Why? For fun!"
+        desc = "Makes the Action bar rainbow. Why? For fun!",
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
@@ -508,7 +520,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Show Achievement Messages",
-        desc = "You can do §e/shachievements§7 to see them all!"
+        desc = "You can do §e/shachievements§7 to see them all!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -517,7 +529,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Mute Stereo Pants",
-        desc = "Mutes music played by Stereo Pants."
+        desc = "Mutes music played by Stereo Pants.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
