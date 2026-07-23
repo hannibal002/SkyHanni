@@ -20,6 +20,7 @@ object UtilsPatterns {
      * REGEX-TEST: EPIC BOOTS
      * REGEX-TEST: COMMON
      * REGEX-TEST: COMMON COMBAT SHARD (ID C9)
+     * REGEX-TEST: EPIC WATER SHARD (ID E5)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
      * REGEX-TEST: a DIVINE a
