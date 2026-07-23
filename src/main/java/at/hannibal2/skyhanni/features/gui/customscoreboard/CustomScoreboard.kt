@@ -9,6 +9,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -188,6 +190,9 @@ object CustomScoreboard {
         ) {
             updateIslandEntries()
         }
+        config.enabled.onEnable {
+            deprecatedFeatureWarning()
+        }
     }
 
     @HandleEvent(HypixelJoinEvent::class)
@@ -251,6 +256,24 @@ object CustomScoreboard {
                 }
             }
         }
+    }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(140, "gui.customScoreboard.enabled") { element ->
+            deprecatedFeatureWarning()
+            config.enabled.set(false)
+            element
+        }
+    }
+
+    private fun deprecatedFeatureWarning() {
+        if (!config.enabled.get()) return
+        ChatUtils.clickableLinkChat(
+            message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
+            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+            prefixColor = "§c"
+        )
     }
 
     private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>, currentIslandList: List<ScoreboardElement>) =
