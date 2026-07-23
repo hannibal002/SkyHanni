@@ -1,3 +1,5 @@
+package repo
+
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtEscapeStringTemplateEntry
