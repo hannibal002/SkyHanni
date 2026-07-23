@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.combat.carrytracker
 
 import at.hannibal2.skyhanni.config.NoConfigLink
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.storage.CarryTrackerStorage
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -20,5 +20,10 @@ class CarryTrackerConfig {
     val display: Position = Position(10, 10)
 
     @Expose
-    val storage: CarryTrackerStorage = CarryTrackerStorage()
+    @ConfigOption(
+        name = "Suggest Carries From Trades",
+        desc = "Detect coins traded and suggest adding carries based on configured prices.",
+    )
+    @ConfigEditorBoolean
+    var suggestCarriesFromTrades: Boolean = true
 }

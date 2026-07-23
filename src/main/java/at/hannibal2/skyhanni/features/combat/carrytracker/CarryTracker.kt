@@ -19,12 +19,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
@@ -32,13 +32,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.StringUtils.width
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onClick
 import at.hannibal2.skyhanni.utils.chat.TextHelper.onHover
 import at.hannibal2.skyhanni.utils.chat.TextHelper.width
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.suggest
@@ -56,7 +54,7 @@ object CarryTracker {
     private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
     private val config get() = SkyHanniMod.feature.combat.carryTracker
-    private val storage get() = config.storage
+    private val priceStorage get() = SkyHanniMod.feature.storage.carryTrackerPrices
     private var display: List<Renderable> = emptyList()
 
     private val customers: MutableList<Customer> = mutableListOf()
@@ -100,6 +98,8 @@ object CarryTracker {
             lastTradedPlayer = name
 
             DelayedRun.runNextTick {
+                lastTradedPlayer = null
+
                 val coins = recentTrades[name] ?: return@runNextTick
                 if (coins <= 0.0) return@runNextTick
 
@@ -109,6 +109,7 @@ object CarryTracker {
                     updateDisplay()
                 }
 
+                if (!config.suggestCarriesFromTrades) return@runNextTick
                 val types = carryTypes.filter { it.pricePer != 0.0 && (coins % it.pricePer) == 0.0 }
 
                 if (types.isNotEmpty()) ChatUtils.chat {
@@ -120,12 +121,13 @@ object CarryTracker {
 
                     for (type in types) {
                         val amount = (coins / type.pricePer).toInt()
-                        val component = " ".asComponent().append(
-                            "§b[${amount}x ${type.shortName}]".asComponent {
+                        val component = componentBuilder {
+                            append(" ")
+                            append("§b[${amount}x ${type.shortName}]") {
                                 onHover("§eClick to add ${amount}x §d${type.displayName}§e!")
                                 onClick { addCarry(name, type.id, amount) }
-                            },
-                        )
+                            }
+                        }
 
                         // dont break component into 2 lines
                         val remainingWidth = chatWidth - ((prefixWidth + this.width()) % chatWidth)
@@ -155,19 +157,15 @@ object CarryTracker {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderTop() {
-        if (InventoryUtils.inAnyInventory()) {
-            InventoryGuiScaleCompat.withOriginalHudScale {
-                renderDisplay()
-            }
-        } else {
-            renderDisplay()
-        }
-    }
-
-    private fun renderDisplay() {
-        config.display.renderRenderables(display, posLabel = "Carry Tracker")
+    init {
+        RenderDisplayHelper(
+            outsideInventory = true,
+            inOwnInventory = true,
+            condition = { true },
+            onRender = {
+                config.display.renderRenderables(display, posLabel = "Carry Tracker")
+            },
+        )
     }
 
     @HandleEvent
@@ -180,10 +178,9 @@ object CarryTracker {
         event.title("Carry Tracker")
         event.addIrrelevant {
             add("customers: $customers")
-            add("carryTypes: $carryTypes")
-            add("carryPrices: ${storage.carryPrices}")
-            add("lastTradedPlayer: $lastTradedPlayer")
-            add("recentTrades: $recentTrades")
+            add("carry types: $carryTypes")
+            add("saved prices: $priceStorage")
+            add("recent trades: $recentTrades")
         }
     }
 
@@ -532,11 +529,11 @@ object CarryTracker {
         abstract val shortName: String
 
         var pricePer: Double = 0.0
-            get() = storage.carryPrices.getOrDefault(id, field)
+            get() = priceStorage.getOrDefault(id, field)
             set(value) {
                 field = value
-                if (value == 0.0) storage.carryPrices.remove(id)
-                else storage.carryPrices.put(id, value)
+                if (value == 0.0) priceStorage.remove(id)
+                else priceStorage.put(id, value)
             }
     }
 

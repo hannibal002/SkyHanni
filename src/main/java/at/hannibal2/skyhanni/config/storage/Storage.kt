@@ -37,4 +37,7 @@ class Storage {
 
     @Expose
     var testRenderablePositions: MutableMap<String, Position> = mutableMapOf()
+
+    @Expose
+    var carryTrackerPrices: MutableMap<String, Double> = mutableMapOf()
 }
