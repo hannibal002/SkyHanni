@@ -167,18 +167,18 @@ object CorpseTracker : SkyHanniBucketedItemTracker<CorpseType, CorpseTracker.Buc
             category = CommandCategory.USERS_RESET
             simpleCallback { resetCommand() }
         }
-        event.registerBrigadier("shaddcorpsekey") {
+        event.registerBrigadier("shaddcorpsekeyusage") {
             description = "Adds/Removes a corpse key usage from the Glacite Mineshaft Corpse Tracker"
             category = CommandCategory.USERS_RESET
             arg("corpseType", EnumArgumentType.custom<CorpseType>({ it.type })) { typeRef ->
                 callback {
                     modify {
-                        it.keysSaved.addOrPut(getArg(typeRef), 1)
+                        it.keysSaved.addOrPut(getArg(typeRef), -1)
                     }
                 }
                 argCallback("amount", LongArgumentType.longArg()) { amount ->
                     modify {
-                        it.keysSaved.addOrPut(getArg(typeRef), amount)
+                        it.keysSaved.addOrPut(getArg(typeRef), -amount)
                     }
                 }
             }
