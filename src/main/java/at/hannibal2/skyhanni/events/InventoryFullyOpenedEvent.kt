@@ -8,6 +8,12 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStack
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 
+/**
+ * Sealed base class for inventory events that provide access to the current inventory's slot data.
+ *
+ * @see InventoryFullyOpenedEvent
+ * @see InventoryUpdatedEvent
+ */
 sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
@@ -46,7 +52,11 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
 /**
- * This event is fired whenever we receive an inventory update packet.
+ * Fired whenever the slot data of the currently open inventory changes.
+ *
+ * This fires once immediately after [InventoryFullyOpenedEvent] on initial open,
+ * and again on any subsequent slot update while the inventory remains open.
+ * Updates after the initial open are delayed by one tick.
  */
 @PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
