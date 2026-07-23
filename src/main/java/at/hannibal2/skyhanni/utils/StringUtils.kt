@@ -597,53 +597,19 @@ object StringUtils {
         "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.toString(), "UTF-8")}"
     }.joinToString("&")
 
+    fun Sequence<String>.withWrappedLines(): Sequence<String> = sequence {
+        val lines = toList()
 
+        for (i in lines.indices) {
+            yield(lines[i])
 
-    /**
-     * Creates joined sliding windows of lines.
-     *
-     * Example with size = 3:
-     *
-     * A
-     * B
-     * C
-     *
-     * produces:
-     *
-     * A
-     * A B
-     * A B C
-     * B
-     * B C
-     * C
-     */
-    fun List<String>.windowedToJoin(
-        size: Int = 2,
-        separator: String = " ",
-    ): Sequence<String> {
-        if (size <= 0) return emptySequence()
-
-        return sequence {
-            for (start in indices) {
-                subList(start, size + start.coerceAtMost(lastIndex + 1))
-                    .indices
-                    .forEach { windowSize ->
-                        yield(
-                            subList(start, start + windowSize + 1)
-                                .joinToString(separator)
-                        )
-                    }
+            if (i + 1 < lines.size) {
+                yield(lines[i] + " " + lines[i + 1])
             }
         }
     }
 
-    fun Sequence<String>.windowedToJoin(
-        size: Int = 2,
-        separator: String = " ",
-    ): Sequence<String> = toList().windowedToJoin(size, separator)
+    fun List<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
 
-    fun Iterator<String>.windowedToJoin(
-        size: Int = 2,
-        separator: String = " ",
-    ): Sequence<String> = asSequence().windowedToJoin(size, separator)
+    fun Iterator<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
 }

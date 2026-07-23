@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.windowedToJoin
+import at.hannibal2.skyhanni.utils.StringUtils.withWrappedLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
@@ -54,7 +54,7 @@ object MinionUpgradeHelper {
         if (!config.minionConfigHelper) return
         lastMinionOpen = SimpleTimeMark.now()
         val lore = event.inventoryItems[50]?.getCleanLore() ?: return
-        requiredItemsPattern.firstMatcher(lore.windowedToJoin()) {
+        requiredItemsPattern.firstMatcher(lore.withWrappedLines()) {
             internalName = NeuInternalName.fromItemName(group("itemName"))
             itemsNeeded = group("amount")?.toInt() ?: 0
         } ?: resetItems()
