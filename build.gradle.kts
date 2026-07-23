@@ -508,10 +508,4 @@ tasks.withType<ValidateAccessWidenerTask>().configureEach {
 repositories {
     mavenLocal()
     mavenCentral()
-    maven("https://maven.operationpotato.com/releases") {
-        content { includeGroup("com.operationpotato") }
-    }
-    maven("https://maven.operationpotato.com/snapshots") {
-        content { includeGroup("com.operationpotato") }
-    }
 }
