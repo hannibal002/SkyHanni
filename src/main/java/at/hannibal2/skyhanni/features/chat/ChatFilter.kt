@@ -345,8 +345,8 @@ object ChatFilter {
      * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
      */
     @Suppress("MaxLineLength")
-    private val anitaFortunePattern by farmingPatternGroup.pattern(
-        "chat.jacobevent.accessory",
+    private val anitaFortunePattern by farmingPatternGroup.list(
+        "jacobevent.accessory",
         "\\[NPC] Jacob: Your Anita's \\w+ is giving you \\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE.hypixelIcon} .+ Fortune during the contest!",
     )
 
