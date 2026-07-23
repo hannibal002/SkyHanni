@@ -191,7 +191,7 @@ object CustomScoreboard {
             updateIslandEntries()
         }
         config.enabled.whenChanged { old, new ->
-            // TODO: figure out why onEnabled call the callback 3 times instead of once
+            // Since Custom Scoreboard calls notifyObservers(), if I use onEnabled it will call this function 3 times.
             if (old == new || !new) return@whenChanged
 
             ChatUtils.clickableLinkChat(
