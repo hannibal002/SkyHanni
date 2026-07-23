@@ -39,25 +39,12 @@ class MaxLineLength(config: Config) :
         super.visitKtFile(file)
 
         val sourceFileLinesMapping = KtPsiSourceFileLinesMapping(file)
-
         file.text.lineSequence().withIndex()
             .filterNot { (index, line) ->
                 isValidLine(file, sourceFileLinesMapping.getLineStartOffset(index), line)
             }
             .forEach { (index, line) ->
-                val offset = sourceFileLinesMapping.getLineStartOffset(index)
-                val ktElement = findFirstMeaningfulKtElementInParents(file, offset, line) ?: file
-                val textRange = TextRange(offset, offset + line.length)
-                val lineAndColumnRange = getLineAndColumnRangeInPsiFile(file, textRange)
-
-                val location = Location(
-                    source = SourceLocation(lineAndColumnRange.start.line, lineAndColumnRange.start.column),
-                    endSource = SourceLocation(lineAndColumnRange.end.line, lineAndColumnRange.end.column),
-                    text = TextLocation(offset, offset + line.length),
-                    path = file.absolutePath(),
-                )
-
-                report(Finding(Entity.from(ktElement, location), description))
+                reportIssue(description, index, line, file, sourceFileLinesMapping)
             }
     }
 
@@ -120,23 +107,5 @@ class MaxLineLength(config: Config) :
 
     companion object {
         private const val DEFAULT_IDEA_LINE_LENGTH = 140
-        private val BLANK_OR_QUOTES = """[\s"]*""".toRegex()
-
-        private fun findFirstMeaningfulKtElementInParents(
-            file: KtFile,
-            offset: Int,
-            line: String,
-        ): PsiElement? =
-            findKtElementInParents(file, offset, line)
-                .firstOrNull { !BLANK_OR_QUOTES.matches(it.text) }
-
-        private fun KtFile.absolutePath(): Path = Path(virtualFilePath)
-
-        private fun findKtElementInParents(file: KtFile, offset: Int, line: String): Sequence<PsiElement> =
-            file.elementsInRange(TextRange.create(offset, offset + line.length))
-                .asSequence()
-                .plus(file.findElementAt(offset))
-                .mapNotNull { it?.getNonStrictParentOfType() }
-
     }
 }
