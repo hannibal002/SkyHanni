@@ -55,7 +55,7 @@ object CorpseLoot {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onIslandChange() {
-        pendingKeyConsumed = false
+        pendingKeyConsumed = true
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
@@ -69,7 +69,7 @@ object CorpseLoot {
             return
         }
 
-        if (resourceFulPerkProcPattern.matches(message)) {
+        if (resourceFulPerkProcPattern.matches(event.cleanMessage)) {
             pendingKeyConsumed = false
             return
         }

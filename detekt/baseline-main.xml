@@ -529,10 +529,8 @@
     <ID>UseOrEmpty:ItemUtils.kt:ItemUtils$lore ?: emptyList()</ID>
     <ID>UselessCallOnNotNull:EssenceShopHelper.kt:EssenceShopHelper$essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()</ID>
     <ID>UselessCallOnNotNull:IslandExceptions.kt:IslandExceptions$armorStand?.name.formattedTextCompatLessResets().orEmpty()</ID>
-    <ID>UselessCallOnNotNull:MoongladeBeacon.kt:MoongladeBeacon$listOfNotNull(normalTuning, enchantedTuning)</ID>
     <ID>UselessCallOnNotNull:ScoreboardData.kt:ScoreboardData$MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()</ID>
     <ID>VarCouldBeVal:CommandBuilder.kt:ComplexCommandBuilder$private var realDescription: String = ""</ID>
-    <ID>VarCouldBeVal:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private var recentTicks: MutableList&lt;Int&gt; = mutableListOf()</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt:RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt:RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
     <ID>VarCouldBeVal:SkyHanniItemTracker.kt:SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>
