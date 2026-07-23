@@ -739,8 +739,7 @@ object ChatFilter {
     }
 
     /**
-     * Checks if the message is present in the list of messages or patterns
-     * Checks against four maps that compare in different ways.
+     * Checks if the message is present in the list patterns
      * @receiver message The message to check
      * @param key The key of the list to check
      * @return True if the message is present in any of the maps
