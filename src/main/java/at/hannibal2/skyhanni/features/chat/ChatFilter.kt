@@ -278,6 +278,9 @@ object ChatFilter {
     )
 
     // Winter Island
+    /**
+     * REGEX-TEST: ☃ [VIP+] liron150 mounted a Snow Cannon!
+     */
     private val winterIslandPatterns by eventPatternGroup.list(
         "winter-island",
         "☃ .* mounted a Snow Cannon!",
@@ -417,18 +420,26 @@ object ChatFilter {
         "RARE REWARD! .* found a .* in their .* Chest!",
     )
 
-    // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
+    /**
+     * REGEX-TEST: Your Healer stats are doubled because you are the only player using this class!
+     * REGEX-TEST: Your Mage stats are doubled because you are the only player using
+     */
     private val soloClassPatterns by dungeonPatternGroup.list(
         "solo-class",
         "Your (Healer|Mage|Berserk|Archer|Tank) stats are doubled because you are the only player using this class!",
     )
 
+    /**
+     * REGEX-TEST: [Healer] My not know this one TODO: this one
+     */
     private val soloStatsPatterns by dungeonPatternGroup.list(
         "solo-stats",
         "\\[(Healer|Mage|Berserk|Archer|Tank)].*",
     )
 
-    // &r&dGenevieve the Fairy&r&f: You killed me! Take this &r&6Revive Stone &r&fso that my death is not in vain!&r
+    /**
+     * REGEX-TEST: Genevieve the Fairy: You killed me! Take this Revive Stone so that my death is not in vain!
+     */
     private val fairyPatterns by dungeonPatternGroup.list(
         "fairy",
         "[\\w']+ the Fairy: You killed me! Take this Revive Stone so that my death is not in vain!",
@@ -436,7 +447,9 @@ object ChatFilter {
         "[\\w']+ the Fairy: Have a great life!",
     )
 
-    // a>>   Achievement Unlocked: Agile   <<a
+    /**
+     * REGEX-TEST: a>>   Achievement Unlocked: Agile   <<a
+     */
     private val achievementGetPatterns by miscPatternGroup.list(
         "achievement.get",
         ".>> {3}Achievement Unlocked: .* {3}<<.",
