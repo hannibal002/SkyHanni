@@ -112,7 +112,7 @@ object ChatFilter {
     @Suppress("MaxLineLength")
     private val guildEventExpPatterns by eventPatternGroup.list(
         "guild-event",
-        "You earned (?:[0-9a-f][\\d,]+ GEXP(?: \\+ [0-9a-f][\\d,]+ Event EXP)?|[0-9a-f][\\d,]+ Event EXP) from playing SkyBlock!",
+        "You earned (?:[\\d,]+ GEXP(?: \\+ [\\d,]+ Event EXP)?|[\\d,]+ Event EXP) from playing SkyBlock!",
     )
 
     // Kill Combo
