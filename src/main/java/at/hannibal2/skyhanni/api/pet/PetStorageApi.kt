@@ -214,7 +214,7 @@ object PetStorageApi {
             val petSkin = getPetSkinOrNull(petInternalName)
             val lore = getCleanLore()
             // The forge "Pets" gets detected here, but has "Items Required"
-            if(PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)) {
+            if (PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)) {
                 return@matchStyledMatcher null
             }
 
