@@ -20,7 +20,7 @@ class ForagingConfig {
 
     @Expose
     @ConfigOption(name = "Starlyn Contests", desc = "")
-    @SearchTag("Agatha")
+    @SearchTag("Agatha Miria")
     @Accordion
     val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
 
@@ -30,9 +30,10 @@ class ForagingConfig {
     val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
 
     @Expose
-    @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.")
+    @ConfigOption(name = "Foraging Beacon", desc = "Settings for the foraging beacons.")
     @Accordion
-    var moongladeBeacon = MoongladeBeaconConfig()
+    // TODO: RENAME and config fix
+    var moongladeBeacon = ForagingBeaconConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")

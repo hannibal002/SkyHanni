@@ -351,9 +351,10 @@ enum class TabWidget(
         // language=RegExp
         "Agatha's Contest:.*",
     ),
+    // TODO rename to FORAGING_BEACON
     MOONGLADE_BEACON(
         // language=RegExp
-        "Moonglade Beacon: (?<stacks>\\d+) Stacks?",
+        "(?<beaconType>\\w+) Beacon: (?<stacks>\\d+) Stacks?",
     ),
     SALTS(
         // language=RegExp

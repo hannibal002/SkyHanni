@@ -3,17 +3,17 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getColorOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getLoreColorOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconPitch.Companion.getBeaconPitchOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconSpeed.Companion.getBeaconSpeedOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconColor.Companion.getColorOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconColor.Companion.getLoreColorOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconPitch.Companion.getBeaconPitchOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconSpeed.Companion.getBeaconSpeedOrNull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.InventoryDetector
@@ -53,7 +53,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.times
 
 @SkyHanniModule
-object MoongladeBeacon {
+object ForagingBeaconSolver {
 
     private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
@@ -269,7 +269,7 @@ object MoongladeBeacon {
         nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!solverEnabled()) return
         if (event.blockOverClick()) {
@@ -300,13 +300,13 @@ object MoongladeBeacon {
 
     private var currentServerTicks = 0
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onServerTick() {
         if (!colorMinigameInventory.isInside()) return
         currentServerTicks++
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onPlaySound(event: PlaySoundEvent) {
         if (!colorMinigameInventory.isInside() || event.soundName != "block.note_block.bass") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
@@ -327,15 +327,14 @@ object MoongladeBeacon {
             outsideInventory = false,
             inOwnInventory = false,
             inventory = colorMinigameInventory,
-            condition = { config.enabled },
-            onlyOnIsland = IslandType.GALATEA,
+            condition = { config.enabled && IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() },
             onRender = {
                 config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
             },
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onBackgroundDrawn() {
         if (!solverEnabled()) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
@@ -344,14 +343,14 @@ object MoongladeBeacon {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!solverEnabled()) return
         normalTuning.tryLabelIfAble(event)
         enchantedTuning.tryLabelIfAble(event)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
