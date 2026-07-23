@@ -575,7 +575,7 @@ object ChatFilter {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        var blockReason = block(event.message)
+        var blockReason = block(event.cleanMessage)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
