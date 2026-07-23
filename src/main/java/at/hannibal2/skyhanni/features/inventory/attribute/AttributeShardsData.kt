@@ -81,7 +81,7 @@ object AttributeShardsData {
      * REGEX-TEST: (1/3) Attribute Menu
      */
     val attributeMenuPattern by patternGroup.pattern(
-        "attributeMenu",
+        "attributemenu",
         "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
     )
 
