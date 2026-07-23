@@ -92,7 +92,7 @@ object MineshaftWaypoints {
             waypoints.add(
                 MineshaftWaypoint(
                     waypointType = corpseType.waypointType,
-                    location = event.location.up(),
+                    location = event.location,
                     isCorpse = true
                 )
             )
