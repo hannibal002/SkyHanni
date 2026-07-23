@@ -5,7 +5,7 @@ import repo.RepoPatternElement.Companion.asRepoPatternElement
 import java.util.IdentityHashMap
 
 class RepoPatternContext {
-    private val cache = IdentityHashMap<KtPropertyDelegate, RepoPatternElement?>(2048)
+    private val cache = IdentityHashMap<KtPropertyDelegate, RepoPatternElement>(2048)
 
     fun getRepoPatternElement(property: KtPropertyDelegate): RepoPatternElement? {
         val cachedValue = cache[property]
