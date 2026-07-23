@@ -218,8 +218,9 @@ object CarryTracker {
                 return
             }
 
-            val newCarry = Carry(type, amount)
-            customer.carries.add(newCarry)
+            val newCarry = Carry(type, amount).also {
+                customer.carries.add(it)
+            }
 
             updateDisplay()
             ChatUtils.chat("Carry added: §b${customer.name} ${newCarry.formatProgress()} §d${newCarry.type.displayName}")

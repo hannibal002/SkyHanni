@@ -25,9 +25,8 @@ class CombatConfig {
     @Category(name = "End Island", desc = "Features for the End Island")
     val endIsland: EndIslandConfig = EndIslandConfig()
 
-    // TODO add some customization config later
-    // @Category(name = "Carry Tracker", desc = "Carry Tracker settings")
     @Expose
+    @Category(name = "Carry Tracker", desc = "Carry Tracker settings")
     val carryTracker: CarryTrackerConfig = CarryTrackerConfig()
 
     @Expose
