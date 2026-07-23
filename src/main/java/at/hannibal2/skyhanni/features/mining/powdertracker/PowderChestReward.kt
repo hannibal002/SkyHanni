@@ -206,7 +206,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ;
 
     val chatPattern by RepoPattern.pattern(
-        "mining.powder.tracker.reward.${this.patternName()}.new",
+        "mining.powder.tracker.reward.${this.patternName()}.colorless",
         pattern,
     )
 
