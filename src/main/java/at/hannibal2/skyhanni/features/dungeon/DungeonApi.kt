@@ -50,12 +50,14 @@ import net.minecraft.world.level.block.Blocks
 object DungeonApi {
     private val patternGroup = RepoPattern.group("dungeon")
 
+    // TODO: move to SkyblockIcons class
     /**
      * WRAPPED-REGEX-TEST: " ⏣ The Catacombs (F7)"
+     * WRAPPED-REGEX-TEST: "  The Catacombs (F7)"
      */
     private val floorPattern by patternGroup.pattern(
         "floor",
-        " . The Catacombs \\((?<floor>.*)\\)",
+        " [⏣\uE067] The Catacombs \\((?<floor>.*)\\)",
     )
 
     /**
