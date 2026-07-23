@@ -126,7 +126,8 @@ object ChatFilter {
 
     // Profile Join
     private val profileJoinMessageStartsWith = listOf(
-        "§aYou are playing on profile: §e", "§8Profile ID: ",
+        "§aYou are playing on profile: §e",
+        "§8Profile ID: ",
         "§eProfile ID: ",
     )
 
