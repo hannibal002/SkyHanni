@@ -31,7 +31,7 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
             if (repoPatternElement.pattern.matcher(test).find()) {
                 delegate.reportIssue(
                     "Repo pattern `$variableName` passed regex test: `$test` pattern: `$rawPattern` " +
-                    "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})"
+                        "even though it was set to fail. [View on Regex101](${repoPatternElement.regex101Url})"
                 )
             }
         }
