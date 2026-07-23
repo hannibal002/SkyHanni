@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -154,14 +155,21 @@ object HypixelLocationApi {
         EventListeners.markEventCacheDirty()
 
         if (oldIsland != IslandType.NONE) {
-            IslandLeaveEvent(oldIsland).post()
+            DelayedRun.runOrNextTick {
+                IslandLeaveEvent(oldIsland).post()
+            }
         }
         if (island != IslandType.NONE) {
-            IslandJoinEvent(island = island, previousIsland = previousIsland).post()
+            val captured = previousIsland
+            DelayedRun.runOrNextTick {
+                IslandJoinEvent(island = island, previousIsland = captured).post()
+            }
             previousIsland = island
         }
 
-        IslandChangeEvent(island, oldIsland).post()
+        DelayedRun.runOrNextTick {
+            IslandChangeEvent(island, oldIsland).post()
+        }
     }
 
     @HandleEvent
