@@ -28,7 +28,7 @@ import net.minecraft.network.chat.Component
 object CompactStarlynSisters {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
-    private val patternGroup = RepoPattern.group("foraging.agatha")
+    private val patternGroup = RepoPattern.group("foraging.starlyn-contest")
 
     /**
      * REGEX-TEST: §e[NPC] §bAgatha§f: §rYou reached the §r§lCOMMON §fBracket in my contest!
@@ -169,22 +169,22 @@ object CompactStarlynSisters {
             compactContestResults(message)
     }
 
-    private const val AGATHA_ACHIEVEMENT = "Very Special Bracket"
+    private const val STARLYN_CONTEST_ACHIEVEMENT = "Very Special Bracket"
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             name = "Very Special Contest".asComponent(),
-            description = Component.literal("Get 20,000 Agatha points in a contest").withColor(ChatFormatting.RED),
+            description = Component.literal("Get 20,000 Starlyn Sister points in a contest").withColor(ChatFormatting.RED),
             userLuckAmount = 20f,
         )
-        event.register(achievement, AGATHA_ACHIEVEMENT)
+        event.register(achievement, STARLYN_CONTEST_ACHIEVEMENT)
     }
 
     private fun SkyHanniChatEvent.Allow.achievements() {
         pointsEarnedPattern.matchMatcher(message) {
             if (group("pointsInteger").formatInt() >= 20_000) {
-                AchievementManager.completeAchievement(AGATHA_ACHIEVEMENT)
+                AchievementManager.completeAchievement(STARLYN_CONTEST_ACHIEVEMENT)
             }
         }
     }

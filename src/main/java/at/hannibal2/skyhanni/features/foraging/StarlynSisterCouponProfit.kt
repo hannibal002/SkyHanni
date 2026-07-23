@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -32,27 +31,28 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
-object AgathaCouponProfit {
+object StarlynSisterCouponProfit {
 
     private val config get() = SkyHanniMod.feature.foraging.starlynContest
 
     private var display = emptyList<Renderable>()
 
     // TODO replace with inventory detector
-    private var inInventory = false
-    private val AGATHA_COUPON = "AGATHA_COUPON".toInternalName()
+    private var currentSisterType: StarlynSisterType? = null
 
     @HandleEvent
     fun onInventoryClose() {
-        inInventory = false
+        currentSisterType = null
         display = emptyList()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.agathaCouponProfitEnabled) return
-        if (event.inventoryName != "Agatha's Shop") return
-        inInventory = true
+        StarlynSisterType.entries.forEach { sisterType ->
+            if (event.inventoryName == sisterType.inventoryName) currentSisterType = sisterType
+        }
+        if (currentSisterType == null) return
 
         val table = mutableListOf<DisplayTableEntry>()
         for ((slot, item) in event.inventoryItems) {
@@ -62,7 +62,7 @@ object AgathaCouponProfit {
                 }
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AgathaCouponProfit while reading item '${item.repoItemName}'",
+                    e, "Error in StarlynSisterCouponProfit while reading item '${item.repoItemName}'",
                     "item" to item,
                     "name" to item.repoItemName,
                     "inventory name" to event.inventoryName,
@@ -71,7 +71,7 @@ object AgathaCouponProfit {
         }
 
         display = buildList {
-            addString("§eProfit per Agatha Coupon")
+            addString("§eProfit per Coupon")
             add(RenderableUtils.fillTable(table, padding = 5, itemScale = 0.7))
         }
     }
@@ -86,7 +86,7 @@ object AgathaCouponProfit {
         for ((name, amount) in requiredItems) {
             val itemPrice = name.getPriceOrNull() ?: continue
             totalCost += itemPrice * amount
-            if (name == AGATHA_COUPON) {
+            if (name == currentSisterType?.couponName) {
                 couponAmount = amount
             }
         }
@@ -144,7 +144,7 @@ object AgathaCouponProfit {
             val originalPair = ItemUtils.readItemAmount(rawItemName)
             if (originalPair == null) {
                 ErrorManager.logErrorStateWithData(
-                    "Error in AnitaCoupon Profit", "Could not read item amount",
+                    "Error in StarlynSisterCouponProfit", "Could not read item amount",
                     "rawItemName" to rawItemName,
                     "name" to item.hoverName.formattedTextCompatLeadingWhiteLessResets(),
                     "lore" to lore,
@@ -165,11 +165,11 @@ object AgathaCouponProfit {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory) return
+        if (currentSisterType == null) return
         config.agathaCouponProfitPos.renderRenderables(
             display,
             extraSpace = 5,
-            posLabel = "Anita Medal Profit",
+            posLabel = "Starlyn Sister Coupon Profit",
         )
     }
 }
