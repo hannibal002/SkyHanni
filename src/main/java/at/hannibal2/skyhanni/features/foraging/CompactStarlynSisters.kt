@@ -3,10 +3,8 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.achievements.Achievement
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.achievements.AchievementManager
@@ -155,8 +153,7 @@ object CompactStarlynSisters {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
-        if (event.oldIsland != IslandType.GALATEA) return
+    fun onIslandLeave() {
         resetContestResultVariables()
         resetPersonalBestVariables()
     }
