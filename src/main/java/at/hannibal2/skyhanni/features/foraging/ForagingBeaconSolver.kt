@@ -316,7 +316,7 @@ object ForagingBeaconSolver {
     }
 
     private fun BeaconPitch.handleMultipleSet() {
-        val bestSet = listOfNotNull(normalTuning, enchantedTuning).filter {
+        val bestSet = listOf(normalTuning, enchantedTuning).filter {
             it.untilNextRefPitch <= acceptablePitchMargin && it.untilNextOurPitch > it.untilNextRefPitch
         }.minByOrNull { it.untilNextRefPitch } ?: return
         bestSet.handlePitch(this)
@@ -462,7 +462,7 @@ object ForagingBeaconSolver {
 
         private var paused = false
         private var lastServerTickCount = 0
-        private var recentTicks: MutableList<Int> = mutableListOf()
+        private val recentTicks: MutableList<Int> = mutableListOf()
         private var currentRefSlot: Int = BeaconSlotRange.MATCH.range.first
 
         val untilNextRefPitch get() = nextPitchPair.referenceUntil

@@ -33,7 +33,7 @@ class ForagingConfig {
     @ConfigOption(name = "Foraging Beacon", desc = "Settings for the foraging beacons.")
     @Accordion
     // TODO: RENAME and config fix
-    var moongladeBeacon = ForagingBeaconConfig()
+    val moongladeBeacon = ForagingBeaconConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
