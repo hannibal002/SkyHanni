@@ -4,7 +4,7 @@ import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternPassesShapeRequirement(config: Config, val ctx: RepoPatternContext) :
+class RepoPatternPassesShapeRequirement(config: Config, private val ctx: RepoPatternContext) :
     SkyHanniRule(config, "All repo pattern keys must pass the shape requirements.") {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {

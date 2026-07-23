@@ -4,7 +4,7 @@ import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 
-class RepoPatternRegexTestFailed(config: Config, val ctx: RepoPatternContext) :
+class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternContext) :
     SkyHanniRule(config, "All repo patterns must be accompanied by one or more passing regex test.") {
 
     override fun visitPropertyDelegate(delegate: KtPropertyDelegate) {
