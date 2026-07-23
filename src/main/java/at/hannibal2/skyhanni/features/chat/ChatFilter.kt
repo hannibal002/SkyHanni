@@ -41,7 +41,7 @@ object ChatFilter {
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
     @Suppress("MaxLineLength")
-    private val lobbyPatterns by RepoPattern.list(
+    private val lobbyPatterns by miscPatternGroup.list(
         // player join
         "(?: >>> )?.* (?:joined|(?:spooked|slid) into) the lobby!(?: <<<)?",
 
@@ -77,15 +77,15 @@ object ChatFilter {
     )
 
     // Warping
-    private val warpingPatterns by RepoPattern.list(
+    private val warpingPatterns by miscPatternGroup.list(
         "warping",
 
-        "Sending to server (.*)\\.\\.\\.",
-        "Request join for Hub (.*)\\.\\.\\.",
-        "Request join for Dungeon Hub #(.*)\\.\\.\\.",
+        "Sending to server .*\\.\\.\\.",
+        "Request join for Hub .*\\.\\.\\.",
+        "Request join for Dungeon Hub #.*\\.\\.\\.",
         // warp portals on public islands
         // (Canvas Room – Flower House, Election Room – Community Center, Void Sepulture – The End)
-        "Warped to (.*)!",
+        "Warped to .*!",
 
         "Warping...", "Warping you to your SkyBlock island...", "Warping using transfer token...",
 
@@ -94,8 +94,8 @@ object ChatFilter {
     )
 
     // Welcome
-    private val welcomeMessages by RepoPattern.list(
-        "welcome"
+    private val welcomeMessages by miscPatternGroup.list(
+        "welcome",
         "Welcome to Hypixel SkyBlock!",
     )
 
@@ -106,7 +106,8 @@ object ChatFilter {
      * REGEX-TEST: You earned 10 Event EXP from playing SkyBlock!
      */
     @Suppress("MaxLineLength")
-    private val guildEventExpPatterns by RepoPattern.list(
+    private val guildEventExpPatterns by eventPatternGroup.list(
+        "guild-event",
         "You earned 0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:\\+ 0-9a-f][\\d,]+ Event EXP )?from playing SkyBlock!",
     )
 
@@ -115,22 +116,24 @@ object ChatFilter {
      * REGEX-TEST: +175 Kill Combo
      * REGEX-TEST: +5 Kill Combo +3% ✯ Magic Find
      */
-    private val killComboPatterns by RepoPattern.list(
-        "\\+(.*) Kill Combo(.*)",
-        "Your Kill Combo has expired! You reached a (.*) Kill Combo!",
-    )
-    private val killComboMessages by RepoPattern.list(
-        "+50 Kill Combo",
+    private val killComboPatterns by miscPatternGroup.list(
+        "kill-combo",
+        "\\+.* Kill Combo.*",
+        "Your Kill Combo has expired! You reached a .* Kill Combo!",
+        "\\+50 Kill Combo",
     )
 
     // Profile Join
-    private val profileJoinMessageStartsWith by RepoPattern.list(
-        "You are playing on profile: ", "Profile ID: ",
+    private val profileJoinPatterns by miscPatternGroup.list(
+        "profile-join",
+        "You are playing on profile: ",
+        "Profile ID: ",
     )
 
     // OTHERS
     // Bazaar And AH Mini
-    private val miniBazaarAndAHMessages by RepoPattern.list(
+    private val miniBazaarAndAHMessages by miscPatternGroup.list(
+        "bazzar-and-ah-mini",
         "Putting item in escrow...",
         "Putting coins in escrow...",
 
@@ -141,13 +144,13 @@ object ChatFilter {
         "Claiming BIN auction...",
 
         // Bazaar
-        "[Bazaar] Submitting sell offer...",
-        "[Bazaar] Submitting buy order...",
-        "[Bazaar] Executing instant sell...",
-        "[Bazaar] Executing instant buy...",
-        "[Bazaar] Cancelling order...",
-        "[Bazaar] Claiming order...",
-        "[Bazaar] Putting goods in escrow...",
+        "\\[Bazaar] Submitting sell offer...",
+        "\\[Bazaar] Submitting buy order...",
+        "\\[Bazaar] Executing instant sell...",
+        "\\[Bazaar] Executing instant buy...",
+        "\\[Bazaar] Cancelling order...",
+        "\\[Bazaar] Claiming order...",
+        "\\[Bazaar] Putting goods in escrow...",
 
         // Bank
         "Depositing coins...",
@@ -156,36 +159,35 @@ object ChatFilter {
 
     // Slayer
     private val slayerPatterns by RepoPattern.list(
+        "slayer-quest",
         // start
         " {2}SLAYER QUEST STARTED!",
-        " {3}» Slay (.*) Combat XP worth of (.*).",
+        " {3}» Slay .* Combat XP worth of .*.",
 
         // end
         " {2}SLAYER QUEST COMPLETE!",
-        " {3}(.*)Slayer LVL 9 - LVL MAXED OUT!",
-        " {3}» Talk to Maddox to claim your (.*) Slayer XP!",
-    )
-    private val slayerMessages by RepoPattern.list(
-        "  NICE! SLAYER BOSS SLAIN!", "You received kill credit for assisting on a slayer miniboss!",
-    )
-    private val slayerMessageStartWith by RepoPattern.list(
-        "✆ RING... ",
-    )
+        " {3}.*Slayer LVL 9 - LVL MAXED OUT!",
+        " {3}» Talk to Maddox to claim your .* Slayer XP!",
+        " {2}NICE! SLAYER BOSS SLAIN!", "You received kill credit for assisting on a slayer miniboss!",
+
+        "✆ RING... .*",
+        )
 
     // Slayer Drop
     @Suppress("MaxLineLength")
     private val slayerDropPatterns by RepoPattern.list(
+        "slayer-drop",
         // Zombie
         // TODO merge patterns together. Just because old ones are designed poorly doesn't mean new ones need to be poor as well
-        "RARE DROP! \\((.*)x Revenant Viscera\\) (.*)",
-        "RARE DROP! \\(Revenant Viscera\\) (.*)",
-        "RARE DROP! \\((.*)x Foul Flesh\\) (.*)",
-        "RARE DROP! \\(Foul Flesh\\) (.*)",
-        "RARE DROP! Golden Powder (.*)",
-        "VERY RARE DROP! {2}\\((.*) Pestilence Rune I\\) (.*)",
-        "VERY RARE DROP! {2}\\(Revenant Catalyst\\) (.*)",
-        "VERY RARE DROP! {2}\\(Undead Catalyst\\) (.*)",
-        "VERY RARE DROP! {2}\\(◆ Pestilence Rune I\\) (.*)",
+        "RARE DROP! \\(.*x Revenant Viscera\\) .*",
+        "RARE DROP! \\(Revenant Viscera\\) .*",
+        "RARE DROP! \\(.*x Foul Flesh\\) .*",
+        "RARE DROP! \\(Foul Flesh\\) .*",
+        "RARE DROP! Golden Powder .*",
+        "VERY RARE DROP! {2}\\(.* Pestilence Rune I\\) .*",
+        "VERY RARE DROP! {2}\\(Revenant Catalyst\\) .*",
+        "VERY RARE DROP! {2}\\(Undead Catalyst\\) .*",
+        "VERY RARE DROP! {2}\\(◆ Pestilence Rune I\\) .*",
 
         // Tarantula
         "RARE DROP! Arachne's Keeper Fragment (.+)",
@@ -196,33 +198,32 @@ object ChatFilter {
         "VERY RARE DROP! {2}\\(Bane of Arthropods VI\\) (.+)",
 
         // Enderman
-        "RARE DROP! \\((.*)x Twilight Arrow Poison\\) (.*)",
-        "VERY RARE DROP! {2}\\(Mana Steal I\\) (.*)",
-        "VERY RARE DROP! {2}\\(Sinful Dice\\) (.*)",
-        "VERY RARE DROP! {2}\\(Null Atom\\) (.*)",
-        "VERY RARE DROP! {2}\\(Transmission Tuner\\) (.*)",
-        "VERY RARE DROP! {2}\\(Mana Steal I\\) (.*)",
-        "VERY RARE DROP! {2}\\(◆ Endersnake Rune I\\) (.*)",
-        "CRAZY RARE DROP! {2}\\(Pocket Espresso Machine\\) (.*)",
-        "VERY RARE DROP! {2}\\(◆ End Rune I\\) (.*)",
+        "RARE DROP! \\(.*x Twilight Arrow Poison\\) .*",
+        "VERY RARE DROP! {2}\\(Mana Steal I\\) .*",
+        "VERY RARE DROP! {2}\\(Sinful Dice\\) .*",
+        "VERY RARE DROP! {2}\\(Null Atom\\) .*",
+        "VERY RARE DROP! {2}\\(Transmission Tuner\\) .*",
+        "VERY RARE DROP! {2}\\(Mana Steal I\\) .*",
+        "VERY RARE DROP! {2}\\(◆ Endersnake Rune I\\) .*",
+        "CRAZY RARE DROP! {2}\\(Pocket Espresso Machine\\) .*",
+        "VERY RARE DROP! {2}\\(◆ End Rune I\\) .*",
         "VERY RARE DROP! {2}\\(Hazmat Enderman\\) .*",
 
         // Blaze
-        "VERY RARE DROP! {2}\\(Wisp's Ice-Flavored Water I Splash Potion\\) (.*)",
-        "RARE DROP! \\(Bundle of Magma Arrows\\) (.*)",
-        "VERY RARE DROP! {2}\\(\\d+x (Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate\\) (.*)",
+        "VERY RARE DROP! {2}\\(Wisp's Ice-Flavored Water I Splash Potion\\) .*",
+        "RARE DROP! \\(Bundle of Magma Arrows\\) .*",
+        "VERY RARE DROP! {2}\\(\\d+x (Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate\\) .*",
     )
 
     // Useless Drop
     private val uselessDropPatterns by RepoPattern.list(
-        "RARE DROP! Enchanted Ender Pearl (.*)",
-        "RARE DROP! Carrot (.*)",
-        "RARE DROP! Potato (.*)",
-        "RARE DROP! Machine Gun Bow (.*)",
-        "RARE DROP! Earth Shard (.*)",
-        "RARE DROP! Zombie Lord Chestplate (.*)",
-    )
-    private val uselessDropMessages by RepoPattern.list(
+        "useless-drop",
+        "RARE DROP! Enchanted Ender Pearl .*",
+        "RARE DROP! Carrot .*",
+        "RARE DROP! Potato .*",
+        "RARE DROP! Machine Gun Bow .*",
+        "RARE DROP! Earth Shard .*",
+        "RARE DROP! Zombie Lord Chestplate .*",
         "RARE DROP! Enchanted Ender Pearl",
         "RARE DROP! Enchanted End Stone",
         "RARE DROP! Crystal Fragment",
@@ -231,15 +232,15 @@ object ChatFilter {
     // Legacy Items
     @Suppress("MaxLineLength")
     private val legacyItems by RepoPattern.list(
+        "legacy-items",
         "You currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!",
     )
 
     // TODO update patterns for 1.21
     // Useless Notification
     private val uselessNotificationPatterns by RepoPattern.list(
-        "(?:)?You tipped \\d+ players? in \\d+(?: different)? games?!",
-    )
-    private val uselessNotificationMessages by RepoPattern.list(
+        "useless-notification",
+        "You tipped \\d+ players? in \\d+(?: different)? games?!",
         "Your previous Plasmaflux Power Orb was removed!",
         "You used your Mining Speed Boost Pickaxe Ability!",
         "Your Mining Speed Boost has expired!",
@@ -251,30 +252,36 @@ object ChatFilter {
 
     // Party
     private val partyMessages by RepoPattern.list(
+        "party",
         "-----------------------------------------------------",
     )
 
     // MONEY
     // Auction House
     private val auctionHouseMessages by RepoPattern.list(
-        "-----------------------------------------------------", "Visit the Auction House to collect your item!",
+        "auction-house",
+        "-----------------------------------------------------",
+        "Visit the Auction House to collect your item!",
     )
 
     // Bazaar
     private val bazaarPatterns by RepoPattern.list(
-        "Buy Order Setup! (.*)x (.*) for (.*) coins.",
-        "Sell Offer Setup! (.*)x (.*) for (.*) coins.",
-        "Cancelled! Refunded (.*) coins from cancelling buy order!",
-        "Cancelled! Refunded (.*)x (.*) from cancelling sell offer!",
+        "bazaar",
+        "Buy Order Setup! .*x .* for .* coins.",
+        "Sell Offer Setup! .*x .* for .* coins.",
+        "Cancelled! Refunded .* coins from cancelling buy order!",
+        "Cancelled! Refunded .*x .* from cancelling sell offer!",
     )
 
     // Winter Island
     private val winterIslandPatterns by RepoPattern.list(
-        "☃ (.*) mounted a Snow Cannon!",
+        "winter-island",
+        "☃ .* mounted a Snow Cannon!",
     )
 
     // Useless Warning
     private val uselessWarningMessages by RepoPattern.list(
+        "useless-warning",
         "You are sending commands too fast! Please slow down.", // TODO prevent in the future
         "You can't use this while in combat!",
         "You can not modify your equipped armor set!",
@@ -292,13 +299,12 @@ object ChatFilter {
     // Annoying Spam
     @Suppress("MaxLineLength")
     private val annoyingSpamPatterns by RepoPattern.list(
-        "Your Implosion hit (.*) for (.*) damage.",
-        "Your Molten Wave hit (.*) for (.*) damage.",
-        "Your Spirit Sceptre hit (.*) for (.*) damage.",
-        "You need a tool with a Breaking Power of (\\d) to mine (.*)! Speak to Fragilis by the entrance to the Crystal Hollows to learn more!",
+        "annoying-spam",
+        "Your Implosion hit .* for .* damage.",
+        "Your Molten Wave hit .* for .* damage.",
+        "Your Spirit Sceptre hit .* for .* damage.",
+        "You need a tool with a Breaking Power of (\\d) to mine .*! Speak to Fragilis by the entrance to the Crystal Hollows to learn more!",
         "\nYouTube Premier Celebrate Hypixel's 12th Anniversary with a special Minecraft Animation, live now https://youtu.be/ikT631vQd8A\n",
-    )
-    private val annoyingSpamMessages by RepoPattern.list(
         "There are blocks in the way!",
         "Your Blessing enchant got you double drops!",
         "You can't use the wardrobe in combat!",
@@ -309,19 +315,21 @@ object ChatFilter {
         "GOOD CATCH! You found a Light Bait.",
         "GOOD CATCH! You found a Hot Bait.",
         "GOOD CATCH! You found a Spooky Bait.",
-        "[NPC] Jacob: My contest has started!",
+        "\\[NPC] Jacob: My contest has started!",
         "Obtain a Booster Cookie from the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
-        "[SBE] Unable to download bin data. This may result in certain features not working!",
-        "[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
+        "\\[SBE] Unable to download bin data. This may result in certain features not working!",
+        "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
     )
 
     private val skymallMessages by RepoPattern.list(
+        "skymall",
         "New day! Your Sky Mall buff changed!",
         "You can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
     private val lotteryMessages by RepoPattern.list(
+        "lottery",
         "New day! Your Lottery buff changed!",
         "You can disable this messaging by toggling Lottery in your /hotf!",
     )
@@ -379,8 +387,8 @@ object ChatFilter {
      * REGEX-TEST: BONUS LOOT! They also received Ritual Residue from their sacrifice!
      */
     private val sacrificePatterns by RepoPattern.list(
-        "SACRIFICE! (.*) turned (.*) into (.*) Dragon Essence!",
-        "BONUS LOOT! They also received (.*) from their sacrifice!",
+        "SACRIFICE! .* turned .* into .* Dragon Essence!",
+        "BONUS LOOT! They also received .* from their sacrifice!",
     )
     private val powderMiningMessages by RepoPattern.list(
         "You uncovered a treasure chest!",
@@ -403,7 +411,7 @@ object ChatFilter {
      * REGEX-TEST: RARE REWARD! Leebys found a Recombobulator 3000 in their Obsidian Chest!
      */
     private val rareDropsMessages by RepoPattern.list(
-        "RARE REWARD! (.*) found a (.*) in their (.*) Chest!",
+        "RARE REWARD! .* found a .* in their .* Chest!",
     )
 
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
@@ -435,11 +443,11 @@ object ChatFilter {
      * REGEX-TEST: You haven't reached all checkpoints for parkour cocoa!
      */
     private val parkourPatterns by RepoPattern.list(
-        "Started parkour (.*)!",
-        "Finished parkour (.*) in (.*)!",
-        "Reached checkpoint #(.*) for parkour (.*)!",
-        "Wrong checkpoint for parkour (.*)!",
-        "You haven't reached all checkpoints for parkour (.*)!",
+        "Started parkour .*!",
+        "Finished parkour .* in .*!",
+        "Reached checkpoint #.* for parkour .*!",
+        "Wrong checkpoint for parkour .*!",
+        "You haven't reached all checkpoints for parkour .*!",
     )
 
     /**
@@ -457,7 +465,7 @@ object ChatFilter {
      ** REGEX-TEST: Warped from the tpPadOne to the tpPadTwo!
      */
     private val teleportPadPatterns by RepoPattern.list(
-        "Warped from the (.*) to the (.*)!",
+        "Warped from the .* to the .*!",
     )
 
     // This Teleport Pad does not have a destination set!
