@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.kuudra
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
@@ -29,8 +30,8 @@ object KuudraApi {
         " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)",
     )
     private val completePattern by patternGroup.pattern(
-        "chat.complete",
-        "§.\\s*(?:§.)*KUUDRA DOWN!",
+        "chat.complete.colorless",
+        "\\s*KUUDRA DOWN!",
     )
 
     /**
@@ -56,8 +57,6 @@ object KuudraApi {
         "(?<chesttype>(?:Paid|Free) Chest)(?: Chest)?",
     )
 
-    val kuudraTiers = listOf("basic", "hot", "burning", "fiery", "infernal")
-
     val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
     val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
@@ -73,7 +72,7 @@ object KuudraApi {
         return removePrefix("${prefix}_")
     }
 
-    var kuudraTier: Int? = null
+    var kuudraTier: KuudraTier? = null
         private set
 
     val inKuudra get() = SkyBlockUtils.inSkyBlock && kuudraTier != null
@@ -100,7 +99,8 @@ object KuudraApi {
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
         tierPattern.firstMatcher(event.added) {
-            val tier = group("tier").toInt()
+            val tierNumber = group("tier").toInt()
+            val tier = KuudraTier.getByTierNumber(tierNumber) ?: return
             kuudraTier = tier
             KuudraEnterEvent(tier).post()
         }
@@ -111,20 +111,16 @@ object KuudraApi {
         kuudraTier = null
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        completePattern.matchMatcher(event.message) {
+        completePattern.matchMatcher(event.cleanMessage) {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }
     }
 
-    fun getKuudraRunTierName(tier: Int): String {
-        return kuudraTiers[tier - 1]
+    fun getKuudraRunTierNumber(displayName: String?): Int? {
+        if (displayName == null) return null
+        return KuudraTier.getByDisplayName(displayName)?.tierNumber
     }
-
-    fun getKuudraRunTierNumber(tier: String?): Int {
-        return kuudraTiers.indexOf(tier)
-    }
-
 }

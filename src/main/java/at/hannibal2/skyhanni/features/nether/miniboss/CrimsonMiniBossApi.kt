@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.features.nether.miniboss
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.combat.CrimsonMinibossEvent
+import at.hannibal2.skyhanni.events.combat.CrimsonMiniBossEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object CrimsonMiniBossApi {
+
     private val patternGroup = RepoPattern.group("crimson.miniboss")
 
     /**
@@ -25,7 +26,7 @@ object CrimsonMiniBossApi {
      */
     private val downPattern by patternGroup.pattern(
         "down",
-        " *(?<name>${getRegexUppercaseNames()}) DOWN!",
+        "\\s*(?<name>${getRegexUppercaseNames()}) DOWN!",
     )
 
     private fun getRegexNames(): String = CrimsonMiniBoss.entries.joinToString("|") { it.displayName }
@@ -34,13 +35,15 @@ object CrimsonMiniBossApi {
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         spawnPattern.matchMatcher(event.cleanMessage) {
-            val miniboss = CrimsonMiniBoss.fromName(group("name")) ?: return
-            CrimsonMinibossEvent.Spawning(miniboss).post()
+            val name = group("name")
+            val miniBoss = CrimsonMiniBoss.getByDisplayName(name) ?: return
+            CrimsonMiniBossEvent.Spawning(miniBoss).post()
             return
         }
         downPattern.matchMatcher(event.cleanMessage) {
-            val miniboss = CrimsonMiniBoss.fromName(group("name")) ?: return
-            CrimsonMinibossEvent.Death(miniboss).post()
+            val name = group("name")
+            val miniBoss = CrimsonMiniBoss.getByDisplayName(name) ?: return
+            CrimsonMiniBossEvent.Death(miniBoss).post()
             return
         }
     }

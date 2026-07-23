@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.features.combat.carrytracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.PartyApi
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.combat.CrimsonMinibossEvent
+import at.hannibal2.skyhanni.events.combat.CrimsonMiniBossEvent
 import at.hannibal2.skyhanni.events.combat.OtherPlayersSlayerEvent
 import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.kuudra.KuudraCompleteEvent
@@ -52,6 +52,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CarryTracker {
+
     private val PRICE_LIST_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
     private val config get() = SkyHanniMod.feature.combat.carryTracker
@@ -568,7 +569,7 @@ object CarryTracker {
         override val shortName: String = displayName,
     ) : CarryType()
 
-    private val carryTypes: List<CarryType> = buildList {
+    private val carryTypes = buildList {
         for (i in 1..5) add(SlayerCarryType("rev$i", "Rev $i", SlayerType.REVENANT, i))
         for (i in 1..5) add(SlayerCarryType("tara$i", "Tara $i", SlayerType.TARANTULA, i))
         for (i in 1..4) add(SlayerCarryType("sven$i", "Sven $i", SlayerType.SVEN, i))
@@ -576,17 +577,17 @@ object CarryTracker {
         for (i in 1..4) add(SlayerCarryType("blaze$i", "Blaze $i", SlayerType.INFERNO, i))
         for (i in 1..5) add(SlayerCarryType("vamp$i", "Vamp $i", SlayerType.VAMPIRE, i))
 
-        add(DungeonCarryType("f0", "Entrance Floor", "E"))
+        add(DungeonCarryType("f0", "Entrance Floor", "E", shortName = "F0"))
         for (i in 1..7) add(DungeonCarryType("f$i", "Floor $i", "F$i"))
         for (i in 1..7) add(DungeonCarryType("m$i", "Master Mode $i", "M$i"))
 
-        for (i in 1..5) add(KuudraCarryType("k$i", KuudraTier.entries[i - 1]))
+        for (kuudraTier in KuudraTier.entries) add(KuudraCarryType("k${kuudraTier.tierNumber}", kuudraTier))
 
         add(CrimsonMinibossCarryType("bladesoul", CrimsonMiniBoss.BLADESOUL))
         add(CrimsonMinibossCarryType("mage_outlaw", CrimsonMiniBoss.MAGE_OUTLAW))
         add(CrimsonMinibossCarryType("barb_duke", CrimsonMiniBoss.BARBARIAN_DUKE_X, shortName = "Barb Duke"))
         add(CrimsonMinibossCarryType("ashfang", CrimsonMiniBoss.ASHFANG))
-        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_BOSS))
+        add(CrimsonMinibossCarryType("magma_boss", CrimsonMiniBoss.MAGMA_CUBE))
     }
 
     @HandleEvent
@@ -613,8 +614,8 @@ object CarryTracker {
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         val type = findCarryType { it is DungeonCarryType && it.dungeonFloor == event.floor } ?: return
 
-        for (player in DungeonApi.getPlayerNames()) {
-            val customer = findCustomer(player) ?: continue
+        for (name in DungeonApi.getPlayerNames()) {
+            val customer = findCustomer(name) ?: continue
             val carry = customer.findCarry(type) ?: continue
 
             // wait for other server messages first
@@ -624,10 +625,10 @@ object CarryTracker {
 
     @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
-        val type = findCarryType { it is KuudraCarryType && it.kuudraTier.tierNumber == event.kuudraTier } ?: return
+        val type = findCarryType { it is KuudraCarryType && it.kuudraTier == event.kuudraTier } ?: return
 
-        for (player in EntityUtils.getPlayerEntities().map { it.name.string }) {
-            val customer = findCustomer(player) ?: continue
+        for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
+            val customer = findCustomer(name) ?: continue
             val carry = customer.findCarry(type) ?: continue
 
             // wait for other server messages first
@@ -636,12 +637,11 @@ object CarryTracker {
     }
 
     @HandleEvent
-    fun onCrimsonMinibossDeath(event: CrimsonMinibossEvent.Death) {
-        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniboss } ?: return
+    fun onCrimsonMinibossDeath(event: CrimsonMiniBossEvent.Death) {
+        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniBoss } ?: return
 
-        // party members is the best method i could think of here
-        for (partyMember in PartyApi.partyMembers) {
-            val customer = findCustomer(partyMember) ?: continue
+        for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
+            val customer = findCustomer(name) ?: continue
             val carry = customer.findCarry(type) ?: continue
 
             // wait for other server messages first
@@ -656,4 +656,9 @@ object CarryTracker {
     fun isCustomer(customerName: String): Boolean = findCustomer(customerName) != null
     fun getCustomerNames(): List<String> = customers.map { it.name }
     fun getCarryTypeIds(): List<String> = carryTypes.map { it.id }
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(139, "misc.carryPosition", "combat.carryTracker.display")
+    }
 }
