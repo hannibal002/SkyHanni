@@ -63,6 +63,35 @@ object RegexUtils {
         return null
     }
 
+    inline fun <T> Pattern.firstWrappedMatcher(
+        sequence: Sequence<String>,
+        consumer: Matcher.() -> T,
+    ): T? {
+        val lines = sequence.toList()
+
+        for (i in lines.indices) {
+            // Normal single-line match
+            matcher(lines[i]).let {
+                if (it.matches()) return consumer(it)
+            }
+
+            // Wrapped across two lines
+            if (i + 1 < lines.size) {
+                val merged = lines[i] + " " + lines[i + 1]
+                matcher(merged).let {
+                    if (it.matches()) return consumer(it)
+                }
+            }
+        }
+
+        return null
+    }
+
+    inline fun <T> Pattern.firstWrappedMatcher(
+        list: List<String>,
+        consumer: Matcher.() -> T,
+    ): T? = firstWrappedMatcher(list.asSequence(), consumer)
+
     fun List<Pattern>.allMatches(list: List<String>): List<String> = list.filter { line -> any { it.matches(line) } }
     fun List<Pattern>.anyMatches(list: List<String>?): Boolean = list?.any { line -> any { it.matches(line) } } ?: false
     fun List<Pattern>.anyMatches(string: String): Boolean = any { it.matches(string) }
