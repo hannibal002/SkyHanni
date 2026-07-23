@@ -1,17 +1,10 @@
 package style
 
 import SkyHanniRule
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 import com.intellij.psi.util.nextLeaf
 import dev.detekt.api.Config
-import dev.detekt.api.Entity
-import dev.detekt.api.Finding
-import dev.detekt.api.Location
-import dev.detekt.api.SourceLocation
-import dev.detekt.api.TextLocation
 import org.jetbrains.kotlin.KtPsiSourceFileLinesMapping
-import org.jetbrains.kotlin.diagnostics.DiagnosticUtils.getLineAndColumnRangeInPsiFile
 import org.jetbrains.kotlin.kdoc.psi.api.KDoc
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.KtAnonymousInitializer
@@ -20,10 +13,7 @@ import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtPropertyAccessor
 import org.jetbrains.kotlin.psi.KtStringTemplateExpression
-import org.jetbrains.kotlin.psi.psiUtil.elementsInRange
 import org.jetbrains.kotlin.psi.psiUtil.getNonStrictParentOfType
-import java.nio.file.Path
-import kotlin.io.path.Path
 
 // Reference: https://github.com/detekt/detekt/blob/ff22c8aff2b5f14acd3a341f2b3d99a33189c117/detekt-rules-style/src/main/kotlin/dev/detekt/rules/style/MaxLineLength.kt
 /**
