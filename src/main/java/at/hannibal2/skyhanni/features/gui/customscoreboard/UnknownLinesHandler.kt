@@ -90,6 +90,18 @@ object UnknownLinesHandler {
             }
         }
 
+        // Remove Miria contest
+        for (i in 1..2) {
+            unknownLines = unknownLines.filter {
+                sidebarLines.nextAfter(
+                    sidebarLines.firstOrNull { line ->
+                        SBPattern.agathasContestPattern.matches(line)
+                    } ?: "§eMiria's Contest",
+                    i,
+                ) != it
+            }
+        }
+
         // Remove slayer
         for (i in 1..2) {
             unknownLines = unknownLines.filter {

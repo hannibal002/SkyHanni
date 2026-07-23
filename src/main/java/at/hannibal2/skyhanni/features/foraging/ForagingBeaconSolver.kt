@@ -444,7 +444,7 @@ object ForagingBeaconSolver {
     private data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : Resettable {
-        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
+        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lForaging Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
         private val colorPair = NullableDataPair<BeaconColor>()
