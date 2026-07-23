@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 
+@Suppress("MaxLineLength")
 @SkyHanniModule
 object ChatFilter {
 
@@ -44,7 +45,6 @@ object ChatFilter {
 
     // <editor-fold desc="Regex Patterns">
     // Lobby Patterns
-    @Suppress("MaxLineLength")
     private val lobbyPatterns by miscPatternGroup.list(
         // player join
         "(?: >>> )?.* (?:joined|(?:spooked|slid) into) the lobby!(?: <<<)?",
@@ -109,7 +109,6 @@ object ChatFilter {
      * REGEX-TEST: You earned 2 GEXP + 210 Event EXP from playing SkyBlock!
      * REGEX-TEST: You earned 10 Event EXP from playing SkyBlock!
      */
-    @Suppress("MaxLineLength")
     private val guildEventExpPatterns by eventPatternGroup.list(
         "guild-event",
         "You earned (?:[\\d,]+ GEXP(?: \\+ [\\d,]+ Event EXP)?|[\\d,]+ Event EXP) from playing SkyBlock!",
@@ -178,7 +177,6 @@ object ChatFilter {
     )
 
     // Slayer Drop
-    @Suppress("MaxLineLength")
     private val slayerDropPatterns by slayerPatternGroup.list(
         "slayer-drop",
         // Zombie
@@ -234,7 +232,6 @@ object ChatFilter {
     )
 
     // Legacy Items
-    @Suppress("MaxLineLength")
     private val legacyItems by miscPatternGroup.list(
         "legacy-items",
         "You currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!",
@@ -304,7 +301,6 @@ object ChatFilter {
     )
 
     // Annoying Spam
-    @Suppress("MaxLineLength")
     private val annoyingSpamPatterns by miscPatternGroup.list(
         "annoying-spam",
         "Your Implosion hit .* for .* damage.",
@@ -344,7 +340,6 @@ object ChatFilter {
     /**
      * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
      */
-    @Suppress("MaxLineLength")
     private val anitaFortunePatterns by farmingPatternGroup.list(
         "jacobevent.accessory",
         "\\[NPC] Jacob: Your Anita's \\w+ is giving you \\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE.hypixelIcon} .+ Fortune during the contest!",
@@ -534,7 +529,6 @@ object ChatFilter {
         "HOPPITY'S HUNT A .* has appeared!",
     )
 
-    @Suppress("MaxLineLength")
     private val hoppityBeginPatterns by eventPatternGroup.list(
         "hoppity-begin",
         "Hoppity's Hunt has begun! Help Hoppity find his Chocolate Rabbit Eggs across SkyBlock each day during the Spring!",
@@ -604,7 +598,7 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
-    @Suppress("CyclomaticComplexMethod", "MaxLineLength")
+    @Suppress("CyclomaticComplexMethod")
     private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
