@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -191,7 +192,11 @@ object CustomScoreboard {
             updateIslandEntries()
         }
         config.enabled.onEnable {
-            deprecatedFeatureWarning()
+            ChatUtils.clickableLinkChat(
+                message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
+                url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+                prefixColor = "§c"
+            )
         }
     }
 
@@ -261,19 +266,15 @@ object CustomScoreboard {
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(140, "gui.customScoreboard.enabled") { element ->
-            deprecatedFeatureWarning()
-            config.enabled.set(false)
-            element
+            if (element.asBoolean) {
+                ChatUtils.clickableLinkChat(
+                    message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
+                    url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+                    prefixColor = "§c"
+                )
+            }
+            JsonPrimitive(false)
         }
-    }
-
-    private fun deprecatedFeatureWarning() {
-        if (!config.enabled.get()) return
-        ChatUtils.clickableLinkChat(
-            message = "Custom Scoreboard feature has been deprecated. Please use this link to download the replacement mod.",
-            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
-            prefixColor = "§c"
-        )
     }
 
     private fun formatEntriesDebug(entries: List<Pair<String, ScoreboardElement>>, currentIslandList: List<ScoreboardElement>) =
