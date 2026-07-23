@@ -67,7 +67,7 @@ object CarryTracker {
     private val patternGroup = RepoPattern.group("carrytracker")
 
     /**
-     * REGEX-TEST: Trade completed with [MVP+] ClachersHD!
+     * REGEX-TEST: Trade completed with [MVP+] zumbiepig!
      */
     private val tradeCompletedPattern by patternGroup.pattern(
         "trade.completed",
@@ -183,9 +183,9 @@ object CarryTracker {
         RenderDisplayHelper(
             outsideInventory = true,
             inOwnInventory = true,
-            condition = { true },
+            condition = display::isNotEmpty,
             onRender = {
-                config.display.renderRenderables(display, posLabel = "Carry Tracker")
+                config.position.renderRenderables(display, posLabel = "Carry Tracker")
             },
         )
     }
@@ -400,18 +400,27 @@ object CarryTracker {
     private fun countCarry(customer: Customer, carry: Carry) {
         carry.done++
         customer.stats.done()
-        updateDisplay()
 
-        HypixelCommands.partyChat("${customer.name}: ${carry.done}/${carry.total}")
+        if (config.sendProgressToParty) HypixelCommands.partyChat("${customer.name}: ${carry.done}/${carry.total}")
         if (carry.done >= carry.total) {
-            ChatUtils.clickableChat(
-                "Carry finished: §b${customer.name} ${carry.formatProgress()} §b${carry.type.displayName}\n§e[CLICK to remove this carry]",
-                { removeCarry(customer.name, carry.type.id) },
-                "§eClick to remove this carry!",
-            )
-            TitleManager.sendTitle("§eCarry finished for §b${customer.name}§e!", duration = 3.seconds)
-            SoundUtils.playBeepSound()
+            val message = "Carry finished: §b${customer.name} ${carry.formatProgress()} §b${carry.type.displayName}"
+            if (config.autoRemoveFinishedCarries) {
+                customer.carries.remove(carry)
+                if (customer.carries.isEmpty()) customers.remove(customer)
+
+                ChatUtils.chat("$message §7(automatically removed)")
+            } else {
+                ChatUtils.clickableChat(
+                    "$message\n§e[CLICK to remove this carry]",
+                    onClick = { removeCarry(customer.name, carry.type.id) },
+                    hover = "§eClick to remove this carry!",
+                )
+            }
+            if (config.carryFinishedTitle) TitleManager.sendTitle("§eCarry finished for §b${customer.name}§e!", duration = 3.seconds)
+            if (config.carryFinishedSound) SoundUtils.playBeepSound()
         }
+
+        updateDisplay()
     }
 
     private fun updateDisplay() {
@@ -600,9 +609,9 @@ object CarryTracker {
         val customer = findCustomer(event.owner) ?: return
         val carry = customer.findCarry(type) ?: return
 
-        ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
-        TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
-        SoundUtils.playPlingSound()
+        if (config.slayerSpawnedMessage) ChatUtils.chat("§d${carry.type.displayName} §espawned for §b${customer.name}")
+        if (config.slayerSpawnedTitle) TitleManager.sendTitle("§eBoss spawned for §b${customer.name}§e!", duration = 3.seconds)
+        if (config.slayerSpawnedSound) SoundUtils.playPlingSound()
     }
 
     @HandleEvent

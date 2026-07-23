@@ -17,7 +17,7 @@ class CarryTrackerConfig {
 
     @Expose
     @NoConfigLink
-    val display: Position = Position(10, 10)
+    val position: Position = Position(10, 10)
 
     @Expose
     @ConfigOption(
@@ -26,4 +26,60 @@ class CarryTrackerConfig {
     )
     @ConfigEditorBoolean
     var suggestCarriesFromTrades: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Send Carry Progress To Party Chat",
+        desc = "Send a message to party chat every time a carry is completed.",
+    )
+    @ConfigEditorBoolean
+    var sendProgressToParty: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Auto Remove Finished Carries",
+        desc = "Automatically remove finished carries without confirmation.",
+    )
+    @ConfigEditorBoolean
+    var autoRemoveFinishedCarries: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Slayer Boss Spawned Chat Message",
+        desc = "Send a chat message when a customer's slayer boss spawns.",
+    )
+    @ConfigEditorBoolean
+    var slayerSpawnedMessage: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Slayer Boss Spawned Title",
+        desc = "Show a title when a customer's slayer boss spawns.",
+    )
+    @ConfigEditorBoolean
+    var slayerSpawnedTitle: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Slayer Boss Spawned Sound",
+        desc = "Play a sound when a customer's slayer boss spawns.",
+    )
+    @ConfigEditorBoolean
+    var slayerSpawnedSound: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Carry Finished Title",
+        desc = "Show a title for carry finished notifications.",
+    )
+    @ConfigEditorBoolean
+    var carryFinishedTitle: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Carry Finished Sound",
+        desc = "Play a sound for carry finished notifications.",
+    )
+    @ConfigEditorBoolean
+    var carryFinishedSound: Boolean = true
 }
