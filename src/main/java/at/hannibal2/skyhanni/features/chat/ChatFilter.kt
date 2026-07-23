@@ -529,7 +529,7 @@ object ChatFilter {
     /**
      * REGEX-TEST: [NPC] Swoop: Wow! I forgot to tell you, monsters around here can only take damage from Axes!
      */
-    private val swoopAxePattern by huntingPatternGroup.pattern(
+    private val swoopAxePatterns by huntingPatternGroup.list(
         "swoop-axe-message",
         "\\[NPC] Swoop: Wow! I forgot to tell you, monsters around here can only take damage from Axes!",
     )
@@ -539,13 +539,13 @@ object ChatFilter {
      * REGEX-TEST: HOPPITY'S HUNT A Chocolate Déjeuner Egg has appeared!
      * REGEX-TEST: HOPPITY'S HUNT A Chocolate Brunch Egg has appeared!
      */
-    private val hoppityAppearPattern by eventPatternGroup.pattern(
+    private val hoppityAppearPatterns by eventPatternGroup.list(
         "hoppity-egg-appear",
         "HOPPITY'S HUNT A .* has appeared!",
     )
 
     @Suppress("MaxLineLength")
-    private val hoppityBeginPattern by eventPatternGroup.pattern(
+    private val hoppityBeginPatterns by eventPatternGroup.list(
         "hoppity-begin",
         "Hoppity's Hunt has begun! Help Hoppity find his Chocolate Rabbit Eggs across SkyBlock each day during the Spring!",
     )
@@ -579,9 +579,11 @@ object ChatFilter {
         "reward_bundles" to rewardBundlePatterns,
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
-        "swoop_axe" to listOf(swoopAxePattern),
-        "hoppity_appear" to listOf(hoppityAppearPattern),
-        "hoppity_begin" to listOf(hoppityBeginPattern),
+        "swoop_axe" to swoopAxePatterns,
+        "hoppity_appear" to hoppityAppearPatterns,
+        "hoppity_begin" to hoppityBeginPatterns,
+        "profile_join" to profileJoinPatterns,
+        "welcome" to welcomeMessages,
     )
 
     // </editor-fold>
@@ -646,6 +648,8 @@ object ChatFilter {
         huntingConfig.swoopAxeMessage && message.isPresent("swoop_axe") -> "swoop_axe"
         config.gardenNoPest && GardenApi.inGarden() && PestApi.noPestsChatPattern.matches(message) -> "garden_pest"
         config.legacyItemsWarning && message.isPresent("legacy_items") -> "legacy_items"
+        config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+        config.welcome && message.isPresent("welcome") -> "welcome"
 
         else -> null
     }
