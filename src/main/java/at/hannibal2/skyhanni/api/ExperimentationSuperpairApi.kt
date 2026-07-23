@@ -79,12 +79,9 @@ object ExperimentationSuperpairApi {
     private var lastClickedSlot = -1
     private var currentFoundData = mapOf<FoundType, List<FoundData>>()
 
-    // True once "Remaining Clicks" has read 0 for two updates in a row: the first 0-reading is the
-    // player's genuine last click (still processed normally), but Hypixel then reveals every
-    // remaining card for the round-end summary, which would otherwise get misclassified as
-    // collected. Tracking stops from the second consecutive 0-reading until clicks are seen above
-    // 0 again (e.g. a +Clicks powerup bouncing the count back up), so a false trigger self-corrects
-    // instead of getting stuck.
+    // True from the second consecutive "Remaining Clicks: 0" reading onward, skipping the
+    // round-end reveal of leftover cards while still processing the genuine final click.
+    // Resets if clicks are seen above 0 again (e.g. a +Clicks powerup).
     private var frozen = false
 
     val foundData: Map<FoundType, List<FoundData>> get() = currentFoundData
