@@ -54,8 +54,9 @@ object CroesusChestTracker {
 
     /**
      * REGEX-TEST: (1/3) Croesus
+     * REGEX-TEST: Croesus
      */
-    private val croesusPattern by patternGroup.pattern("inventory", "\\(\\d+/\\d+\\) Croesus")
+    private val croesusPattern by patternGroup.pattern("inventory", "(?:\\(\\d+/\\d+\\) )?Croesus")
 
     /**
      * REGEX-TEST: No treasures!
