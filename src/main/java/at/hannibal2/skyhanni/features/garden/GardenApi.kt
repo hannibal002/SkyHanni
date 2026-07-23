@@ -252,8 +252,8 @@ object GardenApi {
         // TODO Reevaluate this if Hypixel ever adds right click harvest crops
         if (event.clickType != InteractClickType.LEFT_CLICK) return
 
+        val cropBroken = event.getCropType() ?: return
         val blockState = event.blockState
-        val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
