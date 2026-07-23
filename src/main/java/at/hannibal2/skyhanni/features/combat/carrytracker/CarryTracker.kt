@@ -561,8 +561,8 @@ object CarryTracker {
 
     private data class CrimsonMinibossCarryType(
         override val id: String,
-        val crimsonMiniboss: CrimsonMiniBoss,
-        override val displayName: String = crimsonMiniboss.displayName,
+        val crimsonMiniBoss: CrimsonMiniBoss,
+        override val displayName: String = crimsonMiniBoss.displayName,
         override val shortName: String = displayName,
     ) : CarryType()
 
@@ -635,7 +635,7 @@ object CarryTracker {
 
     @HandleEvent
     fun onCrimsonMinibossDeath(event: CrimsonMiniBossEvent.Death) {
-        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniboss == event.miniBoss } ?: return
+        val type = findCarryType { it is CrimsonMinibossCarryType && it.crimsonMiniBoss == event.miniBoss } ?: return
 
         for (name in EntityUtils.getPlayerEntities().map { it.name.string }) {
             val customer = findCustomer(name) ?: continue
