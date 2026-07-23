@@ -258,7 +258,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     private fun SkyHanniChatEvent.Allow.checkSprayChats() {
-        GardenPlotApi.plotSprayedPattern.matchMatcher(message) {
+        GardenPlotApi.plotSprayedPattern.matchMatcher(cleanMessage) {
             val spray = group("spray")
             val amount = groupOrNull("amount")?.formatInt() ?: 1
             SprayType.getByNameOrNull(spray)?.addSprayUsed(amount)
