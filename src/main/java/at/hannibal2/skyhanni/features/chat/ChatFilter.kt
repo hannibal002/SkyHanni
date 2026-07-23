@@ -401,16 +401,6 @@ object ChatFilter {
         "SACRIFICE! .* turned .* into .* Dragon Essence!",
         "BONUS LOOT! They also received .* from their sacrifice!",
     )
-    private val powderMiningMessages by miningPatternGroup.list(
-        "powder",
-        "You uncovered a treasure chest!",
-        "You received 1 Wishing Compass.",
-        "You received 1 Ascension Rope.",
-        // Jungle
-        "You received 1 Oil Barrel.",
-        // Useful, maybe in another chat
-        "You have successfully picked the lock on this chest!",
-    )
 
     /**
      * REGEX-TEST: RARE REWARD! Leebys found a Recombobulator 3000 in their Obsidian Chest!
@@ -584,6 +574,12 @@ object ChatFilter {
         "hoppity_begin" to hoppityBeginPatterns,
         "profile_join" to profileJoinPatterns,
         "welcome" to welcomeMessages,
+        "bz_ah_minis" to miniBazaarAndAHMessages,
+        "party" to partyMessages,
+        "money" to auctionHouseMessages,
+        "useless_warning" to uselessWarningMessages,
+        "skymall" to skymallMessages,
+        "lottery" to lotteryMessages
     )
 
     // </editor-fold>
@@ -748,11 +744,7 @@ object ChatFilter {
      * @receiver message The message to check
      * @param key The key of the list to check
      * @return True if the message is present in any of the maps
-     * @see messagesMap
      * @see patternsMap
-     * @see repoPatternsMap
-     * @see messagesContainsMap
-     * @see messagesStartsWithMap
      */
     private fun String.isPresent(key: String) =
         (patternsMap[key].orEmpty()).any { it.matches(this) }
