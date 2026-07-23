@@ -17,21 +17,44 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlin.time.Duration.Companion.minutes
 
 class HypixelItemApi {
-
     @SkyHanniModule
     companion object {
-
         // prices = george prices + npc prices
         private var prices = mapOf<NeuInternalName, Double>()
         private var npcPrices = mapOf<NeuInternalName, Double>()
         private var georgePrices = mapOf<NeuInternalName, Double>()
+        private var minionStorageXP = mapOf<NeuInternalName, Map<String, Double>>()
 
         fun getNpcPrice(internalName: NeuInternalName) = prices[internalName]
 
+        fun getMinionStorageXP(internalName: NeuInternalName): Map<String, Double>? =
+            minionStorageXP[internalName]
+
         @HandleEvent
-        fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
             val constant = event.getConstant<NeuGeorgeJson>("george")
             georgePrices = constant.prices ?: return
+            prices = georgePrices + npcPrices
+        }
+
+        internal fun processItemData(itemsData: SkyblockItemsDataJson) {
+            val npcPrices = mutableMapOf<NeuInternalName, Double>()
+            val motesPrice = mutableMapOf<NeuInternalName, Double>()
+            val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
+            val minionStorageXP = mutableMapOf<NeuInternalName, Map<String, Double>>()
+            for (item in itemsData.items) {
+                val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
+                item.npcPrice?.let { npcPrices[neuItemId] = it }
+                item.motesPrice?.let { motesPrice[neuItemId] = it }
+                item.stats?.let { stats -> allStats[neuItemId] = stats }
+                item.experience?.mapNotNull { (skill, experience) ->
+                    experience.minionStorage?.let { skill to it }
+                }?.toMap()?.takeIf { it.isNotEmpty() }?.let { minionStorageXP[neuItemId] = it }
+            }
+            ItemUtils.updateBaseStats(allStats)
+            RiftApi.motesPrice = motesPrice
+            HypixelItemApi.npcPrices = npcPrices
+            HypixelItemApi.minionStorageXP = minionStorageXP
             prices = georgePrices + npcPrices
         }
     }
@@ -44,28 +67,14 @@ class HypixelItemApi {
     private suspend fun loadItemData() {
         val (_, apiResponseData) = ApiUtils.getJsonResponse(hypixelItemStatic).assertSuccessWithData() ?: return
         val itemsData = ConfigManager.gson.fromJson<SkyblockItemsDataJson>(apiResponseData)
-
-        val npcPrices = mutableMapOf<NeuInternalName, Double>()
-        val motesPrice = mutableMapOf<NeuInternalName, Double>()
-        val allStats = mutableMapOf<NeuInternalName, Map<String, Int>>()
-        for (item in itemsData.items) {
-            val neuItemId = NeuItems.transHypixelNameToInternalName(item.id ?: continue)
-            item.npcPrice?.let { npcPrices[neuItemId] = it }
-            item.motesPrice?.let { motesPrice[neuItemId] = it }
-            item.stats?.let { stats -> allStats[neuItemId] = stats }
-        }
-        ItemUtils.updateBaseStats(allStats)
-        RiftApi.motesPrice = motesPrice
-        HypixelItemApi.npcPrices = npcPrices
+        processItemData(itemsData)
     }
 
     fun start() {
         SkyHanniMod.launchIOCoroutine("hypixel item api fetch", timeout = 1.minutes) {
             loadItemData()
-            prices = georgePrices + npcPrices
         }
 
         // TODO use SecondPassedEvent
     }
-
 }
