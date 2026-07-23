@@ -597,7 +597,6 @@ object StringUtils {
         "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.toString(), "UTF-8")}"
     }.joinToString("&")
 
-
     fun Sequence<String>.withWrappedLines(): Sequence<String> = sequence {
         val lines = toList()
 
