@@ -35,8 +35,12 @@ object ChatFilter {
     private val chatFilterGroup = RepoPattern.group("chat-filter")
     private val huntingPatternGroup = chatFilterGroup.group("hunting")
     private val foragingPatternGroup = chatFilterGroup.group("foraging")
+    private val miningPatternGroup = chatFilterGroup.group("mining")
+    private val farmingPatternGroup = chatFilterGroup.group("farming")
+    private val slayerPatternGroup = chatFilterGroup.group("slayer")
     private val miscPatternGroup = chatFilterGroup.group("hypixel-misc")
     private val eventPatternGroup = chatFilterGroup.group("event")
+    private val dungeonPatternGroup = chatFilterGroup.group("dungeon")
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
@@ -62,7 +66,7 @@ object ChatFilter {
         "✦ You earned \\d+ Pet Consumables items!",
 
         // prototype
-        "  ➤ You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!",
+        "\\s+➤ You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!",
 
         // prototype
         ".*Welcome to the Prototype Lobby.*",
@@ -158,7 +162,7 @@ object ChatFilter {
     )
 
     // Slayer
-    private val slayerPatterns by RepoPattern.list(
+    private val slayerPatterns by slayerPatternGroup.list(
         "slayer-quest",
         // start
         " {2}SLAYER QUEST STARTED!",
@@ -175,7 +179,7 @@ object ChatFilter {
 
     // Slayer Drop
     @Suppress("MaxLineLength")
-    private val slayerDropPatterns by RepoPattern.list(
+    private val slayerDropPatterns by slayerPatternGroup.list(
         "slayer-drop",
         // Zombie
         // TODO merge patterns together. Just because old ones are designed poorly doesn't mean new ones need to be poor as well
@@ -216,7 +220,7 @@ object ChatFilter {
     )
 
     // Useless Drop
-    private val uselessDropPatterns by RepoPattern.list(
+    private val uselessDropPatterns by miscPatternGroup.list(
         "useless-drop",
         "RARE DROP! Enchanted Ender Pearl .*",
         "RARE DROP! Carrot .*",
@@ -231,14 +235,14 @@ object ChatFilter {
 
     // Legacy Items
     @Suppress("MaxLineLength")
-    private val legacyItems by RepoPattern.list(
+    private val legacyItems by miscPatternGroup.list(
         "legacy-items",
         "You currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!",
     )
 
     // TODO update patterns for 1.21
     // Useless Notification
-    private val uselessNotificationPatterns by RepoPattern.list(
+    private val uselessNotificationPatterns by miscPatternGroup.list(
         "useless-notification",
         "You tipped \\d+ players? in \\d+(?: different)? games?!",
         "Your previous Plasmaflux Power Orb was removed!",
@@ -251,21 +255,21 @@ object ChatFilter {
     )
 
     // Party
-    private val partyMessages by RepoPattern.list(
+    private val partyMessages by miscPatternGroup.list(
         "party",
         "-----------------------------------------------------",
     )
 
     // MONEY
     // Auction House
-    private val auctionHouseMessages by RepoPattern.list(
+    private val auctionHouseMessages by miscPatternGroup.list(
         "auction-house",
         "-----------------------------------------------------",
         "Visit the Auction House to collect your item!",
     )
 
     // Bazaar
-    private val bazaarPatterns by RepoPattern.list(
+    private val bazaarPatterns by miscPatternGroup.list(
         "bazaar",
         "Buy Order Setup! .*x .* for .* coins.",
         "Sell Offer Setup! .*x .* for .* coins.",
@@ -274,13 +278,13 @@ object ChatFilter {
     )
 
     // Winter Island
-    private val winterIslandPatterns by RepoPattern.list(
+    private val winterIslandPatterns by eventPatternGroup.list(
         "winter-island",
         "☃ .* mounted a Snow Cannon!",
     )
 
     // Useless Warning
-    private val uselessWarningMessages by RepoPattern.list(
+    private val uselessWarningMessages by miscPatternGroup.list(
         "useless-warning",
         "You are sending commands too fast! Please slow down.", // TODO prevent in the future
         "You can't use this while in combat!",
@@ -298,7 +302,7 @@ object ChatFilter {
 
     // Annoying Spam
     @Suppress("MaxLineLength")
-    private val annoyingSpamPatterns by RepoPattern.list(
+    private val annoyingSpamPatterns by miscPatternGroup.list(
         "annoying-spam",
         "Your Implosion hit .* for .* damage.",
         "Your Molten Wave hit .* for .* damage.",
@@ -322,13 +326,13 @@ object ChatFilter {
         "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
     )
 
-    private val skymallMessages by RepoPattern.list(
+    private val skymallMessages by miningPatternGroup.list(
         "skymall",
         "New day! Your Sky Mall buff changed!",
         "You can disable this messaging by toggling Sky Mall in your /hotm!",
     )
 
-    private val lotteryMessages by RepoPattern.list(
+    private val lotteryMessages by foragingPatternGroup.list(
         "lottery",
         "New day! Your Lottery buff changed!",
         "You can disable this messaging by toggling Lottery in your /hotf!",
@@ -338,7 +342,7 @@ object ChatFilter {
      * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
      */
     @Suppress("MaxLineLength")
-    private val anitaFortunePattern by RepoPattern.pattern(
+    private val anitaFortunePattern by farmingPatternGroup.pattern(
         "chat.jacobevent.accessory",
         "\\[NPC] Jacob: Your Anita's \\w+ is giving you \\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE.hypixelIcon} .+ Fortune during the contest!",
     )
@@ -358,24 +362,27 @@ object ChatFilter {
         addAll(GiftProfitTracker.spamPatterns)
     }
 
-    private val fireSalePattern by RepoPattern.pattern(
-        "chat.firesale",
-        "A FIRE SALE A(?:\\n|.)*",
-    )
-    private val fireSalePatterns by RepoPattern.list(
+    private val fireSalePatterns by eventPatternGroup.list(
+        "firesale",
+        "A FIRE SALE A[\\n.]*",
         "♨ Fire Sales for .* are starting soon!",
         "\\s*♨ .* (?:Skin|Rune|Dye) (?:for a limited time )?\\(.* left\\)(?:|!)",
         "♨ Visit the Community Shop in the next .* to grab yours! \\[WARP]",
         "♨ A Fire Sale for .* is starting soon!",
         "♨ Fire Sales? for .* ended!",
         " {3}♨ And \\d+ more!",
+        "A FIRE SALE A",
+        "♨ Selling multiple items for a limited time!",
     )
-    private val eventPatterns by RepoPattern.list(
-        "(?:)? +You are now Event Level *!",
-        "(?:)? +You earned * Event Silver!",
-        "(?:)? +# LEVEL UP! #",
+    private val eventPatterns by eventPatternGroup.list(
+        "event",
+        " +You are now Event Level *!",
+        " +You earned * Event Silver!",
+        " +# LEVEL UP! #",
+        "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
     )
-    private val factoryUpgradePatterns by RepoPattern.list(
+    private val factoryUpgradePatterns by eventPatternGroup.list(
+        "chocolate-factory-upgrade",
         ".* has been promoted to \\[.*] *!",
         "Your Rabbit Barn capacity has been increased to .* Rabbits!",
         "You will now produce .* Chocolate per click!",
@@ -386,11 +393,13 @@ object ChatFilter {
      * REGEX-TEST: SACRIFICE! [MVP++] Mikecraft1224 turned Young Dragon Boots into 40 Dragon Essence!
      * REGEX-TEST: BONUS LOOT! They also received Ritual Residue from their sacrifice!
      */
-    private val sacrificePatterns by RepoPattern.list(
+    private val sacrificePatterns by miscPatternGroup.list(
+        "sacrifice",
         "SACRIFICE! .* turned .* into .* Dragon Essence!",
         "BONUS LOOT! They also received .* from their sacrifice!",
     )
-    private val powderMiningMessages by RepoPattern.list(
+    private val powderMiningMessages by miningPatternGroup.list(
+        "powder",
         "You uncovered a treasure chest!",
         "You received 1 Wishing Compass.",
         "You received 1 Ascension Rope.",
@@ -399,39 +408,37 @@ object ChatFilter {
         // Useful, maybe in another chat
         "You have successfully picked the lock on this chest!",
     )
-    private val fireSaleMessages by RepoPattern.list(
-        "A FIRE SALE A",
-        "♨ Selling multiple items for a limited time!",
-    )
-    private val eventMessage by RepoPattern.list(
-        "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
-    )
 
     /**
      * REGEX-TEST: RARE REWARD! Leebys found a Recombobulator 3000 in their Obsidian Chest!
      */
-    private val rareDropsMessages by RepoPattern.list(
+    private val rareDropsMessages by dungeonPatternGroup.list(
+        "rare-drops",
         "RARE REWARD! .* found a .* in their .* Chest!",
     )
 
     // &r&6Your &r&aMage &r&6stats are doubled because you are the only player using this class!&r
-    private val soloClassPatterns by RepoPattern.list(
+    private val soloClassPatterns by dungeonPatternGroup.list(
+        "solo-class",
         "Your (Healer|Mage|Berserk|Archer|Tank) stats are doubled because you are the only player using this class!",
     )
 
-    private val soloStatsPatterns by RepoPattern.list(
+    private val soloStatsPatterns by dungeonPatternGroup.list(
+        "solo-stats",
         "\\[(Healer|Mage|Berserk|Archer|Tank)].*",
     )
 
     // &r&dGenevieve the Fairy&r&f: You killed me! Take this &r&6Revive Stone &r&fso that my death is not in vain!&r
-    private val fairyPatterns by RepoPattern.list(
+    private val fairyPatterns by dungeonPatternGroup.list(
+        "fairy",
         "[\\w']+ the Fairy: You killed me! Take this Revive Stone so that my death is not in vain!",
         "[\\w']+ the Fairy: You killed me! I'll revive you so that my death is not in vain!",
         "[\\w']+ the Fairy: Have a great life!",
     )
 
     // a>>   Achievement Unlocked: Agile   <<a
-    private val achievementGetPatterns by RepoPattern.list(
+    private val achievementGetPatterns by miscPatternGroup.list(
+        "achievement.get",
         ".>> {3}Achievement Unlocked: .* {3}<<.",
     )
 
@@ -441,21 +448,17 @@ object ChatFilter {
      * REGEX-TEST: Reached checkpoint #4 for parkour cocoa!
      * REGEX-TEST: Wrong checkpoint for parkour cocoa!
      * REGEX-TEST: You haven't reached all checkpoints for parkour cocoa!
+     * REGEX-TEST: Cancelled parkour! You cannot fly.
+     * REGEX-TEST: Cancelled parkour! You cannot use item abilities.
+     * REGEX-TEST: Cancelled parkour!
      */
-    private val parkourPatterns by RepoPattern.list(
+    private val parkourPatterns by miscPatternGroup.list(
+        "parkour",
         "Started parkour .*!",
         "Finished parkour .* in .*!",
         "Reached checkpoint #.* for parkour .*!",
         "Wrong checkpoint for parkour .*!",
         "You haven't reached all checkpoints for parkour .*!",
-    )
-
-    /**
-     * REGEX-TEST: Cancelled parkour! You cannot fly.
-     * REGEX-TEST: Cancelled parkour! You cannot use item abilities.
-     * REGEX-TEST: Cancelled parkour!
-     */
-    private val parkourCancelMessages by RepoPattern.list(
         "Cancelled parkour! You cannot fly.",
         "Cancelled parkour! You cannot use item abilities.",
         "Cancelled parkour!",
@@ -464,25 +467,19 @@ object ChatFilter {
     /**
      ** REGEX-TEST: Warped from the tpPadOne to the tpPadTwo!
      */
-    private val teleportPadPatterns by RepoPattern.list(
+    private val teleportPadPatterns by miscPatternGroup.list(
+        "teleport-pad",
         "Warped from the .* to the .*!",
-    )
-
-    // This Teleport Pad does not have a destination set!
-    private val teleportPadMessages by RepoPattern.list(
         "This Teleport Pad does not have a destination set!",
     )
 
     // [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
-    private val MasterChefPatterns by RepoPattern.list(
+    private val masterChefPatterns by farmingPatternGroup.list(
+        "master-chef",
+        "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
         "\\[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
     )
-
-    // [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
-    private val MasterChefMessages by RepoPattern.list(
-        "[NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.",
-    )
-
+    
     /**
      ** REGEX-TEST: You haven't claimed your Summer Rewards yet!
      ** REGEX-TEST: Talk to the Summer Sloth in the Hub!
@@ -490,8 +487,8 @@ object ChatFilter {
      */
     private val rewardBundlePatterns by miscPatternGroup.list(
         "seasonal-bundles",
-        "(?:)*You haven't claimed your (?:)*\\w+ Rewards (?:)*yet!",
-        "(?:)*Talk to the (?:)*.+(?:)*in the (?:)*.+(?:)*!",
+        "You haven't claimed your \\w+ Rewards yet!",
+        "Talk to the .+in the .+!",
     )
 
     /**
@@ -500,8 +497,8 @@ object ChatFilter {
      */
     private val unmineableTreePatterns by foragingPatternGroup.list(
         "unmineable-tree",
-        "(?:)*You cannot damage a tree while it is regenerating!",
-        "(?:)*The toughness of this tree is way too high!",
+        "You cannot damage a tree while it is regenerating!",
+        "The toughness of this tree is way too high!",
     )
 
     /**
@@ -511,9 +508,9 @@ object ChatFilter {
      */
     private val redundantShardsPatterns by huntingPatternGroup.list(
         "redundant-comments",
-        "(?:)*Mochibear ate too much and passed out! You caught it!",
-        "(?:)*You caught yourself an invisibug! The shard was sent to your Hunting Box!",
-        "(?:)*The Frog is exhausted\\.\\.\\.",
+        "Mochibear ate too much and passed out! You caught it!",
+        "You caught yourself an invisibug! The shard was sent to your Hunting Box!",
+        "The Frog is exhausted\\.\\.\\.",
     )
 
     /**
@@ -565,10 +562,7 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-        "masterchef" to MasterChefPatterns,
-    )
-
-    private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
+        "masterchef" to masterChefPatterns,
         "reward_bundles" to rewardBundlePatterns,
         "redundant_hunting" to redundantShardsPatterns,
         "unmineable_tree" to unmineableTreePatterns,
@@ -577,37 +571,6 @@ object ChatFilter {
         "hoppity_begin" to listOf(hoppityBeginPattern),
     )
 
-    private val messagesMap: Map<String, List<String>> = mapOf(
-        "lobby" to lobbyMessages,
-        "warping" to warpingMessages,
-        "welcome" to welcomeMessages,
-        "kill_combo" to killComboMessages,
-        "bz_ah_minis" to miniBazaarAndAHMessages,
-        "slayer" to slayerMessages,
-        "useless_drop" to uselessDropMessages,
-        "useless_notification" to uselessNotificationMessages,
-        "party" to partyMessages,
-        "money" to auctionHouseMessages,
-        "useless_warning" to uselessWarningMessages,
-        "annoying_spam" to annoyingSpamMessages,
-        "powder_mining" to powderMiningMessages,
-        "fire_sale" to fireSaleMessages,
-        "event" to eventMessage,
-        "skymall" to skymallMessages,
-        "lottery" to lotteryMessages,
-        "parkour" to parkourCancelMessages,
-        "teleport_pads" to teleportPadMessages,
-        "masterchef" to MasterChefMessages,
-    )
-
-    private val messagesContainsMap: Map<String, List<String>> = mapOf(
-        "lobby" to lobbyMessagesContains,
-    )
-
-    private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
-        "slayer" to slayerMessageStartWith,
-        "profile_join" to profileJoinMessageStartsWith,
-    )
     // </editor-fold>
 
     @HandleEvent
@@ -641,7 +604,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
-        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
+        config.masterChef && message.isPresent("masterchef") -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
@@ -652,7 +615,7 @@ object ChatFilter {
         // TODO need proper solution to hide empty messages in event text
         config.eventLevelUp && (message.isPresent("event")) -> "event"
 
-        config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
+        config.fireSale && message.isPresent("fire_sale") -> "fire_sale"
         config.rewardBundles && message.isPresent("reward_bundles") -> "reward_bundles"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.hoppityEggs && message.isPresent("hoppity_appear") -> "hoppity_appear"
@@ -774,11 +737,8 @@ object ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
-        (patternsMap[key].orEmpty()).any { it.matches(this) } ||
-        (repoPatternsMap[key].orEmpty()).any { it.matches(this) } ||
-        (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
-        (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
+    private fun String.isPresent(key: String) =
+        (patternsMap[key].orEmpty()).any { it.matches(this) }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
