@@ -75,9 +75,7 @@ object GardenVisitorSupercraft {
         if (amountInSacks >= amount) return
 
         val ingredients = NeuItems.getRecipes(internalName)
-            .filter { it.recipeType == NeuRecipeType.CRAFTING }
-            // TODO describe what this line does
-            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            .firstOrNull { it.recipeType == NeuRecipeType.CRAFTING }
             ?.ingredients ?: return
         val requiredIngredients = mutableMapOf<NeuInternalName, Int>()
         for ((key, count) in ingredients.toPrimitiveItemStacks()) {
