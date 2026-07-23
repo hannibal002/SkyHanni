@@ -41,7 +41,7 @@ object ConditionalUtils {
 
     fun Property<out Boolean>.onEnable(observer: Runnable) {
         whenChanged { old, new ->
-            if (old != new && new) {
+            if (!old && new) {
                 observer.run()
             }
         }
@@ -49,7 +49,7 @@ object ConditionalUtils {
 
     fun Property<out Boolean>.onDisable(observer: Runnable) {
         whenChanged { old, new ->
-            if (old != new && !new) {
+            if (old && !new) {
                 observer.run()
             }
         }
