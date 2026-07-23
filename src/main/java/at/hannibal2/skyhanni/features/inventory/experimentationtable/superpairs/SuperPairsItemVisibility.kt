@@ -52,7 +52,6 @@ object SuperPairsItemVisibility {
         superpairsSlotsToRead.clear()
     }
 
-    // tryReadUncoveredItem
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val slotNumber = event.slot?.index?.takeUnless(superpairsSlotMap.keys::contains) ?: return
@@ -64,7 +63,6 @@ object SuperPairsItemVisibility {
         }
     }
 
-    // tryReadSuperpairsSlots
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!ExperimentationTableApi.inTable || ExperimentationTableApi.currentExperimentType != TaskType.SUPERPAIRS) return
