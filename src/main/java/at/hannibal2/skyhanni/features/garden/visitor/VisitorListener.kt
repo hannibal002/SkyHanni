@@ -24,9 +24,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -35,6 +35,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.protocol.game.ServerboundInteractPacket
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
+
+//? if >= 26.1
+import net.minecraft.network.protocol.game.ServerboundAttackPacket
 
 @SkyHanniModule
 object VisitorListener {
@@ -55,10 +58,14 @@ object VisitorListener {
     // TODO make event
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onSendEvent(event: PacketSentEvent) {
-        val packet = event.packet
-        if (packet !is ServerboundInteractPacket) return
+        val packetEntityId = when (val packet = event.packet) {
+            is ServerboundInteractPacket -> packet.entityId
+            //? if >= 26.1
+            is ServerboundAttackPacket -> packet.entityId
+            else -> return
+        }
 
-        val entity = MinecraftCompat.localWorld.getEntity(packet.entityId) ?: return
+        val entity = MinecraftCompat.localWorldOrThrow.getEntity(packetEntityId) ?: return
         val entityId = entity.id
 
         lastClickedNpc = entityId

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
@@ -77,41 +79,52 @@ object RareCropTracker {
         tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
-    enum class RareCropDropType(val dropName: String, private val messageName: String) {
-        CROPIE("§aCropie", "Cropie"),
-        SQUASH("§9Squash", "Squash"),
-        FERMENTO("§5Fermento", "Fermento"),
-        HELIANTHUS("§6Helianthus", "Helianthus"),
-        SEASONING("§2Seasoning", "Seasoning"),
-        CORNUCOPIA("§aCornucopia", "Cornucopia"),
-        CARROT_ZEST("§aCarrot Zest", "Carrot Zest"),
-        DEEPFRIES("§aDeepfries", "Deepfries"),
-        AGGOURDIAN("§aAggourdian", "Aggourdian"),
-        CANE_KNOT("§aCane Knot", "Cane Knot"),
-        MELON_JUICE("§aMelon Juice", "Melon Juice"),
-        CACTUS_FLOWER("§aCactus Flower", "Cactus Flower"),
-        DESIGNER_COFFEE_BEANS("§aDesigner Coffee Beans", "Designer Coffee Beans"),
-        FEASTFUNGUS("§aFeastfungus", "Feastfungus"),
-        BOTROOT("§aBotroot", "Botroot"),
-        SALTED_SUNFLOWER_SEEDS("§aSalted Sunflower Seeds", "Salted Sunflower Seeds"),
-        CRYSTALIZED_MOONLIGHT("§aCrystalized Moonlight", "Crystalized Moonlight"),
-        FLORAL_GELATIN("§aFloral Gelatin", "Floral Gelatin"),
-        RAREFINDER_CHIP("§9Rarefinder Chip", "Rarefinder Chip"),
-        BURROWING_SPORES("§9Burrowing Spores", "Burrowing Spores"),
-        WARTY("§5Warty", "Warty"),
+    enum class RareCropDropType(val dropName: String, val pestType: PestType? = null) {
+        CROPIE("§aCropie"),
+        SQUASH("§9Squash"),
+        FERMENTO("§5Fermento"),
+        HELIANTHUS("§6Helianthus"),
+        SEASONING("§2Seasoning"),
+        CORNUCOPIA("§aCornucopia", PestType.FLY),
+        CARROT_ZEST("§aCarrot Zest", PestType.CRICKET),
+        DEEPFRIES("§aDeepfries", PestType.LOCUST),
+        AGGOURDIAN("§aAggourdian", PestType.RAT),
+        CANE_KNOT("§aCane Knot", PestType.MOSQUITO),
+        MELON_JUICE("§aMelon Juice", PestType.EARTHWORM),
+        CACTUS_FLOWER("§aCactus Flower", PestType.MITE),
+        DESIGNER_COFFEE_BEANS("§aDesigner Coffee Beans", PestType.MOTH),
+        FEASTFUNGUS("§aFeastfungus", PestType.SLUG),
+        BOTROOT("§aBotroot", PestType.BEETLE),
+        SALTED_SUNFLOWER_SEEDS("§aSalted Sunflower Seeds", PestType.DRAGONFLY),
+        CRYSTALIZED_MOONLIGHT("§aCrystalized Moonlight", PestType.FIREFLY),
+        FLORAL_GELATIN("§aFloral Gelatin", PestType.PRAYING_MANTIS),
+        RAREFINDER_CHIP("§9Rarefinder Chip"),
+        BURROWING_SPORES("§9Burrowing Spores"),
+        WARTY("§5Warty"),
         ;
 
+        val cleanName = dropName.removeColor()
+
+        val canDropFromPests: Boolean = pestType != null
+
+        /**
+         * REGEX-TEST: RARE CROP! Cropie (+97)
+         * REGEX-TEST: RARE CROP! Cane Knot (+137.6)
+         * REGEX-TEST: RARE CROP! Seasoning (+115) (automatically donated)
+         * REGEX-TEST: VERY RARE CROP! Burrowing Spores
+         */
         val chatPattern by patternGroup.pattern(
-            name.lowercase().replace('_', '-'),
-            "(?:§.)*(?:VERY )?RARE CROP! (?:§.)*$messageName.*",
+            "${name.lowercase().replace('_', '-')}.colorless",
+            "(?:VERY )?RARE CROP! $cleanName(?: .*)?",
         )
     }
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
         for (dropType in RareCropDropType.entries) {
-            if (!dropType.chatPattern.matches(event.message)) continue
+            if (!dropType.chatPattern.matches(event.cleanMessage)) continue
             addDrop(dropType)
+            PestProfitTracker.addRareCropDrop(dropType)
             if (config.hideChat) {
                 event.blockedReason = "rare_crop_tracker"
             }

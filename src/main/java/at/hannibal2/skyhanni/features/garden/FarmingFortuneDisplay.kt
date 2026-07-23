@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.getCurrentMilestoneTier
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummiesCount
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
@@ -38,12 +41,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.getTablistEndTime
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,21 +57,25 @@ object FarmingFortuneDisplay {
     private val patternGroup = RepoPattern.group("garden.fortunedisplay")
 
     /**
-     * REGEX-TEST:  Farming Fortune: ☘1234
+     * WRAPPED-REGEX-TEST: " Farming Fortune: 1234"
      */
     private val universalTabFortunePattern by patternGroup.pattern(
         "tablist.universal-no-color",
-        " Farming Fortune: ☘(?<fortune>\\d+)",
+        " Farming Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
     )
 
     @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific-no-color",
-        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ☘(?<fortune>\\d+)",
+        " (?<crop>${enumJoinToPattern<CropType> { it.cropName }}) Fortune: ${FARMING_FORTUNE.hypixelIcon}(?<fortune>\\d+)",
     )
+
+    /**
+     * REGEX-TEST: §7You have §6+12 Wheat Fortune
+     */
     private val collectionPattern by patternGroup.pattern(
         "collection",
-        "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
+        "§7You have §6\\+(?<ff>\\d{1,3})${FARMING_FORTUNE.hypixelIcon} .*",
     )
 
     @Suppress("MaxLineLength")
@@ -82,28 +89,31 @@ object FarmingFortuneDisplay {
     )
 
     /**
-     * REGEX-TEXT: §7Piece Bonus: §6+10☘
+     * REGEX-TEST: §7Piece Bonus: §6+10
      */
     private val lotusAbilityPattern by patternGroup.pattern(
         "lotusability",
-        "§7Piece Bonus: §6+(?<bonus>.*)☘",
-    )
-
-    // todo make pattern work on Melon and Cropie armor
-    private val armorAbilityFortunePattern by patternGroup.pattern(
-        "armorabilityfortune",
-        "§7.*§7Grants §6(?<bonus>.*)☘.*",
+        "§7Piece Bonus: §6+(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}",
     )
 
     /**
-     * REGEX-TEST:  Bonus: INACTIVE
-     * REGEX-TEST:  Bonus: +200☘ 29m
-     * REGEX-TEST:  Bonus: +200☘ 5m 2s
-     * REGEX-TEST:  Bonus: +200☘ 8s
+     * REGEX-TEST: §7Fermento Armor. §7Grants §60 Farming
+     */
+    // todo make pattern work on Melon and Cropie armor
+    private val armorAbilityFortunePattern by patternGroup.pattern(
+        "armorabilityfortune",
+        "§7.*§7Grants §6(?<bonus>.*)${FARMING_FORTUNE.hypixelIcon}.*",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Bonus: INACTIVE"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 29m"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 5m 2s"
+     * WRAPPED-REGEX-TEST: " Bonus: +200 8s"
      */
     private val pestFortuneBuffPattern by patternGroup.pattern(
         "pestfortunebuff-no-color",
-        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)☘ (?<time>.*))?.*",
+        " Bonus: (?<inactive>INACTIVE)?(?:\\+(?<fortune>\\d+)${FARMING_FORTUNE.hypixelIcon} (?<time>.*))?.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -199,7 +209,17 @@ object FarmingFortuneDisplay {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
+    }
+
+    private fun renderDisplay() {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null) return
@@ -207,13 +227,20 @@ object FarmingFortuneDisplay {
     }
 
     private fun pestBuffExpireWarning() {
-        if (config.bonusFortuneChat)
+        if (config.bonusFortuneChat) {
             ChatUtils.clickToActionOrDisable(
                 "§cPest fortune buff has expired!",
                 config::bonusFortuneChat,
-                "teleport to barn",
-                action = { HypixelCommands.teleportToPlot("barn") },
+                if (config.callPhillip) "call Phillip" else "teleport to the barn",
+                action = {
+                    if (config.callPhillip) {
+                        HypixelCommands.call("Phillip")
+                    } else {
+                        HypixelCommands.teleportToPlot("barn")
+                    }
+                },
             )
+        }
         if (config.bonusFortuneTitle) {
             TitleManager.sendTitle("§cPest Fortune Buff Has Expired!", duration = 3.seconds)
             playUserSound()
@@ -395,17 +422,17 @@ object FarmingFortuneDisplay {
         }
     }
 
-    fun getTurboCropFortune(tool: ItemStack?, cropType: CropType?): Double {
+    fun getTurboCropFortune(tool: SafeItemStack?, cropType: CropType?): Double {
         val crop = cropType ?: return 0.0
         return tool?.getHypixelEnchantments()?.get(crop.getTurboCrop())?.let { it * 5.0 } ?: 0.0
     }
 
-    fun getCollectionFortune(tool: ItemStack?): Double {
+    fun getCollectionFortune(tool: SafeItemStack?): Double {
         val string = tool?.getLore()?.nextAfter("§6Collection Analysis", 3) ?: return 0.0
         return collectionPattern.matchMatcher(string) { group("ff").toDoubleOrNull() } ?: 0.0
     }
 
-    fun getDedicationFortune(tool: ItemStack?, cropType: CropType?): Double {
+    fun getDedicationFortune(tool: SafeItemStack?, cropType: CropType?): Double {
         if (cropType == null) return 0.0
         val dedicationLevel = tool?.getHypixelEnchantments()?.get("dedication") ?: 0
         val dedicationMultiplier = listOf(0.0, 0.5, 0.75, 1.0, 2.0)[dedicationLevel]
@@ -413,10 +440,10 @@ object FarmingFortuneDisplay {
         return dedicationMultiplier * cropMilestone
     }
 
-    fun getSunderFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("sunder") ?: 0) * 12.5
-    fun getHarvestingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
-    fun getCultivatingFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
-    fun getPesterminatorFortune(tool: ItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
+    fun getSunderFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("sunder") ?: 0) * 12.5
+    fun getHarvestingFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("harvesting") ?: 0) * 12.5
+    fun getCultivatingFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("cultivating") ?: 0) * 2.0
+    fun getPesterminatorFortune(tool: SafeItemStack?) = (tool?.getHypixelEnchantments()?.get("pesterminator") ?: 0) * 2.0
 
     fun getAbilityFortune(internalName: NeuInternalName, lore: List<String>): Double {
         var pieces = 0
@@ -439,7 +466,7 @@ object FarmingFortuneDisplay {
         return 0.0
     }
 
-    fun loadFortuneLineData(tool: ItemStack?, enchantmentFortune: Double) {
+    fun loadFortuneLineData(tool: SafeItemStack?, enchantmentFortune: Double) {
         displayedFortune = 0.0
         reforgeFortune = 0.0
         gemstoneFortune = 0.0

@@ -29,7 +29,7 @@ class EnigmaSoulConfig {
             "Complete the first quest in the Rift to unlock this Hypixel feature."
     )
     @ConfigEditorInfoText
-    var tutorialHowToOpenRiftGuide: String = ""
+    val tutorialHowToOpenRiftGuide: String = ""
 
     @Expose
     @ConfigOption(name = "Color", desc = "Color of the Enigma Souls.")

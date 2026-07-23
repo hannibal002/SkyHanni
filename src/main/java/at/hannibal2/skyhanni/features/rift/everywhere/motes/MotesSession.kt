@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -33,7 +32,7 @@ object MotesSession {
     private val patternGroup = RepoPattern.group("rift.everywhere.motes")
 
     /**
-     * REGEX-TEST:  Lifetime Motes: 593,922
+     * WRAPPED-REGEX-TEST: " Lifetime Motes: 593,922"
      */
     private val lifetimeMotesPattern by patternGroup.pattern(
         "lifetime-nocolor",
@@ -62,9 +61,9 @@ object MotesSession {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Mote Millionaire".asComponent(),
-            "Become a millionaire 20 times over".asComponent(),
-            20f,
+            name = "Mote Millionaire",
+            description = "Become a millionaire 20 times over",
+            userLuckAmount = 20f,
         )
         event.register(achievement, MOTES_ACHIEVEMENT)
     }

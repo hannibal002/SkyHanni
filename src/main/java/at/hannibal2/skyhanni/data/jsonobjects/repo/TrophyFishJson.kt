@@ -9,7 +9,7 @@ data class TrophyFishJson(
 )
 
 data class TrophyFishInfo(
-    @Expose val displayName: String,
+    @Expose @SerializedName(value = "display_name", alternate = ["displayName"]) val displayName: String,
     @Expose val description: String,
     @Expose val rate: Int?,
     @Expose val fillet: Map<TrophyRarity, Int>,

@@ -35,7 +35,7 @@ class PowderChestTimerConfig {
     @Expose
     @ConfigOption(
         name = "Use Static Color",
-        desc = "Use a single color for the chest highlight instead of changing it depending of the time.",
+        desc = "Use a single color for the chest highlight instead of changing it depending on the time.",
     )
     @ConfigEditorBoolean
     var useStaticColor: Boolean = false
@@ -68,6 +68,18 @@ class PowderChestTimerConfig {
     @ConfigOption(name = "Line Count", desc = "Specify the number of chests to draw a line between.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
     var drawLineToChestAmount: Int = 5
+
+    @Expose
+    @ConfigOption(name = "Mute Chest Discovery Sound", desc = "Mute the sound from discovering treasure chests.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteChestDiscover: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Mute Chest Opening Sound", desc = "Mute the sound from opening treasure chests.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteChestOpen: Boolean = false
 
     @Expose
     @ConfigLink(owner = PowderChestTimerConfig::class, field = "enabled")

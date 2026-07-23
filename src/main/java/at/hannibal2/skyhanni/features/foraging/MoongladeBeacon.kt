@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.ModernPatterns
@@ -31,19 +32,20 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.math.abs
 import kotlin.time.Duration
@@ -90,7 +92,7 @@ object MoongladeBeacon {
             private val itemToColorMap = entries.associateBy { it.item }
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
-                val stack = this.item ?: return null
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
@@ -124,7 +126,7 @@ object MoongladeBeacon {
             }
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
-                val stack = this.item ?: return null
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
@@ -150,7 +152,7 @@ object MoongladeBeacon {
         companion object {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
-                val stack = this.item ?: return null
+                val stack = this.item.takeUnlessEmpty() ?: return null
                 return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
@@ -228,9 +230,7 @@ object MoongladeBeacon {
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
-    private fun ItemStack.isPaused(): Boolean {
-        return this.item == Items.RED_TERRACOTTA
-    }
+    private fun SafeItemStack.isPaused(): Boolean = this.`is`(Items.RED_TERRACOTTA)
 
     @HandleEvent
     fun onTick() {
@@ -334,7 +334,7 @@ object MoongladeBeacon {
 
     private fun Slot.performColorApplicableSet(block: (Pair<BeaconTuneData, BeaconColor>) -> Unit): Boolean {
         val tuningData = if (this.item.hasEnchantGlint()) enchantedTuning else normalTuning
-        val stackColor = this.item?.item?.getColorOrNull() ?: return false
+        val stackColor = this.item.itemType.getColorOrNull() ?: return false
         block.invoke(tuningData to stackColor)
         return true
     }
@@ -440,7 +440,7 @@ object MoongladeBeacon {
         val untilNextRefPitch get() = nextPitchPair.referenceUntil
         val untilNextOurPitch get() = nextPitchPair.oursUntil
 
-        fun handlePitch(pitch: BeaconPitch) = with(nextPitchPair) {
+        fun handlePitch(pitch: BeaconPitch): Unit = with(nextPitchPair) {
             if (isEnchanted && !upgradingStrength) return
             if (referenceUntil > acceptablePitchMargin || referenceUntil > oursUntil) return
             with(bufferPair[BeaconPieceTarget.REFERENCE]) {
@@ -479,7 +479,7 @@ object MoongladeBeacon {
             }
         }
 
-        private fun readCurrentFromSlot(slot: Slot) = slot.item?.let { stack ->
+        private fun readCurrentFromSlot(slot: Slot) = slot.item.let { stack ->
             if (isEnchanted && !upgradingStrength) return@let
             val ours = BeaconPieceTarget.OURS
             when (slot.containerSlot) {

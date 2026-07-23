@@ -28,7 +28,7 @@ object SkillTooltip {
         val stack = event.itemStack
         if (inventoryName == "Your Skills" && stack.getLoreComponent().any { it.string.contains("Click to view!") }) {
             val iterator = event.toolTip.listIterator()
-            val split = stack.cleanName().split(" ")
+            val split = stack.cleanName.split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: return
             val useRoman = split.last().isRoman()

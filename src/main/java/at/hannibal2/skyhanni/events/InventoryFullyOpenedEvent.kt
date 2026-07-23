@@ -5,20 +5,22 @@ import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
-import net.minecraft.world.item.ItemStack
 
+/**
+ * Sealed base class for inventory events that provide access to the current inventory's slot data.
+ *
+ * @see InventoryFullyOpenedEvent
+ * @see InventoryUpdatedEvent
+ */
 sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title
     val inventorySize: Int get() = inventory.slotCount
-    val inventoryItems: Map<Int, ItemStack> get() {
-        val items = inventory.items
-        items.entries.removeIf { !it.value.isNotEmpty() }
-        return items
-    }
-    val inventoryItemsWithNull: Map<Int, ItemStack?> by lazy {
+    val inventoryItems: Map<Int, SafeItemStack> = inventory.items.filterValues { it.isNotEmpty() }
+    val inventoryItemsWithNull: Map<Int, SafeItemStack?> by lazy {
         (0 until inventorySize).associateWith { inventoryItems[it] }
     }
     val inventoryItemsPrimitive: Map<Int, PrimitiveItemStack> by lazy {
@@ -49,4 +51,12 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
 @PrimaryFunction("onInventoryFullyOpened")
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
+/**
+ * Fired whenever the slot data of the currently open inventory changes.
+ *
+ * This fires once immediately after [InventoryFullyOpenedEvent] on initial open,
+ * and again on any subsequent slot update while the inventory remains open.
+ * Updates after the initial open are delayed by one tick.
+ */
+@PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
