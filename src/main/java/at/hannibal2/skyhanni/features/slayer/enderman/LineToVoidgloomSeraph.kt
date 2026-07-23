@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.slayer.spider
+package at.hannibal2.skyhanni.features.slayer.enderman
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -14,14 +14,14 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 
 @SkyHanniModule
-object LineToSpiderSlayer {
-    private val config get() = SlayerApi.config.spider
+object LineToVoidgloomSeraph {
+    private val config get() = SlayerApi.config.endermen
     private val bosses = mutableSetOf<Mob>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val mob = event.mob
-        if (SlayerType.getByName(mob.name) != SlayerType.TARANTULA) return
+        if (SlayerType.getByName(mob.name) != SlayerType.VOID) return
         if (!mob.belongsToPlayer()) return
         bosses += mob
     }
