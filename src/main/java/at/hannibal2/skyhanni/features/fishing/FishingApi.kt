@@ -47,6 +47,7 @@ import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
@@ -248,7 +249,7 @@ object FishingApi {
 
     private fun hasGuiOpen(): Boolean {
         val screen = MinecraftCompat.screen
-        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
+        return (screen is AbstractContainerScreen<*> || screen is AbstractSignEditScreen) && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)
