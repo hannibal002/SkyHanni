@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.combat.carrytracker
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierArguments
@@ -13,8 +12,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 @SkyHanniModule
 object CarryTrackerCommand {
 
-    @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    fun registerCarryCommand(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcarry") {
             description = "Keep track of carries you do."
             category = CommandCategory.USERS_ACTIVE

@@ -29,6 +29,11 @@ object KuudraApi {
         "scoreboard.tier",
         " §7⏣ §cKuudra's Hollow §8\\(T(?<tier>\\d+)\\)",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: " KUUDRA DOWN!"
+     * TODO find the actual number of spaces for this test, not that it matters
+     */
     private val completePattern by patternGroup.pattern(
         "chat.complete.colorless",
         "\\s*KUUDRA DOWN!",
@@ -58,7 +63,6 @@ object KuudraApi {
     )
 
     val kuudraArmorTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
-    val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     fun NeuInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
@@ -95,7 +99,7 @@ object KuudraApi {
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIsland = IslandType.KUUDRA_ARENA)
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (kuudraTier != null) return
         tierPattern.firstMatcher(event.added) {
@@ -117,10 +121,5 @@ object KuudraApi {
             val tier = kuudraTier ?: return
             KuudraCompleteEvent(tier).post()
         }
-    }
-
-    fun getKuudraRunTierNumber(displayName: String?): Int? {
-        if (displayName == null) return null
-        return KuudraTier.getByDisplayName(displayName)?.tierNumber
     }
 }
