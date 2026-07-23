@@ -138,7 +138,7 @@ object PowderTracker {
 
         for (reward in PowderChestReward.entries) {
             if (reward == PowderChestReward.GEMSTONE_POWDER) continue
-            reward.chatPattern.matchMatcher(msg) {
+            reward.chatPattern.matchMatcher(event.cleanMessage) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     val amount = groupOrNull("amount")?.formatLong() ?: 1
