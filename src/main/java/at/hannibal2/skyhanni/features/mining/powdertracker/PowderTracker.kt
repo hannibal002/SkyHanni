@@ -44,7 +44,7 @@ object PowderTracker {
      */
     private val pickedPattern by patternGroup.pattern(
         "picked.colorless",
-        "(?:\\s+)?CHEST LOCKPICKED(?:\\s+)?$",
+        " *CHEST LOCKPICKED *",
     )
 
     /**
