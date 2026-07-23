@@ -664,8 +664,8 @@ object ChatFilter {
             genericMiningRewardMessage.matchMatcher(event.message) {
                 val reward = groupOrEmpty("reward")
                 val amountFormat = groupOrNull("amount")?.let {
-                    "+ $it"
-                } ?: "+"
+                    "§a+ §b$it§r"
+                } ?: "§a+§r"
                 event.replaceComponent("$amountFormat $reward".asComponent(), "powder_gain")
             }
         }
