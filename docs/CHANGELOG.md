@@ -534,7 +534,7 @@
 + Fixed description for Auto-Load Shaft Routes giving incorrect examples for route names. - Luna (https://github.com/hannibal002/SkyHanni/pull/5904)
 + Fixed Glacite Mineshaft entrance/ladder waypoints being set to wrong location. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5858)
 + Fixed glacite tunnels auto commision not working due to hypixel update. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6015)
-+ Fixed mineshaft mayham perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
++ Fixed Mineshaft Mayhem perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
 + Fixed gemstones not being detected in treasure chests. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6030)
 + Fixed SkyMall/Mayhem perks not being detected from the inventory. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6108)
 
