@@ -103,10 +103,10 @@ allprojects {
 
         // SBIL for compat plugin
         exclusiveContent {
-            forRepository {
-                maven("https://maven.operationpotato.com/releases")
-                //maven("https://maven.operationpotato.com/snapshots")
-            }
+            forRepositories(
+                repositories.maven("https://maven.operationpotato.com/releases"),
+                repositories.maven("https://maven.operationpotato.com/snapshots"),
+            )
             filter {
                 includeGroup("com.operationpotato")
             }
