@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraft.world.SimpleContainer
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,7 +42,7 @@ object CFShortcut {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (IslandTypeTag.HOPPITY_DISALLOWED.isInIsland()) return
-        showItem = config.hoppityMenuShortcut && event.inventoryName == "SkyBlock Menu"
+        showItem = config.hoppityMenuShortcut && UtilsPatterns.skyblockMenuInventory.isInside()
     }
 
     @HandleEvent

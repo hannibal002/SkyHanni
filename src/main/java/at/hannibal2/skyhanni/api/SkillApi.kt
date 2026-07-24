@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -140,6 +141,15 @@ object SkillApi {
         "Max Skill level reached!"
     )
 
+    /**
+     * REGEX-TEST: Your Skills
+     */
+    private val skillMenuNamePattern by patternGroup.pattern(
+        "skill.menu.name",
+        "Your Skills"
+    )
+
+    val skillMenuDetector = InventoryDetector { skillMenuNamePattern }
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
     private val skillStorage get() = ProfileStorageData.profileSpecific?.skills
@@ -332,7 +342,7 @@ object SkillApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Your Skills") return
+        if (!skillMenuNamePattern.matches(event.inventoryName)) return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue

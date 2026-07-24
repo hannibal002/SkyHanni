@@ -59,11 +59,19 @@ object CoralFishHelper {
         "Fish Shown: (?<found>\\d+)/(?<total>\\d+)",
     )
 
+    /**
+     * REGEX-TEST: (1/31) Fish Family
+     * REGEX-TEST: (15/31) Fish Family
+     */
+    private val coralMenuPattern by patternGroup.pattern(
+        "inventory",
+        "\\(\\d+/\\d+\\) Fish Family",
+    )
+
     init {
         InventoryDetector(
-            pattern = "\\(\\d+/\\d+\\) Fish Family".toPattern(),
             onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-        )
+        ) { coralMenuPattern }
     }
 
     private var display = emptyList<Renderable>()

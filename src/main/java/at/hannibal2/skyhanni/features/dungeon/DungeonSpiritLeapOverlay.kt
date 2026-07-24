@@ -43,13 +43,21 @@ object DungeonSpiritLeapOverlay {
     private val config get() = SkyHanniMod.feature.dungeon.spiritLeapOverlay
     private val colorConfig get() = config.colorConfig
 
+    /**
+     * REGEX-TEST: Spirit Leap
+     * REGEX-TEST: Teleport to Player
+     */
+    private val inventoryMenuPattern by DungeonApi.patternGroup.pattern(
+        "spirit-leap.menu",
+        "Spirit Leap|Teleport to Player",
+    )
+
     private var scaleFactor: Double = 1.0
     private var overlayPosition: Position? = null
     private var containerWidth = 0
     private var containerHeight = 0
     private var playerList = emptyList<PlayerStackInfo>()
-    private val validInventoryNames = setOf("Spirit Leap", "Teleport to Player")
-    private val inventory = InventoryDetector { it in validInventoryNames }
+    private val inventory = InventoryDetector { inventoryMenuPattern }
 
     data class PlayerStackInfo(val playerInfo: DungeonApi.TeamMember?, val stack: SafeItemStack, val slotNumber: Int)
 

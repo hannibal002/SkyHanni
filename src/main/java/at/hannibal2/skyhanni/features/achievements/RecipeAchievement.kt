@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -23,7 +23,6 @@ object RecipeAchievement {
     )
 
     private const val RECIPE_ACHIEVEMENT = "Recipe Unlocker"
-    val sbMenuDetector = InventoryDetector(checkInventoryName = { it == "SkyBlock Menu" })
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -38,7 +37,7 @@ object RecipeAchievement {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!sbMenuDetector.isInside()) return
+        if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
         val recipeSlot = 21
         val lore = event.inventoryItems[recipeSlot]?.getLoreComponent() ?: return
         for (line in lore) {

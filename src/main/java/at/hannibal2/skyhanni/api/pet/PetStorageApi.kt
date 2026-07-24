@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -570,7 +572,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readEquipmentPetData() {
-        if (inventoryName != "Your Equipment and Stats") return
+        if (!CurrentEquipmentApi.inventory.isInside()) return
         val petStorage = petStorage ?: return
         val currentPetItem = inventoryItems[EQUIP_MENU_CURRENT_PET_SLOT]?.takeIf {
             it.hoverName.string != "Empty Pet Slot"
@@ -590,7 +592,7 @@ object PetStorageApi {
 
         val petItemSlot = when {
             isPetMenu -> PET_MENU_CURRENT_PET_SLOT
-            inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
+            UtilsPatterns.skyblockMenuInventory.isInside() -> SB_MENU_CURRENT_PET_SLOT
             else -> return
         }
         val currentPetItem = inventoryItems[petItemSlot] ?: return

@@ -166,7 +166,7 @@ object PestApi {
         "stereo.inventory",
         "Stereo Harmony",
     )
-    val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
+    val stereoInventory = InventoryDetector { stereoInventoryPattern }
 
     /**
      * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)

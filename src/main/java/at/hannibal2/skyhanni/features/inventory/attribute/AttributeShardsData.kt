@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -58,23 +57,31 @@ object AttributeShardsData {
 
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
-    ) { name -> attributeMenuPattern.matches(name) }
+    ) { attributeMenuPattern }
     val huntingBoxInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { name -> huntingBoxPattern.matches(name) }
+    ) { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
-        pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
-    )
+    ) { bazaarShardsInventoryPattern }
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
-    ) { name -> name == "Confirm Fusion" }
-    val fusionBoxInventory = InventoryDetector { name -> fusionBoxPattern.matches(name) }
-    val shardFusionInventory = InventoryDetector { name -> shardFusionPattern.matches(name) }
+    ) { confirmFusionPattern }
+    val fusionBoxInventory = InventoryDetector { fusionBoxPattern }
+    val shardFusionInventory = InventoryDetector { shardFusionPattern }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
+
+    /**
+     * REGEX-TEST: (1/3) Oddities ➜ Shards
+     * REGEX-TEST: Oddities ➜ Shards
+     */
+    val bazaarShardsInventoryPattern by patternGroup.pattern(
+        "bazaar.shards.inventory",
+        "(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards",
+    )
 
     /**
      * REGEX-TEST: Attribute Menu
@@ -94,6 +101,14 @@ object AttributeShardsData {
     private val huntingBoxPattern by patternGroup.pattern(
         "hunting-box",
         "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Confirm Fusion
+     */
+    private val confirmFusionPattern by patternGroup.pattern(
+        "confirm-fusion",
+        "Confirm Fusion",
     )
 
     /**
