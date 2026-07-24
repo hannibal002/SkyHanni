@@ -75,7 +75,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
-
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
