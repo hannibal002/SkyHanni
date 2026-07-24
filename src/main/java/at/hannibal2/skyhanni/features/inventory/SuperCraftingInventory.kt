@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.inventory.Slot
 import kotlin.time.Duration.Companion.seconds
 
@@ -37,7 +37,7 @@ object SuperCraftingInventory {
     private const val RESULT_SLOT = 25
     private val config get() = SkyHanniMod.feature.inventory.superCrafting.waste
 
-    private val craftingPatternGroup = RepoPatternGroup("supercrafting-inventory")
+    private val craftingPatternGroup = RepoPattern.group("supercrafting-inventory")
 
     /**
      * REGEX-TEST: Crafting 1,111 items into your sacks!
