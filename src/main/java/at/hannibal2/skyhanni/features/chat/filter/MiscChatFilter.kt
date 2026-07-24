@@ -22,7 +22,7 @@ object MiscChatFilter {
             UselessNotificationFilter,
             PartyFilter,
             AuctionHouseFilter,
-            BazzarFilter,
+            BazaarFilter,
             UselessWarningFilter,
             AnnoyingSpamFilter,
             RewardBundleFilter,
@@ -248,7 +248,7 @@ object MiscChatFilter {
         )
     }
 
-    object BazzarFilter : RegexChatFilter("bazaar") {
+    object BazaarFilter : RegexChatFilter("bazaar") {
         override fun isEnabled(): Boolean = config.others
 
         override val patterns by patternGroup.list(
