@@ -26,12 +26,20 @@ internal object PetStoragePatterns {
         "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
     )
 
+    /**
+     * REGEX-TEST: Pets
+     */
+    private val mainPetMenuTitleItemNamePattern by patternGroup.pattern(
+        "menu.gui.titleitem.name",
+        "Pets",
+    )
+
     val mainMenuInventory = InventoryDetector(
         checkInventoryName = {
             if (!mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
             // Forge pets menu is also called "Pets", but doesn't have this item
             val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
-            return@InventoryDetector mainPetMenuNamePattern.matches(titleItem.cleanName)
+            return@InventoryDetector mainPetMenuTitleItemNamePattern.matches(titleItem.cleanName)
         }
     )
 
