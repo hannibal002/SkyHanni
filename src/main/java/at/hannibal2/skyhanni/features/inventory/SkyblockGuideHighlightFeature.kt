@@ -272,7 +272,8 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
                 "attribute.disable",
-                "Attribute Menu",
+                // TODO: Not duplicate from AttributeShardsData
+                "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
                 "§7Enabled: §cNo",
             )
         }

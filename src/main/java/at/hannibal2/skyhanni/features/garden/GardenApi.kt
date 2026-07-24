@@ -70,6 +70,7 @@ import kotlin.time.Duration.Companion.minutes
 object GardenApi {
 
     private const val GARDEN_OVERFLOW_EXP = 10000
+
     private val RARE_MOOSHROOM_COW_PET = "MOOSHROOM_COW;2".toInternalName()
     val SQUEAKY_MOUSEMAT = "SQUEAKY_MOUSEMAT".toInternalName()
     val SUNS_GRASP = "SUNS_GRASP".toInternalName()
@@ -251,8 +252,8 @@ object GardenApi {
         // TODO Reevaluate this if Hypixel ever adds right click harvest crops
         if (event.clickType != InteractClickType.LEFT_CLICK) return
 
+        val cropBroken = event.getCropType() ?: return
         val blockState = event.blockState
-        val cropBroken = blockState.getCropType(event.position) ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
 
         val position = event.position
