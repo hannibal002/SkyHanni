@@ -197,11 +197,7 @@ object PetStorageApi {
         else -> this.skinTag?.removeColor() == skinTag.removeColor()
     }
 
-    fun isMainPetMenuName(inventoryName: String?): Boolean =
-        PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
-
-    fun isFalsePositivePetMenuLore(lore: List<String>): Boolean =
-        PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)
+    fun isMainPetMenuName(): Boolean = PetStoragePatterns.mainMenuInventory.isInside()
 
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
@@ -215,12 +211,8 @@ object PetStorageApi {
                 PetUtils.petWithRarityToInternalName(petName, rarity)
             }
             val petSkin = getPetSkinOrNull(petInternalName)
-            val lore = getCleanLore()
-            if (isFalsePositivePetMenuLore(lore)) {
-                return@matchStyledMatcher null
-            }
 
-            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(lore) {
+            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(getCleanLore()) {
                 val currentValue = group("current").formatDouble()
                 when (groupOrNull("next")) {
                     null -> currentValue
@@ -503,8 +495,7 @@ object PetStorageApi {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val inventoryName = InventoryUtils.openInventoryName()
-        if (!isMainPetMenuName(inventoryName)) return
+        if (!isMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
         val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
@@ -543,7 +534,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readExactPetMenuPets(): Set<UUID> {
-        if (!isMainPetMenuName(inventoryName)) return emptySet()
+        if (!isMainPetMenuName()) return emptySet()
         val petStorage = petStorage ?: return emptySet()
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         val exactPetUuids = mutableSetOf<UUID>()
@@ -584,7 +575,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
-        val isPetMenu = isMainPetMenuName(inventoryName)
+        val isPetMenu = isMainPetMenuName()
         val exactMenuPetUuids = readExactPetMenuPets()
         if (isPetMenu && lastExactPetMenuClick.passedSince() < 5.seconds) return
 

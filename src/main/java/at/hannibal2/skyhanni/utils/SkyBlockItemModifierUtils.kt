@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.api.pet.PetStorageApi
-import at.hannibal2.skyhanni.api.pet.PetStoragePatterns
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.fishing.FishingApi.getFishingRodPart
@@ -10,14 +8,12 @@ import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.containsCompound
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getStringList
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isPositive
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.getBooleanOrDefault
 import at.hannibal2.skyhanni.utils.compat.getByteOrDefault
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
@@ -153,8 +149,6 @@ object SkyBlockItemModifierUtils {
         }?.getStringOrDefault("petInfo")?.takeIf {
             it.isNotEmpty()
         } ?: return null
-
-        if (PetStorageApi.isFalsePositivePetMenuLore(getCleanLore())) return null
 
         return try {
             ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)

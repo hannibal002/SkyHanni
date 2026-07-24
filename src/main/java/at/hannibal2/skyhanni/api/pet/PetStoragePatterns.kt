@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.api.pet
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -17,9 +21,18 @@ internal object PetStoragePatterns {
      * REGEX-TEST: Pets: "e" (1/2)
      * REGEX-TEST: (6/6) Pets: "e"
      */
-    val mainPetMenuNamePattern by patternGroup.pattern(
+    private val mainPetMenuNamePattern by patternGroup.pattern(
         "menu.gui.name",
         "(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?<search>.*)\")?(?: \\(\\d+\\/\\d+\\))? ?",
+    )
+
+    val mainMenuInventory = InventoryDetector(
+        checkInventoryName = {
+            if (!mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
+            // Forge pets menu is also called "Pets", but doesn't have this item
+            val titleItem = InventoryUtils.getItemAtSlotIndex(4) ?: return@InventoryDetector false
+            return@InventoryDetector mainPetMenuNamePattern.matches(titleItem.cleanName)
+        }
     )
 
     /**
