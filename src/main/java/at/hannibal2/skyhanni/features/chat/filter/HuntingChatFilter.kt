@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.IslandDetector
 
 object HuntingChatFilter {
-    private val patternGroup = ChatFilter.chatFilterGroup.group("hunting")
-    private val config get() = ChatFilter.config.hunting
+    private val patternGroup = CoreChatFilter.chatFilterGroup.group("hunting")
+    private val config get() = CoreChatFilter.config.hunting
 
     val islandDetector = IslandDetector(
         island = IslandType.GALATEA,

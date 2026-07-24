@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.utils.IslandDetector
 
 object FarmingChatFilter {
-    private val patternGroup = ChatFilter.chatFilterGroup.group("farming")
-    private val config get() = ChatFilter.config
-    private val generalConfig get() = ChatFilter.generalConfig
+    private val patternGroup = CoreChatFilter.chatFilterGroup.group("farming")
+    private val config get() = CoreChatFilter.config
+    private val generalConfig get() = CoreChatFilter.generalConfig
 
     private val islandDetector =
         IslandDetector(

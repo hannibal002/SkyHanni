@@ -1,27 +1,13 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
 
 interface ChatFilter {
-
-    /**
-     * Whether this filter should even run.
-     */
-    fun isEnabled(): Boolean
-
     /**
      * Return a reason to block.
      */
-    fun block(message: String): String? = null
-
-    companion object {
-        val chatFilterGroup = RepoPattern.group("chat-filter")
-        val generalConfig get() = SkyHanniMod.feature.chat
-        val config get() = SkyHanniMod.feature.chat.filterType
-    }
+    fun block(message: String): String?
 }
 
 abstract class RegexChatFilter protected constructor(
@@ -34,7 +20,7 @@ abstract class RegexChatFilter protected constructor(
         }
     }
 
-    override fun isEnabled(): Boolean = true
+    protected open fun isEnabled(): Boolean = true
 
     protected abstract val patterns: List<Pattern>
 

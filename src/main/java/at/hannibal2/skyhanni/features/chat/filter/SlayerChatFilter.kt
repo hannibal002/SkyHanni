@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object SlayerChatFilter {
-    private val patternGroup = ChatFilter.chatFilterGroup.group("slayer")
-    private val config get() = ChatFilter.config
+    private val patternGroup = CoreChatFilter.chatFilterGroup.group("slayer")
+    private val config get() = CoreChatFilter.config
 
     private fun isEnabled(): Boolean = config.others
 

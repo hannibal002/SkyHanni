@@ -11,29 +11,32 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.concurrent.ConcurrentHashMap
 
 @SkyHanniModule
 object CoreChatFilter {
 
-    private val config get() = SkyHanniMod.feature.chat.filterType
+    val chatFilterGroup = RepoPattern.group("chat-filter")
+    val generalConfig get() = SkyHanniMod.feature.chat
+    val config get() = SkyHanniMod.feature.chat.filterType
 
-    private val chatFilterGroups = ConcurrentHashMap.newKeySet<ChatFilter>()
+    private val chatFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
 
     fun add(filter: ChatFilter) {
-        chatFilterGroups.plus(filter)
+        chatFilters.plus(filter)
     }
 
     fun remove(filter: ChatFilter) {
-        chatFilterGroups.minus(filter)
+        chatFilters.minus(filter)
     }
 
     fun add(filters: Set<ChatFilter>) {
-        chatFilterGroups.plus(filters)
+        chatFilters.plus(filters)
     }
 
     fun remove(filters: Set<ChatFilter>) {
-        chatFilterGroups.minus(filters)
+        chatFilters.minus(filters)
     }
 
     @HandleEvent
@@ -57,7 +60,7 @@ object CoreChatFilter {
      * @return The reason why the message was blocked, empty if not blocked
      */
     private fun block(message: String): String? {
-        return chatFilterGroups.firstNotNullOfOrNull { it.block(message) }
+        return chatFilters.firstNotNullOfOrNull { it.block(message) }
     }
 
     /**

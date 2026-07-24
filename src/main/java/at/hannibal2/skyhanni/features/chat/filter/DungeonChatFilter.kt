@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.IslandDetector
 
 @SkyHanniModule
 object DungeonChatFilter {
-    private val patternGroup = ChatFilter.chatFilterGroup.group("dungeon")
+    private val patternGroup = CoreChatFilter.chatFilterGroup.group("dungeon")
     private val config get() = SkyHanniMod.feature.dungeon.messageFilter
 
     val islandDetector = IslandDetector(
