@@ -2,17 +2,20 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.KeyMapping
 import net.minecraft.client.Minecraft
+import net.minecraft.client.ToggleKeyMapping
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import org.lwjgl.glfw.GLFW
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
@@ -25,11 +28,13 @@ object GardenCustomKeybinds {
     private val mcSettings get() = Minecraft.getInstance().options
 
     private var map: Map<KeyMapping, Int> = emptyMap()
+    private val pressedToggleKeys = mutableMapOf<KeyMapping, Int>()
     private var lastWindowOpenTime = SimpleTimeMark.farPast()
+    private var wasActive = false
 
     @JvmStatic
-    fun isKeyDown(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
+    fun isKeyDown(keyBinding: KeyMapping, isDown: Boolean, cir: CallbackInfoReturnable<Boolean>) {
+        if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
             if (map.containsValue(keyBinding.key.value)) {
                 cir.returnValue = false
@@ -37,30 +42,38 @@ object GardenCustomKeybinds {
             return
         }
 
-        cir.returnValue = override.isKeyHeld()
+        cir.returnValue = when {
+            !keyBinding.isToggle() -> override.isKeyHeld()
+            keyBinding.isRemappedFrom(override) -> keyBinding.updateToggleState(override, isDown)
+            else -> isDown
+        }
     }
 
     @JvmStatic
     fun isKeyPressed(keyBinding: KeyMapping, cir: CallbackInfoReturnable<Boolean>) {
-        if (!isActive()) return
+        if (!updateActiveState()) return
         val override = map[keyBinding] ?: run {
             if (map.containsValue(keyBinding.key.value)) {
                 cir.returnValue = false
             }
             return
         }
-        cir.returnValue = override.isKeyClicked()
+        cir.returnValue = if (keyBinding.isToggle() && keyBinding.isRemappedFrom(override)) {
+            keyBinding.consumeToggleClick(override)
+        } else {
+            override.isKeyClicked()
+        }
     }
 
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
-        val screen = Minecraft.getInstance().screen ?: return
+        val screen = MinecraftCompat.screen ?: return
         if (screen !is SignEditScreen) return
         lastWindowOpenTime = SimpleTimeMark.now()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     fun onConfigLoad() {
         with(config) {
             ConditionalUtils.onToggle(attack, useItem, left, right, forward, back, jump, sneak) {
@@ -71,6 +84,8 @@ object GardenCustomKeybinds {
     }
 
     private fun update() {
+        pressedToggleKeys.clear()
+        wasActive = false
         with(config) {
             with(mcSettings) {
                 map = buildMap {
@@ -91,18 +106,73 @@ object GardenCustomKeybinds {
         KeyMapping.releaseAll()
     }
 
+    private fun updateActiveState(): Boolean {
+        val active = isActive()
+        if (wasActive == active) return active
+
+        wasActive = active
+        pressedToggleKeys.clear()
+        if (active) primePressedToggleKeys()
+        return active
+    }
+
+    private fun primePressedToggleKeys() {
+        for ((keyBinding, override) in map) {
+            if (keyBinding.isToggle() && keyBinding.isRemappedFrom(override) && override.isKeyHeld()) {
+                pressedToggleKeys[keyBinding] = override
+            }
+        }
+    }
+
+    private fun KeyMapping.isToggle(): Boolean =
+        this is ToggleKeyMapping && needsToggle.asBoolean
+
+    private fun KeyMapping.isRemappedFrom(override: Int): Boolean =
+        key.value != override
+
+    private fun KeyMapping.updateToggleState(override: Int, isDown: Boolean): Boolean {
+        if (!override.isKeyHeld()) {
+            pressedToggleKeys.remove(this, override)
+            return isDown
+        }
+        if (pressedToggleKeys[this] == override) return isDown
+
+        pressedToggleKeys[this] = override
+        setDown(true)
+        return !isDown
+    }
+
+    private fun KeyMapping.consumeToggleClick(override: Int): Boolean {
+        if (!override.isKeyHeld()) {
+            pressedToggleKeys.remove(this, override)
+            return false
+        }
+        if (pressedToggleKeys[this] == override) return false
+
+        pressedToggleKeys[this] = override
+        isDown = true
+        return true
+    }
+
     private fun isEnabled(): Boolean =
         GardenApi.inGarden() &&
             config.enabled &&
             !(GardenApi.onUnfarmablePlot && config.excludeBarn)
 
+    private fun isHoldingTool(): Boolean =
+        GardenApi.hasFarmingToolInHand() ||
+            (config.mousemat && GardenApi.hasMousematInHand()) ||
+            (config.vacuum && PestApi.hasVacuumInHand()) ||
+            (config.fishingRod && FishingApi.holdingRod) ||
+            (config.sunsGrasp && GardenApi.hasActiveSunsGrasp())
+
     private fun isActive(): Boolean =
         isEnabled() &&
-            GardenApi.toolInHand != null &&
+            isHoldingTool() &&
             !hasGuiOpen() &&
             lastWindowOpenTime.passedSince() > 300.milliseconds
 
-    private fun hasGuiOpen() = Minecraft.getInstance().screen != null
+    private fun hasGuiOpen() = MinecraftCompat.screen != null
 
     @JvmStatic
     fun disableAll() {

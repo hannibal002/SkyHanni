@@ -40,19 +40,21 @@ object AnitaExtraFarmingFortune {
 
         if (InventoryUtils.openInventoryName() != "Anita") return
 
-        if (!event.itemStack.cleanName().contains("Extra Farming Fortune")) return
+        if (!event.itemStack.cleanName.contains("Extra Farming Fortune")) return
 
         val anitaUpgrade = GardenApi.storage?.fortune?.anitaUpgrade ?: return
 
         var contributionFactor = 1.0
         val baseAmount = levelPrice[anitaUpgrade + 1]?.jacobTickets ?: return
-        for (line in event.toolTip) {
-            realAmountPattern.matchMatcher(line) {
-                val realAmount = group("realAmount").formatDouble()
-                contributionFactor = realAmount / baseAmount
+        if (baseAmount > 0) {
+            for (line in event.toolTip) {
+                realAmountPattern.matchMatcher(line) {
+                    val realAmount = group("realAmount").formatDouble()
+                    contributionFactor = realAmount / baseAmount
+                }
             }
         }
-
+// TODO Verify and fix jacobTickets calculation with tier 0 (divides by 0)
         var goldMedals = 0
         var jacobTickets = 0
         for ((level, price) in levelPrice) {

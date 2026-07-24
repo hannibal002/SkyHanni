@@ -3,42 +3,40 @@ package at.skyhanni.sharedvariables
 enum class ProjectTarget(
     val projectName: String,
     val minecraftVersion: MinecraftVersion,
-    val mappingDependency: String,
-    val mappingStyle: MappingStyle,
-    val fabricLoaderVersion: String? = null,
-    val fabricApiVersion: String? = null,
-    val modMenuVersion: String? = null,
-    val modrinthInfo: ModrinthInfo? = null,
+    val fabricLoaderVersion: String,
+    val fabricApiVersion: String,
+    val hypixelModApiVersion: String,
+    val hypixelModApiFabricVersion: String,
+    val modMenuVersion: String,
+    val modrinthInfo: ModrinthInfo,
 ) {
-    MODERN_12110(
-        "1.21.10",
-        MinecraftVersion.MC12110,
-        "official",
-        MappingStyle.SEARGE,
-        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.138.4+1.21.10",
-        modMenuVersion = "16.0.0-rc.1",
-        modrinthInfo = ModrinthInfo.FABRIC_1_21_10,
-    ),
     MODERN_12111(
         "1.21.11",
         MinecraftVersion.MC12111,
-        "official",
-        MappingStyle.SEARGE,
-        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.18.4",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.141.2+1.21.11",
-        modMenuVersion = "17.0.0-beta.2",
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.141.5+1.21.11",
+        hypixelModApiVersion = "net.hypixel:mod-api:1.0.1",
+        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21",
+        modMenuVersion = "17.0.0",
         modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
+    ),
+    MODERN_26100(
+        "26.1",
+        MinecraftVersion.MC26100,
+        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
+        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.155.2+26.1.2",
+        hypixelModApiVersion = "net.hypixel:mod-api:1.0.2",
+        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.2+build.1+mc26.1",
+        modMenuVersion = "18.0.0",
+        modrinthInfo = ModrinthInfo.FABRIC_26_1,
     ),
     ;
 
     val projectPath get() = ":$projectName"
 
     companion object {
-        fun activeVersions() = values().filter { MultiVersionStage.activeState.shouldCreateProject(it) }
-
         fun findByMcVersion(mcVersion: String): ProjectTarget? {
-            return values().find { it.minecraftVersion.versionName == mcVersion }
+            return entries.find { it.minecraftVersion.versionName == mcVersion }
         }
     }
 }

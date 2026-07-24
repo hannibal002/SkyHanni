@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -47,7 +47,8 @@ object FastFairySoulsPathfinder {
     // TODO this does not work with glacite tunnels, should prob use strings and add the same workaround we have for graph area
     // TODO also once this is fixed, add a chat message when finding the last soul in dwarven mines and have not yet found the souls in glacite tunnels
     private val foundSouls get() = ProfileStorageData.profileSpecific?.fairySouls?.found ?: mutableMapOf()
-    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound ?: mutableMapOf()
+    private val totalFound get() = ProfileStorageData.profileSpecific?.fairySouls?.totalFound
+        ?: mutableMapOf()
 
     private var data: Data? = null
 
@@ -213,7 +214,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
             // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
             // which is distinct from finding it on an island.
             val found = stack.getLoreComponent().firstOrNull()?.let {
@@ -297,7 +298,7 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
+        if (duplicatePattern.matches(event.cleanMessage) || newPattern.matches(event.cleanMessage)) {
             data?.foundNearby()
         }
     }
@@ -309,7 +310,7 @@ object FastFairySoulsPathfinder {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Fairy Souls Pathfinder")
 
         if (!isEnabled()) return event.addIrrelevant("disabled")

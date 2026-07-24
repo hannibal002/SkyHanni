@@ -1,8 +1,12 @@
+@file:Suppress("AnnotationOnSameLine", "AnnotationOnSeparateLine")
+
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import net.minecraft.world.item.ItemStack
 
+/**
+ * Deprecated entries should not be removed, they are kept to avoid errors with unupdated items.
+ */
 enum class ItemCategory {
     SWORD,
     LONGSWORD,
@@ -10,10 +14,11 @@ enum class ItemCategory {
     SHORT_BOW,
     WAND,
     FISHING_ROD,
+    @Legacy("No longer exists") FISHING_WEAPON,
     ROD_PART,
     AXE,
     GAUNTLET,
-    HOE,
+    @Legacy("No longer exists", ReplaceWith("ItemCategory.FARMING_TOOL")) HOE,
     PICKAXE,
     SHOVEL,
     DRILL,
@@ -41,10 +46,11 @@ enum class ItemCategory {
     TROPHY_FISH,
     ARROW,
     ARROW_POISON,
-    ITEM,
+    // TODO This was previously used as a fake category for uncategorized dungeon items.
+    //  Remove it after ensuring it doesn't break anything.
+    @Deprecated("Legacy fake category", ReplaceWith("ItemCategory.NONE")) ITEM,
     PET_ITEM,
     ENCHANTED_BOOK,
-    FISHING_BAIT,
     POTION,
     RIFT_TIMECHARM,
     COSMETIC,
@@ -68,13 +74,18 @@ enum class ItemCategory {
     GARDEN_CHIP,
     MUTATION,
     WATERING_CAN,
+    FARMING_TOOL,
+    TROPHY,
+    CAPSULE,
 
     NONE,
     ;
 
+    fun isDeprecated(): Boolean = this.javaClass.getField(name).getAnnotation(Deprecated::class.java) != null
+
     companion object {
 
-        fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
+        fun Collection<ItemCategory>.containsItem(stack: SafeItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)

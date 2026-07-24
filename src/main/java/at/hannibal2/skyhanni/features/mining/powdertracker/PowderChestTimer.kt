@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.nucleus.PowderChestTimerConfig
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.events.BlockClickEvent
@@ -62,6 +62,12 @@ object PowderChestTimer {
     fun onPlaySound(event: PlaySoundEvent) {
         if (event.soundName == "entity.player.levelup" && event.pitch == 1f && event.volume == 1.0f) {
             lastSound = SimpleTimeMark.now()
+            if (config.muteChestDiscover) event.cancel()
+        }
+        if (config.muteChestOpen && event.soundName == "block.chest.open" &&
+            event.pitch == 1f && event.volume == 1.0f
+        ) {
+            event.cancel()
         }
     }
 
@@ -110,7 +116,7 @@ object PowderChestTimer {
         if (HotmData.GREAT_EXPLORER.activeLevel < 20) return
 
         if (location.isOpened()) return
-        if (event.clickType == ClickType.RIGHT_CLICK) {
+        if (event.clickType == InteractClickType.RIGHT_CLICK) {
             chests.remove(location)
             return
         }
@@ -124,7 +130,7 @@ object PowderChestTimer {
         display = drawDisplay()?.let(Renderable::text)
 
         chests.keys.removeIf { pos ->
-            ((MinecraftCompat.localWorld.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f
+            ((MinecraftCompat.localWorldOrThrow.getBlockEntity(pos.toBlockPos()) as? ChestBlockEntity)?.getOpenNess(1f) ?: 0f) > 0f
         }
     }
 

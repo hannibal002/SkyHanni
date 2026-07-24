@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.render.gui.ScreenDrawnEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -15,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -33,10 +32,11 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import kotlin.time.Duration.Companion.minutes
@@ -61,39 +61,69 @@ object GardenVisitorShoppingList {
 
     private fun drawDisplay() = buildList {
         if (!config.enabled) return@buildList
-        val (shoppingList, newVisitors) = prepareDrawingData()
+        val (shoppingList, activeVisitors) = prepareDrawingData()
+        val (newVisitors, knownVisitors) = activeVisitors.partition { visitor ->
+            visitor.shoppingList.isEmpty()
+        }
 
         drawShoppingList(shoppingList)
-        drawVisitors(newVisitors, shoppingList)
+        drawVisitorSection(
+            visitors = newVisitors,
+            header = "New Visitor",
+            renderer = {
+                drawNewVisitor(it)
+            },
+        )
+        drawVisitorSection(
+            visitors = knownVisitors,
+            header = "Visitor",
+            renderer = {
+                drawVisitor(it)
+            },
+        )
+    }
+
+    private fun MutableList<Renderable>.drawVisitorSection(
+        visitors: List<VisitorApi.Visitor>,
+        header: String,
+        renderer: MutableList<Renderable>.(VisitorApi.Visitor) -> Unit,
+    ) {
+        if (visitors.isEmpty()) return
+
+        if (isNotEmpty()) addString("")
+
+        val amount = visitors.size
+        val noun = if (amount == 1) header else "${header}s"
+
+        addString("§e$amount §7$noun:")
+
+        visitors.forEach { renderer(it) }
     }
 
     /**
      * Aggregates shopping lists from all active visitors.
-     * @return Pair of (globalShoppingList, newVisitorNames)
+     * Items from ignored visitors are excluded from the aggregated list.
+     * @return Pair of (globalShoppingList, activeVisitors)
      */
-    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<String>> {
+    private fun prepareDrawingData(): Pair<MutableMap<NeuInternalName, Int>, MutableList<VisitorApi.Visitor>> {
         val globalShoppingList = mutableMapOf<NeuInternalName, Int>()
-        val newVisitors = mutableListOf<String>()
+        val activeVisitors = mutableListOf<VisitorApi.Visitor>()
 
-        for ((visitorName, visitor) in VisitorApi.getVisitorsMap()) {
+        for ((_, visitor) in VisitorApi.getVisitorsMap()) {
             if (visitor.status == VisitorApi.VisitorStatus.ACCEPTED ||
                 visitor.status == VisitorApi.VisitorStatus.REFUSED
             ) continue
 
-            if (visitor.visitorName.removeColor() == "Spaceman" &&
-                config.ignoreSpaceman
-            ) continue
+            activeVisitors.add(visitor)
 
-            val shoppingList = visitor.shoppingList
-            if (shoppingList.isEmpty()) {
-                newVisitors.add(visitorName)
-            }
-            for ((internalName, amount) in shoppingList) {
+            if (visitor.ignoreShoppingList) continue
+
+            for ((internalName, amount) in visitor.shoppingList) {
                 val old = globalShoppingList.getOrDefault(internalName, 0)
                 globalShoppingList[internalName] = old + amount
             }
         }
-        return globalShoppingList to newVisitors
+        return globalShoppingList to activeVisitors
     }
 
     /**
@@ -122,7 +152,7 @@ object GardenVisitorShoppingList {
                     tips = internalName.createBuyTip(),
                     onLeftClick = {
                         if (!GardenApi.inGarden()) return@clickable
-                        if (Minecraft.getInstance().screen is SignEditScreen) {
+                        if (MinecraftCompat.screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
@@ -191,7 +221,7 @@ object GardenVisitorShoppingList {
             val renderable = Renderable.clickable(
                 "§aCraftable!",
                 {
-                    if (Minecraft.getInstance().screen is SignEditScreen) {
+                    if (MinecraftCompat.screen is SignEditScreen) {
                         SignUtils.setTextIntoSign("$leftToCraft")
                     } else {
                         HypixelCommands.viewRecipe(internalName)
@@ -205,33 +235,18 @@ object GardenVisitorShoppingList {
     }
 
     /**
-     * Builds the "New Visitors" section showing visitors without known requirements.
+     * Draws a single new-visitor entry with item preview.
+     * Click toggles [VisitorApi.Visitor.ignoreShoppingList].
      */
-    private fun MutableList<Renderable>.drawVisitors(newVisitors: List<String>, shoppingList: Map<NeuInternalName, Int>) {
-        if (newVisitors.isEmpty()) return
-        if (shoppingList.isNotEmpty()) {
-            addString("")
-        }
-        val amount = newVisitors.size
-        val visitorLabel = if (amount == 1) "visitor" else "visitors"
-        addString("§e$amount §7new $visitorLabel:")
-        for (visitor in newVisitors) {
-            drawVisitor(visitor)
-        }
-    }
-
-    /**
-     * Draws a single visitor entry with item preview.
-     */
-    private fun MutableList<Renderable>.drawVisitor(visitorName: String) {
-        val displayName = GardenVisitorColorNames.getColoredName(visitorName)
+    private fun MutableList<Renderable>.drawNewVisitor(visitor: VisitorApi.Visitor) {
+        val visitorName = visitor.visitorName
 
         val list = mutableListOf<Renderable>()
-        list.addString(" §7- $displayName")
+        list.addString(" §7- $visitorName")
 
         if (config.itemPreview) {
-            val visitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
-            val items = visitor?.needItems
+            val repoVisitor = GardenVisitorColorNames.visitorMap[visitorName.removeColor()]
+            val items = repoVisitor?.needItems
             if (items == null) {
                 ErrorManager.logErrorStateWithData(
                     "Visitor has no items in repository",
@@ -241,10 +256,11 @@ object GardenVisitorShoppingList {
                 )
                 logMissingRepoItems(visitorName)
                 list.addString(" §7(§c?§7)")
+                add(Renderable.horizontal(list))
                 return
             }
             if (items.isEmpty()) {
-                if (visitor.unknownRewards == true) {
+                if (repoVisitor.unknownRewards) {
                     list.addString(" §7(§fUnknown§7)")
                 } else {
                     list.addString(" §7(§fAny§7)")
@@ -259,6 +275,32 @@ object GardenVisitorShoppingList {
         add(Renderable.horizontal(list))
     }
 
+    private fun MutableList<Renderable>.drawVisitor(visitor: VisitorApi.Visitor) {
+        val list = mutableListOf<Renderable>()
+        list.addString(" §7- ")
+        list.add(visitor.toClickableName())
+        add(Renderable.horizontal(list))
+    }
+
+    private fun VisitorApi.Visitor.toClickableName(): Renderable {
+        val displayName = if (ignoreShoppingList) {
+            "§7§m${visitorName.removeColor()}"
+        } else {
+            GardenVisitorColorNames.getColoredName(visitorName)
+        }
+        return Renderable.clickable(
+            displayName,
+            onLeftClick = {
+                ignoreShoppingList = !ignoreShoppingList
+                updateDisplay()
+            },
+            tips = listOf(
+                if (ignoreShoppingList) "§eClick to include this visitor in the shopping list."
+                else "§eClick to ignore this visitor in the shopping list.",
+            ),
+        )
+    }
+
     private val visitorMissingItemsWarnTime: MutableMap<String, SimpleTimeMark> = mutableMapOf()
 
     private fun logMissingRepoItems(name: String) {
@@ -269,12 +311,17 @@ object GardenVisitorShoppingList {
         visitorMissingItemsWarnTime.removeIf { it.value.passedSince() > 10.minutes }
     }
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onGuiRender() {
+    @HandleEvent
+    fun onGuiRenderTop() {
         if (!config.enabled) return
-        if (Minecraft.getInstance().screen is SignEditScreen) return
 
-        renderDisplay()
+        if (InventoryUtils.inAnyInventory()) {
+            InventoryGuiScaleCompat.withOriginalHudScale {
+                renderDisplay()
+            }
+        } else {
+            renderDisplay()
+        }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
@@ -296,7 +343,7 @@ object GardenVisitorShoppingList {
         if (VisitorApi.inInventory) return true
         if (BazaarApi.inBazaarInventory) return true
 
-        val currentScreen = Minecraft.getInstance().screen ?: return true
+        val currentScreen = MinecraftCompat.screen ?: return true
         val isInOwnInventory = currentScreen is InventoryScreen
         if (isInOwnInventory) return true
         if (currentScreen is SignEditScreen &&
@@ -308,8 +355,6 @@ object GardenVisitorShoppingList {
 
     private fun hideExtraGuis() = GardenApi.hideExtraGuis() && !VisitorApi.inInventory
 
-    // TODO cut this function down in smaller checks, idk which one, just less than 5 return statements so detekt is happy
-    @Suppress("ReturnCount")
     private fun showGui(): Boolean {
         if (IslandType.HUB.isInIsland()) {
             if (config.inBazaarAlley && SkyBlockUtils.graphArea == "Bazaar Alley") {
@@ -321,14 +366,10 @@ object GardenVisitorShoppingList {
         }
         if (config.inFarmingAreas && IslandType.THE_FARMING_ISLANDS.isInIsland()) return true
         if (hideExtraGuis()) return false
-        if (GardenApi.inGarden()) {
-            if (GardenApi.onBarnPlot) return true
-            if (!config.onlyWhenClose) return true
-        }
-        return false
+        return GardenApi.inGarden() && (GardenApi.onBarnPlot || !config.onlyWhenClose)
     }
 
-    @HandleEvent(ProfileJoinEvent::class)
+    @HandleEvent
     fun onProfileJoin() {
         updateDisplay()
     }

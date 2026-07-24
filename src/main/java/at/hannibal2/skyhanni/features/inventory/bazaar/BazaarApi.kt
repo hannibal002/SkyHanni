@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,7 +44,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -127,7 +128,7 @@ object BazaarApi {
         )
     }
 
-    fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
+    fun isBazaarItem(stack: SafeItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
     fun NeuInternalName.isBazaarItem() = getBazaarData() != null
 
@@ -195,7 +196,7 @@ object BazaarApi {
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NeuInternalName? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, SafeItemStack>): NeuInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§aBuy Instantly") return null
@@ -204,7 +205,7 @@ object BazaarApi {
         return NeuInternalName.fromItemName(bazaarItem.hoverName.formattedTextCompatLeadingWhiteLessResets())
     }
 
-    private fun updateTaxRate(inventoryItems: Map<Int, ItemStack>) {
+    private fun updateTaxRate(inventoryItems: Map<Int, SafeItemStack>) {
         val sellInstantly = inventoryItems[11] ?: return
 
         if (sellInstantly.hoverName.formattedTextCompatLeadingWhiteLessResets() != "§6Sell Instantly") return
@@ -238,7 +239,7 @@ object BazaarApi {
                 continue
             }
 
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == currentSearchedItem) {
+            if (stack.cleanName == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

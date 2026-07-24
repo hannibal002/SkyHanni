@@ -2,12 +2,12 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityDeathEvent
@@ -36,8 +36,8 @@ import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -76,8 +76,8 @@ object VampireSlayerFeatures {
         get() = EntityUtils.getEntities<LocalPlayer>().firstOrNull()?.name?.formattedTextCompatLessResets()
             ?: error("own player is null")
 
-    private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
-    private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
+    private val BLOOD_ICHOR_TEXTURE by SkullTextureHolder.texture("BLOOD_ICHOR")
+    private val KILLER_SPRING_TEXTURE by SkullTextureHolder.texture("KILLER_SPRING")
 
     private var nextClawSend = 0L
     private var lastWitherSpawnSound = ServerTimeMark.farPast()
@@ -209,7 +209,7 @@ object VampireSlayerFeatures {
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (event.clickedEntity !is RemotePlayer) return
         if (!event.clickedEntity.isNpc()) return
         val coopList = configCoopBoss.coopMembers.split(",").toList()
@@ -321,8 +321,8 @@ object VampireSlayerFeatures {
         standList = mutableMapOf()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
         for (boss in loc.getEntitiesNearby<RemotePlayer>(3.0)) {

@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.utils.renderables
 
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import kotlin.reflect.KProperty
 
 interface ItemStackProvider {
-    val stack: ItemStack
+    val stack: SafeItemStack
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): ItemStack = stack
+    operator fun getValue(thisRef: Any?, property: KProperty<*>): SafeItemStack = stack
 }
 
-class ItemStackDirectProvider(override val stack: ItemStack) : ItemStackProvider {
+class ItemStackDirectProvider(override val stack: SafeItemStack) : ItemStackProvider {
     companion object {
-        fun ItemStack.asProvider(): ItemStackProvider = ItemStackDirectProvider(this)
+        fun SafeItemStack.asProvider(): ItemStackProvider = ItemStackDirectProvider(this)
     }
 }

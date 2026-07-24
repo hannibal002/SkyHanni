@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.mountaintop
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -48,11 +48,11 @@ object TimiteHelper {
     fun onBlockHit(event: BlockClickEvent) {
         if (!isEnabled() || !config.evolutionTimer) return
         if (InventoryUtils.itemInHandId != TIME_GUN) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        if (event.position != currentPos || currentBlockState != event.getBlockState) {
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
+        if (event.position != currentPos || currentBlockState != event.blockState) {
             lastClick = SimpleTimeMark.farPast()
 
-            if (event.position == currentPos && currentBlockState != event.getBlockState) {
+            if (event.position == currentPos && currentBlockState != event.blockState) {
                 locations[event.position] = SimpleTimeMark.now()
                 doubleTimeShooting = true
             } else {
@@ -60,9 +60,9 @@ object TimiteHelper {
             }
         }
         currentPos = event.position
-        currentBlockState = event.getBlockState
+        currentBlockState = event.blockState
 
-        val blockState = event.getBlockState
+        val blockState = event.blockState
         if (!blockState.isStainedGlassPane(ColoredBlockCompat.BLUE) && !blockState.isStainedGlassPane(ColoredBlockCompat.LIGHT_BLUE)) return
 
         if (lastClick + 300.milliseconds > SimpleTimeMark.now()) {

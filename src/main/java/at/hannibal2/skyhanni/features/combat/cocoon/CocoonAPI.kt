@@ -4,37 +4,74 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData.skyblockMobs
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.combat.CocoonSpawnEvent
+import at.hannibal2.skyhanni.events.combat.HypixelCocoonChatMessageEvent
 import at.hannibal2.skyhanni.events.entity.EntityEquipmentChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.entity.decoration.ArmorStand
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CocoonAPI {
-    private val COCOON_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
+    private val COCOON_SKULL_TEXTURE by SkullTextureHolder.texture("RIFT_LARVA")
 
+    /*
+    roughly where cocoon's time to hatch took during my testing.
+    the expected time between the cocoon entity being detected & spawning their contained mob.
+    this is used within the Cocoon Overlay feature to estimate when the cocoon will hatch.
+    */
     val expectedLifetime = 6.4.seconds
+    var canCocoon: Boolean = false
+        private set
+
+    const val COCOON_SIGHT_DISTANCE = 32
 
     /*
      roughly where cocoon times landed for me across a few hundred cocoons
      Might require some sort of ping based tweaking?
      */
-    val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
-    val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    // This does not leak Mob, ArmorStand references since it gets cleared on entity leave world and world change events.
+    private val existingCocoons: TimeLimitedSet<CocoonMob> = TimeLimitedSet(8.seconds)
+    private val logger: SkyHanniLogger = SkyHanniLogger("Combat/Cocoon")
+    private val patternGroup = RepoPattern.group("combat.cocoon")
+
+    /*
+     The "an Enderman" test is forward-proofing only, as Hypixel currently always sends "a".
+     */
+    /**
+     * REGEX-TEST: CAUGHT! You cocooned a Crypt Ghoul!
+     * REGEX-TEST: CAUGHT! You cocooned a Enderman!
+     * REGEX-TEST: CAUGHT! You cocooned an Enderman!
+     */
+    private val cocoonChatMessage by patternGroup.pattern(
+        "spawn",
+        "CAUGHT! You cocooned an? (?<name>[\\w ]+)!",
+    )
 
     data class CocoonMob(
         val mob: Mob,
@@ -46,10 +83,40 @@ object CocoonAPI {
         val cocoonEntity: ArmorStand,
     )
 
+    private fun playerCanCocoon(): Boolean {
+        val belt = CurrentEquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
+        return belt.canCocoon()
+    }
+
+    private fun SafeItemStack.canCocoon() =
+        (this.getInternalName() == "THE_PRIMORDIAL".toInternalName() || this.getReforgeModifier() == "blood_shot")
+
+    @HandleEvent
+    fun onSkyblockEquipmentDataUpdate(event: SkyblockEquipmentDataUpdateEvent) {
+        if (!event.isBelt) return
+        if (event.newItemStack == null) {
+            canCocoon = false
+            return
+        }
+        val belt = event.newItemStack
+        canCocoon = belt.canCocoon()
+    }
+
+    @HandleEvent
+    fun onProfileJoin() {
+        canCocoon = playerCanCocoon()
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick() {
+    fun onEntityMove(event: EntityMoveEvent<ArmorStand>) {
+        val cocoon = existingCocoons.firstOrNull { it.cocoonID == event.entity.id } ?: return
+        updateCocoonSeen(cocoon)
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onLocalPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         existingCocoons.forEach { cocoon ->
-            if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen()
+            updateCocoonSeen(cocoon)
         }
     }
 
@@ -62,7 +129,7 @@ object CocoonAPI {
         val id = entity.id
         if (isSameCocoonGroup(position, id)) return
         val mob = getCocoonMob(position) ?: return
-        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(), entity)
+        val cocoon = CocoonMob(mob, mob.seaCreature, position, SimpleTimeMark.now(), id, entity.canBeSeen(COCOON_SIGHT_DISTANCE), entity)
         existingCocoons.add(cocoon)
         val debug = "${cocoon.mob.name}, CocoonID (${cocoon.cocoonID}) Entered List"
         ChatUtils.debug(debug)
@@ -71,7 +138,7 @@ object CocoonAPI {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWorldChange(event: WorldChangeEvent) {
+    fun onWorldChange() {
         existingCocoons.clear()
     }
 
@@ -85,14 +152,32 @@ object CocoonAPI {
         existingCocoons.removeIf { it.cocoonID == event.entity.id }
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onChat(event: SkyHanniChatEvent.Allow) {
+        cocoonChatMessage.matchMatcher(event.cleanMessage) {
+            HypixelCocoonChatMessageEvent(group("name")).post()
+        }
+    }
+
     private fun getCocoonMob(cocoonVector: LorenzVec): Mob? {
-        val mob = skyblockMobs.minByOrNull { it.baseEntity.getLorenzVec().distanceIgnoreY(cocoonVector) } ?: return null
-        if (mob.baseEntity.getLorenzVec().distanceSqOnlyY(cocoonVector) > 4.0) return null
+        val nearbyMobs = skyblockMobs.filter { mob -> mob.baseEntity.getLorenzVec().distanceSq(cocoonVector) < 4.0 }
+        // Jawbus spawns Jawbus Followers, and they are often killed before being detected as Skyblock Mobs.
+        // this, should prevent a downstream feature from sending fake "My Lord Jawbus Was Cocooned" Messages.
+        val filteredMobs = nearbyMobs.filter { mob -> !(mob.name == "Lord Jawbus" && mob.health < 10_000_000) }
+        val mob = filteredMobs.minByOrNull {
+            it.baseEntity.getLorenzVec().distance(cocoonVector)
+        }
         return mob
+    }
+
+    private fun updateCocoonSeen(cocoon: CocoonMob) {
+        if (!cocoon.hasBeenSeen) cocoon.hasBeenSeen = cocoon.cocoonEntity.canBeSeen(COCOON_SIGHT_DISTANCE)
     }
 
     private fun isSameCocoonGroup(currentPos: LorenzVec, currentID: Int): Boolean {
         return existingCocoons.any { it.coordinates.distanceSqIgnoreY(currentPos) < 0.5 || it.cocoonID == currentID }
     }
 
+    fun getVisible(): List<CocoonMob> =
+        existingCocoons.filter { it.hasBeenSeen || it.coordinates.distanceToPlayer() < COCOON_SIGHT_DISTANCE }
 }

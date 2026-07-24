@@ -17,6 +17,6 @@ enum class FactionType(val factionName: String, val apiName: String) {
 
     companion object {
         fun fromName(name: String): FactionType? = entries.firstOrNull { it.factionName.equals(name, ignoreCase = true) }
-        fun fromAPIName(name: String): FactionType? = entries.firstOrNull { it.apiName.equals(name, ignoreCase = true) }
+        fun fromAPIName(name: String?): FactionType? = entries.firstOrNull { it.apiName.equals(name, ignoreCase = true) }
     }
 }

@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.slayer
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.FeatureToggle
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig
 import at.hannibal2.skyhanni.config.features.slayer.spider.SpiderConfig
@@ -16,7 +15,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -69,24 +67,14 @@ class SlayerConfig {
     val slayerBossWarning: SlayerBossWarningConfig = SlayerBossWarningConfig()
 
     @Expose
-    @ConfigOption(name = "Remaining Kills", desc = "Display the names and remaining amount of mob kills needed until the boss spawns.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var remainingKills: Boolean = false
+    @ConfigOption(name = "Slayer Time Messages", desc = "")
+    @Accordion
+    val slayerTimeMessages: SlayerTimeMessagesConfig = SlayerTimeMessagesConfig()
 
     @Expose
-    @ConfigOption(name = "Remaining Kills Level", desc = "Include the mob Level in the Remaining Kills display")
-    @ConfigEditorBoolean
-    var remainingKillsLevel: Boolean = false
-
-    @Expose
-    @ConfigOption(name = "Remaining Kills Health", desc = "Include the mob Health in the Remaining Kills display")
-    @ConfigEditorBoolean
-    var remainingKillsHealth: Boolean = false
-
-    @Expose
-    @ConfigLink(owner = SlayerConfig::class, field = "remainingKills")
-    val remainingKillsPosition: Position = Position(410, 110)
+    @ConfigOption(name = "Remaining Kills Display", desc = "")
+    @Accordion
+    val slayerRemainingKills: SlayerRemainingKillsConfig = SlayerRemainingKillsConfig()
 
     @Expose
     @ConfigOption(name = "Active Boss Transparency", desc = "")
@@ -168,23 +156,6 @@ class SlayerConfig {
     var hideIrrelevantMobsTransparency: Int = 40
 
     @Expose
-    @ConfigOption(name = "Time to Kill Message", desc = "Sends time to kill a slayer in chat.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var timeToKillMessage: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Quest Complete Message", desc = "Sends time to complete (Spawn & Kill) a slayer quest in chat.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var questCompleteMessage: Boolean = true
-
-    @Expose
-    @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
-    @ConfigEditorBoolean
-    var compactTimeMessage: Boolean = false
-
-    @Expose
     @ConfigOption(name = "Slayer Cocoon Title", desc = "Send title when Slayer Boss is cocooned.")
     @ConfigEditorBoolean
     var cocoonTitle: Boolean = false
@@ -208,7 +179,13 @@ class SlayerConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(126, "slayer.hideIrrelevantMobsOpacity", "slayer.hideIrrelevantMobsTransparency")
+            val oldPath = "slayer."
+            event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
+            val remainingKillsPath = "${oldPath}slayerRemainingKills."
+            event.move(138, "${oldPath}remainingKills", "${remainingKillsPath}display")
+            event.move(138, "${oldPath}remainingKillsLevel", "${remainingKillsPath}includeMobLevel")
+            event.move(138, "${oldPath}remainingKillsHealth", "${remainingKillsPath}includeMobHealth")
+            event.move(138, "${oldPath}remainingKillsPosition", "${remainingKillsPath}remainingKillsPosition")
         }
     }
 }

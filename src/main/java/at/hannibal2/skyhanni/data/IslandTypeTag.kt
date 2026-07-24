@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.util.EnumSet
 
+// TODO maybe rename this class to IslandTypeGroup
 /**
- * Each [IslandTypeTag] consists of one or more [SkyHanniIslandType]
+ * Each [IslandTypeTag] consists of one or more [IslandType] or [IslandTypeTag]
  */
-enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType {
+enum class IslandTypeTag(vararg types: Any) {
 
     PRIVATE_ISLAND(IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST),
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
@@ -24,15 +25,39 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
     MINING(NORMAL_MINING, ADVANCED_MINING),
     CUSTOM_MINING(ADVANCED_MINING, IslandType.THE_END, IslandType.CRIMSON_ISLE, IslandType.SPIDER_DEN),
 
-    FORAGING(IslandType.THE_PARK, IslandType.GALATEA),
-    FORAGING_CUSTOM_TREES(IslandType.GALATEA),
+    FORAGING_CUSTOM_TREES(IslandType.GALATEA, IslandType.TORRHUS_CANYON),
+    FORAGING(FORAGING_CUSTOM_TREES, IslandType.THE_PARK),
 
-    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT),
+    HOPPITY_DISALLOWED(IslandType.THE_RIFT, IslandType.KUUDRA_ARENA, IslandType.CATACOMBS, IslandType.MINESHAFT, IslandType.SAFARI),
     HAS_SHOWCASES(PRIVATE_ISLAND, IslandType.HUB, IslandType.CRIMSON_ISLE),
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
     BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+
+    /** islands without npc locations that are fixed. */
+    NO_FIXED_NPC_LOCATIONS(
+        IslandType.PRIVATE_ISLAND, IslandType.PRIVATE_ISLAND_GUEST, IslandType.KUUDRA_ARENA,
+        IslandType.CATACOMBS,
+        IslandType.GARDEN,
+        IslandType.GARDEN_GUEST,
+        IslandType.MINESHAFT,
+        IslandType.NONE,
+        IslandType.ANY,
+        IslandType.UNKNOWN,
+    ),
+    FISHING_HOTSPOT(
+        IslandType.BACKWATER_BAYOU,
+        IslandType.LOTUS_ATOLL,
+        IslandType.HUB,
+        IslandType.THE_PARK,
+        IslandType.CRIMSON_ISLE,
+        IslandType.WINTER,
+    ),
+    WORMHOLE(
+        IslandType.LOTUS_ATOLL,
+        IslandType.CRIMSON_ISLE,
+    ),
     ;
 
     private val types: EnumSet<IslandType> = types.fold(
@@ -52,7 +77,9 @@ enum class IslandTypeTag(vararg types: SkyHanniIslandType) : SkyHanniIslandType 
         newValues.mapNotNullTo(types) { EnumUtils.enumValueOfOrNull<IslandType>(it.uppercase()) }
     }
 
-    override fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && SkyBlockUtils.currentIsland in types
+    fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
+
+    operator fun contains(type: IslandType) = type in types
 
     @SkyHanniModule
     companion object {

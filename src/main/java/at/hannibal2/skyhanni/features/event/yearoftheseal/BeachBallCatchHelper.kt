@@ -37,8 +37,8 @@ object BeachBallCatchHelper {
 
     private val predictors = mutableMapOf<Int, Predictor>()
 
-    private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
-//     private val GIANT_BEACH_BALL by lazy { SkullTextureHolder.getTexture("GIANT_BEACH_BALL") }
+    private val NORMAL_BEACH_BALL by SkullTextureHolder.texture("NORMAL_BEACH_BALL")
+//     private val GIANT_BEACH_BALL by SkullTextureHolder.texture("GIANT_BEACH_BALL")
 
     fun check(entity: ArmorStand) {
         if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
@@ -85,7 +85,7 @@ object BeachBallCatchHelper {
 
     private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
         if (!config.bouncyBallLandingSpot.get()) return
-        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayer, partialTicks).add(y = 1)
+        val player = WorldRenderUtils.exactLocation(MinecraftCompat.localPlayerOrThrow, partialTicks).add(y = 1)
         for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
             val entity = e ?: continue
             val location = WorldRenderUtils.exactLocation(entity, partialTicks).copy(y = player.y)
@@ -97,11 +97,11 @@ object BeachBallCatchHelper {
     private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
         val counter = predictor.bounceCounter
         val (qualityColor, quality) = when {
-            counter < 2 -> "§c" to null // aww man
-            counter < 8 -> "§f" to "DECENT"
-            counter < 18 -> "§a" to "GOOD"
-            counter < 32 -> "§5" to "AMAZING"
-            counter < 51 -> "§6" to "IMPRESSIVE"
+            counter <= 1 -> "§c" to null // aww man
+            counter <= 5 -> "§f" to "DECENT"
+            counter <= 15 -> "§a" to "GOOD"
+            counter <= 25 -> "§5" to "AMAZING"
+            counter <= 39 -> "§6" to "IMPRESSIVE"
             else -> "§d" to "INSANE"
         }
         val qualityString = quality?.let { " §8- $qualityColor§l$it!" }.orEmpty()

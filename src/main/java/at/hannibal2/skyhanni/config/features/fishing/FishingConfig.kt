@@ -21,6 +21,11 @@ class FishingConfig {
     val trophyFishing: TrophyFishingConfig = TrophyFishingConfig()
 
     @Expose
+    @ConfigOption(name = "Wormhole Finder", desc = "Settings for the Wormhole Finder on Lotus Atoll and Crimson Isle.")
+    @Accordion
+    val wormholeFinder: WormholeFinderConfig = WormholeFinderConfig()
+
+    @Expose
     @ConfigOption(name = "Thunder Spark", desc = "")
     @Accordion
     val thunderSpark: ThunderSparkConfig = ThunderSparkConfig()
@@ -29,6 +34,11 @@ class FishingConfig {
     @ConfigOption(name = "Barn Fishing Timer", desc = "")
     @Accordion
     val barnTimer: BarnTimerConfig = BarnTimerConfig()
+
+    @Expose
+    @ConfigOption(name = "Fishing Bobber Timer", desc = "")
+    @Accordion
+    val bobberTimer: FishingBobberTimerConfig = FishingBobberTimerConfig()
 
     @Expose
     @ConfigOption(name = "Chum/Chumcap Bucket Hider", desc = "")
@@ -44,6 +54,11 @@ class FishingConfig {
     @ConfigOption(name = "Fishing Hook Display", desc = "")
     @Accordion
     val fishingHookDisplay: FishingHookDisplayConfig = FishingHookDisplayConfig()
+
+    @Expose
+    @ConfigOption(name = "Fishing Bait Display", desc = "")
+    @Accordion
+    val fishingBaitDisplay: FishingBaitDisplayConfig = FishingBaitDisplayConfig()
 
     @Expose
     @ConfigOption(name = "Bait Warnings", desc = "")
@@ -84,6 +99,11 @@ class FishingConfig {
     @ConfigOption(name = "Cocoon Settings", desc = "")
     @Accordion
     val cocoonSettings: FishingCocoonConfig = FishingCocoonConfig()
+
+    @Expose
+    @ConfigOption(name = "Common Sea Creature Hider", desc = "")
+    @Accordion
+    val commonSeaCreatureHider: CommonSeaCreatureHiderConfig = CommonSeaCreatureHiderConfig()
 
     @Expose
     @ConfigOption(name = "Shark Fish Counter", desc = "Counts how many Sharks have been caught.")
@@ -174,7 +194,7 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom Kill Time Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice1: String = ""
+    val notice1: String = ""
 
     @Expose
     @ConfigOption(
@@ -188,5 +208,5 @@ class FishingConfig {
 
     @ConfigOption(name = "Custom LS Mobs", desc = "This Feature can be customized under /shseacreatures!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 }
