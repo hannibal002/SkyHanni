@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 sealed class GardenPlotSprayEvent(val plot: GardenPlot?, val type: SprayType) : SkyHanniEvent() {
 
     @PrimaryFunction("onGardenPlotSprayAddedEvent")
-    class GardenPlotSprayAddedEvent(plot: GardenPlot?, type: SprayType) : GardenPlotSprayEvent(plot, type)
+    class GardenPlotSprayAddedEvent(plot: GardenPlot?, type: SprayType, val amount: Int) : GardenPlotSprayEvent(plot, type)
 
     @PrimaryFunction("onGardenPlotSprayExpiredEvent")
     class GardenPlotSprayExpiredEvent(plot: GardenPlot?, type: SprayType) : GardenPlotSprayEvent(plot, type)
