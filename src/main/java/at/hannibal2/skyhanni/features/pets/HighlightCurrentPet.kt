@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 
@@ -32,11 +31,11 @@ object HighlightCurrentPet {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        inInventory = PetStorageApi.mainPetMenuNamePattern.matches(event.inventoryName)
+        inInventory = PetStorageApi.inMainPetMenuName()
         if (!inInventory) return
         val currentPetUuid = CurrentPetApi.currentPet?.uuid ?: return
         highlightSlot = event.inventoryItems.entries.firstOrNull {
-            it.value.getPetInfo()?.uniqueId == currentPetUuid
+            it.value.getPetInfo()?.ownedUuid == currentPetUuid
         }?.key
     }
 }

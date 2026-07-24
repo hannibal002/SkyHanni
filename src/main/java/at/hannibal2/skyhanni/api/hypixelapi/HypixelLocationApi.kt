@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.hypixelapi
 
+import at.hannibal2.skyhanni.api.event.EventListeners
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
@@ -11,10 +12,10 @@ import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelApiServerChangeEvent
-import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -151,20 +152,28 @@ object HypixelLocationApi {
         val oldIsland = island
         island = internalIsland
         logger.log("Island change: '$oldIsland' -> '$island'")
+        EventListeners.markEventCacheDirty()
 
         if (oldIsland != IslandType.NONE) {
-            IslandLeaveEvent(oldIsland).post()
+            DelayedRun.runOrNextTick {
+                IslandLeaveEvent(oldIsland).post()
+            }
         }
         if (island != IslandType.NONE) {
-            IslandJoinEvent(island = island, previousIsland = previousIsland).post()
+            val captured = previousIsland
+            DelayedRun.runOrNextTick {
+                IslandJoinEvent(island = island, previousIsland = captured).post()
+            }
             previousIsland = island
         }
 
-        IslandChangeEvent(island, oldIsland).post()
+        DelayedRun.runOrNextTick {
+            IslandChangeEvent(island, oldIsland).post()
+        }
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Hypixel Mod API")
         event.addIrrelevant {
             addAll(debugData.map(::dataToString))
@@ -172,7 +181,7 @@ object HypixelLocationApi {
     }
 
     @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) {
+    fun onDisconnect() {
         if (inSkyblock || island != IslandType.NONE) {
             internalIsland = IslandType.NONE
             changeIsland()
@@ -199,17 +208,15 @@ object HypixelLocationApi {
         isGuest = false
         sentIslandEvent = false
         internalIsland = IslandType.NONE
+        EventListeners.markEventCacheDirty()
     }
 
     private val debugData
         get() = arrayOf(
-            "HypixelData.skyBlock" to HypixelData.skyBlock,
             "inSkyblock" to inSkyblock,
             "HypixelData.hypixelLive" to HypixelData.hypixelLive,
             "inHypixel" to inHypixel,
-            "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
             "island" to island,
-            "HypixelData.serverId" to HypixelData.serverId,
             "serverId" to serverId,
             "serverType" to serverType,
             "lobbyName" to lobbyName,

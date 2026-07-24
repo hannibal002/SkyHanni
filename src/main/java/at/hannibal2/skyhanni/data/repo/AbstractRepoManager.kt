@@ -22,14 +22,14 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.mojang.brigadier.arguments.BoolArgumentType
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
 import kotlin.time.Duration.Companion.minutes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.withContext
 
 @Suppress("TooManyFunctions")
 abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
@@ -226,7 +226,7 @@ abstract class AbstractRepoManager<E : AbstractRepoReloadEvent> {
         }
     }
 
-    private fun resetRepositoryLocation(manual: Boolean = false) = with(config.location) {
+    private fun resetRepositoryLocation(manual: Boolean = false): Unit = with(config.location) {
         if (hasDefaultSettings()) {
             if (manual) logger.chat("$commonShortNameCased repo settings are already on default!")
             return

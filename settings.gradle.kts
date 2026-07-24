@@ -4,17 +4,32 @@ pluginManagement {
         mavenCentral()
         mavenLocal()
         gradlePluginPortal()
-        maven("https://repo.essential.gg/repository/maven-public")
-        maven("https://oss.sonatype.org/content/repositories/snapshots")
-        maven("https://maven.fabricmc.net")
-        maven("https://repo.spongepowered.org/maven/")
-        maven("https://repo.nea.moe/releases")
+        maven("https://maven.fabricmc.net") {
+            content {
+                includeGroupByRegex("net.fabricmc.*")
+            }
+        }
+        maven("https://repo.spongepowered.org/maven/") {
+            content {
+                includeGroup("org.spongepowered")
+            }
+        }
+        maven("https://repo.nea.moe/releases") {
+            content {
+                includeGroup("moe.nea")
+            }
+        }
         maven("https://jitpack.io") {
             content {
                 includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
-        maven("https://maven.kikugie.dev/snapshots") // stone cutter
+        // Stonecutter
+        maven("https://maven.kikugie.dev/snapshots") {
+            content {
+                includeGroupByRegex("dev.kikugie.*")
+            }
+        }
     }
     resolutionStrategy.eachPlugin {
         requested.apply {
@@ -30,7 +45,7 @@ plugins {
     // We can't use libs refs in settings, so these are not stored in `libs.versions.toml`
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
     id("at.skyhanni.shared-variables")
-    id("dev.kikugie.stonecutter") version "0.9"
+    id("dev.kikugie.stonecutter") version "0.9.7"
 }
 
 include("annotation-processors")

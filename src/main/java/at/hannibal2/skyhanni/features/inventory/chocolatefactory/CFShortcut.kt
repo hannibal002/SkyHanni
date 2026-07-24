@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import net.minecraft.world.SimpleContainer
 import kotlin.time.Duration.Companion.seconds
 
@@ -26,23 +26,23 @@ object CFShortcut {
     private val slotId get() = CFApi.cfShortcutIndex
 
     private val item by lazy {
-        ItemUtils.createSkull(
+        ItemUtils.repoSkullProvider(
             displayName = "§6Open Chocolate Factory",
             uuid = "d7ac85e6-bd40-359e-a2c5-86082959309e",
-            value = SkullTextureHolder.getTexture("CHOC_FAC_SHORTCUT"),
+            repoSkullId = "CHOC_FAC_SHORTCUT",
             "§8(From SkyHanni)",
             "",
             "§7Click here to run",
             "§e/chocolatefactory",
             "",
-            "§7Ctrl + Click to open config"
+            "§7Ctrl + Click to open config",
         )
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (IslandTypeTag.HOPPITY_DISALLOWED.isInIsland()) return
-        showItem = config.hoppityMenuShortcut && event.inventoryName == "SkyBlock Menu"
+        showItem = config.hoppityMenuShortcut && UtilsPatterns.skyblockMenuInventory.isInside()
     }
 
     @HandleEvent
@@ -53,7 +53,7 @@ object CFShortcut {
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (event.inventory is SimpleContainer && showItem && event.slot == slotId) {
-            event.replace(item)
+            event.replace(item.stack)
         }
     }
 

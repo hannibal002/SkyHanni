@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.makeShiftClick
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
@@ -21,10 +20,8 @@ object ShiftClickEquipment {
 
         if (slot.index == slot.containerSlot) return
 
-        if (slot.item == null) return
-
-        val chestName = InventoryUtils.openInventoryName()
-        if (!chestName.startsWith("Your Equipment")) return
+        if (slot.item.isEmpty) return
+        if (!CurrentEquipmentApi.inventory.isInside()) return
 
         event.makeShiftClick()
     }

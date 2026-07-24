@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.Re
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.SackApi.isMissingSackItem
+import at.hannibal2.skyhanni.data.garden.ComposterUpgradesData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemNameCompact
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -57,7 +59,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addVerticalSpacer
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.addLine
@@ -84,8 +85,8 @@ object ComposterOverlay {
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private val composterInventory = InventoryDetector { name -> name == "Composter" }
-    private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
+    private val composterInventory = InventoryDetector { ComposterUpgradesData.composterInventoryPattern }
+    private val composterUpgradesInventory = InventoryDetector { ComposterUpgradesData.composterUpgradesInventoryPattern }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value
@@ -140,9 +141,9 @@ object ComposterOverlay {
     fun onToolTip(event: ToolTipTextEvent) {
         if (!composterUpgradesInventory.isInside()) return
         for (upgrade in ComposterUpgrade.entries) {
-            val name = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            val name = event.itemStack.cleanName
             if (name.contains(upgrade.displayName)) {
-                maxLevel = ComposterUpgrade.regex.matchMatcher(name) {
+                maxLevel = ComposterUpgradesData.composterUpgradePattern.matchMatcher(name) {
                     group("level")?.romanToDecimalIfNecessary() ?: 0
                 } == 25
                 extraComposterUpgrade = upgrade

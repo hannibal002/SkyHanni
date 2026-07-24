@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.ThunderSparksHighlight
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -79,7 +79,7 @@ object FireFreezeFeatures {
         }
     }
 
-    private val ARMORSTAND_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("FIRE_FREEZE_SKULLS") }
+    private val ARMORSTAND_SKULL_TEXTURE by SkullTextureHolder.texture("FIRE_FREEZE_SKULLS")
 
     private val affectedMobs = ConcurrentHashMap<Mob, ServerTimeMark>()
     private val fireFreezes = ConcurrentHashMap<LorenzVec, FireFreezeArea>()
@@ -119,12 +119,12 @@ object FireFreezeFeatures {
 
     private fun LorenzVec.isInAnyFireFreeze(): Boolean = fireFreezes.values.any { !it.hasFinished() && it.isInside(this) }
 
-    private fun ReceiveParticleEvent.isFreezeParticle(): Boolean {
+    private fun ParticleEvent.isFreezeParticle(): Boolean {
         return offset.x == PARTICLE_OFFSET && offset.y == PARTICLE_OFFSET && offset.z == PARTICLE_OFFSET
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnSkyblock = true, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (event.type != ParticleTypes.DUST) return
         if (event.count != 0 || event.speed != 1.0f || !event.isFreezeParticle()) return
         if (!config.customCircle) return

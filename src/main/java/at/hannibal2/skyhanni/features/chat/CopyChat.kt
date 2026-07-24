@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -21,8 +20,10 @@ import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2f
 
-//? if >= 26.1
+//? if >= 26.1 {
 import net.minecraft.client.gui.components.ChatComponent
+//?} else
+//import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
 
 object CopyChat {
     private val config get() = SkyHanniMod.feature.chat.copyChat
@@ -40,20 +41,20 @@ object CopyChat {
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
         val chatLine = getChatLine(mouseX, mouseY) ?: return
 
-        val formatted = chatLine.fullComponent.formattedTextCompat()
+        val formatted = chatLine.content.formattedTextCompat()
 
         val (clipboard, infoMessage) = when {
             KeyboardManager.isMenuKeyDown() ->
                 formatted.stripHypixelMessage() to "formatted message"
 
             KeyboardManager.isShiftKeyDown() -> (
-                OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText))
+                OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.content.visualOrderText))
                     .removeColor()
                 ) to "modified message"
 
             KeyboardManager.isControlKeyDown() -> chatLine.content.string.removeColor() to "line"
 
-            else -> chatLine.fullComponent.string.removeColor() to "message"
+            else -> chatLine.content.string.removeColor() to "message"
         }
 
         ClipboardUtils.copyToClipboard(clipboard)
@@ -62,7 +63,7 @@ object CopyChat {
 
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
-        val chatGui = mc.gui.chat ?: return null
+        val chatGui = mc.gui.chat
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
         //~ if < 26.1 'ChatComponent.DisplayMode.FOREGROUND' -> 'true'
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, mc.gui.guiTicks, ChatComponent.DisplayMode.FOREGROUND)

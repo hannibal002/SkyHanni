@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.setHoverShowText
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Style
@@ -29,22 +29,30 @@ object TrophyFishManager {
     private val patternGroup = RepoPattern.group("fishing.trophyfish")
 
     /**
-     * REGEX-TEST: §6Gold §a✔§7 (1)
+     * REGEX-TEST: Gold ✔ (1)
      */
     private val odgerRankPattern by patternGroup.pattern(
-        "odger.rank",
-        "§.(?<rarity>.*) §a✔§7 \\((?<amount>.*)\\)",
+        "odger.rank.colorless",
+        "(?: +)?(?<rarity>.*) ✔ \\((?<amount>.*)\\)",
     )
 
     /**
-     * REGEX-TEST: §bDiamond §c✖
+     * REGEX-TEST: Diamond ✖
      */
     private val odgerRankEmptyPattern by patternGroup.pattern(
-        "odger.rank.empty",
-        "§.(?<rarity>.*) §c✖",
+        "odger.rank.empty.colorless",
+        "(?: +)?(?<rarity>.*) ✖",
     )
 
-    val odgerInventory = InventoryDetector { name -> name == "Trophy Fish" }
+    /**
+     * REGEX-TEST: Trophy Fish
+     */
+    private val odgerInventoryNamePattern by patternGroup.pattern(
+        "odger.inventory",
+        "Trophy Fish",
+    )
+
+    val odgerInventory = InventoryDetector { odgerInventoryNamePattern }
 
     fun loadMissingTrophyFish(): Int {
         val savedFishes = fish ?: return 0
@@ -118,19 +126,19 @@ object TrophyFishManager {
         var updatedFishes = loadMissingTrophyFish()
         val savedFishes = fish ?: return
         for (stack in event.inventoryItems.values) {
-            val internalName = TrophyFishApi.getInternalName(stack.hoverName.string.replace("§k", ""))
+            val internalName = TrophyFishApi.getInternalName(stack.cleanName)
 
             fun getRarity(rawRarity: String, line: String): TrophyRarity =
                 TrophyRarity.getByName(rawRarity) ?: ErrorManager.skyHanniError(
                     "unknown trophy fish rarity in odger inventory",
                     "rawRarity" to rawRarity,
                     "line" to line,
-                    "stack.name" to stack.hoverName.formattedTextCompatLeadingWhiteLessResets(),
+                    "stack.name" to stack.cleanName,
                     "internalName" to internalName,
                 )
 
             var updated = false
-            for (line in stack.getLore()) {
+            for (line in stack.getCleanLore()) {
                 val (rarity, amount) = odgerRankPattern.matchMatcher(line) {
                     val rarity = getRarity(group("rarity"), line)
                     val amount = group("amount").formatInt()

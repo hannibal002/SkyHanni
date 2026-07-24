@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.elitedev.EliteFarmingContest
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -56,12 +57,12 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object GardenNextJacobContest {
@@ -71,7 +72,7 @@ object GardenNextJacobContest {
     private val profileStorage get() = SkyHanniMod.feature.storage
     private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val calendarDetector by lazy { InventoryDetector(monthPattern) }
+    private val calendarDetector by lazy { InventoryDetector { monthPattern } }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
     private val nextContest
         get() = knownContests.filterNot {
@@ -123,15 +124,15 @@ object GardenNextJacobContest {
     // This pattern covers both the tab list widget, and calendar item lore.
     /**
      * REGEX-TEST: ○ Cactus
-     * REGEX-TEST: ☘ Carrot
+     * REGEX-TEST:  Carrot
      * REGEX-TEST: ○ Melon
-     * WRAPPED-REGEX-TEST: " ☘ Mushroom"
+     * WRAPPED-REGEX-TEST: "  Mushroom"
      * WRAPPED-REGEX-TEST: " ○ Pumpkin"
      * WRAPPED-REGEX-TEST: " ○ Wheat"
      */
     private val cropPattern by patternGroup.pattern(
         "crop-no-color",
-        " ?(?:○|(?<boosted>☘)) (?<crop>.*)",
+        " ?(?:○|(?<boosted>${SkyblockStat.FARMING_FORTUNE.hypixelIcon})) (?<crop>.*)",
     )
 
     /**

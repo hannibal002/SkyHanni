@@ -2,24 +2,26 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 //? if >= 26.1 {
 import com.mojang.blaze3d.platform.Transparency
+import net.minecraft.client.renderer.block.FluidModel
 
-// Naming is intentional
-@Suppress("FunctionName")
 interface FluidModelTransparencyOverride {
 
+    // Naming is intentional
+    @Suppress("FunctionName")
     fun `skyhanni$getTransparency`(): Transparency? = throw UnsupportedOperationException("Implemented via mixin")
 
+    @Suppress("FunctionName")
     fun `skyhanni$setTransparency`(value: Transparency?) {
         throw UnsupportedOperationException("Implemented via mixin")
     }
 
-    // Kotlin-only accessor
-    @get:JvmSynthetic
-    @set:JvmSynthetic
-    var transparency: Transparency?
-        get() = `skyhanni$getTransparency`()
-        set(value) {
-            `skyhanni$setTransparency`(value)
-        }
+    companion object {
+
+        var FluidModel.transparency: Transparency?
+            get() = (this as FluidModelTransparencyOverride).`skyhanni$getTransparency`()
+            set(value) {
+                (this as FluidModelTransparencyOverride).`skyhanni$setTransparency`(value)
+            }
+    }
 }
 //?}
