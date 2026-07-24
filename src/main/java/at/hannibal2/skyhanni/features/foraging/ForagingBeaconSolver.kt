@@ -252,9 +252,9 @@ object ForagingBeaconSolver {
         checkInventoryName = { name ->
             beaconInventoryNamePattern.matchMatcher(name) {
                 upgradingStrength = group("upgrade") != null
-                true
+                return@InventoryDetector true
             }
-            false
+            return@InventoryDetector false
         }
     )
 
