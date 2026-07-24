@@ -65,7 +65,7 @@ object UbikReminder {
                 if (!config.ubikReminder) return@InventoryDetector
                 storage?.ubikRemindTime = 2.hours.fromNow()
             },
-        ) { name -> inventoryPattern.matches(name) }
+        ) { inventoryPattern }
     }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)

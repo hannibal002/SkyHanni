@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -22,7 +21,7 @@ object SkillAchievements {
     private const val SKILL_ACHIEVEMENT = "Level 100 Skill"
     private const val ROCK_ACHIEVEMENT = "Mythic Rock"
     private const val DOLPHIN_ACHIEVEMENT = "Mythic Dolphin"
-    val petSkillDetector = InventoryDetector { petSkillMenuPattern.matches(it) }
+    val petSkillDetector = InventoryDetector { petSkillMenuPattern }
 
     /**
      * REGEX-TEST: Ores mined: 2,449,790

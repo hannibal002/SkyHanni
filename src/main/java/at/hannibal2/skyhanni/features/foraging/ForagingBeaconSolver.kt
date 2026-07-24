@@ -85,6 +85,16 @@ object ForagingBeaconSolver {
         "pitch",
         "Current pitch: (?<pitch>\\w+)",
     )
+
+    /**
+     * REGEX-TEST: Upgrade Signal Strength
+     * REGEX-TEST: Tune Frequency
+     */
+    private val beaconInventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "Upgrade Signal Strength|Tune Frequency",
+    )
+
     // </editor-fold>
 
     // <editor-fold desc="Enums & Enum Helpers">
@@ -238,11 +248,7 @@ object ForagingBeaconSolver {
             enchantedTuning.reset()
             display = emptyList()
         },
-    ) { name ->
-        upgradingStrength = (name == "Upgrade Signal Strength")
-        val inInv = (name == "Tune Frequency" || upgradingStrength)
-        inInv
-    }
+    ) { beaconInventoryNamePattern }
 
     private var upgradingStrength = false
     private var normalTuning = BeaconTuneData()

@@ -245,7 +245,7 @@ object GardenApi {
         "toolkit.inventory",
         "Farming Toolkit"
     )
-    val toolkitInventory = InventoryDetector { name -> toolkitInventoryPattern.matches(name) }
+    val toolkitInventory = InventoryDetector { toolkitInventoryPattern }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {

@@ -49,7 +49,7 @@ object CurrentEquipmentApi {
         "Stats & Equipment",
     )
 
-    val inventory = InventoryDetector { equipmentAndStatsMenuPattern.matches(it) }
+    val inventory = InventoryDetector { equipmentAndStatsMenuPattern }
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 

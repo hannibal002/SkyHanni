@@ -22,7 +22,7 @@ object UbikQuickClose {
         "Split or Steal",
     )
 
-    private val inventory = InventoryDetector { name -> inventoryNamePattern.matches(name) }
+    private val inventory = InventoryDetector { inventoryNamePattern }
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {

@@ -12,11 +12,22 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object AnvilApi {
-    val inventory = InventoryDetector { name -> name == "Anvil" }
+    private val patternGroup = RepoPatternGroup("api.anvil")
+
+    /**
+     * REGEX-TEST: Anvil
+     */
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Anvil",
+    )
+
+    val inventory = InventoryDetector { inventoryNamePattern }
 
     var left: SafeItemStack? = null
     var right: SafeItemStack? = null

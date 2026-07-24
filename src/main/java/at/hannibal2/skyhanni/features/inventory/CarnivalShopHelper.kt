@@ -66,10 +66,12 @@ object CarnivalShopHelper {
         "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
-    private val overviewInventory = InventoryDetector { overviewInventoryNamesPattern.matches(it) }
-    private val knownShops = InventoryDetector { name ->
-        repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
-    }
+    private val overviewInventory = InventoryDetector { overviewInventoryNamesPattern }
+    private val knownShops = InventoryDetector(
+        checkInventoryName = { name ->
+            repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
+        }
+    )
 
     data class EventShop(val shopName: String, val upgrades: List<NeuCarnivalTokenCostJson>)
     data class EventShopUpgradeStatus(

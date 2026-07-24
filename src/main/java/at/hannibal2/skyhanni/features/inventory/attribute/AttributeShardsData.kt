@@ -58,19 +58,19 @@ object AttributeShardsData {
 
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
-    ) { name -> attributeMenuPattern.matches(name) }
+    ) { attributeMenuPattern }
     val huntingBoxInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { name -> huntingBoxPattern.matches(name) }
+    ) { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
         checkInventoryName = { bazaarShardsInventoryPattern.matches(it) },
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     )
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
-    ) { name -> name == "Confirm Fusion" }
-    val fusionBoxInventory = InventoryDetector { name -> fusionBoxPattern.matches(name) }
-    val shardFusionInventory = InventoryDetector { name -> shardFusionPattern.matches(name) }
+    ) { confirmFusionPattern }
+    val fusionBoxInventory = InventoryDetector { fusionBoxPattern }
+    val shardFusionInventory = InventoryDetector { shardFusionPattern }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
@@ -103,6 +103,14 @@ object AttributeShardsData {
     private val huntingBoxPattern by patternGroup.pattern(
         "hunting-box",
         "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Confirm Fusion
+     */
+    private val confirmFusionPattern by patternGroup.pattern(
+        "confirm-fusion",
+        "Confirm Fusion",
     )
 
     /**

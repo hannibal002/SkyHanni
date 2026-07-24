@@ -64,6 +64,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButt
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.time.Duration
@@ -75,6 +76,24 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
+    private val patternGroup = RepoPattern.group("composter")
+
+    /**
+     * REGEX-TEST: Composter
+     */
+    private val composterInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "Composter",
+    )
+
+    /**
+     * REGEX-TEST: Composter Upgrades
+     */
+    private val composterUpgradesInventoryPattern by patternGroup.pattern(
+        "upgrades.inventory",
+        "Composter Upgrades",
+    )
+
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
     private var fuelFactors: Map<NeuInternalName, Double> = emptyMap()
@@ -85,8 +104,8 @@ object ComposterOverlay {
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private val composterInventory = InventoryDetector { name -> name == "Composter" }
-    private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
+    private val composterInventory = InventoryDetector { composterInventoryPattern }
+    private val composterUpgradesInventory = InventoryDetector { composterUpgradesInventoryPattern }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value

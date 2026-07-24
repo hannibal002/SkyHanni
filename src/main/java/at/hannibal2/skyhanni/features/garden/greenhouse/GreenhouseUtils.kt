@@ -16,5 +16,5 @@ object GreenhouseUtils {
         "Crop Diagnostics",
     )
 
-    val cropDiagnosticInventory = InventoryDetector { inventoryPattern.matches(it) }
+    val cropDiagnosticInventory = InventoryDetector { inventoryPattern }
 }

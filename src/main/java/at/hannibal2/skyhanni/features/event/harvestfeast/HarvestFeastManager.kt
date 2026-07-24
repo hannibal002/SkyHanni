@@ -62,8 +62,8 @@ object HarvestFeastManager {
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
-    private val mainMenuInventoryDetector by lazy { InventoryDetector { feastInventoryPattern.matches(it) } }
-    private val allCropsInventoryDetector by lazy { InventoryDetector { allCropsInventoryPattern.matches(it) } }
+    private val mainMenuInventoryDetector by lazy { InventoryDetector { feastInventoryPattern } }
+    private val allCropsInventoryDetector by lazy { InventoryDetector { allCropsInventoryPattern } }
 
     private var currentFeastData: EliteFeastData? = null
         set(value) {

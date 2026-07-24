@@ -48,7 +48,7 @@ import net.minecraft.world.level.block.Blocks
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
-    private val patternGroup = RepoPattern.group("dungeon")
+    val patternGroup = RepoPattern.group("dungeon")
 
     // TODO: move to SkyblockIcons class
     /**

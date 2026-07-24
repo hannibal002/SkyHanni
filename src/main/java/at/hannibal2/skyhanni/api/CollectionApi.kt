@@ -82,7 +82,7 @@ object CollectionApi {
         "§7Progress to .* I: .*",
     )
 
-    val collectionInventory = InventoryDetector { name -> collectionInventoryPattern.matches(name) }
+    val collectionInventory = InventoryDetector { collectionInventoryPattern }
     val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
     // TODO repo

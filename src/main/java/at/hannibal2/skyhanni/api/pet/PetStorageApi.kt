@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetInfo
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.indexOfFirstOrNull
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
@@ -581,7 +582,7 @@ object PetStorageApi {
 
         val petItemSlot = when {
             isPetMenu -> PET_MENU_CURRENT_PET_SLOT
-            inventoryName == "SkyBlock Menu" -> SB_MENU_CURRENT_PET_SLOT
+            UtilsPatterns.skyblockMenuGuiPattern.matches(inventoryName) -> SB_MENU_CURRENT_PET_SLOT
             else -> return
         }
         val currentPetItem = inventoryItems[petItemSlot] ?: return

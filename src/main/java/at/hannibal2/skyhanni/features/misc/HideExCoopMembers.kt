@@ -32,7 +32,7 @@ object HideExCoopMembers {
     private val config get() = SkyHanniMod.feature.misc
     private val storage get() = ProfileStorageData.profileSpecific
 
-    private val historicMembersInventory = InventoryDetector { name -> inventoryPattern.matches(name) }
+    private val historicMembersInventory = InventoryDetector { inventoryPattern }
 
     private var changedSlotNumber: Int? = null
 

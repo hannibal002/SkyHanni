@@ -190,7 +190,7 @@ object BitsApi {
         "^Community Shop|Fame Rank$",
     )
 
-    private val museumGuiNamePattern by bitsGuiGroup.pattern(
+    val museumGuiNamePattern by bitsGuiGroup.pattern(
         "museumguiname",
         "Your Museum",
     )

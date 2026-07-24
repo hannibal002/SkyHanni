@@ -46,12 +46,18 @@ object GeorgeHelper {
         "(?i) *(?<fullThing>(?<tierColorCodes>§.)*(?<tier>(?:un)?common|rare|epic|legendary|mythic) (?<pet>[\\S ]+))",
     )
 
+    /**
+     * REGEX-TEST: Offer Pets
+     */
+    private val offerPetsInventoryMenuPattern by patternGroup.pattern(
+        "offer-pets.inventory-menu",
+        "Offer Pets",
+    )
+
     init {
         InventoryDetector(
             onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-        ) { name ->
-            name == "Offer Pets"
-        }
+        ) { offerPetsInventoryMenuPattern }
     }
 
     private var display = emptyList<Renderable>()
