@@ -8,17 +8,15 @@ object ForagingChatFilter {
     private val config get() = ChatFilter.config.foraging
     private val generalConfig get() = ChatFilter.generalConfig
 
-    val foragingDetector = IslandDetector(
-        islandTag = IslandTypeTag.FORAGING,
-        onIslandJoin = { CoreChatFilter.add(LotteryFilter) },
-        onIslandLeave = { CoreChatFilter.remove(LotteryFilter) }
-    )
-
     val customTreesDetector = IslandDetector(
         islandTag = IslandTypeTag.FORAGING_CUSTOM_TREES,
         onIslandJoin = { CoreChatFilter.add(UnmineableTreeFilter) },
         onIslandLeave = { CoreChatFilter.remove(UnmineableTreeFilter) }
     )
+
+    init {
+        CoreChatFilter.add(LotteryFilter)
+    }
 
     object UnmineableTreeFilter : RegexChatFilter("unmineable_tree") {
         override fun isEnabled(): Boolean = IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() && config.unmineable

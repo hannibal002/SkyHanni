@@ -8,29 +8,30 @@ object MiscChatFilter {
     private val patternGroup = ChatFilter.chatFilterGroup.group("hypixel-misc")
     private val config get() = ChatFilter.config
 
+    val filters = setOf(
+        EmptyFilter,
+        WelcomeFilter,
+        LobbyFilter,
+        WarpingFilter,
+        KillComboFilter,
+        ProfileJoinFilter,
+        MiniBazaarAndAHFilter,
+        AchievementGetFilter,
+        ParkourFilter,
+        TeleportPadFilter,
+        UselessDropFilter,
+        LegacyItemsFilter,
+        UselessNotificationFilter,
+        PartyFilter,
+        AuctionHouseFilter,
+        BazaarFilter,
+        UselessWarningFilter,
+        AnnoyingSpamFilter,
+        RewardBundleFilter,
+        SacrificeFilter,
+    )
+
     init {
-        val filters = setOf<ChatFilter>(
-            EmptyFilter,
-            WelcomeFilter,
-            LobbyFilter,
-            WarpingFilter,
-            KillComboFilter,
-            ProfileJoinFilter,
-            MiniBazaarAndAHFilter,
-            AchievementGetFilter,
-            ParkourFilter,
-            TeleportPadFilter,
-            UselessDropFilter,
-            LegacyItemsFilter,
-            UselessNotificationFilter,
-            PartyFilter,
-            AuctionHouseFilter,
-            BazaarFilter,
-            UselessWarningFilter,
-            AnnoyingSpamFilter,
-            RewardBundleFilter,
-            SacrificeFilter,
-        )
         CoreChatFilter.add(filters)
     }
 

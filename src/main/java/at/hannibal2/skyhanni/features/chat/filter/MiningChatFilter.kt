@@ -1,24 +1,19 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
-import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.utils.IslandDetector
-
 object MiningChatFilter {
     private val patternGroup = ChatFilter.chatFilterGroup.group("mining")
     private val generalConfig get() = ChatFilter.generalConfig
 
-    val islandDetector = IslandDetector(
-        islandTag = IslandTypeTag.MINING,
-        onIslandJoin = { CoreChatFilter.add(filters) },
-        onIslandLeave = { CoreChatFilter.remove(filters) }
-    )
-
     val filters =
         setOf<ChatFilter>(
-            SkymallFilter(),
+            SkymallFilter,
         )
 
-    class SkymallFilter : RegexChatFilter("skymall") {
+    init {
+        CoreChatFilter.add(filters)
+    }
+
+    object SkymallFilter : RegexChatFilter("skymall") {
         override fun isEnabled(): Boolean = generalConfig.hideSkyMall
 
         /**
