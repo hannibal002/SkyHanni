@@ -66,7 +66,7 @@ object CarnivalShopHelper {
         "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
-    private val overviewInventory = InventoryDetector {overviewInventoryNamesPattern.matches(it) }
+    private val overviewInventory = InventoryDetector { overviewInventoryNamesPattern.matches(it) }
     private val knownShops = InventoryDetector { name ->
         repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
     }

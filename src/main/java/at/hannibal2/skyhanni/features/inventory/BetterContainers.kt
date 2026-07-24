@@ -68,7 +68,7 @@ object BetterContainers {
         "disallowed",
         "(?i)navigate the maze.*",
     )
-    val disallowedInventory = InventoryDetector {disallowedInventoryPattern.matches(it) }
+    val disallowedInventory = InventoryDetector { disallowedInventoryPattern.matches(it) }
 
     val isRendering: Boolean get() = loaded && gpuTex != null
     val isOverriding: Boolean get() = chestOpen && isRendering && !disallowedInventory.isInside()

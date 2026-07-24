@@ -43,7 +43,7 @@ object BingoCardDisplay {
     private val patternGroup = RepoPattern.group("bingo.card.display")
     private val bingoCardInventoryPattern by patternGroup.pattern("inventory", "Bingo Card")
     private val bingoCardInventoryDetector = InventoryDetector(
-        checkInventoryName = {bingoCardInventoryPattern.matches(it) },
+        checkInventoryName = { bingoCardInventoryPattern.matches(it) },
         onCloseInventory = { dirty = true },
     )
 
