@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
@@ -210,8 +209,8 @@ object PetStorageApi {
                 PetUtils.petWithRarityToInternalName(petName, rarity)
             }
             val petSkin = getPetSkinOrNull(petInternalName)
-
-            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(getCleanLore()) {
+            val lore = getLoreComponent().toColorlessText()
+            val petExp = PetStoragePatterns.petMenuSelectedPetXpPattern.firstMatcher(lore) {
                 val currentValue = group("current").formatDouble()
                 when (groupOrNull("next")) {
                     null -> currentValue
