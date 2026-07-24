@@ -68,7 +68,7 @@ object PetStorageApi {
     private var lastExactPetMenuClick: SimpleTimeMark = SimpleTimeMark.farPast()
     private var petWidgetState: PetWidgetState = PetWidgetState.NOT_READY
 
-    val mainMenuInventory = InventoryDetector(
+    private val mainMenuInventory = InventoryDetector(
         checkInventoryName = {
             if (!PetStoragePatterns.mainPetMenuNamePattern.matches(it)) return@InventoryDetector false
             // Forge pets menu is also called "Pets", but doesn't have this item
