@@ -19,7 +19,7 @@ object ForagingChatFilter {
     }
 
     object UnmineableTreeFilter : RegexChatFilter("unmineable_tree") {
-        override fun isEnabled(): Boolean = IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() && config.unmineable
+        override fun isEnabled(): Boolean = config.unmineable
 
         /**
          ** REGEX-TEST: You cannot damage a tree while it is regenerating!
