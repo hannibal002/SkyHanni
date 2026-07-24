@@ -125,6 +125,11 @@ object ChatFilter {
     )
 
     // Profile Join
+    /**
+     * REGEX-TEST: §8Profile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §eProfile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §aYou are playing on profile: §e691d6a3b-23ea-4541-80b5-771facc73b16
+     */
     private val profileJoinPatterns by miscPatternGroup.list(
         "profile-join",
         "§aYou are playing on profile: §e.*",
@@ -470,7 +475,7 @@ object ChatFilter {
     )
 
     // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefPatterns = listOf(
+    private val masterChefPatterns = listOf(
         "§e\\[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
     )
 
@@ -561,7 +566,7 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-        "masterchef" to MasterChefPatterns,
+        "masterchef" to masterChefPatterns,
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -637,7 +642,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
-        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
+        config.masterChef && masterChefPatterns.matches(message) -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
