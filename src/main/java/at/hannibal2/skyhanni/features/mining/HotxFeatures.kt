@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.foraging.HotfConfig.LotteryDisplayVisibility
 import at.hannibal2.skyhanni.config.features.mining.HotmConfig.SkyMallDisplayVisibility
 import at.hannibal2.skyhanni.data.hotx.HotfData
@@ -31,7 +30,7 @@ object HotxFeatures {
     private val handlers = listOf(HotmData, HotfData)
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         handlers.forEach { it.renderOverlay() }
     }
 
@@ -41,7 +40,7 @@ object HotxFeatures {
         if (!rotatingPerkEntry.isUnlocked || !rotatingPerkEntry.enabled) return
         val currentPerk = currentRotPerk
 
-        val perkDescriptionFormat = currentPerk?.perkDescription
+        val perkDescriptionFormat = currentPerk?.displayDescription
             ?: "§cUnknown! Run ${"§b/${name.lowercase()}"} §cto fix this."
         val finalFormat = "§b${rotatingPerkEntry.guiName}§8: $perkDescriptionFormat"
 

@@ -11,15 +11,16 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getEntityLevel
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
+import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.deceased
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
-import at.hannibal2.skyhanni.utils.compat.getEntityLevel
-import at.hannibal2.skyhanni.utils.compat.getHandItem
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.render.FrustumUtils
 import net.minecraft.client.Minecraft
@@ -31,7 +32,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.monster.EnderMan
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.entity.BlockEntity
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
@@ -134,14 +134,10 @@ object EntityUtils {
         return false
     }
 
-    fun Player.getSkinTexture(): String? {
-        val gameProfile = gameProfile ?: return null
-
-        return gameProfile.properties.entries()
-            .filter { it.key == "textures" }
-            .map { it.value }
-            .firstOrNull { it.name == "textures" }?.value
-    }
+    internal fun Player.getSkinTexture(): String? = gameProfile.properties.entries()
+        .filter { it.key == "textures" }
+        .map { it.value }
+        .firstOrNull { it.name == "textures" }?.value
 
     inline fun <reified T : Entity> getEntitiesNearby(radius: Double, noinline predicate: (T) -> Boolean = ALWAYS): List<T> =
         LocationUtils.playerLocation().getEntitiesNearby<T>(radius, predicate)
@@ -161,18 +157,19 @@ object EntityUtils {
     fun LivingEntity.isAtFullHealth() = baseMaxHealth == findHealthReal().toInt()
 
     @Deprecated("Use specific methods instead, such as wearingSkullTexture or holdingSkullTexture")
-    fun ArmorStand.hasSkullTexture(skin: String): Boolean {
+    fun ArmorStand.hasSkullTexture(skin: String?): Boolean {
+        skin ?: return false
         val inventory = this.getAllEquipment()
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
     fun ArmorStand.getWornSkullTexture(): String? = getStandHelmet()?.getSkullTexture()
-    fun ArmorStand.wearingSkullTexture(skin: String) = getWornSkullTexture() == skin
-    fun ArmorStand.holdingSkullTexture(skin: String) = getHandItem()?.getSkullTexture() == skin
+    fun ArmorStand.wearingSkullTexture(skin: String?) = skin != null && getWornSkullTexture() == skin
+    fun ArmorStand.holdingSkullTexture(skin: String?) = skin != null && getHandItem()?.getSkullTexture() == skin
 
-    fun Player.isNpc() = !isRealPlayer()
+    internal fun Player.isNpc() = !isRealPlayer()
 
-    fun LivingEntity.getArmorInventory(): Array<ItemStack?>? {
+    fun LivingEntity.getArmorInventory(): Array<SafeItemStack?>? {
         if (this !is Player) return null
         return buildList {
             add(inventory.equipment.get(EquipmentSlot.FEET).orNull())
@@ -195,7 +192,7 @@ object EntityUtils {
     // and then filters both for entity type and with the predicate for entities inside those chunks.
     inline fun <reified E : Entity> getEntitiesInBoundingBox(aabb: AABB, noinline predicate: (E) -> Boolean = ALWAYS): List<E> {
         val world = MinecraftCompat.localWorldOrNull ?: return emptyList()
-        return world.getEntitiesOfClass<E>(E::class.java, aabb, predicate)
+        return world.getEntitiesOfClass(E::class.java, aabb, predicate)
     }
 
     @AllEntitiesGetter
@@ -210,9 +207,13 @@ object EntityUtils {
         val world = MinecraftCompat.localWorldOrNull ?: return emptySequence()
         val blockEntityTickers = world.blockEntityTickers.let {
             if (Minecraft.getInstance().isSameThread) it else it.toMutableList()
-        }.asSequence().filterNotNull()
+        }.asSequence()
 
-        return blockEntityTickers.mapNotNull { invoker -> invoker.pos?.let { world.getBlockEntity(it) } }
+        return blockEntityTickers.mapNotNull { invoker ->
+            // This can be null due to other mods
+            @Suppress("UNNECESSARY_SAFE_CALL")
+            invoker.pos?.let(world::getBlockEntity)
+        }
     }
 
     fun Entity.canBeSeen(viewDistance: Number = 150.0, vecYOffset: Double = 0.5, ignoreFrustum: Boolean = false): Boolean {
@@ -228,7 +229,8 @@ object EntityUtils {
     fun LivingEntity.isRunic() = baseMaxHealth == findHealthReal().toInt().derpy() * 4 || isRunicAndCorrupt()
     fun LivingEntity.isRunicAndCorrupt() = baseMaxHealth == findHealthReal().toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.string.removeColor()
+    val Entity.cleanName
+        get() = this.name.string.removeColor()
 
     // TODO use derpy() on every use case
     val LivingEntity.baseMaxHealth: Int
@@ -236,4 +238,7 @@ object EntityUtils {
 
     inline val Entity.spawnTime: ServerTimeMark get() = ServerTimeMark.now() - tickCount.ticks
 
+    fun LivingEntity.hasVisibleEquipment(): Boolean = EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
+
+    fun Entity.isEmptyInvisibleArmorStand(): Boolean = this is ArmorStand && isInvisible && !hasVisibleEquipment()
 }

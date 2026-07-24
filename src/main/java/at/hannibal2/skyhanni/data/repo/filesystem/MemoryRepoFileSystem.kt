@@ -3,28 +3,28 @@ package at.hannibal2.skyhanni.data.repo.filesystem
 import at.hannibal2.skyhanni.SkyHanniMod.launchUnScoped
 import at.hannibal2.skyhanni.data.repo.ChatProgressUpdates
 import at.hannibal2.skyhanni.data.repo.RepoLogger
-import at.hannibal2.skyhanni.utils.coroutines.CoroutineConfig
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.DisposableHandle
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.ConcurrentHashMap
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 class MemoryRepoFileSystem(
     override val root: File,
     override val logger: RepoLogger,
-    private val coroutineConfig: CoroutineConfig,
+    private val coroutineSettings: CoroutineSettings,
 ) : RepoFileSystem, DisposableHandle {
     private val storage = ConcurrentHashMap<String, ByteArray>()
 
     /**
-     * Tracks the result of the background disk-flush started in [loadFromZip].
+     * Tracks the result of the background disk-flush started in [loadFromTgz].
      * Completed (successfully or exceptionally) before [transitionAfterReload] proceeds.
      */
     private var flushResult: CompletableDeferred<Unit>? = null
@@ -48,30 +48,36 @@ class MemoryRepoFileSystem(
     }.map { it.removePrefix("$path/") }
 
     /**
-     * Loads entries from [zipFile] into in-memory storage (via [loadFromZip]), then
+     * Loads entries from [tgzFile] into in-memory storage (via [loadFromTgz]), then
      * kicks off a background [flushResult] job to persist those bytes to [root].
      *
      * The flush is intentionally deferred to after the reload event fires, so that event
      * handlers benefit from fast in-memory reads without waiting for disk I/O. Call
      * [transitionAfterReload] to wait for the flush and switch to [DiskRepoFileSystem].
      */
-    override suspend fun loadFromZip(progress: ChatProgressUpdates, zipFile: File): Boolean {
-        progress.update("repo file system loadFromZip")
-        val success = super.loadFromZip(progress, zipFile)
-        check(flushResult == null) { "loadFromZip called twice on the same MemoryRepoFileSystem instance" }
+    override suspend fun loadFromTgz(progress: ChatProgressUpdates, tgzFile: File): Boolean {
+        progress.update("repo memory file system loadFromTgz")
+        val success = super.loadFromTgz(progress, tgzFile)
+        check(flushResult == null) {
+            "loadFromTgz called twice on the same MemoryRepoFileSystem instance"
+        }
+        flushResult = flushToDisk(progress.category, root)
+        progress.update("loadFromTgz end")
+        return success
+    }
 
-        // Snapshot the category reference now — storage may be cleared before the flush job reads it.
-        val progressCategory = progress.category
+    // Launched into the module-level scope so it outlives this call site and can be
+    // awaited later in transitionAfterReload.
+    // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
+    // through runWithErrorHandling which would otherwise swallow exceptions silently.
+    private fun flushToDisk(
+        category: ChatProgressUpdates.ChatProgressCategory,
+        root: File,
+    ): CompletableDeferred<Unit> {
         val deferred = CompletableDeferred<Unit>()
-        flushResult = deferred
-
-        // Launched into the module-level scope so it outlives this call site and can be
-        // awaited later in transitionAfterReload.
-        // We use CompletableDeferred to propagate success or failure, because launchUnScoped routes
-        // through runWithErrorHandling which would otherwise swallow exceptions silently.
-        coroutineConfig.withIOContext().launchUnScoped {
+        coroutineSettings.withIOContext().launchUnScoped {
             try {
-                saveToDisk(progressCategory, root)
+                saveToDisk(category, root)
                 deferred.complete(Unit)
             } catch (e: CancellationException) {
                 deferred.completeExceptionally(e)
@@ -81,9 +87,7 @@ class MemoryRepoFileSystem(
                 deferred.completeExceptionally(e)
             }
         }
-
-        progress.update("loadFromZip end")
-        return success
+        return deferred
     }
 
     override fun dispose() = storage.clear()
@@ -92,8 +96,8 @@ class MemoryRepoFileSystem(
      * Waits for the background disk flush to complete, then disposes in-memory storage and
      * returns a [DiskRepoFileSystem] backed by [root].
      *
-     * If the flush failed, the error is logged and the transition still proceeds — callers
-     * should treat unsuccessful repo constants as the signal that something went wrong on disk.
+     * If the flush failed, the error is logged and the transition still proceeds.
+     * Callers should treat unsuccessful repo constants as the signal that something went wrong on disk.
      */
     override suspend fun transitionAfterReload(progress: ChatProgressUpdates): RepoFileSystem {
         val deferred = flushResult
@@ -104,7 +108,7 @@ class MemoryRepoFileSystem(
             runCatching { it.await() }.onFailure { e ->
                 // Disk state may be incomplete. We still transition so that memory is freed,
                 // but callers will observe failures via unsuccessfulConstants.
-                progress.update("disk flush failed — repo on disk may be incomplete: ${e.message}")
+                progress.update("disk flush failed! repo on disk may be incomplete: ${e.message}")
             }
         }
 

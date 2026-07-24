@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhite
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -49,7 +50,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 @Suppress("UnusedPrivateProperty")
@@ -140,16 +140,6 @@ object InstanceChestProfit {
     )
 
     /**
-     * REGEX-TEST: Enchanted Book (§d§lWisdom I§f)
-     * REGEX-TEST: Enchanted Book (§d§lCombo I§f)
-     */
-    private val bookColorFixerOld by patternGroup.pattern(
-        // Remove after 7.6.0 is pushed
-        "bookcolorfix",
-        "Enchanted Book \\((?<item>.+)(?:§.)+\\)",
-    )
-
-    /**
      * REGEX-TEST: §eRequires a Dungeon Chest Key
      */
     private val requiresDungeonChestKeyPattern by patternGroup.pattern(
@@ -169,7 +159,7 @@ object InstanceChestProfit {
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
     @HandleEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.enabled && !config.croesusAllChestsOverlay && !config.croesusHighlight) return
 
         if (isInCroesusMenu() && (config.croesusAllChestsOverlay || config.croesusHighlight)) {
@@ -209,8 +199,8 @@ object InstanceChestProfit {
         }
     }
 
-    @HandleEvent
-    fun onKey(event: GuiKeyPressEvent) {
+    @HandleEvent(GuiKeyPressEvent::class)
+    fun onGuiKeyPress() {
         if (!config.keybind.isKeyHeld()) return
         val favoriteItems = profileStorage?.instanceChestFavoriteItems ?: mutableListOf()
         stackUnderCursor()?.getInternalNameOrNull()?.let {
@@ -234,7 +224,7 @@ object InstanceChestProfit {
         croesusDisplay = null
     }
 
-    private fun parseCroesusChest(itemStack: ItemStack?, chestType: CroesusChestType, slot: Int) {
+    private fun parseCroesusChest(itemStack: SafeItemStack?, chestType: CroesusChestType, slot: Int) {
         val chestList = mutableListOf<NeuInternalName>()
         val chestTips = mutableListOf<String>()
         chestTips.add("${chestType.stackChestName}:")
@@ -332,7 +322,7 @@ object InstanceChestProfit {
         count * getPrice(NeuInternalName.fromItemName(name))
     } ?: 0.0
 
-    private fun createDisplay(inventoryName: String, items: Map<Int, ItemStack>) {
+    private fun createDisplay(inventoryName: String, items: Map<Int, SafeItemStack>) {
         /**
          * Kuudra chests say "Free Chest Chest" and "Paid Chest Chest" due to Hypixel issue
          */
@@ -417,7 +407,7 @@ object InstanceChestProfit {
         add(Renderable.emptyText())
         add(Renderable.text("$color§lProfit $color${total.formatCoin()}"))
 
-        if (!IslandType.CATACOMBS.isCurrent() && !IslandType.KUUDRA_ARENA.isCurrent()) return@buildList
+        if (!IslandType.CATACOMBS.isInIsland() && !IslandType.KUUDRA_ARENA.isInIsland()) return@buildList
 
         add(Renderable.emptyText())
         add(Renderable.text("§d§lAll Chest Profits"))
@@ -441,8 +431,8 @@ object InstanceChestProfit {
                 }
             } ?: 0.0
 
-    @HandleEvent(GuiRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
+    fun onChestGuiRender() {
         if (config.enabled && InventoryUtils.inInventory())
             if (isInstanceChestGUI()) {
                 chestDisplay?.let {

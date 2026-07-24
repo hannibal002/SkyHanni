@@ -14,25 +14,27 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object BazaarBestSellMethod {
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
-    private var display = ""
+    private var display: Renderable? = null
 
     // Working with the last clicked item manually because
     // the open inventory event happen while the recent clicked item in the inventory is not in the inventory or in the cursor slot
-    private var lastClickedItem: ItemStack? = null
+    private var lastClickedItem: SafeItemStack? = null
     private var nextCloseWillResetItem = false
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        display = ""
+        display = null
         if (lastClickedItem != null) {
             if (nextCloseWillResetItem) {
                 lastClickedItem = null
@@ -44,15 +46,17 @@ object BazaarBestSellMethod {
     @HandleEvent
     fun onBazaarOpenedProduct(event: BazaarOpenedProductEvent) {
         if (!isEnabled()) return
-        display = updateDisplay(event.openedProduct)
+        display = getDisplay(event.openedProduct)
 
         // on 1.21 NeuInternalName.getAmountInInventory() does not include the item currently clicked at
         DelayedRun.runDelayed(300.milliseconds) {
-            if (display.isEmpty()) {
-                display = updateDisplay(event.openedProduct)
+            if (display == null) {
+                display = getDisplay(event.openedProduct)
             }
         }
     }
+
+    private fun getDisplay(internalName: NeuInternalName?): Renderable = Renderable.text(updateDisplay(internalName))
 
     private fun updateDisplay(internalName: NeuInternalName?): String {
         if (internalName == null) {
@@ -77,9 +81,9 @@ object BazaarBestSellMethod {
     @HandleEvent
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (display.isEmpty()) return
 
-        config.bestSellMethodPos.renderString(display, posLabel = "Bazaar Best Sell Method")
+        val display = display ?: return
+        config.bestSellMethodPos.renderRenderable(display, posLabel = "Bazaar Best Sell Method")
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)

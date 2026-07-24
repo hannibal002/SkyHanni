@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 @SkyHanniModule
 object SkyBlockXPBar {
     private val config get() = SkyHanniMod.feature.misc
+    private val ignoredAreas = setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)
     private var cache: OriginalValues? = null
 
     private class OriginalValues(val currentXP: Float, val maxXP: Int, val level: Int)
@@ -25,7 +26,7 @@ object SkyBlockXPBar {
         if (event.type != RenderLayer.EXPERIENCE_BAR) return
         val (level, xp) = SkyBlockXPApi.levelXPPair ?: return
 
-        with(MinecraftCompat.localPlayer) {
+        with(MinecraftCompat.localPlayerOrThrow) {
             cache = OriginalValues(experienceProgress, totalExperience, experienceLevel)
             setExperienceValues(xp / 100f, 100, level)
         }
@@ -35,7 +36,7 @@ object SkyBlockXPBar {
     fun onRenderOverlayPost(event: GameOverlayRenderPostEvent) {
         if (event.type != RenderLayer.EXPERIENCE_BAR) return
         with(cache ?: return) {
-            MinecraftCompat.localPlayer.setExperienceValues(currentXP, maxXP, level)
+            MinecraftCompat.localPlayerOrThrow.setExperienceValues(currentXP, maxXP, level)
             cache = null
         }
     }
@@ -46,5 +47,5 @@ object SkyBlockXPBar {
     }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && !SkyBlockUtils.inAnyIsland(setOf(IslandType.THE_RIFT, IslandType.CATACOMBS)) && config.skyblockXPBar
+        SkyBlockUtils.inSkyBlock && ignoredAreas.none { it.isInIsland() } && config.skyblockXPBar
 }

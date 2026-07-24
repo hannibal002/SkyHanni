@@ -35,4 +35,14 @@ class GlaciteMineshaftConfig {
     @ConfigOption(name = "Mineshaft Detection", desc = "")
     @Accordion
     val mineshaftDetectionConfig: MineshaftDetectionConfig = MineshaftDetectionConfig()
+
+    @Expose
+    @ConfigOption(name = "Mineshaft Timer", desc = "")
+    @Accordion
+    val mineshaftTimerConfig: MineshaftTimerConfig = MineshaftTimerConfig()
+
+    @Expose
+    @ConfigOption(name = "Organ Donor Accessory", desc = "")
+    @Accordion
+    val organDonorAccessoryConfig: OrganDonorAccessoryConfig = OrganDonorAccessoryConfig()
 }

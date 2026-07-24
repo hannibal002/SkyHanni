@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -49,13 +50,14 @@ object PunchcardHighlight {
     private val patternGroup = RepoPattern.group("rift.punchcard")
 
     /**
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§b[MVP§r§c+§r§b] ThorQOM§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§7Metafighter§r§7 §r§eand both regained §r§a+25ф Rift Time§r§e!
-     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] RickyLafleur22§r§f §r§eand both regained §r§a+25ф Rift Time§r§e!
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§b[MVP§r§c+§r§b] ThorQOM§r§f §r§eand both regained §r§a+25 Rift Time§r§e!
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§7Metafighter§r§7 §r§eand both regained §r§a+25 Rift Time§r§e!
+     * REGEX-TEST: §5§lPUNCHCARD! §r§eYou punched §r§a[VIP] RickyLafleur22§r§f §r§eand both regained §r§a+25 Rift Time§r§e!
      */
+    @Suppress("MaxLineLength")
     private val punchedPattern by patternGroup.pattern(
         "new",
-        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25ф Rift Time§r§e!",
+        "§5§lPUNCHCARD! §r§eYou punched §r§.(?:.*?)?(?<name>\\w+)§r§. §r§eand both regained §r§a\\+25${SkyblockStat.RIFT_TIME.hypixelIcon} Rift Time§r§e!",
     )
 
     /**
@@ -146,7 +148,7 @@ object PunchcardHighlight {
 
     private fun colorPlayer(entity: LivingEntity) {
         val color = config.color.get().toColor()
-        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isCurrent() }
+        RenderLivingEntityHelper.setEntityColor(entity, color) { IslandType.THE_RIFT.isInIsland() }
     }
 
     private fun removePlayerColor(entity: LivingEntity) {

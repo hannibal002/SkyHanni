@@ -1,22 +1,30 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.features.garden.pests.PestApi.getPests
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 
-enum class SprayType(val displayName: String, val internalName: NeuInternalName? = null) {
+enum class SprayType(
+    val displayName: String,
+    val internalName: NeuInternalName? = null,
+) {
     COMPOST("Compost"),
     PLANT_MATTER("Plant Matter"),
     DUNG("Dung"),
     HONEY_JAR("Honey Jar"),
     TASTY_CHEESE("Tasty Cheese", "CHEESE_FUEL".toInternalName()),
-    FINE_FLOUR("Fine Flour"),
     JELLY("Jelly"),
+    MOONDEW("Moondew"),
     ;
 
     fun toInternalName(): NeuInternalName {
         if (internalName != null) return internalName
         return name.toInternalName()
     }
+
+    fun getSprayEffect(): String = getPests().takeIf { it.isNotEmpty() }?.let { pests ->
+        pests.joinToString("§7, §6") { it.displayName }
+    } ?: "§cUnknown Effect"
 
     companion object {
 
@@ -28,6 +36,7 @@ enum class SprayType(val displayName: String, val internalName: NeuInternalName?
             }
             return null
         }
+
         fun getByPestTypeOrAll(pestType: PestType?) = entries.filter {
             it == pestType?.spray
         }.takeIf {

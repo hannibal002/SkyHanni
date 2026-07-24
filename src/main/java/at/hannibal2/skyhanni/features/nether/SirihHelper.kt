@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.FactionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -22,18 +21,20 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SirihHelper {
 
+    private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
+
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private var lastSentMessage = SimpleTimeMark.farPast()
 
-    private val SULPHUR_ORE = "SULPHUR_ORE".toInternalName()
-
     /**
-     * REGEX-TEST: §e[NPC] §dSirih§f: §rOink.
+     * REGEX-TEST: [NPC] Sirih: Oink.
+     * REGEX-TEST: [NPC] Sirih: ✆ Oink?
+     * REGEX-TEST: [NPC] Sirih: ✆ Oink.
      */
     private val sirihLine by RepoPattern.pattern(
-        "crimson.sirih.helper",
-        "§e\\[NPC] §dSirih§f: §rOink\\.",
+        "crimson.sirih.helper.colorless",
+        "\\[NPC] Sirih:(?: ✆)? Oink.",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
@@ -42,7 +43,7 @@ object SirihHelper {
         if (lastSentMessage.passedSince() < 1.minutes) return
         if (!sirihLine.matches(event.message)) return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.getInternalNameOrNull() == SULPHUR_ORE } > 0) return
+        if (InventoryUtils.containsInLowerInventoryInternalName { it == SULPHUR_ORE }) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

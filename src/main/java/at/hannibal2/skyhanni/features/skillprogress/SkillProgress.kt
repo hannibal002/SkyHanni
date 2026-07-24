@@ -10,9 +10,6 @@ import at.hannibal2.skyhanni.api.SkillApi.skillXPInfoMap
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
@@ -21,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -36,6 +34,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import kotlin.math.ceil
@@ -60,7 +59,7 @@ object SkillProgress {
     var hideInActionBar = listOf<String>()
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -78,7 +77,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onChestGuiRender() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
@@ -88,13 +87,23 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
+    fun onGuiRenderTop() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
+            if (InventoryUtils.inAnyInventory()) {
+                InventoryGuiScaleCompat.withOriginalHudScale {
+                    renderAllSkillsDisplay()
+                }
+            } else {
+                renderAllSkillsDisplay()
+            }
         }
+    }
+
+    private fun renderAllSkillsDisplay() {
+        config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
     }
 
     private fun renderDisplay() {
@@ -146,7 +155,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         display = emptyList()
         allDisplay = emptyList()
         etaDisplay = emptyList()
@@ -205,7 +214,7 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         onToggle(
             config.enabled,
             config.alwaysShow,

@@ -31,10 +31,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.BlockCompat
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
@@ -49,7 +49,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
@@ -104,7 +103,7 @@ object MineshaftPityDisplay {
 
 
     /**
-     * REGEX-TEST:  Glacite Mineshafts: 124/2,000
+     * WRAPPED-REGEX-TEST: " Glacite Mineshafts: 124/2,000"
      */
     private val tabPityPattern by group.pattern(
         "tablist",
@@ -133,9 +132,9 @@ object MineshaftPityDisplay {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Quick Shafter".asComponent(),
-            "Spawn a Mineshaft in under 100 Pity".asComponent(),
-            10f,
+            name = "Quick Shafter",
+            description = "Spawn a Mineshaft in under 100 Pity",
+            userLuckAmount = 10f,
         )
         event.register(achievement, SHAFT_ACHIEVEMENT)
     }
@@ -149,7 +148,7 @@ object MineshaftPityDisplay {
             val counterUntilPity = MAX_COUNTER - pityCounter
             val totalBlocks = PityBlock.entries.sumOf { it.blocksBroken + it.spreadBlocksBroken }
 
-            if (counterUntilPity < 100 && counterUntilPity != 0) {
+            if (counterUntilPity < 100 && everFoundPityWidget) {
                 AchievementManager.completeAchievement(SHAFT_ACHIEVEMENT)
             }
 
@@ -206,14 +205,14 @@ object MineshaftPityDisplay {
     private var tablistPity = MAX_COUNTER
     private var everFoundPityWidget = false
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.DWARVEN_MINES)
     fun onPityWidget(event: WidgetUpdateEvent) {
-        if (!isDisplayEnabled()) return
         if (!event.isWidget(TabWidget.PITY)) return
         for (line in event.lines) {
             tabPityPattern.matchMatcher(line) {
                 everFoundPityWidget = true
                 tablistPity = MAX_COUNTER - group("pity").formatInt()
+                update()
             }
         }
     }
@@ -382,13 +381,13 @@ object MineshaftPityDisplay {
         val displayName: String,
         val oreTypes: List<OreType>,
         val multiplier: Int,
-        val displayItem: ItemStack,
+        private val displayItemProvider: () -> SafeItemStack,
     ) {
         MITHRIL(
             "Mithril",
             listOf(OreType.MITHRIL),
             2,
-            ColoredBlockCompat.LIGHT_BLUE.createWoolStack(),
+            { ColoredBlockCompat.LIGHT_BLUE.createWoolStack() },
         ),
 
         // can't rename enum because config explodes
@@ -396,40 +395,42 @@ object MineshaftPityDisplay {
             "Low Tier Gemstone",
             OreType.entries.filter { it.isLowTierGemstone() },
             8,
-            ColoredBlockCompat.RED.createGlassStack(),
+            { ColoredBlockCompat.RED.createGlassStack() },
         ),
         HIGH_TIER_GEMSTONE(
             "High Tier Gemstone",
             OreType.entries.filter { it.isHighTierGemstone() },
             10,
-            ColoredBlockCompat.BLUE.createGlassStack(),
+            { ColoredBlockCompat.BLUE.createGlassStack() },
         ),
         GLACITE(
             "Glacite",
             listOf(OreType.GLACITE),
             4,
-            ItemStack(Blocks.PACKED_ICE),
+            { SafeItemStack(Blocks.PACKED_ICE) },
         ),
         TUNGSTEN(
             "Tungsten",
             listOf(OreType.TUNGSTEN),
             4,
-            ItemStack(Blocks.CLAY),
+            { SafeItemStack(Blocks.CLAY) },
         ),
         UMBER(
             "Umber",
             listOf(OreType.UMBER),
             4,
-            ItemStack(Blocks.RED_SANDSTONE),
+            { SafeItemStack(Blocks.RED_SANDSTONE) },
         ),
 
         TITANIUM(
             "Titanium",
             listOf(OreType.TITANIUM),
             8,
-            BlockCompat.createSmoothDiorite(),
+            { BlockCompat.createSmoothDiorite() },
         ),
         ;
+
+        val displayItem: SafeItemStack by lazy { displayItemProvider() }
 
         companion object {
 

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -48,10 +48,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -60,13 +60,15 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.level.block.Blocks
 
 @SkyHanniModule
 object MinionFeatures {
+
+    const val MINION_FUEL_SLOT = 19
+    const val MINION_PICKUP_SLOT = 53
 
     private val config get() = SkyHanniMod.feature.misc.minions
     private var lastClickedEntity: LorenzVec? = null
@@ -75,7 +77,7 @@ object MinionFeatures {
     private var lastMinionOpened = 0L
 
     private var lastInventoryClosed = 0L
-    private var coinsPerDay = ""
+    private var display: Renderable? = null
 
     private val patternGroup = RepoPattern.group("minion")
 
@@ -96,6 +98,22 @@ object MinionFeatures {
     )
 
     /**
+     * REGEX-TEST: You picked up a minion!
+     */
+    private val minionPickupPattern by patternGroup.pattern(
+        "chat.pickup",
+        "You picked up a minion!",
+    )
+
+    /**
+     * REGEX-TEST: You placed a minion!
+     */
+    private val minionPlacePattern by patternGroup.pattern(
+        "chat.place",
+        "You placed a minion!",
+    )
+
+    /**
      * REGEX-TEST: Redstone Minion IV
      * REGEX-TEST: Chicken Minion XI
      */
@@ -104,8 +122,16 @@ object MinionFeatures {
         "Minion [^➜]",
     )
     private val minionCollectItemPattern by patternGroup.pattern(
-        "item.collect",
-        "^§aCollect All$",
+        "item.collect.colorless",
+        "^Collect All$",
+    )
+
+    /**
+     * REGEX-TEST: You applied the eyedrops on the minion and ran out!
+     */
+    val eyedropsRanOutPattern by patternGroup.pattern(
+        "eyedrops.ranout",
+        "You applied the eyedrops on the minion and ran out!",
     )
 
     var lastMinion: LorenzVec? = null
@@ -126,32 +152,29 @@ object MinionFeatures {
 
         if (equipped.hoverName.string.contains(" Minion ") && lookingAt.getBlockStateAt().block == Blocks.AIR) {
             newMinion = lookingAt.add(0.5, 0.0, 0.5)
-            newMinionName = getMinionName(equipped.cleanName())
+            newMinionName = getMinionName(equipped.cleanName)
         } else {
             newMinion = null
             newMinionName = null
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onEntityClick(event: EntityClickEvent) {
-        if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastClickedEntity = event.clickedEntity.getLorenzVec()
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onBlockClick(event: BlockClickEvent) {
-        if (!enableWithHub()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         lastStorage = event.position
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
-        if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
         val color = config.lastClickedMinion.color.toColor()
@@ -172,14 +195,13 @@ object MinionFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!enableWithHub()) return
         val inventoryName = event.inventoryName
         if (!minionTitlePattern.find(inventoryName)) return
 
         event.inventoryItems[48]?.let {
-            if (minionCollectItemPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())) {
+            if (minionCollectItemPattern.matches(it.cleanName)) {
                 MinionOpenEvent(inventoryName, event.inventoryItems).post()
                 return
             }
@@ -189,9 +211,8 @@ object MinionFeatures {
         minionStorageInventoryOpen = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIslands = [PRIVATE_ISLAND, HUB])
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!enableWithHub()) return
         if (minionInventoryOpen) {
             MinionOpenEvent(event.inventoryName, event.inventoryItems).post()
         }
@@ -205,7 +226,7 @@ object MinionFeatures {
 
         val openInventory = event.inventoryName
         val name = getMinionName(openInventory)
-        val inHub = SkyBlockUtils.currentIsland == IslandType.HUB
+        val inHub = IslandType.HUB.isInIsland()
         val inStorage = minions.contains(entity)
 
         if (!inStorage && !inHub) minions[entity] = ProfileSpecificStorage.MinionConfig().apply {
@@ -229,7 +250,7 @@ object MinionFeatures {
     }
 
     private fun removeBuggedMinions(isCommand: Boolean = false) {
-        if (!IslandType.PRIVATE_ISLAND.isCurrent()) return
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         val minions = minions ?: return
 
         val removedEntities = mutableListOf<LorenzVec>()
@@ -264,11 +285,11 @@ object MinionFeatures {
 
         minionInventoryOpen = false
         lastMinionOpened = System.currentTimeMillis()
-        coinsPerDay = ""
+        display = null
         lastInventoryClosed = System.currentTimeMillis()
 
         MinionCloseEvent().post()
-        if (IslandType.PRIVATE_ISLAND.isCurrent()) {
+        if (IslandType.PRIVATE_ISLAND.isInIsland()) {
             val location = lastMinion ?: return
 
             if (location !in minions) {
@@ -277,12 +298,14 @@ object MinionFeatures {
         }
     }
 
+    // Todo this calculation should not happen invariably when null.
+    //  Use a "dirty" flag or something similar, and handle state management.
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onTick() {
-        if (coinsPerDay != "") return
+        if (display != null) return
 
-        if (Minecraft.getInstance().screen is ContainerScreen && config.hopperProfitDisplay) {
-            coinsPerDay = if (minionInventoryOpen) updateCoinsPerDay() else ""
+        if (MinecraftCompat.screen is ContainerScreen && config.hopperProfitDisplay) {
+            display = if (minionInventoryOpen) Renderable.text(updateCoinsPerDay()) else null
         }
     }
 
@@ -320,6 +343,7 @@ object MinionFeatures {
         return "§7Coins/day with ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}§7: §6$format coins"
     }
 
+    // TODO reshape to data class, use Resettable
     @HandleEvent
     fun onWorldChange() {
         lastClickedEntity = null
@@ -334,18 +358,16 @@ object MinionFeatures {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Inflation Contributor".asComponent(),
-            "Gain Coins from a single Minion Hopper".asComponent(),
-            10f,
-            false,
-            listOf(1_000_000, 5_000_000, 10_000_000),
+            name = "Inflation Contributor".asComponent(),
+            description = "Gain Coins from a single Minion Hopper".asComponent(),
+            userLuckAmount = 10f,
+            tiers = listOf(1_000_000, 5_000_000, 10_000_000),
         )
         event.register(achievement, MINION_COIN_ACHIEVEMENT)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        // TODO use repo patterns
         val message = event.cleanMessage
         minionCoinPattern.matchMatcher(message) {
             if (System.currentTimeMillis() - lastInventoryClosed < 2_000) {
@@ -359,14 +381,14 @@ object MinionFeatures {
                 AchievementManager.updateTieredAchievement(MINION_COIN_ACHIEVEMENT, coins)
             }
         }
-        if (message.startsWith("You picked up a minion!") && lastMinion != null) {
+        if (minionPickupPattern.find(message) && lastMinion != null) {
             minions?.remove(lastMinion)
             lastClickedEntity = null
             lastMinion = null
             lastMinionOpened = 0L
         }
 
-        if (message.startsWith("You placed a minion!")) newMinion?.let {
+        if (minionPlacePattern.find(message)) newMinion?.let {
             minions?.put(
                 it,
                 ProfileSpecificStorage.MinionConfig().apply {
@@ -430,13 +452,12 @@ object MinionFeatures {
         }
     }
 
-    private fun enableWithHub() = IslandType.PRIVATE_ISLAND.isCurrent() || IslandType.HUB.isCurrent()
-
     @HandleEvent(onlyOnSkyblock = true)
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!minionInventoryOpen || !config.hopperProfitDisplay) return
 
-        config.hopperProfitPos.renderRenderable(Renderable.text(coinsPerDay), posLabel = "Minion Coins Per Day")
+        val display = display ?: return
+        config.hopperProfitPos.renderRenderable(display, posLabel = "Minion Coins Per Day")
     }
 
     @HandleEvent

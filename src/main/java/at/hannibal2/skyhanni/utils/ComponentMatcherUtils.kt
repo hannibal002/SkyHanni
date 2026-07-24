@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.defaultStyleConstructor
+import at.hannibal2.skyhanni.utils.compat.orEmpty
 import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.unformattedTextForChatCompat
 import net.minecraft.network.chat.Component
@@ -111,7 +112,11 @@ class ComponentMatcher internal constructor(
      * Return a span equivalent to the group with the given name found by [matches] or [find]
      */
     fun group(name: String): ComponentSpan? {
-        val start = matcher.start(name)
+        val start = try {
+            matcher.start(name)
+        } catch (_: IllegalArgumentException) {
+            return null
+        }
         if (start < 0) return null
         return this.span.slice(start, matcher.end(name))
     }
@@ -182,7 +187,7 @@ class ComponentSpan internal constructor(
     /**
      * Sample the chat style at the start of the span.
      */
-    fun sampleStyleAtStart(): Style? = sampleAtStart().style
+    fun sampleStyleAtStart(): Style = sampleAtStart().style.orEmpty()
 
     /**
      * Sample all the components that intersect with this span. Note that some of the returned components may contain

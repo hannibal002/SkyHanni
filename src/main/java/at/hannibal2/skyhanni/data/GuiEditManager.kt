@@ -14,12 +14,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
-import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiGraphics
+import net.minecraft.client.gui.GuiGraphicsExtractor
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
+import org.joml.Vector2i
 import org.lwjgl.glfw.GLFW
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -30,9 +31,10 @@ object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
-    private val currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private val currentPositions = TimeLimitedCache<String, CurrentPosition>(15.seconds)
     private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
     private var lastMovedGui: String? = null
+    private var addingChestGuiPosition = false
 
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
@@ -43,7 +45,7 @@ object GuiEditManager {
         }
         if (isInGui()) return
 
-        val guiScreen = Minecraft.getInstance().screen
+        val guiScreen = MinecraftCompat.screen
         val openGui = guiScreen?.javaClass?.name ?: "none"
         val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
         if (isInNeuPv) return
@@ -71,7 +73,7 @@ object GuiEditManager {
         val name = position.getOrSetInternalName {
             if (posLabel == "none") "none ${StringUtils.generateRandomId()}" else posLabel
         }
-        currentPositions[name] = position
+        currentPositions[name] = CurrentPosition(position, addingChestGuiPosition)
         currentBorderSize[posLabel] = Pair(width, height)
     }
 
@@ -80,10 +82,12 @@ object GuiEditManager {
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
         SkyHanniMod.shouldCloseScreen = false
+        val positions = currentPositions.values.toList()
         SkyHanniMod.screenToOpen = GuiPositionEditor(
-            currentPositions.values.toList(),
+            positions.map { it.position },
             2,
-            Minecraft.getInstance().screen as? SkyHanniGuiContainer,
+            MinecraftCompat.screen as? SkyHanniGuiContainer,
+            positions.filter { it.isChestGuiOverlay }.map { it.position }.toSet(),
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
@@ -96,7 +100,7 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun renderLast(context: GuiGraphics) {
+    fun renderLast(context: GuiGraphicsExtractor) {
         if (GlobalRender.renderDisabled) return
         if (!isInGui()) return
 
@@ -105,15 +109,32 @@ object GuiEditManager {
 
         RenderData.renderOverlay(context)
 
-        DrawContextUtils.pushPop {
-            GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
-        }
+        val editor = MinecraftCompat.screen as? GuiPositionEditor
+        editor?.renderWithOldScreenMetrics {
+            renderChestOverlay(context)
+        } ?: renderChestOverlay(context)
 
         DrawContextUtils.translate(0f, 0f)
         DrawContextUtils.clearContext()
     }
 
-    fun isInGui() = Minecraft.getInstance().screen is GuiPositionEditor
+    private fun renderChestOverlay(context: GuiGraphicsExtractor) = DrawContextUtils.pushPop {
+        withChestGuiPosition {
+            GuiRenderEvent.ChestGuiOverlayRenderEvent(context).post()
+        }
+    }
+
+    fun withChestGuiPosition(action: () -> Unit) {
+        val wasAddingChestGuiPosition = addingChestGuiPosition
+        addingChestGuiPosition = true
+        try {
+            action()
+        } finally {
+            addingChestGuiPosition = wasAddingChestGuiPosition
+        }
+    }
+
+    fun isInGui() = MinecraftCompat.screen is GuiPositionEditor
 
     fun Position.getDummySize(random: Boolean = false): Vector2i {
         if (random) return Vector2i(5, 5)
@@ -130,5 +151,4 @@ object GuiEditManager {
     }
 }
 
-// TODO remove
-class Vector2i(val x: Int, val y: Int)
+private data class CurrentPosition(val position: Position, val isChestGuiOverlay: Boolean)

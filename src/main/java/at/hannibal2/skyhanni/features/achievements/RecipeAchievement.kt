@@ -28,11 +28,10 @@ object RecipeAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Recipe Fanatic".asComponent(),
-            "Unlock all the Recipes".asComponent(),
-            50f,
-            false,
-            listOf(50, 70, 90, 100),
+            name = "Recipe Fanatic".asComponent(),
+            description = "Unlock all the Recipes".asComponent(),
+            userLuckAmount = 50f,
+            tiers = listOf(50, 70, 90, 99),
         )
         event.register(achievement, RECIPE_ACHIEVEMENT)
     }

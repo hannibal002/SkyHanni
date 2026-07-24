@@ -2,43 +2,38 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.currentSpray
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.greenhouse
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isBarn
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.isSprayExpired
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.markExpiredSprayAsNotified
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.name
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.plots
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.plots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 
 @SkyHanniModule
 object SprayDisplay {
 
     private val config get() = PestApi.config.spray
-    private var display: String? = null
+    private var display: Renderable? = null
+    private val currentSprayPlot get() = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5, 3)) return
 
-        if (config.displayEnabled) {
-            display = GardenPlotApi.getCurrentPlot()?.takeUnless { it.isBarn() || it.greenhouse }?.let { plot ->
-                plot.currentSpray?.let {
-                    val timer = it.expiry.timeUntil()
-                    "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
-                } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
-            }.orEmpty()
-        }
+        // Todo this calculation should not be running onTick
+        if (config.displayEnabled) display = currentSprayPlot?.let { plot ->
+            plot.currentSpray?.let {
+                val timer = it.expiry.timeUntil()
+                "§eSprayed with §a${it.type.displayName} §7- ${timer.timerColor("§b")}${timer.format()}"
+            } ?: if (config.showNotSprayed) "§cNot sprayed!" else ""
+        }?.let { Renderable.text(it) }
 
         if (config.expiryNotification) {
             sendExpiredPlotsToChat(false)
@@ -52,10 +47,10 @@ object SprayDisplay {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!config.displayEnabled) return
         val display = display ?: return
-        config.displayPosition.renderString(display, posLabel = "Active Plot Spray Display")
+        config.displayPosition.renderRenderable(display, posLabel = "Active Plot Spray Display")
     }
 
     private fun sendExpiredPlotsToChat(wasAway: Boolean) {

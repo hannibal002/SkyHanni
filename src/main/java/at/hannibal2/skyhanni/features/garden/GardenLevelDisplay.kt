@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
@@ -25,12 +26,13 @@ import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration.Companion.milliseconds
@@ -47,6 +49,7 @@ object GardenLevelDisplay {
 
     private val patternGroup = RepoPattern.group("garden.level")
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §2§l§m                §f§l§m    §r §e7,891§6/§e10k
      */
@@ -62,9 +65,13 @@ object GardenLevelDisplay {
         "inventory.name",
         "Garden (?:Desk|Level (?<currentLevel>.*))",
     )
+
+    /**
+     * REGEX-TEST: §e§l§m                     §6325,396
+     */
     private val overflowPattern by patternGroup.pattern(
         "inventory.overflow",
-        ".*§r §6(?<overflow>.*)",
+        "§e§l§m\\s+ §6(?<overflow>[\\d,]+)",
     )
 
     /**
@@ -84,14 +91,15 @@ object GardenLevelDisplay {
     )
 
     /**
-     * REGEX-TEST:     §r§8+§r§215 §r§7Garden Experience
+     * WRAPPED-REGEX-TEST: "    §r§8+§r§215 §r§7Garden Experience"
      */
     private val visitorRewardPattern by patternGroup.pattern(
         "chat.increase",
         " {4}§r§8\\+§r§2(?<exp>.*) §r§7Garden Experience",
     )
+    // </editor-fold>
 
-    private var display = ""
+    private var display: Renderable? = null
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
@@ -135,7 +143,7 @@ object GardenLevelDisplay {
             "SkyBlock Menu" -> event.inventoryItems[10] ?: return
             else -> return
         }
-        gardenItemNamePattern.matchMatcher(item.hoverName.string.removeColor()) {
+        gardenItemNamePattern.matchMatcher(item.cleanName) {
             val level = groupOrNull("currentLevel")
             if (level != null) useRomanNumerals = level.isRoman()
         } ?: return
@@ -202,7 +210,7 @@ object GardenLevelDisplay {
     }
 
     private fun update() {
-        display = drawDisplay()
+        display = Renderable.text(drawDisplay())
     }
 
     private fun drawDisplay(): String {
@@ -225,20 +233,18 @@ object GardenLevelDisplay {
         return if (useRomanNumerals) this.toRoman() else this.toString()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
-        if (GardenApi.hideExtraGuis()) return
+        if (!config.display || GardenApi.hideExtraGuis()) return
 
-        config.pos.renderString(display, posLabel = "Garden Level")
+        val display = display ?: return
+        config.pos.renderRenderable(display, posLabel = "Garden Level")
     }
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.overflow) { update() }
     }
-
-    private fun isEnabled() = GardenApi.inGarden() && config.display
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -45,7 +45,7 @@ object ShinyOrbTracker {
     init {
         tracker.initRenderer(
             { config.position },
-        ) { config.enabled && IslandType.HUB.isCurrent() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
+        ) { config.enabled && IslandType.HUB.isInIsland() && passesHoldingItem() && PigFeaturesApi.isYearOfThePig() }
     }
 
     data class ShinyOrbData(

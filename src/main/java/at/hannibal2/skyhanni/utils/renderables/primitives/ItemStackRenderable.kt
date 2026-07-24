@@ -6,16 +6,16 @@ import at.hannibal2.skyhanni.utils.NeuItemStackProvider
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.system.PropertyVar
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.world.item.ItemStack
 
 open class ItemStackRenderable internal constructor(
     open val config: ItemRenderableConfig,
-    private val stackGetter: () -> ItemStack = { ItemStack.EMPTY },
+    private val stackGetter: () -> SafeItemStack = { SafeItemStack.EMPTY },
 ) : Renderable {
     private val scaledSize get() = (15.5 * config.scale + 0.5).toInt()
     override val width: Int get() = scaledSize + config.xSpacing
@@ -23,7 +23,7 @@ open class ItemStackRenderable internal constructor(
     override val horizontalAlign get() = config.horizontalAlign
     override val verticalAlign get() = config.verticalAlign
 
-    open val stack: ItemStack get() = stackGetter()
+    open val stack: SafeItemStack get() = stackGetter()
     var stableRenderId: Int? = null
     open fun getStableId() = stableRenderId
 
@@ -37,16 +37,19 @@ open class ItemStackRenderable internal constructor(
     }
 
     fun withTip(advancedTooltipCompat: Boolean = false) = Renderable.hoverTips(
-        stack,
+        this@ItemStackRenderable,
         stack.getTooltipCompat(advancedTooltipCompat),
         stack = stack,
     )
 
     companion object {
-        fun Renderable.Companion.item(stackGetter: () -> ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
+        fun Renderable.Companion.item(stack: SafeItemStack, config: ItemRenderableConfig) =
+            ItemStackRenderable(config) { stack }
+
+        fun Renderable.Companion.item(stackGetter: () -> SafeItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
             ItemStackRenderable(ItemRenderableConfig().apply(config), stackGetter)
 
-        fun Renderable.Companion.item(stack: ItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
+        fun Renderable.Companion.item(stack: SafeItemStack, config: ItemRenderableConfig.() -> Unit = {}) =
             item({ stack }, config)
 
         fun Renderable.Companion.item(provider: ItemStackProvider, config: ItemRenderableConfig.() -> Unit = {}) =
@@ -57,7 +60,7 @@ open class ItemStackRenderable internal constructor(
     }
 }
 
-open class ItemRenderableConfig {
+open class ItemRenderableConfig(selfOp: ItemRenderableConfig.() -> Unit = {}) {
     open var scale: Double by PropertyVar(NeuItems.ITEM_FONT_SIZE)
     open var xSpacing: Int by PropertyVar(2)
     open var ySpacing: Int by PropertyVar(1)
@@ -65,4 +68,8 @@ open class ItemRenderableConfig {
     open var horizontalAlign: HorizontalAlignment by PropertyVar(HorizontalAlignment.LEFT)
     open var verticalAlign: VerticalAlignment by PropertyVar { Property.of(VerticalAlignment.CENTER) }
     open var alpha: Float by PropertyVar(1f)
+
+    init {
+        selfOp()
+    }
 }

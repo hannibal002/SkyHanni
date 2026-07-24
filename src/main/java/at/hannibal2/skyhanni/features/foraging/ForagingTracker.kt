@@ -5,10 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
-import at.hannibal2.skyhanni.data.IslandTypeTags
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -358,13 +357,13 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         lastHover = null
     }
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    @HandleEvent
+    fun onIslandLeave() {
         if (!isInIsland()) return
         firstUpdate()
     }
 
-    private fun isInIsland() = IslandTypeTags.FORAGING_CUSTOM_TREES.inAny()
+    private fun isInIsland() = IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland()
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
@@ -376,7 +375,7 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
     }
 
     @HandleEvent
-    fun onItemChange(event: ItemInHandChangeEvent) {
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
         if (!isInIsland()) return
         val isAxe = event.newItem.getItemStack().getItemCategoryOrNull() == ItemCategory.AXE
         if (isAxe != hasHeldAxe) {

@@ -324,15 +324,24 @@ object CropFeverTracker : SkyHanniBucketedItemTracker<CropType, CropFeverTracker
         val profit = drawItems(bucketData, { true }, mutableListOf())
         config.text.get().forEach { line ->
             when (line) {
-                CropFeverTrackerTextEntry.ITEM_DROPS -> { drawItems(bucketData, { true }, this) }
-                CropFeverTrackerTextEntry.RNG_DROPS -> { addAll(rngDropList) }
+                CropFeverTrackerTextEntry.ITEM_DROPS -> {
+                    drawItems(bucketData, { true }, this)
+                }
+
+                CropFeverTrackerTextEntry.RNG_DROPS -> {
+                    addAll(rngDropList)
+                }
+
                 CropFeverTrackerTextEntry.TOTAL_PROFIT -> {
                     val duration = bucketData.getTotalUptime()
                     addAll(
                         addTotalProfit(profit, bucketData.getTotalFeverCount(), "fever", duration, "Fevers"),
                     )
                 }
-                else -> { lineMap[line]?.let { add(it) } }
+
+                else -> {
+                    lineMap[line]?.let { add(it) }
+                }
             }
         }
         addPriceFromButton(this)

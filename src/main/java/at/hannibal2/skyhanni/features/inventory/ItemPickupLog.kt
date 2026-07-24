@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
@@ -14,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -26,9 +28,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getItemOnCursor
@@ -38,7 +40,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import java.util.Objects
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
@@ -91,7 +92,7 @@ object ItemPickupLog {
     private val coinConfig get() = config.coinValue
     private val coinIcon = "COIN_TALISMAN".toInternalName()
 
-    private val itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+    private val itemList = mutableMapOf<Int, Pair<SafeItemStack, Int>>()
     private val itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
     private val itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
@@ -108,8 +109,8 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    @HandleEvent
-    fun onGuiRender() {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.position.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
@@ -154,7 +155,7 @@ object ItemPickupLog {
     @HandleEvent(SkyHanniTickEvent::class)
     fun onTick() {
         if (!isEnabled()) return
-        val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+        val oldItemList = mutableMapOf<Int, Pair<SafeItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
@@ -163,7 +164,7 @@ object ItemPickupLog {
 
             val inventoryItems = InventoryUtils.getItemsInOwnInventoryWithNull()?.filterIndexed { i, _ -> i != 8 }
                 ?.filterNotNull().orEmpty().toMutableList()
-            val cursorItem = MinecraftCompat.localPlayer.getItemOnCursor()
+            val cursorItem = MinecraftCompat.localPlayerOrThrow.getItemOnCursor()
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
@@ -224,8 +225,8 @@ object ItemPickupLog {
     }
 
     private fun checkForDuplicateItems(
-        list: MutableMap<Int, Pair<ItemStack, Int>>,
-        listToCheckAgainst: MutableMap<Int, Pair<ItemStack, Int>>,
+        list: MutableMap<Int, Pair<SafeItemStack, Int>>,
+        listToCheckAgainst: MutableMap<Int, Pair<SafeItemStack, Int>>,
         add: Boolean,
     ) {
         for ((key, value) in list) {
@@ -243,7 +244,7 @@ object ItemPickupLog {
         }
     }
 
-    private fun ItemStack.dynamicName(): String {
+    private fun SafeItemStack.dynamicName(): String {
         val compact = when (getItemCategoryOrNull()) {
             ItemCategory.ENCHANTED_BOOK -> true
             ItemCategory.PET -> true
@@ -253,13 +254,13 @@ object ItemPickupLog {
         return runCatching {
             if (compact) getInternalName().repoItemName else default
         }.getOrElse {
-            ChatUtils.debug("Could not get dynamic name for $item - error:\n$it")
+            ChatUtils.debug("Could not get dynamic name for ${getItem()} - error:\n$it")
             default
         }
     }
 
-    private fun ItemStack.hash(): Int {
-        var displayName = this.hoverName.string.removeColor()
+    private fun SafeItemStack.hash(): Int {
+        var displayName = this.cleanName
         shopPattern.matchMatcher(displayName) {
             displayName = group("itemName")
         }

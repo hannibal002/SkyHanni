@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.player.RemotePlayer
 import net.minecraft.world.entity.Entity
@@ -72,6 +72,7 @@ class MobFinder {
     // F5
     private var floor5lividEntity: RemotePlayer? = null
     private var floor5lividEntitySpawnTime = SimpleTimeMark.farPast()
+
     // TODO use RepoPattern
     private val correctLividPattern = "\\[BOSS] (.*) Livid: Impossible! How did you figure out which one I was\\?!".toPattern()
 
@@ -344,8 +345,8 @@ class MobFinder {
     // TODO testing and use sidebar data
     @Suppress("UnusedParameter")
     private fun tryAddEntityDragon(mob: Mob) = when {
-        IslandType.THE_END.isCurrent() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
-        IslandType.WINTER.isCurrent() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
+        IslandType.THE_END.isInIsland() -> EntityResult(bossType = BossType.END_ENDER_DRAGON)
+        IslandType.WINTER.isInIsland() -> EntityResult(bossType = BossType.WINTER_REINDRAKE)
 
         else -> null
     }
@@ -415,7 +416,7 @@ class MobFinder {
         if (mob.name == "Conjoined Brood") {
             return EntityResult(bossType = BossType.SLAYER_SPIDER_5_2)
         }
-        if (IslandType.SPIDER_DEN.isCurrent()) {
+        if (IslandType.SPIDER_DEN.isInIsland()) {
             if (mob.name == "Broodmother") {
                 return EntityResult(bossType = BossType.BROODMOTHER)
             }

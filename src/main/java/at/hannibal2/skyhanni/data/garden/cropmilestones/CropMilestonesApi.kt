@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addsToMilestone
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropCollectionAddEvent
@@ -23,13 +22,12 @@ import at.hannibal2.skyhanni.utils.ChatUtils.clickableChat
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object CropMilestonesApi {
@@ -53,8 +51,8 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:  Cocoa Beans 31: 68%
-     * REGEX-TEST:  Potato 32: 97.7%
+     * WRAPPED-REGEX-TEST: " Cocoa Beans 31: 68%"
+     * WRAPPED-REGEX-TEST: " Potato 32: 97.7%"
      */
     val tabListPercentPattern by patternGroup.pattern(
         "tablist.percent-no-color",
@@ -62,16 +60,16 @@ object CropMilestonesApi {
     )
 
     /**
-     * REGEX-TEST:  Potato 46: MAX
-     * REGEX-TEST:  Cocoa Beans 46: MAX
+     * WRAPPED-REGEX-TEST: " Potato 46: MAX"
+     * WRAPPED-REGEX-TEST: " Cocoa Beans 46: MAX"
      */
     val tabListMaxPattern by patternGroup.pattern(
         "tablist.max-no-color",
-        " (?<crop>[\\w ]+) (?<tier>\\d+): MAX"
+        " (?<crop>[\\w ]+) (?<tier>\\d+): MAX",
     )
 
     /**
-     * REGEX-TEST:   §r§b§lGARDEN MILESTONE §3Melon §845➜§346
+     * WRAPPED-REGEX-TEST: "  §r§b§lGARDEN MILESTONE §3Melon §845➜§346"
      */
     val levelUpPattern by patternGroup.pattern(
         "levelup",
@@ -79,7 +77,7 @@ object CropMilestonesApi {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         if ((cropMilestoneCounter?.size ?: 0) == 0) inaccurateMilestone = true
     }
 
@@ -105,7 +103,7 @@ object CropMilestonesApi {
     private val cropMilestoneTierCache: MutableMap<CropType, Int> = mutableMapOf()
     private val amountToNextTierCache: MutableMap<CropType, Long> = mutableMapOf()
 
-    fun getCropTypeByLore(itemStack: ItemStack): CropType? {
+    fun getCropTypeByLore(itemStack: SafeItemStack): CropType? {
         cropPattern.firstMatcher(itemStack.getLore()) {
             val name = group("name")
             return CropType.getByNameOrNull(name)
@@ -345,7 +343,7 @@ object CropMilestonesApi {
             messages.joinToString("\n"),
             { ClipboardUtils.copyToClipboard(levelUpLine.removeColor()) },
             "Click to copy!",
-            prefix = false
+            prefix = false,
         )
 
         val message = "§e§lYou have reached your milestone goal of §b§l$customGoalLevel " +
@@ -397,8 +395,8 @@ object CropMilestonesApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("Crop Milestones Api")
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Crop Milestones API")
         event.addIrrelevant {
             for (crop in cropMilestoneTierCache) {
                 add("Crop: ${crop.key}, Tier: ${crop.value}")
@@ -414,9 +412,9 @@ object CropMilestonesApi {
     @HandleEvent
     fun onAchievementRegistered(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Expert Gardener".asComponent(),
-            "Get a crop milestone to level 500".asComponent(),
-            15f,
+            name = "Expert Gardener",
+            description = "Get a crop milestone to level 500",
+            userLuckAmount = 15f,
         )
         event.register(achievement, CROP_MILESTONE_ACHIEVEMENT)
     }

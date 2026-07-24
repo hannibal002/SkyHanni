@@ -13,16 +13,16 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.wasRiftTransferred
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object RiftApi {
 
-    fun inRift() = IslandType.THE_RIFT.isCurrent()
+    fun inRift() = IslandType.THE_RIFT.isInIsland()
 
     val config: RiftConfig get() = SkyHanniMod.feature.rift
 
@@ -33,10 +33,10 @@ object RiftApi {
 
     private val blowgun = "BERBERIS_BLOWGUN".toInternalName()
 
-    val ItemStack?.isBlowgun: Boolean
+    val SafeItemStack?.isBlowgun: Boolean
         get() = this?.getInternalName() == blowgun
 
-    fun ItemStack.motesNpcPrice(): Double? {
+    fun SafeItemStack.motesNpcPrice(): Double? {
         if (isRiftExportable() && wasRiftTransferred()) return null
         return getInternalName().motesNpcPrice()?.times(count)
     }

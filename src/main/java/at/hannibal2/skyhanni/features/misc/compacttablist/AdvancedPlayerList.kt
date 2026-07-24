@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.merge
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.flow.merge
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import java.util.regex.Matcher
@@ -155,7 +154,7 @@ object AdvancedPlayerList {
             if (nameSuffix.contains("♲")) ironman = true
             else bingoLevel = BingoApi.getRank(line)
 
-            if (IslandType.CRIMSON_ISLE.isCurrent()) {
+            if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 CrimsonIsleFaction.entries.firstOrNull { it.isLine(line) }?.let {
                     faction = it
                     nameSuffix = nameSuffix.replace(it.pattern, "")
@@ -204,7 +203,7 @@ object AdvancedPlayerList {
             add(nameSuffix)
         }
 
-        if (IslandType.CRIMSON_ISLE.isCurrent() && !config.hideFactions) {
+        if (IslandType.CRIMSON_ISLE.isInIsland() && !config.hideFactions) {
             add(faction.icon)
         }
 

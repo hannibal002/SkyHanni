@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.tracker
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.pet.CurrentPetApi
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.garden.CropCollectionApi.addCollectionCounter
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -16,8 +15,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.lastBrokenCropType
 import at.hannibal2.skyhanni.features.garden.GardenApi.readCounter
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import net.minecraft.world.item.ItemStack
 import kotlin.math.floor
 import kotlin.random.Random
 
@@ -27,7 +26,7 @@ object GardenCropBreakTracker {
     private val counterData: MutableMap<String, Long>? get() = storage?.toolCounterData
     private val cropMap: MutableMap<CropType, Int> = mutableMapOf()
 
-    private var heldItem: ItemStack? = null
+    private var heldItem: SafeItemStack? = null
     private var itemHasCounter: Boolean = false
     private var mooshroomCowCrops: Int = 0
 
@@ -50,7 +49,6 @@ object GardenCropBreakTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != lastBrokenCropType) lastBrokenCropType = event.crop
 
         if (GardenApi.mushroomCowPet) {
@@ -62,7 +60,7 @@ object GardenCropBreakTracker {
         val fortune = storage?.latestTrueFarmingFortune?.get(event.crop) ?: return
         addToCropMap(
             event.crop,
-            ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt()
+            ((weightedRandomRound((fortune % 100).toInt()) + floor(fortune / 100) + 1) * event.crop.baseDrops).toInt(),
         )
     }
 

@@ -5,28 +5,33 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuItemJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.cleanString
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getIntOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
+import at.hannibal2.skyhanni.utils.ensureComponentsBound
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.Screen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.core.component.DataComponentMap
@@ -34,13 +39,12 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.world.Container
 import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 // Code taken from NotEnoughUpdates
 class ItemResolutionQuery {
 
-    private var compound: DataComponentMap? = null
+    private var compound: DataComponentMap = DataComponentMap.EMPTY
 
     private var itemType: Item? = null
     private var knownInternalName: NeuInternalName? = null
@@ -178,9 +182,10 @@ class ItemResolutionQuery {
         }
     }
 
-    fun withItemStack(stack: ItemStack): ItemResolutionQuery {
-        this.itemType = stack.item
-        this.compound = stack.components
+    fun withItemStack(stack: SafeItemStack): ItemResolutionQuery {
+        stack.ensureComponentsBound()
+        this.itemType = stack.itemType
+        this.compound = stack.immutableComponents()
         return this
     }
 
@@ -190,7 +195,7 @@ class ItemResolutionQuery {
     }
 
     fun withCurrentGuiContext(): ItemResolutionQuery {
-        this.guiContext = Minecraft.getInstance().screen
+        this.guiContext = MinecraftCompat.screen
         return this
     }
 
@@ -207,6 +212,7 @@ class ItemResolutionQuery {
             "POTION" -> resolvePotionName()
             "BALLOON_HAT_2024", "BALLOON_HAT_2025" -> resolveBalloonHatName()
             "ATTRIBUTE_SHARD" -> resolveAttributeShardName()
+            "CAKE_HAT_2026" -> resolveCakeHatName()
             else -> resolvedName
         }
     }
@@ -295,6 +301,12 @@ class ItemResolutionQuery {
         return rawInternalName.toInternalName()
     }
 
+    private fun resolveCakeHatName(): NeuInternalName {
+        val color = getExtraAttributes().getStringOrDefault("party_hat_color")
+        val rawInternalName = "CAKE_HAT_2026_" + color.uppercase()
+        return rawInternalName.toInternalName()
+    }
+
     private fun resolveItemInCatacombsRngMeter(): NeuInternalName? {
         val lore = compound.getLore()
         if (lore.size > 16) {
@@ -326,7 +338,7 @@ class ItemResolutionQuery {
         val isOnBazaar: Boolean = isBazaar(inventorySlots.container)
         var displayName: String = ItemUtils.getDisplayName(compound) ?: return null
         displayName = displayName.removePrefix("§6§lSELL ").removePrefix("§a§lBUY ")
-        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && compound != null) {
+        if (itemType === Items.ENCHANTED_BOOK && isOnBazaar && !compound.isEmpty) {
             return resolveEnchantmentByName(displayName)
         }
         if (itemType === Items.PLAYER_HEAD && displayName.contains("Essence")) {
@@ -346,15 +358,19 @@ class ItemResolutionQuery {
             findInternalNameByDisplayName(displayName, false)
         } else if (guiName.endsWith("Experimentation Table RNG")) {
             resolveEnchantmentByName(displayName)
-        } else if (guiName == "Attribute Menu") {
+        } else if (AttributeShardsData.attributeMenuInventory.isInside()) {
             resolveItemInAttributeMenu(compound.getLore())
-        } else if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
+        } else if (
+            AttributeShardsData.huntingBoxInventory.isInside() ||
+            AttributeShardsData.fusionBoxInventory.isInside() ||
+            AttributeShardsData.shardFusionInventory.isInside()
+        ) {
             resolveItemInHuntingBoxMenu(displayName)
         } else if (guiName == "Confirm Fusion") {
             compound.getLore().firstOrNull()?.let {
                 shardPattern.matchMatcher(it) {
                     resolveItemInHuntingBoxMenu(
-                        group("name")
+                        group("name"),
                     )
                 }
             }
@@ -369,14 +385,14 @@ class ItemResolutionQuery {
         }
         val bazaarSlot = chest.containerSize - 5
         if (bazaarSlot < 0) return false
-        val stackInSlot = chest.getItem(bazaarSlot) ?: return false
+        val stackInSlot = chest.getItem(bazaarSlot).takeUnlessEmpty() ?: return false
         if (stackInSlot.count == 0) return false
 
         val lore: List<String> = stackInSlot.getLore()
         return lore.contains("§7To Bazaar")
     }
 
-    private fun getExtraAttributes(): CompoundTag = compound?.extraAttributes ?: CompoundTag()
+    private fun getExtraAttributes(): CompoundTag = compound.extraAttributes
 
     private fun resolveFromSkyblock(): NeuInternalName? {
         val internalName = getExtraAttributes().getStringOrDefault("id")
@@ -389,7 +405,7 @@ class ItemResolutionQuery {
         return EnoughUpdatesManager.getItemById(internalName)
     }
 
-    fun resolveToItemStack(): ItemStack? {
+    fun resolveToItemStack(): SafeItemStack? {
         val neuItem = resolveToItemJson() ?: return null
         return EnoughUpdatesManager.neuItemToStack(neuItem)
     }

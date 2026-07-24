@@ -1,13 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.InteractClickType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WorldClickEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.fishing.BaitUpdateEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.fishing.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.fishing.FishingCatchEvent
@@ -20,13 +23,21 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.addLavas
 import at.hannibal2.skyhanni.utils.compat.addWaters
 import at.hannibal2.skyhanni.utils.compat.deceased
@@ -35,9 +46,11 @@ import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
+import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -53,6 +66,12 @@ object FishingApi {
         val tagName get() = name.lowercase()
     }
 
+    data class BaitType(val displayName: String, val internalName: NeuInternalName) {
+        override fun toString(): String {
+            return internalName.asString()
+        }
+    }
+
     /**
      * REGEX-TEST: BRONZE_HUNTER_HELMET
      * REGEX-TEST: SILVER_HUNTER_CHESTPLATE
@@ -61,7 +80,7 @@ object FishingApi {
      */
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+        "(?<tier>BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     /**
@@ -74,6 +93,25 @@ object FishingApi {
         "fishing.trophyfishing.emberarmor",
         "EMBER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
+
+    /**
+     * REGEX-TEST: Bait Remaining: 49
+     */
+    private val baitRemainingPattern by RepoPattern.pattern(
+        "fishing.bait.inventory",
+        "Bait Remaining: (?<amount>[\\d,]+)",
+    )
+
+    private val obfuscatedBaits = setOf(
+        "OBFUSCATED_FISH_1_BRONZE",
+        "OBFUSCATED_FISH_1_SILVER",
+        "OBFUSCATED_FISH_1_GOLD",
+        "OBFUSCATED_FISH_1_DIAMOND",
+        "OBFUSCATED_FISH_2_BRONZE",
+        "OBFUSCATED_FISH_2_SILVER",
+        "OBFUSCATED_FISH_2_GOLD",
+        "OBFUSCATED_FISH_2_DIAMOND",
+    ).toInternalNames()
 
     const val babySlugName = "Baby Magma Slug"
 
@@ -99,9 +137,16 @@ object FishingApi {
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
 
+    private const val BAIT_HOTBAR_INDEX = 8
+
     var bobber: FishingHook? = null
         private set
     var bobberHasTouchedLiquid = false
+        private set
+
+    var currentBait: BaitType? = null
+        private set
+    var currentBaitAmount: Int = 0
         private set
 
     var wearingTrophyArmor = false
@@ -156,6 +201,57 @@ object FishingApi {
         FishingBobberInLiquidEvent(bobber, isWater).post()
     }
 
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        checkAndUpdateBaitFromInventory()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
+        extractAndPostBaitUpdate(event.itemStack)
+    }
+
+    private fun checkAndUpdateBaitFromInventory() {
+        if (hasGuiOpen()) return
+        val stack = InventoryUtils.getItemsInOwnInventoryWithNull()?.getOrNull(BAIT_HOTBAR_INDEX) ?: run {
+            postEmptyBaitUpdate()
+            return
+        }
+        extractAndPostBaitUpdate(stack)
+    }
+
+    private fun extractAndPostBaitUpdate(stack: SafeItemStack) {
+        if (!stack.isBait()) {
+            postEmptyBaitUpdate()
+            return
+        }
+
+        val baitAmount = stack.getLoreComponent().asSequence()
+            .map { it.formattedTextCompatLessResets() }
+            .firstNotNullOfOrNull { lineText ->
+                baitRemainingPattern.matchMatcher(lineText.removeColor()) { group("amount").formatInt() }
+            } ?: return
+
+        val baitType = BaitType(stack.hoverName.formattedTextCompatLessResets(), stack.getInternalName())
+        postBaitUpdate(baitType, baitAmount, stack)
+    }
+
+    private fun postBaitUpdate(baitType: BaitType?, amount: Int, itemStack: SafeItemStack) {
+        if (currentBait?.internalName == baitType?.internalName && currentBaitAmount == amount) return
+        currentBait = baitType
+        currentBaitAmount = amount
+        BaitUpdateEvent(currentBait, currentBaitAmount, itemStack).post()
+    }
+
+    private fun postEmptyBaitUpdate() {
+        postBaitUpdate(null, 0, SafeItemStack.EMPTY)
+    }
+
+    private fun hasGuiOpen(): Boolean {
+        val screen = MinecraftCompat.screen
+        return (screen is AbstractContainerScreen<*> || screen is AbstractSignEditScreen) && screen !is InventoryScreen
+    }
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlaySound(event: PlaySoundEvent) {
         if (!holdingRod) return
@@ -164,28 +260,34 @@ object FishingApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onClick(event: WorldClickEvent) {
-        if (event.clickType != ClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
+        if (event.clickType != InteractClickType.RIGHT_CLICK || !holdingRod || !bobberHasTouchedLiquid) return
         if (lastReelTime.passedSince() < .3.seconds) return
         lastReelTime = SimpleTimeMark.now()
     }
 
-    fun ItemStack.isFishingRod() = getInternalName().isFishingRod()
+    fun SafeItemStack.isFishingRod() = getInternalName().isFishingRod()
     fun NeuInternalName.isFishingRod() = isLavaRod() || isWaterRod()
 
     fun NeuInternalName.isLavaRod() = this in lavaRods
 
     fun NeuInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
+    fun SafeItemStack.getFishingRodPart(part: RodPart): NeuInternalName? {
         val rodPartName = getExtraAttributes()?.getCompoundOrDefault(part.tagName)?.getStringOrDefault("part")
         if (rodPartName.isNullOrEmpty()) return null
         return rodPartName.toInternalName()
     }
 
-    fun ItemStack.isBait(): Boolean = count == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
+    fun SafeItemStack.isBait(): Boolean {
+        val category = getItemCategoryOrNull() ?: return false
+        if (category == ItemCategory.BAIT) return true
+        val internalName = getInternalNameOrNull() ?: return false
+        return internalName in obfuscatedBaits
+    }
 
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        val wasHoldingRod = holdingRod
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
         holdingLavaRod = event.newItem.isLavaRod()
@@ -194,6 +296,11 @@ object FishingApi {
         if (holdingRod) {
             // If the player is not holding a rod, we want to just save the last state
             hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
+
+            // Check bait when switching to a fishing rod
+            checkAndUpdateBaitFromInventory()
+        } else if (wasHoldingRod) {
+            postEmptyBaitUpdate()
         }
     }
 
@@ -251,9 +358,14 @@ object FishingApi {
     }
 
     private fun isWearingTrophyArmor(): Boolean =
-        InventoryUtils.getArmor().all {
-            trophyArmorNames.matches(it?.getInternalName()?.asString())
-        }
+        InventoryUtils.getArmor()
+            .mapNotNull { stack ->
+                val internalName = stack?.getInternalName()?.asString() ?: return@mapNotNull null
+                trophyArmorNames.matchMatcher(internalName) { group("tier") }
+            }
+            .groupingBy { it }
+            .eachCount()
+            .any { (_, count) -> count >= 2 }
 
     fun isWearingEmberArmor(): Boolean =
         InventoryUtils.getArmor().all {

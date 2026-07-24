@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasHypixelEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
@@ -28,7 +30,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object MinionCraftHelper {
@@ -100,7 +101,7 @@ object MinionCraftHelper {
     }
 
     private fun loadFromInventory(
-        mainInventory: List<ItemStack>,
+        mainInventory: List<SafeItemStack>,
     ): Pair<MutableMap<String, NeuInternalName>, MutableMap<NeuInternalName, Int>> {
         init()
 
@@ -108,7 +109,7 @@ object MinionCraftHelper {
         val otherItems = mutableMapOf<NeuInternalName, Int>()
 
         for (item in mainInventory) {
-            val name = item.hoverName.string.removeColor()
+            val name = item.cleanName
             val rawId = item.getInternalName()
             if (isMinionName(name)) {
                 minions[name] = rawId
@@ -119,7 +120,7 @@ object MinionCraftHelper {
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
         for (item in mainInventory) {
-            val name = item.hoverName.string.removeColor()
+            val name = item.cleanName
             if (item.hasHypixelEnchantments()) continue
             val rawId = item.getInternalName()
             if (!isMinionName(name)) {

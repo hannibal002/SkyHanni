@@ -18,13 +18,13 @@ import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawColor
@@ -50,7 +50,7 @@ object EndermanSlayerFeatures {
     private var sittingBeacon = mapOf<LorenzVec, SimpleTimeMark>()
     private val logger = SkyHanniLogger("slayer/enderman")
 
-    private val NUKEKUBI_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_NUKEKUBI") }
+    private val NUKEKUBI_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_NUKEKUBI")
 
     @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {

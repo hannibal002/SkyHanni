@@ -16,16 +16,19 @@ import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.pests.PestType
+import at.hannibal2.skyhanni.features.misc.update.ModrinthVersionType
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.system.MCVersion
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SessionUptimeTypeAdapter
@@ -39,7 +42,6 @@ import com.google.gson.stream.JsonWriter
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -122,7 +124,7 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     NEU_ITEMSTACK(
-        ItemStack::class.java,
+        SafeItemStack::class.java,
         SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData),
     ),
     INTERNAL_NAME(
@@ -161,13 +163,17 @@ enum class SkyHanniTypeAdapters(
         ModVersion::class.java,
         SimpleStringTypeAdapter(ModVersion::asString, ModVersion::fromString),
     ),
+    MC_VERSION(
+        MCVersion::class.java,
+        SimpleStringTypeAdapter(MCVersion::asString, MCVersion::fromString),
+    ),
     ELITE_LEADERBOARD_TYPE(
         EliteLeaderboardType::class.java,
         EliteLeaderboardTypeAdapter(),
     ),
     TRACKER_DISPLAY_MODE(
         SkyHanniTracker.DefaultDisplayMode::class.java,
-        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
+        SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>(),
     ),
     TIME_MARK(
         SimpleTimeMark::class.java,
@@ -260,12 +266,20 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     GRAPH(Graph::class.java, Graph.typeAdapter),
+    MODRINTH_VERSION_TYPE(
+        ModrinthVersionType::class.java,
+        SimpleStringTypeAdapter.forEnum<ModrinthVersionType>(),
+    ),
 }
 
 @Suppress("UNCHECKED_CAST")
 fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
     SkyHanniTypeAdapters.entries.forEach {
         val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
-        registerTypeAdapter(it.clazz, adapter)
+        if (it == SkyHanniTypeAdapters.NEU_ITEMSTACK) {
+            registerTypeHierarchyAdapter(it.clazz, adapter)
+        } else {
+            registerTypeAdapter(it.clazz, adapter)
+        }
     }
 }

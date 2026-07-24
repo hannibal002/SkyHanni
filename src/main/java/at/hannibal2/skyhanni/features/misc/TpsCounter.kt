@@ -6,13 +6,14 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
-import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.NumberUtil.oneDecimal
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -31,8 +32,8 @@ object TpsCounter {
 
     private val config get() = SkyHanniMod.feature.gui
 
-    private val msPerTickList = SizeLimitedCache<Long, Double>(100)
-    val tps: Double?
+    private val msPerTickList = SizeLimitedCache<Int, Double>(100)
+    val rawTps: Double?
         get() = when {
             timeSinceWorldSwitch < WORLD_SWITCH_DELAY -> null
             msPerTickList.isEmpty() || lastServerTick.passedSince() >= 1.seconds -> 0.0
@@ -40,6 +41,7 @@ object TpsCounter {
                 if (!it.isFinite()) printError(it)
             }
         }
+    val tps get() = rawTps?.let { if (TimeUtils.isAprilFoolsDay) it / 2 else it }
 
     private val timeSinceWorldSwitch get() = SkyBlockUtils.lastWorldSwitch.passedSince()
 
@@ -69,24 +71,30 @@ object TpsCounter {
 
     private fun getTpsString(compact: Boolean = false): String = buildString {
         append("§eTPS: ")
-        var currentTps = tps
+        val currentTps = tps
         when {
-            LimboTimeTracker.inLimbo -> {
+            HypixelData.inLimbo -> {
                 append("§4N/A §7(Limbo)")
             }
+
             currentTps == null -> {
                 val remaining = (WORLD_SWITCH_DELAY - timeSinceWorldSwitch).roundedUpSeconds
                 if (!compact) append("§fCalculating... ")
                 append("§7(${remaining}s)")
             }
+
             else -> {
-                if (TimeUtils.isAprilFoolsDay) currentTps /= 2
                 append("%s%.1f".format(getColor(currentTps), currentTps))
             }
         }
     }
 
     private fun tpsCommand() {
+        if (!SkyBlockUtils.onHypixel) {
+            ChatUtils.userError("This command only works on Hypixel!")
+            return
+        }
+
         val text = getTpsString()
         ChatUtils.chat(text)
 
@@ -105,7 +113,7 @@ object TpsCounter {
         lastServerTick = SimpleTimeMark.farPast()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblockOrFeatures = [OutsideSBFeature.TPS_DISPLAY])
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display?.let { config.tpsDisplayPosition.renderRenderable(it, posLabel = "TPS Display") }
@@ -120,8 +128,7 @@ object TpsCounter {
         }
     }
 
-    private fun isEnabled() = SkyBlockUtils.onHypixel && config.tpsDisplay &&
-        (SkyBlockUtils.inSkyBlock || OutsideSBFeature.TPS_DISPLAY.isSelected())
+    private fun isEnabled() = SkyBlockUtils.onHypixel && config.tpsDisplay
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -145,7 +152,7 @@ object TpsCounter {
             "TPS calculation got an error",
             "tps is $tps",
             "tps" to tps,
-            "msptList" to msPerTickList,
+            "msPerTickList" to msPerTickList,
             "timeSinceWorldSwitch" to timeSinceWorldSwitch,
         )
     }
@@ -154,7 +161,7 @@ object TpsCounter {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("TPS Counter")
         event.addIrrelevant {
-            add("TPS: %.1f".format(tps))
+            add("TPS: ${rawTps?.oneDecimal()}")
             add("Milliseconds Per Tick: ${msPerTickList.values.joinToString(", ") { "%.1f".format(it) }}")
             add("Time Since World Switch: $timeSinceWorldSwitch")
         }

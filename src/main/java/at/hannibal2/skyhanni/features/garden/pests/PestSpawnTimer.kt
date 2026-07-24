@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.HeldItem
 import at.hannibal2.skyhanni.config.features.garden.pests.PestTimerConfig.PestTimerTextEntry
-import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -13,10 +12,9 @@ import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.garden.farming.CropClickEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -26,7 +24,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -53,6 +52,7 @@ object PestSpawnTimer {
 
     private val config get() = PestApi.config.pestTimer
     private val patternGroup = RepoPattern.group("garden.pests")
+    private val cooldownOverMessageId = ChatUtils.getUniqueMessageId()
 
     /**
      * WRAPPED-REGEX-TEST: " Cooldown: READY"
@@ -61,10 +61,17 @@ object PestSpawnTimer {
      * WRAPPED-REGEX-TEST: " Cooldown: 58s"
      * WRAPPED-REGEX-TEST: " Cooldown: MAX PESTS"
      */
-
     private val pestCooldownPattern by patternGroup.pattern(
         "cooldowntime-no-color",
         "\\sCooldown: (?<time>\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?<ready>READY)?(?<maxPests>MAX PESTS)?.*",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Alive: 8"
+     */
+    private val maxPestsAlivePattern by patternGroup.pattern(
+        "max-pests-alive",
+        "\\sAlive: 8",
     )
 
     private val pestSpawnTimes: MutableList<Duration> = mutableListOf()
@@ -72,6 +79,7 @@ object PestSpawnTimer {
     private var longestCropBrokenTime: Duration = 0.seconds
     private var pestSpawned = false
     private var hasWarned = false
+    private var hasReminderShown = false
     private var maxPests = false
     private var ready = false
     private var shouldRender = false
@@ -79,18 +87,33 @@ object PestSpawnTimer {
     private var shouldRepeatWarning = false
     private var countdownTitleContext: TitleContext? = null
     private var lastPlayedSound: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var cooldownNotDetected = false
 
-    private val customCooldownTime get(): Duration =
-        (if (Perk.PEST_ERADICATOR.isActive) config.customCooldownTimeFinnegan else config.customCooldownTime).get().seconds
+    private fun getCustomCooldownTime(): Duration = with(config) {
+        if (Perk.PEST_ERADICATOR.isActive) customCooldownTimeFinnegan
+        else customCooldownTime
+    }.get().seconds
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PESTS)) return
+        val widgetLines = event.widget.lines.map { it.string }
 
-        pestCooldownPattern.firstMatcher(event.widget.lines.map { it.string }) {
+        // Hypixel can sometimes send partial widget
+        // so we first check if the maximum number of pests is present as a workaround
+        maxPestsAlivePattern.firstMatcher(widgetLines) {
+            maxPests = true
+            pestCooldownEndTime = SimpleTimeMark.farPast()
+            shouldRepeatWarning = false
+            cooldownNotDetected = false
+            return
+        }
+
+        pestCooldownPattern.firstMatcher(widgetLines) {
             val time = groupOrNull("time")?.let { getTablistEndTime(it, pestCooldownEndTime) }
             ready = hasGroup("ready")
             maxPests = hasGroup("maxPests")
+            cooldownNotDetected = false
 
             if (ready || maxPests) {
                 pestCooldownEndTime = SimpleTimeMark.farPast()
@@ -99,13 +122,16 @@ object PestSpawnTimer {
             }
             if (time == null) return
             pestCooldownEndTime = if (config.customCooldown.get()) {
-                lastPestSpawnTime + customCooldownTime
+                lastPestSpawnTime + getCustomCooldownTime()
             } else time
 
             if (pestSpawned) {
                 hasWarned = false
+                hasReminderShown = false
                 pestSpawned = false
             }
+        } ?: run {
+            cooldownNotDetected = true
         }
     }
 
@@ -119,9 +145,10 @@ object PestSpawnTimer {
                 pestSpawnTimes.add(spawnTime)
                 ChatUtils.debug("Added pest spawn time ${spawnTime.format()}")
             }
-            if (config.pestSpawnChatMessage) {
-                ChatUtils.chat("Pests spawned in §b${spawnTime.format()}")
-            }
+            if (config.pestSpawnChatMessage) ChatUtils.notifyOrDisable(
+                "Pests spawned in §b${spawnTime.format()}",
+                option = config::pestSpawnChatMessage,
+            )
         }
 
         pestSpawned = true
@@ -130,14 +157,13 @@ object PestSpawnTimer {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onRenderOverlay() {
+    fun onGuiRenderOverlay() {
         if (!shouldRender) return
         config.position.renderRenderables(display, posLabel = "Pest Spawn Timer")
     }
 
     @HandleEvent
-    fun onCropBreak(event: CropClickEvent) {
-        if (event.clickType != ClickType.LEFT_CLICK) return
+    fun onCropClick() {
         val timeDiff = lastCropBrokenTime.passedSince()
 
         if (timeDiff > longestCropBrokenTime) {
@@ -154,24 +180,30 @@ object PestSpawnTimer {
         if (shouldRepeatWarning) {
             countdownTitleContext?.stop()
             countdownTitleContext = null
-            countdownWarn(pestCooldownEndTime.timeUntil())
+            if (pestCooldownEndTime.isInPast()) {
+                shouldRepeatWarning = false
+            } else {
+                countdownWarn(pestCooldownEndTime.timeUntil())
+            }
         }
 
         if (hasWarned || !config.cooldownOverWarning) return
 
+        if (pestCooldownEndTime.isFarPast()) return
         if (pestCooldownEndTime.isInPast()) {
             cooldownExpired()
             return
         }
-        if ((pestCooldownEndTime - ((config.cooldownWarningTime.seconds) + 1.seconds)).isInPast()) {
-            cooldownReminder()
+        if (hasReminderShown) return
+        if ((pestCooldownEndTime - (config.cooldownWarningTime.seconds + 1.seconds)).isInPast()) {
+            cooldownReminder(pestCooldownEndTime)
         } else shouldRepeatWarning = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (shouldRepeatWarning) {
-            if (WardrobeApi.inWardrobe()) {
+            if (ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
                 shouldRepeatWarning = false
                 countdownTitleContext?.stop()
                 countdownTitleContext = null
@@ -183,8 +215,8 @@ object PestSpawnTimer {
         shouldRender = shouldRender()
     }
 
-    @HandleEvent(IslandChangeEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onIslandChange() {
+    @HandleEvent(IslandJoinEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onIslandJoin() {
         shouldRepeatWarning = false
         longestCropBrokenTime = lastCropBrokenTime.passedSince()
     }
@@ -200,7 +232,8 @@ object PestSpawnTimer {
     }
 
     private fun setCustomCooldown() {
-        if (config.customCooldown.get()) pestCooldownEndTime = lastPestSpawnTime + customCooldownTime
+        if (!config.customCooldown.get()) return
+        pestCooldownEndTime = lastPestSpawnTime + getCustomCooldownTime()
     }
 
     private fun drawDisplay(): List<Renderable> {
@@ -219,9 +252,11 @@ object PestSpawnTimer {
             "§cPests Widget not detected! Enable via /widget!"
         } else {
             val cooldownValue = when {
+                cooldownNotDetected -> "§cUnknown"
                 maxPests -> "§cMax Pests!"
-                ready || pestCooldownEndTime.isInPast() -> "§aReady!"
+                ready -> "§aReady!"
                 pestCooldownEndTime.isFarPast() -> "§cUnknown"
+                pestCooldownEndTime.isInPast() -> "§aReady!"
                 else -> pestCooldownEndTime.timeUntil().format()
             }
             "§ePest Cooldown: §b$cooldownValue"
@@ -259,18 +294,28 @@ object PestSpawnTimer {
     }
 
     private fun cooldownExpired() {
+        shouldRepeatWarning = false
         TitleManager.sendTitle("§cPest Cooldown Has Expired!", duration = 3.seconds)
-        ChatUtils.chat("§cPest spawn cooldown has expired!")
+        ChatUtils.notifyOrDisable(
+            "§cPest spawn cooldown has expired!",
+            option = config::cooldownOverWarning,
+            messageId = cooldownOverMessageId,
+        )
         playUserSound()
         hasWarned = true
     }
 
-    private fun cooldownReminder() {
-        ChatUtils.chat("§cPest spawn cooldown expires in ${pestCooldownEndTime.timeUntil().format()}")
+    private fun cooldownReminder(endTime: SimpleTimeMark) {
+        ChatUtils.notifyOrDisable(
+            "§cPest spawn cooldown expires in ${endTime.timeUntil().format()}",
+            option = config::cooldownOverWarning,
+            messageId = cooldownOverMessageId,
+        )
         hasWarned = true
+        hasReminderShown = true
 
         if (config.repeatWarning) {
-            countdownWarn(pestCooldownEndTime.timeUntil())
+            countdownWarn(endTime.timeUntil())
             shouldRepeatWarning = true
             return
         }
@@ -290,12 +335,18 @@ object PestSpawnTimer {
 
     // TODO: Change to countdown title when that works
     private fun countdownWarn(timeLeft: Duration) {
+        val text = "§cPest spawn cooldown expires in ${timeLeft.format()}"
         countdownTitleContext = TitleManager.sendTitle(
-            "§cPest spawn cooldown expires in ${timeLeft.format()}",
+            text,
             duration = 1.seconds,
             intention = PestTitleIntention.COOLDOWN_COUNTDOWN,
             addType = TitleManager.TitleAddType.FORCE_FIRST,
             // countDownDisplayType = TitleManager.CountdownTitleDisplayType.WHOLE_SECONDS,
+        )
+        ChatUtils.notifyOrDisable(
+            text,
+            option = config::cooldownOverWarning,
+            messageId = cooldownOverMessageId,
         )
     }
 

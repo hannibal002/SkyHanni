@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntities
-import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
+import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -25,7 +25,7 @@ object RiftOdonata {
     private val config get() = RiftApi.config.area.wyldWoods.odonata
     private var hasBottleInHand = false
 
-    private val ODONATA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_ODONATA") }
+    private val ODONATA_SKULL_TEXTURE by SkullTextureHolder.texture("MOB_ODONATA")
     private val emptyBottle = "EMPTY_ODONATA_BOTTLE".toInternalName()
 
     @HandleEvent
@@ -41,11 +41,11 @@ object RiftOdonata {
 
     @HandleEvent
     fun onEntityEquipmentChange(event: EntityEquipmentChangeEvent<ArmorStand>) {
-        if (RiftLarva.isEnabled()) tryAdd(event.entity)
+        if (isEnabled()) tryAdd(event.entity)
     }
 
     private fun tryAdd(stand: ArmorStand) {
-        if (!stand.wearingSkullTexture(ODONATA_SKULL_TEXTURE)) return
+        if (!stand.holdingSkullTexture(ODONATA_SKULL_TEXTURE)) return
         RenderLivingEntityHelper.setEntityColor(stand, config.highlightColor.toColor().addAlpha(1)) {
             isEnabled() && hasBottleInHand
         }

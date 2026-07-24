@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.test.graph
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.graph.Graph
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
@@ -14,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sortedDesc
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
@@ -38,8 +36,8 @@ object GraphNodeEditor {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
-    @HandleEvent(GuiRenderEvent.GuiOnTopRenderEvent::class)
-    fun onRenderOverlay() {
+    @HandleEvent
+    fun onGuiRenderTop() {
         doRender()
     }
 
@@ -166,9 +164,7 @@ object GraphNodeEditor {
     private fun checkIsland(tag: GraphNodeTag): Boolean {
         val islandMatches = tag.onlyIsland?.let {
             it == SkyBlockUtils.currentIsland
-        } ?: tag.onlyIslands.takeIfNotEmpty()?.let {
-            SkyBlockUtils.currentIsland in it
-        } ?: true
+        } ?: tag.onlyIslands?.isInIsland() ?: true
 
         val skyblockMatches = tag.onlySkyblock?.let {
             it == SkyBlockUtils.inSkyBlock
@@ -246,7 +242,7 @@ object GraphNodeEditor {
             }
 
             add("§eClick to select/deselect this node!")
-            add("§eControl-Click to edit the tags for this node!")
+            add("§e${KeyboardManager.getModifierKeyName()}-Click to edit the tags for this node!")
 
         },
         onLeftClick = {

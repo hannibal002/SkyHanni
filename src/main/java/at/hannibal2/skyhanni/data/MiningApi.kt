@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -57,14 +58,16 @@ object MiningApi {
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
 
     /**
-     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
+     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
+    @Suppress("MaxLineLength")
     private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
+    // This intentionally uses the old heat icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Heat: §6IMMUNE
      * REGEX-TEST: Heat: §c14♨
@@ -75,6 +78,7 @@ object MiningApi {
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
+    // This intentionally uses the old cold icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Cold: §b-1❄
      */
@@ -193,23 +197,23 @@ object MiningApi {
 
     private var lastOreMinedTime = SimpleTimeMark.farPast()
 
-    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isCurrent()
+    fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
-    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isCurrent() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
+    fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(SkyBlockUtils.graphArea)
 
-    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isCurrent() && !inGlacialTunnels()
+    fun inRegularDwarven() = IslandType.DWARVEN_MINES.isInIsland() && !inGlacialTunnels()
 
-    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isCurrent()
+    fun inCrystalHollows() = IslandType.CRYSTAL_HOLLOWS.isInIsland()
 
     fun inMinesOfDivan() = inCrystalHollows() && minesOfDivanPattern.matches(HypixelData.skyBlockArea)
 
-    fun inMineshaft() = IslandType.MINESHAFT.isCurrent()
+    fun inMineshaft() = IslandType.MINESHAFT.isInIsland()
 
-    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isCurrent() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
+    fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
@@ -223,7 +227,7 @@ object MiningApi {
             }
         }
 
-        if (IslandType.CRYSTAL_HOLLOWS.isCurrent()) {
+        if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
             var found = false
             heatPattern.firstMatcher(event.new) {
                 found = true
@@ -246,9 +250,9 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (event.clickType != ClickType.LEFT_CLICK) return
-        if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
+        if (event.clickType != InteractClickType.LEFT_CLICK) return
+        if (OreBlock.getByStateOrNull(event.blockState) == null) return
         val now = SimpleTimeMark.now()
         recentClickedBlocks[event.position] = now
         lastClickedPos = event.position
@@ -257,8 +261,8 @@ object MiningApi {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
-        if (IslandTypeTags.IS_COLD.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
+        if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
                 updateCold(0)
                 lastColdReset = SimpleTimeMark.now()
@@ -297,7 +301,7 @@ object MiningApi {
 
     @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
             pickobulusExplosionPos = event.location
@@ -341,7 +345,7 @@ object MiningApi {
 
     @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         val oldState = event.oldState
         val newState = event.newState
         val oldBlock = oldState.block
@@ -385,7 +389,7 @@ object MiningApi {
 
     @HandleEvent
     fun onTick() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 10 seconds to mine a single block, congrats
@@ -404,7 +408,7 @@ object MiningApi {
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
     fun onAreaChange() {
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) return
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
 
@@ -478,9 +482,9 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
-        if (!IslandTypeTags.CUSTOM_MINING.inAny()) {
+        if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")
             return
         }
@@ -534,9 +538,9 @@ object MiningApi {
         inMineshaft = inMineshaft()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
-        inCrimsonIsle = IslandType.CRIMSON_ISLE.isCurrent()
-        inEnd = IslandType.THE_END.isCurrent()
-        inSpidersDen = IslandType.SPIDER_DEN.isCurrent()
+        inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
+        inEnd = IslandType.THE_END.isInIsland()
+        inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
     }

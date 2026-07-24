@@ -73,8 +73,6 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
-        if (!event.isLocalPlayer) return
-
         val nextData = nextTeleport ?: return
 
         val passedSince = nextData.startTime.passedSince()
@@ -82,7 +80,7 @@ object EntityMovementData {
             nextTeleport = null
             return
         }
-        if (passedSince > 50.milliseconds && nextData.island.isCurrent()) {
+        if (passedSince > 50.milliseconds && nextData.island.isInIsland()) {
             nextData.action()
             nextTeleport = null
             return
@@ -91,7 +89,7 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        addToTrack(MinecraftCompat.localPlayer)
+        addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         for (entity in entityLocation.keys) {
             if (entity.deceased) continue
