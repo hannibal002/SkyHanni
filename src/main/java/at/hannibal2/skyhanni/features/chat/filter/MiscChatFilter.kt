@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.utils.StringUtils
 
 @Suppress("MaxLineLength")
 object MiscChatFilter {
@@ -9,6 +10,7 @@ object MiscChatFilter {
 
     init {
         val filters = setOf<ChatFilter>(
+            EmptyFilter,
             WelcomeFilter,
             LobbyFilter,
             WarpingFilter,
@@ -30,6 +32,15 @@ object MiscChatFilter {
             SacrificeFilter,
         )
         CoreChatFilter.add(filters)
+    }
+
+    object EmptyFilter : ChatFilter {
+        override fun isEnabled(): Boolean = config.empty
+
+        override fun block(message: String): String? {
+            if (StringUtils.isEmpty(message)) return "empty"
+            return null
+        }
     }
 
     object WelcomeFilter : RegexChatFilter("welcome") {

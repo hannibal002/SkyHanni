@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import java.util.concurrent.ConcurrentHashMap
 
@@ -58,7 +57,6 @@ object CoreChatFilter {
      * @return The reason why the message was blocked, empty if not blocked
      */
     private fun block(message: String): String? {
-        if (config.empty && StringUtils.isEmpty(message)) return "empty"
         return chatFilterGroups.firstNotNullOfOrNull { it.block(message) }
     }
 
