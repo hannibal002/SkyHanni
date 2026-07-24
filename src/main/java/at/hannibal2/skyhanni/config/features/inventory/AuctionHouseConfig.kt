@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import org.lwjgl.glfw.GLFW
 
 class AuctionHouseConfig {
@@ -21,7 +20,7 @@ class AuctionHouseConfig {
     @Expose
     @ConfigOption(name = "Skeleton Master Chestplate Highlight", desc = "")
     @Accordion
-    val skeletonMaster: SkeletonMasterChestplateHighlightConfig = SkeletonMasterChestplateHighlightConfig()
+    val skeletonMasterChestplateHighlight: SkeletonMasterChestplateHighlightConfig = SkeletonMasterChestplateHighlightConfig()
 
     @Expose
     @ConfigOption(

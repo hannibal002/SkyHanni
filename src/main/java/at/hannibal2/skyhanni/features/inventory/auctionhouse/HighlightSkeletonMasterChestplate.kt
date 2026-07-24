@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -18,7 +17,7 @@ import net.minecraft.world.item.ItemStack
 @SkyHanniModule
 object HighlightSkeletonMasterChestplate {
 
-    private val config get() = SkyHanniMod.feature.inventory.auctions.skeletonMaster
+    private val config get() = SkyHanniMod.feature.inventory.auctions.skeletonMasterChestplateHighlight
     private val auctionMenu = InventoryDetector(checkInventoryName = { it.startsWith("Auctions") })
     private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".toInternalName()
 
