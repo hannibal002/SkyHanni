@@ -25,7 +25,7 @@ value class RepoCommitStorage private constructor(private val fileHandler: Strin
     }
 
     private fun deleteFile(): Nothing? {
-        file.delete()
+        fileHandler.delete()
         return null
     }
 }
