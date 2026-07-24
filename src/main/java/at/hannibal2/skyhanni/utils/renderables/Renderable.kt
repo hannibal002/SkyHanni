@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
-import at.hannibal2.skyhanni.utils.collection.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullValues
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -208,8 +207,8 @@ interface Renderable {
              */
             nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
+            override val width get() = render.width
+            override val height get() = render.height
             override val horizontalAlign = render.horizontalAlign
             override val verticalAlign = render.verticalAlign
 
@@ -273,8 +272,8 @@ interface Renderable {
 
             val render = fromAny(content) ?: text("Error")
             return object : Renderable {
-                override val width = render.width
-                override val height = render.height
+                override val width get() = render.width
+                override val height get() = render.height
                 override val horizontalAlign = render.horizontalAlign
                 override val verticalAlign = render.verticalAlign
 
@@ -877,8 +876,9 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
             private val virtualHeight get() = list.sumOf { it.height }
-            override val width get() = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
-                if (showScrollbar && virtualHeight > height) 7 else 0
+            override val width
+                get() = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width) +
+                    if (showScrollbar && virtualHeight > height) 7 else 0
 
             private var scroll = createScroll()
 
