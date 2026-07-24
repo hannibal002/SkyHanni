@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import java.util.concurrent.ConcurrentHashMap
 
-@Suppress("MaxLineLength")
 @SkyHanniModule
 object CoreChatFilter {
 

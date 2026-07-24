@@ -152,14 +152,14 @@ object MiscChatFilter {
         )
     }
 
-    object AchievementGetFilter : RegexChatFilter("achievement-get") {
+    object AchievementGetFilter : RegexChatFilter("achievement_get") {
         override fun isEnabled(): Boolean = config.hideAlphaAchievements && HypixelData.hypixelAlpha
 
         /**
-         * REGEX_TEST: >>>   Achievement Unlocked: The Beginning   <<<
+         * WRAPPED-REGEX_TEST: ">>>   Achievement Unlocked: The Beginning   <<<"
          */
         override val patterns by patternGroup.list(
-            "achievement.get",
+            "achievement-get",
             ".>> {3}Achievement Unlocked: .* {3}<<.",
         )
     }
