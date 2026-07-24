@@ -17,7 +17,7 @@ object MuseumCategoryHighlighter {
 
     private val museumDetector = InventoryDetector { BitsApi.museumGuiNamePattern }
 
-    private val allItemsDonatedPatten by RepoPattern.pattern(
+    private val allItemsDonatedPattern by RepoPattern.pattern(
         "museum.all-items-donated",
         "Items Donated: 100%"
     )
@@ -28,7 +28,7 @@ object MuseumCategoryHighlighter {
         if (!museumDetector.isInside()) return
         for (slot in event.container.slots) {
             val lore = slot.item.getCleanLore()
-            allItemsDonatedPatten.firstMatcher(lore) {
+            allItemsDonatedPattern.firstMatcher(lore) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }
