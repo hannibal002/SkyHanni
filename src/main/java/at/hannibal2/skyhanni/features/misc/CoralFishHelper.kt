@@ -70,9 +70,8 @@ object CoralFishHelper {
 
     init {
         InventoryDetector(
-            checkInventoryName = { coralMenuPattern.matches(it) },
             onOpenInventory = { DelayedRun.runNextTick { checkInventoryItems() } },
-        )
+        ) { coralMenuPattern }
     }
 
     private var display = emptyList<Renderable>()

@@ -63,9 +63,8 @@ object AttributeShardsData {
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
     ) { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
-        checkInventoryName = { bazaarShardsInventoryPattern.matches(it) },
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
-    )
+    ) { bazaarShardsInventoryPattern }
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
     ) { confirmFusionPattern }

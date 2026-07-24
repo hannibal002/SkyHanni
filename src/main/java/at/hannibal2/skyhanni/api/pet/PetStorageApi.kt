@@ -583,7 +583,7 @@ object PetStorageApi {
 
         val petItemSlot = when {
             isPetMenu -> PET_MENU_CURRENT_PET_SLOT
-            UtilsPatterns.skyblockMenuInventory.isInside() -> PET_MENU_CURRENT_PET_SLOT
+            UtilsPatterns.skyblockMenuInventory.isInside() -> SB_MENU_CURRENT_PET_SLOT
             else -> return
         }
         val currentPetItem = inventoryItems[petItemSlot] ?: return

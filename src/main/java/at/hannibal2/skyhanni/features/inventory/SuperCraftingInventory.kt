@@ -65,9 +65,7 @@ object SuperCraftingInventory {
         "inventory.name",
         "(?<itemname>.*) Recipe",
     )
-    private val invDetector = InventoryDetector(
-        checkInventoryName = { name -> inventoryPattern.matches(name) },
-    )
+    private val invDetector = InventoryDetector { inventoryPattern }
 
     private fun getWarnAmount() = if (BitsApi.hasCookieBuff()) {
         config.threshold

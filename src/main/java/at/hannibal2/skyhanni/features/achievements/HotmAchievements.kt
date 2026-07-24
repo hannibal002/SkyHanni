@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 object HotmAchievements {
 
     private const val PICKAXE_ABILITY_ACHIEVEMENT = "ability master"
-    val hotmDetector = InventoryDetector(checkInventoryName = { it == "Heart of the Mountain" })
 
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
@@ -29,7 +28,7 @@ object HotmAchievements {
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (AchievementManager.isCompleted(PICKAXE_ABILITY_ACHIEVEMENT)) return
-        if (!hotmDetector.isInside()) return
+        if (!HotmData.inInventory) return
         var count = 0
         for (ability in HotmData.abilities) {
             if (ability.isUnlocked) count++
