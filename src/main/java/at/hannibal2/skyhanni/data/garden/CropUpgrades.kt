@@ -40,7 +40,7 @@ object CropUpgrades {
      * REGEX-TEST: Crop Upgrades
      */
     private val inventoryNamePattern by patternGroup.pattern(
-        "inventoryname",
+        "inventory",
         "Crop Upgrades",
     )
 
