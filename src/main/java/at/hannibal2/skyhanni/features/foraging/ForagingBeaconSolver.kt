@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -92,7 +93,7 @@ object ForagingBeaconSolver {
      */
     private val beaconInventoryNamePattern by patternGroup.pattern(
         "inventory",
-        "Upgrade Signal Strength|Tune Frequency",
+        "(?<upgrade>Upgrade Signal Strength)|Tune Frequency",
     )
 
     // </editor-fold>
@@ -248,7 +249,14 @@ object ForagingBeaconSolver {
             enchantedTuning.reset()
             display = emptyList()
         },
-    ) { beaconInventoryNamePattern }
+        checkInventoryName = { name ->
+            beaconInventoryNamePattern.matchMatcher(name) {
+                upgradingStrength = group("upgrade") != null
+                true
+            }
+            false
+        }
+    )
 
     private var upgradingStrength = false
     private var normalTuning = BeaconTuneData()
