@@ -104,7 +104,7 @@ object SeaCreatureManager {
                         doubleHookComponent.append(" ").withStyle(ChatFormatting.RESET).append(edited)
                     CompactDoubleHookPosition.RIGHT ->
                         edited.append(doubleHookComponent)
-                } as MutableComponent
+                }
             }
 
             if (original == edited) return
