@@ -670,6 +670,9 @@ class ProfileSpecificStorage(
 
         class GreenHouseStorage(
             @Expose var nextCycle: SimpleTimeMark = farPast(),
+            @Expose var detectedCropsByPlot: MutableMap<Int, MutableSet<String>> = mutableMapOf(),
+            @Expose
+            var diagnosedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>> = mutableMapOf(),
         )
     }
 

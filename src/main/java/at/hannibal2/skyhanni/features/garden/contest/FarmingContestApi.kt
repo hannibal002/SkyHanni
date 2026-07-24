@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.garden.farming.FarmingContestEvent
 import at.hannibal2.skyhanni.features.garden.CropType
@@ -51,7 +52,16 @@ object FarmingContestApi {
      */
     private val sidebarCropPattern by patternGroup.pattern(
         "sidebarcrop.colorless",
-        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*) .*",
+        "\\s*(?:○|${SkyblockStat.FARMING_FORTUNE.hypixelIcon}) (?<crop>.*?)(?: \\d+(?:[hms]\\d*)+)?",
+    )
+
+    /**
+     * REGEX-TEST: Jacob's Contest: 17m left
+     * REGEX-TEST: Jacob's Contest: 1m 36s left
+     */
+    private val contestTimeLeftPattern by patternGroup.pattern(
+        "timeleft.colorless",
+        "Jacob's Contest: \\d+(?:[hms] ?\\d*)* left",
     )
 
     /**
@@ -76,6 +86,25 @@ object FarmingContestApi {
     private var internalContest = false
     val inContest
         get() = internalContest && IslandTypeTag.CONTESTS_SHOWN.isInIsland()
+    val isContestActive
+        get() = IslandTypeTag.CONTESTS_SHOWN.isInIsland() && contestWidgetLines.any {
+            contestTimeLeftPattern.matches(it)
+        }
+
+    fun getContestStatusDebug(): List<String> {
+        val lines = contestWidgetLines
+        return buildList {
+            add("§7Contest island allowed: §e${IslandTypeTag.CONTESTS_SHOWN.isInIsland()}")
+            add("§7Jacob tab widget visible: §e${TabWidget.JACOB_CONTEST.isActive}")
+            add("§7Contest active: §e$isContestActive")
+            if (lines.isEmpty()) {
+                add("§cJacob tab widget has no lines.")
+            } else {
+                add("§7Normalized Jacob tab widget lines:")
+                lines.forEachIndexed { index, line -> add("§8[$index] §f'$line'") }
+            }
+        }
+    }
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
@@ -122,8 +151,7 @@ object FarmingContestApi {
     }
 
     private fun readCurrentCrop(): CropType? {
-        val scoreboard = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
-        val line = scoreboard.nextAfter("Jacob's Contest") ?: return null
+        val line = scoreboardLines.nextAfter(after = { it.startsWith("Jacob's Contest") }) ?: return null
         return sidebarCropPattern.matchMatcher(line) {
             val cropName = group("crop")
             try {
@@ -139,6 +167,10 @@ object FarmingContestApi {
             }
         }
     }
+
+    private val scoreboardLines get() = ScoreboardData.sidebarLinesRaw.map { it.removeColor() }
+    private val contestWidgetLines
+        get() = TabWidget.JACOB_CONTEST.lines.map { it.string.removeColor().trim() }
 
     @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnSkyblock = true)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {

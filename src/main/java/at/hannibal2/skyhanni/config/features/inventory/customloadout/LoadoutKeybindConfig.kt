@@ -77,4 +77,64 @@ class LoadoutKeybindConfig {
     @ConfigOption(name = "Slot 12", desc = "Keybind for loadout slot 12.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var slot12: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 1", desc = "Alternate keybind for loadout slot 1 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot1: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 2", desc = "Alternate keybind for loadout slot 2 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot2: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 3", desc = "Alternate keybind for loadout slot 3 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot3: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 4", desc = "Alternate keybind for loadout slot 4 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot4: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 5", desc = "Alternate keybind for loadout slot 5 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot5: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 6", desc = "Alternate keybind for loadout slot 6 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot6: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 7", desc = "Alternate keybind for loadout slot 7 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot7: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 8", desc = "Alternate keybind for loadout slot 8 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot8: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 9", desc = "Alternate keybind for loadout slot 9 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot9: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 10", desc = "Alternate keybind for loadout slot 10 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot10: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 11", desc = "Alternate keybind for loadout slot 11 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot11: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Contest Slot 12", desc = "Alternate keybind for loadout slot 12 during a Jacob's Contest.")
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var contestSlot12: Int = GLFW.GLFW_KEY_UNKNOWN
 }
