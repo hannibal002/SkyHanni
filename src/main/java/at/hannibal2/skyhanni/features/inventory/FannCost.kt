@@ -73,7 +73,7 @@ object FannCost {
      */
     private val trainingSlotInventoryPattern by patternGroup.pattern(
         "training.slot.inventory",
-        "Training Slot",
+        ".*Training Slot.*",
     )
 
     /**
