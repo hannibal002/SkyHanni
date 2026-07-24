@@ -152,6 +152,7 @@ object MiscChatFilter {
         )
     }
 
+    @Suppress("RepoPatternRegexTestMissing")
     object AchievementGetFilter : RegexChatFilter("achievement_get") {
         override fun isEnabled(): Boolean = config.hideAlphaAchievements && HypixelData.hypixelAlpha
 
