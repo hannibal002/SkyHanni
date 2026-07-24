@@ -4,10 +4,11 @@ package at.hannibal2.skyhanni.utils.render.atlas
  * Identifies a static (non-animated) rounded shape for atlas caching.
  * Two draw calls with the same key will share a single atlas slot.
  */
-sealed class SkyHanniRoundedShapeAtlasKey {
-    abstract val pixelWidth: Int
-    abstract val pixelHeight: Int
-    abstract val smoothness: Float
+sealed interface SkyHanniRoundedShapeAtlasKey {
+
+    val pixelWidth: Int
+    val pixelHeight: Int
+    val smoothness: Float
 
     /**
      * A solid rounded rectangle with a single color or vertical color gradient.
@@ -19,7 +20,7 @@ sealed class SkyHanniRoundedShapeAtlasKey {
         val color: Int,
         val radius: Int,
         override val smoothness: Float,
-    ) : SkyHanniRoundedShapeAtlasKey()
+    ) : SkyHanniRoundedShapeAtlasKey
 
     /**
      * A solid circle (or arc) with a fixed fill color.
@@ -31,7 +32,7 @@ sealed class SkyHanniRoundedShapeAtlasKey {
         override val smoothness: Float,
         val angle1: Float,
         val angle2: Float,
-    ) : SkyHanniRoundedShapeAtlasKey() {
+    ) : SkyHanniRoundedShapeAtlasKey {
         override val pixelWidth get() = radiusPixels * 2
         override val pixelHeight get() = radiusPixels * 2
     }

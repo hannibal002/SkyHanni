@@ -15,11 +15,9 @@ object EstimatedWardrobePrice {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTip(event: ToolTipTextEvent) {
-        if (!isEnabled()) return
         event.slot ?: return
-
         val api = activeWardrobeApi() ?: return
         val slot = api.slots.firstOrNull {
             event.slot.index == it.inventorySlot && it.isInCurrentPage()
@@ -42,15 +40,15 @@ object EstimatedWardrobePrice {
         }
     }
 
-    private fun activeWardrobeApi(): AbstractWardrobeApi? = when {
-        config.armor && ArmorWardrobeApi.inWardrobe() -> ArmorWardrobeApi
-        config.equipment && EquipmentWardrobeApi.inWardrobe() -> EquipmentWardrobeApi
-        else -> null
+    private fun activeWardrobeApi(): AbstractWardrobeApi? {
+        if (!SkyBlockUtils.inSkyBlock) return null
+        if (ArmorWardrobeApi.inCustomWardrobe && !CustomWardrobe.editMode) return null
+        return when {
+            config.armor && ArmorWardrobeApi.inWardrobe() -> ArmorWardrobeApi
+            config.equipment && EquipmentWardrobeApi.inWardrobe() -> EquipmentWardrobeApi
+            else -> null
+        }
     }
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock &&
-        ((config.armor && ArmorWardrobeApi.inWardrobe()) || (config.equipment && EquipmentWardrobeApi.inWardrobe())) &&
-        (!ArmorWardrobeApi.inCustomWardrobe || CustomWardrobe.editMode)
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

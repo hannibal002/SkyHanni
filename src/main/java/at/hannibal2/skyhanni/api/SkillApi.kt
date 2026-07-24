@@ -133,7 +133,7 @@ object SkillApi {
     )
 
     /**
-     * Regex-TEST: Max Skill level reached!
+     * REGEX-TEST: Max Skill level reached!
      */
     private val skillMaxLevelMenuPattern by patternGroup.pattern(
         "skill.menu.maxreached",
