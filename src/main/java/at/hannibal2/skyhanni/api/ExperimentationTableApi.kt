@@ -216,6 +216,14 @@ object ExperimentationTableApi {
         "inventory.experiment-over",
         "Experiment [Oo]ver|Superpairs Rewards",
     )
+
+    /**
+     * REGEX-TEST: Bottles of Enchanting
+     */
+    val bottlesOfEnchantingInventoryPattern by patternGroup.pattern(
+        "inventory.bottles-of-enchanting",
+        "Bottles of Enchanting",
+    )
     // </editor-fold>
 
     val experimentationTableInventory = InventoryDetector { inventoriesPattern }
