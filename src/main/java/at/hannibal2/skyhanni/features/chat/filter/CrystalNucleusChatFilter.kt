@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes

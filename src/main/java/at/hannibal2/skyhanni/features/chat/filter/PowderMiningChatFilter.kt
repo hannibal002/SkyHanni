@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.regex.Pattern
+import kotlin.collections.iterator
 
 @SkyHanniModule
 object PowderMiningChatFilter {
