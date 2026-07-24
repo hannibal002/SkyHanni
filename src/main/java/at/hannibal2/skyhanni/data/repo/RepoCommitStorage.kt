@@ -9,14 +9,20 @@ import com.google.gson.annotations.Expose
 import java.io.File
 
 class RepoCommitStorage(val file: File) {
+
     fun readFromFile(): RepoCommit? {
-        val currentCommitJson = file.getJson() ?: return null
-        return ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson)
+        val currentCommitJson = file.getJson() ?: return deleteFile()
+        return runCatching { ConfigManager.gson.fromJson<RepoCommit>(currentCommitJson) }.getOrElse { deleteFile() }
     }
 
     fun writeToFile(commit: RepoCommit): Boolean {
         val newCurrentCommitJson = ConfigManager.gson.toJsonTree(commit).asJsonObject
         return file.writeJson(newCurrentCommitJson)
+    }
+
+    private fun deleteFile(): Nothing? {
+        file.delete()
+        return null
     }
 }
 

@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.utils.EnumUtils.enumJoinToPattern
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ComposterUpgradesData {
+    private val patternGroup = RepoPattern.group("composter")
 
     /**
      * REGEX-TEST: Composter Speed II
@@ -27,9 +29,25 @@ object ComposterUpgradesData {
         "(?<name>${enumJoinToPattern<ComposterUpgrade> { it.displayName }})(?: (?<level>.*))?",
     )
 
+    /**
+     * REGEX-TEST: Composter
+     */
+    val composterInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "Composter",
+    )
+
+    /**
+     * REGEX-TEST: Composter Upgrades
+     */
+    val composterUpgradesInventoryPattern by patternGroup.pattern(
+        "upgrades.inventory",
+        "Composter Upgrades",
+    )
+
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Composter Upgrades") return
+        if (!composterUpgradesInventoryPattern.matches(event.inventoryName)) return
         for (item in event.inventoryItems.values) {
             composterUpgradePattern.matchMatcher(item.cleanName) {
                 val name = group("name")
