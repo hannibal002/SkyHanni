@@ -22,8 +22,8 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.json.fromJson
-import kotlinx.atomicfu.locks.synchronized
 import kotlin.reflect.KClass
+import kotlinx.atomicfu.locks.synchronized
 
 enum class EliteLeaderboards(
     private val displayName: String,
