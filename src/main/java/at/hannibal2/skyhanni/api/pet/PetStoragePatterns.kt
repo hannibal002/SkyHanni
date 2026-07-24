@@ -166,13 +166,4 @@ internal object PetStoragePatterns {
         "chat.removedhelditem",
         "You removed (?<item>.+?) from your pet!",
     )
-
-    /**
-     * REGEX-TEST: Items Required
-     */
-    val petMenuPetStackLoreFalsePattern by patternGroup.list(
-        "menu.petstack.lorelines.falsepositive",
-        // The Forge menu for buying pets
-        "Items Required",
-    )
 }
