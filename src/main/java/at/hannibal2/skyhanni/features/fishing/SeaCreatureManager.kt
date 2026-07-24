@@ -102,6 +102,7 @@ object SeaCreatureManager {
                 edited = when (config.compactDoubleHookPosition) {
                     CompactDoubleHookPosition.LEFT ->
                         doubleHookComponent.append(" ").withStyle(ChatFormatting.RESET).append(edited)
+
                     CompactDoubleHookPosition.RIGHT ->
                         edited.append(doubleHookComponent)
                 }
@@ -149,7 +150,7 @@ object SeaCreatureManager {
                 val fishingExperience = seaCreature.fishingExperience
                 val rarity = seaCreature.rarity
                 val rare = seaCreature.rare
-val lootshareSphere = seaCreature.lootshareSphereOverride
+                val lootshareSphere = seaCreature.lootshareSphereOverride
                 val oldNames = seaCreature.oldNames.orEmpty()
 
                 val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere, oldNames)
