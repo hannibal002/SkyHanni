@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import com.mojang.brigadier.arguments.LongArgumentType
 
 @SkyHanniModule
 object TreasureFishingTracker {
@@ -129,6 +131,18 @@ object TreasureFishingTracker {
             description = "Resets the Treasure Fishing Tracker"
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
+        }
+        event.registerBrigadier("shaddtreasurefishingcatch") {
+            description = "Adds a catch to the Treasure Fishing Tracker"
+            category = CommandCategory.USERS_BUG_FIX
+            arg("catchType", EnumArgumentType.custom<TreasureCatch>({ it.displayName })) { typeRef ->
+                callback {
+                    tracker.modify { it.catchAmounts.addOrPut(getArg(typeRef), 1) }
+                }
+                argCallback("amount", LongArgumentType.longArg()) { amount ->
+                    tracker.modify { it.catchAmounts.addOrPut(getArg(typeRef), amount) }
+                }
+            }
         }
     }
 }
