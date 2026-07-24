@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.api.pet.PetStoragePatterns
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.features.fishing.FishingApi
@@ -153,7 +154,7 @@ object SkyBlockItemModifierUtils {
             it.isNotEmpty()
         } ?: return null
 
-        if (PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(getCleanLore())) return null
+        if (PetStorageApi.isFalsePositivePetMenuLore(getCleanLore())) return null
 
         return try {
             ConfigManager.gson.fromJson(petInfoJson, PetInfo::class.java)

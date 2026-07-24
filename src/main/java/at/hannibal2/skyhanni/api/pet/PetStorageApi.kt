@@ -200,6 +200,9 @@ object PetStorageApi {
     fun isMainPetMenuName(inventoryName: String?): Boolean =
         PetStoragePatterns.mainPetMenuNamePattern.matches(inventoryName)
 
+    fun isFalsePositivePetMenuLore(lore: List<String>): Boolean =
+        PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)
+
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
             val petInfo = getPetInfo()
@@ -213,7 +216,7 @@ object PetStorageApi {
             }
             val petSkin = getPetSkinOrNull(petInternalName)
             val lore = getCleanLore()
-            if (PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(lore)) {
+            if (isFalsePositivePetMenuLore(lore)) {
                 return@matchStyledMatcher null
             }
 
