@@ -40,7 +40,7 @@ object SlayerChatFilter {
             SlayerDropFilter(),
         )
 
-    class SlayerQuestFilter : RegexChatFilter("slayer-quest") {
+    class SlayerQuestFilter : RegexChatFilter("slayer_quest") {
         override val patterns by patternGroup.list(
             "slayer-quest",
             // start
@@ -57,7 +57,7 @@ object SlayerChatFilter {
         )
     }
 
-    class SlayerDropFilter : RegexChatFilter("slayer-drop") {
+    class SlayerDropFilter : RegexChatFilter("slayer_drop") {
         override val patterns by patternGroup.list(
             "slayer-drop",
             // Zombie

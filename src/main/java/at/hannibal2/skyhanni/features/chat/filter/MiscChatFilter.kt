@@ -102,7 +102,7 @@ object MiscChatFilter {
         )
     }
 
-    object KillComboFilter : RegexChatFilter("kill-combo") {
+    object KillComboFilter : RegexChatFilter("kill_combo") {
         override fun isEnabled(): Boolean = config.killCombo
 
         override val patterns by patternGroup.list(
@@ -113,17 +113,17 @@ object MiscChatFilter {
         )
     }
 
-    object ProfileJoinFilter : RegexChatFilter("profile-join") {
+    object ProfileJoinFilter : RegexChatFilter("profile_join") {
         override fun isEnabled(): Boolean = config.profileJoin
 
         override val patterns by patternGroup.list(
-            "profile-join",
+            "profile_join",
             "You are playing on profile: ",
             "Profile ID: ",
         )
     }
 
-    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar-and-ah-mini") {
+    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar_and_ah_mini") {
         override fun isEnabled(): Boolean = config.others
 
         override val patterns by patternGroup.list(
@@ -156,7 +156,7 @@ object MiscChatFilter {
         override fun isEnabled(): Boolean = config.hideAlphaAchievements && HypixelData.hypixelAlpha
 
         /**
-         * REGEX-TEST: >>>   Achievement Unlocked: The Beginning   <<<
+         * REGEX_TEST: >>>   Achievement Unlocked: The Beginning   <<<
          */
         override val patterns by patternGroup.list(
             "achievement.get",
@@ -180,7 +180,7 @@ object MiscChatFilter {
         )
     }
 
-    object TeleportPadFilter : RegexChatFilter("teleport-pad") {
+    object TeleportPadFilter : RegexChatFilter("teleport_pad") {
         override fun isEnabled(): Boolean = config.teleportPads
 
         override val patterns by patternGroup.list(
@@ -190,7 +190,7 @@ object MiscChatFilter {
         )
     }
 
-    object UselessDropFilter : RegexChatFilter("useless-drop") {
+    object UselessDropFilter : RegexChatFilter("useless_drop") {
         override fun isEnabled(): Boolean = config.others
 
         override val patterns by patternGroup.list(
@@ -207,7 +207,7 @@ object MiscChatFilter {
         )
     }
 
-    object LegacyItemsFilter : RegexChatFilter("legacy-items") {
+    object LegacyItemsFilter : RegexChatFilter("legacy_items") {
         override fun isEnabled(): Boolean = config.legacyItemsWarning
 
         override val patterns by patternGroup.list(
@@ -216,7 +216,7 @@ object MiscChatFilter {
         )
     }
 
-    object UselessNotificationFilter : RegexChatFilter("useless-notification") {
+    object UselessNotificationFilter : RegexChatFilter("useless_notification") {
         override fun isEnabled(): Boolean = config.others
 
         // TODO update patterns for 1.21
@@ -242,7 +242,7 @@ object MiscChatFilter {
         )
     }
 
-    object AuctionHouseFilter : RegexChatFilter("auction-house") {
+    object AuctionHouseFilter : RegexChatFilter("auction_house") {
         override fun isEnabled(): Boolean = config.others
 
         override val patterns by patternGroup.list(
@@ -312,7 +312,7 @@ object MiscChatFilter {
         )
     }
 
-    object RewardBundleFilter : RegexChatFilter("seasonal-bundles") {
+    object RewardBundleFilter : RegexChatFilter("seasonal_bundles") {
         override fun isEnabled(): Boolean = config.others
 
         /**

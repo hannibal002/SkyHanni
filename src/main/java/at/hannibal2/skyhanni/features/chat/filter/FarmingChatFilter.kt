@@ -34,7 +34,7 @@ object FarmingChatFilter {
     }
 
     object AnitaFortuneFilter : RegexChatFilter("anita_fortune") {
-        override fun isEnabled(): Boolean = GardenApi.inGarden() && generalConfig.hideJacob
+        override fun isEnabled(): Boolean = generalConfig.hideJacob
 
         /**
          * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
@@ -60,7 +60,7 @@ object FarmingChatFilter {
     }
 
     object GardenPestFilter : RegexChatFilter("garden_pest") {
-        override fun isEnabled(): Boolean = config.gardenNoPest && GardenApi.inGarden()
+        override fun isEnabled(): Boolean = config.gardenNoPest
 
         /**
          * REGEX-TEST: [NPC] Jacob: Your garden is free of pests! You will not lose any crops to pests during this contest!

@@ -34,7 +34,7 @@ object EventChatFilter {
         CoreChatFilter.add(filters)
     }
 
-    object GuildEventExpFilter : RegexChatFilter("guild-event-exp") {
+    object GuildEventExpFilter : RegexChatFilter("guild_event_exp") {
         override fun isEnabled(): Boolean = config.guildEventExp
 
         /**
@@ -78,12 +78,12 @@ object EventChatFilter {
         )
     }
 
-    object EventLevelUpFilter : RegexChatFilter("event") {
+    object EventLevelUpFilter : RegexChatFilter("event_levelup") {
         override fun isEnabled(): Boolean = config.eventLevelUp
 
         // TODO need proper solution to hide empty messages in event text
         override val patterns by patternGroup.list(
-            "event",
+            "event-levelup",
             " +You are now Event Level *!",
             " +You earned * Event Silver!",
             " +# LEVEL UP! #",
