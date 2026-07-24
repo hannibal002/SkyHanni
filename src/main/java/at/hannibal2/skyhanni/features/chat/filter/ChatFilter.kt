@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.util.regex.Pattern
 
+@FunctionalInterface
 interface ChatFilter {
     /**
      * Return a reason to block.
