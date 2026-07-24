@@ -10,7 +10,7 @@ object FarmingChatFilter {
     private val config get() = CoreChatFilter.config
     private val generalConfig get() = CoreChatFilter.generalConfig
 
-    private val islandDetector =
+    val islandDetector =
         IslandDetector(
             island = IslandType.GARDEN,
             onIslandJoin = { CoreChatFilter.add(gardenFilters) },
