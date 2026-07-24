@@ -76,23 +76,6 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object ComposterOverlay {
 
-    private val patternGroup = RepoPattern.group("composter")
-
-    /**
-     * REGEX-TEST: Composter
-     */
-    private val composterInventoryPattern by patternGroup.pattern(
-        "inventory",
-        "Composter",
-    )
-
-    /**
-     * REGEX-TEST: Composter Upgrades
-     */
-    private val composterUpgradesInventoryPattern by patternGroup.pattern(
-        "upgrades.inventory",
-        "Composter Upgrades",
-    )
 
     private var displayDirty = false
     private var organicMatterFactors: Map<NeuInternalName, Double> = emptyMap()
@@ -104,8 +87,8 @@ object ComposterOverlay {
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private val composterInventory = InventoryDetector { composterInventoryPattern }
-    private val composterUpgradesInventory = InventoryDetector { composterUpgradesInventoryPattern }
+    private val composterInventory = InventoryDetector { ComposterUpgradesData.composterInventoryPattern }
+    private val composterUpgradesInventory = InventoryDetector { ComposterUpgradesData.composterUpgradesInventoryPattern }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value
