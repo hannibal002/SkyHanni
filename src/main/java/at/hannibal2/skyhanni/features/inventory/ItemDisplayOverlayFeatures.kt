@@ -175,7 +175,7 @@ object ItemDisplayOverlayFeatures {
             item.getPetInfo()?.takeIf {
                 // 0.0 Would probably work, but rounding errors can occur
                 // due to hypixel's imprecision in storage.
-                it.exp > 10.0 || PetStorageApi.isMainPetMenuName()
+                it.exp > 10.0 || PetStorageApi.inMainPetMenuName()
             } ?: return null
             val level = item.getPetLevel()
             val maxLevel = item.getMaxPetLevel()

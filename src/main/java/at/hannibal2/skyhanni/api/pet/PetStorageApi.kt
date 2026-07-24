@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.PetUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -197,7 +196,7 @@ object PetStorageApi {
         else -> this.skinTag?.removeColor() == skinTag.removeColor()
     }
 
-    fun isMainPetMenuName(): Boolean = PetStoragePatterns.mainMenuInventory.isInside()
+    fun inMainPetMenuName(): Boolean = PetStoragePatterns.mainMenuInventory.isInside()
 
     private fun SafeItemStack.toVisiblePetDataOrNull(): PetData? =
         PetStoragePatterns.petMenuPetStackNamePattern.matchStyledMatcher(hoverName) {
@@ -495,7 +494,7 @@ object PetStorageApi {
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGHEST)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!isMainPetMenuName()) return
+        if (!inMainPetMenuName()) return
         if (!event.slotId.isPetStackLocation()) return
         val clickedItem = event.slot?.item.orNull() ?: event.item.orNull() ?: return
         val clickedPetData = clickedItem.toClickedPetDataOrNull() ?: return
@@ -534,7 +533,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readExactPetMenuPets(): Set<UUID> {
-        if (!isMainPetMenuName()) return emptySet()
+        if (!inMainPetMenuName()) return emptySet()
         val petStorage = petStorage ?: return emptySet()
         val currentPetUuid = ProfileStorageData.profileSpecific?.currentPetUuid
         val exactPetUuids = mutableSetOf<UUID>()
@@ -575,7 +574,7 @@ object PetStorageApi {
     }
 
     private fun InventoryFullyOpenedEvent.readSelectedPetData() {
-        val isPetMenu = isMainPetMenuName()
+        val isPetMenu = inMainPetMenuName()
         val exactMenuPetUuids = readExactPetMenuPets()
         if (isPetMenu && lastExactPetMenuClick.passedSince() < 5.seconds) return
 
