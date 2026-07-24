@@ -47,7 +47,7 @@ object ComposterUpgradesData {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!composterInventoryPattern.matches(event.inventoryName)) return
+        if (!composterUpgradesInventoryPattern.matches(event.inventoryName)) return
         for (item in event.inventoryItems.values) {
             composterUpgradePattern.matchMatcher(item.cleanName) {
                 val name = group("name")
