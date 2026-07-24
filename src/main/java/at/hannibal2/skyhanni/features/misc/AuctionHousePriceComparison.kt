@@ -91,7 +91,7 @@ object AuctionHousePriceComparison {
         val veryBad = config.veryBad.toColor()
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (HighlightSkeletonMasterChestplate.shouldAuctionHouseHighlightIgnoreItem(slot.item.getInternalName())) continue
+            if (HighlightSkeletonMasterChestplate.shouldOtherHighlightIgnore(slot.item.getInternalName())) continue
             val diff = slotPriceMap[slot.containerSlot] ?: continue
             if (diff == 0L) {
                 slot.highlight(good)

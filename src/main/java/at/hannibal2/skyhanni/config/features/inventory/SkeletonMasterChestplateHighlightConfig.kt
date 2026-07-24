@@ -12,7 +12,10 @@ import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 class SkeletonMasterChestplateHighlightConfig {
 
     @Expose
-    @ConfigOption(name = "Good Chestplate Highlight", desc = "Highlights M7 (Tier 10), 50% Stat Boost Skeleton Master Chestplates in the 'Good Color' below.")
+    @ConfigOption(
+        name = "Good Chestplate Highlight",
+        desc = "Highlights M7 (Tier 10), 50% Stat Boost Skeleton Master Chestplates in the 'Good Color' below."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("Floor")
@@ -24,7 +27,10 @@ class SkeletonMasterChestplateHighlightConfig {
     var goodColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
 
     @Expose
-    @ConfigOption(name = "Bad Chestplate Highlight", desc = "Highlights NON M7 (Tier 10), 50% Stat Boost Skeleton Master Chestplates in the 'Bad Color' below.")
+    @ConfigOption(
+        name = "Bad Chestplate Highlight",
+        desc = "Highlights NON M7 (Tier 10), 50% Stat Boost Skeleton Master Chestplates in the 'Bad Color' below."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("Floor")
