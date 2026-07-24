@@ -38,7 +38,6 @@ object StatOverlay {
         }
     }
 
-    @Suppress("Unused")
     enum class SkyblockStatUI(
         val stat: SkyblockStat,
         val posLabel: String,
@@ -57,7 +56,7 @@ object StatOverlay {
     }
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    fun onProfileJoin() {
         synchronized(displayPositionsLock) {
             with(config.displayPositions) {
                 val updatedList = updateConfigPositionList(
