@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestKillTimes
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker.drawDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -158,7 +160,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
     }
 
-    private fun SprayType.addSprayUsed() = modify { it.spraysUsed.addOrPut(this, 1) }
+    private fun SprayType.addSprayUsed(amount: Int = 1) = modify { it.spraysUsed.addOrPut(this, amount.toLong()) }
 
     fun addRareCropDrop(drop: RareCropTracker.RareCropDropType) {
         if (!drop.canDropFromPests) return

@@ -106,7 +106,7 @@ object GardenPlotApi {
      * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 7 with 3 Plant Matter!
      * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 8 with 5 Jelly!
      */
-    private val plotSprayedPattern by patternGroup.pattern(
+    val plotSprayedPattern by patternGroup.pattern(
         "spray.target.colorless",
         "SPRAYONATOR! You sprayed Plot - (?<plot>.+) with (?:(?<amount>\\d+) )?(?<spray>.+)!",
     )
@@ -154,7 +154,7 @@ object GardenPlotApi {
      * Checks whether the player has moved to a different plot and fires [PlotChangeEvent] if so.
      *
      * [currentPlot] holds the last known plot and is updated only here.
-     * [getCurrentPlot] computes the plot from the current player position without caching.
+     * [fetchCurrentPlot] computes the plot from the current player position without caching.
      */
     fun checkCurrentPlot() {
         val plot = fetchCurrentPlot()
@@ -256,10 +256,9 @@ object GardenPlotApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-
         plotSprayedPattern.matchMatcher(event.cleanMessage) {
-            val sprayName = group("spray")
             val plotName = group("plot")
+            val sprayName = group("spray")
 
             val plot = getPlotByName(plotName)
             val spray = SprayType.getByNameOrNull(sprayName) ?: return

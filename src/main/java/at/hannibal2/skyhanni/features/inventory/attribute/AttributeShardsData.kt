@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
@@ -57,10 +58,10 @@ object AttributeShardsData {
 
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
-    ) { name -> name == "Attribute Menu" }
+    ) { name -> attributeMenuPattern.matches(name) }
     val huntingBoxInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { name -> name == "Hunting Box" }
+    ) { name -> huntingBoxPattern.matches(name) }
     val bazaarShardsInventory = InventoryDetector(
         pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
@@ -68,12 +69,47 @@ object AttributeShardsData {
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
     ) { name -> name == "Confirm Fusion" }
-    val fusionBoxInventory = InventoryDetector { name -> name == "Fusion Box" }
-    val shardFusionInventory = InventoryDetector { name -> name == "Shard Fusion" }
+    val fusionBoxInventory = InventoryDetector { name -> fusionBoxPattern.matches(name) }
+    val shardFusionInventory = InventoryDetector { name -> shardFusionPattern.matches(name) }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
+
+    /**
+     * REGEX-TEST: Attribute Menu
+     * REGEX-TEST: (1/3) Attribute Menu
+     * REGEX-TEST: (11/13) Attribute Menu
+     */
+    private val attributeMenuPattern by patternGroup.pattern(
+        "attribute-menu",
+        "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
+    )
+
+    /**
+     * REGEX-TEST: Hunting Box
+     * REGEX-TEST: (1/3) Hunting Box
+     * REGEX-TEST: (10/13) Hunting Box
+     */
+    private val huntingBoxPattern by patternGroup.pattern(
+        "hunting-box",
+        "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Fusion Box
+     * REGEX-TEST: (1/3) Fusion Box
+     * REGEX-TEST: (10/13) Fusion Box
+     */
+    private val fusionBoxPattern by patternGroup.pattern(
+        "fusion-box",
+        "(?:\\(\\d+/\\d+\\) )?Fusion Box",
+    )
+
+    private val shardFusionPattern by patternGroup.pattern(
+        "shard-fusion",
+        "Shard Fusion",
+    )
 
     /**
      * REGEX-TEST: §6Nature Elemental
