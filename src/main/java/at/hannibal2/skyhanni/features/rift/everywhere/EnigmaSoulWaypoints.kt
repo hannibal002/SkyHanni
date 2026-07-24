@@ -77,11 +77,11 @@ object EnigmaSoulWaypoints {
     )
 
     /**
-     * REGEX-TEST: Rift Guide ➜ Wyld Woods
+     * REGEX-TEST: To Rift Guide ➜ Wyld Woods
      */
     private val guideAreaPattern by patternGroup.pattern(
         "guide-area",
-        "Rift Guide ➜ (?<area>.+)",
+        "To Rift Guide ➜ (?<area>.+)",
     )
 
     /**
@@ -247,7 +247,7 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(40)?.item?.getCleanLore()?.firstOrNull()?.let {
+    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(39)?.item?.getCleanLore()?.firstOrNull()?.let {
         guideAreaPattern.matchMatcher(it) {
             group("area")
         }
