@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi
@@ -19,10 +20,13 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getTargetedBlock
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
@@ -35,6 +39,7 @@ object MissingCropWarning {
     private val config get() = SkyHanniMod.feature.garden.greenhouse
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.greenhouse
     private val fallbackStorage get() = ProfileStorageData.playerSpecific?.greenhouseDiagnosedCropPositionsByPlot
+    private val fallbackDetectedStorage get() = ProfileStorageData.playerSpecific?.greenhouseDetectedCropPositionsByPlot
 
     private var previousScan: Set<CropCategory>? = null
     private var stableScanCount = 0
@@ -43,12 +48,15 @@ object MissingCropWarning {
     private var lastTargetedCrop: Pair<CropCategory, LorenzVec>? = null
     private var lastTargetedPosition: LorenzVec? = null
     private val runtimeDetectedCropsByPlot = mutableMapOf<Int, MutableSet<String>>()
+    private val runtimeDetectedCropPositionsByPlot = mutableMapOf<Int, MutableMap<String, LorenzVec>>()
     private val runtimeDiagnosedPositionsByPlot = mutableMapOf<Int, MutableMap<String, LorenzVec>>()
     private var pendingPersistentSave = false
     private var secondsUntilAllPlotScan = 0
     private var hasCompletedLoadedPlotSweep = false
     private var previousLoadedPlotSweep: Map<Int, Set<String>>? = null
     private var stableLoadedPlotSweepCount = 0
+    private var missingCropWaypointsPlotId: Int? = null
+    private var missingCropWaypoints: Map<CropCategory, LorenzVec> = emptyMap()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
@@ -161,9 +169,21 @@ object MissingCropWarning {
                 saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
             }
         }
+        storage?.detectedCropPositionsByPlot?.let { saved ->
+            runtimeDetectedCropPositionsByPlot.forEach { (plotId, positions) ->
+                saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
+            }
+        }
+        fallbackDetectedStorage?.let { saved ->
+            runtimeDetectedCropPositionsByPlot.forEach { (plotId, positions) ->
+                saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
+            }
+        }
         savePendingData()
 
         val plot = GardenPlotApi.getCurrentPlot() ?: return
+        missingCropWaypointsPlotId = plot.id
+        missingCropWaypoints = emptyMap()
         if (secondsUntilAllPlotScan <= 0) {
             val loadedPlotSweep = scanAllLoadedGreenhouses()
             if (!hasCompletedLoadedPlotSweep) {
@@ -183,7 +203,8 @@ object MissingCropWarning {
         }
         if (hasCompletedLoadedPlotSweep) secondsUntilAllPlotScan--
 
-        val present = scanGreenhouse(plot) - missingDiagnosedCropsOnPlot(plot.id)
+        val scannedPositions = scanGreenhousePositions(plot)
+        val present = scannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id)
         if (present != previousScan) {
             previousScan = present
             stableScanCount = 1
@@ -201,13 +222,17 @@ object MissingCropWarning {
             putAll(runtimeDetectedCropsByPlot)
             this[plot.id] = presentNames
         }
+        saveDetectedCropPositions(plot.id, scannedPositions)
         savePendingData()
 
         val presentAcrossGreenhouses = detectedCropsByPlot().values
             .flatten()
             .mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
-        val missing = CropCategory.entries.toSet() - presentAcrossGreenhouses - diagnosedPresentCrops(plot.id)
+        val missingAtRememberedPositions = missingRememberedCropPositionsOnPlot(plot.id)
+        val missing = CropCategory.entries.toSet() - presentAcrossGreenhouses - diagnosedPresentCrops(plot.id) +
+            missingAtRememberedPositions.keys
         if (!hasCompletedLoadedPlotSweep) return
+        missingCropWaypoints = missingAtRememberedPositions
         if (missing == lastReportedMissing) return
         lastReportedMissing = missing
 
@@ -221,15 +246,20 @@ object MissingCropWarning {
         }
     }
 
-    private fun scanGreenhouse(plot: GardenPlot): Set<CropCategory> {
-        val world = MinecraftCompat.localWorldOrNull ?: return emptySet()
+    private fun scanGreenhouse(plot: GardenPlot): Set<CropCategory> =
+        scanGreenhousePositions(plot).keys
+
+    private fun scanGreenhousePositions(plot: GardenPlot): Map<CropCategory, LorenzVec> {
+        val world = MinecraftCompat.localWorldOrNull ?: return emptyMap()
         val middle = plot.middle.toBlockPos()
         val from = BlockPos(middle.x - SCAN_RADIUS, MIN_GARDEN_Y, middle.z - SCAN_RADIUS)
         val to = BlockPos(middle.x + SCAN_RADIUS, MAX_GARDEN_Y, middle.z + SCAN_RADIUS)
-        return buildSet {
+        return buildMap {
             for (pos in BlockPos.betweenClosed(from, to)) {
-                CropCategory.fromBlock(world.getBlockState(pos).block)?.let(::add)
-                if (size == CropCategory.entries.size) return@buildSet
+                CropCategory.fromBlock(world.getBlockState(pos).block)?.let {
+                    putIfAbsent(it, pos.toLorenzVec())
+                }
+                if (size == CropCategory.entries.size) return@buildMap
             }
         }
     }
@@ -238,9 +268,11 @@ object MissingCropWarning {
         val sweep = mutableMapOf<Int, Set<String>>()
         for (plot in GardenPlotApi.plots.filter { it.greenhouse }) {
             if (!isCompleteScanAreaLoaded(plot)) continue
-            val presentNames = (scanGreenhouse(plot) - missingDiagnosedCropsOnPlot(plot.id))
+            val scannedPositions = scanGreenhousePositions(plot)
+            val presentNames = (scannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id))
                 .mapTo(mutableSetOf()) { it.name }
             sweep[plot.id] = presentNames
+            saveDetectedCropPositions(plot.id, scannedPositions)
             if (runtimeDetectedCropsByPlot[plot.id] == presentNames) continue
             runtimeDetectedCropsByPlot[plot.id] = presentNames
             pendingPersistentSave = true
@@ -268,6 +300,8 @@ object MissingCropWarning {
         hasCompletedLoadedPlotSweep = false
         previousLoadedPlotSweep = null
         stableLoadedPlotSweepCount = 0
+        missingCropWaypointsPlotId = null
+        missingCropWaypoints = emptyMap()
         clearTargetedCrop()
     }
 
@@ -282,15 +316,42 @@ object MissingCropWarning {
         }
 
     private fun missingDiagnosedCropsOnPlot(plotId: Int): Set<CropCategory> =
-        diagnosedPositionsByPlot()[plotId].orEmpty().entries
-            .groupBy({ it.key }, { it.value })
-            .mapNotNullTo(mutableSetOf()) { (name, positions) ->
-                val category = CropCategory.fromStorageName(name) ?: return@mapNotNullTo null
-                category.takeIf {
-                    positions.any { it.isInLoadedChunk() } &&
-                        positions.filter { it.isInLoadedChunk() }.all { it.isMissingCrop(category) }
-                }
+        missingDiagnosedCropPositionsOnPlot(plotId).keys
+
+    private fun missingDiagnosedCropPositionsOnPlot(plotId: Int): Map<CropCategory, LorenzVec> =
+        diagnosedPositionsByPlot()[plotId].orEmpty().entries.mapNotNull { (name, position) ->
+            val category = CropCategory.fromStorageName(name) ?: return@mapNotNull null
+            (category to position).takeIf {
+                position.isInLoadedChunk() && position.isMissingCrop(category)
             }
+        }.toMap()
+
+    private fun missingRememberedCropPositionsOnPlot(plotId: Int): Map<CropCategory, LorenzVec> = buildMap {
+        val diagnosedCategories = diagnosedPositionsByPlot()[plotId].orEmpty().keys
+            .mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
+        detectedCropPositionsByPlot()[plotId].orEmpty().forEach { (name, position) ->
+            val category = CropCategory.fromStorageName(name) ?: return@forEach
+            if (category !in diagnosedCategories && position.isInLoadedChunk() && position.isMissingCrop(category)) {
+                put(category, position)
+            }
+        }
+        putAll(missingDiagnosedCropPositionsOnPlot(plotId))
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!config.missingCropWarning || !isInGreenhouse()) return
+        if (GardenPlotApi.getCurrentPlot()?.id != missingCropWaypointsPlotId) return
+        for ((category, position) in missingCropWaypoints) {
+            event.drawWaypointFilled(
+                position,
+                LorenzColor.RED.toColor(),
+                seeThroughBlocks = true,
+                beacon = true,
+            )
+            event.drawDynamicText(position.add(y = 1), "§cMissing ${category.displayName}", 1.5)
+        }
+    }
 
     private fun LorenzVec.isMissingCrop(category: CropCategory): Boolean {
         val state = getBlockStateAt()
@@ -300,6 +361,12 @@ object MissingCropWarning {
         if (category in diagnosticOnlyCrops) {
             if (findNearbyCropPosition(category, this) != null) return false
             return state.isAir
+        }
+
+        if (category in variableHeightCrops && state.isAir) {
+            return (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).none { yOffset ->
+                CropCategory.fromBlock(add(y = yOffset).getBlockStateAt().block) == category
+            }
         }
 
         return state.isAir
@@ -322,6 +389,30 @@ object MissingCropWarning {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback { toggleDiagnosticCropPositionFinder() }
         }
+        event.registerBrigadier("shclearuniquediagnostics") {
+            description = "Clears all saved unique crop diagnostic positions"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { clearDiagnosticCropPositions() }
+        }
+    }
+
+    private fun clearDiagnosticCropPositions() {
+        val clearedPositions = buildSet {
+            runtimeDiagnosedPositionsByPlot.values.forEach { addAll(it.keys) }
+            storage?.diagnosedCropPositionsByPlot?.values.orEmpty().forEach { addAll(it.keys) }
+            fallbackStorage?.values.orEmpty().forEach { addAll(it.keys) }
+        }.size
+        runtimeDiagnosedPositionsByPlot.clear()
+        storage?.diagnosedCropPositionsByPlot?.clear()
+        fallbackStorage?.clear()
+        clearTargetedCrop()
+        missingCropWaypoints = emptyMap()
+        pendingPersistentSave = true
+        savePendingData()
+        ChatUtils.chat(
+            if (clearedPositions == 0) "§eNo saved Crop Diagnostics positions were found."
+            else "§aCleared saved Crop Diagnostics positions for §e$clearedPositions §acrops.",
+        )
     }
 
     private fun toggleDiagnosticCropPositionFinder() {
@@ -407,8 +498,30 @@ object MissingCropWarning {
     private fun detectedCropsByPlot(): Map<Int, Set<String>> =
         storage?.detectedCropsByPlot.orEmpty() + runtimeDetectedCropsByPlot
 
+    private fun saveDetectedCropPositions(plotId: Int, positions: Map<CropCategory, LorenzVec>) {
+        val positionNames = positions.mapKeys { it.key.name }
+        val runtimePositions = runtimeDetectedCropPositionsByPlot.getOrPut(plotId) { mutableMapOf() }
+        if (positionNames.all { runtimePositions[it.key] == it.value }) return
+        runtimePositions.putAll(positionNames)
+        storage?.detectedCropPositionsByPlot?.getOrPut(plotId) { mutableMapOf() }?.putAll(positionNames)
+        fallbackDetectedStorage?.getOrPut(plotId) { mutableMapOf() }?.putAll(positionNames)
+        pendingPersistentSave = true
+    }
+
+    private fun detectedCropPositionsByPlot(): Map<Int, Map<String, LorenzVec>> = buildMap {
+        storage?.detectedCropPositionsByPlot.orEmpty().forEach { (plotId, positions) ->
+            put(plotId, positions.toMutableMap())
+        }
+        fallbackDetectedStorage.orEmpty().forEach { (plotId, positions) ->
+            put(plotId, get(plotId).orEmpty() + positions)
+        }
+        runtimeDetectedCropPositionsByPlot.forEach { (plotId, positions) ->
+            put(plotId, get(plotId).orEmpty() + positions)
+        }
+    }
+
     private fun savePendingData() {
-        if (!pendingPersistentSave || storage == null && fallbackStorage == null) return
+        if (!pendingPersistentSave || storage == null && fallbackStorage == null && fallbackDetectedStorage == null) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "greenhouse-crop-detection")
         pendingPersistentSave = false
     }
@@ -458,6 +571,7 @@ object MissingCropWarning {
 
     private val deadCropBlocks = setOf(Blocks.DEAD_BUSH, Blocks.CHORUS_PLANT, Blocks.CHORUS_FLOWER)
     private val diagnosticOnlyCrops = setOf(CropCategory.PUMPKIN, CropCategory.COCOA_BEANS)
+    private val variableHeightCrops = setOf(CropCategory.CACTUS, CropCategory.SUGAR_CANE)
     private val greenhouseStemBlocks = setOf(
         Blocks.MELON_STEM,
         Blocks.ATTACHED_MELON_STEM,
@@ -469,7 +583,8 @@ object MissingCropWarning {
     private const val MIN_GARDEN_Y = 60
     private const val MAX_GARDEN_Y = 100
     private const val DIAGNOSTIC_SEARCH_RADIUS = 2
-    private const val REQUIRED_STABLE_SCANS = 3
-    private const val REQUIRED_STABLE_LOADED_PLOT_SWEEPS = 5
+    private const val VARIABLE_HEIGHT_SEARCH_RADIUS = 2
+    private const val REQUIRED_STABLE_SCANS = 2
+    private const val REQUIRED_STABLE_LOADED_PLOT_SWEEPS = 2
     private const val ALL_PLOT_SCAN_INTERVAL_SECONDS = 60
 }
