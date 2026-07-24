@@ -153,7 +153,6 @@ object SkyBlockItemModifierUtils {
             it.isNotEmpty()
         } ?: return null
 
-        // The forge "Pets" menu may get here, but has "Items Required"
         if (PetStoragePatterns.petMenuPetStackLoreFalsePattern.anyMatches(getCleanLore())) return null
 
         return try {

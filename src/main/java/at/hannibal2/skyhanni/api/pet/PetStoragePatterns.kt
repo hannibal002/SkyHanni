@@ -158,7 +158,8 @@ internal object PetStoragePatterns {
      * REGEX-TEST: Items Required
      */
     val petMenuPetStackLoreFalsePattern by patternGroup.list(
-        "menu.petstack.lore.falsepositive",
+        "menu.petstack.lorelines.falsepositive",
+        // The Forge menu for buying pets
         "Items Required",
     )
 }
