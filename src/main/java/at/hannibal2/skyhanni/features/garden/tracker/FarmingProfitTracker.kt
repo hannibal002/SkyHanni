@@ -51,8 +51,9 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeModifier
@@ -64,7 +65,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
@@ -553,10 +553,10 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         lastFarmingActivity = SimpleTimeMark.now()
     }
 
-    fun addPestSpray(spray: SprayType) {
+    fun addPestSpray(spray: SprayType, amount: Int = 1) {
         if (!shouldTrack(TrackedSource.PESTS)) return
         modify {
-            it.spraysUsed.addOrPut(spray, 1)
+            it.spraysUsed.addOrPut(spray, amount.toLong())
         }
         lastFarmingActivity = SimpleTimeMark.now()
     }

@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -61,7 +61,7 @@ object PurseApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryName = InventoryUtils.openInventoryName()
         val item = event.item ?: return
-        val itemName = item.cleanName()
+        val itemName = item.cleanName
 
         if (inventoryName.equalsOneOf("Auction View", "BIN Auction View") && itemName == "Collect Auction") {
             lastAuctionHouseCoinClaim = SimpleTimeMark.now()
@@ -118,7 +118,7 @@ object PurseApi {
                 return PurseChangeCause.GAIN_AUCTION_HOUSE
             }
 
-            if (Minecraft.getInstance().screen == null) {
+            if (MinecraftCompat.screen == null) {
                 if (inventoryCloseTime.passedSince() > 2.seconds) {
                     return PurseChangeCause.GAIN_MOB_KILL
                 }

@@ -452,12 +452,12 @@ enum class HotmData(
 
         // <editor-fold desc="Patterns">
         /**
-         * REGEX-TEST: Level 1/50 (0 0%):skull:
-         * REGEX-TEST: Level 1/50
+         * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
+         * REGEX-TEST: §7Level 1§8/50
          */
         override val levelPattern by patternGroup.pattern(
             "perk.level",
-            """Level (?<level>\d+).*"""
+            "(?:§.)*§(?<color>.)Level (?<level>\\d+).*"
         )
         /**
          * REGEX-TEST: Requires Mining Speed
@@ -597,6 +597,7 @@ enum class HotmData(
             }
         }
 
+        // Color is needed due to blue goblin omelet
         override val readingLevelTransform: Matcher.() -> Int = {
             group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
         }

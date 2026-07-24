@@ -21,6 +21,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -35,8 +37,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -50,38 +52,61 @@ object CroesusChestTracker {
 
     private val patternGroup = RepoPattern.group("dungeon.croesus")
 
-    private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
-    private val croesusEmptyPattern by patternGroup.pattern("empty", "§cNo treasures!")
-    private val kismetPattern by patternGroup.pattern("kismet.reroll", "§aReroll Chest")
-    private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used", "§aYou already rerolled a chest!")
+    /**
+     * REGEX-TEST: (1/3) Croesus
+     * REGEX-TEST: Croesus
+     */
+    private val croesusPattern by patternGroup.pattern("inventory", "(?:\\(\\d+/\\d+\\) )?Croesus")
 
     /**
-     * REGEX-TEST: §eFloor V
+     * REGEX-TEST: No treasures!
      */
-    private val floorPattern by patternGroup.pattern("chest.floor", "§eFloor (?<floor>[IV]+)")
-    private val masterPattern by patternGroup.pattern("chest.master", ".*Master.*")
+    private val croesusEmptyPattern by patternGroup.pattern("empty.colorless", "No treasures!")
 
     /**
-     * REGEX-TEST: §eInfernal Tier
+     * REGEX-TEST: Reroll Chest
      */
-    private val kuudraPattern by patternGroup.pattern("chest.kuudra", "§e(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
+    private val kismetPattern by patternGroup.pattern("kismet.reroll.colorless", "Reroll Chest")
 
     /**
-     * REGEX-TEST: §aNo more chests to open!
+     * REGEX-TEST: You already rerolled a chest!
      */
-    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused", "§aNo more chests to open!")
+    private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used.colorless", "You already rerolled a chest!")
 
     /**
-     * REGEX-TEST: §7Opened Chest: §fWood
+     * REGEX-TEST: Floor V
      */
-    private val openedPattern by patternGroup.pattern("chest.state.opened", "§.Opened [cC]hest:.*")
+    private val floorPattern by patternGroup.pattern("chest.floor.colorless", "Floor (?<floor>[IV]+)")
 
     /**
-     * REGEX-TEST: §cNo chests opened yet!
+     * REGEX-TEST: Master Mode The Catacombs
      */
-    private val unopenedPattern by patternGroup.pattern("chest.state.unopened", "§cNo chests opened yet!")
+    private val masterPattern by patternGroup.pattern("chest.master.colorless", ".*Master.*")
 
-    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used", " §8§mKismet Feather")
+    /**
+     * REGEX-TEST: Infernal Tier
+     */
+    private val kuudraPattern by patternGroup.pattern("chest.kuudra.colorless", "(?<tier>Basic|Hot|Burning|Fiery|Infernal) Tier")
+
+    /**
+     * REGEX-TEST: No more chests to open!
+     */
+    private val keyUsedPattern by patternGroup.pattern("chest.state.keyused.colorless", "No more chests to open!")
+
+    /**
+     * REGEX-TEST: Opened Chest: Wood
+     */
+    private val openedPattern by patternGroup.pattern("chest.state.opened.colorless", "Opened [cC]hest:.*")
+
+    /**
+     * REGEX-TEST: No chests opened yet!
+     */
+    private val unopenedPattern by patternGroup.pattern("chest.state.unopened.colorless", "No chests opened yet!")
+
+    /**
+     * WRAPPED-REGEX-TEST: " Kismet Feather"
+     */
+    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.styled", " §mKismet Feather")
 
     private const val EMPTY_SLOT = 22
     private const val FRONT_ARROW_SLOT = 53
@@ -118,10 +143,13 @@ object CroesusChestTracker {
 
         if (!inCroesusInventory || croesusEmpty) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
-            if (chestSlots.any { it.contains(slot.containerSlot) }) {
-                val color = (OpenedState.getOpenState(slot.item.getLore()) ?: return@forEach).color ?: return@forEach
-                slot.highlight(color)
-            }
+            if (chestSlots.none { it.contains(slot.containerSlot) }) return@forEach
+
+            val lore = slot.item.getCleanLore()
+            if (lore.isEmpty()) return@forEach
+
+            val color = (OpenedState.getOpenState(lore) ?: return@forEach).color ?: return@forEach
+            slot.highlight(color)
         }
     }
 
@@ -160,15 +188,16 @@ object CroesusChestTracker {
                 continue
             }
 
-            val lore = item.getLore()
+            val lore = item.getCleanLore()
+            val itemName = item.cleanName
 
             if (run.floor == null || run.floor == "F0") run.floor =
-                (if (masterPattern.matches(item.hoverName)) "M" else "F") + (
+                (if (masterPattern.matches(itemName)) "M" else "F") + (
                     lore.firstNotNullOfOrNull {
                         floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
                     } ?: "0"
                     )
-            if (run.floor == "F0" && kuudraPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())) run.floor =
+            if (run.floor == "F0" && kuudraPattern.matches(itemName)) run.floor =
                 ("T" + KuudraApi.getKuudraRunTierNumber(lore.firstNotNullOfOrNull { kuudraPattern.matchMatcher(it) { group("tier") } }))
             run.openState = OpenedState.getOpenState(lore)
         }
@@ -177,7 +206,7 @@ object CroesusChestTracker {
     private fun pageSetup(event: InventoryFullyOpenedEvent) {
         inCroesusInventory = true
         pageSwitchable = true
-        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.hoverName.formattedTextCompatLeadingWhiteLessResets())
+        croesusEmpty = croesusEmptyPattern.matches(event.inventoryItems[EMPTY_SLOT]?.cleanName)
         if (event.inventoryItems[BACK_ARROW_SLOT]?.`is`(Items.ARROW) != true) {
             currentPage = 0
         }
@@ -220,8 +249,8 @@ object CroesusChestTracker {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!config.kismetStackSize) return
         if (chestInventory == null) return
-        if (!kismetPattern.matches(event.stack.hoverName.formattedTextCompatLeadingWhiteLessResets())) return
-        if (kismetUsedInChestPattern.matches(event.stack.getLore().lastOrNull())) return
+        if (!kismetPattern.matches(event.stack.cleanName)) return
+        if (kismetUsedInChestPattern.matches(event.stack.getCleanLore().lastOrNull())) return
         event.stackTip = "§a$kismetAmountCache"
     }
 
@@ -231,7 +260,8 @@ object CroesusChestTracker {
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
         croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getLore())) return
+        val styledLore = event.stack.getLore().map { it.removeColor(keepFormatting = true) }
+        if (!kismetUsedInCroesusPattern.anyMatches(styledLore)) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"
