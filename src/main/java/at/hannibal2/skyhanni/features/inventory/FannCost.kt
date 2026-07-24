@@ -69,11 +69,13 @@ object FannCost {
     private var lastStartTrainingLoreHash: Int = 0
 
     /**
-     * REGEX-TEST: Training Slot
+     * REGEX-TEST: Training Slot 1
+     * REGEX-TEST: Training Slot 2
+     * REGEX-TEST: Training Slot 3
      */
     private val trainingSlotInventoryPattern by patternGroup.pattern(
         "training.slot.inventory",
-        ".*Training Slot.*",
+        "Training Slot \\d+",
     )
 
     /**
