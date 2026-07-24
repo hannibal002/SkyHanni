@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.NeuInternalName
-import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -93,7 +91,7 @@ object AuctionHousePriceComparison {
         val veryBad = config.veryBad.toColor()
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (shouldIgnoreItem(slot.item.getInternalName())) continue
+            if (HighlightSkeletonMasterChestplate.shouldAuctionHouseHighlightIgnoreItem(slot.item.getInternalName())) continue
             val diff = slotPriceMap[slot.containerSlot] ?: continue
             if (diff == 0L) {
                 slot.highlight(good)
@@ -152,9 +150,6 @@ object AuctionHousePriceComparison {
 
         return Color(newRed, newGreen, newBlue)
     }
-
-    private fun shouldIgnoreItem(internalName: NeuInternalName): Boolean =
-        internalName == "SKELETON_MASTER_CHESTPLATE".toInternalName() && HighlightSkeletonMasterChestplate.isEnabled()
 
     private fun lerp(delta: Double, start: Int, end: Int) = start + delta * (end - start)
 

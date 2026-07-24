@@ -6,7 +6,9 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils.slots
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonTier
@@ -18,13 +20,14 @@ object HighlightSkeletonMasterChestplate {
 
     private val config get() = SkyHanniMod.feature.inventory.auctions.skeletonMaster
     private val auctionMenu = InventoryDetector(checkInventoryName = { it.startsWith("Auctions") })
+    private val SKELETON_MASTER_CHESTPLATE = "SKELETON_MASTER_CHESTPLATE".toInternalName()
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!auctionMenu.isInside()) return
         if (!isEnabled()) return
-        for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.item.getInternalName() != "SKELETON_MASTER_CHESTPLATE".toInternalName()) continue
+        for (slot in event.gui.slots()) {
+            if (slot.item.getInternalName() != SKELETON_MASTER_CHESTPLATE) continue
             if (isGoodChestplate(slot.item) && config.highlightGoodChestplate) slot.highlight(config.goodColor)
             else if (config.highlightBadChestplate) slot.highlight(config.badColor)
         }
@@ -34,4 +37,6 @@ object HighlightSkeletonMasterChestplate {
         (item.getDungeonTier() == 10 && item.getStatBoostPercentage() == 50)
 
     fun isEnabled(): Boolean = (config.highlightBadChestplate || config.highlightGoodChestplate)
+
+    fun shouldAuctionHouseHighlightIgnoreItem(internalName: NeuInternalName): Boolean = internalName == SKELETON_MASTER_CHESTPLATE && isEnabled()
 }

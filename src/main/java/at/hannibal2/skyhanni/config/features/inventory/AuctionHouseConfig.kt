@@ -19,37 +19,9 @@ class AuctionHouseConfig {
     val auctionsPriceComparison: AuctionHousePriceComparisonConfig = AuctionHousePriceComparisonConfig()
 
     @Expose
-    @ConfigOption(name = "Skeleton Master Highlight", desc = "")
+    @ConfigOption(name = "Skeleton Master Chestplate Highlight", desc = "")
     @Accordion
-    val skeletonMaster: SkeletonMasterHighlight = SkeletonMasterHighlight()
-
-    class SkeletonMasterHighlight {
-        @Expose
-        @ConfigOption(name = "Skeleton Master Highlight", desc = "Highlights M7 (Tier 10), 50% Boost.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        @SearchTag("Floor stat boost")
-        var highlightGoodChestplate: Boolean = true
-
-
-        @Expose
-        @ConfigOption(name = "Good Color", desc = "What color to highlight 50% M7 Skeleton Masters in.")
-        @ConfigEditorColour
-        var goodColor: ChromaColour = LorenzColor.GREEN.toChromaColor()
-
-        @Expose
-        @ConfigOption(name = "Skeleton Master Highlight", desc = "Highlights Non M7 (Tier 10), 50% Boost.")
-        @ConfigEditorBoolean
-        @FeatureToggle
-        @SearchTag("Floor stat boost")
-        var highlightBadChestplate: Boolean = false
-
-        @Expose
-        @ConfigOption(name = "Good Color", desc = "What color to highlight 50% M7 Skeleton Masters in.")
-        @ConfigEditorColour
-        var badColor: ChromaColour = LorenzColor.DARK_RED.toChromaColor()
-
-    }
+    val skeletonMaster: SkeletonMasterChestplateHighlightConfig = SkeletonMasterChestplateHighlightConfig()
 
     @Expose
     @ConfigOption(
