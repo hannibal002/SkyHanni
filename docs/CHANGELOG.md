@@ -86,6 +86,7 @@
 + Added Phantomleaf Solver. - mzhaodev (https://github.com/hannibal002/SkyHanni/pull/6101)
     + When harvesting Phantomleaf in the Garden, highlight the hiding spot in green.
     + Stand still for best results.
++ Added Charmed Visitor Display. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5832)
 
 #### Chat
 
@@ -106,6 +107,7 @@
 #### Slayer
 
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
++ Added line to Voidgloom Seraph boss. - Marina (https://github.com/hannibal002/SkyHanni/pull/5669)
 
 #### Rift
 
@@ -168,6 +170,7 @@
 + Frozen corpse waypoint text in mineshafts now turns green after looting. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/5581)
 + Improved Glacite Mineshaft corpse detection to be instantaneous. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5916)
 + Made Glacite tunnels Landmarks togglable. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5876)
++ Made Corpse Tracker account for the key being saved by the Resourceful perk. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6167)
 
 #### Garden
 
@@ -192,6 +195,9 @@
 + Lock on Mousemat is no longer enabled by default. - Luna (https://github.com/hannibal002/SkyHanni/pull/6045)
     + If you're an existing user, you will have to manually disable it if you don't want it.
 + Added option to show Harvest Feast Display outside of the Garden. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5835)
++ Added an option to prevent breaking crops with Sprayonator. - Luna (https://github.com/hannibal002/SkyHanni/pull/5469)
+    + The existing feature that includes fishing rods will now only prevent breaking *crops*, not all blocks.
++ Added support for detecting Sprayonator used with Juicy Nozzle and Groovy Nozzle. - Luna (https://github.com/hannibal002/SkyHanni/pull/6115)
 
 #### Combat
 
@@ -215,6 +221,8 @@
 + Added a manual reset button for the Experimentation Table's Dry-Streak Display. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5981)
 + Added equipment wardrobe value estimation. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6036)
 + Improved loadouts by letting you highlight currently equipped and favorite loadouts. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6067)
++ Added NEU-style Superpairs slot highlighting in the Experimentation Table. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6126)
+    + Showing collected pairs, known matches, seen cards and powerups.
 
 #### Fishing
 
@@ -226,6 +234,8 @@
 #### Foraging
 
 + Improved Clear Tree View support for Torrhus Canyon. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6076)
++ Made all existing SkyHanni foraging features work on Torrhus Canyon. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6170)
+    + If any feature doesn't work on the new island and you think it should, make a bug report.
 
 #### Commands
 
@@ -266,6 +276,8 @@
 + Added title and sound notification when a `/shremind` reminder is due. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/6072)
 + Compressed island beacon buff display. - T0R0NT0 (https://github.com/hannibal002/SkyHanni/pull/6081)
 + Added Way to Pause and Resume Tracker. - Icetrix (https://github.com/hannibal002/SkyHanni/pull/5952)
++ Added Blazetekk Ham Radio warnings to chat filter. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6168)
++ Reduced cases of inflated prices being reported due to Auction House manipulation. - Luna (https://github.com/hannibal002/SkyHanni/pull/5921)
 
 ### Fixes
 
@@ -335,6 +347,9 @@
 + Fixed Pest Finder giving an error when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6104)
 + Fixed Pest Profit Tracker saying Praying Mantiss instead of Praying Mantises. - Luna (https://github.com/hannibal002/SkyHanni/pull/6114)
 + Fixed paginated Jacob Contest menu not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6128)
++ Fixed SkyHanni not detecting the 4th Harvest Feast in-season crop. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6113)
++ Fixed Pest Spawn Timer giving error when Tab List is still loading when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6165)
++ Fixed an error message when opening the Visitor menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6135)
 
 #### Combat
 
@@ -441,6 +456,7 @@
 + Fixed Obfuscated Fish 1 and 2 not counting as bait. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5833)
 + Fixed Trophy Fish related features not working. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6022)
 + Fixed Legion/Bobbin Time text being too cramped. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/6069)
++ Fixed false fishing bait change warnings when opening a sign GUI while holding a fishing rod. - Growling_Grizzly (https://github.com/hannibal002/SkyHanni/pull/6153)
 
 #### Item
 
@@ -467,6 +483,7 @@
 
 + Fixed error in DNA Analyzer Solver. - hannibal2 + nopo (https://github.com/hannibal002/SkyHanni/pull/5337)
 + Fixed a few errors when trying the torrhus canyon on the alpha. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6060)
++ Fixed Beacon Solver not detecting the color correctly. - Luna (https://github.com/hannibal002/SkyHanni/pull/5254)
 
 #### Rift
 
@@ -475,6 +492,7 @@
   + It should now remain accurate even if the server is lagging.
 + Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 + Fixed rift time features not working with the hypixel resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6050)
++ Fixed rare error while using the Rift Berberis Helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
 
 #### Inventory
 
@@ -511,6 +529,8 @@
 + Fixed prevent missing rabbit the fish sometimes causing you to not be able to close other inventories. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6087)
 + Fixed Estimated Armor Wardrobe Price showing while using Custom Wardrobe. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
 + Fixed Inferno Profit Tracker detecting Bazaar + recipe menus as minion menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6129)
++ Fixed Croesus Chest Tracker thinking you always have already used kismet on a chest. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6164)
++ Fixed future legendary pets for Traveling Zoo not showing when other mods modify the tooltip. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6163)
 
 #### Commands
 
@@ -534,7 +554,7 @@
 + Fixed description for Auto-Load Shaft Routes giving incorrect examples for route names. - Luna (https://github.com/hannibal002/SkyHanni/pull/5904)
 + Fixed Glacite Mineshaft entrance/ladder waypoints being set to wrong location. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5858)
 + Fixed glacite tunnels auto commision not working due to hypixel update. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6015)
-+ Fixed mineshaft mayham perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
++ Fixed Mineshaft Mayhem perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
 + Fixed gemstones not being detected in treasure chests. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6030)
 + Fixed SkyMall/Mayhem perks not being detected from the inventory. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6108)
 
@@ -995,6 +1015,12 @@
 + Marked SkyHanni as incompatible with the mods OpSec and Spoofifed. - Luna (https://github.com/hannibal002/SkyHanni/pull/6085)
     + These mods break our ability to communicate with the Hypixel Mod API.
 + Removed legacy fullComponent field from GuiMessage and ChatUtils. - Luna (https://github.com/hannibal002/SkyHanni/pull/5954)
++ Added MixinTest to automatically validate mixins using JUnit. - Luna (https://github.com/hannibal002/SkyHanni/pull/6148)
++ Added safe Map.filterNotNull, Map.filterNotNullKeys, and Map.filterNotNullKeys extension methods to CollectionUtils. - Luna (https://github.com/hannibal002/SkyHanni/pull/5898)
++ Moved GardenPlotApi.Plot into its own class GardenPlot, with all members (properties and functions) as class members. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6138)
++ Removed ModernPatterns and moved the patterns into their respective files. - Luna (https://github.com/hannibal002/SkyHanni/pull/5254)
+    + We only support modern now, so there is no point in this file existing.
++ Renamed wardrobe and equipment API classes for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6137)
 
 ### Removed Features
 
@@ -1005,6 +1031,8 @@
   + If you think you can do better, feel free to open a pull request.
 + Removed the toggle of ignoring Spaceman in the Shopping List. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5661)
     + Can now be done by clicking on the Visitor name in the Shopping List.
++ Removed Pest Spray Selector. - Luna (https://github.com/hannibal002/SkyHanni/pull/6115)
+    + Hypixel now lets you choose the spray to use in a GUI, this feature became redundant.
 
 ## Version 7.0.0
 
