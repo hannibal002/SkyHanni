@@ -141,7 +141,7 @@ object GardenPlotApi {
     )
     var plots = listOf<GardenPlot>()
 
-    private fun fetchCurrentPlot(): GardenPlot? = getPlot(playerLocation())
+    fun fetchCurrentPlot(): GardenPlot? = getPlot(playerLocation())
 
     fun inGreenhouse(): Boolean {
         return currentPlot?.greenhouse ?: false

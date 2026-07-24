@@ -88,7 +88,7 @@ class GardenPlot(val id: Int, var inventorySlot: Int, val box: AABB, val middle:
         }
     }
 
-    fun isPlayerInside() = GardenPlotApi.getCurrentPlot() == this
+    fun isPlayerInside() = GardenPlotApi.fetchCurrentPlot() == this
 
     fun sendTeleportTo() = HypixelCommands.teleportToPlot(tpName)
 
