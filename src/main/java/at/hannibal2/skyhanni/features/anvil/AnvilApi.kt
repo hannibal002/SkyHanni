@@ -23,7 +23,7 @@ object AnvilApi {
      * REGEX-TEST: Anvil
      */
     private val inventoryNamePattern by patternGroup.pattern(
-        "inventory.name",
+        "inventory",
         "Anvil",
     )
 
