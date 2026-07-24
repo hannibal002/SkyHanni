@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.PlayerUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -41,7 +42,10 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private val patternGroup = RepoPattern.group("bingo.card.display")
     private val bingoCardInventoryPattern by patternGroup.pattern("inventory", "Bingo Card")
-    private val bingoCardInventoryDetector = InventoryDetector(bingoCardInventoryPattern) { dirty = true }
+    private val bingoCardInventoryDetector = InventoryDetector(
+        checkInventoryName = {bingoCardInventoryPattern.matches(it) },
+        onCloseInventory = { dirty = true },
+    )
 
     private var hasHiddenPersonalGoals = false
     private var displayCache: List<Renderable> = emptyList()

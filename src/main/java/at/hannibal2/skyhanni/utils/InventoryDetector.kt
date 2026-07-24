@@ -21,15 +21,6 @@ class InventoryDetector(
     val onCloseInventory: (InventoryCloseEvent) -> Unit = {},
     val checkInventoryName: (String) -> Boolean,
 ) {
-    constructor(
-        pattern: Pattern,
-        onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
-        onCloseInventory: (InventoryCloseEvent) -> Unit = {},
-    ) : this(
-        onOpenInventory,
-        onCloseInventory,
-        checkInventoryName = { name -> pattern.matches(name) }
-    )
 
     init {
         detectors.add(this)

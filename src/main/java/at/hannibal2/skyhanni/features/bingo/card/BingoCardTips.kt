@@ -57,7 +57,7 @@ object BingoCardTips {
         "Row #.*",
     )
 
-    private val bingoCardInventory = InventoryDetector(inventoryPattern)
+    private val bingoCardInventory = InventoryDetector {inventoryPattern.matches(it) }
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {

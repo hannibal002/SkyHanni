@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -61,8 +62,8 @@ object HarvestFeastManager {
     private val ALL_CROPS_SLOTS = 27..44
     private val isCurrentOutdated get() = isOutdated(currentFeastData) && isDataAvailable()
 
-    private val mainMenuInventoryDetector by lazy { InventoryDetector(feastInventoryPattern) }
-    private val allCropsInventoryDetector by lazy { InventoryDetector(allCropsInventoryPattern) }
+    private val mainMenuInventoryDetector by lazy { InventoryDetector { feastInventoryPattern.matches(it) } }
+    private val allCropsInventoryDetector by lazy { InventoryDetector { allCropsInventoryPattern.matches(it) } }
 
     private var currentFeastData: EliteFeastData? = null
         set(value) {

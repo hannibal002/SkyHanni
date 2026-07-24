@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.garden.greenhouse
 import at.hannibal2.skyhanni.features.garden.greenhouse.GrowthCycle.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 @SkyHanniModule
 object GreenhouseUtils {
@@ -15,5 +16,5 @@ object GreenhouseUtils {
         "Crop Diagnostics",
     )
 
-    val cropDiagnosticInventory = InventoryDetector(inventoryPattern)
+    val cropDiagnosticInventory = InventoryDetector { inventoryPattern.matches(it) }
 }

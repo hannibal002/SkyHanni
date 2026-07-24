@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.achievements
 
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 
 @SkyHanniModule
@@ -20,8 +22,7 @@ object SkillAchievements {
     private const val SKILL_ACHIEVEMENT = "Level 100 Skill"
     private const val ROCK_ACHIEVEMENT = "Mythic Rock"
     private const val DOLPHIN_ACHIEVEMENT = "Mythic Dolphin"
-    val skillDetector = InventoryDetector(checkInventoryName = { it == "Your Skills" })
-    val petSkillDetector = InventoryDetector(pattern = "(Fishing|Mining) Skill".toPattern())
+    val petSkillDetector = InventoryDetector { petSkillMenuPattern.matches(it) }
 
     /**
      * REGEX-TEST: Ores mined: 2,449,790
@@ -37,6 +38,15 @@ object SkillAchievements {
     private val seaCreaturesPattern by AchievementManager.group.pattern(
         "sea-creatures",
         "Sea Creatures killed: (?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: Fishing Skill
+     * REGEX-TEST: Mining Skill
+     */
+    private val petSkillMenuPattern by AchievementManager.group.pattern(
+        "pet-skill-menu",
+        "(?:Fishing|Mining) Skill",
     )
 
     @HandleEvent
@@ -73,7 +83,7 @@ object SkillAchievements {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val petSlot = 51
         val lore = event.inventoryItems[petSlot]?.getLoreComponent()
-        if (skillDetector.isInside()) {
+        if (SkillApi.skillMenuDetector.isInside()) {
             DelayedRun.runNextTick {
                 val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return@runNextTick
                 var highestSkill = 0

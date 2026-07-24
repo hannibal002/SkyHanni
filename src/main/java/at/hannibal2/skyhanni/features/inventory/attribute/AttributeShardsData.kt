@@ -63,7 +63,7 @@ object AttributeShardsData {
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
     ) { name -> name == "Hunting Box" }
     val bazaarShardsInventory = InventoryDetector(
-        pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
+        checkInventoryName = { bazaarShardsInventoryPattern.matches(it) },
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     )
     val confirmFusionInventory = InventoryDetector(
@@ -75,6 +75,15 @@ object AttributeShardsData {
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
+
+    /**
+     * REGEX-TEST: (1/3) Oddities ➜ Shards
+     * REGEX-TEST: Oddities ➜ Shards
+     */
+    val bazaarShardsInventoryPattern by patternGroup.pattern(
+        "bazaar.shards.inventory",
+        "(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards",
+    )
 
     /**
      * REGEX-TEST: Attribute Menu

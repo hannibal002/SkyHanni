@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -67,7 +68,7 @@ object BetterContainers {
         "disallowed",
         "(?i)navigate the maze.*",
     )
-    val disallowedInventory = InventoryDetector(disallowedInventoryPattern)
+    val disallowedInventory = InventoryDetector {disallowedInventoryPattern.matches(it) }
 
     val isRendering: Boolean get() = loaded && gpuTex != null
     val isOverriding: Boolean get() = chestOpen && isRendering && !disallowedInventory.isInside()

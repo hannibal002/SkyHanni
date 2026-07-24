@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -65,7 +66,7 @@ object CarnivalShopHelper {
         "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
-    private val overviewInventory = InventoryDetector(overviewInventoryNamesPattern)
+    private val overviewInventory = InventoryDetector {overviewInventoryNamesPattern.matches(it) }
     private val knownShops = InventoryDetector { name ->
         repoEventShops.any { it.shopName.equals(name, ignoreCase = true) }
     }

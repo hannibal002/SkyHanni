@@ -218,7 +218,7 @@ object ExperimentationTableApi {
     )
     // </editor-fold>
 
-    val experimentationTableInventory = InventoryDetector(inventoriesPattern)
+    val experimentationTableInventory = InventoryDetector { inventoriesPattern.matches(it) }
     val inTable get() = experimentationTableInventory.isInside()
     val isActive get() = currentExperimentData.tier != null
     val currentExperimentTier get() = currentExperimentData.tier
