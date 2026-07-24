@@ -60,7 +60,7 @@ object CFStrayTimer {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (timer == Duration.ZERO) return
         timer = when {
-            CFApi.mainInventory.isInside() -> timer
+            CFApi.inChocolateFactory -> timer
             else -> 30.seconds
         }
     }
