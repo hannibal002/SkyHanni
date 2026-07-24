@@ -125,7 +125,7 @@ object HoppityApi {
     )
 
     /**
-     * REGX-TEST: Chocolate Factory
+     * REGEX-TEST: Chocolate Factory
      */
     val chocolateFactoryInvPattern by CFApi.patternGroup.pattern(
         "inventory.chocolatefactory",
