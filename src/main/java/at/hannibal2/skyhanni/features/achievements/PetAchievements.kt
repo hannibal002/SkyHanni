@@ -72,7 +72,7 @@ object PetAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!PetStorageApi.isMainPetMenuName(event.inventoryName)) return
+        if (!PetStorageApi.isMainPetMenuName()) return
         val pets = ProfileStorageData.petProfiles?.pets ?: return
         for (pet in pets) {
             val xp = pet.exp ?: 0.0
