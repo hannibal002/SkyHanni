@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.chat.CurrentChatDisplay
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.features.misc.UserLuckBreakdown
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
@@ -24,6 +25,9 @@ class PlayerSpecificStorage {
 
     @Expose
     var gardenCommunityUpgrade: Int = -1
+
+    @Expose
+    var greenhouseDiagnosedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>> = mutableMapOf()
 
     @Expose
     var fameRank: String = "New Player"

@@ -34,6 +34,7 @@ object MissingCropWarning {
 
     private val config get() = SkyHanniMod.feature.garden.greenhouse
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.greenhouse
+    private val fallbackStorage get() = ProfileStorageData.playerSpecific?.greenhouseDiagnosedCropPositionsByPlot
 
     private var previousScan: Set<CropCategory>? = null
     private var stableScanCount = 0
@@ -51,7 +52,7 @@ object MissingCropWarning {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
-        if (!config.missingCropWarning || !isInGreenhouse()) return
+        if (!config.missingCropWarning || !config.useDiagnosticCropPositionFinder || !isInGreenhouse()) return
         if (Minecraft.getInstance().screen != null) return
         val position = getTargetedBlock() ?: return
         lastTargetedPosition = position
@@ -62,7 +63,7 @@ object MissingCropWarning {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (!config.missingCropWarning || !isInGreenhouse()) return
+        if (!config.missingCropWarning || !config.useDiagnosticCropPositionFinder || !isInGreenhouse()) return
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
         lastTargetedPosition = event.position
         val category = CropCategory.fromBlock(event.blockState.block) ?: return
@@ -72,6 +73,10 @@ object MissingCropWarning {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName != "Crop Diagnostics") return
+        if (!config.useDiagnosticCropPositionFinder) {
+            clearTargetedCrop()
+            return
+        }
         val plotId = GardenPlotApi.getCurrentPlot()?.id ?: return
         val targeted = pendingDiagnostic ?: lastTargetedCrop
         val category = event.inventoryItems.values.firstNotNullOfOrNull {
@@ -91,6 +96,7 @@ object MissingCropWarning {
         if (nearbyPosition == null && targetedCategory != null && targetedCategory != category) {
             runtimeDiagnosedPositionsByPlot[plotId]?.remove(category.name)
             storage?.diagnosedCropPositionsByPlot?.get(plotId)?.remove(category.name)
+            fallbackStorage?.get(plotId)?.remove(category.name)
             pendingPersistentSave = true
             savePendingData()
             clearTargetedCrop()
@@ -105,6 +111,7 @@ object MissingCropWarning {
         clearTargetedCrop()
         runtimeDiagnosedPositionsByPlot.getOrPut(plotId) { mutableMapOf() }[category.name] = position
         storage?.diagnosedCropPositionsByPlot?.getOrPut(plotId) { mutableMapOf() }?.set(category.name, position)
+        fallbackStorage?.getOrPut(plotId) { mutableMapOf() }?.set(category.name, position)
         pendingPersistentSave = true
         savePendingData()
         ChatUtils.chat(
@@ -145,6 +152,11 @@ object MissingCropWarning {
         }
 
         storage?.diagnosedCropPositionsByPlot?.let { saved ->
+            runtimeDiagnosedPositionsByPlot.forEach { (plotId, positions) ->
+                saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
+            }
+        }
+        fallbackStorage?.let { saved ->
             runtimeDiagnosedPositionsByPlot.forEach { (plotId, positions) ->
                 saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
             }
@@ -284,9 +296,10 @@ object MissingCropWarning {
         val state = getBlockStateAt()
         if (state.block in deadCropBlocks) return true
 
-        // Crop Diagnostics supplies the identity because Hypixel can represent both of these using melon/pumpkin-style stems.
+        // Crop Diagnostics supplies the identity because Hypixel can represent both of these using custom backing blocks.
         if (category in diagnosticOnlyCrops) {
-            return state.isAir || state.block !in category.blocks + greenhouseStemBlocks
+            if (findNearbyCropPosition(category, this) != null) return false
+            return state.isAir
         }
 
         return state.isAir
@@ -304,6 +317,22 @@ object MissingCropWarning {
             category = CommandCategory.DEVELOPER_DEBUG
             simpleCallback { showKnownGreenhousePlots() }
         }
+        event.registerBrigadier("shuniquedetect") {
+            description = "Toggles saving unique crop positions from Crop Diagnostics"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { toggleDiagnosticCropPositionFinder() }
+        }
+    }
+
+    private fun toggleDiagnosticCropPositionFinder() {
+        config.useDiagnosticCropPositionFinder = !config.useDiagnosticCropPositionFinder
+        clearTargetedCrop()
+        SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "toggle-unique-crop-detection")
+        val state = if (config.useDiagnosticCropPositionFinder) "enabled" else "disabled"
+        ChatUtils.chat(
+            "§eSaving Crop Diagnostics positions is §${if (config.useDiagnosticCropPositionFinder) "a" else "c"}$state§e. " +
+                "Previously saved crops are still used.",
+        )
     }
 
     private fun showKnownGreenhousePlots() {
@@ -332,6 +361,7 @@ object MissingCropWarning {
         val liveCrops = plot?.let(::scanGreenhouse).orEmpty()
         val savedByPlot = detectedCropsByPlot()
         val savedCrops = savedByPlot.values.flatten().mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
+        val diagnosedPositions = diagnosedPositionsByPlot()[plot?.id].orEmpty()
         ChatUtils.chat(
             buildString {
                 appendLine("§6Greenhouse Crop Checker Debug")
@@ -343,7 +373,16 @@ object MissingCropWarning {
                 appendLine(" §7Live scan: §e${liveCrops.namesOrNone()}")
                 appendLine(" §7Saved crops: §e${savedCrops.namesOrNone()}")
                 val allPresent = savedCrops + diagnosedPresentCrops(plot?.id)
-                append(" §7Missing: §e${(CropCategory.entries.toSet() - allPresent).namesOrNone()}")
+                appendLine(" §7Missing: §e${(CropCategory.entries.toSet() - allPresent).namesOrNone()}")
+                append(" §7Diagnosed positions: §e")
+                append(
+                    if (diagnosedPositions.isEmpty()) "none"
+                    else diagnosedPositions.entries.joinToString("§7, §e") {
+                            val category = CropCategory.fromStorageName(it.key)
+                            val block = it.value.getBlockStateAt().block
+                            "${category?.displayName ?: it.key}=${it.value} ($block)"
+                        },
+                )
             },
         )
     }
@@ -351,12 +390,17 @@ object MissingCropWarning {
     private fun Collection<CropCategory>.namesOrNone(): String =
         ifEmpty { return "none" }.joinToString(", ") { it.displayName }
 
-    private fun diagnosedPositionsByPlot(): Map<Int, Map<String, LorenzVec>> = buildMap {
-        storage?.diagnosedCropPositionsByPlot.orEmpty().forEach { (plotId, positions) ->
-            put(plotId, positions.toMutableMap())
-        }
-        runtimeDiagnosedPositionsByPlot.forEach { (plotId, positions) ->
-            put(plotId, get(plotId).orEmpty() + positions)
+    private fun diagnosedPositionsByPlot(): Map<Int, Map<String, LorenzVec>> {
+        return buildMap {
+            storage?.diagnosedCropPositionsByPlot.orEmpty().forEach { (plotId, positions) ->
+                put(plotId, positions.toMutableMap())
+            }
+            fallbackStorage.orEmpty().forEach { (plotId, positions) ->
+                put(plotId, get(plotId).orEmpty() + positions)
+            }
+            runtimeDiagnosedPositionsByPlot.forEach { (plotId, positions) ->
+                put(plotId, get(plotId).orEmpty() + positions)
+            }
         }
     }
 
@@ -364,7 +408,7 @@ object MissingCropWarning {
         storage?.detectedCropsByPlot.orEmpty() + runtimeDetectedCropsByPlot
 
     private fun savePendingData() {
-        if (!pendingPersistentSave || storage == null) return
+        if (!pendingPersistentSave || storage == null && fallbackStorage == null) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "greenhouse-crop-detection")
         pendingPersistentSave = false
     }
