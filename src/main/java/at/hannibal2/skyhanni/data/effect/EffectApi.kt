@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -211,7 +212,7 @@ object EffectApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
         saltTabPattern.matchAll(event.lines.map { it.string }) {
