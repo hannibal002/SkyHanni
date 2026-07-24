@@ -26,7 +26,7 @@ class InventoryDetector(
         onOpenInventory: (InventoryFullyOpenedEvent) -> Unit = {},
         onCloseInventory: (InventoryCloseEvent) -> Unit = {},
         repoPattern: () -> Pattern,
-        ) : this(
+    ) : this(
         checkInventoryName = { name -> repoPattern().matches(name) },
         onOpenInventory = onOpenInventory,
         onCloseInventory = onCloseInventory,
