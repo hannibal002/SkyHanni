@@ -125,10 +125,11 @@ object ChatFilter {
     )
 
     // Profile Join
-    private val profileJoinMessageStartsWith = listOf(
-        "§aYou are playing on profile: §e",
-        "§8Profile ID: ",
-        "§eProfile ID: ",
+    private val profileJoinPatterns by miscPatternGroup.list(
+        "profile-join",
+        "§aYou are playing on profile: §e.*",
+        "§8Profile ID: .*",
+        "§eProfile ID: .*",
     )
 
     // OTHERS
@@ -474,7 +475,7 @@ object ChatFilter {
     )
 
     // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefMessages = listOf(
+    private val masterChefMessages = listOf(
         "§e[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
@@ -570,6 +571,7 @@ object ChatFilter {
         "swoop_axe" to listOf(swoopAxePattern),
         "hoppity_appear" to listOf(hoppityAppearPattern),
         "hoppity_begin" to listOf(hoppityBeginPattern),
+        "profile_join" to profileJoinPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -592,7 +594,7 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
-        "masterchef" to MasterChefMessages,
+        "masterchef" to masterChefMessages,
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
@@ -601,7 +603,6 @@ object ChatFilter {
 
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
-        "profile_join" to profileJoinMessageStartsWith,
     )
     // </editor-fold>
 
