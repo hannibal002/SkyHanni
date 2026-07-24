@@ -9,7 +9,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -38,7 +37,6 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import com.google.gson.JsonPrimitive
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -63,6 +61,8 @@ object CustomScoreboard {
     private var dirty = false
 
     private var lastLines: List<ScoreboardLine> = emptyList()
+
+    private var deprecatedWarningShown = false
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRenderOverlay() {
@@ -193,20 +193,14 @@ object CustomScoreboard {
         config.enabled.whenChanged { old, new ->
             // Since Custom Scoreboard calls notifyObservers(), using onEnabled will make it call this function 3 times.
             if (old == new || !new) return@whenChanged
-
-            ChatUtils.clickableLinkChat(
-                message = "Custom Scoreboard is deprecated and no longer supported. " +
-                    "Please use the replacement mod instead. " +
-                    "This feature will be removed completely in a future update.",
-                url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
-                prefixColor = "§c"
-            )
+            showDeprecatedWarning()
         }
     }
 
     @HandleEvent(HypixelJoinEvent::class)
     fun onHypixelJoin() {
         updateAllIslandEntries()
+        showDeprecatedWarning()
     }
 
     @HandleEvent
@@ -220,6 +214,18 @@ object CustomScoreboard {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.NONE) updateAllIslandEntries()
         else updateIslandEntries()
+    }
+
+    private fun showDeprecatedWarning() {
+        if (deprecatedWarningShown) return
+        deprecatedWarningShown = true
+        ChatUtils.clickableLinkChat(
+            message = "Custom Scoreboard is deprecated and no longer supported. " +
+                "Please use the replacement mod instead. " +
+                "This feature will be removed completely in a future update.",
+            url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
+            prefixColor = "§c"
+        )
     }
 
     private fun updateIslandEntries() {
@@ -264,23 +270,6 @@ object CustomScoreboard {
                     set.forEach { add("   ${it.line}") }
                 }
             }
-        }
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(140, "gui.customScoreboard.enabled") { element ->
-            if (element.asBoolean) {
-                ChatUtils.clickableLinkChat(
-                    message = "Custom Scoreboard has been disabled in this update. " +
-                        "A replacement mod is available and recommended. " +
-                        "The old feature will be removed completely in a future update.",
-                    url = "https://modrinth.com/mod/skyblock-custom-scoreboard",
-                    prefixColor = "§c"
-                )
-            }
-            config.enabled.set(false)
-            JsonPrimitive(false)
         }
     }
 
