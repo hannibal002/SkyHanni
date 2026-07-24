@@ -24,11 +24,12 @@ object SlayerChatFilter {
 
     @HandleEvent
     fun onSlayerStateChange(event: SlayerStateChangeEvent) {
-        when(event.state) {
+        when (event.state) {
             GRINDING,
             BOSS_FIGHT,
             FAILED,
-            SLAIN -> CoreChatFilter.add(filters)
+            SLAIN,
+            -> CoreChatFilter.add(filters)
             NO_ACTIVE_QUEST -> CoreChatFilter.remove(filters)
         }
     }

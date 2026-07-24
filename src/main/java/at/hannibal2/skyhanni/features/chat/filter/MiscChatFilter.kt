@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.HypixelData
 
+@Suppress("MaxLineLength")
 object MiscChatFilter {
     private val patternGroup = ChatFilter.chatFilterGroup.group("hypixel-misc")
     private val config get() = ChatFilter.config
@@ -154,6 +155,9 @@ object MiscChatFilter {
     object AchievementGetFilter : RegexChatFilter("achievement-get") {
         override fun isEnabled(): Boolean = config.hideAlphaAchievements && HypixelData.hypixelAlpha
 
+        /**
+         * REGEX-TEST: >>>   Achievement Unlocked: The Beginning   <<<
+         */
         override val patterns by patternGroup.list(
             "achievement.get",
             ".>> {3}Achievement Unlocked: .* {3}<<.",

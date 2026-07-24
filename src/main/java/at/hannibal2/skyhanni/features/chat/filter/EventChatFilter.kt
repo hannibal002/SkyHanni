@@ -115,6 +115,9 @@ object EventChatFilter {
     object HoppityEggAppearFilter : RegexChatFilter("hoppity_appear") {
         override fun isEnabled(): Boolean = config.hoppityEggs
 
+        /**
+         * REGEX-TEST: HOPPITY'S HUNT A Chocolate Rabbit Egg has appeared!
+         */
         override val patterns by patternGroup.list(
             "hoppity-egg-appear",
             "HOPPITY'S HUNT A .* has appeared!",

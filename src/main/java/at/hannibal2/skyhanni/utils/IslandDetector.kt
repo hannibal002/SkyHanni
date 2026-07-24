@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 class IslandDetector(
     val onIslandJoin: (island: IslandType) -> Unit,
     val onIslandLeave: (island: IslandType) -> Unit,
-    val checkIslandType: (island: IslandType) -> Boolean
+    val checkIslandType: (island: IslandType) -> Boolean,
 ) {
     init {
         detectors.add(this)
@@ -25,13 +25,13 @@ class IslandDetector(
     constructor(
         island: IslandType,
         onIslandJoin: (island: IslandType) -> Unit = {},
-        onIslandLeave: (island: IslandType) -> Unit = {}
+        onIslandLeave: (island: IslandType) -> Unit = {},
     ) : this(onIslandJoin, onIslandLeave, { it == island })
 
     constructor(
         islandTag: IslandTypeTag,
         onIslandJoin: (island: IslandType) -> Unit = {},
-        onIslandLeave: (island: IslandType) -> Unit = {}
+        onIslandLeave: (island: IslandType) -> Unit = {},
     ) : this(onIslandJoin, onIslandLeave, { it in islandTag })
 
     private fun updateIslandState(oldIsland: IslandType, newIsland: IslandType) {
