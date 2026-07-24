@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fishing.FishingApi
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraApi
@@ -30,16 +31,16 @@ object TreasureFishingTracker {
     private val config get() = SkyHanniMod.feature.fishing.treasureFishingTracker
 
     /**
-     * REGEX-TEST: ⛃ GOOD CATCH! You caught Ice Essence x5!
-     * REGEX-TEST: ⛃ GOOD JUNK CATCH! You caught a Rusty Coin!
-     * REGEX-TEST: ⛃ GREAT CATCH! You caught Enchanted Snow Block x8!
-     * REGEX-TEST: ⛃ GREAT JUNK CATCH! You caught a Busted Belt Buckle!
-     * REGEX-TEST: ⛃ OUTSTANDING CATCH! You caught Enchanted Fig Log x10!
-     * REGEX-TEST: ⛃ OUTSTANDING JUNK CATCH! You caught an Old Leather Boot!
+     * REGEX-TEST:  GOOD CATCH! You caught Ice Essence x5!
+     * REGEX-TEST:  GOOD JUNK CATCH! You caught a Rusty Coin!
+     * REGEX-TEST:  GREAT CATCH! You caught Enchanted Snow Block x8!
+     * REGEX-TEST:  GREAT JUNK CATCH! You caught a Busted Belt Buckle!
+     * REGEX-TEST:  OUTSTANDING CATCH! You caught Enchanted Fig Log x10!
+     * REGEX-TEST:  OUTSTANDING JUNK CATCH! You caught an Old Leather Boot!
      */
     private val treasureCatchPattern by RepoPattern.pattern(
         "fishing.tracker.treasure.catch",
-        "^⛃ (?<catchType>GOOD|GREAT|OUTSTANDING)(?: JUNK)? CATCH! You caught (?:an? )?.*$",
+        "^${SkyblockStat.TREASURE_CHANCE.hypixelIcon} (?<catchType>GOOD|GREAT|OUTSTANDING)(?: JUNK)? CATCH! You caught (?:an? )?.*$",
     )
 
     private val tracker = SkyHanniTracker(
