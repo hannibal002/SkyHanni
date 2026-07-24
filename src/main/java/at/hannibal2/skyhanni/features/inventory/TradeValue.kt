@@ -57,7 +57,7 @@ object TradeValue {
     )
 
     // Detects trade menu thx NEU
-    val inventory = InventoryDetector( onOpenInventory = { onOpen() } ) { tradeMenuPattern }
+    val inventory = InventoryDetector(onOpenInventory = { onOpen() }) { tradeMenuPattern }
 
     init {
         RenderDisplayHelper(
