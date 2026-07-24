@@ -193,6 +193,8 @@ object UtilsPatterns {
         "SkyBlock Menu",
     )
 
+    val skyblockMenuInventory = InventoryDetector { skyblockMenuGuiPattern }
+
     /**
      * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)
      * REGEX-TEST: §7Source: §9Drowned Shard §8(R18)

@@ -230,7 +230,7 @@ enum class SkyblockStat(
         private const val PLAYER_STATS_SLOT_INDEX = 13
 
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
-            if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
+            if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
             val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getCleanLore() ?: return
             DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }

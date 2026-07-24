@@ -290,7 +290,7 @@ object BitsApi {
         val stacks = event.inventoryItems.values
 
         when {
-            UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName) -> handleSkyBlockMenu(stacks)
+            UtilsPatterns.skyblockMenuInventory.isInside() -> handleSkyBlockMenu(stacks)
             fameRankGuiNamePattern.matches(event.inventoryName) -> handleFameRankGui(stacks)
             museumGuiNamePattern.matches(event.inventoryName) -> handleMuseumGui(stacks)
         }
