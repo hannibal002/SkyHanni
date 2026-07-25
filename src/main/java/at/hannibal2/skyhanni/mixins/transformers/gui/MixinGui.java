@@ -92,7 +92,7 @@ public class MixinGui {
         ),
         index = 1
     )
-    private Component renderItemOverlayPost(Component str) {
+    private Component modifyScoreboardLine(Component str) {
         return ScoreboardData.tryToReplaceScoreboardLine(str);
     }
 
