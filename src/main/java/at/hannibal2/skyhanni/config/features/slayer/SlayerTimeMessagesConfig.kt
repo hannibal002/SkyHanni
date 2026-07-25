@@ -31,7 +31,7 @@ class SlayerTimeMessagesConfig {
     var compact: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Show Titles", desc = "Displays slayer messages as titles.")
+    @ConfigOption(name = "Show Titles", desc = "Displays a title when you get a new Personal Best.")
     @ConfigEditorBoolean
     @FeatureToggle
     var titles: Boolean = false

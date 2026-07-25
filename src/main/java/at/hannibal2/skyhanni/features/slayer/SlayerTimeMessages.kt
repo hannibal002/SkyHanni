@@ -43,8 +43,6 @@ object SlayerTimeMessages {
         )
 
         buildChatMessages(slayerTimeData).forEach(ChatUtils::chat)
-
-        showTitle(slayerTimeData)
     }
 
     private fun buildChatMessages(

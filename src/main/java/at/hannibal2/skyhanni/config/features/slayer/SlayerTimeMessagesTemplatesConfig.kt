@@ -71,5 +71,5 @@ class SlayerTimeMessagesTemplatesConfig {
     @Expose
     @ConfigOption(name = "Subtitle", desc = "Subtitle shown when displaying a title.")
     @ConfigEditorText
-    var subtitle: String = "{boss}\n&b{time}"
+    var subtitle: String = "{boss} &7- &b{time}"
 }
