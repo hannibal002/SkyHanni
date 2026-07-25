@@ -40,27 +40,25 @@ abstract class RegexChatFilter(
 }
 
 sealed interface Activation {
-    fun isActive(): Boolean
-
-    fun bind(onChange: (Boolean) -> Unit) {
-        onChange(isActive())
-    }
-
+    fun bind(onChange: (Boolean) -> Unit)
     fun unbind() {}
 
     object Always : Activation {
-        override fun isActive(): Boolean = true
+        override fun bind(onChange: (Boolean) -> Unit) {
+            onChange(true)
+        }
     }
 
     object Never : Activation {
-        override fun isActive(): Boolean = false
+        override fun bind(onChange: (Boolean) -> Unit) {
+            onChange(false)
+        }
     }
 
     class Config(
         private val property: () -> Property<Boolean>,
     ) : Activation {
         private var callback: ((Boolean) -> Unit)? = null
-        override fun isActive(): Boolean = property().get()
         override fun bind(onChange: (Boolean) -> Unit) {
             callback = onChange
             val prop = property()
@@ -81,7 +79,6 @@ sealed interface Activation {
         constructor(island: IslandType) : this(IslandDetector(island))
 
         private var callback: ((Boolean) -> Unit)? = null
-        override fun isActive(): Boolean = detector.isInside()
         override fun bind(onChange: (Boolean) -> Unit) {
             callback = onChange
             onChange(detector.isInside())
