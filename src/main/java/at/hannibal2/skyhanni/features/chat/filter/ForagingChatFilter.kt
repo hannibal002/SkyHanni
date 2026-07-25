@@ -2,13 +2,17 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandTypeTag
 
-@Suppress("unused")
-object ForagingChatFilter {
+object ForagingChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("foraging")
     private val config get() = ChatFilterManager.config.foraging
     private val generalConfig get() = ChatFilterManager.generalConfig
 
     private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES,)
+
+    override val filters: Set<ChatFilter> = setOf(
+        UnmineableTreeFilter,
+        LotteryFilter,
+    )
 
     object UnmineableTreeFilter : RegexIslandChatFilter("unmineable_tree", config.unmineable, customTreesDetector) {
         /**

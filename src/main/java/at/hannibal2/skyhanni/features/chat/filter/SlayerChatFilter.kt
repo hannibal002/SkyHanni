@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object SlayerChatFilter {
+object SlayerChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("slayer")
     private val config get() = ChatFilterManager.config
 
@@ -34,11 +34,10 @@ object SlayerChatFilter {
         }
     }
 
-    val filters =
-        setOf<ChatFilter>(
-            SlayerQuestFilter,
-            SlayerDropFilter,
-        )
+    override val filters: Set<ChatFilter> = setOf(
+        SlayerQuestFilter,
+        SlayerDropFilter,
+    )
 
     object SlayerQuestFilter : AbstractRegexChatFilter("slayer_quest") {
         override val patterns by patternGroup.list(

@@ -3,12 +3,18 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 
-@Suppress("unused")
-object DungeonChatFilter {
+object DungeonChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("dungeon")
     private val config get() = SkyHanniMod.feature.dungeon.messageFilter
 
     val catacombsDetector = IslandDetector(IslandType.CATACOMBS)
+
+    override val filters: Set<ChatFilter> get() = setOf(
+        RareDropsFilter,
+        SoloClassFilter,
+        SoloStatsFilter,
+        FairyFilter,
+    )
 
     object RareDropsFilter : RegexIslandChatFilter("rare_drops", config.rareDrops, catacombsDetector) {
         /**
@@ -19,7 +25,6 @@ object DungeonChatFilter {
             "RARE REWARD! .* found a .* in their .* Chest!",
         )
     }
-
 
     object SoloClassFilter : RegexIslandChatFilter("solo_class", config.soloClass, catacombsDetector) {
         /**

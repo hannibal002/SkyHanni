@@ -3,12 +3,22 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 
-@Suppress("unused")
-object EventChatFilter {
+object EventChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("event")
     private val config get() = ChatFilterManager.config
 
     val winterDetector = IslandDetector(IslandType.WINTER,)
+
+    override val filters: Set<ChatFilter> = setOf(
+        GuildEventExpFilter,
+        WinterIslandFilter,
+        FireSaleFilter,
+        EventLevelUpFilter,
+        ChocolateFactoryUpgradeFilter,
+        HoppityBeginFilter,
+        HoppityEggAppearFilter,
+        WinterGiftFilter,
+    )
 
     object GuildEventExpFilter : RegexChatFilter("guild_event_exp", config.guildEventExp) {
         /**

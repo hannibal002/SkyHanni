@@ -4,13 +4,18 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 
-@Suppress("unused")
-object FarmingChatFilter {
+object FarmingChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("farming")
     private val config get() = ChatFilterManager.config
     private val generalConfig get() = ChatFilterManager.generalConfig
 
     val gardenDetector = IslandDetector(IslandType.GARDEN)
+
+    override val filters: Set<ChatFilter> = setOf(
+        AnitaFortuneFilter,
+        MasterChefFilter,
+        GardenPestFilter,
+    )
 
     object AnitaFortuneFilter : RegexIslandChatFilter("anita_fortune", generalConfig.hideJacob, gardenDetector) {
         /**

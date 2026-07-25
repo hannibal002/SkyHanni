@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.chat.filter.ChatFilterManager.block
 import at.hannibal2.skyhanni.features.chat.filter.PowderMiningChatFilter.genericMiningRewardMessage
@@ -22,13 +23,30 @@ object ChatFilterManager {
     val config get() = SkyHanniMod.feature.chat.filterType
 
     private val chatFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
+    private val groups = setOf(
+        DungeonChatFilter,
+        MiningChatFilter,
+        SlayerChatFilter,
+        EventChatFilter,
+        MiscChatFilter,
+        ForagingChatFilter,
+        HuntingChatFilter,
+        FarmingChatFilter,
+    )
+
+    private val knownFilters = groups.flatMapTo(mutableSetOf()) { it.filters }
+
+    private val activeFilters = mutableSetOf<ChatFilter>()
 
     fun register(filter: ChatFilter) {
-        chatFilters.plus(filter)
+        require(filter in knownFilters) {
+            "Unknown chat filter: ${filter::class.qualifiedName}"
+        }
+        activeFilters += filter
     }
 
     fun unregister(filter: ChatFilter) {
-        chatFilters.minus(filter)
+        activeFilters -= filter
     }
 
     fun register(filters: Set<ChatFilter>) {
@@ -122,6 +140,17 @@ object ChatFilterManager {
             event.replaceComponent(it.asComponent(), "nuc_run")
         }
     }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConfigChatFilter.registeredFilters?.forEach { config ->
+            if (config.get()) {
+                config.notifyObservers()
+            }
+        }
+        ConfigChatFilter.registeredFilters = null
+    }
+}
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

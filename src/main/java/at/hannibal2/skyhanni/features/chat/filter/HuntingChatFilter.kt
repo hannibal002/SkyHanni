@@ -2,12 +2,16 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandType
 
-@Suppress("unused")
-object HuntingChatFilter {
+object HuntingChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("hunting")
     private val config get() = ChatFilterManager.config.hunting
 
     val galateaDetector = IslandDetector(island = IslandType.GALATEA)
+
+    override val filters: Set<ChatFilter> = setOf(
+        RedundantShardsFilter,
+        SwoopAxeFilter,
+    )
 
     object RedundantShardsFilter : RegexIslandChatFilter("redundant_shards", config.redundantComments, galateaDetector) {
         /**

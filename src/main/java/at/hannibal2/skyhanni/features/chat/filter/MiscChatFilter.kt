@@ -3,11 +3,33 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.utils.StringUtils
 
-@Suppress("MaxLineLength", "unused")
-object MiscChatFilter {
+@Suppress("MaxLineLength")
+object MiscChatFilter : ChatFilterGroup {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("hypixel-misc")
     private val config get() = ChatFilterManager.config
 
+    override val filters: Set<ChatFilter> = setOf(
+        EmptyFilter,
+        WelcomeFilter,
+        LobbyFilter,
+        WarpingFilter,
+        KillComboFilter,
+        ProfileJoinFilter,
+        MiniBazaarAndAHFilter,
+        AchievementGetFilter,
+        ParkourFilter,
+        TeleportPadFilter,
+        UselessDropFilter,
+        LegacyItemsFilter,
+        UselessNotificationFilter,
+        PartyFilter,
+        AuctionHouseFilter,
+        BazaarFilter,
+        UselessWarningFilter,
+        AnnoyingSpamFilter,
+        RewardBundleFilter,
+        SacrificeFilter,
+    )
 
     object EmptyFilter : ConfigChatFilter {
         init {
