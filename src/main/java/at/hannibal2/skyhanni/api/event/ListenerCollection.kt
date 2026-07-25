@@ -48,6 +48,8 @@ class ListenerCollection(
 
         const val OUTSIDE = 0
 
+        // Offset applied to island ordinals because bucket 0 
+        // is reserved for the outside-SkyBlock state.
         private const val ISLAND_OFFSET = 1
         private val BUCKET_COUNT = IslandType.entries.size + ISLAND_OFFSET
 
