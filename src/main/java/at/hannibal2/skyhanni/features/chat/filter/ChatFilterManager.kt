@@ -23,27 +23,23 @@ object ChatFilterManager {
     val config get() = SkyHanniMod.feature.chat.filterType
     private val activeFilters = mutableSetOf<ChatFilter>()
 
-    private val groups = setOf(
-        DungeonChatFilter,
-        MiningChatFilter,
-        SlayerChatFilter,
-        EventChatFilter,
-        MiscChatFilter,
-        ForagingChatFilter,
-        HuntingChatFilter,
-        FarmingChatFilter,
-        GardenChatFilter,
-        WinterChatFilter,
-    )
-
-    private val knownFilters = groups
-        .flatMapTo(mutableSetOf()) { it.filters }
+    // To avoid circular dependencies (The groups need chatFilterGroup, and ChatFilterManager needs the groups), we lazily initialize the groups here.
+    private val groups by lazy {
+        setOf(
+            DungeonChatFilter,
+            MiningChatFilter,
+            SlayerChatFilter,
+            EventChatFilter,
+            MiscChatFilter,
+            ForagingChatFilter,
+            HuntingChatFilter,
+            FarmingChatFilter,
+            GardenChatFilter,
+            WinterChatFilter,
+        )
+    }
 
     fun register(filter: ChatFilter) {
-        require(filter in knownFilters) {
-            "Unknown chat filter: ${filter::class.qualifiedName}"
-        }
-
         activeFilters += filter
     }
 
