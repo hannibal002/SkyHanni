@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.chat.filter.ChatFilterManager.block
@@ -23,22 +24,18 @@ object ChatFilterManager {
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val activeFilters = mutableSetOf<ChatFilter>()
 
-    private val groups by lazy {
-        setOf(
-            DungeonChatFilter,
-            MiningChatFilter,
-            SlayerChatFilter,
-            EventChatFilter,
+    // RepoPattern must be initialized at pre-init time
+    private val groups = setOf(
             MiscChatFilter,
-            ForagingChatFilter,
-            HuntingChatFilter,
-            FarmingChatFilter,
-            GardenChatFilter,
-            WinterChatFilter,
         )
-    }
+
+    // Forces all the filters to be initialized at pre-init time
+    private val knownFilters: Set<ChatFilter> =
+        groups.flatMap { it.filters }.toSet()
 
     fun register(filter: ChatFilter) {
+        require(filter in knownFilters) { "Filter $filter is not registered in any group" }
+
         activeFilters += filter
     }
 
@@ -55,7 +52,8 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onHypixel(event: HypixelJoinEvent) {
+    fun onHypixel(event: ConfigLoadEvent) {
+        if (event.firstLoad) return
         groups.forEach { group ->
             group.activation.bind(
                 onEnable = {
