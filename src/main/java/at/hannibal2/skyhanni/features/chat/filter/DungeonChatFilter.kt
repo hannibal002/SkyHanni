@@ -8,7 +8,7 @@ object DungeonChatFilter : ChatFilterGroup() {
     private val patternGroup = RepoPattern.group("chat-filter.dungeon")
     private val config get() = SkyHanniMod.feature.dungeon.messageFilter
 
-    override val activation: Activation = Activation.Island(IslandType.CATACOMBS)
+    override val activation = ChatFilterActivation.Island(IslandType.CATACOMBS)
     override val filters: Set<ChatFilter> get() = setOf(
         RareDropsFilter,
         SoloClassFilter,

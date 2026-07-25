@@ -8,7 +8,7 @@ object HuntingChatFilter : ChatFilterGroup() {
     private val patternGroup = RepoPattern.group("chat-filter.hunting")
     private val config get() = SkyHanniMod.feature.chat.filterType.hunting
 
-    override val activation: Activation = Activation.Island(IslandTypeTag.FORAGING_CUSTOM_TREES)
+    override val activation: ChatFilterActivation = ChatFilterActivation.Island(IslandTypeTag.FORAGING_CUSTOM_TREES)
 
     override val filters: Set<ChatFilter> = setOf(
         RedundantShardsFilter,

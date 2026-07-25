@@ -34,7 +34,7 @@ object MiscChatFilter : ChatFilterGroup() {
     )
 
     object EmptyFilter : ActivatedChatFilter {
-        override val activation = Activation.Config { config.empty }
+        override val activation = ChatFilterActivation.Config { config.empty }
 
         override fun block(message: String): String? {
             if (!StringUtils.isEmpty(message)) return null

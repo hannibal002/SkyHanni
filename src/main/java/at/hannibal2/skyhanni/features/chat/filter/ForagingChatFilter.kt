@@ -7,9 +7,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object ForagingChatFilter : ChatFilterGroup() {
     private val patternGroup = RepoPattern.group("chat-filter.foraging")
     private val config get() = SkyHanniMod.feature.chat.filterType.foraging
-    private val generalConfig get() = SkyHanniMod.feature.chat
 
-    override val activation = Activation.Island(IslandTypeTag.FORAGING)
+    override val activation = ChatFilterActivation.Island(IslandTypeTag.FORAGING)
 
     override val filters: Set<ChatFilter> = setOf(
         UnmineableTreeFilter,

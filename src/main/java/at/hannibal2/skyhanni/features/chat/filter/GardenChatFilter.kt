@@ -11,7 +11,7 @@ object GardenChatFilter : ChatFilterGroup() {
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val generalConfig get() = SkyHanniMod.feature.chat
 
-    override val activation = Activation.Island(IslandType.GARDEN)
+    override val activation = ChatFilterActivation.Island(IslandType.GARDEN)
 
     override val filters: Set<ChatFilter> = setOf(
         AnitaFortuneFilter,

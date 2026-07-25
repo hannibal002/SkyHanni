@@ -12,7 +12,7 @@ object SlayerChatFilter : ChatFilterGroup() {
     private val patternGroup = RepoPattern.group("chat-filter.slayer")
     private val config get() = SkyHanniMod.feature.chat.filterType
 
-    override val activation = Activation.Never
+    override val activation = ChatFilterActivation.Never
 
     private fun isEnabled(): Boolean = config.others.get()
 

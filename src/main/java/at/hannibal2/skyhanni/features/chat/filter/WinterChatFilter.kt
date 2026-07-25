@@ -11,7 +11,7 @@ object WinterChatFilter : ChatFilterGroup() {
     override val filters: Set<ChatFilter> = setOf(
         WinterIslandFilter,
     )
-    override val activation = Activation.Island(IslandType.WINTER)
+    override val activation = ChatFilterActivation.Island(IslandType.WINTER)
 
     object WinterIslandFilter : RegexChatFilter("winter_island", { config.others }) {
         /**
