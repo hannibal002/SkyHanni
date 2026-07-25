@@ -130,7 +130,7 @@ public abstract class MixinHud {
             target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
         )
     )
-    private void renderItemOverlayPost(
+    private void modifyScoreboardLine(
         GuiGraphicsExtractor graphics,
         Font font,
         Component str,

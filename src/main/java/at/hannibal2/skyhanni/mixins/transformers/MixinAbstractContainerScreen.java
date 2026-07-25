@@ -41,7 +41,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
-import kotlin.Unit;
 
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen {
