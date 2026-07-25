@@ -22,7 +22,6 @@ object ChatFilterManager {
     val generalConfig get() = SkyHanniMod.feature.chat
     val config get() = SkyHanniMod.feature.chat.filterType
 
-    private val chatFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
     private val groups = setOf(
         DungeonChatFilter,
         MiningChatFilter,
@@ -34,14 +33,29 @@ object ChatFilterManager {
         FarmingChatFilter,
     )
 
-    private val knownFilters = groups.flatMapTo(mutableSetOf()) { it.filters }
+    private val knownFilters = groups
+        .flatMapTo(mutableSetOf()) { it.filters }
 
-    private val activeFilters = mutableSetOf<ChatFilter>()
+    private val activeFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
+
+    init {
+        groups.forEach { group ->
+            group.activation.bind(
+                onEnable = {
+                    register(group.filters)
+                },
+                onDisable = {
+                    unregister(group.filters)
+                },
+            )
+        }
+    }
 
     fun register(filter: ChatFilter) {
         require(filter in knownFilters) {
             "Unknown chat filter: ${filter::class.qualifiedName}"
         }
+
         activeFilters += filter
     }
 
@@ -50,11 +64,18 @@ object ChatFilterManager {
     }
 
     fun register(filters: Set<ChatFilter>) {
-        chatFilters.plus(filters)
+        filters.forEach(::register)
     }
 
     fun unregister(filters: Set<ChatFilter>) {
-        chatFilters.minus(filters)
+        filters.forEach(::unregister)
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        groups.forEach { group ->
+            group.activation.refresh()
+        }
     }
 
     @HandleEvent
@@ -78,7 +99,7 @@ object ChatFilterManager {
      * @return The reason why the message was blocked, empty if not blocked
      */
     private fun block(message: String): String? {
-        return chatFilters.firstNotNullOfOrNull { it.block(message) }
+        return activeFilters.firstNotNullOfOrNull { it.block(message) }
     }
 
     /**
@@ -140,17 +161,6 @@ object ChatFilterManager {
             event.replaceComponent(it.asComponent(), "nuc_run")
         }
     }
-
-    @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
-        ConfigChatFilter.registeredFilters?.forEach { config ->
-            if (config.get()) {
-                config.notifyObservers()
-            }
-        }
-        ConfigChatFilter.registeredFilters = null
-    }
-}
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

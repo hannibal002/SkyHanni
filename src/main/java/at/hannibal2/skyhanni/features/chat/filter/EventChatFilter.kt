@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 
-object EventChatFilter : ChatFilterGroup {
+object EventChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("event")
     private val config get() = ChatFilterManager.config
 
@@ -33,7 +33,7 @@ object EventChatFilter : ChatFilterGroup {
     }
 
 
-    object WinterIslandFilter : RegexIslandChatFilter("winter_island", config.others, winterDetector) {
+    object WinterIslandFilter : RegexChatFilter("winter_island", config.others, winterDetector) {
         /**
          * REGEX-TEST: ☃ [VIP+] liron150 mounted a Snow Cannon!
          */

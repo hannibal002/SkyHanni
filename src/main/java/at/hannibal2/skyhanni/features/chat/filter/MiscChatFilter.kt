@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.utils.StringUtils
 
 @Suppress("MaxLineLength")
-object MiscChatFilter : ChatFilterGroup {
+object MiscChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("hypixel-misc")
     private val config get() = ChatFilterManager.config
 
@@ -31,9 +31,18 @@ object MiscChatFilter : ChatFilterGroup {
         SacrificeFilter,
     )
 
-    object EmptyFilter : ConfigChatFilter {
+    object EmptyFilter : ChatFilter {
+        private val activation = Activation.Config(config.empty)
+
         init {
-            registerConfig(config.empty)
+            activation.bind(
+                onEnable = {
+                    ChatFilterManager.register(this)
+                },
+                onDisable = {
+                    ChatFilterManager.unregister(this)
+                },
+            )
         }
 
         override fun block(message: String): String? {

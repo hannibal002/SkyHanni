@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
-object MiningChatFilter : ChatFilterGroup {
+object MiningChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("mining")
     private val generalConfig get() = ChatFilterManager.generalConfig
 

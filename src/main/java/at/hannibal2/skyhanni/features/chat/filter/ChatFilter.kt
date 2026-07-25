@@ -12,71 +12,187 @@ interface ChatFilter {
     fun block(message: String): String?
 }
 
-interface ChatFilterGroup {
-    val filters: Set<ChatFilter>
+abstract class ChatFilterGroup {
+    open val activation: Activation = Activation.Always
+
+    abstract val filters: Set<ChatFilter>
 }
 
-interface Activation {
+sealed interface Activation {
+    
+    fun bind(
+        onEnable: () -> Unit,
+        onDisable: () -> Unit,
+    )
+    fun unbind()
+    fun refresh() {}
 
-    fun bind(filter: ChatFilter)
+    object Always : Activation {
+        private var onDisableCallback: (() -> Unit)? = null
+
+        override fun bind(
+            onEnable: () -> Unit,
+            onDisable: () -> Unit,
+        ) {
+            onDisableCallback = onDisable
+            onEnable()
+        }
+
+        override fun unbind() {
+            onDisableCallback?.invoke()
+            onDisableCallback = null
+        }
+    }
 
     class Config(
         private val config: Property<Boolean>,
     ) : Activation {
 
-        override fun bind(filter: ChatFilter) {
-            config.whenChanged { _, enabled ->
-                if (enabled) {
-                    ChatFilterManager.register(filter)
-                } else {
-                    ChatFilterManager.unregister(filter)
-                }
+        private var callback: ((Boolean) -> Unit)? = null
+
+        override fun bind(
+            onEnable: () -> Unit,
+            onDisable: () -> Unit,
+        ) {
+            callback = {
+                if (it) onEnable()
+                else onDisable()
             }
 
-            if (config.get()) {
-                ChatFilterManager.register(filter)
+            config.whenChanged { _, new ->
+                callback?.invoke(new)
             }
+        }
+
+        override fun refresh() {
+            callback?.invoke(config.get())
+        }
+
+        override fun unbind() {
+            callback?.invoke(false)
+            callback = null
         }
     }
 
     class Island(
-        private val config: Property<Boolean>,
         private val detector: IslandDetector,
     ) : Activation {
 
-        override fun bind(filter: ChatFilter) {
-            fun update() {
-                if (config.get() && detector.isInside()) {
-                    ChatFilterManager.register(filter)
-                } else {
-                    ChatFilterManager.unregister(filter)
-                }
+        private var onDisableCallback: (() -> Unit)? = null
+
+        override fun bind(
+            onEnable: () -> Unit,
+            onDisable: () -> Unit,
+        ) {
+            onDisableCallback = onDisable
+
+            if (detector.isInside()) {
+                onEnable()
+            } else {
+                onDisable()
             }
 
-            config.whenChanged { _, _ -> update() }
-            detector.register { _, _ -> update() }
+            detector.register { _, _ ->
+                if (detector.isInside()) {
+                    onEnable()
+                } else {
+                    onDisable()
+                }
+            }
+        }
 
-            update()
+        override fun unbind() {
+            onDisableCallback?.invoke()
+            onDisableCallback = null
+        }
+    }
+
+    class AllOf(
+        private vararg val activations: Activation,
+    ) : Activation {
+
+        private var states: BooleanArray? = null
+        private var onEnableCallback: (() -> Unit)? = null
+        private var onDisableCallback: (() -> Unit)? = null
+
+        override fun bind(
+            onEnable: () -> Unit,
+            onDisable: () -> Unit,
+        ) {
+            onEnableCallback = onEnable
+            onDisableCallback = onDisable
+
+            states = BooleanArray(activations.size)
+
+            activations.forEachIndexed { index, activation ->
+                activation.bind(
+                    onEnable = {
+                        states?.set(index, true)
+                        update()
+                    },
+                    onDisable = {
+                        states?.set(index, false)
+                        update()
+                    },
+                )
+            }
+        }
+
+        private fun update() {
+            if (states?.all { it } == true) {
+                onEnableCallback?.invoke()
+            } else {
+                onDisableCallback?.invoke()
+            }
+        }
+
+        override fun unbind() {
+            activations.forEach {
+                it.unbind()
+            }
+
+            onDisableCallback?.invoke()
+
+            states = null
+            onEnableCallback = null
+            onDisableCallback = null
+        }
+
+        override fun refresh() {
+            activations.forEach {
+                it.refresh()
+            }
         }
     }
 }
 
-abstract class ConfigChatFilter(
-    activation: Activation,
-) : ChatFilter {
-
-    init {
-        activation.bind(this)
-    }
-}
-
-abstract class RegexChatFilter(
+abstract class AbstractRegexChatFilter(
     private val reason: String,
-    activation: Activation,
-) : ConfigChatFilter(activation) {
+) : ChatFilter {
 
     protected abstract val patterns: List<Pattern>
 
     override fun block(message: String): String? =
         if (patterns.matches(message)) reason else null
+}
+
+abstract class RegexChatFilter(
+    reason: String,
+    activation: Activation,
+) : AbstractRegexChatFilter(reason) {
+    constructor(reason: String, config: Property<Boolean>) : this(reason, Activation.Config(config))
+    constructor(reason: String, config: Property<Boolean>, island: IslandDetector) :
+        this(reason, Activation.Config(config), Activation.Island(island))
+    constructor(reason: String, vararg activation: Activation) : this(reason, Activation.AllOf(*activation))
+
+    init {
+        activation.bind(
+            onEnable = {
+                ChatFilterManager.register(this)
+            },
+            onDisable = {
+                ChatFilterManager.unregister(this)
+            },
+        )
+    }
 }

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
 
-object FarmingChatFilter : ChatFilterGroup {
+object FarmingChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("farming")
     private val config get() = ChatFilterManager.config
     private val generalConfig get() = ChatFilterManager.generalConfig
@@ -17,7 +17,7 @@ object FarmingChatFilter : ChatFilterGroup {
         GardenPestFilter,
     )
 
-    object AnitaFortuneFilter : RegexIslandChatFilter("anita_fortune", generalConfig.hideJacob, gardenDetector) {
+    object AnitaFortuneFilter : RegexChatFilter("anita_fortune", generalConfig.hideJacob, gardenDetector) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
          */
@@ -39,7 +39,7 @@ object FarmingChatFilter : ChatFilterGroup {
         )
     }
 
-    object GardenPestFilter : RegexIslandChatFilter("garden_pest", config.gardenNoPest, gardenDetector) {
+    object GardenPestFilter : RegexChatFilter("garden_pest", config.gardenNoPest, gardenDetector) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your garden is free of pests! You will not lose any crops to pests during this contest!
          */

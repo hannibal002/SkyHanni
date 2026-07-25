@@ -2,19 +2,19 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandTypeTag
 
-object ForagingChatFilter : ChatFilterGroup {
+object ForagingChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("foraging")
     private val config get() = ChatFilterManager.config.foraging
     private val generalConfig get() = ChatFilterManager.generalConfig
 
-    private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES,)
+    private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES)
 
     override val filters: Set<ChatFilter> = setOf(
         UnmineableTreeFilter,
         LotteryFilter,
     )
 
-    object UnmineableTreeFilter : RegexIslandChatFilter("unmineable_tree", config.unmineable, customTreesDetector) {
+    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", config.unmineable, customTreesDetector) {
         /**
          ** REGEX-TEST: You cannot damage a tree while it is regenerating!
          ** REGEX-TEST: The toughness of this tree is way too high!
