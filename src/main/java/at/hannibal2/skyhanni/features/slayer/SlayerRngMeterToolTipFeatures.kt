@@ -135,7 +135,8 @@ object SlayerRngMeterToolTipFeatures {
         val items = event.inventoryItems
 
         for (item in items.values) {
-            if (!bonusRewardsItemNamePattern.matches(item.cleanName())) continue
+
+            if (!bonusRewardsItemNamePattern.matches(item.cleanName)) continue
             val toolTip = item.getTooltip(false)
 
             bonusRewardsLevelPattern.matchAll(toolTip.map { it.string.removeColor() }) {

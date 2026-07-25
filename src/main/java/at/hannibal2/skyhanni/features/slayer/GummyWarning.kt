@@ -47,18 +47,11 @@ object GummyWarning {
 
     private var inSmolderingArea = false
     private var holdingSlayerWeapon = false
-    private var slayerWeapons: Map<SlayerType, Set<NeuInternalName>> = emptyMap()
     private val display = Renderable.text("§4§lNo Polar Bear Active!", scale = 2.0)
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onAreaChange(event: GraphAreaChangeEvent) {
         inSmolderingArea = smolderingAreaPattern.matches(SkyBlockUtils.graphArea)
-    }
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<RemainingSlayerKills.SlayerData>("Slayer")
-        slayerWeapons = data.weapons.mapValues { it.value.keys }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -79,7 +72,7 @@ object GummyWarning {
             holdingSlayerWeapon = false
             return
         }
-        holdingSlayerWeapon = slayerWeapons[activeSlayer]?.contains(event.newItem) == true
+        holdingSlayerWeapon = SlayerApi.slayerJsonData?.weapons[activeSlayer]?.contains(event.newItem) == true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
