@@ -98,10 +98,9 @@ object SkyHanniEvents {
         return options to listOf(eventType as Class<out SkyHanniEvent>)
     }
 
-    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? =
+    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val options = method.options ?: return null
-
-        when (method.parameterCount) {
+        return when (method.parameterCount) {
             0 -> handleZeroParameterMethod(method, options)
             1 -> handleSingleParameterMethod(method, options)
             else -> {
@@ -114,6 +113,7 @@ object SkyHanniEvents {
                 null
             }
         }
+    }
 
     private fun unregisterMethod(method: Method) {
         val (_, eventTypes) = getEventData(method) ?: return
