@@ -164,7 +164,7 @@ class MiscConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var glowingDroppedItems: Boolean = true
+    var glowingDroppedItems: Boolean = false
 
     @Expose
     @ConfigOption(name = "Boop Party", desc = "")
