@@ -21,7 +21,6 @@ abstract class ChatFilterGroup {
 }
 
 sealed interface Activation {
-    
     fun bind(
         onEnable: () -> Unit,
         onDisable: () -> Unit,
