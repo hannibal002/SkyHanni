@@ -10,15 +10,12 @@ class RepoPatternContext {
 
     fun getRepoPatternElement(property: KtPropertyDelegate): RepoPatternElement? {
         val identityKey = IdentityCharacteristics(property)
-        val cachedValue = cache[identityKey]
 
-        if (cachedValue != null) {
-            return cachedValue.takeUnless { it === RepoPatternElement.SENTINEL_VALUE }
+        val result = cache.computeIfAbsent(identityKey) {
+            property.asRepoPatternElement() ?: RepoPatternElement.SENTINEL_VALUE
         }
 
-        val element = property.asRepoPatternElement()
-        cache[identityKey] = element ?: RepoPatternElement.SENTINEL_VALUE
-        return element
+        return result.takeUnless { it === RepoPatternElement.SENTINEL_VALUE }
     }
 
     private class IdentityCharacteristics<T>(val value: T) {
