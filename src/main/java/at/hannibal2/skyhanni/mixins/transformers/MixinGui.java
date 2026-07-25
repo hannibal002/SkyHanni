@@ -5,12 +5,10 @@ import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
-import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -95,7 +93,7 @@ public abstract class MixinGui {
         ),
         index = 1
     )
-    private Component renderItemOverlayPost(Component str) {
+    private Component modifyScoreboardLine(Component str) {
         return ScoreboardData.tryToReplaceScoreboardLine(str);
     }
 
