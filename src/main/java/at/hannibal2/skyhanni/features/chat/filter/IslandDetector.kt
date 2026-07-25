@@ -11,8 +11,6 @@ class IslandDetector(
 ) {
 
     private var inIsland = false
-    private var registered = false
-
     private val callbacks = mutableSetOf<(oldIsland: IslandType, newIsland: IslandType) -> Unit>()
 
     constructor(island: IslandType) : this({ it == island })
@@ -27,11 +25,10 @@ class IslandDetector(
     fun register(
         callback: (oldIsland: IslandType, newIsland: IslandType) -> Unit,
     ): IslandDetector {
-        callbacks.add(callback)
-        if (!registered) {
-            registered = true
+        if (callbacks.isEmpty()) {
             detectors.add(this)
         }
+        callbacks.add(callback)
         return this
     }
 
@@ -51,7 +48,6 @@ class IslandDetector(
      * Completely unregister this detector.
      */
     fun unregister() {
-        registered = false
         detectors.remove(this)
         callbacks.clear()
         inIsland = false
