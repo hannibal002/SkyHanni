@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
+import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,81 +24,57 @@ object SlayerTimeMessages {
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val data = event.data
         val bossType = data.bossType
+
         if (!bossType.isSlayer || !data.entity.belongsToPlayer()) return
         if (bossType == BossType.SLAYER_SPIDER_5_1) return
 
-        val compact = config.compact
-        val bossDisplayName = if (compact) bossType.shortName else bossType.fullName
-
         val currentPb = ProfileStorageData.playerSpecific?.slayerPersonalBests?.get(bossType)
-
         val isNewPersonalBest = data.timeToKill < (currentPb ?: Duration.INFINITE)
+
         if (isNewPersonalBest) {
             ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, data.timeToKill)
         }
 
-        val messages = buildTimeMessages(
-            isNewPersonalBest,
-            currentPb,
-            compact,
-            bossDisplayName,
-            data.timeToKillString,
+        val slayerTimeData = createSlayerTimeData(
+            bossType = bossType,
+            timeToKill = data.timeToKillString,
+            currentPb = currentPb,
+            isNewPersonalBest = isNewPersonalBest,
         )
 
-        messages.forEach(ChatUtils::chat)
+        buildChatMessages(slayerTimeData).forEach(ChatUtils::chat)
+
+        showTitle(slayerTimeData)
     }
 
-    private fun buildTimeMessages(
-        isNewPersonalBest: Boolean,
-        currentPb: Duration?,
-        compact: Boolean,
-        bossDisplayName: String,
-        timeToKill: String,
+    private fun buildChatMessages(
+        slayerTimeData: SlayerTimeData,
     ): List<String> = buildList {
+        val compact = config.compact
+
         if (config.timeToKill) {
             add(
-                formatTemplate(
-                    if (compact) templates.compactTimeToKill else templates.timeToKill,
-                    bossDisplayName,
-                    timeToKill,
-                    null,
-                ),
+                (if (compact) templates.compactTimeToKill else templates.timeToKill)
+                    .format(slayerTimeData),
             )
         }
 
         if (config.timeToKillPersonalBests) {
-            val currentPbDisplay = currentPb?.format(showMilliSeconds = true)
-
-            val template = if (isNewPersonalBest) {
-                if (currentPbDisplay == null) {
-                    if (compact) {
-                        templates.compactFirstPersonalBest
-                    } else {
-                        templates.firstPersonalBest
-                    }
-                } else {
-                    if (compact) {
-                        templates.compactNewPersonalBest
-                    } else {
-                        templates.newPersonalBest
-                    }
+            val template = when {
+                slayerTimeData.isNewPersonalBest && slayerTimeData.currentPbDisplay == null -> {
+                    if (compact) templates.compactFirstPersonalBest else templates.firstPersonalBest
                 }
-            } else {
-                if (compact) {
-                    templates.compactPersonalBest
-                } else {
-                    templates.personalBest
+
+                slayerTimeData.isNewPersonalBest -> {
+                    if (compact) templates.compactNewPersonalBest else templates.newPersonalBest
+                }
+
+                else -> {
+                    if (compact) templates.compactPersonalBest else templates.personalBest
                 }
             }
 
-            add(
-                formatTemplate(
-                    template,
-                    bossDisplayName,
-                    timeToKill,
-                    currentPbDisplay,
-                ),
-            )
+            add(template.format(slayerTimeData))
         }
     }
 
@@ -106,28 +83,61 @@ object SlayerTimeMessages {
         val startTime = SlayerApi.questStartTime
         if (!config.questComplete || startTime.isFarPast()) return
 
-        val duration = startTime.passedSince().format()
+        val slayerTimeData = createSlayerTimeData(
+            bossType = null,
+            timeToKill = startTime.passedSince().format(),
+            currentPb = null,
+        )
 
         ChatUtils.chat(
-            formatTemplate(
-                if (config.compact) templates.compactQuestComplete else templates.questComplete,
-                boss = "",
-                time = duration,
-                previous = null,
-            ),
+            (if (config.compact) templates.compactQuestComplete else templates.questComplete)
+                .format(slayerTimeData),
+        )
+
+        showTitle(slayerTimeData)
+    }
+
+    private fun showTitle(slayerTimeData: SlayerTimeData) {
+        if (!config.titles) return
+        if (!slayerTimeData.isNewPersonalBest) return
+        TitleManager.sendTitle(
+            titleText = templates.title.format(slayerTimeData),
+            subtitleText = templates.subtitle
+                .format(slayerTimeData)
+                .takeIf { it.isNotBlank() },
         )
     }
 
-    private fun formatTemplate(
-        template: String,
-        boss: String,
-        time: String,
-        previous: String?,
-    ): String = template
+    private fun createSlayerTimeData(
+        bossType: BossType?,
+        timeToKill: String,
+        currentPb: Duration?,
+        isNewPersonalBest: Boolean = false,
+    ): SlayerTimeData = SlayerTimeData(
+        bossDisplayName = if (bossType == null) {
+            ""
+        } else if (config.compact) {
+            bossType.shortName
+        } else {
+            bossType.fullName
+        },
+        timeToKill = timeToKill,
+        currentPbDisplay = currentPb?.format(showMilliSeconds = true),
+        isNewPersonalBest = isNewPersonalBest,
+    )
+
+    private fun String.format(data: SlayerTimeData): String = this
         .replace("&", "§")
-        .replace("{boss}", boss)
-        .replace("{time}", time)
-        .replace("{previous}", previous.orEmpty())
+        .replace("{boss}", data.bossDisplayName)
+        .replace("{time}", data.timeToKill)
+        .replace("{previous}", data.currentPbDisplay.orEmpty())
+
+    private data class SlayerTimeData(
+        val bossDisplayName: String,
+        val timeToKill: String,
+        val currentPbDisplay: String?,
+        val isNewPersonalBest: Boolean,
+    )
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
