@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(Blaze.class)
-public class MixinEntityBlaze {
+public class MixinBlaze {
 
     @WrapOperation(
         method = "aiStep",
@@ -19,7 +19,7 @@ public class MixinEntityBlaze {
             target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
         )
     )
-    private void onLivingUpdate(
+    private void onAddParticle(
         Level level,
         ParticleOptions particle,
         double x,

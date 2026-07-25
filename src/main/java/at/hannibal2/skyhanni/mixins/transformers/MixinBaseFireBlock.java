@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
 @Mixin(BaseFireBlock.class)
-public class MixinBlockFire {
+public class MixinBaseFireBlock {
 
     @WrapOperation(
         method = "animateTick",
@@ -19,7 +19,7 @@ public class MixinBlockFire {
             target = "Lnet/minecraft/world/level/Level;addParticle(Lnet/minecraft/core/particles/ParticleOptions;DDDDDD)V"
         )
     )
-    private void onRandomDisplayTick(
+    private void onAddParticle(
         Level level,
         ParticleOptions particle,
         double x,
