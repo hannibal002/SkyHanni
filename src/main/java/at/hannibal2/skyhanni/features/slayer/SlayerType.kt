@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
-
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.monster.Blaze
 import net.minecraft.world.entity.monster.EnderMan

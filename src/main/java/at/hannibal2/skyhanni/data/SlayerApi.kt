@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.features.rift.RiftApi
-import at.hannibal2.skyhanni.features.slayer.SlayerDataJson
+import at.hannibal2.skyhanni.features.slayer.SlayerJson
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -75,7 +75,8 @@ object SlayerApi {
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
 
-    var slayerJsonData: SlayerDataJson? = null
+    var slayerJsonData: SlayerJson? = null
+        private set
 
     var questStartTime = SimpleTimeMark.farPast()
 
@@ -313,7 +314,7 @@ object SlayerApi {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
-        slayerJsonData = event.getConstant<SlayerDataJson>("Slayer")
+        slayerJsonData = event.getConstant<SlayerJson>("Slayer")
     }
 
     // TODO USE SH-REPO

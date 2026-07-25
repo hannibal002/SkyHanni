@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -21,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrInsert
 import at.hannibal2.skyhanni.utils.compat.getTooltip
@@ -53,6 +53,14 @@ object SlayerRngMeterToolTipFeatures {
     private val toolTipAmountPattern by patternGroup.pattern(
         "rngmeter.tooltip.amount",
         "Tier (?<tier>.{1,2}) amount: (?<min>\\d{1,3})(?: to (?<max>\\d{1,3}))?",
+    )
+
+    /**
+     * REGEX-TEST: Slayer Bonus Rewards
+     */
+    private val bonusRewardsItemNamePattern by patternGroup.pattern(
+        "bonus.item.name",
+        "Slayer Bonus Rewards"
     )
 
     /**
@@ -100,7 +108,7 @@ object SlayerRngMeterToolTipFeatures {
                 }
             }
 
-            val xpBuff = Perk.SLAYER_XP_BUFF in ElectionCandidate.AATROX.activePerks
+            val xpBuff = Perk.SLAYER_XP_BUFF.isActive
             val baseGained = SlayerApi.slayerJsonData?.xpGains?.get(slayerType)?.get(tierToCalculateFor) ?: return
             scoreGainedPer = baseGained * (if (xpBuff) 1.25 else 1.0)
             scoreNeeded = SlayerRngMeterDisplay.rngScore[slayerName]?.get(internalName) ?: return
@@ -127,7 +135,7 @@ object SlayerRngMeterToolTipFeatures {
         val items = event.inventoryItems
 
         for (item in items.values) {
-            if (item.cleanName() != "Slayer Bonus Rewards") continue
+            if (!bonusRewardsItemNamePattern.matches(item.cleanName())) continue
             val toolTip = item.getTooltip(false)
 
             bonusRewardsLevelPattern.matchAll(toolTip.map { it.string.removeColor() }) {

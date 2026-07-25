@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
-data class SlayerDataJson(
+data class SlayerJson(
 
     @Expose @SerializedName("normal_mobs")
     val normalMobs: Map<SlayerType, Map<String, List<Mob>>>,
