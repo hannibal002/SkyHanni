@@ -57,25 +57,34 @@ sealed interface ChatFilterActivation {
     }
 
     class AllOf(
-        private val ChatFilterActivations: List<ChatFilterActivation>,
+        private val activations: List<ChatFilterActivation>,
     ) : ChatFilterActivation {
-        constructor(vararg ChatFilterActivations: ChatFilterActivation) : this(ChatFilterActivations.toList())
+        constructor(vararg activations: ChatFilterActivation) : this(activations.toList())
+
+        private val actives = Array(activations.size) { false }
+        private var activeAmount = 0
 
         private var callback: ((Boolean) -> Unit)? = null
         override fun bind(onChange: (Boolean) -> Unit) {
             callback = onChange
-            ChatFilterActivations.forEach { it.bind { _ -> onChange(isActive()) } }
-            onChange(isActive())
-        }
-        override fun unbind() {
-            callback = null
-            ChatFilterActivations.forEach { it.unbind() }
+            activations.withIndex().forEach { (index, activation) ->
+                activation.bind { active ->
+                    if (actives[index] != active) {
+                        activeAmount += if (active) 1 else -1
+                        actives[index] = active
+                    }
+                    callback?.invoke(isActive())
+                }
+            }
         }
 
-        private fun isActive(): Boolean = ChatFilterActivations.all { ChatFilterActivation ->
-            var active = false
-            ChatFilterActivation.bind { active = it }
-            active
+        override fun unbind() {
+            callback = null
+            activations.forEach { it.unbind() }
+            activeAmount = 0
+            actives.fill(false)
         }
+
+        fun isActive(): Boolean = activeAmount == activations.size
     }
 }
