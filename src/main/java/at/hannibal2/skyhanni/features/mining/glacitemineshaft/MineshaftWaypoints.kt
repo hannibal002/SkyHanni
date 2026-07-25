@@ -75,7 +75,7 @@ object MineshaftWaypoints {
 
     @HandleEvent
     fun onCorpseFound(event: CorpseFoundEvent) {
-        if (!config.mineshaftWaypoints.enabled || !config.corpseLocator.enabled) return
+        if (!config.waypointsConfig.enabled || !config.waypointsConfig.types.foundCorpse) return
 
         val corpseType = event.corpseType
         val article = if (corpseType == CorpseType.UMBER) "an" else "a"
@@ -98,7 +98,7 @@ object MineshaftWaypoints {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
-        if (event.keyCode != config.shareWaypointLocation) return
+        if (event.keyCode != config.waypointsConfig.shareFoundCorpseKeybind) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
 
         val closestWaypoint = waypoints.filter { it.location.distanceToPlayer() <= 5 }
@@ -122,7 +122,7 @@ object MineshaftWaypoints {
 
         waypoints
             .filter {
-                (it.isCorpse && config.corpseLocator.enabled) || (!it.isCorpse && config.mineshaftWaypoints.enabled)
+                (it.isCorpse && config.waypointsConfig.types.foundCorpse) || (!it.isCorpse && config.waypointsConfig.enabled)
             }
             .forEach {
                 event.drawWaypointFilled(it.location, it.waypointType.color.toColor(), seeThroughBlocks = true)
@@ -131,12 +131,12 @@ object MineshaftWaypoints {
     }
 
     private fun addEntranceWaypoints(spawnLocation: LorenzVec, direction: Vec3i) {
-        if (config.mineshaftWaypoints.entranceLocation) {
+        if (config.waypointsConfig.types.entrance) {
             waypoints.removeIf { it.waypointType == MineshaftWaypointType.ENTRANCE }
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = spawnLocation))
         }
 
-        if (config.mineshaftWaypoints.ladderLocation) {
+        if (config.waypointsConfig.types.ladder) {
             val ladderLocation = spawnLocation
                 // Move 7 blocks in front of the player to be in the ladder shaft
                 .add(x = direction.x * BLOCKS_FORWARD, z = direction.z * BLOCKS_FORWARD)

@@ -29,7 +29,7 @@ object CorpseSharing {
         "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
+    private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
 
     // This list only keeps track of already shared waypoints by anyone in the chat.
     // They don't get rendered.
@@ -37,7 +37,7 @@ object CorpseSharing {
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onSecondPassed() {
-        if (!config.autoSendLocation) return
+        if (!config.autoShareFoundCorpses) return
         if (MineshaftWaypoints.waypoints.isEmpty()) return
         if (PartyApi.partyMembers.isEmpty()) return
         shareCorpse()
