@@ -34,9 +34,6 @@ class ListenerCollection(
     fun current(): Array<Listener>? =
         buckets.getOrNull(SkyHanniEvents.getCurrentStateIndex())
 
-    fun isEmpty(): Boolean =
-        buckets.all { it == null }
-
     inline fun forEachCurrent(
         action: (Listener) -> Boolean,
     ) {
@@ -71,11 +68,7 @@ class ListenerCollection(
                 }
             }
 
-            return buildList {
-                islands.forEach {
-                    add(it + ISLAND_OFFSET)
-                }
-            }
+            return islands.map { it + ISLAND_OFFSET }
         }
 
         private fun getIslands(options: HandleEvent): List<IslandType> {
