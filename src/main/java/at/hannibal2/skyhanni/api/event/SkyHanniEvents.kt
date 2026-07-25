@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import java.lang.reflect.Method
+import java.util.concurrent.atomic.AtomicInteger
 
 @SkyHanniModule
 object SkyHanniEvents {
@@ -93,14 +94,45 @@ object SkyHanniEvents {
         handlers.removeIfKey { it.isAssignableFrom(clazz) }
     }
 
-    @HandleEvent
+    private val listenerCacheGeneration = AtomicInteger(0)
+    private val currentStateIndex = AtomicInteger(ListenerCollection.OUTSIDE)
+
+    fun markEventCacheDirty(type: DirtyReason) {
+        when (type) {
+            DirtyReason.REPO_RELOAD,
+            DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
+            -> listenerCacheGeneration.incrementAndGet()
+
+            DirtyReason.LOCATION_CHANGED ->
+                currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
+
+            DirtyReason.SERVER_DISCONNECTED -> {
+                listenerCacheGeneration.incrementAndGet()
+                currentStateIndex.set(ListenerCollection.OUTSIDE)
+            }
+        }
+    }
+
+    fun getListenerCacheGeneration(): Int = listenerCacheGeneration.get()
+    fun getCurrentStateIndex(): Int = currentStateIndex.get()
+
+    enum class DirtyReason {
+        LOCATION_CHANGED,
+        OUTSIDE_SB_FEATURE_CHANGED,
+        SERVER_DISCONNECTED,
+        REPO_RELOAD,
+    }
+
+    // This is marked highest priority to let it
+    // disable other RepositoryReloadEvent listeners before they happen
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
 
         disabledHandlers = data.disabledHandlers + data.disabledHandlersVersioned.activeNames(version)
         disabledHandlerInvokers = data.disabledInvokers + data.disabledInvokersVersioned.activeNames(version)
-        EventListeners.markEventCacheDirty()
+        markEventCacheDirty(DirtyReason.REPO_RELOAD)
     }
 
 
