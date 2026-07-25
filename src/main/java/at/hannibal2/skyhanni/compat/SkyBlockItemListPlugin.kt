@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.compat
 
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
 import com.operationpotato.itemlist.api.ExcludedScreensManager
 import com.operationpotato.itemlist.api.ExclusionZoneManager
 import com.operationpotato.itemlist.api.Plugin
@@ -21,7 +21,7 @@ object SkyBlockItemListPlugin : Plugin {
 
     override fun registerExcludedScreens(excludedScreensManager: ExcludedScreensManager) {
         excludedScreensManager.addProvider(ContainerScreen::class.java) { screen ->
-            if (WardrobeApi.inCustomWardrobe && (CustomWardrobe.renderableTopCorner == Pair(0, 0) || !showReiItems)) {
+            if (ArmorWardrobeApi.inCustomWardrobe && (CustomWardrobe.renderableTopCorner == Pair(0, 0) || !showReiItems)) {
                 return@addProvider Optional.of("SkyHanni Wardrobe")
             }
             Optional.empty()
@@ -30,7 +30,7 @@ object SkyBlockItemListPlugin : Plugin {
 
     override fun registerExclusionZones(exclusionZoneManager: ExclusionZoneManager) {
         exclusionZoneManager.addProvider(Screen::class.java) { screen ->
-            if (WardrobeApi.inCustomWardrobe && (CustomWardrobe.renderableTopCorner != Pair(0, 0) && showReiItems)) {
+            if (ArmorWardrobeApi.inCustomWardrobe && (CustomWardrobe.renderableTopCorner != Pair(0, 0) && showReiItems)) {
                 return@addProvider listOf(
                     Rect2i(
                         CustomWardrobe.renderableTopCorner.first, CustomWardrobe.renderableTopCorner.second,
