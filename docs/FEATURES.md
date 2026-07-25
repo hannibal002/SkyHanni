@@ -1903,6 +1903,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
 + Added Oringo Pet in Calendar. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5931)
     + Show the future legendary pet Oringo will offer in the Calendar.
++ Added Deployable Reminder. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
+    + A reminder to place down your power orb for Slayer, umbrella for Trophy Fishing, and lantern for Mineshafts.
 
 </details>
 <details open><summary>
