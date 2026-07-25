@@ -20,6 +20,8 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
@@ -48,7 +50,7 @@ import net.minecraft.world.level.block.Blocks
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
-    private val patternGroup = RepoPattern.group("dungeon")
+    val patternGroup = RepoPattern.group("dungeon")
 
     // TODO: move to SkyblockIcons class
     /**
@@ -171,6 +173,14 @@ object DungeonApi {
     val playerDungeonTeamPattern by patternGroup.pattern(
         "tablist.playerteam.colorless",
         "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
+    )
+
+    /**
+     * REGEX-TEST: Boss Collections
+     */
+    val bossCollectionsInventoryPattern by patternGroup.pattern(
+        "boss.collections.inventory",
+        "Boss Collections",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -369,7 +379,7 @@ object DungeonApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
-        if (event.inventoryName == "Boss Collections") {
+        if (bossCollectionsInventoryPattern.matches(event.inventoryName)) {
             readAllCollections(bossCollections, event.inventoryItems)
         } else if (event.inventoryName.endsWith(" Collection")) {
             readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
@@ -382,12 +392,12 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.hoverName.string == "Go Back") {
-                item.getLoreComponent().map { it.string.removeColor() }.getOrNull(0)?.let { firstLine ->
+            if (item.cleanName == "Go Back") {
+                item.getCleanLore().getOrNull(0)?.let { firstLine ->
                     if (firstLine == "To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
-                        val lore = inventoryItems[4]?.getLoreComponent()?.map { it.string.removeColor() } ?: return
+                        val lore = inventoryItems[4]?.getCleanLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
