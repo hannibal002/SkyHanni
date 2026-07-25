@@ -625,4 +625,20 @@ object StringUtils {
 
         return result.toString()
     }
+
+    fun Sequence<String>.withWrappedLines(): Sequence<String> = sequence {
+        val lines = toList()
+
+        for (i in lines.indices) {
+            yield(lines[i])
+
+            if (i + 1 < lines.size) {
+                yield(lines[i] + " " + lines[i + 1])
+            }
+        }
+    }
+
+    fun List<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
+
+    fun Iterator<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
 }

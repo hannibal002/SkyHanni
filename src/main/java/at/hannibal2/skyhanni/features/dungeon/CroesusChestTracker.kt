@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -50,9 +51,25 @@ object CroesusChestTracker {
 
     private val patternGroup = RepoPattern.group("dungeon.croesus")
 
-    private val croesusPattern by patternGroup.pattern("inventory", "Croesus")
+    /**
+     * REGEX-TEST: (1/3) Croesus
+     * REGEX-TEST: Croesus
+     */
+    private val croesusPattern by patternGroup.pattern("inventory", "(?:\\(\\d+/\\d+\\) )?Croesus")
+
+    /**
+     * REGEX-TEST: No treasures!
+     */
     private val croesusEmptyPattern by patternGroup.pattern("empty.colorless", "No treasures!")
+
+    /**
+     * REGEX-TEST: Reroll Chest
+     */
     private val kismetPattern by patternGroup.pattern("kismet.reroll.colorless", "Reroll Chest")
+
+    /**
+     * REGEX-TEST: You already rerolled a chest!
+     */
     private val kismetUsedInChestPattern by patternGroup.pattern("kismet.used.colorless", "You already rerolled a chest!")
 
     /**
@@ -88,7 +105,7 @@ object CroesusChestTracker {
     /**
      * WRAPPED-REGEX-TEST: " Kismet Feather"
      */
-    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.colorless", "(?:\\s+)?Kismet Feather")
+    private val kismetUsedInCroesusPattern by patternGroup.pattern("chest.state.kismet.used.styled", " §mKismet Feather")
 
     private const val EMPTY_SLOT = 22
     private const val FRONT_ARROW_SLOT = 53
@@ -242,7 +259,8 @@ object CroesusChestTracker {
         if (!inCroesusInventory) return
         if (event.slot.containerSlot != event.slot.index) return
         croesusSlotMapToRun(event.slot.containerSlot) ?: return
-        if (!kismetUsedInCroesusPattern.anyMatches(event.stack.getCleanLore())) return
+        val styledLore = event.stack.getLore().map { it.removeColor(keepFormatting = true) }
+        if (!kismetUsedInCroesusPattern.anyMatches(styledLore)) return
         event.offsetY = -1
         event.offsetX = -9
         event.stackTip = "§a✔"

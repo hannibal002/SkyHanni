@@ -415,11 +415,6 @@ object CollectionUtils {
     inline fun <reified C : Collection<T>, T : Collection<T2>, T2> C.filterNotEmpty(): C =
         filter { it.isNotEmpty() } as C
 
-    fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
-        @Suppress("UNCHECKED_CAST")
-        return filterKeys { it != null } as Map<K, V>
-    }
-
     fun <K, V> Map<K, V>.containsKeys(vararg keys: K) = keys.all { this.keys.contains(it) }
 
     /**
@@ -568,12 +563,21 @@ object CollectionUtils {
 
     fun <T> Collection<T>.filterNotClass(clazz: KClass<*>): List<T> = filterNot { clazz.isInstance(it) }
 
-    @Suppress("UNCHECKED_CAST")
-    fun <K, V> Map<K, V?>.filterValuesNotNull(): Map<K, V> = filterValues { it != null } as Map<K, V>
+    fun <K, V> Map<out K, V>.filterNotNull(): Map<K & Any, V & Any> = buildMap {
+        for ((k, v) in this@filterNotNull) {
+            if (k != null && v != null) put(k, v)
+        }
+    }
 
-    fun <T> List<T>.allIdentical(): Boolean {
-        if (isEmpty()) return true
-        val first = first()
-        return all { it == first }
+    fun <K, V> Map<out K, V>.filterNotNullKeys(): Map<K & Any, V> = buildMap {
+        for ((k, v) in this@filterNotNullKeys) {
+            if (k != null) put(k, v)
+        }
+    }
+
+    fun <K, V> Map<out K, V>.filterNotNullValues(): Map<K, V & Any> = buildMap {
+        for ((k, v) in this@filterNotNullValues) {
+            if (v != null) put(k, v)
+        }
     }
 }

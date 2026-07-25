@@ -34,13 +34,13 @@ public class MixinWorldRenderer {
 
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
+        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
+        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
     }
 }
