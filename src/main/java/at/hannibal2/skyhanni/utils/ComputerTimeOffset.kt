@@ -10,8 +10,6 @@ import at.hannibal2.skyhanni.utils.EnumUtils.next
 import at.hannibal2.skyhanni.utils.EnumUtils.previous
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import java.net.SocketTimeoutException
@@ -22,6 +20,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 
 @SkyHanniModule
 object ComputerTimeOffset {

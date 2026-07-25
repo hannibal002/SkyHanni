@@ -57,12 +57,12 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object GardenNextJacobContest {
@@ -72,7 +72,7 @@ object GardenNextJacobContest {
     private val profileStorage get() = SkyHanniMod.feature.storage
     private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val calendarDetector by lazy { InventoryDetector(monthPattern) }
+    private val calendarDetector by lazy { InventoryDetector { monthPattern } }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
     private val nextContest
         get() = knownContests.filterNot {

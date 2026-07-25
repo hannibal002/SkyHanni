@@ -3,32 +3,31 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.Resettable
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
-import at.hannibal2.skyhanni.events.minecraft.ServerTickEvent
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getColorOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconColor.Companion.getLoreColorOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconPitch.Companion.getBeaconPitchOrNull
-import at.hannibal2.skyhanni.features.foraging.MoongladeBeacon.BeaconSpeed.Companion.getBeaconSpeedOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconColor.Companion.getColorOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconColor.Companion.getLoreColorOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconPitch.Companion.getBeaconPitchOrNull
+import at.hannibal2.skyhanni.features.foraging.ForagingBeaconSolver.BeaconSpeed.Companion.getBeaconSpeedOrNull
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantGlint
 import at.hannibal2.skyhanni.utils.ItemUtils.takeUnlessEmpty
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.ModernPatterns
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -42,6 +41,7 @@ import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.StringRenderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.Identifier
 import net.minecraft.world.inventory.Slot
@@ -54,34 +54,74 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.times
 
 @SkyHanniModule
-object MoongladeBeacon {
+object ForagingBeaconSolver {
 
-    private val config get() = SkyHanniMod.feature.foraging.moongladeBeacon
+    private val config get() = SkyHanniMod.feature.foraging.foragingBeacon
     private val debugConfig get() = SkyHanniMod.feature.dev.debug
+
+    private val patternGroup = RepoPattern.group("foraging.beacon")
+
+    // <editor-fold desc="Patterns">
+    /**
+     * REGEX-TEST: Current color: Red
+     * REGEX-TEST: Current color: Light Blue
+     */
+    private val beaconCurrentColorPattern by patternGroup.pattern(
+        "color",
+        "Current color: (?<color>[\\w ]+)",
+    )
+
+    /**
+     * REGEX-TEST: Current speed: 3
+     */
+    private val beaconCurrentSpeedPattern by patternGroup.pattern(
+        "speed",
+        "Current speed: (?<speed>\\d+)",
+    )
+
+    /**
+     * REGEX-TEST: Current pitch: Low
+     */
+    private val beaconCurrentPitchPattern by patternGroup.pattern(
+        "pitch",
+        "Current pitch: (?<pitch>\\w+)",
+    )
+
+    /**
+     * REGEX-TEST: Upgrade Signal Strength
+     * REGEX-TEST: Tune Frequency
+     */
+    private val beaconInventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "(?<upgrade>Upgrade Signal Strength)|Tune Frequency",
+    )
+
+    // </editor-fold>
 
     // <editor-fold desc="Enums & Enum Helpers">
     /**
      * Represents the order of colors for the beacon minigame.
      * Attempts to auto-fetch the item from the registry if not provided.
      *
-     * @param displayName The display name of the color as shown in the GUI.
      * @param itemOverride Optional override for the item to use for this color.
      */
-    enum class BeaconColor(private val displayName: String, itemOverride: Item? = null) {
-        WHITE("§fWhite"),
-        ORANGE("§6Orange"),
-        MAGENTA("§dMagenta"),
-        LIGHT_BLUE("§9Light Blue"), // Why did hypixel do this
-        YELLOW("§eYellow"),
-        LIME("§aLime"),
-        PINK("§dPink"),
-        CYAN("§bCyan"), // This too
-        PURPLE("§5Purple"),
-        BLUE("§1Blue"), // This one makes sense ig
-        BROWN("§6Brown"),
-        GREEN("§2Green"),
-        RED("§4Red"),
+    enum class BeaconColor(itemOverride: Item? = null) {
+        WHITE,
+        ORANGE,
+        MAGENTA,
+        LIGHT_BLUE,
+        YELLOW,
+        LIME,
+        PINK,
+        CYAN,
+        PURPLE,
+        BLUE,
+        BROWN,
+        GREEN,
+        RED,
         ;
+
+        val displayName: String = toFormattedName()
 
         override fun toString() = displayName
 
@@ -90,10 +130,11 @@ object MoongladeBeacon {
 
         companion object {
             private val itemToColorMap = entries.associateBy { it.item }
+
             fun Item.getColorOrNull(): BeaconColor? = itemToColorMap[this]
             fun Slot.getLoreColorOrNull(): BeaconColor? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentColorPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentColorPattern.firstMatcher(stack.getCleanLore()) {
                     val colorName = group("color") ?: return@firstMatcher null
                     entries.find { it.displayName.equals(colorName, ignoreCase = true) }
                 }
@@ -127,7 +168,7 @@ object MoongladeBeacon {
 
             fun Slot.getBeaconSpeedOrNull(): BeaconSpeed? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentSpeedPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentSpeedPattern.firstMatcher(stack.getCleanLore()) {
                     val guiSpeed = group("speed")?.formatIntOrNull() ?: return@firstMatcher null
                     entries.find { it.guiSpeed == guiSpeed }
                 }
@@ -153,7 +194,7 @@ object MoongladeBeacon {
             fun getByPitch(pitch: Float): BeaconPitch? = entries.find { it.pitch == pitch }
             fun Slot.getBeaconPitchOrNull(): BeaconPitch? {
                 val stack = this.item.takeUnlessEmpty() ?: return null
-                return ModernPatterns.beaconCurrentPitchPattern.firstMatcher(stack.getLore()) {
+                return beaconCurrentPitchPattern.firstMatcher(stack.getCleanLore()) {
                     entries.find { it.displayName.equals(group("pitch"), ignoreCase = true) }
                 }
             }
@@ -208,11 +249,13 @@ object MoongladeBeacon {
             enchantedTuning.reset()
             display = emptyList()
         },
-    ) { name ->
-        upgradingStrength = (name == "Upgrade Signal Strength")
-        val inInv = (name == "Tune Frequency" || upgradingStrength)
-        inInv
-    }
+        checkInventoryName = { name ->
+            beaconInventoryNamePattern.matchMatcher(name) {
+                upgradingStrength = group("upgrade") != null
+                true
+            } ?: false
+        }
+    )
 
     private var upgradingStrength = false
     private var normalTuning = BeaconTuneData()
@@ -239,7 +282,7 @@ object MoongladeBeacon {
         nextDevUpdate = SimpleTimeMark.now() + 100.milliseconds
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!solverEnabled()) return
         if (event.blockOverClick()) {
@@ -270,13 +313,13 @@ object MoongladeBeacon {
 
     private var currentServerTicks = 0
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onServerTick(event: ServerTickEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
+    fun onServerTick() {
         if (!colorMinigameInventory.isInside()) return
         currentServerTicks++
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onPlaySound(event: PlaySoundEvent) {
         if (!colorMinigameInventory.isInside() || event.soundName != "block.note_block.bass") return
         val pitch = BeaconPitch.getByPitch(event.pitch) ?: return
@@ -286,7 +329,7 @@ object MoongladeBeacon {
     }
 
     private fun BeaconPitch.handleMultipleSet() {
-        val bestSet = listOfNotNull(normalTuning, enchantedTuning).filter {
+        val bestSet = listOf(normalTuning, enchantedTuning).filter {
             it.untilNextRefPitch <= acceptablePitchMargin && it.untilNextOurPitch > it.untilNextRefPitch
         }.minByOrNull { it.untilNextRefPitch } ?: return
         bestSet.handlePitch(this)
@@ -297,16 +340,15 @@ object MoongladeBeacon {
             outsideInventory = false,
             inOwnInventory = false,
             inventory = colorMinigameInventory,
-            condition = { config.enabled },
-            onlyOnIsland = IslandType.GALATEA,
+            condition = { config.enabled && IslandTypeTag.FORAGING_CUSTOM_TREES.isInIsland() },
             onRender = {
                 config.displayPosition.renderRenderables(display, posLabel = "Moonglade Beacon")
             },
         )
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
+    fun onBackgroundDrawn() {
         if (!solverEnabled()) return
         InventoryUtils.getItemsInOpenChest().forEach { slot ->
             if (normalTuning.tryHighlightSlot(slot)) return@forEach
@@ -314,14 +356,14 @@ object MoongladeBeacon {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun RenderInventoryItemTipEvent.onRenderItemTip() {
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
+    fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!solverEnabled()) return
-        with(normalTuning) { tryLabelIfAble() }
-        if (upgradingStrength) with(enchantedTuning) { tryLabelIfAble() }
+        normalTuning.tryLabelIfAble(event)
+        enchantedTuning.tryLabelIfAble(event)
     }
 
-    @HandleEvent(InventoryUpdatedEvent::class, onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onInventoryUpdated() {
         if (!solverEnabled()) return
 
@@ -415,8 +457,7 @@ object MoongladeBeacon {
     private data class BeaconTuneData(
         val isEnchanted: Boolean = false,
     ) : Resettable {
-        private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"
-        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lMoonglade Beacon Solver"
+        private val title = if (isEnchanted) "§aEnchanted Tuning" else "§d§lForaging Beacon Solver"
         private val slotOffset = if (upgradingStrength && !isEnchanted) -9 else 0
 
         private val colorPair = NullableDataPair<BeaconColor>()
@@ -434,7 +475,7 @@ object MoongladeBeacon {
 
         private var paused = false
         private var lastServerTickCount = 0
-        private var recentTicks: MutableList<Int> = mutableListOf()
+        private val recentTicks: MutableList<Int> = mutableListOf()
         private var currentRefSlot: Int = BeaconSlotRange.MATCH.range.first
 
         val untilNextRefPitch get() = nextPitchPair.referenceUntil
@@ -450,13 +491,6 @@ object MoongladeBeacon {
                 if (size < 3) return
                 pitchPair[BeaconPieceTarget.REFERENCE] = groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
             }
-        }
-
-        fun allCorrect(): Boolean {
-            val colorOffset = colorPair.getOffset<BeaconColor>()
-            val speedOffset = speedPair.getOffset<BeaconSpeed>()
-            val pitchOffset = pitchPair.getOffset<BeaconPitch>()
-            return listOf(colorOffset, speedOffset, pitchOffset).all { it == 0 }
         }
 
         fun readSlot(slot: Slot) {
@@ -522,10 +556,10 @@ object MoongladeBeacon {
             return true
         }
 
-        fun RenderInventoryItemTipEvent.tryLabelIfAble() {
+        fun tryLabelIfAble(event: RenderInventoryItemTipEvent) {
             if (isEnchanted && !upgradingStrength) return
-            val offset = getOffsetBySlot(slot.containerSlot)?.takeIf { it != 0 } ?: return
-            stackTip = "§a$offset"
+            val offset = getOffsetBySlot(event.slot.containerSlot)?.takeIf { it != 0 } ?: return
+            event.stackTip = "§a$offset"
         }
 
         fun getOffsetBySlot(slot: Int): Int? = when (slot) {

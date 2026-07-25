@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.compat.hover
 import at.hannibal2.skyhanni.utils.compat.url
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
-import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.ClientPacketListener
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.network.chat.Component
@@ -344,7 +343,7 @@ object ChatUtils {
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
-    private val chatGui get() = Minecraft.getInstance().gui.chat
+    private val chatGui get() = MinecraftCompat.hud.chat
 
     val chatMessages: MutableList<GuiMessage>
         get() = chatGui.allMessages
@@ -473,14 +472,8 @@ object ChatUtils {
             `skyhanni$setCreated`(value)
         }
 
-    var GuiMessage.fullComponent: Component
-        get() = `skyhanni$getFullComponent`()
-        set(value) {
-            `skyhanni$setFullComponent`(value)
-        }
-
     val GuiMessage.chatMessage get() = content.formattedTextCompat().stripHypixelMessage()
-    fun GuiMessage.passedSinceSent() = (Minecraft.getInstance().gui.guiTicks - addedTime()).ticks
+    fun GuiMessage.passedSinceSent() = (MinecraftCompat.hud.guiTicks - addedTime()).ticks
 
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)

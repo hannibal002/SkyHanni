@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import at.hannibal2.skyhanni.utils.compat.slotUnderCursor
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.resources.language.I18n
@@ -29,7 +28,8 @@ import net.minecraft.world.inventory.Slot
 import net.minecraft.world.item.Items
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
+// TODO refactor
+@Suppress("MemberVisibilityCanBePrivate", "TooManyFunctions", "Unused")
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
@@ -66,7 +66,7 @@ object InventoryUtils {
     }
 
     fun getItemsInOpenChestWithNull(): List<Slot> {
-        val guiChest = Minecraft.getInstance().screen as? ContainerScreen ?: return emptyList()
+        val guiChest = MinecraftCompat.screen as? ContainerScreen ?: return emptyList()
         return guiChest.slots()
             .filter { it.container !is Inventory }
     }
@@ -77,20 +77,20 @@ object InventoryUtils {
 
     // only works while not in an inventory
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return emptyList()
+        val guiInventory = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return emptyList()
         return guiInventory.slots()
             .filter { it.container is Inventory && it.item.isNotEmpty() }
     }
 
     fun openInventoryName(): String = OtherInventoryData.currentInventoryName
 
-    fun inInventory() = Minecraft.getInstance().screen is ContainerScreen
+    fun inInventory() = MinecraftCompat.screen is ContainerScreen
 
-    fun inOwnInventory() = Minecraft.getInstance().screen is InventoryScreen
+    fun inOwnInventory() = MinecraftCompat.screen is InventoryScreen
 
     fun inAnyInventory() = inInventory() || inOwnInventory()
 
-    fun inContainer() = Minecraft.getInstance().screen is SkyHanniGuiContainer
+    fun inContainer() = MinecraftCompat.screen is SkyHanniGuiContainer
 
     fun getItemsInOwnInventory(): List<SafeItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNullOrEmpty().orEmpty()
@@ -191,7 +191,7 @@ object InventoryUtils {
     fun Container.isTopInventory() = this is SimpleContainer
 
     fun closeInventory() {
-        Minecraft.getInstance().screen = null
+        MinecraftCompat.screen = null
     }
 
     fun isInNormalChest(name: String = openInventoryName()): Boolean = name in normalChestInternalNames.map { I18n.get(it) }

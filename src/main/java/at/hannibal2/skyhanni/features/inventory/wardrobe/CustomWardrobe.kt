@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.Companion.MAX_PAGES
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.Companion.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.Companion.MAX_PAGES
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.Companion.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 import at.hannibal2.skyhanni.utils.compat.getTooltip
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
@@ -126,7 +127,7 @@ object CustomWardrobe {
     fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
-        val gui = Minecraft.getInstance().screen as? SkyHanniGuiContainer ?: return
+        val gui = MinecraftCompat.screen as? SkyHanniGuiContainer ?: return
         val renderable = inventoryButton ?: addReEnableButton().also { inventoryButton = it }
         val posX = gui.leftPos + (1.05 * gui.imageWidth).toInt()
         val posY = gui.topPos + (gui.imageHeight - renderable.height) / 2

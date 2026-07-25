@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
@@ -32,7 +33,6 @@ import kotlin.time.Duration.Companion.minutes
 //? if >= 26.1 {
 import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.world.item.ItemStackTemplate
-
 //?}
 
 // TODO do the same thing here as in EntityCompat, no more functions/members that are classless
@@ -125,13 +125,13 @@ private fun Component?.computeFormattedTextCompat(noExtraResets: Boolean, leadin
 }
 
 private val textColorLUT = ChatFormatting.entries
-    .mapNotNull { formatting -> formatting.color?.let { it to formatting } }
+    .mapNotNull { formatting -> TextColor.fromLegacyFormat(formatting)?.let { it.value to formatting } }
     .toMap()
 
 fun Style?.orEmpty(): Style = this ?: Style.EMPTY
 
 fun Style.chatStyle() = buildString {
-    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.formatValue()}>") }
+    color?.let { append(it.toChatFormatting()?.toString() ?: "<${it.serialize()}>") }
     if (isBold) append("§l")
     if (isItalic) append("§o")
     if (isUnderlined) append("§n")
@@ -276,14 +276,15 @@ fun addChatMessageToChat(message: Component, bypassSelfMessages: Boolean = false
 fun addDeletableMessageToChat(component: Component, id: Int, bypassSelfMessages: Boolean = false) {
     if (!bypassSelfMessages) component.skyhanniCreated = true
     DelayedRun.runOrNextTick {
-        val chat = Minecraft.getInstance().gui.chat
+        val chat = MinecraftCompat.hud.chat
         ChatManager.deleteMessage { it.signature == idToMessageSignature(id) }
         DelayedRun.runOrNextTick {
             chat.addMessage(
                 component,
                 idToMessageSignature(id),
-                //? if >= 26.1
+                //? if >= 26.1 {
                 GuiMessageSource.SYSTEM_CLIENT,
+                //?}
                 GuiMessageTag.system(),
             )
         }

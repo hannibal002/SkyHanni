@@ -7,9 +7,6 @@ import net.minecraft.network.chat.Style
 object GuiChatHook {
 
     @JvmStatic
-    var currentComponent: Component? = null
-
-    @JvmStatic
     var replacementComponent: Component? = null
 
     fun replaceEntireComponent(title: String, chatStyle: Style) {

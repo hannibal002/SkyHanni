@@ -335,6 +335,13 @@ class InventoryConfig {
     var ministerInCalendar: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Oringo Pet in Calendar", desc = "Show the future legendary pet Oringo will offer in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("traveling zoo")
+    var oringoPetInCalendar: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
     @ConfigEditorBoolean
     @FeatureToggle
