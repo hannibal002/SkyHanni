@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object SlayerChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("slayer")
-    private val config get() = CoreChatFilter.config
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("slayer")
+    private val config get() = ChatFilterManager.config
 
     private fun isEnabled(): Boolean = config.others.get()
 
@@ -16,9 +16,9 @@ object SlayerChatFilter {
     fun onIslandJoin() {
         if (!isEnabled()) return
         if (SlayerApi.activeType != null) {
-            CoreChatFilter.register(filters)
+            ChatFilterManager.register(filters)
         } else {
-            CoreChatFilter.unregister(filters)
+            ChatFilterManager.unregister(filters)
         }
     }
 
@@ -29,8 +29,8 @@ object SlayerChatFilter {
             BOSS_FIGHT,
             FAILED,
             SLAIN,
-            -> CoreChatFilter.register(filters)
-            NO_ACTIVE_QUEST -> CoreChatFilter.unregister(filters)
+            -> ChatFilterManager.register(filters)
+            NO_ACTIVE_QUEST -> ChatFilterManager.unregister(filters)
         }
     }
 

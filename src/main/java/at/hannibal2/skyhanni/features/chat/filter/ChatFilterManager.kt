@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.chat.filter.CoreChatFilter.block
+import at.hannibal2.skyhanni.features.chat.filter.ChatFilterManager.block
 import at.hannibal2.skyhanni.features.chat.filter.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import java.util.concurrent.ConcurrentHashMap
 
 @SkyHanniModule
-object CoreChatFilter {
+object ChatFilterManager {
 
     val chatFilterGroup = RepoPattern.group("chat-filter")
     val generalConfig get() = SkyHanniMod.feature.chat

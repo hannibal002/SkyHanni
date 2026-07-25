@@ -15,8 +15,8 @@ interface ChatFilter {
 interface ConfigChatFilter : ChatFilter {
     fun registerConfig(
         config: Property<Boolean>,
-        onEnable: (() -> Unit) = { CoreChatFilter.register(this) },
-        onDisable: (() -> Unit) = { CoreChatFilter.unregister(this) }
+        onEnable: (() -> Unit) = { ChatFilterManager.register(this) },
+        onDisable: (() -> Unit) = { ChatFilterManager.unregister(this) }
     ) {
         config.whenChanged { _, new ->
             if (new) onEnable()
@@ -55,9 +55,9 @@ abstract class RegexIslandChatFilter(
     init {
         fun update() {
             if (config.get() && detector.isInside()) {
-                CoreChatFilter.register(this)
+                ChatFilterManager.register(this)
             } else {
-                CoreChatFilter.unregister(this)
+                ChatFilterManager.unregister(this)
             }
         }
 

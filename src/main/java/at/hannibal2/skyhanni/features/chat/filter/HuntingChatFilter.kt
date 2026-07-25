@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.IslandType
 
 @Suppress("unused")
 object HuntingChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("hunting")
-    private val config get() = CoreChatFilter.config.hunting
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("hunting")
+    private val config get() = ChatFilterManager.config.hunting
 
     val galateaDetector = IslandDetector(island = IslandType.GALATEA)
 

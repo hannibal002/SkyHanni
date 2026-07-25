@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 
 @Suppress("unused")
 object ForagingChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("foraging")
-    private val config get() = CoreChatFilter.config.foraging
-    private val generalConfig get() = CoreChatFilter.generalConfig
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("foraging")
+    private val config get() = ChatFilterManager.config.foraging
+    private val generalConfig get() = ChatFilterManager.generalConfig
 
     private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES,)
 

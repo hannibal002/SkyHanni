@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 @Suppress("unused")
 object MiningChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("mining")
-    private val generalConfig get() = CoreChatFilter.generalConfig
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("mining")
+    private val generalConfig get() = ChatFilterManager.generalConfig
 
     object SkymallFilter : RegexChatFilter("skymall", generalConfig.hideSkyMall) {
         /**

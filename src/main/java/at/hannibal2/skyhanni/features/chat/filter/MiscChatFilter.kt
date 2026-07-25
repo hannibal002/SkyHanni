@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.utils.StringUtils
 
 @Suppress("MaxLineLength", "unused")
 object MiscChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("hypixel-misc")
-    private val config get() = CoreChatFilter.config
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("hypixel-misc")
+    private val config get() = ChatFilterManager.config
 
 
     object EmptyFilter : ConfigChatFilter {

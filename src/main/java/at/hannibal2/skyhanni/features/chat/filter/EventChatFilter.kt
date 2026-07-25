@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 
 @Suppress("unused")
 object EventChatFilter {
-    private val patternGroup = CoreChatFilter.chatFilterGroup.group("event")
-    private val config get() = CoreChatFilter.config
+    private val patternGroup = ChatFilterManager.chatFilterGroup.group("event")
+    private val config get() = ChatFilterManager.config
 
     val winterDetector = IslandDetector(IslandType.WINTER,)
 
