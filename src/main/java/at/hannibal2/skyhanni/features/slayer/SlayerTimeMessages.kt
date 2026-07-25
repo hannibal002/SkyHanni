@@ -3,6 +3,9 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
@@ -11,8 +14,11 @@ import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import com.mojang.brigadier.arguments.LongArgumentType
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object SlayerTimeMessages {
@@ -141,5 +147,49 @@ object SlayerTimeMessages {
         event.move(132, "slayer.timeToKillMessage", "slayer.slayerTimeMessages.timeToKill")
         event.move(132, "slayer.questCompleteMessage", "slayer.slayerTimeMessages.questComplete")
         event.move(132, "slayer.compactTimeMessage", "slayer.slayerTimeMessages.compact")
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.registerBrigadier("shtestslayertimemessage") {
+            description = "Tests the slayer time messages (chat and titles)"
+            category = CommandCategory.DEVELOPER_DEBUG
+            arg("bossType",
+                EnumArgumentType.name<BossType>(),
+                BossType.entries.filter { it.isSlayer }.map { it.name }
+            ) { bossArg ->
+                arg("time", LongArgumentType.longArg()) { timeArg ->
+                    arg("previous", LongArgumentType.longArg()) { prevArg ->
+                        callback {
+                            runTestCommand(
+                                getArg(bossArg),
+                                getArg(timeArg),
+                                getArg(prevArg),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun runTestCommand(
+        bossType: BossType,
+        timeToKillMillis: Long,
+        previousMillis: Long,
+    ) {
+        val timeToKillStr = timeToKillMillis.milliseconds.format(TimeUnit.SECOND, showMilliSeconds = true)
+        val currentPb = if (previousMillis > 0) previousMillis.milliseconds else null
+        val isNewPersonalBest = currentPb == null || timeToKillMillis < previousMillis
+
+        val bossData = createSlayerTimeData(
+            bossType = bossType,
+            timeToKill = timeToKillStr,
+            currentPb = currentPb,
+            isNewPersonalBest = isNewPersonalBest,
+        )
+
+        buildChatMessages(bossData).forEach(ChatUtils::chat)
+        showTitle(bossData)
     }
 }
