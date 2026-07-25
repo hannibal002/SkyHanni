@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.hours
@@ -34,7 +35,7 @@ object RobloxReminder {
     init {
         InventoryDetector(
             onOpenInventory = { robuxError() },
-            checkInventoryName = { it == "SkyBlock Menu" },
+            repoPattern = { UtilsPatterns.skyblockMenuGuiPattern },
         )
     }
 

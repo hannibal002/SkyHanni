@@ -41,7 +41,7 @@ enum class NonGodPotEffect(
     GOBLIN(
         "King's Scent I",
         displayName = "§2King's Scent I",
-        effectGainedMessage = "§e[NPC] §6King Yolkaar§f: §rThis egg will help me stomach my pain.",
+        effectGainedMessage = "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.",
         effectRemovedMessage = "§cThe Goblin King's §r§afoul stench §r§chas dissipated!",
         effectDuration = 20.minutes,
         effectChangeType = EffectDurationChangeType.SET,
