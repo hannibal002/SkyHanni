@@ -16,7 +16,7 @@ object MuteOrganDonor {
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.organDonorAccessoryConfig.muteWhenAllFound || !config.corpseLocator.enabled || !allCorpsesFound) return
+        if (!config.organDonorAccessoryConfig.muteWhenAllFound || !config.waypointsConfig.types.foundCorpse || !allCorpsesFound) return
         if (event.soundName == "block.note_block.harp") {
             event.cancel()
         }
