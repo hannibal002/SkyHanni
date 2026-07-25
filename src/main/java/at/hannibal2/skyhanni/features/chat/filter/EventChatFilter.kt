@@ -2,41 +2,14 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
-import at.hannibal2.skyhanni.utils.IslandDetector
 
 object EventChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("event")
     private val config get() = CoreChatFilter.config
 
-    val islandDetector = IslandDetector(
-        island = IslandType.WINTER,
-        onIslandJoin = { CoreChatFilter.add(winterFilters) },
-        onIslandLeave = { CoreChatFilter.remove(winterFilters) }
-    )
+    val winterDetector = IslandDetector(IslandType.WINTER,)
 
-    val winterFilters = setOf<ChatFilter>(
-        WinterIslandFilter,
-    )
-
-    val filters =
-        setOf<ChatFilter>(
-            GuildEventExpFilter,
-            FireSaleFilter,
-            EventLevelUpFilter,
-            ChocolateFactoryUpgradeFilter,
-            HoppityBeginFilter,
-            HoppityEggAppearFilter,
-            // Can be gifted anywhere
-            WinterGiftFilter
-        )
-
-    init {
-        CoreChatFilter.add(filters)
-    }
-
-    object GuildEventExpFilter : RegexChatFilter("guild_event_exp") {
-        override fun isEnabled(): Boolean = config.guildEventExp
-
+    object GuildEventExpFilter : RegexChatFilter("guild_event_exp", config.guildEventExp) {
         /**
          * REGEX-TEST: You earned 2 GEXP from playing SkyBlock!
          * REGEX-TEST: You earned 2 GEXP + 210 Event EXP from playing SkyBlock!
@@ -49,9 +22,7 @@ object EventChatFilter {
     }
 
 
-    object WinterIslandFilter : RegexChatFilter("winter_island") {
-        override fun isEnabled(): Boolean = config.others
-
+    object WinterIslandFilter : RegexIslandChatFilter("winter_island", config.others, winterDetector) {
         /**
          * REGEX-TEST: ☃ [VIP+] liron150 mounted a Snow Cannon!
          */
@@ -61,9 +32,7 @@ object EventChatFilter {
         )
     }
 
-    object FireSaleFilter : RegexChatFilter("firesale") {
-        override fun isEnabled(): Boolean = config.fireSale
-
+    object FireSaleFilter : RegexChatFilter("firesale", config.fireSale) {
         override val patterns by patternGroup.list(
             "firesale",
             "A FIRE SALE A[\\n.]*",
@@ -78,9 +47,7 @@ object EventChatFilter {
         )
     }
 
-    object EventLevelUpFilter : RegexChatFilter("event_levelup") {
-        override fun isEnabled(): Boolean = config.eventLevelUp
-
+    object EventLevelUpFilter : RegexChatFilter("event_levelup", config.eventLevelUp) {
         // TODO need proper solution to hide empty messages in event text
         override val patterns by patternGroup.list(
             "event-levelup",
@@ -91,9 +58,7 @@ object EventChatFilter {
         )
     }
 
-    object ChocolateFactoryUpgradeFilter : RegexChatFilter("factory_upgrade") {
-        override fun isEnabled(): Boolean = config.factoryUpgrade
-
+    object ChocolateFactoryUpgradeFilter : RegexChatFilter("factory_upgrade", config.factoryUpgrade) {
         override val patterns by patternGroup.list(
             "chocolate-factory-upgrade",
             ".* has been promoted to \\[.*] *!",
@@ -103,18 +68,14 @@ object EventChatFilter {
         )
     }
 
-    object HoppityBeginFilter : RegexChatFilter("hoppity_begin") {
-        override fun isEnabled(): Boolean = config.hoppityBegun
-
+    object HoppityBeginFilter : RegexChatFilter("hoppity_begin", config.hoppityBegun) {
         override val patterns by patternGroup.list(
             "hoppity-begin",
             "Hoppity's Hunt has begun! Help Hoppity find his Chocolate Rabbit Eggs across SkyBlock each day during the Spring!",
         )
     }
 
-    object HoppityEggAppearFilter : RegexChatFilter("hoppity_appear") {
-        override fun isEnabled(): Boolean = config.hoppityEggs
-
+    object HoppityEggAppearFilter : RegexChatFilter("hoppity_appear", config.hoppityEggs) {
         /**
          * REGEX-TEST: HOPPITY'S HUNT A Chocolate Rabbit Egg has appeared!
          */
@@ -124,9 +85,7 @@ object EventChatFilter {
         )
     }
 
-    object WinterGiftFilter : RegexChatFilter("winter_gift") {
-        override fun isEnabled(): Boolean = config.winterGift
-
+    object WinterGiftFilter : RegexChatFilter("winter_gift", config.winterGift) {
         override val patterns = buildList {
             GiftProfitTracker.run {
                 listOf(

@@ -10,7 +10,7 @@ object SlayerChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("slayer")
     private val config get() = CoreChatFilter.config
 
-    private fun isEnabled(): Boolean = config.others
+    private fun isEnabled(): Boolean = config.others.get()
 
     @HandleEvent
     fun onIslandJoin() {
@@ -36,11 +36,11 @@ object SlayerChatFilter {
 
     val filters =
         setOf<ChatFilter>(
-            SlayerQuestFilter(),
-            SlayerDropFilter(),
+            SlayerQuestFilter,
+            SlayerDropFilter,
         )
 
-    class SlayerQuestFilter : RegexChatFilter("slayer_quest") {
+    object SlayerQuestFilter : AbstractRegexChatFilter("slayer_quest") {
         override val patterns by patternGroup.list(
             "slayer-quest",
             // start
@@ -57,7 +57,7 @@ object SlayerChatFilter {
         )
     }
 
-    class SlayerDropFilter : RegexChatFilter("slayer_drop") {
+    object SlayerDropFilter : AbstractRegexChatFilter("slayer_drop") {
         override val patterns by patternGroup.list(
             "slayer-drop",
             // Zombie

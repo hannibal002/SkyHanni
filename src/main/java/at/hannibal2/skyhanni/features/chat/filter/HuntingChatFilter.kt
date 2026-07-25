@@ -1,17 +1,12 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.utils.IslandDetector
 
 object HuntingChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("hunting")
     private val config get() = CoreChatFilter.config.hunting
 
-    val islandDetector = IslandDetector(
-        island = IslandType.GALATEA,
-        onIslandJoin = { CoreChatFilter.add(filters) },
-        onIslandLeave = { CoreChatFilter.remove(filters) }
-    )
+    val galateaDetector = IslandDetector(island = IslandType.GALATEA)
 
     val filters =
         setOf<ChatFilter>(
@@ -19,9 +14,7 @@ object HuntingChatFilter {
             SwoopAxeFilter,
         )
 
-    object RedundantShardsFilter : RegexChatFilter("redundant_shards") {
-        override fun isEnabled(): Boolean = config.redundantComments
-
+    object RedundantShardsFilter : RegexIslandChatFilter("redundant_shards", config.redundantComments, galateaDetector) {
         /**
          * REGEX-TEST: Mochibear ate too much and passed out! You caught it!
          * REGEX-TEST: You caught yourself an invisibug! The shard was sent to your Hunting Box!
@@ -35,9 +28,7 @@ object HuntingChatFilter {
         )
     }
 
-    object SwoopAxeFilter : RegexChatFilter("swoop_axe") {
-        override fun isEnabled(): Boolean = config.swoopAxeMessage
-
+    object SwoopAxeFilter : RegexIslandChatFilter("swoop_axe", config.swoopAxeMessage, galateaDetector) {
         /**
          * REGEX-TEST: [NPC] Swoop: Wow! I forgot to tell you, monsters around here can only take damage from Axes!
          */

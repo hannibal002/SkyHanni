@@ -11,6 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
+import io.github.notenoughupdates.moulconfig.observer.Property
 import org.lwjgl.glfw.GLFW
 
 class ChatConfig {
@@ -180,14 +181,14 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideJacob: Boolean = true
+    var hideJacob: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Sky Mall Messages", desc = "Hide the Sky Mall messages outside of Mining Islands.")
     @ConfigEditorBoolean
     @SearchTag("Skymall")
     @FeatureToggle
-    var hideSkyMall: Boolean = true
+    var hideSkyMall: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -204,7 +205,7 @@ class ChatConfig {
     @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideLottery: Boolean = true
+    var hideLottery: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(

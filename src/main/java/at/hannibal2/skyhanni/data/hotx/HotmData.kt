@@ -650,7 +650,7 @@ enum class HotmData(
         override fun onChat(event: SkyHanniChatEvent.Allow) = super.onChat(event)
 
         override fun tryBlock(event: SkyHanniChatEvent.Allow) {
-            if (!chatConfig.hideSkyMall || IslandTypeTag.MINING.isInIsland()) return
+            if (!chatConfig.hideSkyMall.get() || IslandTypeTag.MINING.isInIsland()) return
             event.blockedReason = "skymall"
         }
 

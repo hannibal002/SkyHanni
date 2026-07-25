@@ -3,58 +3,31 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.utils.StringUtils
 
-@Suppress("MaxLineLength")
+@Suppress("MaxLineLength", "unused")
 object MiscChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("hypixel-misc")
     private val config get() = CoreChatFilter.config
 
-    val filters = setOf(
-        EmptyFilter,
-        WelcomeFilter,
-        LobbyFilter,
-        WarpingFilter,
-        KillComboFilter,
-        ProfileJoinFilter,
-        MiniBazaarAndAHFilter,
-        AchievementGetFilter,
-        ParkourFilter,
-        TeleportPadFilter,
-        UselessDropFilter,
-        LegacyItemsFilter,
-        UselessNotificationFilter,
-        PartyFilter,
-        AuctionHouseFilter,
-        BazaarFilter,
-        UselessWarningFilter,
-        AnnoyingSpamFilter,
-        RewardBundleFilter,
-        SacrificeFilter,
-    )
 
-    init {
-        CoreChatFilter.add(filters)
-    }
+    object EmptyFilter : ConfigChatFilter {
+        init {
+            registerConfig(config.empty)
+        }
 
-    object EmptyFilter : ChatFilter {
         override fun block(message: String): String? {
-            if (!config.empty) return null
             if (!StringUtils.isEmpty(message)) return null
             return "empty"
         }
     }
 
-    object WelcomeFilter : RegexChatFilter("welcome") {
-        override fun isEnabled(): Boolean = config.welcome
-
+    object WelcomeFilter : RegexChatFilter("welcome", config.welcome) {
         override val patterns by patternGroup.list(
             "welcome",
             "Welcome to Hypixel SkyBlock!",
         )
     }
 
-    object LobbyFilter : RegexChatFilter("lobby") {
-        override fun isEnabled(): Boolean = config.hypixelHub
-
+    object LobbyFilter : RegexChatFilter("lobby", config.hypixelHub) {
         override val patterns by patternGroup.list(
             "lobby",
 
@@ -93,9 +66,7 @@ object MiscChatFilter {
         )
     }
 
-    object WarpingFilter : RegexChatFilter("warping") {
-        override fun isEnabled(): Boolean = config.warping
-
+    object WarpingFilter : RegexChatFilter("warping", config.warping) {
         override val patterns by patternGroup.list(
             "warping",
 
@@ -113,9 +84,7 @@ object MiscChatFilter {
         )
     }
 
-    object KillComboFilter : RegexChatFilter("kill_combo") {
-        override fun isEnabled(): Boolean = config.killCombo
-
+    object KillComboFilter : RegexChatFilter("kill_combo", config.killCombo) {
         override val patterns by patternGroup.list(
             "kill-combo",
             "\\+.* Kill Combo.*",
@@ -124,9 +93,7 @@ object MiscChatFilter {
         )
     }
 
-    object ProfileJoinFilter : RegexChatFilter("profile_join") {
-        override fun isEnabled(): Boolean = config.profileJoin
-
+    object ProfileJoinFilter : RegexChatFilter("profile_join", config.profileJoin) {
         override val patterns by patternGroup.list(
             "profile_join",
             "You are playing on profile: ",
@@ -134,9 +101,7 @@ object MiscChatFilter {
         )
     }
 
-    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar_and_ah_mini") {
-        override fun isEnabled(): Boolean = config.others
-
+    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar_and_ah_mini", config.others) {
         override val patterns by patternGroup.list(
             "bazzar-and-ah-mini",
             "Putting item in escrow...",
@@ -164,9 +129,7 @@ object MiscChatFilter {
     }
 
     @Suppress("RepoPatternRegexTestMissing")
-    object AchievementGetFilter : RegexChatFilter("achievement_get") {
-        override fun isEnabled(): Boolean = config.hideAlphaAchievements && HypixelData.hypixelAlpha
-
+    object AchievementGetFilter : RegexChatFilter("achievement_get", config.hideAlphaAchievements) {
         /**
          * WRAPPED-REGEX_TEST: ">>>   Achievement Unlocked: The Beginning   <<<"
          */
@@ -174,11 +137,14 @@ object MiscChatFilter {
             "achievement-get",
             ".>> {3}Achievement Unlocked: .* {3}<<.",
         )
+
+        override fun block(message: String): String? {
+            if (!HypixelData.hypixelAlpha) return null
+            return super.block(message)
+        }
     }
 
-    object ParkourFilter : RegexChatFilter("parkour") {
-        override fun isEnabled(): Boolean = config.parkour
-
+    object ParkourFilter : RegexChatFilter("parkour", config.parkour) {
         override val patterns by patternGroup.list(
             "parkour",
             "Started parkour .*!",
@@ -192,9 +158,7 @@ object MiscChatFilter {
         )
     }
 
-    object TeleportPadFilter : RegexChatFilter("teleport_pad") {
-        override fun isEnabled(): Boolean = config.teleportPads
-
+    object TeleportPadFilter : RegexChatFilter("teleport_pad", config.teleportPads) {
         override val patterns by patternGroup.list(
             "teleport-pad",
             "Warped from the .* to the .*!",
@@ -202,9 +166,7 @@ object MiscChatFilter {
         )
     }
 
-    object UselessDropFilter : RegexChatFilter("useless_drop") {
-        override fun isEnabled(): Boolean = config.others
-
+    object UselessDropFilter : RegexChatFilter("useless_drop", config.others) {
         override val patterns by patternGroup.list(
             "useless-drop",
             "RARE DROP! Enchanted Ender Pearl .*",
@@ -219,18 +181,14 @@ object MiscChatFilter {
         )
     }
 
-    object LegacyItemsFilter : RegexChatFilter("legacy_items") {
-        override fun isEnabled(): Boolean = config.legacyItemsWarning
-
+    object LegacyItemsFilter : RegexChatFilter("legacy_items", config.legacyItemsWarning) {
         override val patterns by patternGroup.list(
             "legacy-items",
             "You currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!",
         )
     }
 
-    object UselessNotificationFilter : RegexChatFilter("useless_notification") {
-        override fun isEnabled(): Boolean = config.others
-
+    object UselessNotificationFilter : RegexChatFilter("useless_notification", config.others) {
         // TODO update patterns for 1.21
         override val patterns by patternGroup.list(
             "useless-notification",
@@ -245,18 +203,14 @@ object MiscChatFilter {
         )
     }
 
-    object PartyFilter : RegexChatFilter("party") {
-        override fun isEnabled(): Boolean = config.others
-
+    object PartyFilter : RegexChatFilter("party", config.others) {
         override val patterns by patternGroup.list(
             "party",
             "-----------------------------------------------------",
         )
     }
 
-    object AuctionHouseFilter : RegexChatFilter("auction_house") {
-        override fun isEnabled(): Boolean = config.others
-
+    object AuctionHouseFilter : RegexChatFilter("auction_house", config.others) {
         override val patterns by patternGroup.list(
             "auction-house",
             "-----------------------------------------------------",
@@ -264,9 +218,7 @@ object MiscChatFilter {
         )
     }
 
-    object BazaarFilter : RegexChatFilter("bazaar") {
-        override fun isEnabled(): Boolean = config.others
-
+    object BazaarFilter : RegexChatFilter("bazaar", config.others) {
         override val patterns by patternGroup.list(
             "bazaar",
             "Buy Order Setup! .*x .* for .* coins.",
@@ -276,9 +228,7 @@ object MiscChatFilter {
         )
     }
 
-    object UselessWarningFilter : RegexChatFilter("useless_warning") {
-        override fun isEnabled(): Boolean = config.others
-
+    object UselessWarningFilter : RegexChatFilter("useless_warning", config.others) {
         override val patterns by patternGroup.list(
             "useless-warning",
             "You are sending commands too fast! Please slow down.", // TODO prevent in the future
@@ -296,9 +246,7 @@ object MiscChatFilter {
         )
     }
 
-    object AnnoyingSpamFilter : RegexChatFilter("annoying_spam") {
-        override fun isEnabled(): Boolean = config.others
-
+    object AnnoyingSpamFilter : RegexChatFilter("annoying_spam", config.others) {
         override val patterns by patternGroup.list(
             "annoying-spam",
             "Your Implosion hit .* for .* damage.",
@@ -324,9 +272,7 @@ object MiscChatFilter {
         )
     }
 
-    object RewardBundleFilter : RegexChatFilter("seasonal_bundles") {
-        override fun isEnabled(): Boolean = config.others
-
+    object RewardBundleFilter : RegexChatFilter("seasonal_bundles", config.others) {
         /**
          * REGEX-TEST: You haven't claimed your Summer Rewards yet!
          * REGEX-TEST: Talk to the Summer Sloth in the Hub!
@@ -340,9 +286,7 @@ object MiscChatFilter {
     }
 
 
-    object SacrificeFilter : RegexChatFilter("sacrifice") {
-        override fun isEnabled(): Boolean = config.sacrifice
-
+    object SacrificeFilter : RegexChatFilter("sacrifice", config.sacrifice) {
         /**
          * REGEX-TEST: SACRIFICE! [MVP++] Mikecraft1224 turned Young Dragon Boots into 40 Dragon Essence!
          * REGEX-TEST: BONUS LOOT! They also received Ritual Residue from their sacrifice!

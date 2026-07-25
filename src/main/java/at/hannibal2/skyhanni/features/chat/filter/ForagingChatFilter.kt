@@ -1,26 +1,15 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.utils.IslandDetector
 
 object ForagingChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("foraging")
     private val config get() = CoreChatFilter.config.foraging
     private val generalConfig get() = CoreChatFilter.generalConfig
 
-    val customTreesDetector = IslandDetector(
-        islandTag = IslandTypeTag.FORAGING_CUSTOM_TREES,
-        onIslandJoin = { CoreChatFilter.add(UnmineableTreeFilter) },
-        onIslandLeave = { CoreChatFilter.remove(UnmineableTreeFilter) }
-    )
+    private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES,)
 
-    init {
-        CoreChatFilter.add(LotteryFilter)
-    }
-
-    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree") {
-        override fun isEnabled(): Boolean = config.unmineable
-
+    object UnmineableTreeFilter : RegexIslandChatFilter("unmineable_tree", config.unmineable, customTreesDetector) {
         /**
          ** REGEX-TEST: You cannot damage a tree while it is regenerating!
          ** REGEX-TEST: The toughness of this tree is way too high!
@@ -32,9 +21,7 @@ object ForagingChatFilter {
         )
     }
 
-    object LotteryFilter : RegexChatFilter("lottery") {
-        override fun isEnabled(): Boolean = generalConfig.hideLottery
-
+    object LotteryFilter : RegexChatFilter("lottery", generalConfig.hideLottery) {
         /**
          ** REGEX-TEST: New day! Your Lottery buff changed!
          */

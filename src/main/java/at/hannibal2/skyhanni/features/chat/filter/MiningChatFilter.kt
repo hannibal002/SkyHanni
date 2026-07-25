@@ -4,18 +4,7 @@ object MiningChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("mining")
     private val generalConfig get() = CoreChatFilter.generalConfig
 
-    val filters =
-        setOf<ChatFilter>(
-            SkymallFilter,
-        )
-
-    init {
-        CoreChatFilter.add(filters)
-    }
-
-    object SkymallFilter : RegexChatFilter("skymall") {
-        override fun isEnabled(): Boolean = generalConfig.hideSkyMall
-
+    object SkymallFilter : RegexChatFilter("skymall", generalConfig.hideSkyMall) {
         /**
          * REGEX-TEST: New day! Your Sky Mall buff changed!
          * REGEX-TEST: You can disable this messaging by toggling Sky Mall in your /hotm!

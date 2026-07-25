@@ -3,38 +3,15 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
-import at.hannibal2.skyhanni.utils.IslandDetector
 
 object FarmingChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("farming")
     private val config get() = CoreChatFilter.config
     private val generalConfig get() = CoreChatFilter.generalConfig
 
-    val islandDetector =
-        IslandDetector(
-            island = IslandType.GARDEN,
-            onIslandJoin = { CoreChatFilter.add(gardenFilters) },
-            onIslandLeave = { CoreChatFilter.remove(gardenFilters) }
-        )
+    val gardenDetector = IslandDetector(IslandType.GARDEN)
 
-    val gardenFilters =
-        setOf<ChatFilter>(
-            AnitaFortuneFilter,
-            GardenPestFilter
-        )
-
-    val filters =
-        setOf<ChatFilter>(
-            MasterChefFilter,
-        )
-
-    init {
-        CoreChatFilter.add(filters)
-    }
-
-    object AnitaFortuneFilter : RegexChatFilter("anita_fortune") {
-        override fun isEnabled(): Boolean = generalConfig.hideJacob
-
+    object AnitaFortuneFilter : RegexIslandChatFilter("anita_fortune", generalConfig.hideJacob, gardenDetector) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
          */
@@ -45,9 +22,7 @@ object FarmingChatFilter {
         )
     }
 
-    object MasterChefFilter : RegexChatFilter("master_chef") {
-        override fun isEnabled(): Boolean = config.masterChef
-
+    object MasterChefFilter : RegexChatFilter("master_chef", config.masterChef) {
         /**
          * REGEX-TEST: [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
          */
@@ -58,9 +33,7 @@ object FarmingChatFilter {
         )
     }
 
-    object GardenPestFilter : RegexChatFilter("garden_pest") {
-        override fun isEnabled(): Boolean = config.gardenNoPest
-
+    object GardenPestFilter : RegexIslandChatFilter("garden_pest", config.gardenNoPest, gardenDetector) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your garden is free of pests! You will not lose any crops to pests during this contest!
          */

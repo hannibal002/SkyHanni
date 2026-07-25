@@ -23,7 +23,7 @@ object WatchdogHider {
 
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
+        if (!SkyBlockUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog.get()) return
 
         when (event.message) {
             START_LINE -> {

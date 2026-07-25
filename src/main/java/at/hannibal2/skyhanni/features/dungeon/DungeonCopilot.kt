@@ -90,7 +90,7 @@ object DungeonCopilot {
             foundKeyOrDoor = true
         }
 
-        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors) return "dungeon_keys_and_doors"
+        if (foundKeyOrDoor && SkyHanniMod.feature.dungeon.messageFilter.keysAndDoors.get()) return "dungeon_keys_and_doors"
 
         if (message == "§c[BOSS] The Watcher§r§f: That will be enough for now.") changeNextStep("Clear Blood Room")
 
