@@ -44,6 +44,16 @@ sealed interface Activation {
         }
     }
 
+    object Never : Activation {
+        override fun bind(
+            onEnable: () -> Unit,
+            onDisable: () -> Unit,
+        ) {
+        }
+
+        override fun unbind() {}
+    }
+
     class Config(
         private val config: Property<Boolean>,
     ) : Activation {

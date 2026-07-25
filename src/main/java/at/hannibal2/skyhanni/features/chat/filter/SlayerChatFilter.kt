@@ -6,9 +6,11 @@ import at.hannibal2.skyhanni.events.slayer.SlayerStateChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
-object SlayerChatFilter : ChatFilterGroup {
+object SlayerChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("slayer")
     private val config get() = ChatFilterManager.config
+
+    override val activation = Activation.Never
 
     private fun isEnabled(): Boolean = config.others.get()
 
