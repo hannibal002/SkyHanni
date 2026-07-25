@@ -36,7 +36,7 @@ class RepoPatternElement private constructor(
         private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
         private val wrappedRegexFailPattern = "WRAPPED-REGEX-FAIL: \"(?<test>.*)\"".toPattern()
 
-        fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
+        internal fun KtPropertyDelegate.asRepoPatternElement(): RepoPatternElement? {
             val expression = this.expression as? KtDotQualifiedExpression ?: return null
             val callExpression = expression.selectorExpression as? KtCallExpression ?: return null
             if (callExpression.valueArguments.size != 2) return null
