@@ -9,14 +9,14 @@ object ForagingChatFilter : ChatFilterGroup() {
     private val config get() = SkyHanniMod.feature.chat.filterType.foraging
     private val generalConfig get() = SkyHanniMod.feature.chat
 
-    private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES)
+    override val activation = Activation.Island(IslandTypeTag.FORAGING)
 
     override val filters: Set<ChatFilter> = setOf(
         UnmineableTreeFilter,
         LotteryFilter,
     )
 
-    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", customTreesDetector, { config.unmineable }) {
+    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", { config.unmineable }) {
         /**
          ** REGEX-TEST: You cannot damage a tree while it is regenerating!
          ** REGEX-TEST: The toughness of this tree is way too high!
