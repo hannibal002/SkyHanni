@@ -24,7 +24,6 @@ object GlowingDroppedItems {
     }
 
     private fun getGlowColor(entity: Entity): Color? {
-        if (!isEnabled()) return null
         if (entity.isCurrentlyGlowing) return null
         val itemEntity = entity as? ItemEntity ?: return null
         val stack = itemEntity.item
@@ -32,6 +31,5 @@ object GlowingDroppedItems {
         return rarity.color.toColor()
     }
 
-    @JvmStatic
-    fun isEnabled(): Boolean = SkyBlockUtils.inSkyBlock && config.glowingDroppedItems
+    private fun isEnabled(): Boolean = SkyBlockUtils.inSkyBlock && config.glowingDroppedItems
 }

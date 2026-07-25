@@ -20,7 +20,6 @@ object RenderLivingEntityHelper {
     private val entityColorCondition = ConcurrentHashMap<LivingEntity, () -> Boolean>()
 
     @JvmStatic
-    @get:JvmName("isUsingCustomGlow")
     var isUsingCustomGlow = false
         private set
 
@@ -32,8 +31,8 @@ object RenderLivingEntityHelper {
 
     @JvmStatic
     fun check() {
-        isUsingCustomGlow = entityColorCondition.values.any { it() } ||
-            currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+        isUsingCustomGlow =
+            entityColorCondition.values.any { it() } || currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
     }
 
     @JvmStatic
