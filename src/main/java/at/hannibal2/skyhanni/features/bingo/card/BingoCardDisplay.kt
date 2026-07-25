@@ -41,7 +41,9 @@ object BingoCardDisplay {
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private val patternGroup = RepoPattern.group("bingo.card.display")
     private val bingoCardInventoryPattern by patternGroup.pattern("inventory", "Bingo Card")
-    private val bingoCardInventoryDetector = InventoryDetector(bingoCardInventoryPattern) { dirty = true }
+    private val bingoCardInventoryDetector = InventoryDetector(
+        onCloseInventory = { dirty = true },
+    ) { bingoCardInventoryPattern }
 
     private var hasHiddenPersonalGoals = false
     private var displayCache: List<Renderable> = emptyList()
