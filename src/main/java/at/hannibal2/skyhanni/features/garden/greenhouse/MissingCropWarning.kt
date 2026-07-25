@@ -20,18 +20,30 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getTargetedBlock
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBox
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBoundingBox
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
+import net.minecraft.world.entity.Display
+import net.minecraft.world.entity.decoration.ArmorStand
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.Blocks
+import net.minecraft.world.phys.AABB
 
 @SkyHanniModule
 object MissingCropWarning {
@@ -261,6 +273,29 @@ object MissingCropWarning {
                 }
                 if (size == CropCategory.entries.size) return@buildMap
             }
+            scanFloatingCropHeads(
+                AABB(
+                    from.x.toDouble(),
+                    from.y.toDouble(),
+                    from.z.toDouble(),
+                    (to.x + 1).toDouble(),
+                    (to.y + 1).toDouble(),
+                    (to.z + 1).toDouble(),
+                ),
+            )
+        }
+    }
+
+    private fun MutableMap<CropCategory, LorenzVec>.scanFloatingCropHeads(scanArea: AABB) {
+        getEntitiesInBoundingBox<ArmorStand>(scanArea).forEach { stand ->
+            listOf(stand.getStandHelmet(), stand.getHandItem())
+                .firstNotNullOfOrNull { it.floatingCropHeadCategory() }
+                ?.let { putIfAbsent(it, stand.getLorenzVec()) }
+        }
+        getEntitiesInBoundingBox<Display.ItemDisplay>(scanArea).forEach { display ->
+            display.itemStack.floatingCropHeadCategory()?.let {
+                putIfAbsent(it, display.getLorenzVec())
+            }
         }
     }
 
@@ -360,8 +395,11 @@ object MissingCropWarning {
         // Crop Diagnostics supplies the identity because Hypixel can represent both of these using custom backing blocks.
         if (category in diagnosticOnlyCrops) {
             if (findNearbyCropPosition(category, this) != null) return false
+            if (category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)) return false
             return state.isAir
         }
+
+        if (state.isAir && category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)) return false
 
         if (category in variableHeightCrops && state.isAir) {
             return (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).none { yOffset ->
@@ -370,6 +408,47 @@ object MissingCropWarning {
         }
 
         return state.isAir
+    }
+
+    /**
+     * Hypixel sometimes renders Greenhouse crops such as cactus and moonflower as floating player heads.
+     * Armor stand positions are at their feet, so use a taller Y search while keeping X/Z tight enough
+     * that a decorative head belonging to a neighbouring crop cannot satisfy this position.
+     */
+    private fun LorenzVec.hasFloatingHeadAtCropPosition(category: CropCategory): Boolean {
+        fun net.minecraft.world.entity.Entity.isInCropColumn(): Boolean =
+            kotlin.math.abs(x - this@hasFloatingHeadAtCropPosition.x) <= FLOATING_HEAD_HORIZONTAL_RADIUS &&
+                kotlin.math.abs(z - this@hasFloatingHeadAtCropPosition.z) <= FLOATING_HEAD_HORIZONTAL_RADIUS
+
+        val armorStandHead = getEntitiesInBox<ArmorStand>(this, FLOATING_HEAD_SEARCH_RADIUS) {
+            it.isInCropColumn() && listOf(it.getStandHelmet(), it.getHandItem()).any { stack ->
+                stack.isFloatingCropHead(category)
+            }
+        }.isNotEmpty()
+        if (armorStandHead) return true
+
+        return getEntitiesInBox<Display.ItemDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
+            it.isInCropColumn() && it.itemStack.isFloatingCropHead(category)
+        }.isNotEmpty() || getEntitiesInBox<Display.BlockDisplay>(this, FLOATING_HEAD_SEARCH_RADIUS) {
+            // Block displays do not expose an item name, so only use them for cactus where this was observed.
+            category == CropCategory.CACTUS && it.isInCropColumn() && it.blockState.block in playerHeadBlocks
+        }.isNotEmpty()
+    }
+
+    private fun SafeItemStack?.isFloatingCropHead(category: CropCategory): Boolean {
+        return floatingCropHeadCategory() == category
+    }
+
+    private fun SafeItemStack?.floatingCropHeadCategory(): CropCategory? {
+        if (this?.itemType != Items.PLAYER_HEAD) return null
+        val name = cleanName.lowercase()
+        return when {
+            name.startsWith("cactus") -> CropCategory.CACTUS
+            name.startsWith("sunflower") || name.startsWith("moonflower") -> CropCategory.SUNFLOWER
+            name.startsWith("coco") -> CropCategory.COCOA_BEANS
+            name.startsWith("pumpkin") -> CropCategory.PUMPKIN
+            else -> null
+        }
     }
 
     @HandleEvent
@@ -572,6 +651,13 @@ object MissingCropWarning {
     private val deadCropBlocks = setOf(Blocks.DEAD_BUSH, Blocks.CHORUS_PLANT, Blocks.CHORUS_FLOWER)
     private val diagnosticOnlyCrops = setOf(CropCategory.PUMPKIN, CropCategory.COCOA_BEANS)
     private val variableHeightCrops = setOf(CropCategory.CACTUS, CropCategory.SUGAR_CANE)
+    private val floatingHeadCrops = setOf(
+        CropCategory.CACTUS,
+        CropCategory.SUNFLOWER,
+        CropCategory.COCOA_BEANS,
+        CropCategory.PUMPKIN,
+    )
+    private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
     private val greenhouseStemBlocks = setOf(
         Blocks.MELON_STEM,
         Blocks.ATTACHED_MELON_STEM,
@@ -584,6 +670,8 @@ object MissingCropWarning {
     private const val MAX_GARDEN_Y = 100
     private const val DIAGNOSTIC_SEARCH_RADIUS = 2
     private const val VARIABLE_HEIGHT_SEARCH_RADIUS = 2
+    private const val FLOATING_HEAD_SEARCH_RADIUS = 2.5
+    private const val FLOATING_HEAD_HORIZONTAL_RADIUS = 0.75
     private const val REQUIRED_STABLE_SCANS = 2
     private const val REQUIRED_STABLE_LOADED_PLOT_SWEEPS = 2
     private const val ALL_PLOT_SCAN_INTERVAL_SECONDS = 60
