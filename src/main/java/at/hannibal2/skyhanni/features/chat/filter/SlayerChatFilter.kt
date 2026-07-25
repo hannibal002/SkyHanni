@@ -76,12 +76,12 @@ object SlayerChatFilter : ChatFilterGroup() {
             "VERY RARE DROP! {2}\\(◆ Pestilence Rune I\\) .*",
 
             // Tarantula
-            "RARE DROP! Arachne's Keeper Fragment (.+)",
-            "RARE DROP! Travel Scroll to Spider's Den Top of Nest (.+)",
-            "VERY RARE DROP! {2}\\(◆ Bite Rune I\\) (.+)",
-            "RARE DROP! \\((.+)x Toxic Arrow Poison\\) (.+)",
-            "RARE DROP! \\(Toxic Arrow Poison\\) (.+)",
-            "VERY RARE DROP! {2}\\(Bane of Arthropods VI\\) (.+)",
+            "RARE DROP! Arachne's Keeper Fragment .+",
+            "RARE DROP! Travel Scroll to Spider's Den Top of Nest .+",
+            "VERY RARE DROP! {2}\\(◆ Bite Rune I\\) .+",
+            "RARE DROP! \\(.+x Toxic Arrow Poison\\) .+",
+            "RARE DROP! \\(Toxic Arrow Poison\\) .+",
+            "VERY RARE DROP! {2}\\(Bane of Arthropods VI\\) .+",
 
             // Enderman
             "RARE DROP! \\(.*x Twilight Arrow Poison\\) .*",
