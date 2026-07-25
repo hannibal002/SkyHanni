@@ -43,6 +43,7 @@ object SlayerTimeMessages {
         )
 
         buildChatMessages(slayerTimeData).forEach(ChatUtils::chat)
+        showTitle(slayerTimeData)
     }
 
     private fun buildChatMessages(
@@ -91,8 +92,6 @@ object SlayerTimeMessages {
             (if (config.compact) templates.compactQuestComplete else templates.questComplete)
                 .format(slayerTimeData),
         )
-
-        showTitle(slayerTimeData)
     }
 
     private fun showTitle(slayerTimeData: SlayerTimeData) {
