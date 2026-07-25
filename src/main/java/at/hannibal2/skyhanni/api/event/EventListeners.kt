@@ -103,7 +103,6 @@ class EventListeners private constructor(val name: String, private val isGeneric
                     @Suppress("DEPRECATION")
                     add { _ -> SkyBlockUtils.inSkyBlock || features.any { it.isSelected() } }
                 }
-
                 add { _ -> !SkyHanniEvents.isDisabledInvoker(name) }
             }
             // These predicates can't be cached since they depend on info about the actual event
