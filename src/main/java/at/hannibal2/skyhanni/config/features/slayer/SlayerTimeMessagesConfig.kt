@@ -2,11 +2,11 @@ package at.hannibal2.skyhanni.config.features.slayer
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SlayerTimeMessagesConfig {
-
     @Expose
     @ConfigOption(name = "Time to Kill", desc = "Sends time to kill a slayer in chat.")
     @ConfigEditorBoolean
@@ -26,7 +26,18 @@ class SlayerTimeMessagesConfig {
     var questComplete: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Compact Time Messages", desc = "Shorter Time to Kill and Quest Complete messages.")
+    @ConfigOption(name = "Compact Time Messages", desc = "Uses shorter chat messages.")
     @ConfigEditorBoolean
     var compact: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Show Titles", desc = "Displays slayer messages as titles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var titles: Boolean = false
+
+    @Expose
+    @Accordion
+    @ConfigOption(name = "Templates", desc = "Customize the displayed messages.")
+    val templates = SlayerTimeMessagesTemplatesConfig()
 }

@@ -17,6 +17,7 @@ import kotlin.time.Duration
 object SlayerTimeMessages {
 
     private val config get() = SkyHanniMod.feature.slayer.slayerTimeMessages
+    private val templates get() = config.templates
 
     @HandleEvent
     fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
@@ -26,17 +27,24 @@ object SlayerTimeMessages {
         if (bossType == BossType.SLAYER_SPIDER_5_1) return
 
         val compact = config.compact
-
         val bossDisplayName = if (compact) bossType.shortName else bossType.fullName
 
         val currentPb = ProfileStorageData.playerSpecific?.slayerPersonalBests?.get(bossType)
 
         val isNewPersonalBest = data.timeToKill < (currentPb ?: Duration.INFINITE)
-        if (isNewPersonalBest) ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, data.timeToKill)
+        if (isNewPersonalBest) {
+            ProfileStorageData.playerSpecific?.slayerPersonalBests?.set(bossType, data.timeToKill)
+        }
 
-        val messages = buildTimeMessages(isNewPersonalBest, currentPb, compact, bossDisplayName, data.timeToKillString)
+        val messages = buildTimeMessages(
+            isNewPersonalBest,
+            currentPb,
+            compact,
+            bossDisplayName,
+            data.timeToKillString,
+        )
 
-        messages.forEach { ChatUtils.chat(it) }
+        messages.forEach(ChatUtils::chat)
     }
 
     private fun buildTimeMessages(
@@ -46,30 +54,49 @@ object SlayerTimeMessages {
         bossDisplayName: String,
         timeToKill: String,
     ): List<String> = buildList {
-        if (config.timeToKill) add(
-            if (compact) "$bossDisplayName §etook §b$timeToKill"
-            else "It took §b$timeToKill§e to kill $bossDisplayName",
-        )
+        if (config.timeToKill) {
+            add(
+                formatTemplate(
+                    if (compact) templates.compactTimeToKill else templates.timeToKill,
+                    bossDisplayName,
+                    timeToKill,
+                    null,
+                ),
+            )
+        }
 
         if (config.timeToKillPersonalBests) {
             val currentPbDisplay = currentPb?.format(showMilliSeconds = true)
 
-            add(
-                if (isNewPersonalBest) {
-                    when (currentPbDisplay) {
-                        null -> {
-                            if (compact) "§e§lNEW PB! $bossDisplayName §ein §a$timeToKill"
-                            else "§e§lNEW PERSONAL BEST! §a$timeToKill §efor $bossDisplayName"
-                        }
-                        else -> {
-                            if (compact) "§e§lNEW PB! $bossDisplayName §ein §c$currentPbDisplay §e-> §a$timeToKill"
-                            else "§e§lNEW PERSONAL BEST! §a$timeToKill §7(Previous $currentPbDisplay) §efor $bossDisplayName"
-                        }
+            val template = if (isNewPersonalBest) {
+                if (currentPbDisplay == null) {
+                    if (compact) {
+                        templates.compactFirstPersonalBest
+                    } else {
+                        templates.firstPersonalBest
                     }
                 } else {
-                    if (compact) "$bossDisplayName §ePB: §6$currentPbDisplay"
-                    else "$bossDisplayName §ePersonal best: §6$currentPbDisplay"
-                },
+                    if (compact) {
+                        templates.compactNewPersonalBest
+                    } else {
+                        templates.newPersonalBest
+                    }
+                }
+            } else {
+                if (compact) {
+                    templates.compactPersonalBest
+                } else {
+                    templates.personalBest
+                }
+            }
+
+            add(
+                formatTemplate(
+                    template,
+                    bossDisplayName,
+                    timeToKill,
+                    currentPbDisplay,
+                ),
             )
         }
     }
@@ -82,12 +109,25 @@ object SlayerTimeMessages {
         val duration = startTime.passedSince().format()
 
         ChatUtils.chat(
-            if (config.compact)
-                "Quest took §b$duration§e in total."
-            else
-                "Slayer quest took §b$duration§e to complete.",
+            formatTemplate(
+                if (config.compact) templates.compactQuestComplete else templates.questComplete,
+                boss = "",
+                time = duration,
+                previous = null,
+            ),
         )
     }
+
+    private fun formatTemplate(
+        template: String,
+        boss: String,
+        time: String,
+        previous: String?,
+    ): String = template
+        .replace("&", "§")
+        .replace("{boss}", boss)
+        .replace("{time}", time)
+        .replace("{previous}", previous.orEmpty())
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
