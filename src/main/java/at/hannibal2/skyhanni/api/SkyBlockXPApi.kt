@@ -77,7 +77,7 @@ object SkyBlockXPApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!UtilsPatterns.skyblockMenuGuiPattern.matches(event.inventoryName)) return
+        if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
 
         val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return
 
