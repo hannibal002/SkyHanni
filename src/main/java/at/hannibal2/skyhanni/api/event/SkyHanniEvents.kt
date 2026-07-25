@@ -123,7 +123,9 @@ object SkyHanniEvents {
         REPO_RELOAD,
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    // This is marked highest priority to let it
+    // disable other RepositoryReloadEvent listeners before they happen
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DisabledEventsJson>("DisabledEvents")
         val version = SkyHanniMod.modVersion
