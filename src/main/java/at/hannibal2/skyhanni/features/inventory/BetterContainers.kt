@@ -98,8 +98,8 @@ object BetterContainers {
     }
 
     @JvmStatic
-    fun slotCanBeHighlighted(slot: Slot): Boolean {
-        return if (!isOverriding) slot.isHighlightable
+    fun slotCanBeHighlighted(slot: Slot, original: Boolean): Boolean {
+        return if (!isOverriding) original
         else !isBlankStack(slot.item)
     }
 
