@@ -2,23 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>AbstractClassCanBeConcreteClass:CarryTracker.kt:CarryTracker.CarryType$CarryType</ID>
-    <ID>AbstractClassCanBeConcreteClass:GenericIndividualTrackerConfig.kt:GenericIndividualTrackerConfig$GenericIndividualTrackerConfig</ID>
-    <ID>AbstractClassCanBeConcreteClass:GuiRenderItemEvent.kt:GuiRenderItemEvent$GuiRenderItemEvent</ID>
-    <ID>AbstractClassCanBeConcreteClass:MultiTypeRankGoalConfig.kt:MultiTypeRankGoalConfig$MultiTypeRankGoalConfig</ID>
-    <ID>AbstractClassCanBeConcreteClass:NextStep.kt:NextStep$NextStep</ID>
-    <ID>AbstractClassCanBeConcreteClass:ProgressQuest.kt:ProgressQuest$ProgressQuest</ID>
-    <ID>AbstractClassCanBeConcreteClass:ProgressionStep.kt:ProgressionStep$ProgressionStep</ID>
-    <ID>AbstractClassCanBeConcreteClass:Quest.kt:Quest$Quest</ID>
-    <ID>AbstractClassCanBeConcreteClass:RenderableTestSuite.kt:RenderableTestSuite.TestRenderable$TestRenderable</ID>
-    <ID>AbstractClassCanBeConcreteClass:RenderableTestSuite.kt:RenderableTestSuite.TestRenderableFor$TestRenderableFor</ID>
-    <ID>AbstractClassCanBeConcreteClass:RoundedShader.kt:RoundedShader$RoundedShader</ID>
-    <ID>AbstractClassCanBeConcreteClass:SackApi.kt:SackApi.AbstractSackItem$AbstractSackItem</ID>
-    <ID>AbstractClassCanBeConcreteClass:SkyHanniAbstractItemTexture.kt:SkyHanniAbstractItemTexture$SkyHanniAbstractItemTexture</ID>
-    <ID>AbstractClassCanBeConcreteClass:SkyHanniBaseScreen.kt:SkyHanniBaseScreen$SkyHanniBaseScreen</ID>
-    <ID>AbstractClassCanBeConcreteClass:SkyHanniBucketedItemTracker.kt:SkyHanniBucketedItemTracker$SkyHanniBucketedItemTracker</ID>
-    <ID>AbstractClassCanBeConcreteClass:SkyHanniEvent.kt:SkyHanniEvent$SkyHanniEvent</ID>
-    <ID>AbstractClassCanBeConcreteClass:TrackerData.kt:TrackerData$TrackerData</ID>
     <ID>ArrayPrimitive:LorenzVec.kt:Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt:LorenzVec$Array&lt;Double&gt;</ID>
     <ID>ArrayPrimitive:LorenzVec.kt:LorenzVec$Array&lt;Float&gt;</ID>
@@ -73,7 +56,6 @@
     <ID>LongMethod:ItemAbilityCooldown.kt:ItemAbilityCooldown$@HandleEvent fun onPlaySound</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt:ItemDisplayOverlayFeatures$private fun getStackTip: String?</ID>
     <ID>LoopWithTooManyJumpStatements:AdvancedPlayerList.kt:AdvancedPlayerList$for</ID>
-    <ID>LoopWithTooManyJumpStatements:BetterContainers.kt:BetterContainers$for</ID>
     <ID>LoopWithTooManyJumpStatements:DataWatcherApi.kt:DataWatcherApi$for</ID>
     <ID>LoopWithTooManyJumpStatements:GardenComposterInventoryFeatures.kt:GardenComposterInventoryFeatures$for</ID>
     <ID>LoopWithTooManyJumpStatements:HighlightMissingRepoItems.kt:HighlightMissingRepoItems$for</ID>
@@ -82,19 +64,30 @@
     <ID>LoopWithTooManyJumpStatements:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$for</ID>
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt:SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$for</ID>
+    <ID>MapGetWithNotNullAssertionOperator:CommunityFix.kt:CommunityFix$map[crop]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:CropMoneyDisplay.kt:CropMoneyDisplay$cropNames[internalName]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:DefaultConfigFeatures.kt:DefaultConfigFeatures$resetSuggestionState[cat]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:EntityMovementData.kt:EntityMovementData$entityLocation[entity]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:FarmingContestApi.kt:FarmingContestApi$contests[bracket]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:GardenPlotIcon.kt:GardenPlotIcon$originalStack[index]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:GraphEditorState.kt:GraphEditorState$nodeMap[oldEdge.node1]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:GraphEditorState.kt:GraphEditorState$nodeMap[oldEdge.node2]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:ItemPickupLog.kt:ItemPickupLog$listToCheckAgainst[key]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:ItemUtils.kt:ItemUtils$itemAmountCache[input]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:JacobContestTimeNeeded.kt:JacobContestTimeNeeded$map[crop]!!</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt:NavigationHelper$distances[node]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:NumberUtil.kt:NumberUtil$romanSymbols[this]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:ReminderManager.kt:ReminderManager$storage[args.drop(1).first()]!!</ID>
+    <ID>MapGetWithNotNullAssertionOperator:ReminderManager.kt:ReminderManager$storage[args.first()]!!</ID>
     <ID>MaxLineLength:CFStrayWarning.kt:CFStrayWarning$clickMeGoldenRabbitPattern.matches(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) || stack.getSkullTexture() in specialRabbitTextures</ID>
     <ID>MaxLineLength:ColoredBlockCompat.kt:ColoredBlockCompat.Companion$block.glassBlock == this.block || block.glassPaneBlock == this.block || block.woolBlock == this.block || block.clayBlock == this.block</ID>
     <ID>MaxLineLength:EssenceShopHelper.kt:EssenceShopHelper$if</ID>
     <ID>MaxLineLength:EstimatedItemValueCalculator.kt:EstimatedItemValueCalculator$"Wrong item rarity detected in estimated item value for item ${stack.hoverName.formattedTextCompatLeadingWhiteLessResets()}"</ID>
-    <ID>MaxLineLength:HoppityApi.kt:HoppityApi$it.key !in event.inventoryItems || event.inventoryItems[it.key]?.hoverName.formattedTextCompatLeadingWhiteLessResets() != it.value</ID>
     <ID>MaxLineLength:InfernoMinionFeatures.kt:InfernoMinionFeatures$val containsFuel = NeuInternalName.fromItemNameOrNull(event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()) in fuelItemIds</ID>
     <ID>MaxLineLength:InvisibugHighlighter.kt:InvisibugHighlighter$val nearestArmorStand = EntityUtils.getEntitiesInBoundingBox&lt;ArmorStand&gt;(aabb).minByOrNull { it.distanceTo(event.location) } ?: return</ID>
     <ID>MaxLineLength:IslandExceptions.kt:IslandExceptions$(armorStand.name.formattedTextCompatLessResets() == "§e﴾ §5♃ §c§lThe Watcher§r§r §e﴿" || armorStand.name.formattedTextCompatLessResets() == "§3§lWatchful Eye§r")</ID>
     <ID>MaxLineLength:MiscConfig.kt:MiscConfig$@ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")</ID>
     <ID>MaxLineLength:MiscConfig.kt:MiscConfig$@SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")</ID>
-    <ID>MaxLineLength:MobFilter.kt:MobFilter$(baseEntity is Pig || baseEntity is Horse) &amp;&amp; illegalEntitiesPattern.matches(armorStand.name.formattedTextCompatLessResets()) -&gt; MobResult.illegal</ID>
-    <ID>MaxLineLength:MobFilter.kt:MobFilter$extraEntityList.lastOrNull()?.name.formattedTextCompatLessResets() == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿"</ID>
     <ID>MaxLineLength:RareDropMessages.kt:RareDropMessages$"(?&lt;start&gt;(?:§.)*⛃ (?:§.)*(?:GOOD|GREAT|OUTSTANDING) CATCH! (?:§.)*You caught a (?:§.)*\\[Lvl 1] )(?:§.)*§(?&lt;rarityColor&gt;.)(?&lt;petName&gt;[^§(.]+)(?&lt;end&gt;.*)"</ID>
     <ID>MaxLineLength:SackApi.kt:SackApi$if (quality == GemstoneQuality.FINE || gemstoneStackFilter != null) gemstoneItem[value.hoverName.formattedTextCompatLeadingWhiteLessResets()] = gem</ID>
     <ID>MaxLineLength:SkyBlockItemModifierUtils.kt:SkyBlockItemModifierUtils$ChatUtils.debug("Gemstone quality is null for item name().formattedTextCompatLeadingWhiteLessResets()§7: ('$key' = '$value')")</ID>
@@ -102,7 +95,6 @@
     <ID>MaxLineLength:SkyBlockXPApi.kt:SkyBlockXPApi$val stack = event.inventoryItems.values.find { itemNamePattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets()) } ?: return</ID>
     <ID>MaxLineLength:SuperPairsItemVisibility.kt:SuperPairsItemVisibility$if</ID>
     <ID>MaxLineLength:SuperPairsItemVisibility.kt:SuperPairsItemVisibility$it.key in superpairsSlotsToRead &amp;&amp; !unknownSuperpairsClickPattern.matches(it.value.hoverName.formattedTextCompatLeadingWhiteLessResets())</ID>
-    <ID>MaxLineLength:SuperpairDataDisplay.kt:SuperpairDataDisplay$if (isOutOfBounds(event.slotId, currentTier) || item.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == "?") return</ID>
     <ID>MaxLineLength:TextCompat.kt:if</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt:FirstMinionTier$fun firstMinionTier</ID>
     <ID>MemberNameEqualsClassName:LastServers.kt:LastServers$private val lastServers = mutableMapOf&lt;String, SimpleTimeMark&gt;()</ID>
@@ -123,21 +115,12 @@
     <ID>NoNameShadowing:Renderable.kt:Renderable.Companion.&lt;no name provided&gt;$verticalAlign</ID>
     <ID>NoNameShadowing:Renderable.kt:Renderable.Companion.&lt;no name provided&gt;$width</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt:ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
-    <ID>NoUnusedImports:AshfangHider.kt:at.hannibal2.skyhanni.features.nether.ashfang.AshfangHider.kt</ID>
     <ID>NoUnusedImports:CarnivalQuickStart.kt:at.hannibal2.skyhanni.features.event.carnival.CarnivalQuickStart.kt</ID>
     <ID>NoUnusedImports:CarnivalShopHelper.kt:at.hannibal2.skyhanni.features.inventory.CarnivalShopHelper.kt</ID>
-    <ID>NoUnusedImports:ChumBucketHider.kt:at.hannibal2.skyhanni.features.fishing.ChumBucketHider.kt</ID>
     <ID>NoUnusedImports:CraftMaterialCollector.kt:at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialCollector.kt</ID>
     <ID>NoUnusedImports:ExcavatorTooltipHider.kt:at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorTooltipHider.kt</ID>
-    <ID>NoUnusedImports:FavoritePowerStone.kt:at.hannibal2.skyhanni.features.inventory.FavoritePowerStone.kt</ID>
-    <ID>NoUnusedImports:FirstMinionTier.kt:at.hannibal2.skyhanni.features.bingo.FirstMinionTier.kt</ID>
     <ID>NoUnusedImports:GuiIngameHook.kt:at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook.kt</ID>
     <ID>NoUnusedImports:HitmanApi.kt:at.hannibal2.skyhanni.features.inventory.chocolatefactory.hitman.HitmanApi.kt</ID>
-    <ID>NoUnusedImports:QuickCraftFeatures.kt:at.hannibal2.skyhanni.features.inventory.QuickCraftFeatures.kt</ID>
-    <ID>NoUnusedImports:RiftTimer.kt:at.hannibal2.skyhanni.features.rift.everywhere.RiftTimer.kt</ID>
-    <ID>NoUnusedImports:RngMeterInventory.kt:at.hannibal2.skyhanni.features.inventory.RngMeterInventory.kt</ID>
-    <ID>NoUnusedImports:SkillExperience.kt:at.hannibal2.skyhanni.data.SkillExperience.kt</ID>
-    <ID>NoUnusedImports:SkyBlockItemModifierUtils.kt:at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.kt</ID>
     <ID>NoUnusedImports:StatsTuning.kt:at.hannibal2.skyhanni.features.inventory.StatsTuning.kt</ID>
     <ID>PropertyName:FishingApi.kt:FishingApi$const val babySlugName = "Baby Magma Slug"</ID>
     <ID>PropertyName:FrozenTreasureHighlighter.kt:FrozenTreasureHighlighter$private const val yOffset = 2</ID>
@@ -161,7 +144,6 @@
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val modernAABB = "net.minecraft.util.math.Box"</ID>
     <ID>PropertyName:WorldEdit.kt:WorldEdit$private const val modernBlockPos = "net.minecraft.util.math.BlockPos"</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt:AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
-    <ID>RepoPatternRegexTestMissing:BazaarCancelledBuyOrderClipboard.kt:BazaarCancelledBuyOrderClipboard$by patternGroup.pattern( "cancelledmessage", "§6\\[Bazaar] §r§7§r§cCancelled! §r§7Refunded §r§6(?&lt;coins&gt;.*) coins §r§7from cancelling Buy Order!", )</ID>
     <ID>RepoPatternRegexTestMissing:BingoCardReader.kt:BingoCardReader$by patternGroup.pattern( "goalcomplete", "§6§lBINGO GOAL COMPLETE! §r§e(?&lt;name&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:BingoCardReader.kt:BingoCardReader$by patternGroup.pattern( "hiddengoal", ".*§7§eThe next hint will unlock in (?&lt;time&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:BingoCardReader.kt:BingoCardReader$by patternGroup.pattern( "percentage", " {2}§8Top §.(?&lt;percentage&gt;.*)%" )</ID>
@@ -174,9 +156,6 @@
     <ID>RepoPatternRegexTestMissing:CityProjectFeatures.kt:CityProjectFeatures$by patternGroup.pattern( "completed", "§aProject is (?:being built|released)!", )</ID>
     <ID>RepoPatternRegexTestMissing:CityProjectFeatures.kt:CityProjectFeatures$by patternGroup.pattern( "contribute", "§7Contribute again: §e(?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt:CompactBingoChat$by patternGroup.pattern( "border", "§[e3]§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬" )</ID>
-    <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt:CompactBingoChat$by patternGroup.pattern( "health", " {3}§r§7§8\\+§a.* §c❤ Health" )</ID>
-    <ID>RepoPatternRegexTestMissing:CompactBingoChat.kt:CompactBingoChat$by patternGroup.pattern( "strength", " {3}§r§7§8\\+§a. §c❁ Strength" )</ID>
-    <ID>RepoPatternRegexTestMissing:CroesusChestTracker.kt:CroesusChestTracker$by patternGroup.pattern("chest.master", ".*Master.*")</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt:DianaProfitTracker$by patternGroup.pattern( "burrow.dug", "(?:§eYou dug out a Griffin Burrow!|§eYou finished the Griffin burrow chain!) .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DianaProfitTracker.kt:DianaProfitTracker$by patternGroup.pattern( "coins", "§6§lWow! §r§eYou dug out §r§6(?&lt;coins&gt;.*) coins§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:DojoRankDisplay.kt:DojoRankDisplay$by patternGroup.pattern( "name", "(?&lt;color&gt;§\\w)Test of (?&lt;name&gt;.*)", )</ID>
@@ -185,13 +164,7 @@
     <ID>RepoPatternRegexTestMissing:DungeonArchitectFeatures.kt:DungeonArchitectFeatures$by patternGroup.pattern( "puzzle.fail.quiz", "§4\\[STATUE] Oruo the Omniscient§r§f: (?:§.)*(?&lt;name&gt;\\S*) (?:§.)*chose the wrong .*", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonCopilot.kt:DungeonCopilot$by patternGroup.pattern( "countdown", ".* has started the dungeon countdown. The dungeon will begin in 1 minute.", )</ID>
     <ID>RepoPatternRegexTestMissing:DungeonFinderFeatures.kt:DungeonFinderFeatures$by patternGroup.pattern( "nonpug", "(?i).*(?:PERM|VC|DISCORD).*", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt:FarmingContestApi$by patternGroup.pattern( "crop", "§8(?&lt;crop&gt;.*) Contest", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt:FarmingContestApi$by patternGroup.pattern( "sidebarcrop", "\\s*(?:§e○|§6☘) §f(?&lt;crop&gt;.*) §a.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingContestApi.kt:FarmingContestApi$by patternGroup.pattern( "time", "§a(?&lt;month&gt;.*) (?&lt;day&gt;.*)(?:rd|st|nd|th), Year (?&lt;year&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$by patternGroup.pattern( "armorability", "Tiered Bonus: .* [(](?&lt;pieces&gt;.*)/4[)]", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$by patternGroup.pattern( "armorabilityfortune", "§7.*§7Grants §6(?&lt;bonus&gt;.*)☘.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$by patternGroup.pattern( "collection", "§7You have §6\\+(?&lt;ff&gt;\\d{1,3})☘ .*", )</ID>
-    <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$by patternGroup.pattern( "lotusability", "§7Piece Bonus: §6+(?&lt;bonus&gt;.*)☘", )</ID>
     <ID>RepoPatternRegexTestMissing:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$by patternGroup.pattern( "tooltip.new", "^§7Farming Fortune: §6\\+(?&lt;display&gt;[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?&lt;reforge&gt;\\d+)\\))?(?: §d\\(\\+(?&lt;gemstone&gt;\\d+)\\))?\$", )</ID>
     <ID>RepoPatternRegexTestMissing:GardenLevelDisplay.kt:GardenLevelDisplay$by patternGroup.pattern( "inventory.overflow", ".*§r §6(?&lt;overflow&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:GlacitePowderFeatures.kt:GlacitePowderFeatures$by patternGroup.pattern( "glacitepowder", "Glacite Powder x(?&lt;amount&gt;.*)" )</ID>
@@ -199,10 +172,7 @@
     <ID>RepoPatternRegexTestMissing:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$by patternGroup.pattern( "main.scoreboard.basket", "^Baskets Found: §a\\d+§f/§a\\d+\$", )</ID>
     <ID>RepoPatternRegexTestMissing:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$by patternGroup.pattern( "main.scoreboard.halloween", "^§6Halloween \\d+$", )</ID>
     <ID>RepoPatternRegexTestMissing:HighlightPlaceableNpcs.kt:HighlightPlaceableNpcs$by patternGroup.pattern( "location", "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]", )</ID>
-    <ID>RepoPatternRegexTestMissing:HotmData.kt:HotmData.Companion$by patternGroup.pattern( "mayhem", "§b§lMAYHEM! §r§7(?&lt;perk&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt:ItemAbilityCooldown$by patternGroup.pattern( "alignedother", "§eYou aligned §r§a.* §r§eother players?!", )</ID>
-    <ID>RepoPatternRegexTestMissing:ItemAbilityCooldown.kt:ItemAbilityCooldown$by patternGroup.pattern( "buffedyourself", "§aYou buffed yourself for §r§c\\+\\d+❁ Strength", )</ID>
-    <ID>RepoPatternRegexTestMissing:ItemAddManager.kt:ItemAddManager$by RepoPattern.pattern( "data.itemmanager.diceroll", "§eYour §r§(?:5|6High Class )Archfiend Dice §r§erolled a §r§.(?&lt;number&gt;.)§r§e! Bonus: §r§.(?&lt;hearts&gt;.*)❤", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt:ItemDisplayOverlayFeatures$by patternGroup.pattern( "bestiarystack", "§7Progress to Tier (?&lt;tier&gt;[\\dIVXC]+): §b[\\d.]+%", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt:ItemDisplayOverlayFeatures$by patternGroup.pattern( "bingogoalrank", "(?:§.)*You were the (?:§.)*(?&lt;rank&gt;\\w+)(?&lt;ordinal&gt;st|nd|rd|th) (?:§.)*to", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt:ItemDisplayOverlayFeatures$by patternGroup.pattern( "harvest", "§7§7You may harvest §6(?&lt;amount&gt;.).*", )</ID>
@@ -215,22 +185,18 @@
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.heavypearl.collect", "§.§lCOLLECT!", )</ID>
-    <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.jerry.magma.cube", "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.petcare", "^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern( "pattern.summon.owner", ".*Spawned by: (?&lt;name&gt;.*).*", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt:MobFilter$by patternGroup.pattern("displaynpc.name", "[a-z0-9]{10}")</ID>
     <ID>RepoPatternRegexTestMissing:NewYearCakeReminder.kt:NewYearCakeReminder$by RepoPattern.pattern( "event.winter.newyearcake.reminder.sidebar", "§dNew Year Event!§f (?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:PartyApi.kt:PartyApi$by patternGroup.pattern( "kuudrafinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)", )</ID>
-    <ID>RepoPatternRegexTestMissing:PestApi.kt:PestApi$by patternGroup.pattern( "scoreboard.pests", " §7⏣ §[ac]The Garden §4§lൠ§7 x(?&lt;pests&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:PresentWaypoints.kt:PresentWaypoints$by patternGroup.pattern( "found", "§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:QuiverApi.kt:QuiverApi$by chatGroup.pattern( "addedtoquiver", "(?:§.)*You've added (?:§.)*(?&lt;type&gt;.*) x(?&lt;amount&gt;.*) (?:§.)*to your quiver!", )</ID>
     <ID>RepoPatternRegexTestMissing:QuiverApi.kt:QuiverApi$by chatGroup.pattern( "cleared", "§aCleared your quiver!|§c§lYour quiver is now completely empty!", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "cleared", "(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:ScoreboardPattern.kt:ScoreboardPattern$by dungeonSB.pattern( "keys", "Keys: §.■ §.[✗✓] §.■ §a.x", )</ID>
     <ID>RepoPatternRegexTestMissing:ShowMotesNpcSellPrice.kt:ShowMotesNpcSellPrice$by RepoPattern.pattern( "rift.everywhere.burger", ".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
-    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
-    <ID>RepoPatternRegexTestMissing:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$by RepoPattern.pattern( "slayer.bosswarning.progress", " \\(?(?&lt;progress&gt;[0-9.,k]+)/(?&lt;total&gt;[0-9.,k]+)\\)?.*" )</ID>
+    <ID>RepoPatternRegexTestMissing:SkillExperience.kt:SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter", )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt:SlayerRngMeterDisplay$by patternGroup.pattern( "update", " {3}§dRNG Meter §f- §d(?&lt;exp&gt;.*) Stored XP", )</ID>
@@ -274,7 +240,6 @@
     <ID>ReturnCount:QuestLoader.kt:QuestLoader$private fun addQuest: Quest</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt:SkyHanniConfigSearchResetCommand$private fun setCommand: String</ID>
     <ID>SpacingAroundParens:ChestValue.kt:ChestValue$)</ID>
-    <ID>SpacingAroundParens:GuiContainerHook.kt:GuiContainerHook$)</ID>
     <ID>SpacingAroundParens:IsFishingDetection.kt:IsFishingDetection$)</ID>
     <ID>SpreadOperator:TextHelper.kt:TextHelper$(*component.toTypedArray(), separator = separator)</ID>
     <ID>StatementWrapping:ItemTrackerData.kt:ItemTrackerData${ removalRunner(internalName) }</ID>
@@ -285,7 +250,6 @@
     <ID>StatementWrapping:PetData.kt:PetData${ specifiedRarity.oneAbove() ?: specifiedRarity }</ID>
     <ID>StatementWrapping:SkyHanniRealtimeItemSlot.kt:SkyHanniRealtimeItemSlot${ allocate(slotSize) }</ID>
     <ID>StorageVarOrVal:ChatSoundResponseConfig.kt:ChatSoundResponseConfig$@Expose @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.") @ConfigEditorDraggableList var soundResponses = SoundResponseTypes.entries.toMutableList()</ID>
-    <ID>StorageVarOrVal:DiscordRPCConfig.kt:DiscordRPCConfig$@ConfigOption( name = "Image Credits", desc = "Hypixel Pack HQ (old images), @unfamiliartunes (Winter Island),\n" + "@next_g (Crystal Nucleus)", ) @ConfigEditorInfoText val credits = ""</ID>
     <ID>StorageVarOrVal:ForagingConfig.kt:ForagingConfig$@Expose @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.") @Accordion var moongladeBeacon = MoongladeBeaconConfig()</ID>
     <ID>StorageVarOrVal:GalateaMobHighlightConfig.kt:GalateaMobHighlightConfig$@Expose @ConfigOption(name = "Birries Highlight", desc = "") @Accordion var birries = BirriesHighlightConfig()</ID>
     <ID>StorageVarOrVal:GalateaMobHighlightConfig.kt:GalateaMobHighlightConfig$@Expose @ConfigOption(name = "Hideonleaf Highlight", desc = "") @Accordion var hideonleaf = HideonleafHighlightConfig()</ID>
@@ -372,7 +336,6 @@
     <ID>TrailingCommaOnDeclarationSite:EliteLeaderboards.kt:EliteLeaderboards.EliteLeaderboardDisplayManager$FarmingWeightTextEntry</ID>
     <ID>TrailingCommaOnDeclarationSite:EnderNode.kt:EnderNode</ID>
     <ID>TrailingCommaOnDeclarationSite:ExperimentsAddonsHelper.kt:ExperimentsAddonsHelper$HelperPhase</ID>
-    <ID>TrailingCommaOnDeclarationSite:ExperimentsJson.kt:ExperimentsJson$( @Expose @SerializedName("misc_rewards") val miscRewards: List&lt;NeuInternalName&gt; )</ID>
     <ID>TrailingCommaOnDeclarationSite:ExtendedChatColor.kt:ExtendedChatColor$( val rgb: Int )</ID>
     <ID>TrailingCommaOnDeclarationSite:FannCost.kt:FannCost$( pattern: Pattern, groupName: String )</ID>
     <ID>TrailingCommaOnDeclarationSite:FarmingContestPhase.kt:FarmingContestPhase</ID>
@@ -407,7 +370,6 @@
     <ID>TrailingCommaOnDeclarationSite:KloonTerminal.kt:KloonTerminal</ID>
     <ID>TrailingCommaOnDeclarationSite:LorenzColor.kt:LorenzColor</ID>
     <ID>TrailingCommaOnDeclarationSite:Matrix.kt:Matrix.Companion$( height: Int, width: Int, function: (row: Int, column: Int) -&gt; Double )</ID>
-    <ID>TrailingCommaOnDeclarationSite:MessageSendToServerEvent.kt:MessageSendToServerEvent$( val message: String, val splitMessage: List&lt;String&gt;, val originatingModContainer: ModInstance? )</ID>
     <ID>TrailingCommaOnDeclarationSite:MineshaftWaypointType.kt:MineshaftWaypointType</ID>
     <ID>TrailingCommaOnDeclarationSite:MiningEventConfig.kt:MiningEventConfig$ShowType</ID>
     <ID>TrailingCommaOnDeclarationSite:MiningEventData.kt:EventData$( @Expose @SerializedName("starts_at_min") val startMin: Long, @Expose @SerializedName("starts_at_max") val startMax: Long, @Expose @SerializedName("ends_at_min") val endMin: Long, @Expose @SerializedName("ends_at_max") val endMax: Long, @Expose @SerializedName("lobby_count") val lobbyCount: Int )</ID>
@@ -423,7 +385,6 @@
     <ID>TrailingCommaOnDeclarationSite:NeuGeorgeJson.kt:NeuGeorgeJson$( @Expose val prices: Map&lt;NeuInternalName, Double&gt;? )</ID>
     <ID>TrailingCommaOnDeclarationSite:NeuPetNumsJson.kt:NeuPetNums$( @Expose val otherNums: List&lt;Double&gt;, @Expose val statNums: Map&lt;SkyblockStat, Double&gt; )</ID>
     <ID>TrailingCommaOnDeclarationSite:NeuRepositoryReloadEvent.kt:NeuRepositoryReloadEvent$( override val manager: AbstractRepoManager&lt;NeuRepositoryReloadEvent&gt; )</ID>
-    <ID>TrailingCommaOnDeclarationSite:NonGodPotEffect.kt:NonGodPotEffect$( val tabListName: String, val isMixin: Boolean = false, val inventoryItemName: String = tabListName, val displayName: String )</ID>
     <ID>TrailingCommaOnDeclarationSite:PestDisplay.kt:PestLeaderboardStorage$( @Expose var enum: PestType?, @Expose var mode: EliteLeaderboardMode )</ID>
     <ID>TrailingCommaOnDeclarationSite:PestKillsLeaderboardConfig.kt:PestTypeWithAll</ID>
     <ID>TrailingCommaOnDeclarationSite:PestSpawnTimer.kt:PestSpawnTimer$PestTitleIntention</ID>
@@ -451,7 +412,6 @@
     <ID>TrailingCommaOnDeclarationSite:SkyHanniRenderEntityEvent.kt:SkyHanniRenderEntityEvent.Specials.Post$( entity: T, x: Double, y: Double, z: Double )</ID>
     <ID>TrailingCommaOnDeclarationSite:SkyHanniRenderEntityEvent.kt:SkyHanniRenderEntityEvent.Specials.Pre$( entity: T, x: Double, y: Double, z: Double )</ID>
     <ID>TrailingCommaOnDeclarationSite:SkyHanniTracker.kt:SkyHanniTracker$DisplayMode</ID>
-    <ID>TrailingCommaOnDeclarationSite:SkyblockStat.kt:SkyblockStat</ID>
     <ID>TrailingCommaOnDeclarationSite:SkyhanniTimedTracker.kt:SkyhanniTimedTracker$( name: String, createNewSession: () -&gt; Data, private var storage: (ProfileSpecificStorage) -&gt; TimedTrackerData&lt;Data&gt;, drawDisplay: (Data) -&gt; List&lt;Searchable&gt;, extraDisplayModes: Set&lt;DisplayMode&gt; = emptySet(), customUptimeControl: Boolean = false, trackerConfig: () -&gt; Type )</ID>
     <ID>TrailingCommaOnDeclarationSite:SlayerType.kt:SlayerType</ID>
     <ID>TrailingCommaOnDeclarationSite:StewHelper.kt:StewHelper$StewStatus</ID>
@@ -475,7 +435,6 @@
     <ID>TypeParameterListSpacing:ApiResponse.kt:ApiResponse$&lt;T&gt;</ID>
     <ID>TypeParameterListSpacing:TitleManager.kt:TitleManager$&lt;reified E : Enum&lt;E&gt;&gt;</ID>
     <ID>UnnecessaryFilter:ExperimentationTableApi.kt:ExperimentationTableApi.ExperimentationTier$filter { (it % 9) !in when (sideSpace) { 1 -&gt; listOf(0, 8) 2 -&gt; listOf(0, 1, 7, 8) else -&gt; emptyList() } }</ID>
-    <ID>UnnecessaryNotNullOperator:FarmingContestApi.kt:FarmingContestApi$currentCrop!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt:CollectionUtils$this.merge(key, number, Double::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt:CollectionUtils$this.merge(key, number, Float::plus)!!</ID>
     <ID>UnsafeCallOnNullableType:CollectionUtils.kt:CollectionUtils$this.merge(key, number, Int::plus)!!</ID>
@@ -487,7 +446,6 @@
     <ID>UnsafeCallOnNullableType:DailyMiniBossHelper.kt:DailyMiniBossHelper$getByDisplayName(name)!!</ID>
     <ID>UnsafeCallOnNullableType:DamageIndicatorManager.kt:DamageIndicatorManager$data.deathLocation!!</ID>
     <ID>UnsafeCallOnNullableType:DefaultConfigFeatures.kt:DefaultConfigFeatures$resetSuggestionState[cat]!!</ID>
-    <ID>UnsafeCallOnNullableType:DefaultConfigOptionGui.kt:DefaultConfigOptionGui$resetSuggestionState[cat]!!</ID>
     <ID>UnsafeCallOnNullableType:EasterEggWaypoints.kt:EasterEggWaypoints$EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!</ID>
     <ID>UnsafeCallOnNullableType:EntityMovementData.kt:EntityMovementData$entityLocation[entity]!!</ID>
     <ID>UnsafeCallOnNullableType:FarmingContestApi.kt:FarmingContestApi$contestCrop!!</ID>
@@ -520,20 +478,15 @@
     <ID>UnusedParameter:CropType.kt:CropType.Companion$pos: LorenzVec</ID>
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$nextEntity: LivingEntity?</ID>
-    <ID>UnusedParameter:ParticleUtils.kt:ParticleUtils$shouldError: Boolean = false</ID>
     <ID>UnusedParameter:RenderEvents.kt:RenderEvents$tick: DeltaTracker</ID>
     <ID>UnusedPrivateProperty:BetterContainers.kt:BetterContainers$private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")</ID>
     <ID>UnusedPrivateProperty:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private val debugName = if (isEnchanted) "§aEnchanted Tuning" else "§dNormal Tuning"</ID>
-    <ID>UnusedPrivateProperty:ParticleEvent.kt:ParticleEvent$private val particleArgs: IntArray? = null</ID>
     <ID>UnusedVariable:MobFinder.kt:MobFinder$val entity = mob.baseEntity</ID>
     <ID>UseOrEmpty:EquipmentApi.kt:EquipmentApi$equipment?.filterNotNull() ?: emptyList()</ID>
-    <ID>UseOrEmpty:ItemUtils.kt:ItemUtils$lore ?: emptyList()</ID>
     <ID>UselessCallOnNotNull:EssenceShopHelper.kt:EssenceShopHelper$essenceHeaderStack?.hoverName.formattedTextCompatLeadingWhiteLessResets().orEmpty()</ID>
     <ID>UselessCallOnNotNull:IslandExceptions.kt:IslandExceptions$armorStand?.name.formattedTextCompatLessResets().orEmpty()</ID>
-    <ID>UselessCallOnNotNull:MoongladeBeacon.kt:MoongladeBeacon$listOfNotNull(normalTuning, enchantedTuning)</ID>
     <ID>UselessCallOnNotNull:ScoreboardData.kt:ScoreboardData$MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()</ID>
     <ID>VarCouldBeVal:CommandBuilder.kt:ComplexCommandBuilder$private var realDescription: String = ""</ID>
-    <ID>VarCouldBeVal:MoongladeBeacon.kt:MoongladeBeacon.BeaconTuneData$private var recentTicks: MutableList&lt;Int&gt; = mutableListOf()</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt:RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt:RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
     <ID>VarCouldBeVal:SkyHanniItemTracker.kt:SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>

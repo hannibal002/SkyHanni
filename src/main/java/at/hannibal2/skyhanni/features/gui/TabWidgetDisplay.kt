@@ -4,15 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.primitives.text
+import at.hannibal2.skyhanni.utils.renderables.toRenderables
 
 enum class TabWidgetDisplay(
     private val configName: String?,
@@ -49,15 +46,18 @@ enum class TabWidgetDisplay(
         TabWidget.FAIRY_SOULS,
     ),
     EYES("Eyes placed", TabWidget.EYES_PLACED),
-    MOONGLADE_BEACON("Moonglade Beacon", TabWidget.MOONGLADE_BEACON),
+    // TODO rename to FORAGING_BEACON
+    MOONGLADE_BEACON("Foraging Beacon", TabWidget.MOONGLADE_BEACON),
     STARBORN_TEMPLE("Starborn Temple", TabWidget.STARBORN_TEMPLE),
     SHARD_TRAPS("Shard Traps", TabWidget.SHARD_TRAPS),
-    FOREST_WHISPERS("Forest Whispers", TabWidget.FOREST_WHISPERS),
+    // TODO rename to WHISPERS
+    FOREST_WHISPERS("Whispers", TabWidget.FOREST_WHISPERS),
     AGATHA_CONTEST("Agatha's Contest", TabWidget.AGATHA_CONTEST),
     COMMISSIONS("Mining Commissions", TabWidget.COMMISSIONS),
     SLAYER("Slayer", TabWidget.SLAYER),
     PITY("Pity", TabWidget.PITY),
     PICKAXE_COOLDOWN("Pickaxe Cooldown", TabWidget.PICKAXE_COOLDOWN),
+    MIRIA_CONTEST("Miria's Contest", TabWidget.MIRIA_CONTEST),
     ;
 
     val position get() = config.displayPositions[ordinal]
@@ -73,13 +73,13 @@ enum class TabWidgetDisplay(
         private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
         @HandleEvent
-        fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        fun onGuiRenderOverlay() {
             if (!isEnabled()) return
             if (config.displayPositions.isEmpty()) return
             config.display.get().forEach { widget ->
                 widget.position.renderRenderables(
                     widget.widgets.flatMap { subWidget ->
-                        subWidget.lines.map { Renderable.text(it) }
+                        subWidget.lines.toRenderables()
                     },
                     posLabel = "Display Widget: ${widget.name}",
                     extraSpace = -2
@@ -88,7 +88,7 @@ enum class TabWidgetDisplay(
         }
 
         @HandleEvent
-        fun onJoin(event: ProfileJoinEvent) {
+        fun onProfileJoin() {
             // Validation that the displayPositions in the config is correct
             val sizeDiff = TabWidgetDisplay.entries.size - config.displayPositions.size
             if (sizeDiff == 0) return

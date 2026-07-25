@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.mixins.transformers.gui;
 
 import at.hannibal2.skyhanni.api.minecraftevents.RenderEvents;
+import at.hannibal2.skyhanni.data.ScoreboardData;
 import at.hannibal2.skyhanni.events.TitleReceivedEvent;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard;
-import at.hannibal2.skyhanni.mixins.hooks.GuiIngameHook;
 import at.hannibal2.skyhanni.utils.compat.TextCompatKt;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
@@ -18,7 +17,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 //? if >= 26.1
@@ -37,7 +35,7 @@ public class MixinGui {
     //~ if < 26.1 'extractItemHotbar' -> 'renderItemHotbar' {
     @Inject(method = "extractItemHotbar", at = @At("HEAD"), cancellable = true)
     public void renderHotbar(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postHotbarLayerEventPre(context)) {
+        if (RenderEvents.postHotbarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -51,7 +49,7 @@ public class MixinGui {
     //~ if < 26.1 'extractTabList' -> 'renderTabList'
     @Inject(method = "extractTabList", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/PlayerTabOverlay;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;ILnet/minecraft/world/scores/Scoreboard;Lnet/minecraft/world/scores/Objective;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderPlayerList(GuiGraphicsExtractor context, DeltaTracker tickCounter, CallbackInfo ci) {
-        if (RenderEvents.postTablistLayerEventPre(context)) {
+        if (RenderEvents.postTablistLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -60,7 +58,7 @@ public class MixinGui {
     //~ if < 26.1 'extractBackground' -> 'renderBackground' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceBar(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postExperienceBarLayerEventPre(context)) {
+        if (RenderEvents.postExperienceBarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -74,7 +72,7 @@ public class MixinGui {
     //~if < 26.1 'extractExperienceLevel(' -> 'renderExperienceLevel(' {
     @Inject(method = "extractHotbarAndDecorations", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/contextualbar/ContextualBarRenderer;extractExperienceLevel(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/gui/Font;I)V", shift = At.Shift.BEFORE), cancellable = true)
     public void renderExperienceLevelHead(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postExperienceNumberLayerEventPre(context)) {
+        if (RenderEvents.postExperienceNumberLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -86,9 +84,16 @@ public class MixinGui {
     //~}
     //~}
 
-    @Redirect(method = "displayScoreboardSidebar", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"))
-    private void renderItemOverlayPost(GuiGraphicsExtractor drawContext, Font textRenderer, Component text, int x, int y, int color, boolean bl) {
-        GuiIngameHook.drawString(textRenderer, drawContext, text, x, y, color, bl);
+    @ModifyArg(
+        method = "displayScoreboardSidebar",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
+        ),
+        index = 1
+    )
+    private Component modifyScoreboardLine(Component str) {
+        return ScoreboardData.tryToReplaceScoreboardLine(str);
     }
 
     //? if >= 26.1 {
@@ -108,7 +113,7 @@ public class MixinGui {
     @WrapMethod(method = "setTitle")
     private void handleTitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, false).post()) {
+        if (!new TitleReceivedEvent(formattedText, false).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -116,7 +121,7 @@ public class MixinGui {
     @WrapMethod(method = "setSubtitle")
     private void handleSubtitle(Component component, Operation<Void> original) {
         String formattedText = TextCompatKt.formattedTextCompat(component);
-        if (!new TitleReceivedEvent(formattedText, true).post()) {
+        if (!new TitleReceivedEvent(formattedText, true).post().isCancelled()) {
             original.call(component);
         }
     }
@@ -124,7 +129,7 @@ public class MixinGui {
     //~ if < 26.1 '"extractSelectedItemName"' -> '"renderSelectedItemName"' {
     @Inject(method = "extractSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemNamePre(GuiGraphicsExtractor context, CallbackInfo ci) {
-        if (RenderEvents.postHeldItemTooltipLayerEventPre(context)) {
+        if (RenderEvents.postHeldItemTooltipLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }
@@ -138,7 +143,7 @@ public class MixinGui {
     //~ if < 26.1 '"extractOverlayMessage"' -> '"renderOverlayMessage"' {
     @Inject(method = "extractOverlayMessage", at = @At("HEAD"), cancellable = true)
     public void renderOverlayMessagePre(GuiGraphicsExtractor context, DeltaTracker deltaTracker, CallbackInfo ci) {
-        if (RenderEvents.postActionBarLayerEventPre(context)) {
+        if (RenderEvents.postActionBarLayerEventPre(context).isCancelled()) {
             ci.cancel();
         }
     }

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.ChocolateA
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -24,13 +25,12 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 
 @SkyHanniModule
@@ -98,7 +98,7 @@ object CFCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || !inChocolateMenu()) return
         val item = event.item ?: return
-        CFDataLoader.upgradeTierPattern.matchMatcher(item.hoverName.string.removeColor()) {
+        CFDataLoader.upgradeTierPattern.matchMatcher(item.cleanName) {
             if (group("upgrade") == "Time Tower" && event.clickedButton == 1) return
         }
         val (cost, name) = getCostAndName(item) ?: return
@@ -144,7 +144,7 @@ object CFCustomReminder {
     fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!configReminder.always) return
-        if (Minecraft.getInstance().screen is ContainerScreen) return
+        if (MinecraftCompat.screen is ContainerScreen) return
         if (ReminderUtils.isBusy()) return
 
         configReminder.position.renderRenderables(display, posLabel = "Chocolate Factory Custom Reminder")

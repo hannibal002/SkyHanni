@@ -126,6 +126,11 @@ You can do this by following the instructions within the IntelliJ window in the 
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
+Bug fixes should generally be submitted as standalone PRs. Including a bug fix alongside other changes is only acceptable if the
+total PR size is small (under 500 lines changed). Large PRs whose primary goal is not a bug fix should not include **Fixes**
+changelog entries. If you discover a bug while working on a large PR, extract the fix into a separate standalone PR instead of
+including it in the current one.
+
 When writing the PR description, ensure you fill out the template with all the necessary information.
 In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
@@ -219,7 +224,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Exception: a standalone `if` that calls `ci.cancel()` is acceptable when the `CallbackInfo` object must stay in the mixin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
@@ -287,7 +293,7 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation. Extension functions are an exception to this rule.
+  readability and maintain encapsulation. Extension functions and unqualified enum entries in `when` blocks are exceptions to this rule.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -502,8 +508,8 @@ Two dependency formats are supported:
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
-The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently carrying the
-label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
+The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
+carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
 Known limitation: if a dependency PR in an external repository merges, the workflow does not fire for that repository. The label on the
 dependent PR remains until the PR itself is edited or another supported event occurs.

@@ -43,7 +43,7 @@ val dependencyLabel = "Waiting on Dependency PR"
 
 val warningIcon = "⚠\uFE0F"
 
-val maxDirectFindings = 8
+val maxDirectFindings = 15
 val maxLogChars = 10_000
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
@@ -58,17 +58,43 @@ var errorCommentPosted = false
 fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
-        val comment = buildString {
-            appendLine(workflowFailedMarker)
-            appendLine("❌ Workflow failed: $mode")
-            appendLine()
-            appendLine(message)
-        }
-        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to comment))
+        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildErrorComment(message)))
         postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
         errorCommentPosted = true
     }
     exitProcess(1)
+}
+
+fun buildErrorComment(message: String): String = buildString {
+    appendLine(workflowFailedMarker)
+
+    appendLine("❌ Workflow failed ❌")
+    appendLine()
+
+    appendLine("Error message:")
+    appendLine(message)
+    appendLine()
+
+    appendLine("Mode:")
+    appendLine(mode)
+    appendLine()
+
+    appendLine("Most likely fix:")
+    val theSecretFix = "merge the beta branch into this PR."
+    appendLine(theSecretFix)
+    appendLine()
+
+    appendLine("If the issue persists, please ping a maintainer on [SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908).")
+    appendLine()
+
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) {
+        val runLink = " \\[[workflow run](https://github.com/$repo/actions/runs/$runId)\\]"
+        appendLine("For investigating this error, see $runLink")
+    } else {
+        appendLine("GITHUB_RUN_ID is null, good luck finding the issue ;)")
+    }
+
 }
 
 val Int.isHttpError: Boolean get() = this !in 200..299
@@ -150,15 +176,28 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
     appendLine("")
     val direct = findings.take(maxDirectFindings)
     val overflow = findings.drop(maxDirectFindings)
-    appendAll(direct)
+    appendCompact(direct)
     if (overflow.isNotEmpty()) {
         appendLine("\n<details><summary>${overflow.size} more ${if (overflow.size == 1) "issue" else "issues"}</summary>\n")
-        appendAll(overflow)
+        appendCompact(overflow)
         appendLine("\n</details>")
+    }
+    appendLine("\n<details><summary>More Details</summary>\n")
+    appendFull(findings)
+    appendLine("\n</details>")
+}
+
+fun StringBuilder.appendCompact(findings: List<Finding>) {
+    for (finding in findings) {
+        val fileName = finding.path.substringAfterLast('/')
+        val message = sanitize(finding.message)
+        val className = sanitize(fileName)
+        val line = finding.line
+        appendLine("- ```$className:$line```: $message")
     }
 }
 
-fun StringBuilder.appendAll(findings: List<Finding>) {
+fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
         val ruleId = sanitize(finding.ruleId)
@@ -166,8 +205,11 @@ fun StringBuilder.appendAll(findings: List<Finding>) {
         val className = sanitize(fileName)
         val line = finding.line
         val path = sanitize(finding.path)
-        appendLine("- ```$className``` at line $line: $message")
-        appendLine("  rule: `$ruleId`, path: `$path`")
+        appendLine("- ```$className:$line```")
+        appendLine("  message: `$message`")
+        appendLine("  rule: `$ruleId`")
+        appendLine("  path: `$path`")
+        appendLine()
     }
 }
 
@@ -249,6 +291,7 @@ fun parseOneLiner(logContent: String): String? {
         ?: lines.firstOrNull { it.trimStart().startsWith("e: ") }
         ?: lines.firstOrNull { "Received status code" in it }
         ?: lines.firstOrNull { it.trimStart().startsWith("> Could not resolve ") }
+        ?: lines.firstOrNull { ": error:" in it && ".java:" in it }
         ?: lines.firstOrNull { it.contains("> Task :") && it.trimEnd().endsWith("FAILED") }
     if (line == null || workspace.isNullOrEmpty()) return line
     return line.replace("file://$workspace/", "")
@@ -269,6 +312,31 @@ fun parseStackTrace(logContent: String): String {
     return if (raw.length > maxLogChars) raw.take(maxLogChars) + "\n\n... (truncated)" else raw
 }
 
+fun parseAllErrors(logContent: String): List<String> =
+    logContent.lines()
+        .filter {
+            (it.trimStart().startsWith("e: ") || (": error:" in it && ".java:" in it)) &&
+                "warnings found and -Werror specified" !in it
+        }
+        .map { it.trim() }
+        .distinct()
+
+fun parseErrorContinuations(logContent: String, errorLine: String): List<String> {
+    val lines = logContent.lines()
+    val idx = lines.indexOf(errorLine)
+    if (idx < 0) return emptyList()
+    val result = mutableListOf<String>()
+    var i = idx + 1
+    while (i < lines.size) {
+        val next = lines[i]
+        if (next.isBlank()) break
+        if (next.trimStart().startsWith("e: ") || next.trimStart().startsWith("w: ")) break
+        if (next.startsWith("> ") || next.startsWith("FAILURE") || next.startsWith("*")) break
+        result.add(next.trim())
+        i++
+    }
+    return result
+}
 
 fun isStonecutterOneLiner(oneLiner: String): Boolean {
     if (!oneLiner.startsWith("e: ")) return false
@@ -321,14 +389,34 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
     for ((version, logContent) in versions) {
         if (logContent.isNullOrBlank()) continue
         appendWarningTitle("Build failed: $version")
-        val oneLiner = parseOneLiner(logContent)
-        if (oneLiner != null) {
-            val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-            appendLine("`$displayLine`")
-            if ("warnings found and -Werror specified" in logContent) {
-                appendLine()
-                appendLine("_Warning elevated to error by `-Werror`_")
+        val workspace = System.getenv("GITHUB_WORKSPACE") ?: ""
+        val rawErrorLines = parseAllErrors(logContent)
+        if (rawErrorLines.isNotEmpty()) {
+            for (rawLine in rawErrorLines.take(5)) {
+                val display = rawLine.trimStart().removePrefix("e: ")
+                    .let {
+                        if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
+                        else it
+                    }
+                    .take(300)
+                appendLine("- `$display`")
+                if (rawLine.trimStart().startsWith("e: ")) {
+                    for (cont in parseErrorContinuations(logContent, rawLine)) {
+                        appendLine("  - `${cont.take(300)}`")
+                    }
+                }
             }
+            if (rawErrorLines.size > 5) appendLine("_...and ${rawErrorLines.size - 5} more_")
+        } else {
+            val oneLiner = parseOneLiner(logContent)
+            if (oneLiner != null) {
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+                appendLine("`$displayLine`")
+            }
+        }
+        if ("warnings found and -Werror specified" in logContent) {
+            appendLine()
+            appendLine("_Warning elevated to error by `-Werror`_")
         }
         appendLine()
         val versionParts = version.split(" and ").map { it.trim() }

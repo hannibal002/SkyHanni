@@ -16,23 +16,22 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import kotlin.Unit;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.KeyEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,22 +41,19 @@ public abstract class MixinAbstractContainerScreen {
     //~ if < 26.1 '"extractRenderState"' -> '"render"' {
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (GlobalRender.INSTANCE.getRenderDisabled()) return;
+        if (GlobalRender.getRenderDisabled()) return;
         AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post()) {
-            GuiData.INSTANCE.setPreDrawEventCancelled(true);
+        if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post().isCancelled()) {
+            GuiData.setPreDrawEventCancelled(true);
             ci.cancel();
         } else {
-            DelayedRun.INSTANCE.runNextTick(() -> {
-                GuiData.INSTANCE.setPreDrawEventCancelled(false);
-                return Unit.INSTANCE;
-            });
+            DelayedRun.runNextTick(() -> GuiData.setPreDrawEventCancelled(false));
         }
     }
 
     @Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post()) ci.cancel();
+        if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
@@ -82,7 +78,7 @@ public abstract class MixinAbstractContainerScreen {
         int keyCode = input.input();
         TextInput.Companion.onGuiInput(cir);
         boolean shouldCancelInventoryClose = KeyboardManager.checkIsInventoryClosure(keyCode);
-        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post() || shouldCancelInventoryClose) {
+        if (new GuiKeyPressEvent((AbstractContainerScreen<?>) (Object) this).post().isCancelled() || shouldCancelInventoryClose) {
             cir.setReturnValue(false);
         }
     }
@@ -90,10 +86,10 @@ public abstract class MixinAbstractContainerScreen {
     @Inject(method = "mouseClicked", at = @At(value = "HEAD"), cancellable = true)
     private void mouseClicked(MouseButtonEvent mouseButtonEvent, boolean bl, CallbackInfoReturnable<Boolean> cir) {
         AbstractContainerScreen<?> screen = (AbstractContainerScreen<?>) (Object) this;
-        if (new GuiKeyPressEvent(screen).post()) {
+        if (new GuiKeyPressEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
-        if (new GuiMouseInputEvent(screen).post()) {
+        if (new GuiMouseInputEvent(screen).post().isCancelled()) {
             cir.setReturnValue(false);
         }
     }
@@ -104,14 +100,20 @@ public abstract class MixinAbstractContainerScreen {
         return BetterContainers.getTextColor(colour);
     }
 
-    @Redirect(method = "extractSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
-    private boolean canBeHighlightedBack(Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot);
+    @WrapOperation(
+        method = "extractSlotHighlightBack",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
+    )
+    private boolean canBeHighlightedBack(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
-    @Redirect(method = "extractSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
-    private boolean canBeHighlightedFront(Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot);
+    @WrapOperation(
+        method = "extractSlotHighlightFront",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
+    )
+    private boolean canBeHighlightedFront(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
     @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;hasInfiniteMaterials()Z"))

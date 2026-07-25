@@ -111,7 +111,7 @@ object GardenVisitorTooltip {
      * Modifies the tooltip to show calculated prices and times.
      */
     fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
-        if (itemStack.cleanName() != "Accept Offer") return
+        if (itemStack.cleanName != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)

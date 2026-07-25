@@ -281,7 +281,7 @@ object QuiverApi {
         if (!isQuiverPreview) return
 
         val currentArrowType = stack.getQuiverPreviewArrowTypeOrNull() ?: run {
-            val type = stack.cleanName()
+            val type = stack.cleanName
             logUnknownArrowType(type, "item name" to type, "lore" to lore)
             return
         }
@@ -298,7 +298,7 @@ object QuiverApi {
     }
 
     private fun SafeItemStack.getQuiverPreviewArrowTypeOrNull(): ArrowType? {
-        getArrowByNameOrNull(cleanName().trimWhiteSpace())?.let { return it }
+        getArrowByNameOrNull(cleanName.trimWhiteSpace())?.let { return it }
         return getLoreComponent().firstNotNullOfOrNull { line ->
             getArrowByNameOrNull(line.string.trimWhiteSpace())
         }

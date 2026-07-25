@@ -5,21 +5,21 @@ import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils.asStructuredText
 import at.hannibal2.skyhanni.utils.OSUtils
-import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.ModVersion
 import io.github.notenoughupdates.moulconfig.common.RenderContext
+import io.github.notenoughupdates.moulconfig.gui.CloseEventListener
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.gui.KeyboardEvent
 import io.github.notenoughupdates.moulconfig.gui.MouseEvent
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
 import kotlin.math.max
 
-class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option) {
+class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(option), CloseEventListener {
 
-    val button = GuiElementButton()
-    val changelog = GuiElementButton().apply { text = "Show Changelog" }
+    private val download = GuiElementButton()
+    private val changelog = GuiElementButton().apply { text = "Show Changelog" }
 
-    val currentVersion = SkyHanniMod.VERSION
+    private val currentVersion = SkyHanniMod.VERSION
 
     override fun render(context: RenderContext, x: Int, y: Int, width: Int) {
         val fr = context.minecraft.defaultFontRenderer
@@ -29,19 +29,19 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         val adjustedWidth = width - 20
         val nextVersion = UpdateManager.getNextVersion()
 
-        button.text = when (UpdateManager.updateState) {
+        download.text = when (UpdateManager.updateState) {
             UpdateManager.UpdateState.AVAILABLE -> "Manually download"
             UpdateManager.UpdateState.NONE -> if (nextVersion == null) "Check for Updates" else "Up to date"
         }
-        button.width = button.getWidth(context)
-        button.render(context, getButtonPosition(adjustedWidth), 10)
+        download.width = download.getWidth(context)
+        download.render(context, getDownloadPosition(adjustedWidth), 10)
 
         if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
             changelog.width = changelog.getWidth(context)
             changelog.render(context, getChangelogPosition(adjustedWidth), 30)
         }
 
-        val widthRemaining = adjustedWidth - max(button.width, changelog.width) - 10
+        val widthRemaining = adjustedWidth - max(download.width, changelog.width) - 10
 
         context.scale(2F, 2F)
         val hasNewerVersion = nextVersion?.let {
@@ -63,40 +63,80 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
         context.popMatrix()
     }
 
-    private fun getButtonPosition(width: Int) = width - button.width
+    private fun getDownloadPosition(width: Int) = width - download.width
     private fun getChangelogPosition(width: Int) = width - changelog.width
     override fun getHeight(): Int {
         return 55
     }
 
-    override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int, mouseEvent: MouseEvent): Boolean {
+    private var wasMouseButtonDown = false
+    private var wasInsideDownload = false
+    private var wasInsideChangelog = false
+
+    override fun onAfterClose() {
+        wasMouseButtonDown = false
+        wasInsideDownload = false
+        wasInsideChangelog = false
+    }
+
+    override fun mouseInput(
+        x: Int,
+        y: Int,
+        width: Int,
+        mouseX: Int,
+        mouseY: Int,
+        mouseEvent: MouseEvent,
+    ): Boolean {
+        val event = mouseEvent as? MouseEvent.Click ?: return false
+        if (event.mouseButton != 0) return false
+
         fun isInside(width: Int, height: Int, def: GuiElementButton): Boolean {
             val inX = (mouseX - width - x) in (0..def.width)
             val inY = (mouseY - height - y) in (0..def.height)
-            return MouseCompat.getEventButtonState() && inX && inY
+            return inX && inY
         }
 
-        if (isInside(getButtonPosition(width - 20), height = 10, button)) {
-            when (UpdateManager.updateState) {
-                UpdateManager.UpdateState.AVAILABLE ->
-                    UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
+        val isMouseButtonDown = event.mouseState
+        val isInsideDownload = isInside(getDownloadPosition(width - 20), height = 10, download)
+        val isInsideChangelog = isInside(getChangelogPosition(width - 20), height = 30, changelog)
 
-                UpdateManager.UpdateState.NONE ->
-                    UpdateManager.checkUpdate()
+        // We want to trigger the action when the user releases their mouse button, because this is
+        // the standard expectation for most UIs
+        val downloadClicked =
+            wasInsideDownload && isInsideDownload && wasMouseButtonDown && !isMouseButtonDown
+        val changelogClicked =
+            wasInsideChangelog && isInsideChangelog && wasMouseButtonDown && !isMouseButtonDown
+
+        wasMouseButtonDown = isMouseButtonDown
+        wasInsideDownload = isInsideDownload
+        wasInsideChangelog = isInsideChangelog
+
+        return when {
+            downloadClicked -> {
+                when (UpdateManager.updateState) {
+                    UpdateManager.UpdateState.AVAILABLE ->
+                        UpdateManager.getDownloadPage()?.let(OSUtils::openBrowser)
+
+                    UpdateManager.UpdateState.NONE ->
+                        UpdateManager.checkUpdate()
+                }
+                true
             }
-            return true
+
+            changelogClicked -> {
+                if (UpdateManager.updateState != UpdateManager.UpdateState.NONE) {
+                    UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
+                        ?: ErrorManager.logErrorStateWithData(
+                            "Can't get Changelog because of internal error",
+                            "UpdateManager.getNextVersion is null even though updateState is != NONE",
+                            "state" to UpdateManager.updateState,
+                        )
+                }
+                true
+            }
+
+            else -> false
         }
-        if (!isInside(getChangelogPosition(width - 20), height = 30, changelog)) return false
-
-        if (UpdateManager.updateState != UpdateManager.UpdateState.NONE)
-            UpdateManager.getNextVersion()?.let { ChangelogViewer.showChangelog(currentVersion, it) }
-                ?: ErrorManager.logErrorStateWithData(
-                    "Can't get Changelog because of internal error",
-                    "UpdateManager.getNextVersion is null even though updateState is != NONE",
-                    "state" to UpdateManager.updateState,
-                )
-
-        return true
     }
 
     override fun keyboardInput(event: KeyboardEvent): Boolean {

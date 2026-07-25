@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.utils.CachedItemData.Companion.cachedData
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cacheInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -159,8 +160,7 @@ class ItemUtilsTest {
         expectedCategory: ItemCategory,
     ) {
         val stack = ItemUtils.createItemStack(item, displayName, lore)
-        stack.cachedData.lastInternalName = internalName.toInternalName()
-        stack.cachedData.lastInternalNameFetchTime = SimpleTimeMark.now()
+        stack.cacheInternalName(internalName.toInternalName())
 
         assertEquals(expectedRarity, stack.getItemRarityOrNull())
         assertEquals(expectedCategory, stack.getItemCategoryOrNull())

@@ -69,7 +69,7 @@ object CopyNearbyEntitiesCommand {
             add("entity: $simpleName")
             val displayName = entity.displayName
             add("name: '" + entity.name.formattedTextCompatLessResets() + "'")
-            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName() + "'")
+            if (entity is ArmorStand) add("cleanName: '" + entity.cleanName + "'")
             add("displayName: '${displayName.formattedTextCompat()}'")
             add("entityId: ${entity.id}")
             add("Category of Mob: ${getCategory(entity, mob)}")
@@ -183,7 +183,7 @@ object CopyNearbyEntitiesCommand {
         val stack = entity.item
         val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
         val stackDisplayName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
-        val cleanName = stack.cleanName()
+        val cleanName = stack.cleanName
         val itemEnchanted = stack.isEnchanted
         val stackSize = stack.count
         val maxStackSize = stack.maxStackSize
@@ -300,7 +300,7 @@ object CopyNearbyEntitiesCommand {
                 add("-     skullTexture:")
                 add("-     $skullTexture")
             }
-            val cleanName = stack.cleanName()
+            val cleanName = stack.cleanName
             val stackName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             val type = stack.javaClass.name
             add("-     name: '$stackName'")

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.ItemStackDirectProvider.Companion.asProvider
@@ -41,7 +42,7 @@ object OldSkyblockMenu {
             // Reset all buttons to enabled when the menu is closed
             SkyBlockButton.entries.forEach { it.disabled = false }
         },
-    ) { name -> name == "SkyBlock Menu" }
+    ) { UtilsPatterns.skyblockMenuGuiPattern }
     private val storage get() = ProfileStorageData.profileSpecific?.maxwell
     private val enabled get() = SkyHanniMod.feature.inventory.oldSkyBlockMenu
 

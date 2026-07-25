@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.NeuRenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.render.gui.GuiMouseInputEvent
+import at.hannibal2.skyhanni.features.inventory.loadout.CustomLoadoutKeybinds
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isActive
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import org.lwjgl.glfw.GLFW
@@ -19,6 +21,7 @@ import org.lwjgl.glfw.GLFW
 @SkyHanniModule
 object GuiData {
 
+    @JvmStatic
     var preDrawEventCancelled = false
 
     @HandleEvent(priority = HandleEvent.HIGH)
@@ -34,6 +37,7 @@ object GuiData {
     @HandleEvent
     fun onMouseInput(event: GuiMouseInputEvent) {
         if (CustomWardrobeKeybinds.allowMouseClick()) return
+        if (CustomLoadoutKeybinds.allowMouseClick()) return
 
         if (preDrawEventCancelled) event.cancel()
     }
@@ -51,6 +55,7 @@ object GuiData {
         if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
 
         if (CustomWardrobeKeybinds.allowKeyboardClick()) return
+        if (CustomLoadoutKeybinds.allowKeyboardClick()) return
 
         if (preDrawEventCancelled) event.cancel()
     }
@@ -58,7 +63,7 @@ object GuiData {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
-            if (Minecraft.getInstance().screen !is ContainerScreen) {
+            if (MinecraftCompat.screen !is ContainerScreen) {
                 preDrawEventCancelled = false
             }
         }

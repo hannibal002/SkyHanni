@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -57,14 +58,16 @@ object MiningApi {
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
 
     /**
-     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!
+     * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
      * REGEX-TEST: §c ☠ §r§7You froze to death§r§7.
      */
+    @Suppress("MaxLineLength")
     private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
+        "§6The warmth of the campfire reduced your §r§b${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
+    // This intentionally uses the old heat icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Heat: §6IMMUNE
      * REGEX-TEST: Heat: §c14♨
@@ -75,6 +78,7 @@ object MiningApi {
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
     )
 
+    // This intentionally uses the old cold icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Cold: §b-1❄
      */

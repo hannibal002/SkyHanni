@@ -32,12 +32,12 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
@@ -45,10 +45,11 @@ import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.inventory.loadout.LoadoutApi.LoadoutData
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
@@ -511,6 +512,9 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
+        var charmedVisitors: MutableSet<String> = mutableSetOf()
+
+        @Expose
         var ignoredVisitors: MutableSet<String> = mutableSetOf()
 
         @Expose
@@ -715,9 +719,23 @@ class ProfileSpecificStorage(
     @Expose
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
+    @Expose
+    var equipmentWardrobe: WardrobeStorage = WardrobeStorage()
+
     class WardrobeStorage {
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+
+        @Expose
+        var currentSlot: Int? = null
+    }
+
+    @Expose
+    var loadout: LoadoutStorage = LoadoutStorage()
+
+    class LoadoutStorage {
+        @Expose
+        var data: MutableMap<Int, LoadoutData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null
@@ -728,10 +746,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
+        var slots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<SafeItemStack?> = EquipmentApi.getEmptyEquipment()
+        var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
     // - foraging

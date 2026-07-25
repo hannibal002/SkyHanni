@@ -125,6 +125,7 @@ enum class PestType(
         VinylType.PRAY_FOR_ME,
         "PEST_PRAYING_MANTIS_MONSTER".toInternalName(),
         CropType.WILD_ROSE,
+        pluralName = "Praying Mantises",
         eliteLbName = "mantis",
     ),
     FIREFLY(

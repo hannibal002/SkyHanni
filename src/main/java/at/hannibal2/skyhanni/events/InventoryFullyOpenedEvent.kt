@@ -8,6 +8,12 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStack
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 
+/**
+ * Sealed base class for inventory events that provide access to the current inventory's slot data.
+ *
+ * @see InventoryFullyOpenedEvent
+ * @see InventoryUpdatedEvent
+ */
 sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
@@ -30,19 +36,27 @@ sealed class InventoryOpenEvent(private val inventory: OtherInventoryData.Invent
 }
 
 /**
- * This event is getting fired after every slot in the newly opened inventory has item data.
+ * This event is fired after every slot in the newly opened inventory has item data.
  *
- * New inventory data gets first sent as an empty inventory from the server.
+ * New inventory data first gets sent as an empty inventory from the server.
  * Item stack slot information is sent afterwards, sometimes with a short delay.
  *
- * This approach is faster than to wait a fix duration after the inventory open packet is detected.
+ * This approach is faster than waiting a fixed duration after the inventory open packet is detected.
  *
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
  * this event does not get fired when opening the inventory via pressing E.
  *
- * TODO does not work for inventories with empty slots. e.g. dungeon when death ghost tp menu "Teleport to Player".
+ * TODO does not work for inventories with empty slots (e.g. "Teleport to Player" ghost ability in dungeons).
  */
 @PrimaryFunction("onInventoryFullyOpened")
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 
+/**
+ * Fired whenever the slot data of the currently open inventory changes.
+ *
+ * This fires once immediately after [InventoryFullyOpenedEvent] on initial open,
+ * and again on any subsequent slot update while the inventory remains open.
+ * Updates after the initial open are delayed by one tick.
+ */
+@PrimaryFunction("onInventoryUpdated")
 class InventoryUpdatedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)

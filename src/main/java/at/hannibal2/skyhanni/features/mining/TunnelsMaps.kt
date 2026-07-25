@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
@@ -49,6 +49,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -58,7 +59,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import java.awt.Color
 import kotlin.math.roundToInt
 import kotlin.time.Duration.Companion.seconds
@@ -120,29 +120,28 @@ object TunnelsMaps {
 
     // <editor-fold desc="Patterns">
     /**
-     * REGEX-TEST: §9Glacite Collector
+     * REGEX-TEST: Glacite Collector
      */
     private val collectorCommissionPattern by RepoPattern.pattern(
-        "mining.commisson.collector",
-        "§9(?<what>\\w+(?: \\w+)?) Collector",
+        "mining.commisson.collector.colorless",
+        "(?<what>\\w+(?: \\w+)?) Collector",
     )
 
     /**
-     * REGEX-TEST: §7- §b277 Glacite Powder
-     * REGEX-TEST: §7- §b1,010 Glacite Powder
+     * REGEX-TEST: - 277 Glacite Powder
+     * REGEX-TEST: - 1,010 Glacite Powder
      */
     private val glacitePattern by RepoPattern.pattern(
-        "mining.commisson.reward.glacite",
-        "§7- §b[\\d,]+ Glacite Powder",
+        "mining.commisson.reward.glacite.colorless",
+        "- [\\d,]+ Glacite Powder",
     )
-
     private val invalidGoalPattern by RepoPattern.pattern(
         "mining.commisson.collector.invalid",
         "Glacite|Scrap",
     )
     private val completedPattern by RepoPattern.pattern(
-        "mining.commisson.completed",
-        "§a§lCOMPLETED",
+        "mining.commisson.completed.colorless",
+        "COMPLETED",
     )
     private val commissionInvPattern by RepoPattern.pattern(
         "mining.commission.inventory",
@@ -177,7 +176,7 @@ object TunnelsMaps {
         clickTranslate = mapOf()
         if (!commissionInvPattern.matches(event.inventoryName)) return
         clickTranslate = event.inventoryItems.mapNotNull { (slotId, item) ->
-            val lore = item.getLore()
+            val lore = item.getLoreComponent().map { it.string.removeColor() }
             if (!glacitePattern.anyMatches(lore)) return@mapNotNull null
             if (completedPattern.anyMatches(lore)) return@mapNotNull null
             val type = collectorCommissionPattern.firstMatcher(lore) {
@@ -464,7 +463,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
-            showNodeNames = true,
+            showNodeNames = config.showLandmarks,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -487,7 +486,7 @@ object TunnelsMaps {
     @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         campfireKey(event)
         nextSpotKey(event)
     }

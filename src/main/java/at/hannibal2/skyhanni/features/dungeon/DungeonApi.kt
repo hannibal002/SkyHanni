@@ -20,7 +20,9 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -36,21 +38,69 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.bold
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.withColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
 import net.minecraft.world.level.block.Blocks
 
 @Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object DungeonApi {
+    val patternGroup = RepoPattern.group("dungeon")
 
-    // TODO repo patterns
-    private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
+    // TODO: move to SkyblockIcons class
+    /**
+     * WRAPPED-REGEX-TEST: " ⏣ The Catacombs (F7)"
+     * WRAPPED-REGEX-TEST: "  The Catacombs (F7)"
+     */
+    private val floorPattern by patternGroup.pattern(
+        "floor",
+        " [⏣\uE067] The Catacombs \\((?<floor>.*)\\)",
+    )
 
-    private val bossPattern = "View all your (?<name>\\w+) Collection".toPattern()
-    private val levelPattern = " +(?<kills>\\d+).*".toPattern()
-    private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
-    private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
+    /**
+     * REGEX-TEST: Your Mage stats are doubled because you are the only player using this class!
+     */
+    private val uniqueClassBonus by patternGroup.pattern(
+        "unique-class-bonus",
+        "^Your (?<class>[A-Za-z]+) stats are doubled because you are the only player using this class!$",
+    )
+
+    /**
+     * REGEX-TEST: View all your Bonzo Collection
+     */
+    private val bossPattern by patternGroup.pattern(
+        "boss",
+        "View all your (?<name>\\w+) Collection",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " 1234"
+     */
+    private val levelPattern by patternGroup.pattern(
+        "level",
+        " +(?<kills>\\d+).*",
+    )
+
+    /**
+     * WRAPPED-REGEX-TEST: " ☠ Defeated Bonzo"
+     */
+    private val killPattern by patternGroup.pattern(
+        "kill",
+        " +. Defeated (?<boss>\\w+).*",
+    )
+
+    /**
+     * REGEX-TEST: Total Kills: 123
+     */
+    private val totalKillsPattern by patternGroup.pattern(
+        "total-kills",
+        "Total Kills: (?<kills>.*)",
+    )
 
     var dungeonFloor: String? = null
         private set
@@ -74,7 +124,6 @@ object DungeonApi {
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
-    private val patternGroup = RepoPattern.group("dungeon")
     private val WITHER_ESSENCE_TEXTURE by SkullTextureHolder.texture("WITHER_ESSENCE")
 
     /**
@@ -124,6 +173,14 @@ object DungeonApi {
     val playerDungeonTeamPattern by patternGroup.pattern(
         "tablist.playerteam.colorless",
         "^(?<sbLevel>\\[\\d+]) (?<rank>\\[[^]]+])? ?(?<playerName>\\S+)\\s?(?<symbols>[^(]*) \\((?:(?<className>\\S+) (?<classLevel>[CLXVI0]+)|(?<playerDead>DEAD))\\)\$",
+    )
+
+    /**
+     * REGEX-TEST: Boss Collections
+     */
+    val bossCollectionsInventoryPattern by patternGroup.pattern(
+        "boss.collections.inventory",
+        "Boss Collections",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -181,6 +238,7 @@ object DungeonApi {
     private const val WATER_ROOM_ID = "-60,-60"
     val inWaterRoom: Boolean get() = roomId == WATER_ROOM_ID
 
+    @Deprecated("Use getLevelComponent instead for better formatting", replaceWith = ReplaceWith("getLevelComponent(level)"))
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
         level >= 45 -> "§c"
@@ -195,10 +253,32 @@ object DungeonApi {
         else -> "§7"
     }
 
+    fun getLevelComponent(level: Int): Component {
+        val formatting: ChatFormatting = when {
+            level >= 45 -> RED
+            level >= 40 -> GOLD
+            level >= 35 -> DARK_PURPLE
+            level >= 30 -> BLUE
+            level >= 25 -> AQUA
+            level >= 20 -> DARK_GREEN
+            level >= 15 -> GREEN
+            level >= 10 -> YELLOW
+            level >= 5 -> WHITE
+            else -> GRAY
+        }
+        return componentBuilder {
+            append("$level") {
+                withColor(formatting)
+                if (level >= 50) bold = true
+            }
+        }
+    }
+
     @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+        val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
-        floorPattern.firstMatcher(event.added) {
+        floorPattern.firstMatcher(cleanAdded) {
             val floor = group("floor")
             if (dungeonFloor == floor) return
             dungeonFloor = floor
@@ -206,11 +286,11 @@ object DungeonApi {
             return
         }
         if (!inDungeon()) return
-        dungeonRoomPattern.firstMatcher(event.added) {
+        dungeonRoomPattern.firstMatcher(cleanAdded) {
             roomId = group("roomId")
             return
         }
-        timePattern.firstMatcher(event.added) {
+        timePattern.firstMatcher(cleanAdded) {
             time = "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
             return
         }
@@ -223,7 +303,7 @@ object DungeonApi {
 
         val playerTeam = event.tabList.find { it.string.contains(PlayerUtils.getName()) }?.string ?: return
         for (dungeonClass in DungeonClass.entries) {
-            if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
+            if (playerTeam.contains("(${dungeonClass.displayName} ")) {
                 val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
                 playerClass = dungeonClass
                 playerClassLevel = level
@@ -275,7 +355,7 @@ object DungeonApi {
             started = true
             DungeonStartEvent(floor).post()
         }
-        if (event.cleanMessage.matches(uniqueClassBonus)) {
+        if (uniqueClassBonus.matches(event.cleanMessage)) {
             isUniqueClass = true
         }
 
@@ -299,7 +379,7 @@ object DungeonApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
-        if (event.inventoryName == "Boss Collections") {
+        if (bossCollectionsInventoryPattern.matches(event.inventoryName)) {
             readAllCollections(bossCollections, event.inventoryItems)
         } else if (event.inventoryName.endsWith(" Collection")) {
             readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
@@ -312,12 +392,12 @@ object DungeonApi {
         inventoryName: String,
     ) {
         inventoryItems[48]?.let { item ->
-            if (item.hoverName.string == "Go Back") {
-                item.getLore().getOrNull(0)?.let { firstLine ->
-                    if (firstLine == "§7To Boss Collections") {
+            if (item.cleanName == "Go Back") {
+                item.getCleanLore().getOrNull(0)?.let { firstLine ->
+                    if (firstLine == "To Boss Collections") {
                         val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                         val floor = DungeonFloor.byBossName(name) ?: return
-                        val lore = inventoryItems[4]?.getLore() ?: return
+                        val lore = inventoryItems[4]?.getCleanLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
                             group("kills").formatInt()
@@ -336,8 +416,8 @@ object DungeonApi {
         nextItem@ for (stack in inventoryItems.values) {
             var name = ""
             var kills = 0
-            nextLine@ for (line in stack.getLore()) {
-                val colorlessLine = line.removeColor()
+            nextLine@ for (line in stack.getLoreComponent()) {
+                val colorlessLine = line.string.removeColor()
                 bossPattern.matchMatcher(colorlessLine) {
                     if (matches()) {
                         name = group("name")
@@ -382,7 +462,7 @@ object DungeonApi {
         }
     }
 
-    enum class DungeonClass(val scoreboardName: String) {
+    enum class DungeonClass(val displayName: String) {
         ARCHER("Archer"),
         BERSERK("Berserk"),
         HEALER("Healer"),
@@ -392,7 +472,7 @@ object DungeonApi {
 
         companion object {
             fun getByClassName(className: String): DungeonClass? {
-                return DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+                return DungeonClass.entries.firstOrNull { it.displayName.equals(className, ignoreCase = true) }
             }
         }
     }

@@ -40,7 +40,7 @@ object AnitaExtraFarmingFortune {
 
         if (InventoryUtils.openInventoryName() != "Anita") return
 
-        if (!event.itemStack.cleanName().contains("Extra Farming Fortune")) return
+        if (!event.itemStack.cleanName.contains("Extra Farming Fortune")) return
 
         val anitaUpgrade = GardenApi.storage?.fortune?.anitaUpgrade ?: return
 

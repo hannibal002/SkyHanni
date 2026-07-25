@@ -28,14 +28,6 @@ data class CachedItemData(
 
     var itemCategory: ItemCategory? = null,
 
-    var lastInternalName: NeuInternalName? = null,
-
-    var lastInternalNameFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-
-    var lastLore: List<String> = listOf(),
-
-    var lastLoreFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),
-
     var lastExtraAttributes: CompoundTag? = null,
 
     var lastExtraAttributesFetchTime: SimpleTimeMark = SimpleTimeMark.farPast(),

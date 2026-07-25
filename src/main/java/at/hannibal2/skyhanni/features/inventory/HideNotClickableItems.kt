@@ -51,8 +51,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 import kotlin.time.Duration.Companion.seconds
@@ -141,7 +141,7 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getInstance().screen
+        val guiChest = MinecraftCompat.screen
         if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
@@ -210,7 +210,7 @@ object HideNotClickableItems {
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
-            hideYourEquipment(chestName, stack) -> true
+            hideYourEquipment(stack) -> true
             hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
@@ -303,8 +303,8 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideYourEquipment(chestName: String, stack: SafeItemStack): Boolean {
-        if (!chestName.startsWith("Your Equipment")) return false
+    private fun hideYourEquipment(stack: SafeItemStack): Boolean {
+        if (!CurrentEquipmentApi.inventory.isInside()) return false
 
         val list = listOf(
             "HELMET",
@@ -364,7 +364,7 @@ object HideNotClickableItems {
         }
 
         showGreenLine = true
-        if (stack.cleanName().endsWith(" Potion") || stack.cleanName() == "Water Bottle") return false
+        if (stack.cleanName.endsWith(" Potion") || stack.cleanName == "Water Bottle") return false
 
         hideReason = "This item is not a potion!"
         return true
@@ -447,7 +447,7 @@ object HideNotClickableItems {
             return true
         }
 
-        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy" || stack.cleanName() == "Dark Candy") return false
+        if (stack.cleanName == "Green Candy" || stack.cleanName == "Purple Candy" || stack.cleanName == "Dark Candy") return false
 
         hideReason = "This item is not a spooky candy!"
         return true
@@ -466,7 +466,7 @@ object HideNotClickableItems {
             return true
         }
 
-        val name = stack.cleanName()
+        val name = stack.cleanName
 
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be traded!"
@@ -487,7 +487,7 @@ object HideNotClickableItems {
 
         showGreenLine = true
 
-        var name = stack.cleanName()
+        var name = stack.cleanName
         val size = stack.count
         val amountText = " x$size"
         if (name.endsWith(amountText)) {
@@ -528,7 +528,7 @@ object HideNotClickableItems {
             return true
         }
 
-        val name = stack.cleanName()
+        val name = stack.cleanName
 
         val result = hideInStorageFilter.match(name)
 
@@ -562,7 +562,7 @@ object HideNotClickableItems {
             return true
         }
 
-        val name = stack.cleanName()
+        val name = stack.cleanName
         for (item in itemsToSalvage) {
             if (name.endsWith(item)) {
                 return false
@@ -607,7 +607,7 @@ object HideNotClickableItems {
             return true
         }
 
-        val name = stack.cleanName()
+        val name = stack.cleanName
 
         if (ItemUtils.isSack(stack)) {
             hideReason = "Sacks cannot be auctioned!"

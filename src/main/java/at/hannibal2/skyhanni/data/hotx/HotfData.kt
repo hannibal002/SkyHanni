@@ -251,7 +251,7 @@ enum class HotfData(
     ),
     ;
 
-    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
+    override val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", guiName)
 
     override val printName = name.allLettersFirstUppercase()
 
@@ -306,12 +306,12 @@ enum class HotfData(
 
         // <editor-fold desc="Patterns">
         /**
-         * REGEX-TEST: §7§a§lSELECTED
-         * REGEX-TEST: §a§lENABLED
+         * REGEX-TEST: SELECTED
+         * REGEX-TEST: ENABLED
          */
         override val enabledPattern: Pattern by patternGroup.pattern(
             "perk.enable",
-            "§a§lENABLED|(?:§.)*SELECTED",
+            """ENABLED|SELECTED"""
         )
 
         /**
@@ -319,7 +319,7 @@ enum class HotfData(
          */
         override val inventoryPattern: Pattern by patternGroup.pattern(
             "inventory",
-            "Heart of the Forest",
+            """Heart of the Forest"""
         )
 
         /**
@@ -327,75 +327,75 @@ enum class HotfData(
          */
         override val levelPattern: Pattern by patternGroup.pattern(
             "perk.level",
-            "(?:§.)*Level (?<level>\\d+).*",
+            "(?:§.)*Level (?<level>\\d+).*"
         )
 
         /**
-         * REGEX-TEST: §aForest§c!
-         * REGEX-TEST: §7§cRequires Strength Boost
-         * REGEX-TEST: §7§cRequires Damage Boost
-         * REGEX-TEST: §7§cRequires Tier 5
-         * REGEX-TEST: §7§eClick to unlock!
+         * REGEX-TEST: Forest!
+         * REGEX-TEST: Requires Strength Boost
+         * REGEX-TEST: Requires Damage Boost
+         * REGEX-TEST: Requires Tier 5
+         * REGEX-TEST: Click to unlock!
          */
         override val notUnlockedPattern: Pattern by patternGroup.pattern(
             "perk.notunlocked",
-            "(?:§.)*Requires.*|.*Forest(?:§.)*!|(?:§.)*Click to unlock!",
+            """Requires.*|.*Forest!|Click to unlock!"""
         )
 
         /**
-         * REGEX-TEST: '§aHeart of the Forest'
+         * REGEX-TEST: Heart of the Forest
          */
         override val heartItemPattern: Pattern by patternGroup.pattern(
             "inventory.heart",
-            "§aHeart of the Forest",
+            """Heart of the Forest"""
         )
 
         /**
-         * REGEX-TEST: §cReset Heart of the Forest
+         * REGEX-TEST: Reset Heart of the Forest
          */
         override val resetItemPattern: Pattern by patternGroup.pattern(
             "inventory.reset",
-            "§cReset Heart of the Forest",
+            """Reset Heart of the Forest"""
         )
 
         /**
-         * REGEX-TEST: §7Tokens of the Forest: §a0
+         * REGEX-TEST: Tokens of the Forest: 0
          */
         override val heartTokensPattern: Pattern by patternGroup.pattern(
             "inventory.heart.token",
-            "§7Tokens of the Forest: §a(?<token>\\d+)",
+            """Tokens of the Forest: (?<token>\d+)"""
         )
 
         /**
-         * WRAPPED-REGEX-TEST: "  §8- §a5 §aToken of the Forest"
+         * WRAPPED-REGEX-TEST: "  - 5 Token of the Forest"
          */
         override val resetTokensPattern: Pattern by patternGroup.pattern(
             "inventory.reset.token",
-            "\\s*§8- §a(?<token>\\d+) §aToken of the Forest",
+            """\s*-\s*(?<token>\d+) Token of the Forest"""
         )
 
         /**
-         * WRAPPED-REGEX-TEST: " §7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset."
+         * WRAPPED-REGEX-TEST: " You have reset your Heart of the Forest! Your Perks and Abilities have been reset."
          */
         override val resetChatPattern by patternGroup.pattern(
             "reset.chat",
-            "\\s*§7You have reset your §r§aHeart of the Forest§r§7! Your §r§aPerks §r§7and §r§aAbilities §r§7have been reset\\.",
+            """\s*You have reset your Heart of the Forest! Your Perks and Abilities have been reset\."""
         )
 
         /**
-         * REGEX-TEST: §7Forest Whispers: §325,271
+         * REGEX-TEST: Forest Whispers: 25,271
          */
         private val whisperHeartPattern by patternGroup.pattern(
             "whisper.heart",
-            "§7Forest Whispers: §.(?<whisper>[\\d,]*)",
+            """Forest Whispers: (?<whisper>[\d,]*)"""
         )
 
         /**
-         * WRAPPED-REGEX-TEST: " §8- §3114,060 Forest Whispers"
+         * WRAPPED-REGEX-TEST: " - 114,060 Forest Whispers"
          */
         private val whisperResetPattern by patternGroup.pattern(
             "whisper.reset",
-            "\\s+§8- §.(?<whisper>[\\d,]*) Forest Whispers",
+            """\s+-\s*(?<whisper>[\d,]*) Forest Whispers"""
         )
         // </editor-fold>
 

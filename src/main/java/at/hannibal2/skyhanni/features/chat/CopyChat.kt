@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ChatUtils.fullComponent
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -42,20 +41,20 @@ object CopyChat {
     private fun processCopyChat(mouseX: Int, mouseY: Int) {
         val chatLine = getChatLine(mouseX, mouseY) ?: return
 
-        val formatted = chatLine.fullComponent.formattedTextCompat()
+        val formatted = chatLine.content.formattedTextCompat()
 
         val (clipboard, infoMessage) = when {
             KeyboardManager.isMenuKeyDown() ->
                 formatted.stripHypixelMessage() to "formatted message"
 
             KeyboardManager.isShiftKeyDown() -> (
-                OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.fullComponent.visualOrderText))
+                OrderedTextUtils.orderedTextToLegacyString(ModifyVisualWords.transformText(chatLine.content.visualOrderText))
                     .removeColor()
                 ) to "modified message"
 
             KeyboardManager.isControlKeyDown() -> chatLine.content.string.removeColor() to "line"
 
-            else -> chatLine.fullComponent.string.removeColor() to "message"
+            else -> chatLine.content.string.removeColor() to "message"
         }
 
         ClipboardUtils.copyToClipboard(clipboard)

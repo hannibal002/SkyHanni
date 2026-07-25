@@ -17,17 +17,17 @@ abstract class MixinInGameOverlayRenderer {
 
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
     private static void renderFire(PoseStack poseStack, MultiBufferSource multiBufferSource, TextureAtlasSprite textureAtlasSprite, CallbackInfo ci) {
-        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
     private static void renderWater(Minecraft client, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
-        if (new BlockOverlayRenderEvent(OverlayType.WATER).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.WATER).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
     private static void renderBlock(TextureAtlasSprite sprite, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
-        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post()) ci.cancel();
+        if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post().isCancelled()) ci.cancel();
     }
 
 }

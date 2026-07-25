@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -27,9 +28,6 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -112,7 +110,7 @@ object EffectApi {
      */
     private val tabEffectPattern by RepoPattern.pattern(
         "tab.effects-no-color",
-        " *(?<effect>[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:|[: ])+(?<time>[dhms0-9 ]+)"
+        " *(?<effect>[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:|[: ])+(?<time>[dhms0-9 ]+)",
     )
 
     /**
@@ -122,14 +120,17 @@ object EffectApi {
      */
     private val saltTabPattern by RepoPattern.pattern(
         "tab.salts-no-color",
-        " (?<effect>[\\w\\-' ]+)*: *(?<time>[dhms0-9 ]+)"
+        " (?<effect>[\\w\\-' ]+)*: *(?<time>[dhms0-9 ]+)",
     )
     // </editor-fold>
 
+    init {
+        NonGodPotEffect.entries.forEach { it.tabListName }
+    }
+
     private val profileStorage get() = ProfileStorageData.profileSpecific
 
-    // Todo : cleanup and add support for poison candy I, and add support for splash / other formats
-    // TODO: Move these to repo
+    // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
         hotChocolateMixinConsumePattern.matchMatcher(event.message) {
@@ -146,70 +147,24 @@ object EffectApi {
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
 
-        val effect: NonGodPotEffect?
-        val changeType: EffectDurationChangeType?
-        val duration: Duration?
-
         val modifiedMessage = event.message.replace(
             " Press TAB or type /effects to view your active effects!",
-            ""
+            "",
         )
 
-        when (modifiedMessage) {
-            "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
-                effect = NonGodPotEffect.SMOLDERING
-                changeType = EffectDurationChangeType.ADD // These stack when you consume them
-                duration = 1.hours
+        for (effect in NonGodPotEffect.entries) {
+            if (effect.effectRemovedPattern?.pattern() == modifiedMessage) {
+                EffectDurationChangeEvent(effect, EffectDurationChangeType.REMOVE, null).post()
+                return
             }
-            "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f!" -> {
-                effect = NonGodPotEffect.GLOWY
-                changeType = EffectDurationChangeType.SET
-                duration = 1.hours
-            }
-            "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f!" -> {
-                effect = NonGodPotEffect.WISP
-                changeType = EffectDurationChangeType.SET
-                duration = 5.minutes
-            }
-            "§eYou consumed a §r§fGreat Spook Potion§r§e!" -> {
-                effect = NonGodPotEffect.GREAT_SPOOK
-                changeType = EffectDurationChangeType.SET
-                duration = 24.hours
-            }
-            "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f!" -> {
-                effect = NonGodPotEffect.HARVEST_HARBINGER
-                changeType = EffectDurationChangeType.SET
-                duration = 25.minutes
-            }
-            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
-                effect = NonGodPotEffect.PEST_REPELLENT
-                changeType = EffectDurationChangeType.SET
-                duration = 1.hours
-            }
-            "§a§lYUM! §r§2ൠ Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!" -> {
-                effect = NonGodPotEffect.PEST_REPELLENT_MAX
-                changeType = EffectDurationChangeType.SET
-                duration = 1.hours
-            }
-            "§e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain." -> {
-                effect = NonGodPotEffect.GOBLIN
-                changeType = EffectDurationChangeType.SET
-                duration = 20.minutes
-            }
-            "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
-                effect = NonGodPotEffect.GOBLIN
-                changeType = EffectDurationChangeType.REMOVE
-                duration = null
-            }
-            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f!" -> {
-                effect = NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE
-                changeType = EffectDurationChangeType.SET
-                duration = 1.hours
-            }
-            else -> return
-        }
 
-        EffectDurationChangeEvent(effect, changeType, duration).post()
+            if (effect.effectGainedPattern?.pattern() != modifiedMessage) continue
+            val changeType = effect.effectChangeType ?: continue
+            val duration = effect.effectDuration ?: continue
+
+            EffectDurationChangeEvent(effect, changeType, duration).post()
+            return
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -229,7 +184,7 @@ object EffectApi {
 
     private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAllComponents(this) {
         val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull { effect ->
-            effect.tabListName == group("effect")
+            effect.tablistNamePattern.pattern() == group("effect")
         } ?: return@matchAllComponents
         try {
             val duration = TimeUtils.getDuration(group("time"))
@@ -257,14 +212,14 @@ object EffectApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
+    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
         saltTabPattern.matchAll(event.lines.map { it.string }) {
             val effect = group("effect")
             val duration = TimeUtils.getDuration(group("time"))
             val salt = NonGodPotEffect.entries.firstOrNull {
-                it.tabListName == effect
+                it.tablistNamePattern.pattern() == effect
             } ?: return@matchAll
             EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
         }

@@ -36,11 +36,10 @@ Describe what this pull request does, including technical details, screenshots, 
 + Fixed cool feature. - your_name_here
     * Optional extra info.
 
-## Changelog Technical Details
-+ Something technical you changed in the backend. - your_name_here
-    * Optional extra info.
-
 ## Changelog Removed Features
 + Removed cool feature. - your_name_here
     * Optional extra info.
 
+## Changelog Technical Details
++ Something technical you changed in the backend. - your_name_here
+    * Optional extra info.
