@@ -24,7 +24,6 @@ object ChatFilterManager {
     // RepoPattern must be initialized at pre-init time
     private val groups = setOf(
         DungeonChatFilter,
-        MiningChatFilter,
         SlayerChatFilter,
         EventChatFilter,
         MiscChatFilter,

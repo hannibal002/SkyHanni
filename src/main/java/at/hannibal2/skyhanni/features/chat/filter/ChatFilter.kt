@@ -90,4 +90,27 @@ sealed interface Activation {
             callback = null
         }
     }
+
+    class AllOf(
+        private val activations: List<Activation>,
+    ) : Activation {
+        constructor(vararg activations: Activation) : this(activations.toList())
+
+        private var callback: ((Boolean) -> Unit)? = null
+        override fun bind(onChange: (Boolean) -> Unit) {
+            callback = onChange
+            activations.forEach { it.bind { _ -> onChange(isActive()) } }
+            onChange(isActive())
+        }
+        override fun unbind() {
+            callback = null
+            activations.forEach { it.unbind() }
+        }
+
+        private fun isActive(): Boolean = activations.all { activation ->
+            var active = false
+            activation.bind { active = it }
+            active
+        }
+    }
 }

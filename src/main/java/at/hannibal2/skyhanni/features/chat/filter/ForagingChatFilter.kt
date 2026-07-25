@@ -13,7 +13,6 @@ object ForagingChatFilter : ChatFilterGroup() {
 
     override val filters: Set<ChatFilter> = setOf(
         UnmineableTreeFilter,
-        LotteryFilter,
     )
 
     object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", { config.unmineable }) {
@@ -25,16 +24,6 @@ object ForagingChatFilter : ChatFilterGroup() {
             "unmineable-tree",
             "You cannot damage a tree while it is regenerating!",
             "The toughness of this tree is way too high!",
-        )
-    }
-
-    object LotteryFilter : RegexChatFilter("lottery", { generalConfig.hideLottery }) {
-        /**
-         ** REGEX-TEST: New day! Your Lottery buff changed!
-         */
-        override val patterns by patternGroup.list(
-            "lottery",
-            "New day! Your Lottery buff changed!",
         )
     }
 }
