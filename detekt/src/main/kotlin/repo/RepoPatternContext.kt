@@ -2,7 +2,6 @@ package repo
 
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import repo.RepoPatternElement.Companion.asRepoPatternElement
-import java.util.IdentityHashMap
 import java.util.concurrent.ConcurrentHashMap
 
 class RepoPatternContext {
