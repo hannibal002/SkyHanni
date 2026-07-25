@@ -126,6 +126,11 @@ You can do this by following the instructions within the IntelliJ window in the 
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
+Bug fixes should generally be submitted as standalone PRs. Including a bug fix alongside other changes is only acceptable if the
+total PR size is small (under 500 lines changed). Large PRs whose primary goal is not a bug fix should not include **Fixes**
+changelog entries. If you discover a bug while working on a large PR, extract the fix into a separate standalone PR instead of
+including it in the current one.
+
 When writing the PR description, ensure you fill out the template with all the necessary information.
 In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
