@@ -59,9 +59,10 @@ object SkyHanniEvents {
 
     private val Method.options: HandleEvent? get() = getAnnotation(HandleEvent::class.java)
 
-    private fun handleZeroParameterMethod(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
-        val options = method.options ?: return null
-
+    private fun handleZeroParameterMethod(
+        method: Method,
+        options: HandleEvent,
+    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
         if (primaryFunctionEventType != null) return options to listOf(primaryFunctionEventType)
 
@@ -79,9 +80,10 @@ object SkyHanniEvents {
         return options to options.eventTypes.map { it.java }
     }
 
-    private fun handleSingleParameterMethod(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
-        val options = method.options ?: return null
-
+    private fun handleSingleParameterMethod(
+        method: Method,
+        options: HandleEvent,
+    ): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val eventType = method.parameterTypes.first()
 
         if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
@@ -97,9 +99,11 @@ object SkyHanniEvents {
     }
 
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? =
+        val options = method.options ?: return null
+
         when (method.parameterCount) {
-            0 -> handleZeroParameterMethod(method)
-            1 -> handleSingleParameterMethod(method)
+            0 -> handleZeroParameterMethod(method, options)
+            1 -> handleSingleParameterMethod(method, options)
             else -> {
                 ErrorManager.crashInDevEnv(
                     "Function ${method.fullyQualifiedName} has too many parameters. It must have " +
