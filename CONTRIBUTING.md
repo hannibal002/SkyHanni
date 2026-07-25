@@ -219,7 +219,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Exception: a standalone `if` that calls `ci.cancel()` is acceptable when the `CallbackInfo` object must stay in the mixin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
