@@ -1,20 +1,19 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
+import at.hannibal2.skyhanni.features.garden.pests.PestEntityResolver.LoadedPest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.BlockUtils.raycast
-import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.deceased
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
@@ -29,13 +28,12 @@ object PestRoute {
 
     private val config get() = PestApi.config
     private val routeColor = LorenzColor.RED.toColor()
-    private var route = emptyList<Mob>()
+    private var route = emptyList<LoadedPest>()
     private var etherwarpTarget: EtherwarpTarget? = null
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         val enabled = isEnabled()
-        MobData.extendedGardenDetectionRange = enabled
         if (!enabled) {
             route = emptyList()
             etherwarpTarget = null
@@ -43,9 +41,8 @@ object PestRoute {
         }
         if (!event.isMod(ROUTE_UPDATE_INTERVAL_TICKS)) return
 
-        val pests = MobData.entityToMob.values
+        val pests = PestEntityResolver.getLoadedPests()
             .filter { it.isVisiblePest() }
-            .distinct()
 
         route = calculateRoute(LocationUtils.playerLocation(), pests)
         etherwarpTarget = when {
@@ -64,18 +61,18 @@ object PestRoute {
 
         if (config.shortestPestRoute) {
             val playerLocation = LocationUtils.playerLocation()
-            val nearestPest = visibleRoute.minBy { it.centerCords.distance(playerLocation) }
-            event.drawLineToCrosshair(nearestPest.centerCords, routeColor, lineWidth = 3, depth = true)
+            val nearestPest = visibleRoute.minBy { it.location.distance(playerLocation) }
+            event.drawLineToCrosshair(nearestPest.location, routeColor, lineWidth = 3, depth = true)
 
             visibleRoute.zipWithNext().forEach { (previous, next) ->
-                event.draw3DLine(previous.centerCords, next.centerCords, routeColor, lineWidth = 3, depth = true)
+                event.draw3DLine(previous.location, next.location, routeColor, lineWidth = 3, depth = true)
             }
 
             visibleRoute.forEachIndexed { index, pest ->
-                val location = pest.centerCords
+                val location = pest.location
                 event.drawDynamicText(
-                    location.add(y = 1.5),
-                    "§c§l${index + 1} §7${pest.name}",
+                    location.add(y = 0.75),
+                    "§c§l${index + 1} §7${pest.type.displayName}",
                     scaleMultiplier = 1.8,
                     seeThroughBlocks = false,
                 )
@@ -107,27 +104,25 @@ object PestRoute {
     private fun isEtherwarpTargetEnabled() =
         config.etherwarpPestTarget && InventoryUtils.getItemInHand()?.hasEtherwarp() == true
 
-    private fun Mob.isVisiblePest() =
-        isAlive &&
-            PestType.getByNameOrNull(name) != null &&
-            fullEntityList().any { it.canBeSeen(viewDistance = PEST_VIEW_DISTANCE) }
+    private fun LoadedPest.isVisiblePest() =
+        !entity.deceased && canBeSeen(viewDistance = PEST_VIEW_DISTANCE)
 
-    private fun calculateRoute(start: LorenzVec, pests: List<Mob>): List<Mob> {
+    private fun calculateRoute(start: LorenzVec, pests: List<LoadedPest>): List<LoadedPest> {
         if (pests.size <= 1) return pests
 
         val order = if (pests.size <= MAX_EXACT_PESTS) {
-            shortestOpenRoute(start, pests.map { it.centerCords })
+            shortestOpenRoute(start, pests.map { it.location })
         } else {
-            nearestNeighbourRoute(start, pests.map { it.centerCords })
+            nearestNeighbourRoute(start, pests.map { it.location })
         }
         return order.map(pests::get)
     }
 
-    private fun findEtherwarpTarget(pests: List<Mob>): EtherwarpTarget? {
+    private fun findEtherwarpTarget(pests: List<LoadedPest>): EtherwarpTarget? {
         if (pests.isEmpty()) return null
 
         val playerEye = LocationUtils.playerEyeLocation()
-        val pestLocations = pests.map { it.centerCords }
+        val pestLocations = pests.map { it.location }
         return buildSet {
             for (pestLocation in pestLocations) {
                 val baseX = floor(pestLocation.x).toInt()
