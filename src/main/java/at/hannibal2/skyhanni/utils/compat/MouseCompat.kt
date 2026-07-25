@@ -8,30 +8,36 @@ import net.minecraft.client.input.MouseButtonInfo
 import kotlin.math.sign
 
 /**
- * This is a compatibility layer that helps with multiple minecraft versions and mixins.
+ * This is a compatibility layer that helps with multiple Minecraft versions and mixins.
  * This class should be used in utils/data/api classes and not in feature classes.
  */
 object MouseCompat {
+
     const val NUMBER_OF_MOUSE_BUTTONS = 6
 
+    @JvmStatic
+    var deltaMouseX = 0.0
+
+    @JvmStatic
     var deltaMouseY = 0.0
         set(value) {
             field = value
             mouseMoveEventId++
         }
-    var deltaMouseX = 0.0
+
+    @JvmStatic
     var scroll = 0.0
         set(value) {
             field = value
             if (value != 0.0) scrollEventId++
         }
+
     private var mouseMoveEventId = 0L
     private var scrollEventId = 0L
+
     private val buttonStates = BooleanArray(NUMBER_OF_MOUSE_BUTTONS)
 
-    private val mouse by lazy {
-        Minecraft.getInstance().mouseHandler
-    }
+    private val mouse by lazy { Minecraft.getInstance().mouseHandler }
 
     fun isButtonDown(button: Int): Boolean {
         if (button in 0..5) return buttonStates[button]
@@ -50,7 +56,7 @@ object MouseCompat {
 
     fun getPreciseScrollDelta(): Double {
         val delta = scroll
-        DelayedRun.runNextTickOld { scroll = 0.0 }
+        DelayedRun.runNextTickEnd { scroll = 0.0 }
         val options = Minecraft.getInstance().options
         val scrollAmount = if (options.discreteMouseScroll().get()) delta.sign else delta
         return scrollAmount * options.mouseWheelSensitivity().get()
@@ -70,17 +76,13 @@ object MouseCompat {
         return mouse.ypos().toInt()
     }
 
-    // I have no clue what the difference between getx and geteventx is on 1.8.9
-    // on 1.8.9 they are pretty much the same (they are the exact same when the mouse is still)
-    fun getEventX(): Int = getX()
-    fun getEventY(): Int = getY()
-
     fun getEventButtonState(): Boolean = buttonStates.any { it }
 
     fun getEventDY(): Int {
         return deltaMouseY.toInt()
     }
 
+    @JvmStatic
     fun handleMouseButton(input: MouseButtonInfo, action: Int) {
         val button: Int = input.button()
         if (action == 1) {
@@ -89,7 +91,7 @@ object MouseCompat {
             KeyPressEvent(button).post()
         } else {
             KeyPressEvent(button).post()
-            DelayedRun.runNextTickOld {
+            DelayedRun.runNextTickEnd {
                 setButtonState(button, false)
             }
         }
