@@ -89,7 +89,7 @@ object AchievementManager {
         }
 
         config[id] = achievement
-        SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
+        SkyHanniMod.configManager.queueSave(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
     }
 
     // This function returns true if the achievement was completed, false if it was already completed or if you're in Hypixel Alpha
