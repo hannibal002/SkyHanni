@@ -51,7 +51,7 @@ object PestEntityResolver {
 
     private fun String.normalizedBase64() = trim().trimEnd('=')
 
-    private val PET_NAME_PATTERN = Regex("^\\[Lvl ?[\\d,]+] ?(?<name>.+?)(?: ✦)?$")
+    private val PET_NAME_PATTERN = Regex("^\\[Lv ?[\\d,]+] ?(?<name>.+?)(?: ✦)?$")
     private const val MODEL_HEIGHT_OFFSET = 1.5
     private const val PET_NAME_SEARCH_RADIUS = 3.0
 }
