@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.spongepowered.asm.mixin.MixinEnvironment
+import org.spongepowered.asm.mixin.MixinEnvironment.Option
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer
 
 /**
