@@ -61,7 +61,7 @@ object PestRoute {
     private fun Mob.isVisiblePest() =
         isAlive &&
             PestType.getByNameOrNull(name) != null &&
-            fullEntityList().any { it.canBeSeen() }
+            fullEntityList().any { it.canBeSeen(viewDistance = PEST_VIEW_DISTANCE) }
 
     private fun calculateRoute(start: LorenzVec, pests: List<Mob>): List<Mob> {
         if (pests.size <= 1) return pests
@@ -136,4 +136,5 @@ object PestRoute {
 
     private const val ROUTE_UPDATE_INTERVAL_TICKS = 10
     private const val MAX_EXACT_PESTS = 10
+    private const val PEST_VIEW_DISTANCE = 400
 }
