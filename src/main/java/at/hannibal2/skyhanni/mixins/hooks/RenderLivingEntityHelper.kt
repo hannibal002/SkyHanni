@@ -26,24 +26,13 @@ object RenderLivingEntityHelper {
     @JvmStatic
     var currentGlowEvent: RenderEntityOutlineEvent? = null
 
-    @JvmStatic
-    var currentXrayGlowEvent: RenderEntityOutlineEvent? = null
-
     private fun isEntityInGlowEvent(entity: Entity): Int {
-        return currentXrayGlowEvent?.entitiesToOutline?.get(entity)?.rgb
-            ?: currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb
-            ?: 0
+        return currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb ?: 0
     }
 
     @JvmStatic
-    fun isEntityXrayGlow(entity: Entity): Boolean =
-        currentXrayGlowEvent?.entitiesToOutline?.containsKey(entity) == true
-
-    @JvmStatic
     fun check() {
-        areMobsHighlighted = entityColorCondition.values.any { it() } ||
-            currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true ||
-            currentXrayGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+        areMobsHighlighted = entityColorCondition.values.any { it() } || currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
     }
 
     @JvmStatic

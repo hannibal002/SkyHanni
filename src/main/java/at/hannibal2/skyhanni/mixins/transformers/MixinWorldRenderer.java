@@ -20,9 +20,6 @@ public class MixinWorldRenderer {
     @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfo ci) {
         RenderLivingEntityHelper.check();
-        RenderEntityOutlineEvent xrayOutlineEvent = new RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null);
-        RenderLivingEntityHelper.setCurrentXrayGlowEvent(xrayOutlineEvent);
-        xrayOutlineEvent.post();
         RenderEntityOutlineEvent noXrayOutlineEvent = new RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.NO_XRAY, null);
         RenderLivingEntityHelper.setCurrentGlowEvent(noXrayOutlineEvent);
         noXrayOutlineEvent.post();

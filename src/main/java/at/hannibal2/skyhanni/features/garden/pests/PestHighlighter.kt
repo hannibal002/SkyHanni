@@ -22,7 +22,7 @@ object PestHighlighter {
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (!GardenApi.inGarden() || !config.pestHighlight) return
-        if (event.type !== RenderEntityOutlineEvent.Type.XRAY) return
+        if (event.type !== RenderEntityOutlineEvent.Type.NO_XRAY) return
 
         val pestMobs = MobData.entityToMob.values
             .filter { PestType.getByNameOrNull(it.name) != null }

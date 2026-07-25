@@ -161,7 +161,7 @@ object FarmingContestApi {
                     e, "Farming contest read current crop failed",
                     "cropName" to cropName,
                     "line" to line,
-                    "sidebarLinesFormatted" to scoreboard,
+                    "sidebarLinesFormatted" to scoreboardLines,
                 )
                 null
             }

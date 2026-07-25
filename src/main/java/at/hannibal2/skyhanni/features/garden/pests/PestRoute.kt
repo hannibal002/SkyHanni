@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -23,14 +24,13 @@ object PestRoute {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (!event.isMod(5)) return
         if (!isEnabled()) {
             route = emptyList()
             return
         }
 
         val pests = MobData.entityToMob.values
-            .filter { it.isAlive && PestType.getByNameOrNull(it.name) != null }
+            .filter { it.isVisiblePest() }
             .distinct()
 
         route = calculateRoute(LocationUtils.playerLocation(), pests)
@@ -41,21 +41,26 @@ object PestRoute {
         if (!isEnabled() || route.isEmpty()) return
 
         var previous = event.exactPlayerEyeLocation()
-        route.forEachIndexed { index, pest ->
-            if (!pest.isAlive) return@forEachIndexed
+        route.filter { it.isVisiblePest() }.forEachIndexed { index, pest ->
 
             val location = pest.centerCords
-            event.draw3DLine(previous, location, routeColor, lineWidth = 3, depth = false)
+            event.draw3DLine(previous, location, routeColor, lineWidth = 3, depth = true)
             event.drawDynamicText(
                 location.add(y = 1.5),
                 "§c§l${index + 1} §7${pest.name}",
-                scaleMultiplier = 1.2,
+                scaleMultiplier = 1.8,
+                seeThroughBlocks = false,
             )
             previous = location
         }
     }
 
     private fun isEnabled() = GardenApi.inGarden() && config.shortestPestRoute
+
+    private fun Mob.isVisiblePest() =
+        isAlive &&
+            PestType.getByNameOrNull(name) != null &&
+            fullEntityList().any { it.canBeSeen() }
 
     private fun calculateRoute(start: LorenzVec, pests: List<Mob>): List<Mob> {
         if (pests.size <= 1) return pests

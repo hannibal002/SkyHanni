@@ -14,7 +14,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(
         name = "Pest Highlight",
-        desc = "Highlights pests with a §cred outline §7through blocks.",
+        desc = "Highlights visible pests with a §cred outline§7.",
     )
     @ConfigEditorBoolean
     var pestHighlight: Boolean = false
@@ -22,7 +22,7 @@ class PestsConfig {
     @Expose
     @ConfigOption(
         name = "Shortest Pest Route",
-        desc = "Shows the shortest route from you through every detected pest.",
+        desc = "Shows the shortest route from you through every visible pest.",
     )
     @ConfigEditorBoolean
     var shortestPestRoute: Boolean = false
