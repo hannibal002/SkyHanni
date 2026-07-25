@@ -30,7 +30,7 @@ class RepoPatternElement private constructor(
 
     companion object {
         // A sentinel value to indicate that a KtPropertyDelegate has been processed but does not correspond to a valid RepoPatternElement.
-        // Must be public so that it can be accessed from RepoPatternContext.
+        // Must be internal so that it can be accessed from RepoPatternContext.
         internal val SENTINEL_VALUE = RepoPatternElement("SENTINEL", null, "", emptyList(), emptyList())
 
         private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
