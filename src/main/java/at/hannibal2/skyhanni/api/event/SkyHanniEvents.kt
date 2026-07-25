@@ -55,8 +55,6 @@ object SkyHanniEvents {
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    // TODO refactor
-    @Suppress("ReturnCount")
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val name = "${method.declaringClass.name}.${method.name}"
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
