@@ -358,15 +358,19 @@ class ItemResolutionQuery {
             findInternalNameByDisplayName(displayName, false)
         } else if (guiName.endsWith("Experimentation Table RNG")) {
             resolveEnchantmentByName(displayName)
-        } else if (AttributeShardsData.attributeMenuPattern.matches(guiName)) {
+        } else if (AttributeShardsData.attributeMenuInventory.isInside()) {
             resolveItemInAttributeMenu(compound.getLore())
-        } else if (guiName == "Hunting Box" || guiName == "Fusion Box" || guiName == "Shard Fusion") {
+        } else if (
+            AttributeShardsData.huntingBoxInventory.isInside() ||
+            AttributeShardsData.fusionBoxInventory.isInside() ||
+            AttributeShardsData.shardFusionInventory.isInside()
+        ) {
             resolveItemInHuntingBoxMenu(displayName)
         } else if (guiName == "Confirm Fusion") {
             compound.getLore().firstOrNull()?.let {
                 shardPattern.matchMatcher(it) {
                     resolveItemInHuntingBoxMenu(
-                        group("name")
+                        group("name"),
                     )
                 }
             }
