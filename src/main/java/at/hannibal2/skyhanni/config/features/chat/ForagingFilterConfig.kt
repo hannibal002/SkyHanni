@@ -10,5 +10,5 @@ class ForagingFilterConfig {
     @Expose
     @ConfigOption(name = "Unmineable Trees", desc = "Hide messages from trying to cut down an unmineable tree.")
     @ConfigEditorBoolean
-    var unmineable: Property<Boolean> = Property.of(false)
+    val unmineable: Property<Boolean> = Property.of(false)
 }

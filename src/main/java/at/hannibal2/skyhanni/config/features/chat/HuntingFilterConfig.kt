@@ -12,11 +12,11 @@ class HuntingFilterConfig {
     @ConfigOption(name = "Redundant Comments", desc = "Hide redundant comments from successfully hunting shards.")
     @SearchTag("panda mochibear invisibug")
     @ConfigEditorBoolean
-    var redundantComments: Property<Boolean> = Property.of(false)
+    val redundantComments: Property<Boolean> = Property.of(false)
 
     @Expose
     @ConfigOption(name = "Swoop Huntaxe", desc = "Hide Swoop's message about monsters only taking damage from axes.")
     @ConfigEditorBoolean
-    var swoopAxeMessage: Property<Boolean> = Property.of(false)
+    val swoopAxeMessage: Property<Boolean> = Property.of(false)
 
 }
