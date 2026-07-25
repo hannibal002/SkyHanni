@@ -60,9 +60,7 @@ object PestRoute {
         if (visibleRoute.isEmpty()) return
 
         if (config.shortestPestRoute) {
-            val playerLocation = LocationUtils.playerLocation()
-            val nearestPest = visibleRoute.minBy { it.location.distance(playerLocation) }
-            event.drawLineToCrosshair(nearestPest.location, routeColor, lineWidth = 3, depth = true)
+            event.drawLineToCrosshair(visibleRoute.first().location, routeColor, lineWidth = 3, depth = true)
 
             visibleRoute.zipWithNext().forEach { (previous, next) ->
                 event.draw3DLine(previous.location, next.location, routeColor, lineWidth = 3, depth = true)
