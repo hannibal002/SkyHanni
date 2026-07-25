@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object DungeonChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("dungeon")
+    private val patternGroup = RepoPattern.group("chat-filter.dungeon")
     private val config get() = SkyHanniMod.feature.dungeon.messageFilter
 
     override val activation: Activation = Activation.Island(IslandType.CATACOMBS)

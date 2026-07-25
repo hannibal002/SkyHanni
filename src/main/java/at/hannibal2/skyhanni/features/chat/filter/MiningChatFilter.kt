@@ -1,8 +1,11 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+
 object MiningChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("mining")
-    private val generalConfig get() = ChatFilterManager.generalConfig
+    private val patternGroup = RepoPattern.group("chat-filter.mining")
+    private val generalConfig get() = SkyHanniMod.feature.chat
 
     override val filters: Set<ChatFilter> = setOf(
         SkymallFilter,

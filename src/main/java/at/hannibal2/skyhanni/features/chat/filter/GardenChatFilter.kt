@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.features.garden.pests.PestApi
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object GardenChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("farming.garden")
-    private val config get() = ChatFilterManager.config
-    private val generalConfig get() = ChatFilterManager.generalConfig
+    private val patternGroup = RepoPattern.group("chat-filter.farming.garden")
+    private val config get() = SkyHanniMod.feature.chat.filterType
+    private val generalConfig get() = SkyHanniMod.feature.chat
 
     override val activation = Activation.Island(IslandType.GARDEN)
 

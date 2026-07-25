@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object WinterChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("event")
-    private val config get() = ChatFilterManager.config
+    private val patternGroup = RepoPattern.group("chat-filter.event")
+    private val config get() = SkyHanniMod.feature.chat.filterType
 
     override val filters: Set<ChatFilter> = setOf(
         WinterIslandFilter,

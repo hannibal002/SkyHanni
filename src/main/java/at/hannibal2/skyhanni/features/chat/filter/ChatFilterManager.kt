@@ -18,12 +18,11 @@ import java.util.concurrent.ConcurrentHashMap
 @SkyHanniModule
 object ChatFilterManager {
 
-    val chatFilterGroup = RepoPattern.group("chat-filter")
-    val generalConfig get() = SkyHanniMod.feature.chat
-    val config get() = SkyHanniMod.feature.chat.filterType
+    // DO NOT MAKE THIS PUBLIC
+    // To avoid circular dependencies (The groups need chatFilterGroup, and ChatFilterManager needs the groups)
+    private val config get() = SkyHanniMod.feature.chat.filterType
     private val activeFilters = mutableSetOf<ChatFilter>()
 
-    // To avoid circular dependencies (The groups need chatFilterGroup, and ChatFilterManager needs the groups), we lazily initialize the groups here.
     private val groups by lazy {
         setOf(
             DungeonChatFilter,

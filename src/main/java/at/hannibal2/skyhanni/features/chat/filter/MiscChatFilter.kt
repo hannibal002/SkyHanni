@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @Suppress("MaxLineLength")
 object MiscChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("hypixel-misc")
-    private val config get() = ChatFilterManager.config
+    private val patternGroup = RepoPattern.group("chat-filter.hypixel-misc")
+    private val config get() = SkyHanniMod.feature.chat.filterType
 
     override val filters: Set<ChatFilter> = setOf(
         EmptyFilter,

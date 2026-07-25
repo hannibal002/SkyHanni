@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandTypeTag
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object ForagingChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("foraging")
-    private val config get() = ChatFilterManager.config.foraging
-    private val generalConfig get() = ChatFilterManager.generalConfig
+    private val patternGroup = RepoPattern.group("chat-filter.foraging")
+    private val config get() = SkyHanniMod.feature.chat.filterType.foraging
+    private val generalConfig get() = SkyHanniMod.feature.chat
 
     private val customTreesDetector = IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES)
 

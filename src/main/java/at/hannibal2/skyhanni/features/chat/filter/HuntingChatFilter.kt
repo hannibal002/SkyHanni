@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandTypeTag
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 object HuntingChatFilter : ChatFilterGroup() {
-    private val patternGroup = ChatFilterManager.chatFilterGroup.group("hunting")
-    private val config get() = ChatFilterManager.config.hunting
+    private val patternGroup = RepoPattern.group("chat-filter.hunting")
+    private val config get() = SkyHanniMod.feature.chat.filterType.hunting
 
     override val activation: Activation = Activation.Island(IslandTypeTag.FORAGING_CUSTOM_TREES)
 
