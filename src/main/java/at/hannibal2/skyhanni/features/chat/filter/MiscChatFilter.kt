@@ -118,8 +118,8 @@ object MiscChatFilter : ChatFilterGroup() {
     object ProfileJoinFilter : RegexChatFilter("profile_join", { config.profileJoin }) {
         override val patterns by patternGroup.list(
             "profile-join",
-            "You are playing on profile: ",
-            "Profile ID: ",
+            "You are playing on profile: .*",
+            "Profile ID: .*",
         )
     }
 

@@ -103,7 +103,13 @@ object ChatFilterManager {
      * @return The reason why the message was blocked, empty if not blocked
      */
     private fun block(message: String): String? {
-        return activeFilters.firstNotNullOfOrNull { it.block(message) }
+        for (filter in activeFilters) {
+            val blockReason = filter.block(message)
+            if (blockReason != null) {
+                return blockReason
+            }
+        }
+        return null
     }
 
     /**
