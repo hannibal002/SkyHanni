@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -39,6 +41,7 @@ object MobData {
     const val DISPLAY_NPC_DETECTION_RANGE = 24.0 // 24.0
 
     var externRemoveOfRetryAmount = 0
+    var extendedGardenDetectionRange = false
 
     val logger = SkyHanniLogger("mob/detection")
 
@@ -84,7 +87,9 @@ object MobData {
             entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) > when (roughCategory) {
                 MobCategory.DISPLAY_NPC -> DISPLAY_NPC_DETECTION_RANGE
                 MobCategory.PLAYER -> Double.POSITIVE_INFINITY
-                else -> DETECTION_RANGE
+                else -> if (extendedGardenDetectionRange && SkyBlockUtils.currentIsland == IslandType.GARDEN) {
+                    ENTITY_RENDER_RANGE_IN_BLOCKS
+                } else DETECTION_RANGE
             }
     }
 

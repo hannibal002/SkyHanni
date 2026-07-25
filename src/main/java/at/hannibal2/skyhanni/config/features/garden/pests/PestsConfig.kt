@@ -28,6 +28,15 @@ class PestsConfig {
     var shortestPestRoute: Boolean = false
 
     @Expose
+    @ConfigOption(
+        name = "Etherwarp Pest Target",
+        desc = "Suggests a reachable Etherwarp landing block near the largest group of visible pests. " +
+            "You must aim, sneak, and right-click manually.",
+    )
+    @ConfigEditorBoolean
+    var etherwarpPestTarget: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Pest Spawn", desc = "")
     @Accordion
     val pestSpawn: PestSpawnConfig = PestSpawnConfig()
