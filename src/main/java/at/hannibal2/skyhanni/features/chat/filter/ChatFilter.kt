@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.util.regex.Pattern
@@ -22,7 +24,22 @@ interface ConfigChatFilter : ChatFilter {
             if (new) onEnable()
             else onDisable()
         }
-        if (config.get()) onEnable()
+        registeredFilters?.add(config) ?: run {
+            if (config.get()) onEnable()
+        }
+    }
+
+    @SkyHanniModule
+    companion object {
+        private var registeredFilters: MutableSet<Property<Boolean>>? = mutableSetOf()
+        fun onConfigLoad(event: ConfigLoadEvent) {
+            registeredFilters?.forEach { config ->
+                if (config.get()) {
+                    config.notifyObservers()
+                }
+            }
+            registeredFilters = null
+        }
     }
 }
 
@@ -61,12 +78,11 @@ abstract class RegexIslandChatFilter(
             }
         }
 
+        detector.register { _, _ -> update() }
         registerConfig(
             config,
             onEnable = { update() },
             onDisable = { update() }
         )
-
-        update()
     }
 }
