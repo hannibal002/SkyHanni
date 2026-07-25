@@ -285,6 +285,9 @@ object ChatFilter {
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
         "§cYou cannot open the SkyBlock menu while in combat!",
+        "§7Your radio is weak. Find another enjoyer to boost it.",
+        "§7Your radio signal is strong!",
+        "§7Your radio lost signal. There's too many enjoyers on this channel.",
     )
 
     // Annoying Spam

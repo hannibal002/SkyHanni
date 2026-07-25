@@ -31,23 +31,29 @@ object DelayedRun {
         return time to block
     }
 
+    // TODO maybe rename to runOnNextMinecraftTick
     /**
-     * Runs [runnable] at the start of the next game tick, always on the main thread.
+     * Schedules a task via Minecraft's internal scheduler, which runs it on the main thread
+     * at the start of the next game tick. The exact point relative to SkyHanni's own event
+     * handlers is not guaranteed.
      */
     @JvmStatic
     fun runNextTick(runnable: Runnable) = Minecraft.getInstance().schedule(runnable)
 
+    // TODO maybe rename to runAfterCurrentTickEvents
     /**
-     * Runs [runnable] at the end of the next game tick, always on the main thread.
-     *
-     * Prefer [runNextTick] unless you have a specific reason to use this method.
+     * Runs at the end of the next game tick, after all other event handlers have processed.
+     * Unlike [runNextTick], this goes through SkyHanni's own tick handler at [HandleEvent.LOWEST]
+     * priority, guaranteeing that all event handlers for the current tick have finished first.
+     * Use this when the task reads state that other handlers (e.g. chat handlers) may still
+     * modify during the current tick.
      */
     @JvmStatic
     fun runNextTickEnd(runnable: Runnable) = futureTasks.add(runnable::run to SimpleTimeMark.farPast())
 
     /**
-     * Runs [runnable] now if we are on the main thread,
-     * otherwise queues it for the start of the next game tick.
+     * Runs [runnable] now if we are on the main thread, otherwise schedules it for the start of the
+     * next game tick, same as [runNextTick].
      */
     fun runOrNextTick(runnable: Runnable) = Minecraft.getInstance().execute(runnable)
 

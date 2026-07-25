@@ -44,7 +44,15 @@ object TrophyFishManager {
         "(?: +)?(?<rarity>.*) ✖",
     )
 
-    val odgerInventory = InventoryDetector { name -> name == "Trophy Fish" }
+    /**
+     * REGEX-TEST: Trophy Fish
+     */
+    private val odgerInventoryNamePattern by patternGroup.pattern(
+        "odger.inventory",
+        "Trophy Fish",
+    )
+
+    val odgerInventory = InventoryDetector { odgerInventoryNamePattern }
 
     fun loadMissingTrophyFish(): Int {
         val savedFishes = fish ?: return 0

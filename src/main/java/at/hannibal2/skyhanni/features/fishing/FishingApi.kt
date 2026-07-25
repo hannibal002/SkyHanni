@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.InteractClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
@@ -47,6 +50,7 @@ import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
+import net.minecraft.client.gui.screens.inventory.AbstractSignEditScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.projectile.FishingHook
@@ -131,10 +135,14 @@ object FishingApi {
         private set
     var hasTreasureHook = false
         private set
+    var hasTrophyLine = false
+        private set
 
     private var lavaRods = listOf<NeuInternalName>()
     private var waterRods = listOf<NeuInternalName>()
     private val TREASURE_HOOK = "TREASURE_HOOK".toInternalName()
+    private val TROPHY_LINE = "TROPHY_LINE".toInternalName()
+    private val HOT_BAIT = "HOT_BAIT".toInternalName()
 
     private const val BAIT_HOTBAR_INDEX = 8
 
@@ -248,7 +256,7 @@ object FishingApi {
 
     private fun hasGuiOpen(): Boolean {
         val screen = MinecraftCompat.screen
-        return screen is AbstractContainerScreen<*> && screen !is InventoryScreen
+        return (screen is AbstractContainerScreen<*> || screen is AbstractSignEditScreen) && screen !is InventoryScreen
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -295,6 +303,7 @@ object FishingApi {
         if (holdingRod) {
             // If the player is not holding a rod, we want to just save the last state
             hasTreasureHook = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.HOOK) == TREASURE_HOOK
+            hasTrophyLine = InventoryUtils.getItemInHand()?.getFishingRodPart(RodPart.LINE) == TROPHY_LINE
 
             // Check bait when switching to a fishing rod
             checkAndUpdateBaitFromInventory()
@@ -370,4 +379,28 @@ object FishingApi {
         InventoryUtils.getArmor().all {
             emberArmorNames.matches(it?.getInternalName()?.asString())
         }
+
+    fun isTrophyFishing(): Boolean {
+        if (hasTreasureHook) return false
+
+        if (wearingTrophyArmor ||
+            wearingEmberArmor ||
+            currentBait?.internalName == HOT_BAIT ||
+            hasTrophyLine
+        ) {
+            return true
+        }
+
+        if (!holdingRod) return false
+
+        // TODO: repofiy the levels numbers/islands
+        // TODO: Check if hotspot fishing since those have lower level requirements
+        val fishingLevel = SkillApi.storage?.get(SkillType.FISHING)?.level
+        return when {
+            fishingLevel == null -> false
+            IslandType.CRIMSON_ISLE.isInIsland() -> fishingLevel < 27
+            IslandType.LOTUS_ATOLL.isInIsland() -> fishingLevel < 10
+            else -> false
+        }
+    }
 }
