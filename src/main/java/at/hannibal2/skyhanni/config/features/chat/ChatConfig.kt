@@ -181,14 +181,14 @@ class ChatConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideJacob: Property<Boolean> = Property.of(true)
+    val hideJacob: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Sky Mall Messages", desc = "Hide the Sky Mall messages outside of Mining Islands.")
     @ConfigEditorBoolean
     @SearchTag("Skymall")
     @FeatureToggle
-    var hideSkyMall: Property<Boolean> = Property.of(true)
+    val hideSkyMall: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
@@ -205,7 +205,7 @@ class ChatConfig {
     @ConfigOption(name = "Hide Lottery Messages", desc = "Hide the Lottery messages outside of Foraging Islands.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideLottery: Property<Boolean> = Property.of(true)
+    val hideLottery: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(
