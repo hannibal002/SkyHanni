@@ -16,7 +16,7 @@ object DungeonChatFilter : ChatFilterGroup() {
         FairyFilter,
     )
 
-    object RareDropsFilter : RegexChatFilter("rare_drops", config.rareDrops) {
+    object RareDropsFilter : RegexChatFilter("rare_drops", { config.rareDrops }) {
         /**
          * REGEX-TEST: RARE REWARD! Leebys found a Recombobulator 3000 in their Obsidian Chest!
          */
@@ -38,7 +38,7 @@ object DungeonChatFilter : ChatFilterGroup() {
     }
 
 
-    object SoloStatsFilter : RegexChatFilter("solo_stats", config.soloStats) {
+    object SoloStatsFilter : RegexChatFilter("solo_stats", { config.soloStats }) {
         /**
          * REGEX-TEST: [Healer] My not know this one TODO: this one
          */
@@ -48,7 +48,7 @@ object DungeonChatFilter : ChatFilterGroup() {
         )
     }
 
-    object FairyFilter : RegexChatFilter("fairy", config.fairy) {
+    object FairyFilter : RegexChatFilter("fairy", { config.fairy }) {
         /**
          * REGEX-TEST: Genevieve the Fairy: You killed me! Take this Revive Stone so that my death is not in vain!
          */

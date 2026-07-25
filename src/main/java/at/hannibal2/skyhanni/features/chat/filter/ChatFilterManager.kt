@@ -23,8 +23,17 @@ object ChatFilterManager {
 
     // RepoPattern must be initialized at pre-init time
     private val groups = setOf(
-            MiscChatFilter,
-        )
+        DungeonChatFilter,
+        MiningChatFilter,
+        SlayerChatFilter,
+        EventChatFilter,
+        MiscChatFilter,
+        ForagingChatFilter,
+        HuntingChatFilter,
+        FarmingChatFilter,
+        GardenChatFilter,
+        WinterChatFilter,
+    )
 
     // Forces all the filters to be initialized at pre-init time
     private val knownFilters: Set<ChatFilter> =
@@ -57,7 +66,7 @@ object ChatFilterManager {
                         if (it is ActivatedChatFilter) {
                             it.activation.bind(
                                 onEnable = { register(it) },
-                                onDisable = { unregister(it) }
+                                onDisable = { unregister(it) },
                             )
                         }
                     }
