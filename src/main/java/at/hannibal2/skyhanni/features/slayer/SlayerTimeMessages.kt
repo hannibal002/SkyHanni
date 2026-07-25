@@ -154,7 +154,8 @@ object SlayerTimeMessages {
         event.registerBrigadier("shtestslayertimemessage") {
             description = "Tests the slayer time messages (chat and titles)"
             category = CommandCategory.DEVELOPER_TEST
-            arg("bossType",
+            arg(
+                "bossType",
                 EnumArgumentType.name<BossType>(),
                 BossType.entries.filter { it.isSlayer }.map { it.name }
             ) { bossArg ->
