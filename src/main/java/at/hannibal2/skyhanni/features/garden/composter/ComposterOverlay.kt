@@ -85,8 +85,8 @@ object ComposterOverlay {
     private var fuelExtraDisplay: Renderable? = null
 
     private var currentTimeType = TimeType.HOUR
-    private val composterInventory = InventoryDetector { name -> name == "Composter" }
-    private val composterUpgradesInventory = InventoryDetector { name -> name == "Composter Upgrades" }
+    private val composterInventory = InventoryDetector { ComposterUpgradesData.composterInventoryPattern }
+    private val composterUpgradesInventory = InventoryDetector { ComposterUpgradesData.composterUpgradesInventoryPattern }
     private var extraComposterUpgrade: ComposterUpgrade? = null
         set(value) {
             field = value

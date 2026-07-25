@@ -23,6 +23,14 @@ internal object PetStoragePatterns {
     )
 
     /**
+     * REGEX-TEST: Pets
+     */
+    val mainPetMenuTitleItemNamePattern by patternGroup.pattern(
+        "menu.gui.titleitem.name",
+        "Pets",
+    )
+
+    /**
      * REGEX-TEST: [Lvl 8] Squid
      * REGEX-TEST: [Lvl 100] Hermit Crab
      * REGEX-TEST: [Lvl 200] [122✦] Golden Dragon
