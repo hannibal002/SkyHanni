@@ -31,19 +31,8 @@ object MiscChatFilter : ChatFilterGroup() {
         SacrificeFilter,
     )
 
-    object EmptyFilter : ChatFilter {
-        private val activation = Activation.Config(config.empty)
-
-        init {
-            activation.bind(
-                onEnable = {
-                    ChatFilterManager.register(this)
-                },
-                onDisable = {
-                    ChatFilterManager.unregister(this)
-                },
-            )
-        }
+    object EmptyFilter : ActivatedChatFilter {
+        override val activation = Activation.Config(config.empty)
 
         override fun block(message: String): String? {
             if (!StringUtils.isEmpty(message)) return null

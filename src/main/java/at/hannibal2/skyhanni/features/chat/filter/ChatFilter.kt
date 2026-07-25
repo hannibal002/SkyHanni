@@ -14,9 +14,12 @@ interface ChatFilter {
     fun block(message: String): String?
 }
 
+interface ActivatedChatFilter : ChatFilter {
+    val activation: Activation
+}
+
 abstract class ChatFilterGroup {
     open val activation: Activation = Activation.Always
-
     abstract val filters: Set<ChatFilter>
 }
 
@@ -26,7 +29,6 @@ sealed interface Activation {
         onDisable: () -> Unit,
     )
     fun unbind()
-    fun refresh() {}
 
     object Always : Activation {
         private var onDisableCallback: (() -> Unit)? = null
@@ -73,9 +75,6 @@ sealed interface Activation {
             config.whenChanged { _, new ->
                 callback?.invoke(new)
             }
-        }
-
-        override fun refresh() {
             callback?.invoke(config.get())
         }
 
@@ -171,12 +170,6 @@ sealed interface Activation {
             onEnableCallback = null
             onDisableCallback = null
         }
-
-        override fun refresh() {
-            activations.forEach {
-                it.refresh()
-            }
-        }
     }
 }
 
@@ -192,21 +185,12 @@ abstract class AbstractRegexChatFilter(
 
 abstract class RegexChatFilter(
     reason: String,
-    activation: Activation,
-) : AbstractRegexChatFilter(reason) {
+    activationParam: Activation,
+) : AbstractRegexChatFilter(reason), ActivatedChatFilter {
     constructor(reason: String, config: Property<Boolean>) : this(reason, Activation.Config(config))
     constructor(reason: String, config: Property<Boolean>, island: IslandDetector) :
         this(reason, Activation.Config(config), Activation.Island(island))
     constructor(reason: String, vararg activation: Activation) : this(reason, Activation.AllOf(*activation))
 
-    init {
-        activation.bind(
-            onEnable = {
-                ChatFilterManager.register(this)
-            },
-            onDisable = {
-                ChatFilterManager.unregister(this)
-            },
-        )
-    }
+    override val activation: Activation = activationParam
 }

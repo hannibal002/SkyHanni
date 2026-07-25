@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.chat.filter.ChatFilterManager.block
 import at.hannibal2.skyhanni.features.chat.filter.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,6 +21,7 @@ object ChatFilterManager {
     val chatFilterGroup = RepoPattern.group("chat-filter")
     val generalConfig get() = SkyHanniMod.feature.chat
     val config get() = SkyHanniMod.feature.chat.filterType
+    private val activeFilters = mutableSetOf<ChatFilter>()
 
     private val groups = setOf(
         DungeonChatFilter,
@@ -36,21 +38,6 @@ object ChatFilterManager {
 
     private val knownFilters = groups
         .flatMapTo(mutableSetOf()) { it.filters }
-
-    private val activeFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
-
-    init {
-        groups.forEach { group ->
-            group.activation.bind(
-                onEnable = {
-                    register(group.filters)
-                },
-                onDisable = {
-                    unregister(group.filters)
-                },
-            )
-        }
-    }
 
     fun register(filter: ChatFilter) {
         require(filter in knownFilters) {
@@ -73,9 +60,27 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    fun onHypixel(event: HypixelJoinEvent) {
         groups.forEach { group ->
-            group.activation.refresh()
+            group.activation.bind(
+                onEnable = {
+                    group.filters.forEach {
+                        if (it is ActivatedChatFilter) {
+                            it.activation.bind(
+                                onEnable = { register(it) },
+                                onDisable = { unregister(it) }
+                            )
+                        }
+                    }
+                },
+                onDisable = {
+                    group.filters.forEach {
+                        if (it is ActivatedChatFilter) {
+                            it.activation.unbind()
+                        }
+                    }
+                },
+            )
         }
     }
 
