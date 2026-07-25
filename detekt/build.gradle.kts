@@ -15,7 +15,7 @@ abstract class DetektTestMetadataRule : ComponentMetadataRule {
 
     override fun execute(context: ComponentMetadataContext) {
         val version = context.details.id.version
-        if (version != "2.0.0-alhpa.4" && version != "2.0.0-alpha.5") return
+        if (version != "2.0.0-alpha.4" && version != "2.0.0-alpha.5") return
 
         context.details.withVariant("runtimeElements") {
             withDependencies {
