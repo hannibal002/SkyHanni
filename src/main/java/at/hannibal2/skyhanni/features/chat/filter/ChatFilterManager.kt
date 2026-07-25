@@ -68,6 +68,8 @@ object ChatFilterManager {
                                 onEnable = { register(it) },
                                 onDisable = { unregister(it) },
                             )
+                        } else {
+                            register(it)
                         }
                     }
                 },
@@ -75,6 +77,8 @@ object ChatFilterManager {
                     group.filters.forEach {
                         if (it is ActivatedChatFilter) {
                             it.activation.unbind()
+                        } else {
+                            unregister(it)
                         }
                     }
                 },
