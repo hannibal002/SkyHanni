@@ -135,6 +135,8 @@
 + Made warnings from Barn Fishing Timer clearer. - Luna (https://github.com/hannibal002/SkyHanni/pull/5453)
 + Added the Hotspot Tonic Mixin to the Non-Godpot Effect Display Feature. - jani (https://github.com/hannibal002/SkyHanni/pull/5804)
 + Added an option to put the DOUBLE HOOK! from Compact Double Hook after the sea creature catch message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5531)
++ Improved Trophy Fish Display detection for if you're Trophy Fishing. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
+    + Instead of only checking for Trophy Armor it now also checks for Trophy Line, Hot Bait usage, and if you are too low level to fish Sea Creatures.
 
 #### Event
 
@@ -350,6 +352,11 @@
 + Fixed SkyHanni not detecting the 4th Harvest Feast in-season crop. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6113)
 + Fixed Pest Spawn Timer giving error when Tab List is still loading when joining the Garden. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6165)
 + Fixed an error message when opening the Visitor menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6135)
++ Fixed detection of completed Jacob's Contests. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6191)
++ Fixed Juicy Sprayonator and Salty Sprayonator not being blocked by the No-Break feature in the Garden. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed not properly detecting overflow Garden XP from the desk. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6190)
++ Fixed Spray usage not being tracked in the Pest Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed Visitor Supercraft assuming killing a Werewolf Sea Creature is the only way to craft Enchanted Pumpkin. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6178)
 
 #### Combat
 
@@ -411,6 +418,7 @@
 + Fixed Pet Display visually keeping removed pet items. - Akinsoft (https://github.com/hannibal002/SkyHanni/pull/6066)
 + Fixed tab widget highlight not working in multi-page settings pages. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6103)
 + Fixed changing loadouts not updating Power Stone and tunings in Custom Scoreboard. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6146)
++ Fixed an issue where forging a pet would incorrectly replace your currently equipped pet in the pet display. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6179)
 
 #### Item Ability
 
@@ -493,6 +501,7 @@
 + Fixed Rift Odonata, Larva, and Vermin Highlight not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/5701)
 + Fixed rift time features not working with the hypixel resource pack. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6050)
 + Fixed rare error while using the Rift Berberis Helper. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6166)
++ Fixed Enigma Soul Helper not detecting the menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6187)
 
 #### Inventory
 
@@ -531,6 +540,10 @@
 + Fixed Inferno Profit Tracker detecting Bazaar + recipe menus as minion menu. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6129)
 + Fixed Croesus Chest Tracker thinking you always have already used kismet on a chest. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6164)
 + Fixed future legendary pets for Traveling Zoo not showing when other mods modify the tooltip. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6163)
++ Fixed Attribute Menu paginated inventory not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6182)
++ Fixed Croesus Chest Tracker not detecting paged Croesus inventory. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6180)
++ Fixed Hunting Box and Fusion Box not being detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6186)
++ Fixed Minion Upgrade Helper not detecting wrapped ingredient line. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6175)
 
 #### Commands
 
@@ -557,6 +570,9 @@
 + Fixed Mineshaft Mayhem perk buff giving an error. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6055)
 + Fixed gemstones not being detected in treasure chests. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6030)
 + Fixed SkyMall/Mayhem perks not being detected from the inventory. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6108)
++ Fixed certain Goblin Eggs, Diamond Essence and Gold Essence from treasure chests not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6183)
++ Fixed Corpse Loot incorrectly tracking whether a key was consumed after leaving the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6173)
++ Fixed Flawed Ruby being shown as Flawed Sapphire in Powder Chest Profit Tracker. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6183)
 
 #### Chat
 
@@ -686,6 +702,9 @@
 + Fixed Zorro's Cape protection not working due to Equipment change. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/6111)
 + Fixed skill progress features not correctly counting overflow skill XP. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6155)
 + Fixed some text (e.g. Damage Indicator) rendering behind entities on 26.1. - Luna (https://github.com/hannibal002/SkyHanni/pull/6149)
++ Fixed not being able to update NEU/SkyHanni repo if certain files are corrupted. - Luna (https://github.com/hannibal002/SkyHanni/pull/6097)
++ Fixed not detecting /stats menu due to Hypixel changing the menu name. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6187)
++ Fixed some Magical Power features not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6172)
 
 ### Technical Details
 
