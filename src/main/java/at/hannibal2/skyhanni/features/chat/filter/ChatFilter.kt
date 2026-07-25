@@ -26,7 +26,6 @@ abstract class ChatFilterGroup {
 abstract class AbstractRegexChatFilter(
     private val reason: String,
 ) : ChatFilter {
-
     protected abstract val patterns: List<Pattern>
 
     override fun block(message: String): String? =
@@ -35,11 +34,9 @@ abstract class AbstractRegexChatFilter(
 
 abstract class RegexChatFilter(
     reason: String,
-    activationParam: Activation,
+    config: () -> Property<Boolean>,
 ) : AbstractRegexChatFilter(reason), ActivatedChatFilter {
-    constructor(reason: String, config: () -> Property<Boolean>) : this(reason, Activation.Config(config))
-
-    override val activation: Activation = activationParam
+    override val activation: Activation = Activation.Config(config)
 }
 
 sealed interface Activation {
