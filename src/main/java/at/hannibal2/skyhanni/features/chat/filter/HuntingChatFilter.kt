@@ -6,7 +6,7 @@ object HuntingChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("hunting")
     private val config get() = ChatFilterManager.config.hunting
 
-    override val activation: Activation = Activation.Island(IslandDetector(IslandTypeTag.FORAGING_CUSTOM_TREES))
+    override val activation: Activation = Activation.Island(IslandTypeTag.FORAGING_CUSTOM_TREES)
 
     override val filters: Set<ChatFilter> = setOf(
         RedundantShardsFilter,

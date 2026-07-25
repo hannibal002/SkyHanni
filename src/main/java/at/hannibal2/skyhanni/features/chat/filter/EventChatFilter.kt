@@ -1,17 +1,13 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 
 object EventChatFilter : ChatFilterGroup() {
     private val patternGroup = ChatFilterManager.chatFilterGroup.group("event")
     private val config get() = ChatFilterManager.config
 
-    val winterDetector = IslandDetector(IslandType.WINTER,)
-
     override val filters: Set<ChatFilter> = setOf(
         GuildEventExpFilter,
-        WinterIslandFilter,
         FireSaleFilter,
         EventLevelUpFilter,
         ChocolateFactoryUpgradeFilter,
@@ -29,17 +25,6 @@ object EventChatFilter : ChatFilterGroup() {
         override val patterns by patternGroup.list(
             "guild-event",
             "You earned (?:[\\d,]+ GEXP(?: \\+ [\\d,]+ Event EXP)?|[\\d,]+ Event EXP) from playing SkyBlock!",
-        )
-    }
-
-
-    object WinterIslandFilter : RegexChatFilter("winter_island", config.others, winterDetector) {
-        /**
-         * REGEX-TEST: ☃ [VIP+] liron150 mounted a Snow Cannon!
-         */
-        override val patterns by patternGroup.list(
-            "winter-island",
-            "☃ .* mounted a Snow Cannon!",
         )
     }
 

@@ -31,6 +31,8 @@ object ChatFilterManager {
         ForagingChatFilter,
         HuntingChatFilter,
         FarmingChatFilter,
+        GardenChatFilter,
+        WinterChatFilter,
     )
 
     private val knownFilters = groups
