@@ -55,51 +55,61 @@ object SkyHanniEvents {
     val eventPrimaryFunctionNames: Map<String, Class<out SkyHanniEvent>> =
         GeneratedEventPrimaryFunctionNames.map
 
-    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
-        val name = "${method.declaringClass.name}.${method.name}"
-        val options = method.getAnnotation(HandleEvent::class.java) ?: return null
-        return when (method.parameterCount) {
-            0 -> {
-                val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
-                if (primaryFunctionEventType != null) {
-                    return options to listOf(primaryFunctionEventType)
-                }
-                if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
-                if (options.eventTypes.isEmpty()) {
-                    ErrorManager.crashInDevEnv(
-                        "Function $name must have an event parameter, a primary function " +
-                            "name, or an explicit event specification because it is " +
-                            "annotated with @HandleEvent",
-                    )
-                    return null
-                }
-                options to options.eventTypes.map { it.java }
-            }
+    private val Method.fullyQualifiedName: String get() = "${declaringClass.name}.$name"
 
-            1 -> {
-                val eventType = method.parameterTypes.first()
-                if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-                    ErrorManager.crashInDevEnv(
-                        "Function $name must have an event assignable from SkyHanniEvent " +
-                            "because it is annotated with @HandleEvent",
-                    )
-                    return null
-                }
-                @Suppress("UNCHECKED_CAST")
-                options to listOf(eventType as Class<out SkyHanniEvent>)
-            }
+    private val Method.options: HandleEvent? get() = getAnnotation(HandleEvent::class.java)
 
+    private fun handleZeroParameterMethod(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val options = method.options ?: return null
+
+        val primaryFunctionEventType = eventPrimaryFunctionNames[method.name]
+        if (primaryFunctionEventType != null) return options to listOf(primaryFunctionEventType)
+
+        if (options.eventType != SkyHanniEvent::class) return options to listOf(options.eventType.java)
+
+        if (options.eventTypes.isEmpty()) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must have an event parameter, a primary " +
+                    "function name, or an explicit event specification because it is annotated " +
+                    "with @HandleEvent",
+            )
+            return null
+        }
+
+        return options to options.eventTypes.map { it.java }
+    }
+
+    private fun handleSingleParameterMethod(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
+        val options = method.options ?: return null
+
+        val eventType = method.parameterTypes.first()
+
+        if (!SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must have an event assignable from " +
+                    "SkyHanniEvent because it is annotated with @HandleEvent",
+            )
+            return null
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        return options to listOf(eventType as Class<out SkyHanniEvent>)
+    }
+
+    private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? =
+        when (method.parameterCount) {
+            0 -> handleZeroParameterMethod(method)
+            1 -> handleSingleParameterMethod(method)
             else -> {
                 ErrorManager.crashInDevEnv(
-                    "Function $name has too many parameters. It must have exactly one " +
-                        "event parameter, or be parameterless with a primary function " +
-                        "name or an explicit event specification because it is annotated " +
-                        "with @HandleEvent",
+                    "Function ${method.fullyQualifiedName} has too many parameters. It must have " +
+                        "exactly one event parameter, or be parameterless with a primary " +
+                        "function name or an explicit event specification because it is " +
+                        "annotated with @HandleEvent",
                 )
                 null
             }
         }
-    }
 
     private fun unregisterMethod(method: Method) {
         val (_, eventTypes) = getEventData(method) ?: return
