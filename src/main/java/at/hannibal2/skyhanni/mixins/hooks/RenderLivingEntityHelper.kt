@@ -36,16 +36,16 @@ object RenderLivingEntityHelper {
     }
 
     @JvmStatic
-    fun getEntityGlowColor(entity: Entity): Int? =
-        getLivingEntityGlowColor(entity) ?: getEntityGlowEventColor(entity)
-
-    private fun getLivingEntityGlowColor(entity: Entity): Int? {
-        val livingEntity = entity as? LivingEntity ?: return null
-        if (livingEntity.isInvisible && !livingEntity.hasVisibleEquipment()) return null
-        val color = internalSetColorMultiplier(livingEntity, 0)
-        if (color != 0) return color
-        return null
+    fun getEntityGlowColor(entity: Entity): Int? {
+        if (entity is LivingEntity) {
+            if (entity.isInvisible && !entity.hasVisibleEquipment()) return null
+            getLivingEntityGlowColor(entity)?.let { return it }
+        }
+        return getEntityGlowEventColor(entity)
     }
+
+    private fun getLivingEntityGlowColor(entity: LivingEntity): Int? =
+        internalSetColorMultiplier(entity, 0).takeIf { it != 0 }
 
     @HandleEvent
     fun onWorldChange() {
