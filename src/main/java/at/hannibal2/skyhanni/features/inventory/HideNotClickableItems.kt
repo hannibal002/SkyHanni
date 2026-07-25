@@ -210,7 +210,7 @@ object HideNotClickableItems {
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
-            hideYourEquipment(chestName, stack) -> true
+            hideYourEquipment(stack) -> true
             hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
@@ -303,8 +303,8 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideYourEquipment(chestName: String, stack: SafeItemStack): Boolean {
-        if (!chestName.startsWith("Your Equipment")) return false
+    private fun hideYourEquipment(stack: SafeItemStack): Boolean {
+        if (!CurrentEquipmentApi.inventory.isInside()) return false
 
         val list = listOf(
             "HELMET",

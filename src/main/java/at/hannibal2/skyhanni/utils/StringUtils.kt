@@ -599,4 +599,20 @@ object StringUtils {
     fun Map<String, Any>.toQueryString(): String = "?" + map { (k, v) ->
         "${URLEncoder.encode(k, "UTF-8")}=${URLEncoder.encode(v.toString(), "UTF-8")}"
     }.joinToString("&")
+
+    fun Sequence<String>.withWrappedLines(): Sequence<String> = sequence {
+        val lines = toList()
+
+        for (i in lines.indices) {
+            yield(lines[i])
+
+            if (i + 1 < lines.size) {
+                yield(lines[i] + " " + lines[i + 1])
+            }
+        }
+    }
+
+    fun List<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
+
+    fun Iterator<String>.withWrappedLines(): Sequence<String> = asSequence().withWrappedLines()
 }
