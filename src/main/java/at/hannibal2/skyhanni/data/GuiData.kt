@@ -21,6 +21,7 @@ import net.minecraft.client.gui.screens.inventory.ContainerScreen
 @SkyHanniModule
 object GuiData {
 
+    @JvmStatic
     var preDrawEventCancelled = false
 
     @HandleEvent(priority = HandleEvent.HIGH)

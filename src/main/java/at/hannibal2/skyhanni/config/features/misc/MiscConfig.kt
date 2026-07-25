@@ -158,6 +158,15 @@ class MiscConfig {
     val colorfulItemTooltips: ColorfulItemTooltips = ColorfulItemTooltips()
 
     @Expose
+    @ConfigOption(
+        name = "Glowing Dropped Items",
+        desc = "Gives items on the ground that Hypixel doesn't already highlight a glowing outline based on their rarity.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var glowingDroppedItems: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Boop Party", desc = "")
     @Accordion
     val boopParty: BoopPartyConfig = BoopPartyConfig()
