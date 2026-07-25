@@ -66,14 +66,23 @@ object PestRoute {
                 event.draw3DLine(previous.location, next.location, routeColor, lineWidth = 3, depth = true)
             }
 
+            var previousLocation = LocationUtils.playerLocation()
             visibleRoute.forEachIndexed { index, pest ->
                 val location = pest.location
+                val rightClicks = (previousLocation.distance(location) / RIGHT_CLICK_TELEPORT_DISTANCE).toInt()
+                event.drawDynamicText(
+                    previousLocation.middle(location).add(y = 0.5),
+                    "§e$rightClicks RC",
+                    scaleMultiplier = 1.2,
+                    seeThroughBlocks = false,
+                )
                 event.drawDynamicText(
                     location.add(y = 0.75),
                     "§c§l${index + 1} §7${pest.type.displayName}",
                     scaleMultiplier = 1.8,
                     seeThroughBlocks = false,
                 )
+                previousLocation = location
             }
         }
 
@@ -225,6 +234,7 @@ object PestRoute {
     private const val ETHERWARP_UPDATE_INTERVAL_TICKS = 20
     private const val MAX_EXACT_PESTS = 10
     private const val PEST_VIEW_DISTANCE = 400
+    private const val RIGHT_CLICK_TELEPORT_DISTANCE = 12.0
     private const val MIN_ETHERWARP_DISTANCE = 8.0
     private const val MAX_ETHERWARP_DISTANCE = 61.0
     private const val TARGET_SEARCH_RADIUS = 4
