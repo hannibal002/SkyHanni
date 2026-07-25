@@ -63,7 +63,7 @@ object GummyWarning {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onArmorChange(event: OwnInventoryArmorUpdateEvent) {
-        if (!isEnabled()) return
+        if (!config.gummyWarning) return
         val armor = InventoryUtils.getArmor()
         hasHabanero = armor.any { piece ->
             if (piece == null) return@any false
