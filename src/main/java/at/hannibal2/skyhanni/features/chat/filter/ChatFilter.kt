@@ -22,7 +22,7 @@ interface ConfigChatFilter : ChatFilter {
             if (new) onEnable()
             else onDisable()
         }
-        if (config.get()) onEnable() else onDisable()
+        if (config.get()) onEnable()
     }
 }
 
