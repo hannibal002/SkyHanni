@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandTypeTag
 
+@Suppress("unused")
 object ForagingChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("foraging")
     private val config get() = CoreChatFilter.config.foraging

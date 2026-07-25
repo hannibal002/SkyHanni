@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.chat.filter
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 
+@Suppress("unused")
 object EventChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("event")
     private val config get() = CoreChatFilter.config

@@ -2,17 +2,12 @@ package at.hannibal2.skyhanni.features.chat.filter
 
 import at.hannibal2.skyhanni.data.IslandType
 
+@Suppress("unused")
 object HuntingChatFilter {
     private val patternGroup = CoreChatFilter.chatFilterGroup.group("hunting")
     private val config get() = CoreChatFilter.config.hunting
 
     val galateaDetector = IslandDetector(island = IslandType.GALATEA)
-
-    val filters =
-        setOf<ChatFilter>(
-            RedundantShardsFilter,
-            SwoopAxeFilter,
-        )
 
     object RedundantShardsFilter : RegexIslandChatFilter("redundant_shards", config.redundantComments, galateaDetector) {
         /**
