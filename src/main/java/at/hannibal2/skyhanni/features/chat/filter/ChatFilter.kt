@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.util.regex.Pattern
@@ -23,156 +21,6 @@ abstract class ChatFilterGroup {
     abstract val filters: Set<ChatFilter>
 }
 
-sealed interface Activation {
-    fun bind(
-        onEnable: () -> Unit,
-        onDisable: () -> Unit,
-    )
-    fun unbind()
-
-    object Always : Activation {
-        private var onDisableCallback: (() -> Unit)? = null
-
-        override fun bind(
-            onEnable: () -> Unit,
-            onDisable: () -> Unit,
-        ) {
-            onDisableCallback = onDisable
-            onEnable()
-        }
-
-        override fun unbind() {
-            onDisableCallback?.invoke()
-            onDisableCallback = null
-        }
-    }
-
-    object Never : Activation {
-        override fun bind(
-            onEnable: () -> Unit,
-            onDisable: () -> Unit,
-        ) {
-        }
-
-        override fun unbind() {}
-    }
-
-    class Config(
-        private val config: () -> Property<Boolean>,
-    ) : Activation {
-
-        private var callback: ((Boolean) -> Unit)? = null
-
-        override fun bind(
-            onEnable: () -> Unit,
-            onDisable: () -> Unit,
-        ) {
-            callback = {
-                if (it) onEnable()
-                else onDisable()
-            }
-            val actualConfig = config()
-            actualConfig.whenChanged { _, new ->
-                callback?.invoke(new)
-            }
-            callback?.invoke(actualConfig.get())
-        }
-
-        override fun unbind() {
-            callback?.invoke(false)
-            callback = null
-        }
-    }
-
-    class Island(
-        private val detector: IslandDetector,
-    ) : Activation {
-
-        constructor(island: IslandType) : this(IslandDetector(island))
-        constructor(islandTag: IslandTypeTag) : this(IslandDetector(islandTag))
-
-        private var onDisableCallback: (() -> Unit)? = null
-
-        override fun bind(
-            onEnable: () -> Unit,
-            onDisable: () -> Unit,
-        ) {
-            onDisableCallback = onDisable
-
-            if (detector.isInside()) {
-                onEnable()
-            } else {
-                onDisable()
-            }
-
-            detector.register { _, _ ->
-                if (detector.isInside()) {
-                    onEnable()
-                } else {
-                    onDisable()
-                }
-            }
-        }
-
-        override fun unbind() {
-            onDisableCallback?.invoke()
-            onDisableCallback = null
-        }
-    }
-
-    class AllOf(
-        private vararg val activations: Activation,
-    ) : Activation {
-
-        private var states: BooleanArray? = null
-        private var onEnableCallback: (() -> Unit)? = null
-        private var onDisableCallback: (() -> Unit)? = null
-
-        override fun bind(
-            onEnable: () -> Unit,
-            onDisable: () -> Unit,
-        ) {
-            onEnableCallback = onEnable
-            onDisableCallback = onDisable
-
-            states = BooleanArray(activations.size)
-
-            activations.forEachIndexed { index, activation ->
-                activation.bind(
-                    onEnable = {
-                        states?.set(index, true)
-                        update()
-                    },
-                    onDisable = {
-                        states?.set(index, false)
-                        update()
-                    },
-                )
-            }
-        }
-
-        private fun update() {
-            if (states?.all { it } == true) {
-                onEnableCallback?.invoke()
-            } else {
-                onDisableCallback?.invoke()
-            }
-        }
-
-        override fun unbind() {
-            activations.forEach {
-                it.unbind()
-            }
-
-            onDisableCallback?.invoke()
-
-            states = null
-            onEnableCallback = null
-            onDisableCallback = null
-        }
-    }
-}
-
 abstract class AbstractRegexChatFilter(
     private val reason: String,
 ) : ChatFilter {
@@ -188,9 +36,59 @@ abstract class RegexChatFilter(
     activationParam: Activation,
 ) : AbstractRegexChatFilter(reason), ActivatedChatFilter {
     constructor(reason: String, config: () -> Property<Boolean>) : this(reason, Activation.Config(config))
-    constructor(reason: String, island: IslandDetector, config: () -> Property<Boolean>) :
-        this(reason, Activation.Config(config), Activation.Island(island))
-    constructor(reason: String, vararg activation: Activation) : this(reason, Activation.AllOf(*activation))
 
     override val activation: Activation = activationParam
+}
+
+sealed interface Activation {
+    fun isActive(): Boolean
+
+    fun bind(onChange: (Boolean) -> Unit) {
+        onChange(isActive())
+    }
+
+    fun unbind() {}
+
+    object Always : Activation {
+        override fun isActive(): Boolean = true
+    }
+
+    object Never : Activation {
+        override fun isActive(): Boolean = false
+    }
+
+    class Config(
+        private val property: () -> Property<Boolean>,
+    ) : Activation {
+        private var callback: ((Boolean) -> Unit)? = null
+        override fun isActive(): Boolean = property().get()
+        override fun bind(onChange: (Boolean) -> Unit) {
+            callback = onChange
+            val prop = property()
+            prop.whenChanged { _, new ->
+                callback?.invoke(new)
+            }
+            onChange(prop.get())
+        }
+        override fun unbind() {
+            callback = null
+        }
+    }
+
+    class Island(
+        private val detector: IslandDetector,
+    ) : Activation {
+        private var callback: ((Boolean) -> Unit)? = null
+        override fun isActive(): Boolean = detector.isInside()
+        override fun bind(onChange: (Boolean) -> Unit) {
+            callback = onChange
+            onChange(detector.isInside())
+            detector.register { _, _ ->
+                callback?.invoke(detector.isInside())
+            }
+        }
+        override fun unbind() {
+            callback = null
+        }
+    }
 }

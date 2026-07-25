@@ -60,29 +60,27 @@ object ChatFilterManager {
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         groups.forEach { group ->
-            group.activation.bind(
-                onEnable = {
-                    group.filters.forEach {
-                        if (it is ActivatedChatFilter) {
-                            it.activation.bind(
-                                onEnable = { register(it) },
-                                onDisable = { unregister(it) },
-                            )
+            group.activation.bind { groupActive ->
+                if (groupActive) {
+                    group.filters.forEach { filter ->
+                        if (filter is ActivatedChatFilter) {
+                            filter.activation.bind { active ->
+                                if (active) register(filter)
+                                else unregister(filter)
+                            }
                         } else {
-                            register(it)
+                            register(filter)
                         }
                     }
-                },
-                onDisable = {
-                    group.filters.forEach {
-                        if (it is ActivatedChatFilter) {
-                            it.activation.unbind()
-                        } else {
-                            unregister(it)
+                } else {
+                    group.filters.forEach { filter ->
+                        if (filter is ActivatedChatFilter) {
+                            filter.activation.unbind()
                         }
+                        unregister(filter)
                     }
-                },
-            )
+                }
+            }
         }
     }
 
