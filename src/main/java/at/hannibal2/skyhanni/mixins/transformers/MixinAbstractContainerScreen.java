@@ -42,7 +42,7 @@ public abstract class MixinAbstractContainerScreen {
     //~ if < 26.1 '"extractRenderState"' -> '"render"' {
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        if (GlobalRender.INSTANCE.getRenderDisabled()) return;
+        if (GlobalRender.getRenderDisabled()) return;
         AbstractContainerScreen<?> gui = (AbstractContainerScreen<?>) (Object) this;
         if (new GuiContainerEvent.PreDraw(context, gui, gui.getMenu(), mouseX, mouseY, deltaTicks).post().isCancelled()) {
             GuiData.setPreDrawEventCancelled(true);
