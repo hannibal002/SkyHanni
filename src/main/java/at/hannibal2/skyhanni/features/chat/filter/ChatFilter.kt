@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.chat.filter
 
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import io.github.notenoughupdates.moulconfig.observer.Property
 import java.util.regex.Pattern
@@ -78,6 +80,9 @@ sealed interface Activation {
     class Island(
         private val detector: IslandDetector,
     ) : Activation {
+        constructor(islandType: IslandTypeTag) : this(IslandDetector(islandType))
+        constructor(island: IslandType) : this(IslandDetector(island))
+
         private var callback: ((Boolean) -> Unit)? = null
         override fun isActive(): Boolean = detector.isInside()
         override fun bind(onChange: (Boolean) -> Unit) {
