@@ -12,6 +12,22 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestsConfig {
     @Expose
+    @ConfigOption(
+        name = "Pest Highlight",
+        desc = "Highlights pests with a §cred outline §7through blocks.",
+    )
+    @ConfigEditorBoolean
+    var pestHighlight: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Shortest Pest Route",
+        desc = "Shows the shortest route from you through every detected pest.",
+    )
+    @ConfigEditorBoolean
+    var shortestPestRoute: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Pest Spawn", desc = "")
     @Accordion
     val pestSpawn: PestSpawnConfig = PestSpawnConfig()
@@ -79,4 +95,3 @@ class PestsConfig {
     @ConfigLink(owner = PestsConfig::class, field = "pestChanceDisplay")
     val pestChanceDisplayPosition: Position = Position(5, -115)
 }
-

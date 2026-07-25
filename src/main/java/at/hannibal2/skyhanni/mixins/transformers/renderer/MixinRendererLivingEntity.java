@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
 import at.hannibal2.skyhanni.mixins.hooks.RendererLivingEntityHook;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -89,9 +90,11 @@ public abstract class MixinRendererLivingEntity<T extends LivingEntity, S extend
         int outlineColor,
         ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        return !(state instanceof LivingEntityRenderState livingState &&
-            livingState.isInvisible &&
-            livingState.skyhanni$isUsingCustomOutline());
+        if (!(state instanceof LivingEntityRenderState livingState) || !livingState.isInvisible) return true;
+
+        boolean isXrayGlow = EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity &&
+            RenderLivingEntityHelper.isEntityXrayGlow(livingEntity);
+        return !livingState.skyhanni$isUsingCustomOutline() && !isXrayGlow;
     }
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)

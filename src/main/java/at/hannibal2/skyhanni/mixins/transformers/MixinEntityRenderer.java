@@ -57,7 +57,9 @@ public class MixinEntityRenderer {
         if (glowColor == null) {
             return original.call(client, entity);
         }
-        state.skyhanni$setUsingCustomOutline();
+        if (!RenderLivingEntityHelper.isEntityXrayGlow(entity)) {
+            state.skyhanni$setUsingCustomOutline();
+        }
         return true;
     }
 
