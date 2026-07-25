@@ -43,10 +43,7 @@ object HypixelLocationApi {
         private set
 
     var inSkyblock: Boolean = false
-        private set(value) {
-            field = value
-            SkyHanniEvents.markEventCacheDirty(DirtyReason.LOCATION_CHANGED)
-        }
+        private set
 
     var island: IslandType = IslandType.NONE
         private set(value) {
