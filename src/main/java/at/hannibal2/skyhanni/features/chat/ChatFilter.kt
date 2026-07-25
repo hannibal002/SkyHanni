@@ -125,8 +125,16 @@ object ChatFilter {
     )
 
     // Profile Join
-    private val profileJoinMessageStartsWith = listOf(
-        "§aYou are playing on profile: §e", "§8Profile ID: ",
+    /**
+     * REGEX-TEST: §8Profile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §eProfile ID: 691d6a3b-23ea-4541-80b5-771facc73b16
+     * REGEX-TEST: §aYou are playing on profile: §e691d6a3b-23ea-4541-80b5-771facc73b16
+     */
+    private val profileJoinPatterns by miscPatternGroup.list(
+        "profile-join",
+        "§aYou are playing on profile: §e.*",
+        "§8Profile ID: .*",
+        "§eProfile ID: .*",
     )
 
     // OTHERS
@@ -285,6 +293,9 @@ object ChatFilter {
         "§cWhoa! Slow down there!",
         "§cWait a moment before confirming!",
         "§cYou cannot open the SkyBlock menu while in combat!",
+        "§7Your radio is weak. Find another enjoyer to boost it.",
+        "§7Your radio signal is strong!",
+        "§7Your radio lost signal. There's too many enjoyers on this channel.",
     )
 
     // Annoying Spam
@@ -464,12 +475,12 @@ object ChatFilter {
     )
 
     // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefPatterns = listOf(
+    private val masterChefPatterns = listOf(
         "§e\\[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.".toPattern(),
     )
 
     // §e[NPC] Feast Chef Ted§f: Thanks for the donation! I've added a §eKernel §fto your purse.
-    private val MasterChefMessages = listOf(
+    private val masterChefMessages = listOf(
         "§e[NPC] Feast Chef Ted§f: §rThanks for the donation! I've added a §eKernel §fto your purse.",
     )
 
@@ -555,7 +566,7 @@ object ChatFilter {
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
         "teleport_pads" to teleportPadPatterns,
-        "masterchef" to MasterChefPatterns,
+        "masterchef" to masterChefPatterns,
     )
 
     private val repoPatternsMap: Map<String, List<Pattern>> = mapOf(
@@ -565,6 +576,7 @@ object ChatFilter {
         "swoop_axe" to listOf(swoopAxePattern),
         "hoppity_appear" to listOf(hoppityAppearPattern),
         "hoppity_begin" to listOf(hoppityBeginPattern),
+        "profile_join" to profileJoinPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -587,7 +599,7 @@ object ChatFilter {
         "lottery" to lotteryMessages,
         "parkour" to parkourCancelMessages,
         "teleport_pads" to teleportPadMessages,
-        "masterchef" to MasterChefMessages,
+        "masterchef" to masterChefMessages,
     )
 
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
@@ -596,7 +608,6 @@ object ChatFilter {
 
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
-        "profile_join" to profileJoinMessageStartsWith,
     )
     // </editor-fold>
 
@@ -631,7 +642,7 @@ object ChatFilter {
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
         config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
-        config.masterChef && MasterChefPatterns.matches(message) -> "masterchef"
+        config.masterChef && masterChefPatterns.matches(message) -> "masterchef"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

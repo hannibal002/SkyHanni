@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.inventory.AttemptedInventoryCloseEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.CFApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -56,10 +57,10 @@ object CFStrayTimer {
     }
 
     @HandleEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (timer == Duration.ZERO) return
-        timer = when (event.inventoryName) {
-            "Chocolate Factory" -> timer
+        timer = when {
+            CFApi.inChocolateFactory -> timer
             else -> 30.seconds
         }
     }
