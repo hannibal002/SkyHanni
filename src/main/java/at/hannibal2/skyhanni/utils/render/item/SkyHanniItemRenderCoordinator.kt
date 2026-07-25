@@ -1,15 +1,27 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.render.item.atlas.SkyHanniItemAtlas
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.render.state.GuiRenderState
-import net.minecraft.client.renderer.CachedOrthoProjectionMatrixBuffer
 import net.minecraft.client.renderer.MultiBufferSource.BufferSource
+import net.minecraft.client.renderer.ProjectionMatrixBuffer
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
+import net.minecraft.client.renderer.state.gui.GuiRenderState
 import net.minecraft.world.phys.Vec3
 import kotlin.math.abs
 
+@SkyHanniModule
 internal object SkyHanniItemRenderCoordinator {
+
+    @HandleEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Item Atlas")
+        event.addIrrelevant {
+            atlas.atlasDebugInfo().onEach(::add)
+        }
+    }
 
     private data class FrameRenderResources(
         val bufferSource: BufferSource,
@@ -22,12 +34,19 @@ internal object SkyHanniItemRenderCoordinator {
     // items that have been stable for this many frames are committed to the atlas.
     private const val SETTLE_FRAMES = 4
     private val projectionBuffer by lazy {
-        CachedOrthoProjectionMatrixBuffer("SkyHanni items", -1000.0f, 1000.0f, true)
+        ProjectionMatrixBuffer(
+            "SkyHanni items",
+            //? if < 26.1 {
+            /*-1000.0f,
+            1000.0f,
+            true,
+            *///?}
+        )
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()
     private val realtimeSlotLastSeen = HashMap<Int, Int>() // stableId -> frameNumber
     private val settleTracker = HashMap<Int, SettleEntry>() // keyed by stableId, NOT atlasKey
-    private val atlas = SkyHanniItemAtlas()
+    private val atlas by lazy { SkyHanniItemAtlas() }
     private var lastEvictFrame = -1
 
     fun invalidateAtlas() {
@@ -100,7 +119,7 @@ internal object SkyHanniItemRenderCoordinator {
         if (isSettled) {
             val blitSubmitted = with(atlas) { submitBlitForState(state, guiRenderState, frameNumber) }
             if (blitSubmitted) return
-            // Atlas miss (overflow or not yet allocated) — fall through to realtime
+            // Atlas miss (overflow or not yet allocated) - fall through to realtime
         }
 
         realtimeSlotLastSeen[state.stableId] = frameNumber

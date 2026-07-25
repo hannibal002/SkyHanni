@@ -240,7 +240,7 @@ object TitleManager {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("TitleManager")
         event.addIrrelevant {
             add(

@@ -106,7 +106,7 @@ object KeyboardManager {
         val isClose = keycode.matchesClosureKey() || keycode == GLFW.GLFW_KEY_ESCAPE
         if (!isClose) return false
 
-        return AttemptedInventoryCloseEvent().post()
+        return AttemptedInventoryCloseEvent().post().isCancelled
     }
 
     fun getModifierKeyName(short: Boolean = false): String =
@@ -164,13 +164,13 @@ object KeyboardManager {
             else -> false
         }
 
-        val w get() = Minecraft.getInstance().options.keyUp!!
-        val a get() = Minecraft.getInstance().options.keyLeft!!
-        val s get() = Minecraft.getInstance().options.keyDown!!
-        val d get() = Minecraft.getInstance().options.keyRight!!
+        val w get() = Minecraft.getInstance().options.keyUp
+        val a get() = Minecraft.getInstance().options.keyLeft
+        val s get() = Minecraft.getInstance().options.keyDown
+        val d get() = Minecraft.getInstance().options.keyRight
 
-        val up get() = Minecraft.getInstance().options.keyJump!!
-        val down get() = Minecraft.getInstance().options.keyShift!!
+        val up get() = Minecraft.getInstance().options.keyJump
+        val down get() = Minecraft.getInstance().options.keyShift
 
         override fun iterator(): Iterator<KeyMapping> =
             object : Iterator<KeyMapping> {

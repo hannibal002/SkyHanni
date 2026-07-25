@@ -15,6 +15,7 @@ class CompatRuleSetProvider : RuleSetProvider {
             ruleSetId,
             mapOf(
                 RuleName("MinecraftCompat") to ::MinecraftCompat,
+                RuleName("VanillaItemStackImport") to ::VanillaItemStackImport,
             ),
         )
     }

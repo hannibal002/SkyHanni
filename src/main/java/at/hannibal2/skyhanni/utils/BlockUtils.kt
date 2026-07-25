@@ -14,7 +14,7 @@ import net.minecraft.world.phys.HitResult
 
 object BlockUtils {
 
-    private val world get() = MinecraftCompat.localWorld
+    private val world get() = MinecraftCompat.localWorldOrThrow
 
     fun LorenzVec.getBlockAt(): Block = getBlockStateAt().block
 
@@ -37,20 +37,20 @@ object BlockUtils {
         return getValue(property) == 0
     }
 
-    private fun raycast(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec? {
+    private fun raycast(start: LorenzVec, direction: LorenzVec, distance: Double = 50.0): LorenzVec {
         val target = start + direction.normalize() * distance
         val result = raycast(start, target)
 
-        return result?.location?.toLorenzVec()
+        return result.location.toLorenzVec()
     }
 
-    fun raycast(start: LorenzVec, end: LorenzVec): BlockHitResult? = world.clip(
+    fun raycast(start: LorenzVec, end: LorenzVec): BlockHitResult = world.clip(
         ClipContext(
             start.toVec3(),
             end.toVec3(),
             ClipContext.Block.COLLIDER,
             ClipContext.Fluid.NONE,
-            MinecraftCompat.localPlayer,
+            MinecraftCompat.localPlayerOrThrow,
         ),
     )
 
@@ -60,9 +60,9 @@ object BlockUtils {
 
     fun getTargetedBlockAtDistance(distance: Double) = raycast(
         LocationUtils.playerEyeLocation(),
-        MinecraftCompat.localPlayer.lookAngle.toLorenzVec(),
+        MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec(),
         distance,
-    )?.roundToBlock()
+    ).roundToBlock()
 
     private fun nearbyBlocks(center: LorenzVec, distance: Int): MutableIterable<BlockPos> {
         val from = center.add(-distance, -distance, -distance).toBlockPos()

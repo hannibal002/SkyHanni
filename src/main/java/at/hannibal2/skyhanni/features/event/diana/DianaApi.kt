@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DianaApi {
@@ -34,7 +34,7 @@ object DianaApi {
 
     fun isDoingDiana() = IslandType.HUB.isInIsland() && isRitualActive() && hasSpadeInHotbar()
 
-    val ItemStack.isDianaSpade get() = getInternalName() in spades
+    val SafeItemStack.isDianaSpade get() = getInternalName() in spades
 
     val NeuInternalName.isDianaSpade get() = this in spades
 

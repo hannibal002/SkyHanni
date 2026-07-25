@@ -1,26 +1,27 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.overrideId
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.DyeCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.deferredItemRenderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Companion.item
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-private fun createPlayerHead(): ItemStack = ItemStack(Items.PLAYER_HEAD)
+private fun createPlayerHead(): SafeItemStack = SafeItemStack(Items.PLAYER_HEAD)
 
 // Todo de-duplicate with MiningEventType in data
 enum class MiningEventType(
@@ -30,7 +31,7 @@ enum class MiningEventType(
     color: LorenzColor,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
-    var itemStack: ItemStack? = null,
+    var itemStack: SafeItemStack? = null,
 ) {
     GONE_WITH_THE_WIND(
         "GONE WITH THE WIND", "Wind", 18.minutes, LorenzColor.BLUE, false,
@@ -40,7 +41,9 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val compass = Renderable.item(ItemStack(Items.COMPASS)) { scale = 0.45 }
+            val compass by lazy {
+                Renderable.item(SafeItemStack(Items.COMPASS)) { scale = 0.45 }
+            }
             val wind = Renderable.text("§9≈", scale = 0.75)
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
@@ -60,8 +63,12 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val dyeGreen = Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
-            val dyePink = Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            val dyeGreen by lazy {
+                Renderable.item(DyeCompat.LIME.createStack()) { scale = 0.45 }
+            }
+            val dyePink by lazy {
+                Renderable.item(DyeCompat.PINK.createStack()) { scale = 0.45 }
+            }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(1f, 0f)
@@ -76,7 +83,13 @@ enum class MiningEventType(
 
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, LorenzColor.RED, true,
-        Renderable.item(createPlayerHead()) { scale = 0.36 }, // Late init when skull texture holder is loaded
+        Renderable.item(
+            ItemUtils.repoSkullProvider(
+                displayName = "Goblin",
+                uuid = "32518c29-6127-3c71-b2a7-be4c3251e76f",
+                repoSkullId = "GOBLIN_RAID",
+            ),
+        ) { scale = 0.36 },
     ),
 
     BETTER_TOGETHER(
@@ -87,16 +100,15 @@ enum class MiningEventType(
             override val horizontalAlign = RenderUtils.HorizontalAlignment.LEFT
             override val verticalAlign = RenderUtils.VerticalAlignment.CENTER
 
-            val steveHead = Renderable.item(createPlayerHead()) { scale = 0.36 }
-            val alexHead by lazy {
-                Renderable.item(
-                    ItemUtils.createSkull(
-                        "Alex",
-                        "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
-                        SkullTextureHolder.getTexture("ALEX_SKIN_TEXTURE"),
-                    )
-                ) { scale = 0.36 }
+            val steveHead by lazy {
+                Renderable.item(createPlayerHead()) { scale = 0.36 }
             }
+            val alexHeadProvider = ItemUtils.repoSkullProvider(
+                displayName = "Alex",
+                uuid = "6ab43178-89fd-4905-97f6-0f67d9d76fd9",
+                repoSkullId = "ALEX_SKIN_TEXTURE",
+            )
+            val alexHead by lazy { Renderable.item(alexHeadProvider) { scale = 0.36 } }
 
             override fun render(mouseOffsetX: Int, mouseOffsetY: Int) {
                 DrawContextUtils.translate(-1f, 0f)
@@ -114,14 +126,14 @@ enum class MiningEventType(
         160.seconds,
         color = LorenzColor.GOLD,
         dwarvenSpecific = true,
-        iconInput = ItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET"),
+        iconInput = deferredItemRenderable { SafeItemStack(Items.NAME_TAG).overrideId("MINING_RAFFLE_TICKET") },
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
         "Gourmand", 10.minutes,
         color = LorenzColor.AQUA,
         dwarvenSpecific = true,
-        iconInput = DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND"),
+        iconInput = deferredItemRenderable { DyeCompat.CYAN.createStack().overrideId("MITHRIL_GOURMAND") },
     ),
     ;
 
@@ -131,25 +143,19 @@ enum class MiningEventType(
         defaultLength: Duration,
         color: LorenzColor,
         dwarvenSpecific: Boolean,
-        iconInput: ItemStack,
+        iconInput: SafeItemStack,
     ) : this(
         eventName, shortName, defaultLength, color, dwarvenSpecific,
         Renderable.item(iconInput) { xSpacing = 0 },
         iconInput,
     )
 
-    private var icon = Renderable.hoverTips(iconInput, listOf(eventName))
+    private val icon = Renderable.hoverTips(iconInput, listOf(eventName))
     private val compactText = Renderable.text("${color.getChatColor()}$shortName")
     private val normalText = Renderable.text("${color.getChatColor()}$eventName")
 
-    private var compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
-    private var normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
-
-    private fun rebuildIcons(iconInput: ItemStack) {
-        icon = Renderable.hoverTips(iconInput, listOf(eventName))
-        compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
-        normalTextWithIcon = Renderable.horizontal(listOf(icon, normalText), 0)
-    }
+    private val compactTextWithIcon = Renderable.horizontal(icon, compactText, spacing = 0)
+    private val normalTextWithIcon = Renderable.horizontal(icon, normalText, spacing = 0)
 
     fun getRenderable(): Renderable = when (config.compressedFormat) {
         CompressFormat.COMPACT_TEXT -> compactTextWithIcon
@@ -159,21 +165,13 @@ enum class MiningEventType(
         CompressFormat.DEFAULT -> normalTextWithIcon
     }
 
-    // todo on 1.8 this used to make it darker, the shader we had for that is gone now so idk
+    // TODO on 1.8 this used to make it darker, the shader we had for that is gone now so idk
     fun getRenderableAsPast(): Renderable = getRenderable()
 
+    @SkyHanniModule
     companion object {
-        private val config get() = SkyHanniMod.feature.mining.miningEvent
 
-        // Because we don't want to hard-code the goblin texture, this gets called by SkullTextureHolder when the repository is loaded
-        fun fixGoblinItemStack() {
-            val goblinItemStack = ItemUtils.createSkull(
-                "Goblin",
-                "32518c29-6127-3c71-b2a7-be4c3251e76f",
-                SkullTextureHolder.getTexture("GOBLIN_RAID"),
-            )
-            GOBLIN_RAID.rebuildIcons(goblinItemStack)
-        }
+        private val config get() = SkyHanniMod.feature.mining.miningEvent
 
         enum class CompressFormat {
             DEFAULT,

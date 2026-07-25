@@ -40,6 +40,7 @@ object BingoCardTips {
         "reward",
         "Reward",
     )
+
     /**
      * REGEX-TEST: Contribution Rewards
      */
@@ -56,7 +57,7 @@ object BingoCardTips {
         "Row #.*",
     )
 
-    private val bingoCardInventory = InventoryDetector(inventoryPattern)
+    private val bingoCardInventory = InventoryDetector { inventoryPattern }
 
     @HandleEvent
     fun onToolTip(event: ToolTipTextEvent) {

@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.data.garden.cropmilestones.CropMilestonesApi.percen
 import at.hannibal2.skyhanni.data.garden.cropmilestones.CustomGoals.getCustomGoal
 import at.hannibal2.skyhanni.data.title.TitleContext
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.garden.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.garden.farming.CropMilestoneUpdateEvent
@@ -75,8 +76,8 @@ object GardenCropMilestoneDisplay {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onGuiRender() {
+    @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnIsland = IslandType.GARDEN)
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         if (GardenApi.hideExtraGuis()) return
 

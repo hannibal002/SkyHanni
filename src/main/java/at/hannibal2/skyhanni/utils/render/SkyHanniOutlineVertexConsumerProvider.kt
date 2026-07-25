@@ -2,8 +2,6 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.textures.AddressMode
-import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
 import com.mojang.blaze3d.textures.TextureFormat
@@ -90,10 +88,6 @@ class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
                     TextureFormat.DEPTH32,
                     lastWidth, lastHeight, 1, 1,
                 )
-                //? if < 1.21.11 {
-                depthAttachment.setTextureFilter(FilterMode.NEAREST, false)
-                depthAttachment.setAddressMode(AddressMode.CLAMP_TO_EDGE)
-                //?}
                 customDepthAttachment = depthAttachment
                 customDepthAttachmentView = device.createTextureView(depthAttachment)
             } catch (e: Exception) {

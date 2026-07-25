@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
 import at.hannibal2.skyhanni.data.GuiData;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
@@ -18,10 +18,11 @@ abstract class MixinGenericContainerScreen {
     private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();
 
     @ModifyArg(
-        method = "renderBg",
+        //~ if < 26.1 'extractBackground' -> 'renderBg'
+        method = "extractBackground",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphics;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
+            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;blit(Lcom/mojang/blaze3d/pipeline/RenderPipeline;Lnet/minecraft/resources/Identifier;IIFFIIII)V"
         ),
         index = 1
     )
@@ -29,8 +30,10 @@ abstract class MixinGenericContainerScreen {
         return skyhanni$hook.getTexture(sprite);
     }
 
-    @Inject(method = "renderBg", at = @At(value = "HEAD"), cancellable = true)
-    private void cancelWardrobeBackground(GuiGraphics guiGraphics, float f, int i, int j, CallbackInfo ci) {
+    //~ if < 26.1 'extractBackground' -> 'renderBg'
+    @Inject(method = "extractBackground", at = @At(value = "HEAD"), cancellable = true)
+    //~ if < 26.1 'int mouseX, int mouseY, float a' -> 'float f, int i, int j'
+    private void cancelWardrobeBackground(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float a, CallbackInfo ci) {
         if (GuiData.INSTANCE.getPreDrawEventCancelled()) {
             ci.cancel();
         }

@@ -1,78 +1,125 @@
 # Download and Install SkyHanni
 
-SkyHanni is a Forge mod for **Minecraft 1.8.9 only**.
-Running SkyHanni on Badlion, Lunar, Feather, or newer versions of Minecraft is **not supported**.
+SkyHanni is a Fabric mod for **modern Minecraft versions**.
+Legacy versions of Minecraft (like 1.8.9) are **no longer supported** by SkyBlock or SkyHanni.
+Follow this guide to install SkyHanni for the Fabric loader. Pick whichever launcher section matches what you use.
 
-Follow this guide to install SkyHanni in regular Minecraft Forge.
-If you already have Forge mods, you can skip to step 4. Otherwise, start from step 1.
-If you already have the latest alpha version from NEU, you can skip to step 5.
+> **1: Install Java**
+> To play with modern Fabric mods, you need a recent version of Java matching your Minecraft version (1.21.x: **Java 21**, 26.x: **Java 25**).
+> We recommend [Adoptium Temurin](https://adoptium.net/temurin/releases/).
+> Download and run the installer for your operating system.
 
-> **1: Run vanilla 1.8.9**
-> Run Minecraft 1.8.9, unmodded, for 10 seconds, then close it.
+---
 
-> **2: Install Java**
-> To play with mods, you need Java 8.
-> Install [Java 8](<https://www.java.com/en/download/>).
-> Double-click the file to install it.
+## Option A: Prism Launcher
 
-> **3: Install Forge**
-> Forge is the system that loads your mods into the game.
-> You need Java to run Forge.
-> Download [Forge for 1.8.9](<https://maven.minecraftforge.net/net/minecraftforge/forge/1.8.9-11.15.1.2318-1.8.9/forge-1.8.9-11.15.1.2318-1.8.9-installer.jar>).
-> When you double-click the file, install as client.
-> If Forge does not open with Java, download [Jarfix](<https://johann.loefflmann.net/en/software/jarfix/index.html>), double-click it, then try running Forge again.
+Prism Launcher can handle Fabric, the dependencies, RAM, and Java all from one instance setup screen, so it's the fastest option.
 
-> **4: Download NEU**
-> NEU is NotEnoughUpdates, another Forge mod that contains files that SkyHanni depends on to function.
-> You can install it from any of those spots:
-> - [Modrinth](<https://modrinth.com/mod/notenoughupdates>)
-> - [Moulberry's Bush Discord Server](<https://discord.gg/moulberry>) in the channel [#neu-download](<https://discord.com/channels/516977525906341928/693586404256645231>) 
-> - [SkyHanni Discord](<https://discord.com/invite/skyhanni-997079228510117908>) in the channel #neu-updates.
+> **2: Install Prism Launcher**
+> Download it from the [Official Prism Launcher website](https://prismlauncher.org/download/) for your OS.
 
-> **5: Download SkyHanni**
-> SkyHanni has two different update circles: [Full Release](<https://github.com/hannibal002/SkyHanni/releases/latest>) and [Beta](<https://github.com/hannibal002/SkyHanni/releases>).
-> It is recommended to use the **Full Release**.
-> It updates every 3–4 weeks and should run very stable.
-> If you find bugs or miss features in the full version, they might be fixed/implemented already in a beta version.
-> The **Beta Version**, on the other hand, gets updated multiple times a week, has new features earlier, but may also contain more bugs.
+> **3: Create a new instance**
+> 1. Click **Add Instance**.
+> 2. Select the **Minecraft version** you want (e.g. 26.1.2).
+> 3. Under **Loader**, choose **Fabric** and select the latest compatible loader version.
+> 4. Click **Create Instance**.
 
-> **6: Find .minecraft**
-> Once you have downloaded both NEU and SkyHanni, you need to navigate to your `.minecraft` folder.
-> - On Windows, open File Explorer, in the file location bar at the top type in `%appdata%` and open `.minecraft`.
-> - On Mac, open Finder, click on "Go" at the top of your screen and then "Go to Folder" and type in `~/Library/Application Support/Minecraft`.
-> - On Linux, `.minecraft` is located in your home folder. `~/.minecraft`
+> **4: Add SkyHanni**
+> 1. Right-click your new instance and select **Edit**.
+> 2. Select **Mods** category and click on **Download Mods** - this searches Modrinth's catalog directly inside Prism.
+> 3. Under Modrinth, search for **SkyHanni** and click it to add it straight to your instance.
+> 4. You can add many other mods the same way.
 
-> **7: Move mods into mods folder**
-> If there is a `mods` folder, great! Open it.
-> Otherwise, create a new folder and name it exactly `mods`.
-> Move the NEU and SkyHanni files you downloaded into the folder.
-> Remove older versions of NEU or SkyHanni in that folder before adding the new files.
-> *Note: If you encounter a problem, support may ask for a screenshot of your mods folder: this is the folder you just set up.*
+> **5: Setup RAM**
+> 1. Right-click the instance and select **Edit**.
+> 2. Select **Settings** on the left, then click the **Java** tab.
+> 3. Enable the **Memory** checkbox and set **Maximum Memory** to at least **4096 MiB** (4GB).
 
-> **8: Setup RAM**
-> If you're running mods, you also need to set up your RAM.
-> If you don't know how much RAM your computer has, follow [this guide](<https://www.howtogeek.com/435644/how-to-see-how-much-ram-is-in-your-pc-and-its-speed/>).
-> To allocate RAM, go to Installations, press the 3 dots next to the installation you are using, click edit, and press the `More Options` button.
-> In JVM arguments, look for something that says `-Xmx2G` or some other number followed by `G`.
-> - If you have 4GB, allocate 2GB.
-> - If you have 8GB or more, allocate 4GB.
-> You generally don't need more than 4GB unless you are using an extensive number of mods.
+> **6: Launch**
+> Launch the instance you just created.
 
-> **9: Launch the Forge profile in the launcher**
-> Installing Minecraft Forge should have set the profile for you, but if it didn't, go to installations, select new installation, and under version, find Forge for 1.8.9 (most likely at the top or bottom).
+---
 
-> **10: Recommended additional mods (optional)**
-> [OptiFine](<https://optifine.net/adloadx?f=preview_OptiFine_1.8.9_HD_U_M6_pre2.jar>) and either [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>) or [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes, including fixed cactus hitboxes).
-> Those two mods help you get more FPS in-game and let you change many more performance settings.
+## Option B: Vanilla Minecraft Launcher
 
-*Ask in #support if you need help with a step during installation.
-If you have any other questions about the mod, please read our #faq before asking in #support for help.*
+> **2: Install Fabric Loader**
+> Fabric is the system that loads your mods into the game.
+> 1. Download the [Fabric Installer](https://fabricmc.net/use/installer/).
+> 2. Run the installer and select the Minecraft version you want (e.g., 1.21.11 or 26.1+).
+> 3. Click "Install" to create a new profile in your Minecraft Launcher.
+
+> **3: Download SkyHanni Dependencies**
+> - [Fabric API](https://modrinth.com/mod/fabric-api)
+> - [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
+> - [Hypixel Mod API](https://modrinth.com/mod/hypixel-mod-api)
+
+> **4: Download SkyHanni**
+> SkyHanni Official Downloads:
+> - [GitHub](https://github.com/hannibal002/SkyHanni/releases).
+> - [Modrinth](https://modrinth.com/mod/skyhanni/).
+
+
+> **5: Find .minecraft**
+> Once you have downloaded SkyHanni, you need to navigate to your mods folder.
+> - **Windows:** Open File Explorer, type `%appdata%` in the address bar, and open `.minecraft`.
+> - **macOS:** Open Finder, click "Go" at the top of your screen, then "Go to Folder", and type `~/Library/Application Support/Minecraft`.
+> - **Linux:** `.minecraft` is located in your home folder: `~/.minecraft`.
+
+> **6: Move mods into mods folder**
+> 1. Open the `mods` folder inside `.minecraft`. If it doesn't exist, create it.
+> 2. Move the SkyHanni `.jar` and all the dependencies' `.jar` into this folder.
+> 3. Remove any older versions of SkyHanni before adding the new files.
+
+> **7: Setup RAM**
+> Modern Minecraft versions require more memory than older versions.
+> 1. Open the Minecraft Launcher and go to the **Installations** tab.
+> 2. Press the 3 dots next to your Fabric installation, click **Edit**, and press **More Options**.
+> 3. In **JVM Arguments**, look for `-Xmx2G`.
+> 4. Change it to `-Xmx4G` (4GB) or more if your computer has at least 8GB of RAM.
+
+> **8: Launch the Fabric profile**
+> Select the Fabric profile you just created in the launcher and press **Play**.
+
+---
+
+## Option C: Modrinth App
+
+The Modrinth App can install Fabric and mods directly from Modrinth's own catalog.
+
+> **2: Install the Modrinth App**
+> Download it from the [Official Modrinth website](https://modrinth.com/app).
+
+> **3: Create a new instance**
+> 1. Click **Create Instance**.
+> 2. Select the **Minecraft version** you want (e.g. 26.1.2).
+> 3. Under **Mod Loader**, choose **Fabric** and select the latest compatible loader version.
+> 4. Click **Create**.
+
+> **4: Add SkyHanni**
+> 1. Open the instance and go to the **Mods** tab.
+> 2. Click **Add Content**, search for **SkyHanni**, and add it.
+
+
+> **5: Setup RAM**
+> 1. Click your instance to open its page, then click **Settings** on the left.
+> 2. Select the **Java** tab.
+> 3. Toggle **Override global settings** to ON and set **Maximum Memory Allocation** to at least **4096 MB** (4GB).
+
+> **6: Launch**
+> Click the instance, then press **Play**.
+
+---
+
+## For All Launchers
+
+> **Recommended additional mods (optional)**
+> These mods are highly recommended for the best experience on modern versions:
+> - [Sodium](https://modrinth.com/mod/sodium): Significant performance improvements.
+> - [Mod Menu](https://modrinth.com/mod/modmenu): View and configure your installed mods.
+
+*Ask in #support on our [Discord](https://discord.gg/skyhanni-997079228510117908) if you need help with installation.*
+*If you have any other questions about the mod, please read our #faq before asking in #support for help.*
 
 > **Important note**
-> Never run files sent to you via Discord or other messaging apps.
-
-> **Quick Download Links**
-> Full Release: #releases
-> Beta: #beta
-
-*This guide was last updated on December 24th, 2024.*
+> Never run files sent to you via Discord or other messaging apps. Only download from official sources like Modrinth or GitHub. Be careful with GitHub, especially less popular repositories.
+*This guide was last updated on July 4th, 2026.*

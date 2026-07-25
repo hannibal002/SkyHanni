@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -30,25 +31,32 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object StewHelper {
+    private val patternGroup = RepoPattern.group("event.year-of-the-witch")
 
     /**
      * REGEX-TEST: Warmed Flakes x64
      */
-    private val stewItemNamePattern by RepoPattern.pattern(
-        "event.year-of-the-witch.stew-item",
+    private val stewItemNamePattern by patternGroup.pattern(
+        "stew-item",
         "(?<item>.*) x(?<amount>\\d+)",
     )
 
+    /**
+     * REGEX-TEST: Witches Stew
+     */
+    private val stewInventoryPattern by patternGroup.pattern(
+        "stew-inventory",
+        "Witches Stew",
+    )
+
     private val inventoryDetector = InventoryDetector(
-        checkInventoryName = { it == "Witches Stew" },
         // TODO use InventoryUpdatedEvent, either in this file, or in InventoryDetector
         onOpenInventory = { DelayedRun.runNextTick { checkSlots() } },
-    )
+    ) { stewInventoryPattern }
 
     private var display = emptyList<Renderable>()
     private val textInput = SearchTextInput()
@@ -61,7 +69,7 @@ object StewHelper {
         if (!inventoryDetector.isInside()) return
         for (slot in event.container.slots) {
             val stack = slot.item
-            if (stack.item != Items.PLAYER_HEAD) continue
+            if (!stack.`is`(Items.PLAYER_HEAD)) continue
             val status = getStewStatus(stack) ?: continue
             status.color?.let { slot.highlight(it) }
         }
@@ -72,7 +80,7 @@ object StewHelper {
         val items = InventoryUtils.getItemsInOpenChest().map { it.item }
         val requiredItems = mutableMapOf<NeuInternalName, Int>()
         for (stack in items) {
-            if (stack.item != Items.PLAYER_HEAD) continue
+            if (!stack.`is`(Items.PLAYER_HEAD)) continue
             if (getStewStatus(stack) == StewStatus.HAS_EATEN) continue
             val ingredientLine = stack.getLoreComponent().map { it.string }.nextAfter("Requires:") ?: continue
             stewItemNamePattern.matchMatcher(ingredientLine) {
@@ -130,7 +138,7 @@ object StewHelper {
     }
 
     // TODO repo patterns for the two lastLine
-    private fun getStewStatus(stack: ItemStack): StewStatus? {
+    private fun getStewStatus(stack: SafeItemStack): StewStatus? {
         val lastLine = stack.getLoreComponent().lastOrNull()?.string ?: return null
         if (lastLine == "You've already eaten this stew!") return StewStatus.HAS_EATEN
         if (lastLine == "Click to give ingredients!") return StewStatus.HAS_ENOUGH

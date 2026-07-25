@@ -19,7 +19,7 @@ object BestiaryAchievement {
      */
     private val bestiaryPattern by AchievementManager.group.pattern(
         "bestiary",
-        "Bestiary Milestone (?<milestone>.*)"
+        "Bestiary Milestone (?<milestone>.*)",
     )
 
     private const val BESTIARY_ACHIEVEMENT = "bestiary"
@@ -28,11 +28,10 @@ object BestiaryAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Insistent Murderer".asComponent(),
-            "Unlock Bestiary Milestones".asComponent(),
-            50f,
-            false,
-            listOf(100, 200, 300),
+            name = "Insistent Murderer".asComponent(),
+            description = "Unlock Bestiary Milestones".asComponent(),
+            userLuckAmount = 50f,
+            tiers = listOf(100, 200, 300),
         )
         event.register(achievement, BESTIARY_ACHIEVEMENT)
     }

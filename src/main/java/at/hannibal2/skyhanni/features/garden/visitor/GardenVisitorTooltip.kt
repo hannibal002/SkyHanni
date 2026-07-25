@@ -17,11 +17,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -43,15 +43,16 @@ object GardenVisitorTooltip {
     private val patternGroup = RepoPattern.group("garden.visitor.tooltip")
 
     /**
-     * REGEX-TEST:  §8+§c20 Copper
+     * WRAPPED-REGEX-TEST: " §8+§c20 Copper"
+     * WRAPPED-REGEX-TEST: " §8+§c150 Copper §d❤"
      */
     private val copperPattern by patternGroup.pattern(
         "copper",
-        " §8\\+§c(?<amount>.*) Copper",
+        " §8\\+§c(?<amount>.*) Copper(?: .*)?",
     )
 
     /**
-     * REGEX-TEST:  §8+§215 §7Garden Experience
+     * WRAPPED-REGEX-TEST: " §8+§215 §7Garden Experience"
      */
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",
@@ -109,8 +110,8 @@ object GardenVisitorTooltip {
      * Called by VisitorListener when tooltip is rendered.
      * Modifies the tooltip to show calculated prices and times.
      */
-    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: ItemStack, toolTip: MutableList<String>) {
-        if (itemStack.cleanName() != "Accept Offer") return
+    fun onTooltip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack, toolTip: MutableList<String>) {
+        if (itemStack.cleanName != "Accept Offer") return
 
         if (visitor.lastLore.isEmpty()) {
             readToolTip(visitor, itemStack, toolTip)
@@ -125,7 +126,7 @@ object GardenVisitorTooltip {
      */
     // TODO throw an axe on this function to split it up
     @Suppress("LongMethod", "CyclomaticComplexMethod", "LoopWithTooManyJumpStatements")
-    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: ItemStack?, toolTip: MutableList<String>) {
+    private fun readToolTip(visitor: VisitorApi.Visitor, itemStack: SafeItemStack?, toolTip: MutableList<String>) {
         val stack = itemStack ?: error("Accept offer item not found for visitor ${visitor.visitorName}")
 
         var totalPrice = 0.0
@@ -140,7 +141,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -223,7 +225,8 @@ object GardenVisitorTooltip {
                 readingShoppingList = false
             }
 
-            val (itemName, amount) = ItemUtils.readItemAmount(formattedLine) ?: continue
+            val itemLine = if (readingShoppingList) formattedLine else formattedLine.removeCharmedSuffix()
+            val (itemName, amount) = ItemUtils.readItemAmount(itemLine) ?: continue
             val internalName = NeuInternalName.fromItemNameOrNull(itemName.removeColor())
                 ?.replace("◆_", "") ?: continue
 
@@ -262,6 +265,8 @@ object GardenVisitorTooltip {
 
         visitor.blockReason = visitor.blockReason()
     }
+
+    private fun String.removeCharmedSuffix() = removeSuffix(" §d❤")
 
     private fun getCropType(internalName: NeuInternalName) =
         CropType.getByNameOrNull(

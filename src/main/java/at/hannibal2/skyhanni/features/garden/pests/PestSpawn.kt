@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -24,46 +25,54 @@ object PestSpawn {
     private val patternGroup = RepoPattern.group("garden.pests.spawn")
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7A §2ൠ Pest §7has appeared in §aPlot §7- §bS 4§7!
+     * REGEX-TEST: GROSS! A  Pest has appeared in Plot - S 4!
+     * REGEX-TEST: GROSS! A  Pest has appeared in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! A  Pest has appeared in Plot - 67!
      */
-    private val onePestPattern by patternGroup.pattern(
-        "one",
-        "§6§l.*! §7A §2ൠ Pest §7has appeared in §aPlot §7- §b(?<plot>.*)§7!",
+    private val onePestPattern by patternGroup.list(
+        "one.colorless",
+        "^\\w+! A  Pest has appeared in Plot - (?<plot>.*)!",
+        "^\\w+! A  Pest has appeared in (?<plot>The Barn)!",
     )
 
     /**
-     * REGEX-TEST: §6§lYUCK! §24 §2ൠ Pest §7have spawned in §aPlot §7- §b14§7!
+     * REGEX-TEST: YUCK! 4  Pest have spawned in Plot - 14!
+     * REGEX-TEST: YUCK! 4  Pest have spawned in The Barn!
+     * REGEX-FAIL: From [MVP+] ThePleader: YUCK! 6  Pest have spawned in Plot - 7!
      */
-    private val multiplePestsPattern by patternGroup.pattern(
-        "multiple",
-        "§6§l.*! §2(?<amount>\\d) §2ൠ Pests? §7have spawned in §aPlot §7- §b(?<plot>.*)§7!",
+    private val multiplePestsPattern by patternGroup.list(
+        "multiple.colorless",
+        "^\\w+! (?<amount>\\d)  Pests? have spawned in Plot - (?<plot>.*)!",
+        "^\\w+! (?<amount>\\d)  Pests? have spawned in (?<plot>The Barn)!",
     )
 
     /**
-     * REGEX-TEST: §6§lGROSS! §7While you were offline, §2ൠ §2Pest §7spawned in §aPlots §r§b12§r§7, §r§b9§r§7, §r§b5§r§7, §r§b11§r§7 and §r§b3§r§r§7!
+     * REGEX-TEST: GROSS! While you were offline,  Pest spawned in Plots 12, 9, 5, 11 and 3!
+     * REGEX-FAIL: From [MVP+] ThePleader: GROSS! While you were offline,  Pest spawned in Plots 6 and 7!
      */
     private val offlinePestsPattern by patternGroup.pattern(
-        "offline",
-        "§6§l.*! §7While you were offline, §2ൠ §2Pests? §7spawned in §aPlots (?<plots>.*)!",
+        "offline.colorless",
+        "^\\w+! While you were offline,  Pests? spawned in Plots (?<plots>.*)!",
     )
+
     /**
-     * WRAPPED-REGEX-TEST: "  §r§e§lCLICK HERE §eto teleport to the plot!"
+     * WRAPPED-REGEX-TEST: "  CLICK HERE to teleport to the plot!"
      */
     private val clickToTPPattern by patternGroup.pattern(
-        "teleport",
-        "\\s*§r§e§lCLICK HERE §eto teleport to the plot!",
+        "teleport.colorless",
+        "\\s*CLICK HERE to teleport to the plot!",
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+        val message = event.cleanMessage
         var blocked = false
 
-        onePestPattern.matchMatcher(message) {
+        onePestPattern.matchMatchers(message) {
             spawn(1, listOf(group("plot")))
             blocked = true
         }
-        multiplePestsPattern.matchMatcher(message) {
+        multiplePestsPattern.matchMatchers(message) {
             spawn(group("amount").toInt(), listOf(group("plot")))
             blocked = true
         }
@@ -96,12 +105,13 @@ object PestSpawn {
         }
 
         if (config.chatMessageFormat == PestSpawnConfig.ChatMessageFormatEntry.COMPACT) {
+            val tpName = if (plotName == "The Barn") "barn" else plotName
             ChatUtils.clickableChat(
                 message,
                 onClick = {
-                    HypixelCommands.teleportToPlot(plotName)
+                    HypixelCommands.teleportToPlot(tpName)
                 },
-                "§eClick to run /plottp $plotName!",
+                "§eClick to run /plottp $tpName!",
             )
         }
     }

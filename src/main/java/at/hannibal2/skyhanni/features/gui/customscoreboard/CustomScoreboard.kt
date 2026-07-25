@@ -12,10 +12,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -65,7 +63,7 @@ object CustomScoreboard {
     private var lastLines: List<ScoreboardLine> = emptyList()
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         display ?: return
 
@@ -128,8 +126,8 @@ object CustomScoreboard {
             UnknownLinesHandler.handleUnknownLines()
     }
 
-    @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    @HandleEvent(ScoreboardUpdateEvent::class)
+    fun onScoreboardChange() {
         dirty = true
     }
 
@@ -183,7 +181,7 @@ object CustomScoreboard {
             ?: dropWhile { it.display.isBlank() }.dropLastWhile { it.display.isBlank() }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.scoreboardEntries,
             eventsConfig.eventEntries,
@@ -192,8 +190,8 @@ object CustomScoreboard {
         }
     }
 
-    @HandleEvent
-    fun onHypixelJoin(event: HypixelJoinEvent) {
+    @HandleEvent(HypixelJoinEvent::class)
+    fun onHypixelJoin() {
         updateAllIslandEntries()
     }
 
@@ -232,7 +230,7 @@ object CustomScoreboard {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
             if (!config.enabled.get()) {

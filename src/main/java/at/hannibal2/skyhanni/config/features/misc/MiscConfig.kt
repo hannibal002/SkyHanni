@@ -332,15 +332,6 @@ class MiscConfig {
     @FeatureToggle
     var lesserOrbHider: Boolean = false
 
-    @Expose
-    @ConfigOption(name = "Lock Mouse Message", desc = "Show a message in chat when toggling §e/shmouselock§7.")
-    @ConfigEditorBoolean
-    var lockMouseLookChatMessage: Boolean = true
-
-    @Expose
-    @NoConfigLink
-    val lockedMouseDisplay: Position = Position(400, 200, 0.8f)
-
     // doesn't work properly
     /*@ConfigOption(
         name = "Fix Ghost Entities",
@@ -426,6 +417,15 @@ class MiscConfig {
     @FeatureToggle
     var gfsPiggyBank: Boolean = true
 
+    // Not a FeatureToggle: moving a Hypixel UI element is a personal preference, not a feature to auto-enable.
+    @Expose
+    @ConfigOption(
+        name = "Move Insert Into Sack Button",
+        desc = "Moves the \"Insert Into Sack\" button to a more convenient location in the sack menu.",
+    )
+    @ConfigEditorBoolean
+    var moveInsertIntoSackButton: Boolean = false
+
     @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
@@ -441,6 +441,11 @@ class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var warnAboutPcTimeOffset: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "NPC Daily Limit Tracker", desc = "")
+    @Accordion
+    val npcDayLimitTracker: NpcDayLimitTrackerConfig = NpcDayLimitTrackerConfig()
 
     @Expose
     @ConfigOption(name = "Coral Fish Helper", desc = "Shows a helper for which fish are cheapest to buy for the NPC §dCoral§7.")
@@ -486,15 +491,18 @@ class MiscConfig {
     var fixDoubleClicks: Boolean = true
 
 
-    @ConfigOption(name = "Color Particle Warning", desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.§f")
+    @ConfigOption(
+        name = "Color Particle Warning",
+        desc = "§c§lThis can break particle Coloring in parts of Skyblock where it is done properly.",
+    )
     @ConfigEditorInfoText
     @SearchTag("Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes Fix Colored Particles")
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(
         name = "Fix Colored Particles",
-        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes."
+        desc = "Fixes Hypixel not setting colored particles properly such as Slayer Specific Spawn Particles or Motes.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -504,7 +512,7 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Rainbow Action Bar",
-        desc = "Makes the Action bar rainbow. Why? For fun!"
+        desc = "Makes the Action bar rainbow. Why? For fun!",
     )
     @ConfigEditorBoolean
     var rainbowActionBar: Boolean = false
@@ -512,9 +520,25 @@ class MiscConfig {
     @Expose
     @ConfigOption(
         name = "Show Achievement Messages",
-        desc = "You can do §e/shachievements§7 to see them all!"
+        desc = "You can do §e/shachievements§7 to see them all!",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var achievementMessages: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Mute Stereo Pants",
+        desc = "Mutes music played by Stereo Pants.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteStereoPants: Boolean = false
+
+    @Expose
+    @ConfigOption(name = "Gift Clean Display", desc = "Show only 'CLICK TO OPEN' on gifts.")
+    @SearchTag("century cake slice")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var giftCleanDisplay: Boolean = false
 }

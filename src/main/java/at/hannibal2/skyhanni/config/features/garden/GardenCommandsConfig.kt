@@ -19,16 +19,16 @@ class GardenCommandsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Home Hotkey",
-        desc = "Press this key to teleport you to your Garden home. §cOnly works while in the garden."
+        name = "Spawn Hotkey",
+        desc = "Press this key to teleport you to your Garden spawn. §cOnly works while in the garden.",
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var homeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(
-        name = "Sethome Hotkey",
-        desc = "Press this key to set your Garden home. §cOnly works while in the garden."
+        name = "Set Spawn Hotkey",
+        desc = "Press this key to set your Garden spawn. §cOnly works while in the garden.",
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var sethomeHotkey: Int = GLFW.GLFW_KEY_UNKNOWN

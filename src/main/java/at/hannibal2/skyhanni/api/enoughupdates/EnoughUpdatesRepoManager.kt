@@ -15,8 +15,7 @@ object EnoughUpdatesRepoManager : AbstractRepoManager<NeuRepositoryReloadEvent>(
     override val commonShortNameCased = "NEU"
     override val configDirectory = EnoughUpdatesManager.configDirectory
     override val config get(): NeuRepositoryConfig = SkyHanniMod.feature.dev.neuRepo
-    override val backupRepoResourcePath: String = "assets/skyhanni/neu-repo.zip"
-
+    override val backupRepoResourcePath: String = "assets/skyhanni/neu-repo.tar.gz"
 
     override val reloadCommand: String = "neureloadrepo"
     override val progressCategory = ChatProgressUpdates.category("NotEnoughUpdates Repo")

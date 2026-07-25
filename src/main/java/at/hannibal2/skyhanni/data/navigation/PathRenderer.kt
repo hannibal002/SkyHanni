@@ -81,7 +81,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
 
     private fun renderPathSegments(event: SkyHanniRenderWorldEvent) {
         val eyePos = event.exactPlayerEyeLocation()
-        val anchorY = eyePos.y - MinecraftCompat.localPlayer.eyeHeight + STANDING_EYE_HEIGHT
+        val anchorY = eyePos.y - MinecraftCompat.localPlayerOrThrow.eyeHeight + STANDING_EYE_HEIGHT
         if (pathPoints.isEmpty()) return
 
         if (pathPoints.size == 1) {

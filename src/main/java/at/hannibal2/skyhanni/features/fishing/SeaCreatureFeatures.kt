@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color

@@ -51,10 +51,12 @@ object SuperpairsClicksAlert {
             ExperimentationTableApi.inChronomatron -> {
                 ExperimentsAddonsHelper.currentChronomatronRound > roundsNeeded
             }
+
             ExperimentationTableApi.inUltrasequencer -> {
                 // We subtract 1 due to a Hypixel bug causing one less round to be required
                 ExperimentsAddonsHelper.currentUltraSequencerRound > (roundsNeeded - 1)
             }
+
             else -> false
         }
         if (!areWeDone) return

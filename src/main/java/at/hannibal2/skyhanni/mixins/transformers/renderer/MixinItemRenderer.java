@@ -1,4 +1,5 @@
-package at.hannibal2.skyhanni.mixins.transformers.renderer;
+//? if < 26.1 {
+/*package at.hannibal2.skyhanni.mixins.transformers.renderer;
 
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
@@ -18,9 +19,7 @@ public class MixinItemRenderer {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
             if (entityAlpha == null) return originalAlpha;
-            float alphaFloat = entityAlpha / 255.0F;
-
-            return Math.min(originalAlpha, alphaFloat);
+            return Math.min(originalAlpha, entityAlpha / 255.0F);
         }
         return originalAlpha;
     }
@@ -34,3 +33,4 @@ public class MixinItemRenderer {
         return layer;
     }
 }
+*///?}

@@ -36,7 +36,7 @@ object NotificationManager {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderOverlay() {
         val notification = getCurrentNotification() ?: return
 
         if (InventoryUtils.inInventory() && !notification.showOverInventory) return

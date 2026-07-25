@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.CFConfig
+import at.hannibal2.skyhanni.config.features.inventory.customloadout.CustomLoadoutConfig
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig
@@ -54,12 +55,17 @@ class InventoryConfig {
     val customWardrobe: CustomWardrobeConfig = CustomWardrobeConfig()
 
     @Expose
+    @Category(name = "Custom Loadout", desc = "New Loadout menu look.")
+    val customLoadout: CustomLoadoutConfig = CustomLoadoutConfig()
+
+    @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     val chocolateFactory: CFConfig = CFConfig()
 
     @Expose
-    @ConfigOption(name = "Improved SB Menus", desc = "")
+    @ConfigOption(name = "Improved SkyBlock Menus", desc = "")
     @Accordion
+    @SearchTag("better container sb")
     val improvedSBMenus: ImprovedSBMenusConfig = ImprovedSBMenusConfig()
 
     @Expose
@@ -327,6 +333,13 @@ class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var ministerInCalendar: Boolean = true
+
+    @Expose
+    @ConfigOption(name = "Oringo Pet in Calendar", desc = "Show the future legendary pet Oringo will offer in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    @SearchTag("traveling zoo")
+    var oringoPetInCalendar: Boolean = true
 
     @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")

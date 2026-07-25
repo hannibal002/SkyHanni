@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -21,16 +22,16 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
+import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.emptyText
 import com.google.gson.JsonPrimitive
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object ExperimentsAddonsHelper {
@@ -49,7 +50,7 @@ object ExperimentsAddonsHelper {
     private val userChronomatronProgress: MutableList<LorenzColor> = mutableListOf()
     private val hypixelUltrasequencerData: MutableList<Int> = mutableListOf()
     private val userUltrasequencerProgress: MutableList<Int> = mutableListOf()
-    private val ultrasequencerDyeMap: MutableMap<Int, ItemStack> = mutableMapOf()
+    private val ultrasequencerDyeMap: MutableMap<Int, SafeItemStack> = mutableMapOf()
 
     private var chronHasBeenEmpty: Boolean = true
     private var lastChronomatronSound: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -108,7 +109,7 @@ object ExperimentsAddonsHelper {
         chronHasBeenEmpty = true
     }
 
-    private fun ItemStack.getLorenzColorOrNull(): LorenzColor? = when (hoverName.string.removeColor()) {
+    private fun SafeItemStack.getLorenzColorOrNull(): LorenzColor? = when (cleanName) {
         "Green" -> LorenzColor.DARK_GREEN
         "Lime" -> LorenzColor.GREEN
         "Pink" -> LorenzColor.LIGHT_PURPLE
@@ -116,7 +117,7 @@ object ExperimentsAddonsHelper {
         "Orange" -> LorenzColor.GOLD
         "Purple" -> LorenzColor.DARK_PURPLE
         else -> try {
-            LorenzColor.valueOf(hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor().uppercase())
+            LorenzColor.valueOf(cleanName.uppercase())
         } catch (exception: IllegalArgumentException) {
             null
         }
@@ -266,7 +267,7 @@ object ExperimentsAddonsHelper {
         val userSizeNow = userChronomatronProgress.size
 
         val activeColors = inventoryItems.values.filter {
-            nextChronomatronItemPattern.matches(it.item.getIdentifierString())
+            nextChronomatronItemPattern.matches(it.itemType.getIdentifierString())
         }.mapNotNull { it.getLorenzColorOrNull() }.distinct()
 
         chronHasBeenEmpty = if (activeColors.isEmpty()) true
@@ -300,14 +301,14 @@ object ExperimentsAddonsHelper {
     private data class UltraSequencerSlot(
         val sequenceNumber: Int,
         val slotIndex: Int,
-        val itemStack: ItemStack,
+        val itemStack: SafeItemStack,
     )
 
     private fun InventoryUpdatedEvent.readUltrasequencer() {
         val orderedUltrasequencerSlots = inventoryItems.filter {
             it.value.hoverName.formattedTextCompatLeadingWhiteLessResets().trim().isNotEmpty()
         }.mapNotNull { (slot, stack) ->
-            val sequenceNumber = stack.hoverName.string.removeColor().toIntOrNull() ?: return@mapNotNull null
+            val sequenceNumber = stack.cleanName.toIntOrNull() ?: return@mapNotNull null
             currentUltraSequencerRound = maxOf(currentUltraSequencerRound, sequenceNumber)
             if (sequenceNumber !in ultrasequencerDyeMap) ultrasequencerDyeMap[sequenceNumber] = stack
             UltraSequencerSlot(

@@ -14,11 +14,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object DojoRankDisplay {
@@ -42,7 +42,7 @@ object DojoRankDisplay {
         config.dojoRankDisplayPosition.renderStrings(display, posLabel = "Dojo Rank Display")
     }
 
-    private fun drawDisplay(items: Collection<ItemStack>) = buildList {
+    private fun drawDisplay(items: Collection<SafeItemStack>) = buildList {
         if (belts.isEmpty()) {
             // TODO make clickable
             add("§cUnable to get Belts data, please run /shupdaterepo")

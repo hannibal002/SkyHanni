@@ -1,0 +1,65 @@
+# Execution context: PR branch code
+name: "PR Changelog Verification"
+
+on:
+    pull_request:
+        types: [ opened, edited, ready_for_review, synchronize ]
+
+permissions:
+    contents: read
+
+jobs:
+    verify-changelog:
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id
+        runs-on: ubuntu-latest
+        concurrency:
+            group: verify-changelog-${{ github.event.pull_request.number }}
+            cancel-in-progress: true
+        steps:
+            -   name: Checkout code
+                uses: actions/checkout@v6
+                with:
+                    ref: ${{ github.event.pull_request.head.sha }}
+                    repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository == 'hannibal002/SkyHanni'
+            -   uses: ./.github/actions/setup-normal-workspace
+                if: github.repository != 'hannibal002/SkyHanni'
+
+            -   name: Grant execute permission for gradlew
+                run: chmod +x gradlew
+
+
+            -   name: Run ChangeLog verification w/retry
+                id: check_main
+                if: github.repository == 'hannibal002/SkyHanni'
+                continue-on-error: true
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: checkPrDescription
+            -   name: Run ChangeLog verification w/retry
+                id: check_fork
+                if: github.repository != 'hannibal002/SkyHanni'
+                continue-on-error: true
+                env:
+                    PR_TITLE: ${{ github.event.pull_request.title }}
+                    PR_BODY: ${{ github.event.pull_request.body }}
+                uses: ./.github/actions/gradle-retry
+                with:
+                    gradle-command: checkPrDescription
+
+            -   name: Upload changelog check failure artifact
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                uses: actions/upload-artifact@v7
+                with:
+                    name: changelog-check-failure
+                    path: "**/changelog-verification/changelog_errors.txt"
+                    if-no-files-found: error
+
+            -   name: Fail job if changelog check failed
+                if: steps.check_main.outcome == 'failure' || steps.check_fork.outcome == 'failure'
+                run: exit 1

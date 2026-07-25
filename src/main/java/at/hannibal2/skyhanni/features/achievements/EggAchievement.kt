@@ -22,11 +22,11 @@ object EggAchievement {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Lay 25 Eggs".asComponent(),
-            TextHelper.createAtlasSprite("item/egg", "items", "minecraft"),
-            1f,
-            true,
-            listOf(25),
+            name = "Lay 25 Eggs".asComponent(),
+            description = TextHelper.createAtlasSprite("item/egg", "items", "minecraft"),
+            userLuckAmount = 1f,
+            secret = true,
+            tiers = listOf(25),
         )
         event.register(achievement, EGG_ACHIEVEMENT)
     }

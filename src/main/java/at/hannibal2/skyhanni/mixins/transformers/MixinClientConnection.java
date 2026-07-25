@@ -28,7 +28,7 @@ public class MixinClientConnection {
 
     @Inject(method = "send(Lnet/minecraft/network/protocol/Packet;Lio/netty/channel/ChannelFutureListener;Z)V", at = @At(value = "HEAD"), cancellable = true)
     private void sendPacketNew(Packet<?> packet, ChannelFutureListener channelFutureListener, boolean flush, CallbackInfo ci) {
-        if (new PacketSentEvent(packet).post()) {
+        if (new PacketSentEvent(packet).post().isCancelled()) {
             ci.cancel();
         }
     }

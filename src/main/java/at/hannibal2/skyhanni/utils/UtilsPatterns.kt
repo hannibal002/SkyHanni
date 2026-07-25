@@ -20,6 +20,7 @@ object UtilsPatterns {
      * REGEX-TEST: EPIC BOOTS
      * REGEX-TEST: COMMON
      * REGEX-TEST: COMMON COMBAT SHARD (ID C9)
+     * REGEX-TEST: EPIC WATER SHARD (ID E5)
      * REGEX-TEST: Rarity: LEGENDARY
      * REGEX-TEST: Rarity: RARE
      * REGEX-TEST: a DIVINE a
@@ -28,7 +29,7 @@ object UtilsPatterns {
      */
     val rarityLoreLinePattern by patternGroup.pattern(
         "item.lore.rarity.line.colorless",
-        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>${rarities})(?: DUNGEON)? ?(?<itemCategory>[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$",
+        "^(?:Rarity: )?(?:a )?(?:SHINY )?(?<rarity>$rarities)(?: DUNGEON)? ?(?<itemCategory>[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$",
     )
 
     /**
@@ -88,7 +89,7 @@ object UtilsPatterns {
 
     /**
      * REGEX-TEST: 8x Enchanted Pork
-     * REGEX-TEST:   §810x §r§bGlacite Jewel
+     * WRAPPED-REGEX-TEST: "  §810x §r§bGlacite Jewel"
      */
     val readAmountBeforePattern by patternGroup.pattern(
         "item.amount.front",
@@ -191,6 +192,8 @@ object UtilsPatterns {
         "inventory.skyblockmenu",
         "SkyBlock Menu",
     )
+
+    val skyblockMenuInventory = InventoryDetector { skyblockMenuGuiPattern }
 
     /**
      * REGEX-TEST: §7Source: §fVerdant Shard §8(C11)

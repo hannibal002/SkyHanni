@@ -92,7 +92,6 @@ class DarkMonolithConfig {
     val perTrackerConfig: IndividualItemTrackerConfig = IndividualItemTrackerConfig()
 
     companion object {
-        @Suppress("StorageVarOrVal")
         @Transient
         internal const val DEFAULT_TITLE: String = "§5§lDark Monolith"
     }

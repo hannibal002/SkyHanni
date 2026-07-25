@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFDataLoader
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.data.CFUpgrade
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -38,7 +40,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -136,7 +137,7 @@ object CFApi {
 
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("block.note_block.pling", 1f)
-    val mainInventory = InventoryDetector { name -> name == "Chocolate Factory" }
+    val mainInventory = InventoryDetector { HoppityApi.chocolateFactoryInvPattern }
 
     private val partyModeRegex = Regex("§[a-fA-F0-9]")
 
@@ -222,7 +223,7 @@ object CFApi {
         }
     }
 
-    fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
+    fun getNextLevelName(stack: SafeItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
         val isEmployee = stack.getLore().any { it == "§8Employee" }
         val upgradeName = if (!isEmployee) groupOrNull("upgradename")
         else employeeNamePattern.matchMatcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()) {

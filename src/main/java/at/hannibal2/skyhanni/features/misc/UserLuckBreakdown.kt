@@ -6,29 +6,31 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.isTopInventory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
@@ -46,19 +48,39 @@ object UserLuckBreakdown {
     private val mainLuckID = Items.ENDER_PEARL
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
-    private var fillerItem: ItemStack? = null
+    private var fillerItem: SafeItemStack? = null
     private val fillerID = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
 
     private var showAllStats = true
+
+    private val patternGroup = RepoPattern.group("misc.statsbreakdown")
 
     /**
      * REGEX-TEST: §7Show all stats: §aYes
      * REGEX-TEST: §7Show all stats: §cNope
      */
-    private val showAllStatsPattern by RepoPattern.pattern(
-        "misc.statsbreakdown.showallstats",
+    private val showAllStatsPattern by patternGroup.pattern(
+        "showallstats",
         "§7Show all stats: §.(?<toggle>.*)",
     )
+
+    /**
+     * Your Stats Breakdown
+     */
+    private val statsBreakdownInventoryPattern by patternGroup.pattern(
+        "inventory",
+        "Your Stats Breakdown",
+    )
+
+    /**
+     * REGEX-TEST: Miscellaneous Stats
+     */
+    private val miscStatsInventoryPattern by patternGroup.pattern(
+        "inventory.miscstats",
+        "Miscellaneous Stats",
+    )
+
+    private val statsBreakdownInventory = InventoryDetector { statsBreakdownInventoryPattern }
 
     private const val LUCK_TOOLTIP = "§5§o §a✴ SkyHanni User Luck §f"
     private var inCustomBreakdown = false
@@ -66,7 +88,7 @@ object UserLuckBreakdown {
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
     private val invalidItemSlots = (0..53).filter { it !in validItemSlots }
 
-    private val skillOverflowLuck = mutableMapOf<SkillType, Int>()
+    private var skillOverflowLuck = mapOf<SkillType, Int>()
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
@@ -114,12 +136,12 @@ object UserLuckBreakdown {
 
     @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
-        if (event.inventoryName != "Your Stats Breakdown") {
+        if (!statsBreakdownInventory.isInside()) {
             inMiscStats = false
             return
         }
         val inventoryName = event.inventoryItems[4]?.hoverName?.string.orEmpty()
-        if (inventoryName != "Miscellaneous Stats") return
+        if (!miscStatsInventoryPattern.matches(inventoryName)) return
         inMiscStats = true
         replaceSlot = findValidSlot(event.inventoryItemsWithNull)
         val showAllStatsLore = event.inventoryItems[50]?.getLore() ?: listOf("")
@@ -135,12 +157,12 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         inMiscStats = false
         inCustomBreakdown = false
     }
 
-    private fun findValidSlot(input: Map<Int, ItemStack?>): Int? {
+    private fun findValidSlot(input: Map<Int, SafeItemStack?>): Int? {
         for (slot in input.keys) {
             if (slot !in validItemSlots && slot < 44) continue
             if (input[slot].orNull() == null) {
@@ -159,10 +181,10 @@ object UserLuckBreakdown {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
-        when (InventoryUtils.openInventoryName()) {
-            "Your Equipment and Stats" -> equipmentMenuTooltip(event)
-            "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event)
-            "SkyBlock Menu" -> skyblockMenuTooltip(event)
+        when {
+            CurrentEquipmentApi.inventory.isInside() -> equipmentMenuTooltip(event)
+            statsBreakdownInventory.isInside() -> statsBreakdownLoreTooltip(event)
+            UtilsPatterns.skyblockMenuInventory.isInside() -> skyblockMenuTooltip(event)
         }
     }
 
@@ -208,7 +230,7 @@ object UserLuckBreakdown {
 
     private fun tryTruncateFloat(input: Float): String {
         val string = input.addSeparators()
-        return if (string.endsWith(".0")) return string.dropLast(2)
+        return if (string.endsWith(".0")) string.dropLast(2)
         else string
     }
 
@@ -236,7 +258,7 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun createFillerItem(): ItemStack {
+    private fun createFillerItem(): SafeItemStack {
         return ItemUtils.createItemStack(fillerID, " ", listOf(), 1)
     }
 
@@ -327,13 +349,14 @@ object UserLuckBreakdown {
     }
 
     private fun calcSkillLuck() {
-        val storage = ProfileStorageData.profileSpecific?.skillData ?: return
-        skillOverflowLuck.clear()
-        for ((skillType, skillInfo) in storage) {
-            val level = skillInfo.level
-            val overflow = skillInfo.overflowLevel
-            val luck = ((overflow - level) / 5) * 50
-            skillOverflowLuck.addOrPut(skillType, luck)
+        val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return
+        skillOverflowLuck = buildMap {
+            for ((skillType, skillInfo) in storage) {
+                val level = skillInfo.level
+                val overflow = skillInfo.overflowLevel
+                val luck = ((overflow - level) / 5) * 50
+                addOrPut(skillType, luck)
+            }
         }
     }
 

@@ -27,11 +27,15 @@ class WeightDisplay : EliteLeaderboardDisplayBase<FarmingWeight, EliteLeaderboar
 
     override var currentMode: EliteLeaderboardMode
         get() = weightStorage?.mode ?: EliteLeaderboardMode.ALL_TIME
-        set(value) { weightStorage?.mode = value }
+        set(value) {
+            weightStorage?.mode = value
+        }
 
     override var currentEnum: FarmingWeight?
         get() = weightStorage?.enum ?: FarmingWeight.FARMING_WEIGHT
-        set(value) { weightStorage?.enum = value }
+        set(value) {
+            weightStorage?.enum = value
+        }
 
     override fun getDefaultEnum(): FarmingWeight {
         return FarmingWeight.FARMING_WEIGHT

@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.ParticleChangeEvent;
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent;
 import at.hannibal2.skyhanni.features.misc.CurrentPing;
-import at.hannibal2.skyhanni.utils.LorenzVec;
+import at.hannibal2.skyhanni.utils.ParticleUtils;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -34,17 +33,7 @@ public class MixinClientPacketListener {
         cancellable = true
     )
     public void postParticleEvent(ClientboundLevelParticlesPacket packet, CallbackInfo ci) {
-        if (
-            new ReceiveParticleEvent(
-                packet.getParticle().getType(),
-                new LorenzVec(packet.getX(), packet.getY(), packet.getZ()),
-                packet.getCount(),
-                packet.getMaxSpeed(),
-                new LorenzVec(packet.getXDist(), packet.getYDist(), packet.getZDist()),
-                packet.isOverrideLimiter(),
-                null
-            ).post()
-        ) {
+        if (ParticleUtils.shouldSuppressParticle()) {
             ci.cancel();
         }
     }
@@ -55,5 +44,4 @@ public class MixinClientPacketListener {
         particleChangeEvent.post();
         return particleChangeEvent.getParticleOptions();
     }
-
 }

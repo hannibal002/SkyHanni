@@ -132,6 +132,7 @@ object MiningEventTracker {
     private fun sendData(eventName: String, time: String?) {
         // Option to opt out of data sending
         if (!config.allowDataSharing) return
+        if (HypixelData.hypixelAlpha) return
 
         // we now ignore mineshaft events.
         if (IslandType.MINESHAFT.isInIsland()) return

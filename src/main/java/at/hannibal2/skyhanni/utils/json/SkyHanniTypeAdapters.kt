@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.Stopwatch
@@ -41,7 +42,6 @@ import com.google.gson.stream.JsonWriter
 import com.mojang.serialization.JsonOps
 import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.ComponentSerialization
-import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.time.Duration
@@ -124,7 +124,7 @@ enum class SkyHanniTypeAdapters(
         },
     ),
     NEU_ITEMSTACK(
-        ItemStack::class.java,
+        SafeItemStack::class.java,
         SimpleStringTypeAdapter(NeuItems::saveNBTData, NeuItems::loadNBTData),
     ),
     INTERNAL_NAME(
@@ -276,6 +276,10 @@ enum class SkyHanniTypeAdapters(
 fun GsonBuilder.registerSkyHanniAdapters(): GsonBuilder = apply {
     SkyHanniTypeAdapters.entries.forEach {
         val adapter = (it.adapter as TypeAdapter<Any>).nullSafe()
-        registerTypeAdapter(it.clazz, adapter)
+        if (it == SkyHanniTypeAdapters.NEU_ITEMSTACK) {
+            registerTypeHierarchyAdapter(it.clazz, adapter)
+        } else {
+            registerTypeAdapter(it.clazz, adapter)
+        }
     }
 }

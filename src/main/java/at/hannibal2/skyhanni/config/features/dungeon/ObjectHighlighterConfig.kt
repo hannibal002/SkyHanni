@@ -27,12 +27,12 @@ class ObjectHighlighterConfig {
         /*
         TODO for someone who has time
         @Expose
-        @ConfigOption(name = "Show Outline", desc = "Shows only a outline instead of a full highlight.")
+        @ConfigOption(name = "Show Outline", desc = "Shows only an outline instead of a full highlight.")
         @ConfigEditorBoolean
         public Property<Boolean> showOutline = Property.of(true); */
         @ConfigOption(name = "No Chroma", desc = "§cThe chroma setting for the color is currently not working!")
         @ConfigEditorInfoText
-        var info: String? = null
+        val info: String? = null
 
         @Expose
         @ConfigOption(name = "Color", desc = "The color used to highlight starred mobs.")

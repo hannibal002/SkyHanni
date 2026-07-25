@@ -33,7 +33,7 @@ class AttributeShardsConfig {
     var includeHuntingBox: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Only Current Inventory", desc = "Only show the shards that are in the current inventory you have open.")
+    @ConfigOption(name = "Only Current Inventory", desc = "Only show the shards that are in the inventory you currently have open.")
     @ConfigEditorBoolean
     var onlyCurrentInventory: Boolean = false
 

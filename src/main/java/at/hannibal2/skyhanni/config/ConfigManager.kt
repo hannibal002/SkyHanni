@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.config.storage.AchievementStorage
 import at.hannibal2.skyhanni.config.storage.CustomTodosStorage
 import at.hannibal2.skyhanni.config.storage.OrderedWaypointsRoutes
+import at.hannibal2.skyhanni.config.storage.SeenContributorStorage
 import at.hannibal2.skyhanni.config.storage.SpecificSeaCreatureStorage
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PetDataStorage
@@ -13,13 +14,16 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.features.pets.PetDisplayConfigGuiManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
-import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyHanniLogger
 import at.hannibal2.skyhanni.utils.StringFileHandler
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -76,7 +80,7 @@ class ConfigManager {
         }
 
         // TODO use SecondPassedEvent
-        fixedRateTimer(name = "skyhanni-config-auto-save", period = 60_000L, initialDelay = 60_000L) {
+        fixedRateTimer(name = "skyhanni-config-auto-save", daemon = true, period = 60_000L, initialDelay = 60_000L) {
             saveConfig(ConfigFileType.FEATURES, "auto-save-60s")
         }
 
@@ -165,7 +169,10 @@ class ConfigManager {
                             run()
                         } catch (e: Throwable) {
                             logger.log(e.stackTraceToString())
-                            PlatformUtils.shutdownMinecraft("Config is corrupt inside development environment. Maybe you forgot to implement a config migration, or the migration failed.")
+                            PlatformUtils.shutdownMinecraft(
+                                "Config is corrupt inside development environment. " +
+                                    "Maybe you forgot to implement a config migration, or the migration failed."
+                            )
                         }
                     } else {
                         run()
@@ -234,8 +241,15 @@ class ConfigManager {
         disableSaving = true
     }
 
+    /**
+     * Rebuilds the MoulConfig editor and processor only. Config objects (SkyHanniMod.feature and
+     * all nested objects) are not recreated here; they are created once in firstLoad() and remain
+     * the same instances for the entire session.
+     */
     fun recreateConfig() {
         ConfigGuiManager.editor = null
+        PetDisplayConfigGuiManager.invalidate()
+        ConfigUtils.clearEditorCache()
         val features = SkyHanniMod.feature
         processor = BlockingMoulConfigProcessor()
         BuiltinMoulConfigGuis.addProcessors(processor)
@@ -272,6 +286,7 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     CUSTOM_TODOS("custom_todos", CustomTodosStorage::class.java, SkyHanniMod::customTodos),
     SEA_CREATURES("sea_creature_settings", SpecificSeaCreatureStorage::class.java, SkyHanniMod::seaCreatureStorage),
     ACHIEVEMENTS("achievements", AchievementStorage::class.java, SkyHanniMod::achievementStorage),
+    SEEN_CONTRIBUTORS("seen_contributors", SeenContributorStorage::class.java, SkyHanniMod::seenContributorStorage),
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
@@ -279,6 +294,8 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
 }
 
 class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanniMod.feature) {
+    val isDev by lazy { ContributorManager.isSelfDeveloper() }
+
     override fun createOptionGui(
         processedOption: ProcessedOption,
         field: Field,
@@ -298,6 +315,12 @@ class BlockingMoulConfigProcessor : MoulConfigProcessor<SkyHanniConfig>(SkyHanni
 
         EnforcedConfigValues.isBlockedFromEditing(extraPath)?.let { extraMessage ->
             return GuiOptionEditorBlocked(default, extraMessage)
+        }
+
+        if (!isDev) {
+            if (field.isAnnotationPresent(OnlyDebug::class.java)) {
+                return GuiOptionEditorHidden(default)
+            }
         }
 
         return default

@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.KSerializable
  * # Setting up the `generate-constants.yaml` workflow
  * The GitHub action workflow needs to be configured properly. For that it needs to have the
  * `env.data_repo` key adjusted to be the live repo.
- * It also needs a [repository GitHub action secret](https://github.com/nea89o/SkyHanni/settings/secrets/actions)
+ * It also needs a [repository GitHub action secret](https://github.com/hannibal002/SkyHanni/settings/secrets/actions)
  * called `REPO_PAT`, which contains a [personal access token](https://github.com/settings/tokens/new) with repo write
  * access to the live repo.
  */

@@ -48,13 +48,16 @@
     },
     "depends": {
         "fabric-api": ">=${fapi}",
-        "fabric-language-kotlin": ">=1.13.7+kotlin.2.2.21",
-        "fabricloader": ">=0.18.0",
+        "fabric-language-kotlin": ">=1.13.12+kotlin.2.4.0",
+        "fabricloader": ">=0.19.3",
+        "hypixel-mod-api": ">=${hypixelmodapi}",
         "minecraft": "${minecraft}"
     },
     "breaks": {
         "clientspoofer": "*",
-        "exordium": "*"
+        "exordium": "*",
+        "opsec": "*",
+        "spoofified": "*"
     },
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",

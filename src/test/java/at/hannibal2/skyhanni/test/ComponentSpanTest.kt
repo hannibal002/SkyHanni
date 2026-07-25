@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.withColor
 import net.minecraft.ChatFormatting
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import java.util.regex.Pattern
 
@@ -69,6 +70,16 @@ class ComponentSpanTest {
             }!!
         Pattern.compile("(?<whole>c)").findStyledMatcher(middlePartExtracted) {
             assertEquals(ChatFormatting.RED.color, groupOrThrow("whole").sampleStyleAtStart().color?.value)
+        }
+    }
+
+    @Test
+    fun testUndeclaredOptionalGroup() {
+        val component = componentBuilder {
+            append("Selected pet: Rift Ferret")
+        }
+        Pattern.compile("Selected pet: (?<pet>[\\w ]+)(?<skin> ✦)?").matchStyledMatcher(component) {
+            assertNull(component("skin") ?: component("altskin"))
         }
     }
 

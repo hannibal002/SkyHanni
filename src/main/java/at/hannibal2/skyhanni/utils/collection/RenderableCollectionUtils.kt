@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.Searchable
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.placeholder
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
-import net.minecraft.world.item.ItemStack
 import java.util.Collections
 
 // TODO move the type specific into the companion objects, the rest goes back into the RenderableUtils
@@ -50,7 +50,7 @@ object RenderableCollectionUtils {
     }
 
     fun MutableList<Renderable>.addItemStack(
-        itemStack: ItemStack,
+        itemStack: SafeItemStack,
         highlight: Boolean = false,
         scale: Double = NeuItems.ITEM_FONT_SIZE,
     ) {

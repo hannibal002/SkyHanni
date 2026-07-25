@@ -21,6 +21,8 @@ object PlatformUtils {
 
     val MC_VERSION: String = net.minecraft.SharedConstants.getCurrentVersion().name()
 
+    @JvmStatic
+    @get:JvmName("isDevEnvironment")
     val isDevEnvironment: Boolean by lazy {
         FabricLoader.getInstance().isDevelopmentEnvironment
     }
@@ -50,7 +52,7 @@ object PlatformUtils {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Loaded Mods")
         event.addIrrelevant {
             getLoadedMods().forEach { (_, name, version, origin) ->

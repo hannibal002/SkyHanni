@@ -20,14 +20,14 @@ object SlayerItemsOnGround {
 
     private val config get() = SlayerApi.config.itemsOnGround
 
-    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(2.seconds)
+    private val itemsOnGround = TimeLimitedCache<ItemEntity, String>(2.seconds, useWeakKeys = true)
 
     @HandleEvent
     fun onTick() {
         if (!isEnabled()) return
         for (entityItem in EntityUtils.getEntitiesNearby<ItemEntity>(15.0)) {
             val itemStack = entityItem.item
-            if (itemStack.item is SpawnEggItem) continue
+            if (itemStack.getItem() is SpawnEggItem) continue
             if (itemStack.getInternalName() == NeuInternalName.NONE) continue
             val (name, price) = SlayerApi.getItemNameAndPrice(itemStack.getInternalName(), itemStack.count)
             if (config.minimumPrice > price) continue

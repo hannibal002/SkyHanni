@@ -25,7 +25,7 @@ object CrystalNucleusApi {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
 
     /**
-     * REGEX-TEST:   §r§5§lCRYSTAL NUCLEUS LOOT BUNDLE
+     * WRAPPED-REGEX-TEST: "  §r§5§lCRYSTAL NUCLEUS LOOT BUNDLE"
      */
     private val startPattern by patternGroup.pattern(
         "loot.start",

@@ -75,7 +75,10 @@ class DebugConfig {
     var copyInternalName: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Copy Cosmetics Skull Data", desc = "Copies the cosmetic data for skins with different variants but no animations.")
+    @ConfigOption(
+        name = "Copy Cosmetics Skull Data",
+        desc = "Copies the cosmetic data for skins with different variants but no animations."
+    )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var copyCosmeticsSkullData: Int = GLFW.GLFW_KEY_UNKNOWN
 
@@ -247,6 +250,11 @@ class DebugConfig {
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")
     val addonsDebugPosition: Position = Position(300, 300)
+
+    @Expose
+    @ConfigOption(name = "Remaining Kills Debug", desc = "Enables Extra Debug messages for Remaining Slayer Kills.")
+    @ConfigEditorBoolean
+    var remainingKillsDebug: Boolean = false
 
     @Expose
     @ConfigOption(name = "Track Sound", desc = "")

@@ -136,7 +136,7 @@ object SlayerRngMeterDisplay {
                 if (storage.goalNeeded == -1L) {
                     ErrorManager.logErrorStateWithData(
                         "Error Calculating Slayer RNG Meter",
-                        "gaol needed is -1, this should never be the case!",
+                        "goal needed is -1, this should never be the case!",
                         "goalNeeded" to storage.goalNeeded,
                         "currentMeter" to storage.currentMeter,
                         "gainPerBoss" to storage.gainPerBoss,

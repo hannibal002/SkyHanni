@@ -37,6 +37,11 @@ class VisitorConfig {
     val dropsStatistics: DropsStatisticsConfig = DropsStatisticsConfig()
 
     @Expose
+    @ConfigOption(name = "Charmed Visitors", desc = "")
+    @Accordion
+    val charmed: CharmedVisitorsConfig = CharmedVisitorsConfig()
+
+    @Expose
     @ConfigOption(name = "Notification Chat", desc = "Show in chat when a new visitor is visiting your island.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -84,7 +89,7 @@ class VisitorConfig {
     @Expose
     @ConfigOption(
         name = "Hide Chat",
-        desc = "Hide chat messages from the visitors in the garden. (Except Beth, Maeve, and Spaceman)"
+        desc = "Hide chat messages from the visitors in the garden. (Except those with long dialogues)"
     )
     @ConfigEditorBoolean
     @FeatureToggle

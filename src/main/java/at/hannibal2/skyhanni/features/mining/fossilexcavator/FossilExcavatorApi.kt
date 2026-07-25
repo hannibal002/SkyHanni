@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
@@ -21,7 +21,7 @@ object FossilExcavatorApi {
     private val chatPatternGroup = patternGroup.group("chat")
 
     /**
-     * REGEX-TEST:   §r§6§lEXCAVATION COMPLETE
+     * WRAPPED-REGEX-TEST: "  §r§6§lEXCAVATION COMPLETE"
      */
     private val startPattern by chatPatternGroup.pattern("start", " {2}§r§6§lEXCAVATION COMPLETE ?")
 
@@ -31,7 +31,7 @@ object FossilExcavatorApi {
     private val endPattern by chatPatternGroup.pattern("end", "§a§l▬{64}")
 
     /**
-     * REGEX-TEST:     §r§6Tusk Fossil
+     * WRAPPED-REGEX-TEST: "    §r§6Tusk Fossil"
      */
     private val itemPattern by chatPatternGroup.pattern("item", " {4}§r(?<item>.+)")
 
@@ -39,6 +39,11 @@ object FossilExcavatorApi {
      * REGEX-TEST: §cYou didn't find anything. Maybe next time!
      */
     private val emptyPattern by chatPatternGroup.pattern("empty", "§cYou didn't find anything. Maybe next time!")
+
+    /**
+     * REGEX-TEST: Fossil Excavator
+     */
+    private val excavatorInventoryPattern by patternGroup.pattern("inventory", "Fossil Excavator")
 
     private var inLoot = false
     private val loot = mutableListOf<Pair<String, Int>>()
@@ -48,15 +53,14 @@ object FossilExcavatorApi {
     val scrapItem = "SUSPICIOUS_SCRAP".toInternalName()
 
     val excavatorInventory = InventoryDetector(
-        checkInventoryName = { it == "Fossil Excavator" },
         onCloseInventory = { inExcavatorMenu = false }
-    )
+    ) { excavatorInventoryPattern }
 
     @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!excavatorInventory.isInside()) return
         inExcavatorMenu = event.inventoryItems.values.any {
-            it.hoverName.string.removeColor() == "Start Excavator"
+            it.cleanName == "Start Excavator"
         }
     }
 

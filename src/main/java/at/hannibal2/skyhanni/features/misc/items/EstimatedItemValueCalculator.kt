@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.intPow
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
@@ -84,7 +85,6 @@ import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessRes
 import at.hannibal2.skyhanni.utils.compat.getCompoundOrDefault
 import at.hannibal2.skyhanni.utils.compat.getStringOrDefault
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.world.item.ItemStack
 import java.util.Locale
 
 // TODO split into smaller sub classes
@@ -168,7 +168,7 @@ object EstimatedItemValueCalculator {
     private val FREE_WILL = "FREE_WILL".toInternalName()
 
     // TODO Extend this to actually take a price source instead of having price source be decided by Estimated Item Value config
-    fun getTotalPrice(stack: ItemStack, ignoreBasePrice: Boolean = false): Double? {
+    fun getTotalPrice(stack: SafeItemStack, ignoreBasePrice: Boolean = false): Double? {
         val (totalPrice, basePrice) = calculate(stack, mutableListOf())
         if (ignoreBasePrice && totalPrice == basePrice) {
             return null
@@ -176,7 +176,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    fun calculate(stack: ItemStack, list: MutableList<String>): Pair<Double, Double> {
+    fun calculate(stack: SafeItemStack, list: MutableList<String>): Pair<Double, Double> {
         val basePrice = addBaseItem(stack, list)
         // The value of enchantments will already be added in ::addEnchantments, so set to 0 to avoid double counting
         val foldValue = if (stack.getItemId() == "ENCHANTED_BOOK") 0.0
@@ -187,7 +187,7 @@ object EstimatedItemValueCalculator {
 
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
-    private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addReforgeStone(stack: SafeItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeModifier() ?: return 0.0
 
         val reforge = ReforgeApi.reforgeStones.firstOrNull {
@@ -207,7 +207,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun getReforgeStoneApplyCost(
-        stack: ItemStack,
+        stack: SafeItemStack,
         reforgeCosts: Map<LorenzRarity, Long>,
         reforgeStone: NeuInternalName,
     ): Int? {
@@ -249,60 +249,60 @@ object EstimatedItemValueCalculator {
         }
     }
 
-    private fun addRecombobulator(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addRecombobulator(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.isRecombobulated()) return 0.0
 
         return list.formatHaving("Recombobulated", RECOMBOBULATOR_3000)
     }
 
-    private fun addJalapenoBook(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addJalapenoBook(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasJalapenoBook()) return 0.0
 
         return list.formatHaving("Jalapeno Book", JALAPENO_BOOK)
     }
 
-    private fun addWoodSingularity(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addWoodSingularity(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasWoodSingularity()) return 0.0
 
         return list.formatHaving("Wood Singularity", WOOD_SINGULARITY)
     }
 
-    private fun addDivanPowderCoating(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addDivanPowderCoating(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasDivanPowderCoating()) return 0.0
 
         return list.formatHaving("Divan Powder Coating", DIVAN_POWDER_COATING)
     }
 
-    private fun addMithrilInfusion(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addMithrilInfusion(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.getMithrilInfusion()) return 0.0
         return list.formatHaving("Mithril Infusion", MITHRIL_INFUSION)
     }
 
-    private fun addFreeWill(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addFreeWill(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.getFreeWill()) return 0.0
         return list.formatHaving("Free Will", FREE_WILL)
     }
 
-    private fun addArtOfWar(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArtOfWar(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfWar()) return 0.0
 
         return list.formatHaving("The Art of War", ART_OF_WAR)
     }
 
-    private fun addStatsBook(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addStatsBook(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasBookOfStats()) return 0.0
 
         return list.formatHaving("Book of Stats", BOOK_OF_STATS)
     }
 
     // TODO untested
-    private fun addArtOfPeace(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArtOfPeace(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasArtOfPeace()) return 0.0
 
         return list.formatHaving("The Art Of Peace", ART_OF_PEACE)
     }
 
-    private fun addPowerScrolls(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addPowerScrolls(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getPowerScroll() ?: return 0.0
 
         val name = internalName.itemNameWithoutColor
@@ -315,14 +315,14 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addEtherwarp(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addEtherwarp(stack: SafeItemStack, list: MutableList<String>): Double {
         if (!stack.hasEtherwarp()) return 0.0
         val price = ETHERWARP_CONDUIT.getPrice() + ETHERWARP_MERGER.getPrice()
         list.add("§7Etherwarp: §a§l✔ ${price.formatCoinWithBrackets()}")
         return price
     }
 
-    private fun addMasterStars(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addMasterStars(stack: SafeItemStack, list: MutableList<String>): Double {
         var totalStars = stack.getDungeonStarCount() ?: return 0.0
         starChange.takeIf { it != 0 }?.let {
             totalStars += it
@@ -351,7 +351,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addHotPotatoBooks(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addHotPotatoBooks(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getHotPotatoCount() ?: return 0.0
 
         val hpb: Int
@@ -379,7 +379,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addWetBook(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addWetBook(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getWetBookCount() ?: return 0.0
 
         val price = WET_BOOK.getPrice() * count
@@ -387,7 +387,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addFarmingForDummies(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addFarmingForDummies(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getFarmingForDummiesCount() ?: return 0.0
 
         val price = FARMING_FOR_DUMMIES.getPrice() * count
@@ -395,7 +395,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addOverclocker(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addOverclocker(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getOverclockerCount() ?: return 0.0
 
         val price = OVERCLOCKER_3000.getPrice() * count
@@ -403,7 +403,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addPolarvoidBook(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addPolarvoidBook(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getPolarvoidBookCount() ?: return 0.0
 
         val price = POLARVOID_BOOK.getPrice() * count
@@ -411,7 +411,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addPocketSackInASack(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addPocketSackInASack(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getAppliedPocketSackInASack() ?: return 0.0
 
         val price = POCKET_SACK_IN_A_SACK.getPrice() * count
@@ -419,7 +419,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addBookwormBook(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addBookwormBook(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getBookwormBookCount() ?: return 0.0
 
         val price = BOOKWORM_BOOK.getPrice() * count
@@ -427,7 +427,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addSilex(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addSilex(stack: SafeItemStack, list: MutableList<String>): Double {
         val tier = stack.getSilexCount() ?: return 0.0
 
         val internalName = stack.getInternalName()
@@ -438,7 +438,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addTransmissionTuners(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addTransmissionTuners(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getTransmissionTunerCount() ?: return 0.0
 
         val price = TRANSMISSION_TUNER.getPrice() * count
@@ -446,7 +446,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addManaDisintegrators(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addManaDisintegrators(stack: SafeItemStack, list: MutableList<String>): Double {
         val count = stack.getManaDisintegrators() ?: return 0.0
 
         val price = MANA_DISINTEGRATOR.getPrice() * count
@@ -458,7 +458,7 @@ object EstimatedItemValueCalculator {
         return "§7$label: §e$have§7/§e$max ${price.formatCoinWithBrackets()}"
     }
 
-    private fun addCrimsonPrestige(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addCrimsonPrestige(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalNameOrNull() ?: return 0.0
         if (!internalName.isKuudraArmor()) return 0.0
         val tierIndex = internalName.getArmorKuudraTier()?.takeIf { it > 1 } ?: return 0.0
@@ -489,7 +489,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addStars(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addStars(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalNameOrNull() ?: return 0.0
         var totalStars = stack.getDungeonStarCount() ?: stack.getStarCount() ?: 0
 
@@ -592,7 +592,7 @@ object EstimatedItemValueCalculator {
         return EssenceUtils.EssenceUpgradePrice(totalEssencePrice, totalCoinPrice, totalItemPrice)
     }
 
-    private fun addDrillUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addDrillUpgrades(stack: SafeItemStack, list: MutableList<String>): Double {
         val drillUpgrades = stack.getDrillUpgrades() ?: return 0.0
 
         val (totalPrice, names) = getTotalAndNames(drillUpgrades)
@@ -603,7 +603,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addRodUpgrades(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addRodUpgrades(stack: SafeItemStack, list: MutableList<String>): Double {
         val rodUpgrades = stack.getRodParts()
 
         val (totalPrice, names) = getTotalAndNames(rodUpgrades)
@@ -614,7 +614,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addAbilityScrolls(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addAbilityScrolls(stack: SafeItemStack, list: MutableList<String>): Double {
         val abilityScrolls = stack.getAbilityScrolls() ?: return 0.0
 
         val (totalPrice, names) = getTotalAndNames(abilityScrolls)
@@ -625,7 +625,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addEnchantments(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addEnchantments(stack: SafeItemStack, list: MutableList<String>): Double {
         val (totalPrice, names) = stack.getEnchantmentItems() ?: return 0.0
 
         val enchantmentsCap: Int = config.enchantmentsCap.get()
@@ -642,7 +642,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addBoosters(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addBoosters(stack: SafeItemStack, list: MutableList<String>): Double {
         val boosters = stack.readBoosters()
         if (boosters.isEmpty()) return 0.0
 
@@ -657,7 +657,7 @@ object EstimatedItemValueCalculator {
 
     }
 
-    private fun ItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
+    private fun SafeItemStack.getEnchantmentItems(): Pair<Double, List<String>>? {
         val enchantments = getHypixelEnchantments() ?: return null
         val data = EstimatedItemValue.itemValueCalculationData ?: return null
         val items = fetchEnchantmentItems(enchantments, getInternalName(), data)
@@ -738,7 +738,7 @@ object EstimatedItemValueCalculator {
         return items
     }
 
-    private fun addGemstones(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addGemstones(stack: SafeItemStack, list: MutableList<String>): Double {
         val gemstones = stack.getGemstones() ?: return 0.0
 
         val items = mutableMapOf<NeuInternalName, Int>()
@@ -756,7 +756,7 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
-    private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addGemstoneSlotUnlockCost(stack: SafeItemStack, list: MutableList<String>): Double {
         val unlockedSlots = stack.readUnlockedSlots() ?: return 0.0
 
         val items = mutableMapOf<NeuInternalName, Int>()
@@ -819,17 +819,17 @@ object EstimatedItemValueCalculator {
         return totalPrice to map.sortedDesc().keys.toList()
     }
 
-    private fun addHelmetSkin(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addHelmetSkin(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getHelmetSkin() ?: return 0.0
         return addCosmetic(internalName, list, "Skin", config.ignoreHelmetSkins)
     }
 
-    private fun addArmorDye(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addArmorDye(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getArmorDye() ?: return 0.0
         return addCosmetic(internalName, list, "Dye", config.ignoreArmorDyes)
     }
 
-    private fun addRune(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addRune(stack: SafeItemStack, list: MutableList<String>): Double {
         if (stack.getInternalName().isRune()) return 0.0
         val internalName = stack.getRune() ?: return 0.0
 
@@ -855,7 +855,7 @@ object EstimatedItemValueCalculator {
         return if (shouldIgnorePrice.get()) 0.0 else price
     }
 
-    private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addEnrichment(stack: SafeItemStack, list: MutableList<String>): Double {
         val enrichmentName = stack.getEnrichment() ?: return 0.0
         val internalName = "TALISMAN_ENRICHMENT_$enrichmentName".toInternalName()
 
@@ -865,7 +865,7 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
+    private fun addBaseItem(stack: SafeItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName().removeKuudraTier()
         val petLevelInclusiveInternalName = stack.getPetInternalNameWithLevel().removeKuudraTier()
 
@@ -899,9 +899,9 @@ object EstimatedItemValueCalculator {
         return price
     }
 
-    private fun ItemStack.readNbtDump() = extraAttributes.getReadableNBTDump(includeLore = true).joinToString("\n")
+    private fun SafeItemStack.readNbtDump() = extraAttributes.getReadableNBTDump(includeLore = true).joinToString("\n")
 
-    private fun ItemStack.readUnlockedSlots(): String? {
+    private fun SafeItemStack.readUnlockedSlots(): String? {
         // item have to contains gems.unlocked_slots NBT array for unlocked slot detection
         val unlockedSlots = getExtraAttributes()?.getCompoundOrDefault("gems")?.get("unlocked_slots")?.toString() ?: return null
 
@@ -930,7 +930,7 @@ object EstimatedItemValueCalculator {
         return unlockedSlots
     }
 
-    private fun ItemStack.readBoosters(): List<NeuInternalName> {
+    private fun SafeItemStack.readBoosters(): List<NeuInternalName> {
         val list = NbtCompat.getStringTagList(extraAttributes, "boosters")
         if (list.isEmpty) return emptyList()
         val boosters = mutableListOf<NeuInternalName>()

@@ -13,7 +13,7 @@ import com.google.gson.JsonPrimitive
 object ConfigUpdaterMigrator {
 
     val logger = SkyHanniLogger("ConfigMigration")
-    const val CONFIG_VERSION = 133
+    const val CONFIG_VERSION = 139
     fun JsonElement.at(chain: List<String>, init: Boolean): JsonElement? {
         if (chain.isEmpty()) return this
         if (this !is JsonObject) return null
@@ -67,8 +67,8 @@ object ConfigUpdaterMigrator {
                 }
                 for (realPrefix in realPrefixes) {
                     add(since, "$realPrefix.${path.substringAfter('.')}", value)
-                    return
                 }
+                return
             }
             val newParentElement = new.at(np.dropLast(1), true)
             if (newParentElement !is JsonObject) {

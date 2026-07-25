@@ -6,21 +6,17 @@ import at.hannibal2.skyhanni.events.fishing.SeaCreatureEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SeaCreatureSettings
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LootshareUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawSphereWireframeInWorld
 
 @SkyHanniModule
 object SeaCreatureLootshareSphere {
     private val config get() = SkyHanniMod.feature.fishing
 
-    private const val RANGE = 30.0f
-
     private val seaCreatures = mutableSetOf<LivingSeaCreatureData>()
-    private val existingCircles = mutableSetOf<LorenzVec>()
 
-    fun isInRange(pos: LorenzVec): Boolean = pos.distanceToPlayer() < RANGE
+    private val spherePositions = mutableSetOf<LootshareUtils.Sphere>()
 
     @HandleEvent
     fun onSeaCreatureSpawn(event: SeaCreatureEvent.Spawn) = addMob(event.seaCreature)
@@ -31,18 +27,28 @@ object SeaCreatureLootshareSphere {
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!config.lootshareRange) return
-        existingCircles.clear()
+        for (entry in spherePositions) {
+            event.drawSphereWireframeInWorld(entry.color.toColor(), entry.position, LootshareUtils.RANGE)
+        }
+        spherePositions.clear()
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTick() {
+        if (!config.lootshareRange) return
         for (seaCreature in seaCreatures) {
             if (!seaCreature.exists()) continue
+            var otherNearbySpheres = 0
             val pos = seaCreature.pos ?: continue
-            var circleCount = 0
-            existingCircles.forEach {
-                if (it.distance(pos) < 10) circleCount++
+            val color = if (seaCreature.isOwn || LootshareUtils.isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
+
+            for (lootshareSphere in spherePositions) {
+                val position = lootshareSphere.position
+                if (position.distance(pos) < 10) otherNearbySpheres++
             }
-            if (circleCount > 2) continue
-            val color = if (seaCreature.isOwn || isInRange(pos)) LorenzColor.GREEN else LorenzColor.WHITE
-            event.drawSphereWireframeInWorld(color.toColor(), pos, RANGE)
-            existingCircles.add(pos)
+            if (otherNearbySpheres < 2) {
+                spherePositions.add(LootshareUtils.Sphere(pos, color))
+            }
         }
     }
 

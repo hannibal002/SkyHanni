@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.GuiContainerEvent.ClickType
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -20,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedClay
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.container
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -27,6 +27,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.SimpleContainer
+import net.minecraft.world.inventory.ContainerInput
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -76,7 +77,7 @@ object HarpFeatures {
 
             event.cancel()
 
-            InventoryUtils.clickSlot(37 + index, chest.container.containerId, mouseButton = 2, mode = ClickType.MIDDLE)
+            InventoryUtils.clickSlot(37 + index, chest.container.containerId, mouseButton = 2, mode = ContainerInput.CLONE)
             lastClick = SimpleTimeMark.now()
             break
         }
@@ -107,7 +108,7 @@ object HarpFeatures {
     }
 
     private fun updateScale() {
-        if (Minecraft.getInstance().screen == null) {
+        if (MinecraftCompat.screen == null) {
             DelayedRun.runNextTick {
                 updateScale()
             }
@@ -174,7 +175,7 @@ object HarpFeatures {
         if (isHarpGui(InventoryUtils.openInventoryName())) {
             if (config.keybinds) {
                 // needed to not send duplicate clicks via keybind feature
-                if (event.clickType == ClickType.HOTBAR) {
+                if (event.clickType == ContainerInput.SWAP) {
                     event.cancel()
                     return
                 }

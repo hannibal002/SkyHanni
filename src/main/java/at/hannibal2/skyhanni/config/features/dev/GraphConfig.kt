@@ -26,6 +26,11 @@ class GraphConfig {
     var placeKey: Int = GLFW.GLFW_KEY_F
 
     @Expose
+    @ConfigOption(name = "Auto Select Node", desc = "Automatically select a node after placing it.")
+    @ConfigEditorBoolean
+    var autoSelectNode: Boolean = false
+
+    @Expose
     @ConfigOption(name = "Select Key", desc = "Select the nearest node to be active. Double press to unselect.")
     @ConfigEditorKeybind(defaultKey = KeyboardManager.MIDDLE_MOUSE)
     var selectKey: Int = KeyboardManager.MIDDLE_MOUSE

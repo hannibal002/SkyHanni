@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.features.event.AnniversaryTeamFinderColorCon
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
@@ -79,7 +78,7 @@ object Year400Features {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    fun onConfigLoad() {
         with(config.colors) {
             ConditionalUtils.onToggle(wrong, pink, blue, yellow, green, red) {
                 colorInHand?.let {

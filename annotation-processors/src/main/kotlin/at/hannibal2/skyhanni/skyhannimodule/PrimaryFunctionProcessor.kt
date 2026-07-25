@@ -13,7 +13,11 @@ class PrimaryFunctionProcessor(
     codeGenerator: CodeGenerator,
     logger: KSPLogger,
     modVersion: String,
+    mcVersion: String,
+    cacheDir: String?,
 ) : BaseProcessor(codeGenerator, logger, modVersion) {
+
+    private val cache = KspIncrementalCache(cacheDir, mcVersion, "ksp-primary-function-state")
 
     override fun processSymbols(resolver: Resolver): List<KSAnnotated> {
         val skyHanniEvent = resolver.getClassDeclarationByName("at.hannibal2.skyhanni.api.event.SkyHanniEvent")
@@ -24,7 +28,22 @@ class PrimaryFunctionProcessor(
             .filter { skyHanniEvent.isAssignableFrom(it.asStarProjectedType()) }
             .toList()
 
+        val filePaths = symbols.mapNotNull { it.containingFile?.filePath }.toSet()
+        val outputFile = cache.outputFile("at/hannibal2/skyhanni/api/event", "GeneratedEventPrimaryFunctionNames")
+        val dirtyFilePaths = cache.evaluate(filePaths, outputFile)
+
+        if (dirtyFilePaths == null) {
+            logger.warn("No @PrimaryFunction files changed, skipping GeneratedEventPrimaryFunctionNames regeneration")
+            cache.commit()
+            return emptyList()
+        }
+
+        if (dirtyFilePaths.isEmpty()) {
+            logger.warn("No @PrimaryFunction files changed but GeneratedEventPrimaryFunctionNames.kt is missing, regenerating")
+        }
+
         generate(symbols)
+        cache.commit()
         return emptyList()
     }
 

@@ -1,0 +1,46 @@
+# Execution context: base branch code (push to beta / pull_request_target)
+
+name: "Merge Conflict Label"
+on:
+    push:
+        branches: [ beta ]
+    pull_request_target:
+        types: [ opened, synchronize ]
+
+concurrency:
+    group: merge-conflict-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+    issues: write
+    pull-requests: write
+
+jobs:
+    conflicts:
+        runs-on: ubuntu-latest
+        steps:
+            -   name: Checkout
+                uses: actions/checkout@v7
+
+            -   name: Cache Kotlin compiler
+                uses: actions/cache@v6
+                with:
+                    path: ~/kotlinc
+                    key: kotlin-2.4.0
+
+            -   name: Set up Kotlin
+                run: |
+                    if [ ! -d "$HOME/kotlinc" ]; then
+                        curl -sLO "https://github.com/JetBrains/kotlin/releases/download/v2.4.0/kotlin-compiler-2.4.0.zip"
+                        unzip -q kotlin-compiler-2.4.0.zip -d "$HOME"
+                    fi
+                    echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
+
+            -   name: Post merge conflict comment
+                env:
+                    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    GITHUB_REPOSITORY: ${{ github.repository }}
+                    PR_NUMBER: ${{ github.event.pull_request.number }}
+                    MODE: mergeconflict
+                run: kotlinc -script .github/scripts/pr_review.main.kts

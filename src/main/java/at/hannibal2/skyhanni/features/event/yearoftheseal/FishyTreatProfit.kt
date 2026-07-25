@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
@@ -32,15 +33,15 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object FishyTreatProfit {
 
     private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
     private var display = emptyList<Renderable>()
-    private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
+    private val inventory = InventoryDetector { inventoryNamePattern }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
+
     // idk why this fetches price source based on tracker config,
     // but it already did before I changed how tracker config worked
     val priceSource get() = SkyHanniMod.feature.misc.tracker.priceSource
@@ -53,6 +54,11 @@ object FishyTreatProfit {
     private val coinsPattern by patternGroup.pattern(
         "coins",
         "§6(?<coins>.*) Coins",
+    )
+
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "Lukas the Aquarist",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -83,7 +89,7 @@ object FishyTreatProfit {
         return
     }
 
-    private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
+    private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
         val allMaterials = getAdditionalMaterials(getRequiredItems(item))
         val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
@@ -151,7 +157,7 @@ object FishyTreatProfit {
         }
     }
 
-    private fun getItemName(item: ItemStack): Component {
+    private fun getItemName(item: SafeItemStack): Component {
         val name = item.hoverName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
@@ -179,7 +185,7 @@ object FishyTreatProfit {
         return otherItemsPrice
     }
 
-    private fun getRequiredItems(item: ItemStack): MutableMap<String, Int> {
+    private fun getRequiredItems(item: SafeItemStack): MutableMap<String, Int> {
         val items = mutableMapOf<String, Int>()
         var next = false
         val lore = item.getLore()

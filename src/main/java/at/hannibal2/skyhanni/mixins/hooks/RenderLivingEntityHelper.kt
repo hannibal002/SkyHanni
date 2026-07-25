@@ -5,11 +5,10 @@ import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.hasVisibleEquipment
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIfKey
-import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.deceased
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.EquipmentSlot
 import net.minecraft.world.entity.LivingEntity
 import java.awt.Color
 import java.util.concurrent.ConcurrentHashMap
@@ -50,9 +49,6 @@ object RenderLivingEntityHelper {
         }
         return color
     }
-
-    private fun LivingEntity.hasVisibleEquipment() =
-        EquipmentSlot.entries.any { getItemBySlot(it).isNotEmpty() }
 
     @HandleEvent
     fun onWorldChange() {

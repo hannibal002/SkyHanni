@@ -29,7 +29,7 @@ class CFUpgradeWarningsConfig {
     @Expose
     @ConfigOption(
         name = "Upgrade Warning Interval",
-        desc = "How often the warning an upgrade is available is repeated in minutes."
+        desc = "How often the upgrade-available warning is repeated in minutes."
     )
     @ConfigEditorSlider(minValue = 0f, maxValue = 10f, minStep = 0.25f)
     var timeBetweenWarnings: Float = 1f

@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationFeedback
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.chat.TextHelper.send
@@ -214,7 +214,7 @@ object FastFairySoulsPathfinder {
         if (event.inventoryName != "Fairy Souls Guide") return
 
         for (stack in event.inventoryItems.values) {
-            val island = IslandType.getByNameOrNull(stack.hoverName.string.removeColor()) ?: continue
+            val island = IslandType.getByNameOrNull(stack.cleanName) ?: continue
             // The group is named "found" rather than "have", because "having" a fairy soul means trading it to Tia the Fairy for XP,
             // which is distinct from finding it on an island.
             val found = stack.getLoreComponent().firstOrNull()?.let {
@@ -298,7 +298,7 @@ object FastFairySoulsPathfinder {
 
     @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent.Allow) {
-        if (duplicatePattern.matches(event.chatComponent) || newPattern.matches(event.chatComponent)) {
+        if (duplicatePattern.matches(event.cleanMessage) || newPattern.matches(event.cleanMessage)) {
             data?.foundNearby()
         }
     }

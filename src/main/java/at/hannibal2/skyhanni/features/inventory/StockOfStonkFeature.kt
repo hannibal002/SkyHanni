@@ -44,8 +44,8 @@ object StockOfStonkFeature {
     )
 
     /**
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
-     * REGEX-TEST:    Minimum Bid: 2,400,002 Coins
+     * WRAPPED-REGEX-TEST: "   Minimum Bid: 2,400,002 Coins"
+     * WRAPPED-REGEX-TEST: "   Minimum Bid: 2,400,002 Coins"
      */
     private val bidPattern by patternGroup.pattern(
         "bid.new",
@@ -70,7 +70,7 @@ object StockOfStonkFeature {
     fun onToolTip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        if (!inventoryPattern.matches(event.itemStack.cleanName())) return
+        if (!inventoryPattern.matches(event.itemStack.cleanName)) return
         var stonksReward = 0
         var index = 0
         var bestValueIndex = 0

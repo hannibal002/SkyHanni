@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemModel
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
@@ -21,14 +22,13 @@ import net.minecraft.core.component.DataComponents
 import net.minecraft.nbt.NbtOps
 import net.minecraft.resources.Identifier
 import net.minecraft.util.Unit
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.component.CustomData
 import net.minecraft.world.item.component.DyedItemColor
 import net.minecraft.world.item.component.ResolvableProfile
 import kotlin.jvm.optionals.getOrNull
 
 object ComponentUtils {
-    fun convertToComponents(stack: ItemStack, nbtInfo: NeuNbtInfoJson?) {
+    fun convertToComponents(stack: SafeItemStack, nbtInfo: NeuNbtInfoJson?) {
         nbtInfo ?: return
         nbtInfo.extraAttributes?.let { extraJson ->
             val extraAttributes = JsonOps.INSTANCE
@@ -65,7 +65,7 @@ object ComponentUtils {
 
     }
 
-    fun convertToNeuNbtInfoJson(stack: ItemStack): JsonObject {
+    fun convertToNeuNbtInfoJson(stack: SafeItemStack): JsonObject {
         val isUnbreakable = NbtBoolean(stack.has(DataComponents.UNBREAKABLE))
         val profile = stack.get(DataComponents.PROFILE)
         val profileProperties = profile?.partialProfile()?.properties?.get("textures")?.firstOrNull()

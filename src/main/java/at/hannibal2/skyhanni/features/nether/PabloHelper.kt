@@ -42,7 +42,7 @@ object PabloHelper {
             group("flower")
         } ?: return
 
-        if (InventoryUtils.countItemsInLowerInventory { it.hoverName.string.contains(itemName) } > 0) return
+        if (InventoryUtils.containsInLowerInventory { it.hoverName.string.contains(itemName) }) return
 
         DelayedRun.runNextTick {
             GetFromSackApi.getFromChatMessageSackItems(

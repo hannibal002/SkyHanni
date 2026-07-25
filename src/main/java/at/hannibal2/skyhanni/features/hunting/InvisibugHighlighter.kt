@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -31,8 +31,8 @@ object InvisibugHighlighter {
     private val invisibugEntities = mutableSetOf<LivingEntity>()
     private var locationsToRender = listOf<LorenzVec>()
 
-    @HandleEvent(onlyOnIsland = IslandType.GALATEA)
-    fun onParticle(event: ReceiveParticleEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GALATEA, receiveCancelled = true)
+    fun onParticle(event: ParticleEvent) {
         if (!config.enabled) return
 
         val particle = event.type

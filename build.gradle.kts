@@ -1,47 +1,69 @@
-import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
 import dev.detekt.gradle.DetektCreateBaselineTask
 import dev.kikugie.stonecutter.StonecutterExperimentalAPI
+import net.fabricmc.loom.api.LoomGradleExtensionAPI
+import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
+import org.gradle.api.provider.Provider
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
 import skyhannibuildsystem.PublishToModrinth
+import org.gradle.jvm.tasks.Jar as GradleJar
 
 plugins {
     idea
     java
     alias(libs.plugins.shadow)
-    id("net.fabricmc.fabric-loom-remap")
+    id("net.fabricmc.fabric-loom-remap") apply false
+    id("net.fabricmc.fabric-loom") apply false
     kotlin("jvm")
     id("com.google.devtools.ksp")
-    kotlin("plugin.power-assert")
     `maven-publish`
     id("dev.detekt")
 }
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
+val primaryTarget = ProjectTarget.MODERN_26100
+val isDeobf = target.minecraftVersion.versionNumber >= 260100
 
+if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
+else apply(plugin = "net.fabricmc.fabric-loom-remap")
+
+// Manual accessors for the conditionally-applied loom plugin.
+// These replace the typed accessors that Kotlin DSL would normally generate for
+// plugins applied in the plugins block. Since both loom plugins are declared with
+// apply false, no accessors are auto-generated, so we define them explicitly.
+val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
+fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
+fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
+fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
+fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
+fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
+fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
+    add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
+fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
+fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
+    add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+
+fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
-    // possible candidate. Some DCEVMs are however incompatible with some things Gradle is doing,
-    // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
-    // IntelliJ run configuration.
-    toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 
 // Minecraft configuration:
 @OptIn(StonecutterExperimentalAPI::class)
-loom {
+loom.apply {
     val classTweakerFile = sc.process(
         rootProject.file("src/main/resources/skyhanni.classtweaker"),
         "build/skyhanni.classtweaker",
@@ -56,14 +78,13 @@ loom {
 
     runs {
         named("client") {
-            isIdeConfigGenerated = true
-            appendProjectPathToConfigName.set(true)
+            appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G")
+            vmArgs("-Xmx4G", "-Dnarrator.none=true")
             programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
         }
@@ -76,14 +97,21 @@ val shadowImpl: Configuration by configurations.creating {
 }
 
 val shadowModImpl: Configuration by configurations.creating {
-    configurations.modImplementation.get().extendsFrom(this)
+    if (!isDeobf) configurations.getByName("modImplementation").extendsFrom(this)
+}
+
+val shadowOnly: Configuration by configurations.creating
+
+val mixinTestRuntime: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    extendsFrom(configurations.testRuntimeClasspath.get())
 }
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
     this.branch = "main"
-    this.resourcePath = "assets/skyhanni/repo.zip"
+    this.resourcePath = "assets/skyhanni/repo.tar.gz"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
 }
 
@@ -91,35 +119,38 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
-    this.resourcePath = "assets/skyhanni/neu-repo.zip"
+    this.resourcePath = "assets/skyhanni/neu-repo.tar.gz"
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
 val publishToModrinth by tasks.registering(PublishToModrinth::class)
 
-tasks.runClient {
+tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
-tasks.register("checkPrDescription", ChangelogVerification::class) {
-    this.outputDirectory.set(layout.buildDirectory)
-    this.prTitle = project.findProperty("prTitle") as? String ?: ""
-    this.prBody = project.findProperty("prBody") as? String ?: ""
+tasks.register<ClientProductionRunTask>("prodClient") {
+    notCompatibleWithConfigurationCache("Interactive client launches must start a new process every time.")
+    outputs.upToDateWhen { false }
+    runDir = file("run")
+}
+
+if (target == primaryTarget) {
+    tasks.register("checkPrDescription", ChangelogVerification::class) {
+        this.prTitle = System.getenv("PR_TITLE") ?: project.findProperty("prTitle") as? String ?: ""
+        this.prBody = System.getenv("PR_BODY") ?: project.findProperty("prBody") as? String ?: ""
+        this.outputDirectory.set(
+            layout.buildDirectory.dir("changelog-verification")
+        )
+    }
 }
 
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
     @Suppress("UnstableApiUsage")
-    if (target.mappingDependency == "official") {
-        mappings(loom.layered {
-            officialMojangMappings()
-            if (versionName == "1.21.10") {
-                mappings("dev.lambdaurora:yalmm-mojbackward:1.21.10+build.3")
-            }
-        })
-    } else {
-        mappings(target.mappingDependency)
+    if (!isDeobf) {
+        mappings(loom.officialMojangMappings())
     }
 
     compileOnly(libs.jbAnnotations)
@@ -128,55 +159,92 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let { modImplementation(it) }
-    target.fabricApiVersion?.let { modImplementation(it) }
-    modImplementation(libs.fabricLanguageKotlin)
-    target.modMenuVersion?.let { modImplementation("maven.modrinth:modmenu:$it") }
+    target.fabricLoaderVersion?.let {
+        if (isDeobf) implementation(it) else modImplementation(it)
+        "productionRuntimeMods"(it)
+        mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
+    }
+    target.fabricApiVersion?.let {
+        if (isDeobf) implementation(it) else modImplementation(it)
+        "productionRuntimeMods"(it)
+    }
+    if (isDeobf) implementation(libs.fabricLanguageKotlin)
+    else modImplementation(libs.fabricLanguageKotlin)
+    "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
-    modRuntimeOnly(libs.devauth)
+    target.modMenuVersion?.let {
+        if (isDeobf) implementation("maven.modrinth:modmenu:$it")
+        else modImplementation("maven.modrinth:modmenu:$it")
+    }
+
+    if (isDeobf) runtimeOnly(libs.devauth)
+    else modRuntimeOnly(libs.devauth)
+    "productionRuntimeMods"(libs.devauth)
 
     val moulconfigVersion = target.minecraftVersion.moulconfigMinecraftVersionOverride ?: target.minecraftVersion.versionName
-    shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
-        exclude("org.jetbrains.kotlin")
-        exclude("org.jetbrains.kotlinx")
+    if (isDeobf) {
+        shadowImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+            exclude("org.jetbrains.kotlin")
+            exclude("org.jetbrains.kotlinx")
+        }
+    } else {
+        shadowModImpl("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}") {
+            exclude("org.jetbrains.kotlin")
+            exclude("org.jetbrains.kotlinx")
+        }
+        include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
     }
-    include("org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}")
+    "minecraftTestClientRuntimeLibraries"(
+        "org.notenoughupdates.moulconfig:modern-$moulconfigVersion:${libs.versions.moulconfig.get()}"
+    )
 
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
     }
+    "minecraftTestClientRuntimeLibraries"(libs.libautoupdate)
 
     testImplementation(libs.junit)
     testRuntimeOnly(libs.junit.launcher)
     testImplementation(libs.mockk)
+    testImplementation(libs.mockk.agent)
 
-    modImplementation(libs.hypixelmodapi)
-    include(libs.hypixelmodapi.fabric)
-
-
-    modCompileOnly(libs.roughlyenoughitems) {
-        exclude(group = "net.fabricmc.fabric-api")
+    if (isDeobf) {
+        implementation(target.hypixelModApiVersion)
+        runtimeOnly(target.hypixelModApiFabricVersion)
+    } else {
+        modImplementation(target.hypixelModApiVersion)
+        modRuntimeOnly(target.hypixelModApiFabricVersion)
     }
+    "productionRuntimeMods"(target.hypixelModApiFabricVersion)
+
+    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
 
     // getting clock offset
     includeImplementation(libs.commons.net)
+    "minecraftTestClientRuntimeLibraries"(libs.commons.net)
 
     // Calculator
-    includeImplementation(libs.keval)
-
-    // Repo mgmt
-    includeImplementation(libs.jgit)
+    includeImplementation(libs.keval) {
+        exclude(group = "org.jetbrains.kotlin")
+    }
+    "minecraftTestClientRuntimeLibraries"(libs.keval)
 
     detektPlugins(libs.detektrules.neu)
     detektPlugins(project(":detekt"))
     detektPlugins(libs.detektrules.ktlint)
 
-    if (target != ProjectTarget.MODERN_12110) shadowImpl(libs.httpclient)
+    shadowImpl(libs.httpclient)
+    "minecraftTestClientRuntimeLibraries"(libs.httpclient)
 }
 
-fun DependencyHandler.includeImplementation(dep: Any) {
-    include(dep)
-    modImplementation(dep)
+fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit = {}) {
+    if (isDeobf) {
+        add("shadowImpl", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
+    } else {
+        include(dep).also { (it as? ExternalModuleDependency)?.configure() }
+        modImplementation(dep).also { (it as? ExternalModuleDependency)?.configure() }
+    }
 }
 
 afterEvaluate {
@@ -187,22 +255,51 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
-        arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        if (!isDeobf) {
+            arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
+        } else {
+            arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
+        }
     }
 }
 
-tasks.withType(Test::class) {
+tasks.withType<Test> {
     useJUnitPlatform()
+    testLogging {
+        showStackTraces = true
+        exceptionFormat = TestExceptionFormat.FULL
+    }
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
     workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
+    jvmArgs(
+        "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+        "--add-opens", "java.base/java.util=ALL-UNNAMED",
+        "-XX:+EnableDynamicAgentLoading",
+        // Tests start NPE-ing without this on Java 25
+        "-Dnet.bytebuddy.experimental=true",
+    )
+}
+
+val mixinTest by tasks.registering(Test::class) {
+    description = "Audits mixin application under Fabric Loader."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().output + sourceSets.main.get().output + mixinTestRuntime
+    filter {
+        includeTestsMatching("at.hannibal2.skyhanni.test.MixinTest")
+    }
+}
+
+tasks.test {
+    dependsOn(mixinTest)
+    exclude("at/hannibal2/skyhanni/test/MixinTest.class")
 }
 
 kotlin {
     sourceSets.all {
         languageSettings {
-            languageVersion = "2.2"
+            languageVersion = "2.4"
         }
     }
 }
@@ -212,10 +309,13 @@ tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
     val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val hypixelModApiVersion = target.hypixelModApiFabricVersion.split(":").last()
+    val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
     val props = buildMap {
         put("version", version)
-        put("minecraft", target.minecraftVersion.versionName)
+        put("minecraft", minecraftVersion)
         put("fapi", fapiVersion)
+        put("hypixelmodapi", hypixelModApiVersion)
     }
 
     props.forEach(inputs::property)
@@ -226,8 +326,8 @@ tasks.processResources {
 }
 
 @Suppress("UnstableApiUsage")
-if (target == ProjectTarget.MODERN_12110) {
-    fabricApi {
+if (target == primaryTarget) {
+    configure<FabricApiExtension> {
         configureTests {
             modId = "skyhanni"
             enableGameTests = false // Server game tests
@@ -237,9 +337,8 @@ if (target == ProjectTarget.MODERN_12110) {
     }
     tasks.register("generateRepoPatterns", ClientProductionRunTask::class.java).configure {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-        dependsOn(tasks.configureLaunch)
+        dependsOn(tasks.named("configureLaunch"))
         val outputFile = project.file("build/regexes/constants.json")
-        mods.from(project.configurations.modImplementation.get())
 
         jvmArgs.add("-DSkyHanniDumpRegex.enabled=true")
         jvmArgs.add("-DSkyHanniDumpRegex=${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
@@ -261,46 +360,70 @@ fun excludeBuildPaths(buildPathsFile: File, sourceSet: Provider<SourceSet>) {
         }
     }
 }
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
-excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
+if (isDeobf) {
+    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.main)
+    excludeBuildPaths(file("buildpaths-excluded.txt"), sourceSets.test)
+}
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+        val jvmTargetStr = if (isDeobf) target.minecraftVersion.formattedKotlinJvmTarget
+        else target.minecraftVersion.formattedJavaLanguageVersion
+        jvmTarget.set(JvmTarget.fromTarget(jvmTargetStr))
+        allWarningsAsErrors = true
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
+            "kotlin.time.ExperimentalTime"
         )
-        // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.3.x,
-        // leaving corrupt .class files that break subsequent incremental builds.
-        // see: https://youtrack.jetbrains.com/issue/KT-85498/
         freeCompilerArgs.addAll(
+            // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.4.x,
+            // leaving corrupt .class files that break subsequent incremental builds.
+            // see: https://youtrack.jetbrains.com/issue/KT-85498/
             "-Xbackend-threads=1",
+            // This is so that workflows logs look cleaner, IntelliJ shows the warnings in the IDE anyway
+            "-Xwarning-level=DEPRECATION:disabled",
+            "-Xintrinsic-const-evaluation",
+            "-Xcontext-sensitive-resolution"
         )
     }
 }
 
-tasks.withType(JavaCompile::class) {
+tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
 }
 
-tasks.withType(org.gradle.jvm.tasks.Jar::class) {
+tasks.withType<GradleJar> {
     archiveBaseName.set("SkyHanni")
     archiveVersion.set("$version-mc${target.minecraftVersion.versionName}")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
 }
 
-val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
-    archiveClassifier.set("")
-    dependsOn(tasks.shadowJar)
-    inputFile.set(tasks.shadowJar.get().archiveFile)
-    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+if (!isDeobf) {
+    val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+        archiveClassifier.set("")
+        dependsOn(tasks.shadowJar)
+        inputFile.set(tasks.shadowJar.get().archiveFile)
+        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+    }
+    tasks.assemble.get().dependsOn(remapJar)
 }
 
 tasks.shadowJar {
-    destinationDirectory.set(layout.buildDirectory.dir("badjars"))
-    archiveClassifier.set("all-dev")
-    configurations = listOf(shadowImpl, shadowModImpl)
+    if (isDeobf) {
+        destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
+        archiveClassifier.set("")
+    } else {
+        destinationDirectory.set(layout.buildDirectory.dir("badjars"))
+        archiveClassifier.set("all-dev")
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = buildList {
+        add(shadowImpl)
+        if (!isDeobf) add(shadowModImpl)
+        if (isDeobf) add(shadowOnly)
+    }
     exclude("META-INF/versions/**")
+    exclude("META-INF/*.kotlin_module")
     mergeServiceFiles()
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
@@ -310,21 +433,9 @@ tasks.jar {
     archiveClassifier.set("nodeps")
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
 }
-tasks.assemble.get().dependsOn(tasks.remapJar)
 
-if (!MultiVersionStage.activeState.shouldCompile(target)) {
-    tasks.withType<JavaCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<KotlinCompile> {
-        onlyIf { false }
-    }
-    tasks.withType<AbstractArchiveTask> {
-        onlyIf { false }
-    }
-    tasks.withType<ProcessResources> {
-        onlyIf { false }
-    }
+if (isDeobf) {
+    tasks.assemble.get().dependsOn(tasks.shadowJar)
 }
 
 val sourcesJar by tasks.registering(Jar::class) {
@@ -335,7 +446,8 @@ val sourcesJar by tasks.registering(Jar::class) {
 
 publishing.publications {
     create<MavenPublication>("maven") {
-        artifact(tasks.remapJar)
+        if (!isDeobf) artifact(tasks.named("remapJar"))
+        else artifact(tasks.shadowJar)
         artifact(sourcesJar) { classifier = "sources" }
         pom {
             name.set("SkyHanni")
@@ -354,10 +466,14 @@ publishing.publications {
 }
 
 detekt {
-    buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml")) // a way of suppressing issues before introducing detekt
-    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+    buildUponDefaultConfig = true
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
+    source.setFrom(project.sourceSets.named("main").map {
+        it.allSource.matching {
+            exclude { elem -> elem.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
+        }
+    })
 }
 
 // Detekt is handled by a dedicated CI workflow; exclude it from the check/build lifecycle
@@ -366,14 +482,16 @@ afterEvaluate {
     tasks.findByName("check")?.setDependsOn(
         tasks.getByName("check").dependsOn.filterNot { dep ->
             (dep is Task && dep.name.startsWith("detekt")) ||
-            (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
+                (dep is TaskProvider<*> && dep.name.startsWith("detekt"))
         }
     )
 }
 
-
 tasks.withType<Detekt>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    source = source.matching {
+        exclude { it.file.absolutePath.replace('\\', '/').contains("/build/generated/") }
+    }
+    val isTargetVersion = target == primaryTarget
     val skipDetekt = project.findProperty("skipDetekt") == "true"
     onlyIf { isTargetVersion && !skipDetekt }
 
@@ -389,7 +507,7 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    val isTargetVersion = target == ProjectTarget.MODERN_12110
+    val isTargetVersion = target == primaryTarget
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false }
     onlyIf { isTargetVersion }
@@ -408,10 +526,10 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    // This must be explicitly declared because of configuration cache shenanigans
     dependsOn("stonecutterPrepare")
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 }

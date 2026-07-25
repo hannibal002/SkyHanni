@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.events.minecraft
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.Slot
-import net.minecraft.world.item.ItemStack
 
-class ToolTipTextEvent(val slot: Slot?, val itemStack: ItemStack, val toolTip: MutableList<Component>) : CancellableSkyHanniEvent()
+class ToolTipTextEvent(val slot: Slot?, val itemStack: SafeItemStack, val toolTip: MutableList<Component>) : CancellableSkyHanniEvent()
 
 fun MutableList<Component>.add(index: Int, string: String) {
     this.add(index, Component.literal(string))

@@ -84,7 +84,6 @@ object GraphEditor {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<LocalPlayer>) {
         if (!isEnabled()) return
-        if (!event.isLocalPlayer) return
 
         if (event.distance > 20) {
             updateCache()

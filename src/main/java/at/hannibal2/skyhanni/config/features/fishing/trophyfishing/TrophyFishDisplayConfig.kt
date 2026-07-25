@@ -41,7 +41,11 @@ class TrophyFishDisplayConfig {
     var keybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
-    @ConfigOption(name = "Hunter Armor", desc = "Only show when wearing a full Hunter Armor or Ember Armor.")
+    @ConfigOption(
+        name = "Trophy Fishing Gear",
+        desc = "Only show when: wearing 2+ Hunter Armor pieces, full Ember Armor, trophy line on your rod, using hot bait, " +
+            "or you're too low level to fish for sea creatures."
+    )
     @ConfigEditorBoolean
     val requireArmor: Property<Boolean> = Property.of(false)
 

@@ -3,14 +3,18 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.OwnInventoryMenuUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
@@ -35,7 +39,6 @@ object OwnInventoryData {
 
     private var itemAmounts = mapOf<NeuInternalName, Int>()
     private var dirty = false
-    private var lastWardrobeClose = SimpleTimeMark.farPast()
 
     /**
      * REGEX-TEST: §aMoved §r§e10 Wheat§r§a from your Sacks to your inventory.
@@ -48,17 +51,38 @@ object OwnInventoryData {
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnSkyblock = true)
     fun onItemPickupReceivePacket(event: PacketReceivedEvent) {
         val packet = event.packet
-        if (packet is ClientboundContainerSetSlotPacket || packet is ClientboundTakeItemEntityPacket) {
-            dirty = true
-        }
-        if (packet is ClientboundContainerSetSlotPacket) {
-            val windowId = packet.containerId
-            if (windowId == 0) {
+        when (packet) {
+            is ClientboundTakeItemEntityPacket -> {
+                dirty = true
+            }
+            is ClientboundContainerSetSlotPacket -> {
+                dirty = true
+
+                if (packet.containerId != 0) return
+
                 val slot = packet.slot
-                val item = packet.item ?: return
+                val item = packet.item
+
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item, slot).post()
+                    val internalName = item.getInternalName()
+                    when (slot) {
+                        in 0..4 -> {} // crafting output+grid
+                        in 5..8 -> { // armor
+                            ChatUtils.debug("OwnInventoryArmorUpdateEvent: $slot - $item - $internalName")
+                            OwnInventoryArmorUpdateEvent(item, slot).post()
+                        }
+                        in 9..43 -> { // normal items
+                            ChatUtils.debug("OwnInventoryItemUpdateEvent: $slot - $item - $internalName")
+                            OwnInventoryItemUpdateEvent(item, slot).post()
+                        }
+                        44 -> { // skyblock menu
+                            ChatUtils.debug("OwnInventoryMenuUpdateEvent: $slot - $item - $internalName")
+                            OwnInventoryMenuUpdateEvent(item).post()
+                        }
+                        45 -> {} // offhand
+                    }
                 }
+
             }
         }
     }
@@ -81,32 +105,20 @@ object OwnInventoryData {
         if (!dirty) return
         dirty = false
 
-
-        val armorInternalNames = InventoryUtils.getArmorInternalNames()
-
-        if (lastWardrobeClose.passedSince() < 2.seconds) {
-            lastWardrobeClose = SimpleTimeMark.farPast()
-            for (name in armorInternalNames) {
-                ignoreItem(1.seconds, name)
-            }
-        }
-
-        val map = getCurrentItems(armorInternalNames)
+        val map = getCurrentItems()
         for ((internalName, amount) in map) {
             calculateDifference(internalName, amount)
         }
         itemAmounts = map
     }
 
-    private fun getCurrentItems(
-        armorInternalNames: Set<NeuInternalName> = InventoryUtils.getArmorInternalNames(),
-    ): MutableMap<NeuInternalName, Int> {
+    private fun getCurrentItems(): MutableMap<NeuInternalName, Int> {
         val map = mutableMapOf<NeuInternalName, Int>()
         for (itemStack in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = itemStack.getInternalNameOrNull() ?: continue
             map.addOrPut(internalName, itemStack.count)
         }
-        for (name in armorInternalNames) {
+        for (name in InventoryUtils.getArmorInternalNames()) {
             map.addOrPut(name, 1)
         }
         return map
@@ -128,9 +140,6 @@ object OwnInventoryData {
 
     @HandleEvent(InventoryCloseEvent::class)
     fun onInventoryClose() {
-        if (InventoryUtils.openInventoryName().startsWith("Wardrobe")) {
-            lastWardrobeClose = SimpleTimeMark.now()
-        }
         val item = MinecraftCompat.localPlayerOrNull?.getItemOnCursor() ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds, internalNameOrNull)

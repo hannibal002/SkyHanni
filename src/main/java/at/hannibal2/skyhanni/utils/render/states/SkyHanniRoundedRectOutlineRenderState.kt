@@ -18,7 +18,7 @@ class SkyHanniRoundedRectOutlineRenderState(
     private val borderBlur: Float,
     params: RoundedRenderStateParams,
     scissor: ScreenRectangle?,
-) : AbstractSkyHanniRoundedRectRenderState(x, y, width, height, params, scissor) {
+) : AbstractSkyHanniRoundedShapeRenderState(x, y, width, height, params, scissor) {
 
     override val padding = (borderThickness / 2).toInt()
     override fun pipeline() = SkyHanniRenderPipeline.ROUNDED_RECT_OUTLINE_DEFERRED()

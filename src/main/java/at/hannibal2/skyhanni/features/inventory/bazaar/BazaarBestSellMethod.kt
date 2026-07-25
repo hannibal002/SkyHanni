@@ -15,10 +15,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.world.item.ItemStack
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object BazaarBestSellMethod {
 
     // Working with the last clicked item manually because
     // the open inventory event happen while the recent clicked item in the inventory is not in the inventory or in the cursor slot
-    private var lastClickedItem: ItemStack? = null
+    private var lastClickedItem: SafeItemStack? = null
     private var nextCloseWillResetItem = false
 
     @HandleEvent

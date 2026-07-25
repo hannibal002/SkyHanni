@@ -104,6 +104,22 @@ class DevConfig {
     var contributorNametags: Boolean = true
 
     @Expose
+    @ConfigOption(
+        name = "Discover Contributor Message",
+        desc = "Sends a message to your chat when you see a unique contributor.",
+    )
+    @ConfigEditorBoolean
+    var discoverContributorMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Contributor Fangirling Tracker",
+        desc = "Tracks how many times you have been noticed as a contributor by a player.",
+    )
+    @ConfigEditorBoolean
+    var contributorMentionTracker: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Flip Contributors", desc = "Make SkyHanni contributors appear upside down in the world.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -122,12 +138,6 @@ class DevConfig {
     @ConfigOption(name = "Number Format Override", desc = "Forces the number format to use the en_US locale.")
     @ConfigEditorBoolean
     var numberFormatOverride: Boolean = false
-
-    // TODO re-enable the setting once the hypixel mod api works fine
-    // @Expose
-    // @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
-    // @ConfigEditorBoolean
-    // var hypixelModApi: Boolean = true
 
     @Expose
     @ConfigOption(

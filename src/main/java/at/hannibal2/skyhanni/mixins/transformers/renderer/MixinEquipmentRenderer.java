@@ -10,8 +10,7 @@ import net.minecraft.resources.Identifier;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-//? if > 1.21.10
-//import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 
 @Mixin(EquipmentLayerRenderer.class)
 public class MixinEquipmentRenderer {
@@ -21,9 +20,7 @@ public class MixinEquipmentRenderer {
          if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
              Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
              if (entityAlpha == null) return original;
-
-             //~ if > 1.21.10 'RenderType' -> 'RenderTypes'
-             return RenderType.armorTranslucent(identifier);
+             return RenderTypes.armorTranslucent(identifier);
          }
          return original;
      }

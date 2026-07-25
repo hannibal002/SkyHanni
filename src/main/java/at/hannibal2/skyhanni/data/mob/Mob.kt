@@ -18,9 +18,9 @@ import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.toSingletonListOrEmpty
-import at.hannibal2.skyhanni.utils.compat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getAllEquipment
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -198,7 +198,7 @@ class Mob(
 
         if (ownerName == null && category == MobCategory.SLAYER) {
             hologram2?.let {
-                summonOwnerPattern.matchMatcher(it.cleanName()) {
+                summonOwnerPattern.matchMatcher(it.cleanName) {
                     ownerName = group("name")
                 }
             }

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,8 +17,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.core.particles.ParticleTypes
 import net.minecraft.world.entity.Entity
@@ -34,16 +34,18 @@ object DungeonHideItems {
     private val hideParticles = mutableMapOf<ArmorStand, SimpleTimeMark>()
     private val movingSkeletonSkulls = mutableMapOf<ArmorStand, SimpleTimeMark>()
 
-    private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
-    private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
-    private val REVIVE_STONE_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_REVIVE_STONE") }
-    private val PREMIUM_FLESH_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_PREMIUM_FLESH") }
-    private val ABILITY_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_ABILITY_ORB") }
-    private val SUPPORT_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_SUPPORT_ORB") }
-    private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
-    private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
+    private val SOUL_WEAVER_HIDER by SkullTextureHolder.texture("DUNGEONS_SOUL_WEAVER")
+    private val BLESSING_TEXTURE by SkullTextureHolder.texture("DUNGEONS_BLESSING")
+    private val REVIVE_STONE_TEXTURE by SkullTextureHolder.texture("DUNGEONS_REVIVE_STONE")
+    private val PREMIUM_FLESH_TEXTURE by SkullTextureHolder.texture("DUNGEONS_PREMIUM_FLESH")
+    private val ABILITY_ORB_TEXTURE by SkullTextureHolder.texture("DUNGEONS_ABILITY_ORB")
+    private val SUPPORT_ORB_TEXTURE by SkullTextureHolder.texture("DUNGEONS_SUPPORT_ORB")
+    private val DAMAGE_ORB_TEXTURE by SkullTextureHolder.texture("DUNGEONS_DAMAGE_ORB")
+    private val HEALER_FAIRY_TEXTURE by SkullTextureHolder.texture("DUNGEONS_HEALER_FAIRY")
 
-    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName() == "Skeleton Skull"
+    private fun String?.matchesTexture(texture: String?) = texture != null && this == texture
+
+    private fun isSkeletonSkull(entity: ArmorStand): Boolean = entity.getStandHelmet()?.cleanName == "Skeleton Skull"
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
@@ -51,11 +53,11 @@ object DungeonHideItems {
 
         if (entity is ItemEntity) {
             val stack = entity.item
-            if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
+            if (config.hideReviveStone && stack.cleanName == "Revive Stone") {
                 event.cancel()
             }
 
-            if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
+            if (config.hideJournalEntry && stack.cleanName == "Journal Entry") {
                 event.cancel()
             }
         }
@@ -69,7 +71,7 @@ object DungeonHideItems {
                 event.cancel()
             }
 
-            if (head != null && head.cleanName() == "Superboom TNT") {
+            if (head != null && head.cleanName == "Superboom TNT") {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }
@@ -80,7 +82,7 @@ object DungeonHideItems {
                 event.cancel()
             }
 
-            if (skullTexture == BLESSING_TEXTURE) {
+            if (skullTexture.matchesTexture(BLESSING_TEXTURE)) {
                 event.cancel()
             }
         }
@@ -90,7 +92,7 @@ object DungeonHideItems {
                 event.cancel()
             }
 
-            if (skullTexture == REVIVE_STONE_TEXTURE) {
+            if (skullTexture.matchesTexture(REVIVE_STONE_TEXTURE)) {
                 event.cancel()
                 hideParticles[entity] = SimpleTimeMark.now()
             }
@@ -102,7 +104,7 @@ object DungeonHideItems {
                 hideParticles[entity] = SimpleTimeMark.now()
             }
 
-            if (skullTexture == PREMIUM_FLESH_TEXTURE) {
+            if (skullTexture.matchesTexture(PREMIUM_FLESH_TEXTURE)) {
                 event.cancel()
             }
         }
@@ -123,15 +125,14 @@ object DungeonHideItems {
                 entity.name.formattedTextCompatLessResets().startsWith("§a§lDEFENSE §e") -> event.cancel()
             }
 
-            when (skullTexture) {
-                ABILITY_ORB_TEXTURE,
-                SUPPORT_ORB_TEXTURE,
-                DAMAGE_ORB_TEXTURE,
-                -> {
-                    event.cancel()
-                    hideParticles[entity] = SimpleTimeMark.now()
-                    return
-                }
+            if (
+                skullTexture.matchesTexture(ABILITY_ORB_TEXTURE) ||
+                skullTexture.matchesTexture(SUPPORT_ORB_TEXTURE) ||
+                skullTexture.matchesTexture(DAMAGE_ORB_TEXTURE)
+            ) {
+                event.cancel()
+                hideParticles[entity] = SimpleTimeMark.now()
+                return
             }
         }
 
@@ -143,7 +144,7 @@ object DungeonHideItems {
         }
 
         if (config.hideSoulweaverSkulls) {
-            if (skullTexture == SOUL_WEAVER_HIDER) {
+            if (skullTexture.matchesTexture(SOUL_WEAVER_HIDER)) {
                 event.cancel()
                 return
             }
@@ -151,7 +152,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.OtherModsSettings
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHypixelEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -33,7 +34,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.HoverEvent
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.chat.contents.PlainTextContents
-import net.minecraft.world.item.ItemStack
 import java.util.TreeSet
 
 /**
@@ -52,22 +52,32 @@ object EnchantParser {
      * from running `formattedTextCompat()` on a lore line, which is what is used against the regex)
      *
      * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
+     * REGEX-TEST: §9Drain IV, Ender Slayer VI, Execute V
+     * REGEX-TEST: §9Toxophilite VIII §82.1M
+     * REGEX-TEST: §9Cultivating VII §81,625,381
+     * REGEX-FAIL: §c§7by §c10% §7per hit, capped at §c200% §7for 3
      */
     val enchantmentExclusivePattern by patternGroup.pattern(
         "exclusive",
-        "^(?:(?:§.)+[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
+        "^(?:(?:§.)*[A-Za-z][A-Za-z '-]+ (?:[IVXLCDM]+|[0-9]+)(?:(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*)[kKmMbB]?)+\$",
     )
 
     /**
      * REGEX-TEST: §5§r§d§l§r§d§lUltimate Wise V, §r§9Champion X, §r§9Cleave V
+     * REGEX-TEST: §d§l§d§lFatal Tempo I, §9Chance IV, §9Cubism V
+     * REGEX-TEST: §9Drain IV, Ender Slayer VI, Execute V
+     * REGEX-TEST: §9Toxophilite VIII §82.1M
+     * REGEX-TEST: §9Cultivating VII §81,625,381
+     * REGEX-FAIL: §c§7by §c10% §7per hit, capped at §c200% §7for 3
      */
     @Suppress("MaxLineLength")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(?:§7§l|§d§l|§9|§7)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| §r§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
+        "(?<=^|, )(?:§.)*(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(?:§r)?, |\$| (?:§r)?§8\\d{1,3}(?:[,.]\\d{1,3})*[kKmMbB]?)",
     )
 
-    private var currentItem: ItemStack? = null
+    private var currentItem: SafeItemStack? = null
 
     private var startEnchant = -1
     private var endEnchant = -1
@@ -299,7 +309,10 @@ object EnchantParser {
 
             stackingEnchants.forEach { stacking ->
                 currentItem?.let { item ->
-                    loreList.add(loreList.size - 1, Component.literal(stacking.progressString(item)))
+                    val progString: String = stacking.progressString(item)
+                    if (progString.isNotEmpty()) {
+                        loreList.add(loreList.size - 1, Component.literal(progString))
+                    }
                 }
             }
         }

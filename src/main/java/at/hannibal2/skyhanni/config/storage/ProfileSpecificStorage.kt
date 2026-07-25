@@ -32,12 +32,12 @@ import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.foraging.ForagingTrackerLegacy
 import at.hannibal2.skyhanni.features.garden.CropAccessory
 import at.hannibal2.skyhanni.features.garden.CropType
-import at.hannibal2.skyhanni.features.garden.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLane
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.CropLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.PestLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.leaderboarddisplays.WeightLeaderboardStorage
 import at.hannibal2.skyhanni.features.garden.pests.stereo.VinylType
+import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.PlotData
 import at.hannibal2.skyhanni.features.garden.tracker.CropFeverTracker
 import at.hannibal2.skyhanni.features.garden.tracker.GardenBpsTracker
 import at.hannibal2.skyhanni.features.garden.tracker.PestProfitTracker
@@ -45,16 +45,17 @@ import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.features.gifting.GiftProfitTracker
 import at.hannibal2.skyhanni.features.hunting.HuntingProfitTracker
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
+import at.hannibal2.skyhanni.features.inventory.loadout.LoadoutApi.LoadoutData
+import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractWardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.DarkMonolithFeatures
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.MineshaftDetection
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.InfernoMinionProfitTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
@@ -70,13 +71,13 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farFuture
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.enumMapOf
 import com.google.gson.annotations.Expose
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import java.time.LocalDate
 import java.util.EnumMap
 import java.util.UUID
@@ -88,7 +89,15 @@ class ProfileSpecificStorage(
 ) {
     // api
     @Expose
-    var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+    var skills: SkillStorage = SkillStorage()
+
+    class SkillStorage {
+        @Expose
+        var skillData: MutableMap<SkillType, SkillApi.SkillInfo> = enumMapOf()
+
+        @Expose
+        var giftTalismanSkillXpBonus: Double = 0.0
+    }
 
     @Expose
     var totalSkyBlockXP: Int? = null
@@ -503,6 +512,12 @@ class ProfileSpecificStorage(
         var uniqueVisitors: Int = 0
 
         @Expose
+        var charmedVisitors: MutableSet<String> = mutableSetOf()
+
+        @Expose
+        var ignoredVisitors: MutableSet<String> = mutableSetOf()
+
+        @Expose
         var visitorDrops: VisitorDrops = VisitorDrops()
 
         // Todo: Move to a SkyhanniTracker (preferably bucketed by rarity)
@@ -704,9 +719,23 @@ class ProfileSpecificStorage(
     @Expose
     var wardrobe: WardrobeStorage = WardrobeStorage()
 
+    @Expose
+    var equipmentWardrobe: WardrobeStorage = WardrobeStorage()
+
     class WardrobeStorage {
         @Expose
         var data: MutableMap<Int, WardrobeData> = mutableMapOf()
+
+        @Expose
+        var currentSlot: Int? = null
+    }
+
+    @Expose
+    var loadout: LoadoutStorage = LoadoutStorage()
+
+    class LoadoutStorage {
+        @Expose
+        var data: MutableMap<Int, LoadoutData> = mutableMapOf()
 
         @Expose
         var currentSlot: Int? = null
@@ -717,10 +746,10 @@ class ProfileSpecificStorage(
 
     class EquipmentStorage {
         @Expose
-        var slots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var slots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
 
         @Expose
-        var riftSlots: MutableList<ItemStack?> = EquipmentApi.getEmptyEquipment()
+        var riftSlots: MutableList<SafeItemStack?> = CurrentEquipmentApi.getEmptyEquipment()
     }
 
     // - foraging
@@ -864,6 +893,17 @@ class ProfileSpecificStorage(
 
     @Expose
     var enchantedClockBoosts: MutableMap<EnchantedClockHelper.SimpleBoostType, EnchantedClockHelper.Status> = enumMapOf()
+
+    @Expose
+    var npcDayLimit: NpcDayLimitStorage = NpcDayLimitStorage()
+
+    class NpcDayLimitStorage {
+        @Expose
+        var gmtEpochDay: Long = 0L
+
+        @Expose
+        var soldCoins: Long = 0L
+    }
 
     // - nether
     @Expose

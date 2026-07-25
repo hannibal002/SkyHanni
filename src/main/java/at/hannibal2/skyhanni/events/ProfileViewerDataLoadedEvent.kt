@@ -11,3 +11,5 @@ class ProfileViewerDataLoadedEvent(val playerData: HypixelPlayerApiJson) : SkyHa
 
     fun getCurrentPlayerData() = getCurrentProfileData()?.members?.get(PlayerUtils.getUuid())
 }
+
+class ProfileDataReadyEvent : SkyHanniEvent()

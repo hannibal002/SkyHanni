@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.CancellableSkyHanniEvent
-import at.hannibal2.skyhanni.data.ClickType
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.data.InteractClickType
+import at.hannibal2.skyhanni.utils.SafeItemStack
 
-open class WorldClickEvent(val itemInHand: ItemStack?, val clickType: ClickType) : CancellableSkyHanniEvent()
+open class WorldClickEvent(val itemInHand: SafeItemStack?, val clickType: InteractClickType) : CancellableSkyHanniEvent()

@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat.Companion.isStainedGlassPane
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
+import at.hannibal2.skyhanni.utils.renderables.ItemStackDirectProvider.Companion.asProvider
+import at.hannibal2.skyhanni.utils.renderables.ItemStackProvider
 import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 import kotlin.reflect.KFunction
 
@@ -40,7 +42,7 @@ object OldSkyblockMenu {
             // Reset all buttons to enabled when the menu is closed
             SkyBlockButton.entries.forEach { it.disabled = false }
         },
-    ) { name -> name == "SkyBlock Menu" }
+    ) { UtilsPatterns.skyblockMenuGuiPattern }
     private val storage get() = ProfileStorageData.profileSpecific?.maxwell
     private val enabled get() = SkyHanniMod.feature.inventory.oldSkyBlockMenu
 
@@ -89,7 +91,7 @@ object OldSkyblockMenu {
         private val itemData: ItemData,
         val requiresBoosterCookie: Boolean = true,
         var disabled: Boolean = false,
-        private val extraItemBuilding: ((ItemStack) -> ItemStack)? = null,
+        private val extraItemBuilding: ((SafeItemStack) -> SafeItemStack)? = null,
     ) {
         TRADES(
             HypixelCommands::trades,
@@ -157,10 +159,10 @@ object OldSkyblockMenu {
         ),
         ;
 
-        val item get() = if (showWarning) itemWithCookieWarning else itemWithoutCookieWarning
+        val item get() = if (showWarning) itemWithCookieWarning.stack else itemWithoutCookieWarning.stack
         private val showWarning get() = requiresBoosterCookie && !BitsApi.hasCookieBuff()
-        private val itemWithCookieWarning: ItemStack by lazy { createItem(true) }
-        private val itemWithoutCookieWarning: ItemStack by lazy { createItem(false) }
+        private val itemWithCookieWarning: ItemStackProvider by lazy { createItemProvider(true) }
+        private val itemWithoutCookieWarning: ItemStackProvider by lazy { createItemProvider(false) }
 
         private fun buildLore(showCookieWarning: Boolean) = buildList {
             displayDescription.map { "§7$it" }.forEach { add(it) }
@@ -171,18 +173,22 @@ object OldSkyblockMenu {
             } else add("§eClick to execute /${command.name.lowercase()}")
         }
 
-        private fun createItem(showCookieWarning: Boolean): ItemStack {
+        private fun createItemProvider(showCookieWarning: Boolean): ItemStackProvider {
             val name = "§a$displayName"
             val lore = buildLore(showCookieWarning)
-            val baseItem = when (itemData) {
-                is NormalItemData -> ItemUtils.createItemStack(itemData.displayIcon, name, lore)
-                is SkullItemData -> {
-                    val skullTexture = SkullTextureHolder.getTexture(itemData.repoSkullId)
-                    ItemUtils.createSkull(name, itemData.uuid, skullTexture, lore)
-                }
-            }
-            return baseItem.apply {
-                extraItemBuilding?.let { it(this) }
+            return when (itemData) {
+                is NormalItemData -> ItemUtils.createItemStack(itemData.displayIcon, name, lore).apply {
+                    extraItemBuilding?.let { it(this) }
+                }.asProvider()
+                is SkullItemData -> ItemUtils.repoSkullProvider(
+                    displayName = name,
+                    uuid = itemData.uuid,
+                    repoSkullId = itemData.repoSkullId,
+                    lore = lore,
+                    extraOps = {
+                        extraItemBuilding?.let { it(this) }
+                    },
+                )
             }
         }
     }

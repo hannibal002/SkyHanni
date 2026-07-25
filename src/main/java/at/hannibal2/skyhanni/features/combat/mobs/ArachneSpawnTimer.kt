@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -83,7 +83,7 @@ object ArachneSpawnTimer {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.SPIDER_DEN, priority = HandleEvent.LOW, receiveCancelled = true)
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
+    fun onParticle(event: ParticleEvent) {
         if (!saveNextTickParticles) return
         if (searchTime.passedSince() < 3.seconds) return
 

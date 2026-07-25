@@ -36,6 +36,7 @@ object MineshaftCaveInTimer {
     private var firstColdTime = SimpleTimeMark.farPast()
     private var lastColdValue: Int? = null
     private var totalColdGained: Int = 0
+    private var estimatedMaxTime: SimpleTimeMark? = null
 
     private var display: List<Renderable> = emptyList()
 
@@ -43,8 +44,9 @@ object MineshaftCaveInTimer {
     fun onWorldChange() {
         caveInTimerStart = SimpleTimeMark.farPast()
         firstColdTime = SimpleTimeMark.farPast()
-        lastColdValue = 0
+        lastColdValue = null
         totalColdGained = 0
+        estimatedMaxTime = null
         display = emptyList()
     }
 
@@ -52,14 +54,13 @@ object MineshaftCaveInTimer {
     fun onMineshaftDetect() {
         caveInTimerStart = SimpleTimeMark.now()
         firstColdTime = SimpleTimeMark.farPast()
-        lastColdValue = 0
+        lastColdValue = null
         totalColdGained = 0
+        estimatedMaxTime = null
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onColdUpdate(event: ColdUpdateEvent) {
-        if (event.cold == 0) return
-
         val prev = lastColdValue
         lastColdValue = event.cold
 
@@ -70,6 +71,8 @@ object MineshaftCaveInTimer {
 
         val delta = event.cold - prev
         if (delta > 0) totalColdGained += delta
+
+        estimatedMaxTime = computeEstimatedMaxTime()
     }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.MINESHAFT)
@@ -96,7 +99,7 @@ object MineshaftCaveInTimer {
             }
 
             if (config.showEstimatedTimeLeft) {
-                val estimatedTime = estimateMaxTimeLeft()
+                val estimatedTime = estimatedMaxTime?.timeUntil()?.coerceAtLeast(Duration.ZERO)
                 val estimatedTimeText = estimatedTime?.format() ?: "§7Calculating..."
                 add("§fEstimated time left: §e$estimatedTimeText".let(Renderable::text))
             }
@@ -130,12 +133,12 @@ object MineshaftCaveInTimer {
         config.position.renderRenderables(display, posLabel = "Mineshaft Cave-in Timer")
     }
 
-    private fun estimateMaxTimeLeft(): Duration? {
+    private fun computeEstimatedMaxTime(): SimpleTimeMark? {
         val current = lastColdValue ?: return null
         if (firstColdTime.isFarPast()) return null
         val elapsed = firstColdTime.passedSince().inPartialSeconds
         if (totalColdGained <= 0 || elapsed <= 0) return null
         val ratePerSecond = totalColdGained / elapsed
-        return ((100 - current) / ratePerSecond).seconds
+        return SimpleTimeMark.now() + ((100 - current) / ratePerSecond).seconds
     }
 }

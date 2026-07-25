@@ -25,10 +25,10 @@ object DungeonsAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Use RNG Meter to get a Book from F1 Wood Chest".asComponent(),
-            "Even the smallest rng drop can be chosen.".asComponent(),
-            10f,
-            true,
+            name = "Use RNG Meter to get a Book from F1 Wood Chest".asComponent(),
+            description = "Even the smallest rng drop can be chosen.".asComponent(),
+            userLuckAmount = 10f,
+            secret = true,
         )
         event.register(achievement, WOOD_ACHIEVEMENT)
     }

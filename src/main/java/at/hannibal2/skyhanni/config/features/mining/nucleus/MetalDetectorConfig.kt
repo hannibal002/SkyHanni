@@ -11,7 +11,7 @@ class MetalDetectorConfig {
 
     @ConfigOption(name = "Credits", desc = "Most features here are from Coleweight or SoopyV2, huge thanks to them!")
     @ConfigEditorInfoText
-    var notice: String = ""
+    val notice: String = ""
 
     @Expose
     @ConfigOption(name = "Metal Detector Solver", desc = "Enables the solver for the metal detector.")

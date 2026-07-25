@@ -36,6 +36,7 @@ enum class SprayType(
             }
             return null
         }
+
         fun getByPestTypeOrAll(pestType: PestType?) = entries.filter {
             it == pestType?.spray
         }.takeIf {

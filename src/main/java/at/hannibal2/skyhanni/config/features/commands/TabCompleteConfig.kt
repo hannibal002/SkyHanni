@@ -42,6 +42,11 @@ class TabCompleteConfig {
     var guild: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Carry Customers", desc = "Tab-complete Carry Customers.")
+    @ConfigEditorBoolean
+    var carryCustomer: Boolean = false
+
+    @Expose
     @ConfigOption(name = "VIP Visits", desc = "Tab-complete the visit to special users with cake souls on it.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -56,7 +61,7 @@ class TabCompleteConfig {
     @Expose
     @ConfigOption(
         name = "View Recipe",
-        desc = "Tab-complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.",
+        desc = "Tab-complete item IDs in the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.",
     )
     @ConfigEditorBoolean
     @FeatureToggle

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.test.garden
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
+import at.hannibal2.skyhanni.test.BootstrapExtension
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
@@ -12,41 +12,33 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
 import io.mockk.verify
+import net.minecraft.network.chat.Component
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 
+@ExtendWith(BootstrapExtension::class)
 class VisitorListenerTest {
     private lateinit var listener: VisitorListener
 
     @BeforeEach
     fun setUp() {
-        mockkObject(GardenApi)
-        every { GardenApi.inGarden() } returns true
-
         mockkObject(PlayerUtils)
         mockkObject(SkyBlockUtils)
         every { PlayerUtils.getName() } returns "ThePlayerName"
 
         mockkObject(VisitorApi)
         every { VisitorApi.addVisitor(any()) } returns true
+        every { VisitorApi.visitorsInTabList(any()) } returns emptyList()
 
         listener = VisitorListener
     }
 
     @Test
     fun `onTablistUpdate it should add new visitors to the list`() {
-        listener.onWidgetUpdate(
-            fakeTabWidget(
-                mutableListOf(
-                    "§b§lVisitors: §r§f(3)",
-                    " §r§cSpaceman",
-                    " §r§6Madame Eleanor Q. Goldsworth III §r§fCarrot §r§c333 C §r§3107k FXP §r§275 GXP",
-                    " §r§fJacob",
-                    "ThePlayerName",
-                    "",
-                ),
-            ),
-        )
+        every { VisitorApi.visitorsInTabList(any()) } returns listOf("§cSpaceman", "§6Madame Eleanor Q. Goldsworth III", "§fJacob")
+
+        listener.onWidgetUpdate(fakeTabWidget(mutableListOf("")))
 
         verify { VisitorApi.addVisitor("§fJacob") }
         verify { VisitorApi.addVisitor("§cSpaceman") }
@@ -86,6 +78,6 @@ class VisitorListenerTest {
     }
 
     private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
-        return WidgetUpdateEvent(TabWidget.VISITORS, lines)
+        return WidgetUpdateEvent(TabWidget.VISITORS, lines.map { Component.literal(it) })
     }
 }

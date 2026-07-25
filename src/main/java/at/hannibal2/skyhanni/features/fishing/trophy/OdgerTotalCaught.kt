@@ -2,11 +2,9 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -15,6 +13,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 object OdgerTotalCaught {
 
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
+
     private val patternGroup = RepoPattern.group("fishing.trophy.odger")
 
     /**
@@ -35,16 +34,15 @@ object OdgerTotalCaught {
         "^Bronze.*",
     )
 
-    private val odgerInventory = InventoryDetector { name -> name == "Trophy Fishing" }
-
-    @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
+    // Not island-gated because Odger has an Abiphone contact
+    @HandleEvent(onlyOnSkyblock = true)
     fun onToolTipEvent(event: ToolTipTextEvent) {
-        if (!odgerInventory.isInside()) return
+        if (!TrophyFishManager.odgerInventory.isInside()) return
         if (!config.totalFishCaught) return
 
         if (event.toolTip.none { discoveredPattern.matcher(it.string).find() }) return
 
-        val trophyFishKey = TrophyFishApi.getInternalName(event.itemStack.cleanName())
+        val trophyFishKey = TrophyFishApi.getInternalName(event.itemStack.cleanName)
 
         val counts = TrophyFishManager.fish?.get(trophyFishKey) ?: return
         val bestFishObtained = counts.filter { it.value > 0 }.keys.maxOrNull() ?: TrophyRarity.BRONZE

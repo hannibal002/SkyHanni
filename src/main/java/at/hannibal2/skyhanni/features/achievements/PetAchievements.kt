@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.achievements
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.pet.PetStorageApi
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.achievements.Achievement
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import kotlin.collections.contains
 
 @SkyHanniModule
 object PetAchievements {
@@ -37,20 +37,20 @@ object PetAchievements {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val petScoreAchievement = Achievement(
-            "Oringo Competitor".asComponent(),
-            "Oringo thinks true pet collectors have at least 400 Pet Score".asComponent(),
-            14f,
+            name = "Oringo Competitor",
+            description = "Oringo thinks true pet collectors have at least 400 Pet Score",
+            userLuckAmount = 14f,
         )
         val petLevelAchievement = Achievement(
-            "Over Achiever".asComponent(),
-            "Have a Pet with enough XP to get Level 300".asComponent(),
-            30f,
+            name = "Over Achiever",
+            description = "Have a Pet with enough XP to get Level 300",
+            userLuckAmount = 30f,
         )
         val turtleAchievement = Achievement(
-            "Have every anti-knockback item equipped".asComponent(),
-            "Be ultra immune to knockback".asComponent(),
-            25f,
-            true,
+            name = "Have every anti-knockback item equipped".asComponent(),
+            description = "Be ultra immune to knockback".asComponent(),
+            userLuckAmount = 25f,
+            secret = true,
         )
         event.register(petScoreAchievement, PET_SCORE_ACHIEVEMENT)
         event.register(petLevelAchievement, PET_EXP_ACHIEVEMENT)
@@ -59,7 +59,8 @@ object PetAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (event.repeatSeconds(10)) return
+        if (AchievementManager.isCompleted(TURTLE_ACHIEVEMENT)) return
+        if (!event.repeatSeconds(10)) return
         val pets = ProfileStorageData.petProfiles?.pets ?: return
         if (InventoryUtils.getHelmet()?.getInternalNameOrNull() != SLIME_HAT) return
         for (pet in pets) {
@@ -71,7 +72,7 @@ object PetAchievements {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!event.inventoryName.startsWith("Pets")) return
+        if (!PetStorageApi.inMainPetMenuName()) return
         val pets = ProfileStorageData.petProfiles?.pets ?: return
         for (pet in pets) {
             val xp = pet.exp ?: 0.0

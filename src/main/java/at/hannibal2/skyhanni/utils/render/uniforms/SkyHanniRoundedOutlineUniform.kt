@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils.render.uniforms
 import com.mojang.blaze3d.buffers.GpuBufferSlice
 import com.mojang.blaze3d.buffers.Std140Builder
 import com.mojang.blaze3d.buffers.Std140SizeCalculator
-import java.nio.ByteBuffer
 import net.minecraft.client.renderer.DynamicUniformStorage
+import java.nio.ByteBuffer
 
 class SkyHanniRoundedOutlineUniform : AutoCloseable {
     private val uniformSize = Std140SizeCalculator().putFloat().putFloat().get()

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.ProfileDataReadyEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
@@ -28,6 +29,7 @@ object ProfileStorageData {
     var playerSpecific: PlayerSpecificStorage? = null
     var profileSpecific: ProfileSpecificStorage? = null
     var loaded = false
+    var repoReady = false
     private var firstLoad = true
     private var noTabListTime = SimpleTimeMark.farPast()
 
@@ -168,6 +170,7 @@ object ProfileStorageData {
         petProfiles = petPlayer.profiles.getOrPut(profileName) { PetDataStorage.ProfileSpecific() }
         loaded = true
         postConfigLoadEvent()
+        if (repoReady) ProfileDataReadyEvent().post()
     }
 
     @HandleEvent

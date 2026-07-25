@@ -20,13 +20,14 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeExp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getHoeLevel
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.append
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
@@ -38,7 +39,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
 @SkyHanniModule
@@ -107,7 +107,7 @@ object HoeLevelDisplay {
         val leveledUpTool = levelUpPattern.matchMatcher(event.cleanMessage) {
             group("tool")
         } ?: return
-        val heldItemName = heldItem.hoverName.string.removeColor()
+        val heldItemName = heldItem.cleanName
         if (!heldItemName.contains(leveledUpTool)) return
         val overflowLevel = addOverflowHoeLevel(heldItem.getItemUuid())
         if (isEnabled() && config.overflow && overflowLevel != null) {
@@ -181,7 +181,7 @@ object HoeLevelDisplay {
         ChatUtils.userError("You must hold a specialized farming tool to use this command!")
     }
 
-    private fun errorStorage(item: ItemStack): Nothing {
+    private fun errorStorage(item: SafeItemStack): Nothing {
         ErrorManager.skyHanniError(
             "Error getting overflow hoe level storage",
             "item" to item,
@@ -193,8 +193,8 @@ object HoeLevelDisplay {
     @HandleEvent
     fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
-            "Hoe Expert".asComponent(),
-            componentBuilder {
+            name = "Hoe Expert".asComponent(),
+            description = componentBuilder {
                 append("Get a hoe to level 1000. ") {
                     withColor(ChatFormatting.YELLOW)
                 }
@@ -209,7 +209,7 @@ object HoeLevelDisplay {
                     withColor(ChatFormatting.GREEN)
                 }
             },
-            30f,
+            userLuckAmount = 30f,
         )
         event.register(achievement, HOE_ACHIEVEMENT)
     }

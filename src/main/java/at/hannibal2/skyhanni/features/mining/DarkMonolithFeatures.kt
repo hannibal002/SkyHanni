@@ -119,7 +119,7 @@ object DarkMonolithFeatures {
     }
 
     @HandleEvent
-    fun onWorldChange(event: IslandChangeEvent) {
+    fun onIslandChange(event: IslandChangeEvent) {
         data.reset()
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
@@ -207,7 +207,7 @@ object DarkMonolithFeatures {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dark Monolith")
         event.addIrrelevant {
             add("knownEggs: ${data.knownEggs.size}")

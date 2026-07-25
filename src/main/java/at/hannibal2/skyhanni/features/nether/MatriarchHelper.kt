@@ -59,7 +59,7 @@ object MatriarchHelper {
         if (pearlList.size > 3) {
             ErrorManager.logErrorStateWithData(
                 "Something went wrong with the Heavy Pearl detection",
-                "More then 3 pearls",
+                "More than 3 pearls",
                 "pearList" to pearlList.map { getMobInfo(it.first) to it.second },
                 "mob" to getMobInfo(event.mob),
             )

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.test.command.track
 
-import at.hannibal2.skyhanni.events.CancellableWorldEvent
+import at.hannibal2.skyhanni.events.WorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
@@ -9,13 +9,13 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
  * Abstract class for world-tracking commands, extending [TrackCommand] with world rendering support.
  * Use this for events that have a world location, providing in-world visualization of tracked events.
  *
- * @param T The type of event to track, which must extend [CancellableWorldEvent].
+ * @param T The type of event to track, which must extend [WorldEvent].
  * @param K The type of identifier used to categorize the tracked events.
  * @param onlyOnSkyblock If true, the command will only work in SkyBlock.
  * @param commonName The singular name of the tracked event.
  * @param commonNamePlural The plural name of the tracked event.
  */
-abstract class TrackWorldCommand<T : CancellableWorldEvent, K>(
+abstract class TrackWorldCommand<T : WorldEvent, K>(
     onlyOnSkyblock: Boolean = true,
     commonName: String,
     commonNamePlural: String = commonName + "s",

@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
@@ -33,6 +34,7 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import kotlin.math.ceil
@@ -85,13 +87,23 @@ object SkillProgress {
     }
 
     @HandleEvent
-    fun onGuiRender() {
+    fun onGuiRenderTop() {
         if (!isDisplayEnabled()) return
         if (display.isEmpty()) return
 
         if (allSkillConfig.enabled.get()) {
-            config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
+            if (InventoryUtils.inAnyInventory()) {
+                InventoryGuiScaleCompat.withOriginalHudScale {
+                    renderAllSkillsDisplay()
+                }
+            } else {
+                renderAllSkillsDisplay()
+            }
         }
+    }
+
+    private fun renderAllSkillsDisplay() {
+        config.allSkillPosition.renderRenderables(allDisplay, posLabel = "All Skills Display")
     }
 
     private fun renderDisplay() {

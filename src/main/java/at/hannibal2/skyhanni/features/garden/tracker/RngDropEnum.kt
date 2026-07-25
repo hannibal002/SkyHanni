@@ -8,6 +8,7 @@ enum class RngDropEnum(private val displayName: String, private val matchName: S
     ;
 
     override fun toString() = displayName
+
     companion object {
         fun getByNameOrNull(name: String): RngDropEnum? {
             return entries.firstOrNull {

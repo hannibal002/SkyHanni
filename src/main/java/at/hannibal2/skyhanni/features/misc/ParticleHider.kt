@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.ParticleEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
@@ -24,8 +24,7 @@ object ParticleHider {
     private fun inM7Boss() = DungeonApi.inDungeon() && DungeonApi.dungeonFloor == "M7" && DungeonApi.inBossRoom
 
     @HandleEvent
-    fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!MinecraftCompat.localPlayerExists) return
+    fun onParticle(event: ParticleEvent) {
         with(event) {
             val hideFarCancel = (config.hideFarParticles && distanceToPlayer > 40 && !inM7Boss())
             val hideCloseRedstoneCancel = (config.hideCloseRedstoneParticles && type == ParticleTypes.DUST && distanceToPlayer < 2)
@@ -51,6 +50,9 @@ object ParticleHider {
 
     @JvmStatic
     fun shouldHideBlazeParticles() = MinecraftCompat.localWorldExists && config.hideBlazeParticles
+
+    @JvmStatic
+    fun shouldHideFireballParticles() = MinecraftCompat.localWorldExists && config.hideFireballParticles
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

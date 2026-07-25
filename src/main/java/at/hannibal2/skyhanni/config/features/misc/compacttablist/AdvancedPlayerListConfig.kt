@@ -29,7 +29,7 @@ class AdvancedPlayerListConfig {
     var reverseSort: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of player in the tab list.")
+    @ConfigOption(name = "Hide Player Icons", desc = "Hide the icons/skins of players in the tab list.")
     @ConfigEditorBoolean
     var hidePlayerIcons: Boolean = false
 

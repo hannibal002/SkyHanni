@@ -7,8 +7,6 @@ import com.google.gson.annotations.SerializedName
 import java.time.Instant
 
 data class ShortCommitAuthor(
-    @Expose val name: String,
-    @Expose val email: String,
     @Expose @field:SerializedName("date") private val dateString: String,
 ) {
     val date: SimpleTimeMark get() = Instant.parse(dateString).toEpochMilli().asTimeMark()

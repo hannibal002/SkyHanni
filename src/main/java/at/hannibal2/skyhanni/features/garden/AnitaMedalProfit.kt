@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.add
@@ -32,7 +33,6 @@ import at.hannibal2.skyhanni.utils.compat.mapToComponents
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import net.minecraft.network.chat.Component
-import net.minecraft.world.item.ItemStack
 
 @SkyHanniModule
 object AnitaMedalProfit {
@@ -93,7 +93,7 @@ object AnitaMedalProfit {
         display = newList
     }
 
-    private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
+    private fun readItem(slot: Int, item: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
         if (isInvalidItemName(itemName.string)) return
 
@@ -164,7 +164,7 @@ object AnitaMedalProfit {
 
     private fun isInvalidItemName(itemName: String): Boolean = itemName in invalidItemNames
 
-    private fun getItemName(item: ItemStack): Component {
+    private fun getItemName(item: SafeItemStack): Component {
         val name = item.hoverName
         val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
@@ -200,7 +200,7 @@ object AnitaMedalProfit {
         return null
     }
 
-    private fun getRequiredItems(item: ItemStack): MutableMap<String, Int> {
+    private fun getRequiredItems(item: SafeItemStack): MutableMap<String, Int> {
         val items = mutableMapOf<String, Int>()
         var next = false
         val lore = item.getLore()

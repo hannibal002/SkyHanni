@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.data.GlobalRender
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
-import net.minecraft.client.gui.GuiGraphics
-import net.minecraft.world.item.ItemStack
+import at.hannibal2.skyhanni.utils.SafeItemStack
+import net.minecraft.client.gui.GuiGraphicsExtractor
 
 fun renderItemOverlayPost(
-    context: GuiGraphics,
-    stack: ItemStack?,
+    context: GuiGraphicsExtractor,
+    stack: SafeItemStack?,
     xPosition: Int,
     yPosition: Int,
     text: String?,
@@ -23,7 +23,7 @@ fun renderItemOverlayPost(
     ).post()
 }
 
-fun renderItemReturn(context: GuiGraphics, stack: ItemStack, x: Int, y: Int) {
+fun renderItemReturn(context: GuiGraphicsExtractor, stack: SafeItemStack, x: Int, y: Int) {
     if (GlobalRender.renderDisabled) return
     RenderGuiItemOverlayEvent(context, stack, x, y).post()
 }
