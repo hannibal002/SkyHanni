@@ -45,7 +45,9 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.seconds
 
 class ConfigManager {
     companion object {
@@ -208,6 +210,11 @@ class ConfigManager {
     }
 
     fun saveConfig(fileType: ConfigFileType, reason: String) {
+        if (fileType.isRateLimited()) {
+            logger.log("saveConfig: $reason - Skipping save for $fileType because it is rate limited")
+            return
+        }
+        fileType.updateLastSaveTime()
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
         saveFile(fileType.file, fileType.fileName, json, reason)
         saveFile(fileType.backupFile, fileType.fileName, json, reason)
@@ -273,7 +280,12 @@ private fun getBackupFile(file: File): File {
     return File(directory, "$year-$month-$day-${SkyHanniMod.VERSION}-$fileName.json")
 }
 
-enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
+enum class ConfigFileType(
+    val fileName: String,
+    val clazz: Class<*>,
+    val property: KMutableProperty0<*>,
+    val minimumDelay: Duration = 1.seconds
+) {
     FEATURES("config", SkyHanniConfig::class.java, SkyHanniMod::feature),
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
     FRIENDS("friends", FriendsJson::class.java, SkyHanniMod::friendsData),
@@ -289,6 +301,16 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     SEEN_CONTRIBUTORS("seen_contributors", SeenContributorStorage::class.java, SkyHanniMod::seenContributorStorage),
     ;
 
+    fun isRateLimited(): Boolean {
+        val passed = lastSaveTime.passedSince()
+        return passed < minimumDelay
+    }
+
+    fun updateLastSaveTime() {
+        lastSaveTime = SimpleTimeMark.now()
+    }
+
+    private var lastSaveTime: SimpleTimeMark = SimpleTimeMark.farPast()
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
     val backupFile get() = getBackupFile(file)
 }
