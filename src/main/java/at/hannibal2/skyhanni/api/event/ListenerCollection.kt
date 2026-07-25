@@ -77,7 +77,7 @@ class ListenerCollection(
             val islandTypes = mutableSetOf<IslandType>()
 
             options.onlyOnIsland
-                .takeIf { it != IslandType.ANY }
+                .takeUnless { it == IslandType.ANY }
                 ?.let(islandTypes::add)
 
             islandTypes += options.onlyOnIslands
