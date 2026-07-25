@@ -16,9 +16,9 @@ object SlayerChatFilter {
     fun onIslandJoin() {
         if (!isEnabled()) return
         if (SlayerApi.activeType != null) {
-            CoreChatFilter.add(filters)
+            CoreChatFilter.register(filters)
         } else {
-            CoreChatFilter.remove(filters)
+            CoreChatFilter.unregister(filters)
         }
     }
 
@@ -29,8 +29,8 @@ object SlayerChatFilter {
             BOSS_FIGHT,
             FAILED,
             SLAIN,
-            -> CoreChatFilter.add(filters)
-            NO_ACTIVE_QUEST -> CoreChatFilter.remove(filters)
+            -> CoreChatFilter.register(filters)
+            NO_ACTIVE_QUEST -> CoreChatFilter.unregister(filters)
         }
     }
 

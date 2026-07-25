@@ -23,19 +23,19 @@ object CoreChatFilter {
 
     private val chatFilters = ConcurrentHashMap.newKeySet<ChatFilter>()
 
-    fun add(filter: ChatFilter) {
+    fun register(filter: ChatFilter) {
         chatFilters.plus(filter)
     }
 
-    fun remove(filter: ChatFilter) {
+    fun unregister(filter: ChatFilter) {
         chatFilters.minus(filter)
     }
 
-    fun add(filters: Set<ChatFilter>) {
+    fun register(filters: Set<ChatFilter>) {
         chatFilters.plus(filters)
     }
 
-    fun remove(filters: Set<ChatFilter>) {
+    fun unregister(filters: Set<ChatFilter>) {
         chatFilters.minus(filters)
     }
 
