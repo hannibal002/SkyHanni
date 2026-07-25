@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 
 @SkyHanniModule
 object PestRoute {
@@ -41,18 +41,25 @@ object PestRoute {
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || route.isEmpty()) return
 
-        var previous = event.exactPlayerEyeLocation()
-        route.filter { it.isVisiblePest() }.forEachIndexed { index, pest ->
+        val visibleRoute = route.filter { it.isVisiblePest() }
+        if (visibleRoute.isEmpty()) return
 
+        val playerLocation = LocationUtils.playerLocation()
+        val nearestPest = visibleRoute.minBy { it.centerCords.distance(playerLocation) }
+        event.drawLineToCrosshair(nearestPest.centerCords, routeColor, lineWidth = 3, depth = true)
+
+        visibleRoute.zipWithNext().forEach { (previous, next) ->
+            event.draw3DLine(previous.centerCords, next.centerCords, routeColor, lineWidth = 3, depth = true)
+        }
+
+        visibleRoute.forEachIndexed { index, pest ->
             val location = pest.centerCords
-            event.draw3DLine(previous, location, routeColor, lineWidth = 3, depth = true)
             event.drawDynamicText(
                 location.add(y = 1.5),
                 "§c§l${index + 1} §7${pest.name}",
                 scaleMultiplier = 1.8,
                 seeThroughBlocks = false,
             )
-            previous = location
         }
     }
 
