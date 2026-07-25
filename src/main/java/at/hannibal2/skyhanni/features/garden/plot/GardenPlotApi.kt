@@ -101,11 +101,13 @@ object GardenPlotApi {
     )
 
     /**
-     * REGEX-TEST: §a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b6 §r§7with §r§aCompost§r§7!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 6 with Compost!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 7 with 3 Plant Matter!
+     * REGEX-TEST: SPRAYONATOR! You sprayed Plot - 8 with 5 Jelly!
      */
-    private val plotSprayedPattern by patternGroup.pattern(
-        "spray.target",
-        "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!",
+    val plotSprayedPattern by patternGroup.pattern(
+        "spray.target.colorless",
+        "SPRAYONATOR! You sprayed Plot - (?<plot>.+) with (?:(?<amount>\\d+) )?(?<spray>.+)!",
     )
 
     /**
@@ -243,10 +245,9 @@ object GardenPlotApi {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-
-        plotSprayedPattern.matchMatcher(event.message) {
-            val sprayName = group("spray")
+        plotSprayedPattern.matchMatcher(event.cleanMessage) {
             val plotName = group("plot")
+            val sprayName = group("spray")
 
             val plot = getPlotByName(plotName)
             val spray = SprayType.getByNameOrNull(sprayName) ?: return

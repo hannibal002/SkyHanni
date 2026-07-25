@@ -318,6 +318,7 @@ fun parseAllErrors(logContent: String): List<String> =
             (it.trimStart().startsWith("e: ") || (": error:" in it && ".java:" in it)) &&
                 "warnings found and -Werror specified" !in it
         }
+        .map { it.trim() }
         .distinct()
 
 fun parseErrorContinuations(logContent: String, errorLine: String): List<String> {

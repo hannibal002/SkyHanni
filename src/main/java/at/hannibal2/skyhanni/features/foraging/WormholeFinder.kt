@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
-import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
@@ -119,7 +118,7 @@ object WormholeFinder {
         TitleManager.sendTitle("§cWormhole closed!")
     }
 
-    @HandleEvent(IslandLeaveEvent::class)
+    @HandleEvent
     fun onIslandLeave() {
         matchedWormholes = emptyList()
         currentTarget = null
