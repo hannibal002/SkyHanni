@@ -36,9 +36,19 @@ enum class EquipmentSlot(val slot: Int, vararg val categories: ItemCategory) {
 }
 
 @SkyHanniModule
-object EquipmentApi {
+object CurrentEquipmentApi {
 
-    val inventory = InventoryDetector { it == "Your Equipment and Stats" }
+    val patternGroup = RepoPattern.group("data.equipment")
+
+    /**
+     * REGEX-TEST: Stats & Equipment
+     */
+    val equipmentAndStatsMenuPattern by patternGroup.pattern(
+        "equipment-and-stats-menu",
+        "Stats & Equipment",
+    )
+
+    val inventory = InventoryDetector { equipmentAndStatsMenuPattern }
 
     private val storage get() = ProfileStorageData.profileSpecific?.equipment
 
@@ -49,7 +59,7 @@ object EquipmentApi {
     fun getSlots(): Map<EquipmentSlot, SafeItemStack?> =
         EquipmentSlot.entries.associateWith { equipment?.get(it.ordinal) }
 
-    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull() ?: emptyList()
+    fun getAll(): List<SafeItemStack> = equipment?.filterNotNull().orEmpty()
 
     fun setEquipment(slot: EquipmentSlot, itemStack: SafeItemStack?) {
         val equipment = equipment ?: return
