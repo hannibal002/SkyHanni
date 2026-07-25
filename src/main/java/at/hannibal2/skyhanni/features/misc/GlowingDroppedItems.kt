@@ -18,7 +18,7 @@ object GlowingDroppedItems {
     @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (!isEnabled()) return
-        if (event.type !== RenderEntityOutlineEvent.Type.NO_XRAY) return
+        if (event.type != RenderEntityOutlineEvent.Type.NO_XRAY) return
 
         event.queueEntitiesToOutline(::getGlowColor)
     }
