@@ -192,7 +192,7 @@ public abstract class MixinLevelRenderer {
         )
     )
     private void setGlowDepth(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
+        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
 
@@ -205,7 +205,7 @@ public abstract class MixinLevelRenderer {
         )
     )
     private void renderSkyHanniGlow(CallbackInfo ci) {
-        if (!RenderLivingEntityHelper.getAreMobsHighlighted()) return;
+        if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
     }
     *///?}
