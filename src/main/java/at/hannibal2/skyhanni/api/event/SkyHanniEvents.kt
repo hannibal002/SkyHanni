@@ -57,8 +57,6 @@ object SkyHanniEvents {
 
     private val Method.fullyQualifiedName: String get() = "${declaringClass.name}.$name"
 
-    private val Method.options: HandleEvent? get() = getAnnotation(HandleEvent::class.java)
-
     private fun handleZeroParameterMethod(
         method: Method,
         options: HandleEvent,
@@ -99,7 +97,7 @@ object SkyHanniEvents {
     }
 
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
-        val options = method.options ?: return null
+        val options = method.getAnnotation(HandleEvent::class.java) ?: return null
         return when (method.parameterCount) {
             0 -> handleZeroParameterMethod(method, options)
             1 -> handleSingleParameterMethod(method, options)
