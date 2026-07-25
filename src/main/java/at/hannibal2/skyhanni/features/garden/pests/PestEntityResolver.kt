@@ -3,12 +3,14 @@ package at.hannibal2.skyhanni.features.garden.pests
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.EntityUtils.getWornSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.RecalculatingValue
+import at.hannibal2.skyhanni.utils.compat.getAllEquipment
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
+import kotlin.time.Duration.Companion.seconds
 
 object PestEntityResolver {
 
@@ -19,20 +21,25 @@ object PestEntityResolver {
             entity.canBeSeen(viewDistance = viewDistance, vecYOffset = MODEL_HEIGHT_OFFSET)
     }
 
-    private val pestTypeByTexture by lazy {
+    private val pestTypeByTexture by RecalculatingValue(1.seconds) {
         PestType.filterableEntries.mapNotNull { type ->
             val texture = type.internalName.getItemStackOrNull()?.getSkullTexture() ?: return@mapNotNull null
-            texture to type
+            texture.normalizedBase64() to type
         }.toMap()
     }
 
     fun getPestType(entity: ArmorStand): PestType? =
-        entity.getWornSkullTexture()?.let(pestTypeByTexture::get)
+        entity.getAllEquipment()
+            .firstNotNullOfOrNull { item ->
+                item?.getSkullTexture()?.normalizedBase64()?.let(pestTypeByTexture::get)
+            }
 
     @OptIn(AllEntitiesGetter::class)
     fun getLoadedPests(): List<LoadedPest> = EntityUtils.getEntities<ArmorStand>()
         .mapNotNull { entity -> getPestType(entity)?.let { LoadedPest(entity, it) } }
         .toList()
+
+    private fun String.normalizedBase64() = trim().trimEnd('=')
 
     private const val MODEL_HEIGHT_OFFSET = 1.5
 }
