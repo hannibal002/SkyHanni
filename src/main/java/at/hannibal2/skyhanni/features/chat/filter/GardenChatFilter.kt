@@ -18,7 +18,7 @@ object GardenChatFilter : ChatFilterGroup() {
         GardenPestFilter,
     )
 
-    object AnitaFortuneFilter : RegexChatFilter("anita_fortune", generalConfig.hideJacob) {
+    object AnitaFortuneFilter : RegexChatFilter("anita_fortune", { generalConfig.hideJacob }) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your Anita's Talisman is giving you +25 Carrot Fortune during the contest!
          */
@@ -29,7 +29,7 @@ object GardenChatFilter : ChatFilterGroup() {
         )
     }
 
-    object GardenPestFilter : RegexChatFilter("garden_pest", config.gardenNoPest) {
+    object GardenPestFilter : RegexChatFilter("garden_pest", { config.gardenNoPest }) {
         /**
          * REGEX-TEST: [NPC] Jacob: Your garden is free of pests! You will not lose any crops to pests during this contest!
          */

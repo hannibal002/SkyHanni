@@ -34,7 +34,7 @@ object MiscChatFilter : ChatFilterGroup() {
     )
 
     object EmptyFilter : ActivatedChatFilter {
-        override val activation = Activation.Config(config.empty)
+        override val activation = Activation.Config { config.empty }
 
         override fun block(message: String): String? {
             if (!StringUtils.isEmpty(message)) return null
@@ -42,14 +42,14 @@ object MiscChatFilter : ChatFilterGroup() {
         }
     }
 
-    object WelcomeFilter : RegexChatFilter("welcome", config.welcome) {
+    object WelcomeFilter : RegexChatFilter("welcome", { config.welcome }) {
         override val patterns by patternGroup.list(
             "welcome",
             "Welcome to Hypixel SkyBlock!",
         )
     }
 
-    object LobbyFilter : RegexChatFilter("lobby", config.hypixelHub) {
+    object LobbyFilter : RegexChatFilter("lobby", { config.hypixelHub }) {
         override val patterns by patternGroup.list(
             "lobby",
 
@@ -88,7 +88,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object WarpingFilter : RegexChatFilter("warping", config.warping) {
+    object WarpingFilter : RegexChatFilter("warping", { config.warping }) {
         override val patterns by patternGroup.list(
             "warping",
 
@@ -106,7 +106,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object KillComboFilter : RegexChatFilter("kill_combo", config.killCombo) {
+    object KillComboFilter : RegexChatFilter("kill_combo", { config.killCombo }) {
         override val patterns by patternGroup.list(
             "kill-combo",
             "\\+.* Kill Combo.*",
@@ -115,7 +115,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object ProfileJoinFilter : RegexChatFilter("profile_join", config.profileJoin) {
+    object ProfileJoinFilter : RegexChatFilter("profile_join", { config.profileJoin }) {
         override val patterns by patternGroup.list(
             "profile-join",
             "You are playing on profile: ",
@@ -123,7 +123,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar_and_ah_mini", config.others) {
+    object MiniBazaarAndAHFilter : RegexChatFilter("bazzar_and_ah_mini", { config.others }) {
         override val patterns by patternGroup.list(
             "bazzar-and-ah-mini",
             "Putting item in escrow...",
@@ -151,7 +151,7 @@ object MiscChatFilter : ChatFilterGroup() {
     }
 
     @Suppress("RepoPatternRegexTestMissing")
-    object AchievementGetFilter : RegexChatFilter("achievement_get", config.hideAlphaAchievements) {
+    object AchievementGetFilter : RegexChatFilter("achievement_get", { config.hideAlphaAchievements }) {
         /**
          * WRAPPED-REGEX_TEST: ">>>   Achievement Unlocked: The Beginning   <<<"
          */
@@ -166,7 +166,7 @@ object MiscChatFilter : ChatFilterGroup() {
         }
     }
 
-    object ParkourFilter : RegexChatFilter("parkour", config.parkour) {
+    object ParkourFilter : RegexChatFilter("parkour", { config.parkour }) {
         override val patterns by patternGroup.list(
             "parkour",
             "Started parkour .*!",
@@ -180,7 +180,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object TeleportPadFilter : RegexChatFilter("teleport_pad", config.teleportPads) {
+    object TeleportPadFilter : RegexChatFilter("teleport_pad", { config.teleportPads }) {
         override val patterns by patternGroup.list(
             "teleport-pad",
             "Warped from the .* to the .*!",
@@ -188,7 +188,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object UselessDropFilter : RegexChatFilter("useless_drop", config.others) {
+    object UselessDropFilter : RegexChatFilter("useless_drop", { config.others }) {
         override val patterns by patternGroup.list(
             "useless-drop",
             "RARE DROP! Enchanted Ender Pearl .*",
@@ -203,14 +203,14 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object LegacyItemsFilter : RegexChatFilter("legacy_items", config.legacyItemsWarning) {
+    object LegacyItemsFilter : RegexChatFilter("legacy_items", { config.legacyItemsWarning }) {
         override val patterns by patternGroup.list(
             "legacy-items",
             "You currently have one or more Legacy Items in your inventory or sacks that are no longer used throughout the game! Exchange them in the Legacy Trades menu, accessed through /legacytrades!",
         )
     }
 
-    object UselessNotificationFilter : RegexChatFilter("useless_notification", config.others) {
+    object UselessNotificationFilter : RegexChatFilter("useless_notification", { config.others }) {
         // TODO update patterns for 1.21
         override val patterns by patternGroup.list(
             "useless-notification",
@@ -225,14 +225,14 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object PartyFilter : RegexChatFilter("party", config.others) {
+    object PartyFilter : RegexChatFilter("party", { config.others }) {
         override val patterns by patternGroup.list(
             "party",
             "-----------------------------------------------------",
         )
     }
 
-    object AuctionHouseFilter : RegexChatFilter("auction_house", config.others) {
+    object AuctionHouseFilter : RegexChatFilter("auction_house", { config.others }) {
         override val patterns by patternGroup.list(
             "auction-house",
             "-----------------------------------------------------",
@@ -240,7 +240,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object BazaarFilter : RegexChatFilter("bazaar", config.others) {
+    object BazaarFilter : RegexChatFilter("bazaar", { config.others }) {
         override val patterns by patternGroup.list(
             "bazaar",
             "Buy Order Setup! .*x .* for .* coins.",
@@ -250,7 +250,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object UselessWarningFilter : RegexChatFilter("useless_warning", config.others) {
+    object UselessWarningFilter : RegexChatFilter("useless_warning", { config.others }) {
         override val patterns by patternGroup.list(
             "useless-warning",
             "You are sending commands too fast! Please slow down.", // TODO prevent in the future
@@ -268,7 +268,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object AnnoyingSpamFilter : RegexChatFilter("annoying_spam", config.others) {
+    object AnnoyingSpamFilter : RegexChatFilter("annoying_spam", { config.others }) {
         override val patterns by patternGroup.list(
             "annoying-spam",
             "Your Implosion hit .* for .* damage.",
@@ -294,7 +294,7 @@ object MiscChatFilter : ChatFilterGroup() {
         )
     }
 
-    object RewardBundleFilter : RegexChatFilter("seasonal_bundles", config.others) {
+    object RewardBundleFilter : RegexChatFilter("seasonal_bundles", { config.others }) {
         /**
          * REGEX-TEST: You haven't claimed your Summer Rewards yet!
          * REGEX-TEST: Talk to the Summer Sloth in the Hub!
@@ -308,7 +308,7 @@ object MiscChatFilter : ChatFilterGroup() {
     }
 
 
-    object SacrificeFilter : RegexChatFilter("sacrifice", config.sacrifice) {
+    object SacrificeFilter : RegexChatFilter("sacrifice", { config.sacrifice }) {
         /**
          * REGEX-TEST: SACRIFICE! [MVP++] Mikecraft1224 turned Young Dragon Boots into 40 Dragon Essence!
          * REGEX-TEST: BONUS LOOT! They also received Ritual Residue from their sacrifice!

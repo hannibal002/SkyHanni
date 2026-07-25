@@ -26,7 +26,7 @@ object DungeonChatFilter : ChatFilterGroup() {
         )
     }
 
-    object SoloClassFilter : RegexChatFilter("solo_class", config.soloClass) {
+    object SoloClassFilter : RegexChatFilter("solo_class", { config.soloClass }) {
         /**
          * REGEX-TEST: Your Healer stats are doubled because you are the only player using this object!
          * REGEX-TEST: Your Mage stats are doubled because you are the only player using this object!

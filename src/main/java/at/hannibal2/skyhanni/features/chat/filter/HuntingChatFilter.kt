@@ -15,7 +15,7 @@ object HuntingChatFilter : ChatFilterGroup() {
         SwoopAxeFilter,
     )
 
-    object RedundantShardsFilter : RegexChatFilter("redundant_shards", config.redundantComments) {
+    object RedundantShardsFilter : RegexChatFilter("redundant_shards", { config.redundantComments }) {
         /**
          * REGEX-TEST: Mochibear ate too much and passed out! You caught it!
          * REGEX-TEST: You caught yourself an invisibug! The shard was sent to your Hunting Box!
@@ -29,7 +29,7 @@ object HuntingChatFilter : ChatFilterGroup() {
         )
     }
 
-    object SwoopAxeFilter : RegexChatFilter("swoop_axe", config.swoopAxeMessage) {
+    object SwoopAxeFilter : RegexChatFilter("swoop_axe", { config.swoopAxeMessage }) {
         /**
          * REGEX-TEST: [NPC] Swoop: Wow! I forgot to tell you, monsters around here can only take damage from Axes!
          */

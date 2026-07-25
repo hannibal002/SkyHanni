@@ -58,7 +58,7 @@ sealed interface Activation {
     }
 
     class Config(
-        private val config: Property<Boolean>,
+        private val config: () -> Property<Boolean>,
     ) : Activation {
 
         private var callback: ((Boolean) -> Unit)? = null
@@ -71,11 +71,11 @@ sealed interface Activation {
                 if (it) onEnable()
                 else onDisable()
             }
-
-            config.whenChanged { _, new ->
+            val actualConfig = config()
+            actualConfig.whenChanged { _, new ->
                 callback?.invoke(new)
             }
-            callback?.invoke(config.get())
+            callback?.invoke(actualConfig.get())
         }
 
         override fun unbind() {
@@ -187,8 +187,8 @@ abstract class RegexChatFilter(
     reason: String,
     activationParam: Activation,
 ) : AbstractRegexChatFilter(reason), ActivatedChatFilter {
-    constructor(reason: String, config: Property<Boolean>) : this(reason, Activation.Config(config))
-    constructor(reason: String, config: Property<Boolean>, island: IslandDetector) :
+    constructor(reason: String, config: () -> Property<Boolean>) : this(reason, Activation.Config(config))
+    constructor(reason: String, island: IslandDetector, config: () -> Property<Boolean>) :
         this(reason, Activation.Config(config), Activation.Island(island))
     constructor(reason: String, vararg activation: Activation) : this(reason, Activation.AllOf(*activation))
 

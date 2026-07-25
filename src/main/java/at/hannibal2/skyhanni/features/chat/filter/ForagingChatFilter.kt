@@ -16,7 +16,7 @@ object ForagingChatFilter : ChatFilterGroup() {
         LotteryFilter,
     )
 
-    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", config.unmineable, customTreesDetector) {
+    object UnmineableTreeFilter : RegexChatFilter("unmineable_tree", customTreesDetector, { config.unmineable }) {
         /**
          ** REGEX-TEST: You cannot damage a tree while it is regenerating!
          ** REGEX-TEST: The toughness of this tree is way too high!
@@ -28,7 +28,7 @@ object ForagingChatFilter : ChatFilterGroup() {
         )
     }
 
-    object LotteryFilter : RegexChatFilter("lottery", generalConfig.hideLottery) {
+    object LotteryFilter : RegexChatFilter("lottery", { generalConfig.hideLottery }) {
         /**
          ** REGEX-TEST: New day! Your Lottery buff changed!
          */

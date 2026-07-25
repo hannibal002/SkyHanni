@@ -18,7 +18,7 @@ object EventChatFilter : ChatFilterGroup() {
         WinterGiftFilter,
     )
 
-    object GuildEventExpFilter : RegexChatFilter("guild_event_exp", config.guildEventExp) {
+    object GuildEventExpFilter : RegexChatFilter("guild_event_exp", { config.guildEventExp }) {
         /**
          * REGEX-TEST: You earned 2 GEXP from playing SkyBlock!
          * REGEX-TEST: You earned 2 GEXP + 210 Event EXP from playing SkyBlock!
@@ -30,7 +30,7 @@ object EventChatFilter : ChatFilterGroup() {
         )
     }
 
-    object FireSaleFilter : RegexChatFilter("firesale", config.fireSale) {
+    object FireSaleFilter : RegexChatFilter("firesale", { config.fireSale }) {
         override val patterns by patternGroup.list(
             "firesale",
             "A FIRE SALE A[\\n.]*",
@@ -45,7 +45,7 @@ object EventChatFilter : ChatFilterGroup() {
         )
     }
 
-    object EventLevelUpFilter : RegexChatFilter("event_levelup", config.eventLevelUp) {
+    object EventLevelUpFilter : RegexChatFilter("event_levelup", { config.eventLevelUp }) {
         // TODO need proper solution to hide empty messages in event text
         override val patterns by patternGroup.list(
             "event-levelup",
@@ -56,7 +56,7 @@ object EventChatFilter : ChatFilterGroup() {
         )
     }
 
-    object ChocolateFactoryUpgradeFilter : RegexChatFilter("factory_upgrade", config.factoryUpgrade) {
+    object ChocolateFactoryUpgradeFilter : RegexChatFilter("factory_upgrade", { config.factoryUpgrade }) {
         override val patterns by patternGroup.list(
             "chocolate-factory-upgrade",
             ".* has been promoted to \\[.*] *!",
@@ -66,14 +66,14 @@ object EventChatFilter : ChatFilterGroup() {
         )
     }
 
-    object HoppityBeginFilter : RegexChatFilter("hoppity_begin", config.hoppityBegun) {
+    object HoppityBeginFilter : RegexChatFilter("hoppity_begin", { config.hoppityBegun }) {
         override val patterns by patternGroup.list(
             "hoppity-begin",
             "Hoppity's Hunt has begun! Help Hoppity find his Chocolate Rabbit Eggs across SkyBlock each day during the Spring!",
         )
     }
 
-    object HoppityEggAppearFilter : RegexChatFilter("hoppity_appear", config.hoppityEggs) {
+    object HoppityEggAppearFilter : RegexChatFilter("hoppity_appear", { config.hoppityEggs }) {
         /**
          * REGEX-TEST: HOPPITY'S HUNT A Chocolate Rabbit Egg has appeared!
          */
@@ -83,7 +83,7 @@ object EventChatFilter : ChatFilterGroup() {
         )
     }
 
-    object WinterGiftFilter : RegexChatFilter("winter_gift", config.winterGift) {
+    object WinterGiftFilter : RegexChatFilter("winter_gift", { config.winterGift }) {
         override val patterns = buildList {
             GiftProfitTracker.run {
                 listOf(

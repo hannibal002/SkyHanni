@@ -13,7 +13,7 @@ object WinterChatFilter : ChatFilterGroup() {
     )
     override val activation = Activation.Island(IslandType.WINTER)
 
-    object WinterIslandFilter : RegexChatFilter("winter_island", config.others) {
+    object WinterIslandFilter : RegexChatFilter("winter_island", { config.others }) {
         /**
          * REGEX-TEST: ☃ [VIP+] liron150 mounted a Snow Cannon!
          */

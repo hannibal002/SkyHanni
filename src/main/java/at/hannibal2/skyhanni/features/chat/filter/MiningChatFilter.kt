@@ -11,7 +11,7 @@ object MiningChatFilter : ChatFilterGroup() {
         SkymallFilter,
     )
 
-    object SkymallFilter : RegexChatFilter("skymall", generalConfig.hideSkyMall) {
+    object SkymallFilter : RegexChatFilter("skymall", { generalConfig.hideSkyMall }) {
         /**
          * REGEX-TEST: New day! Your Sky Mall buff changed!
          * REGEX-TEST: You can disable this messaging by toggling Sky Mall in your /hotm!

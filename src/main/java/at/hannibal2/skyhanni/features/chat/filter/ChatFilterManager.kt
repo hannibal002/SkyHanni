@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.hypixel.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.chat.filter.ChatFilterManager.block
 import at.hannibal2.skyhanni.features.chat.filter.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,8 +12,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.util.concurrent.ConcurrentHashMap
 
 @SkyHanniModule
 object ChatFilterManager {
@@ -52,8 +49,7 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onHypixel(event: ConfigLoadEvent) {
-        if (event.firstLoad) return
+    fun onConfigLoad(event: ConfigLoadEvent) {
         groups.forEach { group ->
             group.activation.bind(
                 onEnable = {

@@ -11,7 +11,7 @@ object FarmingChatFilter : ChatFilterGroup() {
         MasterChefFilter,
     )
 
-    object MasterChefFilter : RegexChatFilter("master_chef", config.masterChef) {
+    object MasterChefFilter : RegexChatFilter("master_chef", { config.masterChef }) {
         /**
          * REGEX-TEST: [NPC] Feast Chef Ted: Thanks for the donation! I've added a Kernel to your purse.
          */
