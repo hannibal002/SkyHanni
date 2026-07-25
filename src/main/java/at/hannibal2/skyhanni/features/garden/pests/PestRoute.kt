@@ -28,6 +28,7 @@ object PestRoute {
             route = emptyList()
             return
         }
+        if (!event.isMod(ROUTE_UPDATE_INTERVAL_TICKS)) return
 
         val pests = MobData.entityToMob.values
             .filter { it.isVisiblePest() }
@@ -133,5 +134,6 @@ object PestRoute {
         return result
     }
 
-    private const val MAX_EXACT_PESTS = 15
+    private const val ROUTE_UPDATE_INTERVAL_TICKS = 10
+    private const val MAX_EXACT_PESTS = 10
 }

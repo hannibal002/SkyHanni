@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
-import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -19,9 +19,9 @@ object PestHighlighter {
     private val config get() = PestApi.config
     private val highlightColor = Color.RED
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
-        if (!GardenApi.inGarden() || !config.pestHighlight) return
+        if (!config.pestHighlight) return
         if (event.type !== RenderEntityOutlineEvent.Type.NO_XRAY) return
 
         val pestMobs = MobData.entityToMob.values

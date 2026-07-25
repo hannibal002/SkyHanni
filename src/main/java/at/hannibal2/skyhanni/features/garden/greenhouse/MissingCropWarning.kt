@@ -20,8 +20,8 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.BlockUtils.getTargetedBlock
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBox
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBoundingBox
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBox
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -31,10 +31,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getHandItem
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.getStandHelmet
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraft.core.BlockPos
@@ -390,24 +390,26 @@ object MissingCropWarning {
 
     private fun LorenzVec.isMissingCrop(category: CropCategory): Boolean {
         val state = getBlockStateAt()
-        if (state.block in deadCropBlocks) return true
+        return when {
+            state.block in deadCropBlocks -> true
 
-        // Crop Diagnostics supplies the identity because Hypixel can represent both of these using custom backing blocks.
-        if (category in diagnosticOnlyCrops) {
-            if (findNearbyCropPosition(category, this) != null) return false
-            if (category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)) return false
-            return state.isAir
-        }
-
-        if (state.isAir && category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)) return false
-
-        if (category in variableHeightCrops && state.isAir) {
-            return (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).none { yOffset ->
-                CropCategory.fromBlock(add(y = yOffset).getBlockStateAt().block) == category
+            // Crop Diagnostics supplies the identity for crops that can use custom backing blocks.
+            category in diagnosticOnlyCrops -> {
+                val hasNearbyCrop = findNearbyCropPosition(category, this) != null
+                val hasFloatingHead = category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)
+                !hasNearbyCrop && !hasFloatingHead && state.isAir
             }
-        }
 
-        return state.isAir
+            state.isAir && category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category) -> false
+
+            category in variableHeightCrops && state.isAir -> {
+                (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).none { yOffset ->
+                    CropCategory.fromBlock(add(y = yOffset).getBlockStateAt().block) == category
+                }
+            }
+
+            else -> state.isAir
+        }
     }
 
     /**
@@ -508,20 +510,20 @@ object MissingCropWarning {
     private fun showKnownGreenhousePlots() {
         val greenhousePlots = GardenPlotApi.plots.filter { it.greenhouse }
         if (greenhousePlots.isEmpty()) {
-            ChatUtils.chat("Â§cSkyHanni currently knows no Greenhouse plots.")
+            ChatUtils.chat("§cSkyHanni currently knows no Greenhouse plots.")
             return
         }
         ChatUtils.chat(
             buildString {
-                appendLine("Â§6Known Greenhouse Plots")
+                appendLine("§6Known Greenhouse Plots")
                 greenhousePlots.sortedBy { it.id }.forEach { plot ->
                     val loaded = isCompleteScanAreaLoaded(plot)
                     appendLine(
-                        " Â§7Plot Â§e${plot.id}Â§7: " +
-                            if (loaded) "Â§afully loaded" else "Â§cnot fully loaded",
+                        " §7Plot §e${plot.id}§7: " +
+                            if (loaded) "§afully loaded" else "§cnot fully loaded",
                     )
                 }
-                append(" Â§7Current plot: Â§e${GardenPlotApi.getCurrentPlot()?.id ?: "none"}")
+                append(" §7Current plot: §e${GardenPlotApi.getCurrentPlot()?.id ?: "none"}")
             },
         )
     }
@@ -548,10 +550,10 @@ object MissingCropWarning {
                 append(
                     if (diagnosedPositions.isEmpty()) "none"
                     else diagnosedPositions.entries.joinToString("§7, §e") {
-                            val category = CropCategory.fromStorageName(it.key)
-                            val block = it.value.getBlockStateAt().block
-                            "${category?.displayName ?: it.key}=${it.value} ($block)"
-                        },
+                        val category = CropCategory.fromStorageName(it.key)
+                        val block = it.value.getBlockStateAt().block
+                        "${category?.displayName ?: it.key}=${it.value} ($block)"
+                    },
                 )
             },
         )
