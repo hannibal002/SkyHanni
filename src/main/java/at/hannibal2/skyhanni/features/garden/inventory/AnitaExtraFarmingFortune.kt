@@ -97,22 +97,24 @@ object AnitaExtraFarmingFortune {
         event.toolTip.add(index, "§7Cost to max out")
         event.toolTip.add(index, "")
 
-        event.toolTip.add(
-            farmingFortuneLine + 2,
-            "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}",
-        )
+        if (farmingFortuneLine != null) {
+            event.toolTip.add(
+                farmingFortuneLine + 2,
+                "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}",
+            )
+        }
     }
 
     private fun parseExtraFarmingFortuneLore(
         lore: List<String>,
     ): ExtraFarmingFortuneLore? {
-        var farmingFortune: Int? = null
-        var farmingFortuneLine = -1
+        var farmingFortune = 0
+        var farmingFortuneLine: Int? = null
         var contributionFactor = 1.0
 
         for ((index, line) in lore.withIndex()) {
             farmingFortunePattern.matchMatcher(line) {
-                farmingFortune = group("farmingFortune").toIntOrNull()
+                farmingFortune = group("farmingFortune").toInt()
                 farmingFortuneLine = index
             }
 
@@ -140,7 +142,7 @@ object AnitaExtraFarmingFortune {
 
     private data class ExtraFarmingFortuneLore(
         val farmingFortune: Int,
-        val farmingFortuneLine: Int,
+        val farmingFortuneLine: Int?,
         val contributionFactor: Double,
     )
 
