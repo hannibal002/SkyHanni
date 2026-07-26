@@ -5,8 +5,14 @@ import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
 
 /**
- * @param guiContainer passes the SkyHanniGuiContainer of the Gui on key press.
- * @param isMouseBasedEvent boolean indicating whether the event was fired by a Mouse Button.
+ * Fired when a key or mouse button is pressed while a container GUI is open.
+ *
+ * Note: despite the name, this event also covers mouse button inputs. The [isMouseBasedEvent]
+ * flag distinguishes between the two. A cleaner solution passing key IDs may replace this approach
+ * in the future.
+ *
+ * @param guiContainer the container GUI that received the input.
+ * @param isMouseBasedEvent true if triggered by a mouse button, false for keyboard keys.
  */
 @PrimaryFunction("onGuiKeyPress")
 class GuiKeyPressEvent(val guiContainer: SkyHanniGuiContainer, val isMouseBasedEvent: Boolean) : CancellableSkyHanniEvent()
