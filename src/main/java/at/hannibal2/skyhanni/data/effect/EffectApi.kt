@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
@@ -44,22 +46,22 @@ object EffectApi {
     )
 
     /**
-     * REGEX-TEST: §a§lSCHLURP! §r§eThe effects of the §r§9Hot Chocolate Mixin §r§ehave been extended by §r§986h 24m§r§e!
-     * They will pause if your §r§cGod Potion §r§eexpires.
+     * REGEX-TEST: SCHLURP! The effects of the Hot Chocolate Mixin have been extended by 86h 24m!
+     * They will pause if your God Potion expires.
      */
     private val hotChocolateMixinConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.hotchocolatemixinconsume",
-        "(?:§.)+.*(?:§.)+Hot Chocolate Mixin ?(?:§.)+.*extended by (?:§.)+(?<time>[dhms0-9 ]*)(?:§.)+!.*",
+        "stats.chatpatterns.hotchocolatemixinconsume.colorless",
+        ".*Hot Chocolate Mixin have been extended by (?<time>[dhms0-9 ]*)!.*",
     )
 
     /**
-     * REGEX-TEST: §a§lGULP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSIP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
-     * REGEX-TEST: §a§lSLURP! §r§eThe §r§cGod Potion §r§egrants you powers for §r§928h 48m§r§e!
+     * REGEX-TEST: GULP! The God Potion grants you powers for 28h 48m!
+     * REGEX-TEST: SIP! The God Potion grants you powers for 28h 48m!
+     * REGEX-TEST: SLURP! The God Potion grants you powers for 28h 48m!
      */
     private val godPotConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.godpotconsume",
-        "(?:§.)+.*(?:§.)+God Potion ?(?:§.)+.*grants you powers for (?:§.)+(?<time>[dhms0-9 ]*)(?:§.)+!.*",
+        "stats.chatpatterns.godpotconsume.colorless",
+        ".*God Potion grants you powers for (?<time>[dhms0-9 ]*)!.*",
     )
 
     /**
@@ -67,35 +69,37 @@ object EffectApi {
      */
     private val effectsInventoryPattern by RepoPattern.pattern(
         "inventory.effects",
-        "(?:§.)?(?:[(\\d\\/)]* )?Active Effects",
+        "(?:\\(\\d+/\\d+\\) )?Active Effects",
     )
 
     /**
-     * REGEX-TEST: §aFilter
+     * REGEX-TEST: Filter
      */
     private val filterPattern by RepoPattern.pattern(
-        "inventory.effects.filter",
-        "§aFilter",
+        "inventory.effects.filter.colorlesss",
+        "Filter",
     )
 
     /**
-     * REGEX-TEST: §b▶ God Potion Effects
+     * REGEX-TEST: ▶ God Potion Effects
      */
     private val godPotEffectsFilterSelectPattern by RepoPattern.pattern(
-        "inventory.effects.filtergodpotselect",
-        "§b▶ God Potion Effects",
+        "inventory.effects.filtergodpotselect.colorless",
+        "▶ God Potion Effects",
     )
 
     /**
-     * REGEX-TEST: §7Remaining: §f105:01:34
+     * REGEX-TEST: Remaining: 105:01:34
      */
     private val potionRemainingLoreTimerPattern by RepoPattern.pattern(
-        "inventory.effects.effecttimeleft",
-        "§7Remaining: §f(?<time>[\\d:]+)",
+        "inventory.effects.effecttimeleft.colorless",
+        "Remaining: (?<time>[\\d:]+)",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " Repellent: MAX (12s)"
+     * WRAPPED-REGEX-TEST: " Repellent: Regular (58m)"
+     * WRAPPED-REGEX-TEST: " Repellent: Max (58m)"
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
@@ -122,6 +126,26 @@ object EffectApi {
         "tab.salts-no-color",
         " (?<effect>[\\w\\-' ]+)*: *(?<time>[dhms0-9 ]+)",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: " Press TAB or type /effects to view your active effects!"
+     */
+    private val tabListFooterPattern by RepoPattern.pattern(
+        "tab.footer.effects",
+        " Press TAB or type /effects to view your active effects!",
+    )
+
+    /**
+     * REGEX-TEST: Time Remaining: Completed!
+     * REGEX-TEST: Time Remaining: 1h 2m
+     * REGEX-TEST: Time Remaining: 1h 2m 3s
+     * REGEX-TEST: Remaining: 1h 2m 3s
+     * REGEX-TEST: PAUSED
+     */
+    private val remainingPattern by RepoPattern.pattern(
+        "effects.remaining",
+        "^.*Remaining: (?<time>.+)$",
+    )
     // </editor-fold>
 
     init {
@@ -133,7 +157,8 @@ object EffectApi {
     // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
     fun onChat(event: SkyHanniChatEvent.Allow) {
-        hotChocolateMixinConsumePattern.matchMatcher(event.message) {
+        val msg = event.cleanMessage
+        hotChocolateMixinConsumePattern.matchMatcher(msg) {
             val durationAdded = TimeUtils.getDuration(group("time"))
             EffectDurationChangeEvent(
                 NonGodPotEffect.HOT_CHOCOLATE,
@@ -141,24 +166,22 @@ object EffectApi {
                 durationAdded,
             ).post()
         }
-        godPotConsumePattern.matchMatcher(event.message) {
+        godPotConsumePattern.matchMatcher(msg) {
             val durationAdded = TimeUtils.getDuration(group("time"))
             val existingValue = profileStorage?.godPotExpiry?.takeIfInitialized() ?: SimpleTimeMark.now()
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
-
-        val modifiedMessage = event.message.replace(
-            " Press TAB or type /effects to view your active effects!",
-            "",
-        )
+        if (tabListFooterPattern.matches(msg)) {
+            return
+        }
 
         for (effect in NonGodPotEffect.entries) {
-            if (effect.effectRemovedPattern?.pattern() == modifiedMessage) {
+            if (effect.effectRemovedPattern?.pattern() == msg) {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.REMOVE, null).post()
                 return
             }
 
-            if (effect.effectGainedPattern?.pattern() != modifiedMessage) continue
+            if (effect.effectGainedPattern?.pattern() != msg) continue
             val changeType = effect.effectChangeType ?: continue
             val duration = effect.effectDuration ?: continue
 
@@ -201,7 +224,7 @@ object EffectApi {
         repellentPattern.firstMatcher(event.lines.map { it.string }) {
             // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
             val time = group("time")?.toIntOrNull() ?: return@firstMatcher
-            val tier = group("tier")
+            val tier = group("tier").uppercase()
             val duration = time.toDuration(DurationUnit.SECONDS)
             val propTier = when (tier) {
                 "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
@@ -229,7 +252,7 @@ object EffectApi {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!event.isGodPotEffectsFilterSelect()) return
 
-        val potionLore = event.inventoryItems[10]?.getLore() ?: run {
+        val potionLore = event.inventoryItems[10]?.getCleanLore() ?: run {
             // No active god pot effects found, reset the expiry time
             profileStorage?.godPotExpiry = SimpleTimeMark.farPast()
             return
@@ -245,32 +268,32 @@ object EffectApi {
     private fun InventoryUpdatedEvent.isGodPotEffectsFilterSelect(): Boolean =
         effectsInventoryPattern.matches(this.inventoryName) &&
             this.inventoryItems.values.firstOrNull {
-                filterPattern.matches(it.hoverName.formattedTextCompatLeadingWhiteLessResets())
-            }?.getLore()?.any {
+                filterPattern.matches(it.cleanName)
+            }?.getCleanLore()?.any {
                 godPotEffectsFilterSelectPattern.matches(it)
             } ?: false
 
     private fun SafeItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        hoverName.formattedTextCompatLeadingWhiteLessResets().contains(it.inventoryItemName)
+        cleanName.contains(it.inventoryItemName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!event.inventoryName.endsWith("Active Effects")) return
+        if (!effectsInventoryPattern.matches(event.inventoryName)) return
 
-        for (stack in event.inventoryItems.values) {
+        loop@ for (stack in event.inventoryItems.values) {
             val effect = stack.getNonGodPotEffectOrNull() ?: continue
-            for (line in stack.getLore()) {
-                if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
-                if (line.endsWith("PAUSED")) continue
+            val lore = stack.getCleanLore()
+            remainingPattern.firstMatcher(lore) {
                 val duration = try {
-                    TimeUtils.getDuration(line.split("§f")[1])
-                } catch (e: IndexOutOfBoundsException) {
+                    TimeUtils.getDuration(group("time"))
+                } catch (e: Exception) {
                     ErrorManager.logErrorWithData(
-                        e, "Error while reading Non God-Potion effects from tab list",
-                        "line" to line,
+                        e,
+                        "Error while reading Non God-Potion effects from inventory",
+                        "lore" to lore,
                     )
-                    continue
+                    continue@loop
                 }
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.SET, duration).post()
             }
