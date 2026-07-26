@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.foraging
+package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -46,7 +46,7 @@ object WormholeFinder {
         if (!event.isMod(10)) return
         if (!wearingFroggles()) return
 
-        val playerPos = playerLocation()
+        val playerPos = LocationUtils.playerLocation()
         val rawArrows = playerPos.getEntitiesNearby<Display.TextDisplay>(3.0)
 
         matchedWormholes = rawArrows.mapNotNull { matchArrow(it) }.distinct()
