@@ -27,7 +27,7 @@ data class EntityTextUpdateEvent(
  *
  * @property entity The entity that was removed.
  */
-@PrimaryFunction("onTextDisplayRemoved")
+@PrimaryFunction("onEntityTextRemoved")
 data class EntityTextRemovedEvent(
     val entity: Entity,
 ) : SkyHanniEvent()
