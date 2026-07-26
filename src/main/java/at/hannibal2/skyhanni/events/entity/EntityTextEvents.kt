@@ -11,8 +11,8 @@ import net.minecraft.world.entity.Entity
  * Do note that event.entity.customName is NOT equivalent to event.newName for text display entities.
  * Only fires on SkyBlock.
  *
- * @property entity The entity whose custom name was updated.
- * @property newName The new custom name of the entity, or null if the name was removed.
+ * @property entity The entity whose associated text was updated.
+ * @property newName The new text associated with the entity, or null if the text was removed.
  */
 @PrimaryFunction("onEntityTextUpdate")
 data class EntityTextUpdateEvent(
