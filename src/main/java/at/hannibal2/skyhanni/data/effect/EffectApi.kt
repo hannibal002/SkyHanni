@@ -103,7 +103,7 @@ object EffectApi {
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
-        " Repellent: (?<tier>\\w+)?(?: \\((?<time>\\d)s\\))?",
+        "( +)?Repellent: (?<tier>\\w+)?(?: \\((?<time>[dhms0-9 ]+)\\))?",
     )
 
     /**
