@@ -15,23 +15,22 @@ import at.hannibal2.skyhanni.utils.DelayedRun;
 import at.hannibal2.skyhanni.utils.KeyboardManager;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
-import kotlin.Unit;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.client.input.KeyEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,14 +96,20 @@ public abstract class MixinAbstractContainerScreen {
         return BetterContainers.getTextColor(colour);
     }
 
-    @Redirect(method = "extractSlotHighlightBack", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
-    private boolean canBeHighlightedBack(Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot);
+    @WrapOperation(
+        method = "extractSlotHighlightBack",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
+    )
+    private boolean canBeHighlightedBack(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
-    @Redirect(method = "extractSlotHighlightFront", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z"))
-    private boolean canBeHighlightedFront(Slot slot) {
-        return BetterContainers.slotCanBeHighlighted(slot);
+    @WrapOperation(
+        method = "extractSlotHighlightFront",
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/Slot;isHighlightable()Z")
+    )
+    private boolean canBeHighlightedFront(Slot slot, Operation<Boolean> original) {
+        return BetterContainers.slotCanBeHighlighted(slot, original.call(slot));
     }
 
     @ModifyExpressionValue(method = "mouseClicked", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;hasInfiniteMaterials()Z"))

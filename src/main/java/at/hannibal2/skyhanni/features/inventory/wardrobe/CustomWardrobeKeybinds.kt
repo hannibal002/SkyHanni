@@ -26,10 +26,10 @@ object CustomWardrobeKeybinds {
             config.keybinds.slot8,
             config.keybinds.slot9,
         )
-    var lastClick = SimpleTimeMark.farPast()
+    private var lastClick = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onGui(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (handlePress()) event.cancel()
     }
 
