@@ -14,7 +14,7 @@ import net.minecraft.world.entity.Entity
  * @property entity The entity whose custom name was updated.
  * @property newName The new custom name of the entity, or null if the name was removed.
  */
-@PrimaryFunction("onTextDisplayUpdate")
+@PrimaryFunction("onEntityTextUpdate")
 data class EntityTextUpdateEvent(
     val entity: Entity,
     val newName: Component?,
