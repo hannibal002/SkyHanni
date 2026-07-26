@@ -6,8 +6,8 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 
 /**
- * Event that is fired when a text display entity's custom name is updated.
- * This includes both text display and armor stand entities, as they can both have custom names.
+ * Event that is fired when text associated with an entity is updated.
+ * This includes both text display entities and armor stand custom names.
  * Do note that event.entity.customName is NOT equivalent to event.newName for text display entities.
  * Only fires on SkyBlock.
  *
