@@ -99,7 +99,7 @@ object EffectApi {
      */
     private val repellentPattern by RepoPattern.pattern(
         "misc.nongodpot.repellant-no-color",
-        "( +)?Repellent: (?<tier>\\w+)?(?: \\((?<time>[dhms0-9 ]+)\\))?",
+        "(?: +)?Repellent: (?<tier>\\w+)?(?: \\((?<time>[dhms0-9 ]+)\\))?",
     )
 
     /**
@@ -136,7 +136,7 @@ object EffectApi {
      * REGEX-TEST: Time Remaining: 1h 2m
      * REGEX-TEST: Time Remaining: 1h 2m 3s
      * REGEX-TEST: Remaining: 1h 2m 3s
-     * REGEX-TEST: PAUSED
+     * REGEX-FAIL: PAUSED
      */
     private val remainingPattern by RepoPattern.pattern(
         "effects.remaining",
