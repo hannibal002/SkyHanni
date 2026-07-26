@@ -8,7 +8,6 @@ import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapSourcesJarTask
 import net.fabricmc.loom.task.ValidateAccessWidenerTask
 import net.fabricmc.loom.task.prod.ClientProductionRunTask
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -79,35 +78,38 @@ loom.apply {
     runs {
         named("client") {
             appendProjectPathToDisplayName.set(true)
-            this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
-            property("mixin.debug", "true")
+            runDirectory = rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir)
+            systemProperties.put("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
-                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+                systemProperties.put("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            vmArgs("-Xmx4G", "-Dnarrator.none=true")
-            programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
-            programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
+            jvmArguments.addAll("-Xmx4G", "-Dnarrator.none=true")
+            programArguments.addAll(
+                "--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker",
+                "--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker",
+            )
         }
         removeIf { it.name == "server" }
     }
 }
 
-val shadowImpl: Configuration by configurations.creating {
+val shadowImpl: Configuration = configurations.create("shadowImpl") {
     configurations.implementation.get().extendsFrom(this)
 }
 
-val shadowModImpl: Configuration by configurations.creating {
+val shadowModImpl: Configuration = configurations.create("shadowModImpl") {
     if (!isDeobf) configurations.getByName("modImplementation").extendsFrom(this)
 }
 
-val shadowOnly: Configuration by configurations.creating
+val shadowOnly: Configuration = configurations.create("shadowOnly")
 
-val mixinTestRuntime: Configuration by configurations.creating {
+val mixinTestRuntime: Configuration = configurations.create("mixinTestRuntime") {
     isCanBeConsumed = false
     extendsFrom(configurations.testRuntimeClasspath.get())
 }
 
-val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+val includeBackupRepo = tasks.register<DownloadBackupRepo>("includeBackupRepo") {
+    description = "Includes the a backup of the SkyHanni repo into the final jar"
     this.user = "hannibal002"
     this.repo = "SkyHanni-Repo"
     this.branch = "main"
@@ -115,7 +117,8 @@ val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
 }
 
-val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
+val includeBackupNeuRepo = tasks.register<DownloadBackupRepo>("includeBackupNeuRepo") {
+    description = "Includes the a backup of the NotEnoughUpdates repo into the final jar"
     this.user = "NotEnoughUpdates"
     this.repo = "NotEnoughUpdates-Repo"
     this.branch = "master"
@@ -123,13 +126,15 @@ val includeBackupNeuRepo by tasks.registering(DownloadBackupRepo::class) {
     this.outputDirectory.set(layout.buildDirectory.dir("downloadedNeuRepo"))
 }
 
-val publishToModrinth by tasks.registering(PublishToModrinth::class)
+val publishToModrinth = tasks.register<PublishToModrinth>("publishToModrinth")
 
 tasks.named<JavaExec>("runClient") {
     this.javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
 }
 
+@Suppress("UnstableApiUsage")
 tasks.register<ClientProductionRunTask>("prodClient") {
+    description = "Runs the client in a production-like environment."
     notCompatibleWithConfigurationCache("Interactive client launches must start a new process every time.")
     outputs.upToDateWhen { false }
     runDir = file("run")
@@ -148,7 +153,6 @@ if (target == primaryTarget) {
 dependencies {
     val versionName = target.minecraftVersion.versionNameOverride ?: target.minecraftVersion.versionName
     minecraft("com.mojang:minecraft:$versionName")
-    @Suppress("UnstableApiUsage")
     if (!isDeobf) {
         mappings(loom.officialMojangMappings())
     }
@@ -159,12 +163,12 @@ dependencies {
     ksp(libs.autoservice.ksp)
     implementation(libs.autoservice.annotations)
 
-    target.fabricLoaderVersion?.let {
+    target.fabricLoaderVersion.let {
         if (isDeobf) implementation(it) else modImplementation(it)
         "productionRuntimeMods"(it)
         mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
-    target.fabricApiVersion?.let {
+    target.fabricApiVersion.let {
         if (isDeobf) implementation(it) else modImplementation(it)
         "productionRuntimeMods"(it)
     }
@@ -172,7 +176,7 @@ dependencies {
     else modImplementation(libs.fabricLanguageKotlin)
     "productionRuntimeMods"(libs.fabricLanguageKotlin)
 
-    target.modMenuVersion?.let {
+    target.modMenuVersion.let {
         if (isDeobf) implementation("maven.modrinth:modmenu:$it")
         else modImplementation("maven.modrinth:modmenu:$it")
     }
@@ -249,7 +253,7 @@ fun DependencyHandler.includeImplementation(dep: Any, configure: ExternalModuleD
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--quickPlayMultiplayer", "hypixel.net")
+        programArguments.addAll("--quickPlayMultiplayer", "hypixel.net")
     }
 
     ksp {
@@ -281,7 +285,7 @@ tasks.withType<Test> {
     )
 }
 
-val mixinTest by tasks.registering(Test::class) {
+val mixinTest = tasks.register<Test>("mixinTest") {
     description = "Audits mixin application under Fabric Loader."
     group = "verification"
     testClassesDirs = sourceSets.test.get().output.classesDirs
@@ -308,7 +312,7 @@ kotlin {
 tasks.processResources {
     from(includeBackupRepo)
     from(includeBackupNeuRepo)
-    val fapiVersion = target.fabricApiVersion?.split(":")?.last() ?: ""
+    val fapiVersion = target.fabricApiVersion.split(":").last()
     val hypixelModApiVersion = target.hypixelModApiFabricVersion.split(":").last()
     val minecraftVersion = target.minecraftVersion.fabricModJsonVersion
     val props = buildMap {
@@ -399,7 +403,7 @@ tasks.withType<GradleJar> {
 }
 
 if (!isDeobf) {
-    val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
+    val remapJar = tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
         archiveClassifier.set("")
         dependsOn(tasks.shadowJar)
         inputFile.set(tasks.shadowJar.get().archiveFile)
@@ -438,7 +442,7 @@ if (isDeobf) {
     tasks.assemble.get().dependsOn(tasks.shadowJar)
 }
 
-val sourcesJar by tasks.registering(Jar::class) {
+val sourcesJar = tasks.register<Jar>("sourcesJar") {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
     from(sourceSets.main.get().allSource)
