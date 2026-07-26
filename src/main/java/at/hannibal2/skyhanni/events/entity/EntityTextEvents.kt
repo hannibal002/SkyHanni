@@ -21,8 +21,7 @@ data class EntityTextUpdateEvent(
 ) : SkyHanniEvent()
 
 /**
- * Event that is fired when a text display entity is removed from the world.
- * This includes both text display and armor stand entities, as they can both have custom names.
+ * Event that is fired when a text display entity or an armor stand with a custom name is removed from the world.
  * Only fires on SkyBlock.
  *
  * @property entity The entity that was removed.
