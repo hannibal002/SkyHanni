@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -60,7 +61,7 @@ object AnitaExtraFarmingFortune {
      */
     private val farmingFortunePattern by patternGroup.pattern(
         "farmingfortune",
-        "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune"
+        "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune",
     )
 
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
@@ -70,7 +71,8 @@ object AnitaExtraFarmingFortune {
         if (!config.extraFarmingFortune) return
         if (!anitaInventoryDetector.isInside()) return
         if (!extraFarmingFortunePattern.matches(event.itemStack.cleanName)) return
-        val (farmingFortune, farmingFortuneLine, contributionFactor) =
+
+        val (farmingFortune, contributionFactor) =
             parseExtraFarmingFortuneLore(event.itemStack.getCleanLore()) ?: return
 
         val anitaUpgrade = farmingFortune / 4
@@ -91,15 +93,19 @@ object AnitaExtraFarmingFortune {
 
         val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()
         event.toolTip.add(index, "  §7Price: §6${price.shortFormat()} coins")
-
         event.toolTip.add(index, "§aJacob Tickets §8x${jacobTickets.addSeparators()}")
         event.toolTip.add(index, "§6Gold medals: §8x$goldMedals")
         event.toolTip.add(index, "§7Cost to max out")
         event.toolTip.add(index, "")
 
-        if (farmingFortuneLine != null && farmingFortuneLine + 2 < event.toolTip.size) {
+        // Others mods may add their own lines to the tooltip, so we need to find the line
+        val farmingFortuneLine = event.toolTip.indexOfFirst {
+            farmingFortunePattern.matches(it.string)
+        }
+
+        if (farmingFortuneLine != -1) {
             event.toolTip.add(
-                farmingFortuneLine + 2,
+                farmingFortuneLine + 1,
                 "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}",
             )
         }
@@ -108,41 +114,29 @@ object AnitaExtraFarmingFortune {
     private fun parseExtraFarmingFortuneLore(
         lore: List<String>,
     ): ExtraFarmingFortuneLore? {
-        var farmingFortune = 0
-        var farmingFortuneLine: Int? = null
-        var contributionFactor = 1.0
+        val farmingFortune = farmingFortunePattern.firstMatcher(lore) {
+             group("farmingFortune").toInt()
+        } ?: 0
 
-        for ((index, line) in lore.withIndex()) {
-            farmingFortunePattern.matchMatcher(line) {
-                farmingFortune = group("farmingFortune").toInt()
-                farmingFortuneLine = index
-            }
+        var contributionFactor = realAmountPattern.firstMatcher(lore) {
+             group("realAmount").formatDouble()
+        } ?: return null
 
-            realAmountPattern.matchMatcher(line) {
-                contributionFactor = group("realAmount").formatDouble()
-            }
-        }
-
-        val fortune = farmingFortune ?: return null
-        val nextUpgrade = fortune / 4 + 1
+        val nextUpgrade = farmingFortune / 4 + 1
         val baseAmount = levelPrice[nextUpgrade]?.jacobTickets ?: return null
 
         if (baseAmount > 0) {
             contributionFactor /= baseAmount
-        } else {
-            contributionFactor = 1.0
         }
 
         return ExtraFarmingFortuneLore(
-            farmingFortune = fortune,
-            farmingFortuneLine = farmingFortuneLine,
+            farmingFortune = farmingFortune,
             contributionFactor = contributionFactor,
         )
     }
 
     private data class ExtraFarmingFortuneLore(
         val farmingFortune: Int,
-        val farmingFortuneLine: Int?,
         val contributionFactor: Double,
     )
 
