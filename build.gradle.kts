@@ -525,6 +525,63 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
     enabled = false
 }
 
+tasks.register("detektGitDiff", Detekt::class) {
+    // Use the same jvm target as the baseline task
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml"))
+    baseline = file(rootProject.layout.projectDirectory.file("detekt/baseline-main.xml"))
+    outputs.cacheIf { false }
+    outputs.upToDateWhen { false }
+
+    val detektDir = rootProject.layout.buildDirectory.dir("reports/detekt").get().asFile.absolutePath
+    reports {
+        html.required.set(true)
+        html.outputLocation.set(file("$detektDir/detekt-git-diff.html"))
+        sarif.required.set(true)
+        sarif.outputLocation.set(file("$detektDir/detekt-git-diff.sarif"))
+    }
+}.configure {
+    // Configure source files after task registration by running git diff against origin/beta from the repository root
+    val repoRoot = rootProject.projectDir
+
+    try {
+
+        val gitOutput = providers.exec {
+            commandLine("git", "diff", "--name-only", "origin/beta")
+        }.standardOutput.asText.get()
+
+        if (gitOutput.isNotBlank()) {
+            val modifiedKotlinFiles = gitOutput
+                .split("\n")
+                .filter { it.isNotBlank() && (it.endsWith(".kt") || it.endsWith(".java")) }
+                .map { repoRoot.resolve(it) }
+                .filter { it.exists() }
+
+            println("[detektGitDiff] Kotlin files found: ${modifiedKotlinFiles.size}")
+            modifiedKotlinFiles.forEach { println("[detektGitDiff]   - ${it.absolutePath}") }
+
+            if (modifiedKotlinFiles.isNotEmpty()) {
+                // Include files relative to the repository root so files anywhere in the repo are picked up
+                source = fileTree(repoRoot) {
+                    include(modifiedKotlinFiles.map { it.relativeTo(repoRoot).path })
+                }
+                println("[detektGitDiff] Source set to ${modifiedKotlinFiles.size} files")
+            } else {
+                println("[detektGitDiff] No Kotlin files found, disabling task")
+                onlyIf { false }
+            }
+        } else {
+            println("[detektGitDiff] No files from git diff, disabling task")
+            onlyIf { false }
+        }
+    } catch (e: Exception) {
+        println("[detektGitDiff] Error running git diff: ${e.message}")
+        e.printStackTrace()
+        onlyIf { false }
+    }
+}
+
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
     dependsOn("stonecutterPrepare")
 }

@@ -31,4 +31,4 @@ data class TextDisplayUpdateEvent(
 @PrimaryFunction("onTextDisplayRemoved")
 data class TextDisplayRemovedEvent(
     val entity: Entity,
-    ) : SkyHanniEvent()
+) : SkyHanniEvent()
