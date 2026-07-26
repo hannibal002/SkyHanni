@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
+import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.decoration.ArmorStand
 
 @SkyHanniModule
@@ -54,26 +56,26 @@ object TreeProgressDisplay {
             val displayName = entity.displayName
 
             currentTreeProgressPattern.matchStyledMatcher(displayName) {
-                display = if (config.compact) {
-                    val treeType = componentOrThrow("treeType")
-                    val percent = groupOrThrow("percent")
-                    val percentStyle = percent.sampleStyleAtStart()
-                    Renderable.text(
-                        componentBuilder {
-                            append(treeType)
-                            append(" ")
-                            append(percent.intoComponent())
-                            append("%") {
-                                style = percentStyle
-                            }
-                        }
-                    )
-                } else {
-                    Renderable.text(displayName)
-                }
+                val component = if (config.compact) formatCompact() else displayName
+                display = Renderable.text(component)
                 return
             }
         }
         display = null
+    }
+
+    private fun ComponentMatcher.formatCompact(): Component {
+        val treeType = componentOrThrow("treeType")
+        val percent = groupOrThrow("percent")
+        val percentStyle = percent.sampleStyleAtStart()
+
+        return componentBuilder {
+            append(treeType)
+            append(" ")
+            append(percent.intoComponent())
+            append("%") {
+                style = percentStyle
+            }
+        }
     }
 }
