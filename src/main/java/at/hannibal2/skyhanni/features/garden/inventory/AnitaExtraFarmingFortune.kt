@@ -97,7 +97,7 @@ object AnitaExtraFarmingFortune {
         event.toolTip.add(index, "§7Cost to max out")
         event.toolTip.add(index, "")
 
-        if (farmingFortuneLine != null) {
+        if (farmingFortuneLine != null && farmingFortuneLine + 2 < event.toolTip.size) {
             event.toolTip.add(
                 farmingFortuneLine + 2,
                 "§7Current Tier: §e$anitaUpgrade/${levelPrice.size}",
