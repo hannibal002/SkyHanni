@@ -63,6 +63,14 @@ object AnitaExtraFarmingFortune {
         "You have: \\+(?<farmingFortune>\\d+)${SkyblockStat.FARMING_FORTUNE.hypixelIcon} Farming Fortune",
     )
 
+    /**
+     * REGEX-TEST: Click to trade!
+     */
+    private val clickToTradePattern by patternGroup.pattern(
+        "clicktotrade",
+        "Click to trade!",
+    )
+
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
 
     @HandleEvent
@@ -87,7 +95,7 @@ object AnitaExtraFarmingFortune {
         }
         jacobTickets = (contributionFactor * jacobTickets).toInt()
 
-        val index = event.toolTip.lastIndex - 1
+        val index = event.toolTip.indexOfFirst { clickToTradePattern.matches(it) }.let { it - 1 }
         if (index < 0) return
 
         val price = jacobTickets * "JACOBS_TICKET".toInternalName().getPrice()
@@ -114,11 +122,11 @@ object AnitaExtraFarmingFortune {
         lore: List<String>,
     ): ExtraFarmingFortuneLore? {
         val farmingFortune = farmingFortunePattern.firstMatcher(lore) {
-             group("farmingFortune").toInt()
+            group("farmingFortune").toInt()
         } ?: 0
 
         var contributionFactor = realAmountPattern.firstMatcher(lore) {
-             group("realAmount").formatDouble()
+            group("realAmount").formatDouble()
         } ?: return null
 
         val nextUpgrade = farmingFortune / 4 + 1
