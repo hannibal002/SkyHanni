@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity
 
 /**
  * Event that is called when an entity's equipment changes.
+ * This refers to armor and held item, not SkyBlock equipment.
  *
  * @param T The type of the entity.
  * @property entity The entity whose equipment changed.
