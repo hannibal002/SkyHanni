@@ -189,8 +189,8 @@ object PlayerNameFormatter {
 
         var emblemFormat: Component? = null
         emblemPattern.matchStyledMatcher(author) {
-            emblemFormat = componentOrThrow("emblem")
-            cleanAuthor = groupOrThrow("author").stripHypixelMessage()
+            emblemFormat = component("emblem")
+            cleanAuthor = group("author").stripHypixelMessage()
         }
 
         val name = formatAuthor(cleanAuthor, levelColor)

@@ -95,14 +95,14 @@ class ComponentMatcher internal constructor(
     /**
      * Return a span equivalent to the entire match found by [matches] or [find]
      */
-    fun group(): ComponentSpan {
+    fun groupOrNull(): ComponentSpan {
         return this.span.slice(matcher.start(), matcher.end())
     }
 
     /**
      * Return a span equivalent to the group with the given index found by [matches] or [find]
      */
-    fun group(index: Int): ComponentSpan? {
+    fun groupOrNull(index: Int): ComponentSpan? {
         val start = matcher.start(index)
         if (start < 0) return null
         return this.span.slice(start, matcher.end(index))
@@ -111,7 +111,7 @@ class ComponentMatcher internal constructor(
     /**
      * Return a span equivalent to the group with the given name found by [matches] or [find]
      */
-    fun group(name: String): ComponentSpan? {
+    fun groupOrNull(name: String): ComponentSpan? {
         val start = try {
             matcher.start(name)
         } catch (_: IllegalArgumentException) {
@@ -124,24 +124,24 @@ class ComponentMatcher internal constructor(
     /**
      * Return a span equivalent to the group with the given name found by [matches] or [find]
      */
-    fun component(name: String): Component? {
-        return group(name)?.intoComponent()
+    fun componentOrNull(name: String): Component? {
+        return groupOrNull(name)?.intoComponent()
     }
 
     /**
      * Return a span equivalent to the group with the given name found by [matches] or [find].
      * Returns not nullable object, or throws an error.
      */
-    fun groupOrThrow(name: String): ComponentSpan {
-        return group(name) ?: error("group '$name' not found in ComponentSpan!")
+    fun group(name: String): ComponentSpan {
+        return groupOrNull(name) ?: error("group '$name' not found in ComponentSpan!")
     }
 
     /**
      * Return a IChatComponent equivalent to the group with the given name found by [matches] or [find].
      * Returns not nullable object, or throws an error.
      */
-    fun componentOrThrow(name: String): Component {
-        return groupOrThrow(name).intoComponent()
+    fun component(name: String): Component {
+        return group(name).intoComponent()
     }
 }
 
@@ -323,5 +323,4 @@ class ComponentSpan internal constructor(
             return ComponentSpan("".asComponent(), "", 0, 0)
         }
     }
-
 }

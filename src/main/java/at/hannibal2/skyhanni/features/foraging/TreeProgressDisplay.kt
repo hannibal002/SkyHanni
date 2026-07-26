@@ -65,8 +65,8 @@ object TreeProgressDisplay {
     }
 
     private fun ComponentMatcher.formatCompact(): Component {
-        val treeType = componentOrThrow("treeType")
-        val percent = groupOrThrow("percent")
+        val treeType = component("treeType")
+        val percent = group("percent")
         val percentStyle = percent.sampleStyleAtStart()
 
         return componentBuilder {
