@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.slayer.blaze
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
+import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -30,9 +30,10 @@ object FirePillarDisplay {
     private var entityId: Int = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onEntityCustomNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
         if (!config.firePillarDisplay) return
-        val seconds = entityNamePattern.matchGroup(event.newName ?: return, "seconds") ?: return
+        val name = event.newName ?: return
+        val seconds = entityNamePattern.matchGroup(name, "seconds") ?: return
         entityId = event.entity.id
         display = Renderable.text("§cFire Pillar: §b${seconds}s")
     }

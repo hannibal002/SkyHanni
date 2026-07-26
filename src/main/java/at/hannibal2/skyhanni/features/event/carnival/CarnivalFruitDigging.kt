@@ -6,10 +6,11 @@ import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFilledBoundingBox
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.BlockPos
-import net.minecraft.world.entity.decoration.ArmorStand
 import net.minecraft.world.entity.item.ItemEntity
 import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
@@ -370,12 +369,12 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
         if (!isEnabled()) return
 
         // Armor stand appears when a fruit is dug or exposed by watermelon
         val entity = event.entity
-        val name = event.newName?.removeColor() ?: return
+        val name = entity.cleanName
         if (name.isBlank()) return
 
         val pos = entity.blockPosition().toLorenzVec()

@@ -2,8 +2,18 @@ package at.hannibal2.skyhanni.events.entity
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.world.entity.Entity
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import net.minecraft.network.chat.Component
 
+/**
+ * Event that is fired when an entity's custom name is updated.
+ *
+ * @param T The type of the entity.
+ * @property entity The entity whose custom name was updated.
+ * @property newName The new custom name of the entity, or null if the name was removed.
+ */
+@PrimaryFunction("onEntityNameUpdate")
 data class EntityCustomNameUpdateEvent<T : Entity>(
     val entity: T,
-    val newName: String?,
+    val newName: Component?,
 ) : GenericSkyHanniEvent<T>(entity.javaClass)

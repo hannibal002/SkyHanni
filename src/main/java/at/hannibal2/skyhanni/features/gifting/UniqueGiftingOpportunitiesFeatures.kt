@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
+import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -55,7 +55,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
     private const val HAS_GIFTED_NAMETAG = "§c§lꤥ"
 
-    private fun analyzeArmorStand(entity: ArmorStand) {
+    private fun analyzeArmorStand(entity: Entity) {
         if (!config.useArmorStandDetection) return
         if (entity.name.formattedTextCompatLessResets() != HAS_GIFTED_NAMETAG) return
 
@@ -65,7 +65,7 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
         analyzeArmorStand(event.entity)
     }
 

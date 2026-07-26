@@ -22,6 +22,6 @@ public class MixinLivingEntity {
 
     @Inject(method = "setItemSlot", at = @At("TAIL"))
     public void setItemStack(EquipmentSlot equipment, ItemStack itemStack, CallbackInfo ci) {
-        new EntityEquipmentChangeEvent<>((Entity) (Object) this, equipment.getId(), itemStack).post();
+        new EntityEquipmentChangeEvent<>((LivingEntity) (Object) this, equipment.getId(), itemStack).post();
     }
 }

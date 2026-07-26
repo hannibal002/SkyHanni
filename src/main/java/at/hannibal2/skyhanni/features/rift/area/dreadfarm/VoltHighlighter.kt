@@ -40,10 +40,10 @@ object VoltHighlighter {
 
     private const val LIGHTNING_DISTANCE = 7F
     private val CHARGE_TIME = 12.seconds
-    private var chargingSince = mapOf<Entity, SimpleTimeMark>()
+    private var chargingSince = mapOf<LivingEntity, SimpleTimeMark>()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
-    fun onArmorChange(event: EntityEquipmentChangeEvent<Entity>) {
+    fun onArmorChange(event: EntityEquipmentChangeEvent<LivingEntity>) {
         if (!config.voltWarning) return
         if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
             event.entity.distanceSqToPlayer() <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
@@ -105,7 +105,7 @@ object VoltHighlighter {
         }
     }
 
-    private fun getVoltState(entity: Entity): VoltState {
+    private fun getVoltState(entity: LivingEntity): VoltState {
         if (entity !is ArmorStand) return VoltState.NO_VOLT
         val helmet = entity.getStandHelmet() ?: return VoltState.NO_VOLT
         return getVoltState(helmet)

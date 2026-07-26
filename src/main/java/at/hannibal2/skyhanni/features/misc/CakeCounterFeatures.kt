@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.world.entity.decoration.ArmorStand
@@ -98,9 +98,9 @@ object CakeCounterFeatures {
     private var lastSoulFoundBySelf = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val entity = event.entity
-        val name = entity.name.formattedTextCompatLessResets()
+        val name = event.newName ?: return
         val entityId = entity.id
 
         if (cakesEatenEntityId == null) {
@@ -141,7 +141,7 @@ object CakeCounterFeatures {
 
         val nearbyArmorStands = cakesStand.blockPosition().toLorenzVec().getEntitiesNearby<ArmorStand>(1.0)
         soulsStandExists = nearbyArmorStands.any { armorStand ->
-            soulsFoundPattern.matchMatcher(armorStand.name.formattedTextCompatLessResets()) {
+            soulsFoundPattern.matchMatcher(armorStand.cleanName) {
                 soulsFoundEntityId = armorStand.id
                 ChatUtils.debug("Found \"Souls Found\" entity (from \"Cakes Eaten\" location)")
                 updateSoulsFound()
