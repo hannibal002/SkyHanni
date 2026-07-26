@@ -67,6 +67,7 @@ object CFBlockOpen {
             EffectDurationChangeType.ADD -> chocolateFactory.hotChocolateMixinExpiry + event.duration
             EffectDurationChangeType.REMOVE -> SimpleTimeMark.farPast()
             EffectDurationChangeType.SET -> SimpleTimeMark.now() + event.duration
+            else -> chocolateFactory.hotChocolateMixinExpiry
         }
     }
 
