@@ -140,7 +140,7 @@ object EffectApi {
      */
     private val remainingPattern by RepoPattern.pattern(
         "effects.remaining",
-        "^.*Remaining: (?<time>.+)$",
+        ".*Remaining: (?<time>.+)$",
     )
     // </editor-fold>
 
