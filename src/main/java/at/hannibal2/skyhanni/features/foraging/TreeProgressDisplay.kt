@@ -5,14 +5,14 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.AllEntitiesGetter
+import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.compat.append
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -51,15 +51,27 @@ object TreeProgressDisplay {
             return
         }
         for (entity in EntityUtils.getEntities<ArmorStand>()) {
-            val name = entity.displayName.formattedTextCompat().removeColor()
-            currentTreeProgressPattern.matchMatcher(name) {
+            val displayName = entity.displayName
+
+            currentTreeProgressPattern.matchStyledMatcher(displayName) {
                 display = if (config.compact) {
-                    Renderable.text("${group("treeType")} §b§l${group("percent")}%")
+                    val treeType = componentOrThrow("treeType")
+                    val percent = groupOrThrow("percent")
+                    val percentStyle = percent.sampleStyleAtStart()
+                    Renderable.text(
+                        componentBuilder {
+                            append(treeType)
+                            append(" ")
+                            append(percent.intoComponent())
+                            append("%") {
+                                style = percentStyle
+                            }
+                        }
+                    )
                 } else {
-                    Renderable.text(name)
+                    Renderable.text(displayName)
                 }
                 return
-
             }
         }
         display = null
