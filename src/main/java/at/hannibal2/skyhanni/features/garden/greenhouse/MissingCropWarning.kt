@@ -237,14 +237,14 @@ object MissingCropWarning {
         saveDetectedCropPositions(plot.id, scannedPositions)
         savePendingData()
 
-        val presentAcrossGreenhouses = detectedCropsByPlot().values
-            .flatten()
-            .mapNotNullTo(mutableSetOf(), CropCategory::fromStorageName)
-        val missingAtRememberedPositions = missingRememberedCropPositionsOnPlot(plot.id)
-        val missing = CropCategory.entries.toSet() - presentAcrossGreenhouses - diagnosedPresentCrops(plot.id) +
-            missingAtRememberedPositions.keys
+        val presentAcrossGreenhouses = detectedCropsByPlot().flatMapTo(mutableSetOf()) { (plotId, names) ->
+            val missingOnPlot = if (plotId == plot.id) missingRememberedCropPositionsOnPlot(plotId).keys else emptySet()
+            names.mapNotNull(CropCategory::fromStorageName).filterNot { it in missingOnPlot }
+        }
+        val missing = CropCategory.entries.toSet() - presentAcrossGreenhouses - diagnosedPresentCrops(plot.id)
         if (!hasCompletedLoadedPlotSweep) return
-        missingCropWaypoints = missingAtRememberedPositions
+        missingCropWaypoints = missingRememberedCropPositionsOnPlot(plot.id)
+            .filterKeys { it in missing }
         if (missing == lastReportedMissing) return
         lastReportedMissing = missing
 
@@ -268,7 +268,8 @@ object MissingCropWarning {
         val to = BlockPos(middle.x + SCAN_RADIUS, MAX_GARDEN_Y, middle.z + SCAN_RADIUS)
         return buildMap {
             for (pos in BlockPos.betweenClosed(from, to)) {
-                CropCategory.fromBlock(world.getBlockState(pos).block)?.let {
+                val block = world.getBlockState(pos).block
+                CropCategory.fromBlock(block)?.let {
                     putIfAbsent(it, pos.toLorenzVec())
                 }
                 if (size == CropCategory.entries.size) return@buildMap
@@ -290,22 +291,27 @@ object MissingCropWarning {
         getEntitiesInBoundingBox<ArmorStand>(scanArea).forEach { stand ->
             listOf(stand.getStandHelmet(), stand.getHandItem())
                 .firstNotNullOfOrNull { it.floatingCropHeadCategory() }
-                ?.let { putIfAbsent(it, stand.getLorenzVec()) }
+                ?.let { this[it] = stand.getLorenzVec() }
         }
         getEntitiesInBoundingBox<Display.ItemDisplay>(scanArea).forEach { display ->
             display.itemStack.floatingCropHeadCategory()?.let {
-                putIfAbsent(it, display.getLorenzVec())
+                this[it] = display.getLorenzVec()
             }
         }
     }
 
     private fun scanAllLoadedGreenhouses(): Map<Int, Set<String>> {
         val sweep = mutableMapOf<Int, Set<String>>()
+        val currentPlotId = GardenPlotApi.getCurrentPlot()?.id
         for (plot in GardenPlotApi.plots.filter { it.greenhouse }) {
             if (!isCompleteScanAreaLoaded(plot)) continue
             val scannedPositions = scanGreenhousePositions(plot)
             val presentNames = (scannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id))
                 .mapTo(mutableSetOf()) { it.name }
+            if (plot.id != currentPlotId) {
+                detectedCropsByPlot()[plot.id].orEmpty()
+                    .filterTo(presentNames) { CropCategory.fromStorageName(it) in floatingHeadCrops }
+            }
             sweep[plot.id] = presentNames
             saveDetectedCropPositions(plot.id, scannedPositions)
             if (runtimeDetectedCropsByPlot[plot.id] == presentNames) continue
@@ -397,18 +403,18 @@ object MissingCropWarning {
             category in diagnosticOnlyCrops -> {
                 val hasNearbyCrop = findNearbyCropPosition(category, this) != null
                 val hasFloatingHead = category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category)
-                !hasNearbyCrop && !hasFloatingHead && state.isAir
+                !hasNearbyCrop && !hasFloatingHead
             }
 
-            state.isAir && category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category) -> false
+            category in floatingHeadCrops && hasFloatingHeadAtCropPosition(category) -> false
 
-            category in variableHeightCrops && state.isAir -> {
+            category in variableHeightCrops -> {
                 (-VARIABLE_HEIGHT_SEARCH_RADIUS..VARIABLE_HEIGHT_SEARCH_RADIUS).none { yOffset ->
                     CropCategory.fromBlock(add(y = yOffset).getBlockStateAt().block) == category
                 }
             }
 
-            else -> state.isAir
+            else -> CropCategory.fromBlock(state.block) != category
         }
     }
 
@@ -449,6 +455,7 @@ object MissingCropWarning {
             name.startsWith("sunflower") || name.startsWith("moonflower") -> CropCategory.SUNFLOWER
             name.startsWith("coco") -> CropCategory.COCOA_BEANS
             name.startsWith("pumpkin") -> CropCategory.PUMPKIN
+            name.removePrefix("melon").toIntOrNull() != null -> CropCategory.MELON
             else -> null
         }
     }
@@ -628,7 +635,7 @@ object MissingCropWarning {
             "Pumpkin",
             setOf(Blocks.PUMPKIN, Blocks.CARVED_PUMPKIN, Blocks.PUMPKIN_STEM, Blocks.ATTACHED_PUMPKIN_STEM),
         ),
-        MELON("Melon", setOf(Blocks.MELON, Blocks.MELON_STEM, Blocks.ATTACHED_MELON_STEM), "Melon Slice"),
+        MELON("Melon", setOf(Blocks.MELON), "Melon Slice"),
         COCOA_BEANS("Cocoa Beans", setOf(Blocks.COCOA)),
         SUGAR_CANE("Sugar Cane", setOf(Blocks.SUGAR_CANE)),
         CACTUS("Cactus", setOf(Blocks.CACTUS)),
@@ -658,6 +665,7 @@ object MissingCropWarning {
         CropCategory.SUNFLOWER,
         CropCategory.COCOA_BEANS,
         CropCategory.PUMPKIN,
+        CropCategory.MELON,
     )
     private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
     private val greenhouseStemBlocks = setOf(
