@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.events.entity
 
 import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import net.minecraft.world.entity.LivingEntity
 
 /**
@@ -11,4 +12,5 @@ import net.minecraft.world.entity.LivingEntity
  * @param T The type of the entity that died.
  * @property entity The entity that died.
  */
+@PrimaryFunction("onEntityDeath")
 class EntityDeathEvent<T : LivingEntity>(val entity: T) : GenericSkyHanniEvent<T>(entity.javaClass)
