@@ -436,16 +436,14 @@ object GardenNextJacobContest {
         TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
-        val cropTextNoColor = crops.joinToString(", ") {
-            if (it == boostedCrop) "<b>${it.cropName}</b>" else it.cropName
-        }
         if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            CoroutineSettings("garden jacob contest openPopupWindow").launchCoroutine {
-                DialogUtils.openPopupWindow(
-                    title = "SkyHanni Jacob Contest Notification",
-                    message = "<html>Farming Contest soon!<br />Crops: $cropTextNoColor</html>",
-                )
+            val cropTextNoColor = crops.joinToString(", ") {
+                if (it == boostedCrop) "${it.cropName} (boosted)" else it.cropName
             }
+            DialogUtils.openPopupWindow(
+                title = "SkyHanni Jacob Contest Notification",
+                message = "Farming Contest soon!\nCrops: $cropTextNoColor",
+            )
         }
     }
 
