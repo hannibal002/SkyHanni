@@ -14,7 +14,7 @@ class TreeProgressConfig {
     @ConfigOption(name = "Tree Progress Display", desc = "Displays your tree progress on screen.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var enabled: Property<Boolean> = Property.of(true)
+    val enabled: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigLink(owner = TreeProgressConfig::class, field = "enabled")
