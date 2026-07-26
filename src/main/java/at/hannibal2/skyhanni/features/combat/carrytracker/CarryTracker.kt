@@ -677,6 +677,6 @@ object CarryTracker {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(139, "misc.carryPosition", "combat.carryTracker.display")
+        event.move(139, "misc.carryPosition", "combat.carryTracker.position")
     }
 }
