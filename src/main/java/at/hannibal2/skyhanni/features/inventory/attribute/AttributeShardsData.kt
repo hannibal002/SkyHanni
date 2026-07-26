@@ -57,23 +57,74 @@ object AttributeShardsData {
 
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
-    ) { name -> name == "Attribute Menu" }
+    ) { attributeMenuPattern }
     val huntingBoxInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { name -> name == "Hunting Box" }
+    ) { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
-        pattern = "\\(\\d+/\\d+\\) Oddities ➜ Shards".toPattern(),
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
-    )
+    ) { bazaarShardsInventoryPattern }
     val confirmFusionInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { FusionData.updateFusionData() } },
-    ) { name -> name == "Confirm Fusion" }
-    val fusionBoxInventory = InventoryDetector { name -> name == "Fusion Box" }
-    val shardFusionInventory = InventoryDetector { name -> name == "Shard Fusion" }
+    ) { confirmFusionPattern }
+    val fusionBoxInventory = InventoryDetector { fusionBoxPattern }
+    val shardFusionInventory = InventoryDetector { shardFusionPattern }
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
+
+    /**
+     * REGEX-TEST: (1/3) Oddities ➜ Shards
+     * REGEX-TEST: Oddities ➜ Shards
+     */
+    val bazaarShardsInventoryPattern by patternGroup.pattern(
+        "bazaar.shards.inventory",
+        "(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards",
+    )
+
+    /**
+     * REGEX-TEST: Attribute Menu
+     * REGEX-TEST: (1/3) Attribute Menu
+     * REGEX-TEST: (11/13) Attribute Menu
+     */
+    private val attributeMenuPattern by patternGroup.pattern(
+        "attribute-menu",
+        "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
+    )
+
+    /**
+     * REGEX-TEST: Hunting Box
+     * REGEX-TEST: (1/3) Hunting Box
+     * REGEX-TEST: (10/13) Hunting Box
+     */
+    private val huntingBoxPattern by patternGroup.pattern(
+        "hunting-box",
+        "(?:\\(\\d+/\\d+\\) )?Hunting Box",
+    )
+
+    /**
+     * REGEX-TEST: Confirm Fusion
+     */
+    private val confirmFusionPattern by patternGroup.pattern(
+        "confirm-fusion",
+        "Confirm Fusion",
+    )
+
+    /**
+     * REGEX-TEST: Fusion Box
+     * REGEX-TEST: (1/3) Fusion Box
+     * REGEX-TEST: (10/13) Fusion Box
+     */
+    private val fusionBoxPattern by patternGroup.pattern(
+        "fusion-box",
+        "(?:\\(\\d+/\\d+\\) )?Fusion Box",
+    )
+
+    private val shardFusionPattern by patternGroup.pattern(
+        "shard-fusion",
+        "Shard Fusion",
+    )
 
     /**
      * REGEX-TEST: §6Nature Elemental

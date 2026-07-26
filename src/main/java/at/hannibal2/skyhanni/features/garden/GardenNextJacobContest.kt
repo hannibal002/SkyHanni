@@ -72,7 +72,7 @@ object GardenNextJacobContest {
     private val profileStorage get() = SkyHanniMod.feature.storage
     private val config get() = GardenApi.config.jacobContest.nextContest
     private val patternGroup = RepoPattern.group("garden.nextcontest")
-    private val calendarDetector by lazy { InventoryDetector(monthPattern) }
+    private val calendarDetector by lazy { InventoryDetector { monthPattern } }
     private val haveAllContests get() = knownContests.size == MAX_CONTESTS_PER_YEAR
     private val nextContest
         get() = knownContests.filterNot {

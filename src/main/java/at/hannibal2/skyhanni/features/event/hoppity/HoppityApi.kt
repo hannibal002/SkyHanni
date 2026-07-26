@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTr
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.stray.CFStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
@@ -125,12 +126,31 @@ object HoppityApi {
     )
 
     /**
+     * REGEX-TEST: Chocolate Factory
+     */
+    val chocolateFactoryInvPattern by CFApi.patternGroup.pattern(
+        "inventory.chocolatefactory",
+        "Chocolate Factory",
+    )
+
+    /**
      * REGEX-TEST: Rabbit Hitman
      */
     val hitmanInventoryPattern by CFApi.patternGroup.pattern(
         "hitman.inventory",
         "(?:§.)*Rabbit Hitman",
     )
+
+    /**
+     * REGEX-TEST: Hoppity
+     */
+    val hoppityInventoryPattern by CFApi.patternGroup.pattern(
+        "hoppity.inventory",
+        "Hoppity",
+    )
+
+    val hoppityDetector = InventoryDetector { hoppityInventoryPattern }
+
     // </editor-fold>
 
     data class HoppityStateDataSet(
@@ -227,7 +247,7 @@ object HoppityApi {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!checkNextInvOpen) return
         checkNextInvOpen = false
-        if (event.inventoryName != "Hoppity") return
+        if (!hoppityDetector.isInside()) return
         lastHoppityCallAccept = SimpleTimeMark.now()
     }
 
