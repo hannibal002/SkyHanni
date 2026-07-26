@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
@@ -27,11 +26,8 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
 
 @SkyHanniModule
 object EffectApi {
@@ -222,10 +218,8 @@ object EffectApi {
         if (!event.isWidget(TabWidget.PESTS)) return
 
         repellentPattern.firstMatcher(event.lines.map { it.string }) {
-            // Update repellent timer when near expiration to sync with the in-game countdown delay (which is slow)
-            val time = group("time")?.toIntOrNull() ?: return@firstMatcher
+            val duration = TimeUtils.getDurationOrNull(group("time")) ?: return@firstMatcher
             val tier = group("tier").uppercase()
-            val duration = time.toDuration(DurationUnit.SECONDS)
             val propTier = when (tier) {
                 "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
                 "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
