@@ -225,7 +225,7 @@ object EffectApi {
                 "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
                 else -> return@firstMatcher
             }
-            EffectDurationChangeEvent(propTier, EffectDurationChangeType.SET, duration).post()
+            EffectDurationChangeEvent(propTier, EffectDurationChangeType.PARTIAL_SET, duration).post()
         }
     }
 
@@ -238,7 +238,7 @@ object EffectApi {
             val salt = NonGodPotEffect.entries.firstOrNull {
                 it.tablistNamePattern.pattern() == effect
             } ?: return@matchAll
-            EffectDurationChangeEvent(salt, EffectDurationChangeType.SET, duration).post()
+            EffectDurationChangeEvent(salt, EffectDurationChangeType.PARTIAL_SET, duration).post()
         }
     }
 

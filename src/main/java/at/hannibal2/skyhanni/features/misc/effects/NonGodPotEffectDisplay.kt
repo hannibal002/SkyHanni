@@ -31,6 +31,8 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -84,6 +86,44 @@ object NonGodPotEffectDisplay {
 
             EffectDurationChangeType.REMOVE -> {
                 effectDuration.remove(event.effect)
+            }
+
+            EffectDurationChangeType.PARTIAL_SET -> {
+                val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
+                if (existing == Duration.ZERO) {
+                    effectDuration[event.effect] = Timer(duration)
+                    return
+                }
+                val existingMinutes = existing.inWholeMinutes % 60
+                val existingSeconds = existing.inWholeSeconds % 60
+                val newHours = duration.inWholeHours
+                val newMinutes = duration.inWholeMinutes % 60
+                val hasSeconds = duration.inWholeSeconds % 60 != 0L
+                val hasMinutes = newMinutes != 0L || hasSeconds
+                val hasHours = newHours != 0L
+                val result = when {
+                    // Full precision update (contains seconds)
+                    hasSeconds -> {
+                        duration
+                    }
+                    // Minutes are known, seconds are not
+                    hasMinutes -> {
+                        newHours.hours +
+                            newMinutes.minutes +
+                            existingSeconds.seconds
+                    }
+                    // Only hours are known
+                    hasHours -> {
+                        newHours.hours +
+                            existingMinutes.minutes +
+                            existingSeconds.seconds
+                    }
+                    // Zero duration
+                    else -> {
+                        duration
+                    }
+                }
+                effectDuration[event.effect] = Timer(result)
             }
         }
         update()
