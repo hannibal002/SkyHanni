@@ -369,7 +369,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
+    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         if (!isEnabled()) return
 
         // Armor stand appears when a fruit is dug or exposed by watermelon

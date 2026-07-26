@@ -65,7 +65,7 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
+    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         analyzeArmorStand(event.entity)
     }
 

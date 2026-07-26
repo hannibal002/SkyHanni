@@ -57,7 +57,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onTextDisplayRemoved(event: EntityTextRemovedEvent) {
+    fun onEntityTextRemoved(event: EntityTextRemovedEvent) {
         if (!config.enabled.get()) return
         if (event.entity.id == displayEntityId) {
             display = null
@@ -66,7 +66,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
+    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         if (!config.enabled.get()) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
             display = null

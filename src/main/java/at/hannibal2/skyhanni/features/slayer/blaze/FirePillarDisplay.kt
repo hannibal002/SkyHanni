@@ -30,7 +30,7 @@ object FirePillarDisplay {
     private var entityId: Int = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
+    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         if (!config.firePillarDisplay) return
         val name = event.newName ?: return
         val seconds = entityNamePattern.matchGroup(name, "seconds") ?: return
