@@ -22,7 +22,7 @@ data class TextDisplayUpdateEvent(
 /**
  * Event that is fired when a text display entity is removed from the world.
  * This includes both text display and armor stand entities, as they can both have custom names.
- * Only Fires in Hypixel Skyblock
+ * Only fires on SkyBlock.
  *
  * @property entity The entity that was removed.
  */
