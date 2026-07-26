@@ -70,10 +70,8 @@ object PestRoute {
             visibleRoute.forEachIndexed { index, pest ->
                 val location = pest.location
                 val rightClicks = (previousLocation.distance(location) / RIGHT_CLICK_TELEPORT_DISTANCE).toInt()
-                val rightClickLabelLocation =
-                    previousLocation + (location - previousLocation) * RIGHT_CLICK_LABEL_SEGMENT_POSITION
                 event.drawDynamicText(
-                    rightClickLabelLocation.add(y = 1.0),
+                    location.add(y = 0.75),
                     "§8[§e§l$rightClicks RC§8]",
                     scaleMultiplier = 1.35,
                     yOff = RIGHT_CLICK_LABEL_SCREEN_OFFSET,
@@ -238,8 +236,7 @@ object PestRoute {
     private const val MAX_EXACT_PESTS = 10
     private const val PEST_VIEW_DISTANCE = 400
     private const val RIGHT_CLICK_TELEPORT_DISTANCE = 12.0
-    private const val RIGHT_CLICK_LABEL_SEGMENT_POSITION = 0.35
-    private const val RIGHT_CLICK_LABEL_SCREEN_OFFSET = 10f
+    private const val RIGHT_CLICK_LABEL_SCREEN_OFFSET = 14f
     private const val MIN_ETHERWARP_DISTANCE = 8.0
     private const val MAX_ETHERWARP_DISTANCE = 61.0
     private const val TARGET_SEARCH_RADIUS = 4
