@@ -71,6 +71,14 @@ object SlayerApi {
         "rngmeter.type",
         "(?<type>.+) RNG Meter",
     )
+
+    /**
+     * REGEX-TEST: Slayer
+     */
+    val inventoryNamePattern by patternGroup.pattern(
+        "inventory.name",
+        "Slayer",
+    )
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
@@ -124,9 +132,26 @@ object SlayerApi {
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
-    const val SLAYER_COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
+    const val COST_REDUCTION = 0.96 // -4% from Slayer Bonus Rewards level 7
     const val BREWERY_CONTRIBUTION_REDUCTION = 0.95 // -5% from contributing to the brewery community project
-    const val SLAYER_COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
+    const val COST_REDUCTION_LEVEL = 7 // Slayer Bonus Rewards level required to get the -4% discount
+
+    var bonusRewardsLevel: Int
+        get() {
+            return ProfileStorageData.profileSpecific?.slayer?.bonusRewardsLevel ?: 0
+        }
+        set(value) {
+            ProfileStorageData.profileSpecific?.slayer?.bonusRewardsLevel = value
+        }
+
+    var breweryContribution: Boolean
+        get() {
+            return ProfileStorageData.profileSpecific?.slayer?.breweryContributionReduction == true
+        }
+        set(value) {
+            ProfileStorageData.profileSpecific?.slayer?.breweryContributionReduction = value
+        }
+
 
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST

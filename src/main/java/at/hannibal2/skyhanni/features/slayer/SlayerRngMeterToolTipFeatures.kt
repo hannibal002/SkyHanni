@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
@@ -14,9 +13,11 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcherWithIndex
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -41,7 +42,7 @@ object SlayerRngMeterToolTipFeatures {
      * REGEX-TEST: Odds: RNGesus Incarnate (0.0136% 0.0174%)
      * REGEX-TEST: Odds: Occasional (13.6082%)
      */
-    private val toolTipOddsPattern by patternGroup.pattern(
+    private val oddsPattern by patternGroup.pattern(
         "rngmeter.tooltip.odds",
         "Odds: [^(]+\\((?<primary>\\d{1,2}\\.?\\d{0,4})%(?: (?<secondary>\\d{1,2}\\.?\\d{0,4})%)?\\)",
     )
@@ -50,7 +51,7 @@ object SlayerRngMeterToolTipFeatures {
      * REGEX-TEST: Tier V amount: 1 to 2
      * REGEX-TEST: Tier IV amount: 32 to 48
      */
-    private val toolTipAmountPattern by patternGroup.pattern(
+    private val amountPattern by patternGroup.pattern(
         "rngmeter.tooltip.amount",
         "Tier (?<tier>.{1,2}) amount: (?<min>\\d{1,3})(?: to (?<max>\\d{1,3}))?",
     )
@@ -60,7 +61,7 @@ object SlayerRngMeterToolTipFeatures {
      */
     private val bonusRewardsItemNamePattern by patternGroup.pattern(
         "bonus.item.name",
-        "Slayer Bonus Rewards"
+        "Slayer Bonus Rewards",
     )
 
     /**
@@ -69,6 +70,12 @@ object SlayerRngMeterToolTipFeatures {
     private val bonusRewardsLevelPattern by patternGroup.pattern(
         "bonus.tooltip.level",
         "✔ LVL (?<level>\\d)",
+    )
+
+    private data class OddsInfo(
+        val primary: String,
+        val secondary: String?,
+        val toolTipIndex: Int,
     )
 
     @HandleEvent
@@ -83,54 +90,65 @@ object SlayerRngMeterToolTipFeatures {
         val slayerType = SlayerType.getByName(slayerName)
 
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
-
-        var minItemPrice = 0.0
-        var maxItemPrice: Double? = null
-        var spawnCost = 0.0
-        var scoreGainedPer = 0.0
-        var scoreNeeded = 0L
+        val oddsInfo = getOddsInformation(event.toolTipStrings.value) ?: return
 
         if (coinsPerBoss) {
             val slayerCosts = SlayerApi.slayerJsonData?.spawnCosts?.get(slayerType)
             val maxTier = slayerCosts?.keys?.maxOrNull()
             val tierToCalculateFor = SlayerApi.tier.takeIf { it != 0 } ?: maxTier ?: return
-            spawnCost = slayerType?.calculateSpawnCost(tierToCalculateFor) ?: return
+            val spawnCost = slayerType?.calculateSpawnCost(tierToCalculateFor) ?: return
 
-            // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for
-            // if it is found or the highest amount dropped overall.
-            loop@ for (line in event.toolTip.map { it.string }) {
-                toolTipAmountPattern.matchMatcher(line) {
-                    minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
-                    maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
-                        SlayerApi.getItemNameAndPrice(internalName, it).second
-                    }
-                    if (group("tier").romanToDecimal() == tierToCalculateFor) break@loop
-                }
-            }
+            val (minItemPrice, maxItemPrice) = loopThroughDropAmounts(event.toolTipStrings.value, internalName, tierToCalculateFor)
 
             val xpBuff = Perk.SLAYER_XP_BUFF.isActive
             val baseGained = SlayerApi.slayerJsonData?.xpGains?.get(slayerType)?.get(tierToCalculateFor) ?: return
-            scoreGainedPer = baseGained * (if (xpBuff) 1.25 else 1.0)
-            scoreNeeded = SlayerRngMeterDisplay.rngScore[slayerName]?.get(internalName) ?: return
+            val scoreGainedPer = baseGained * (if (xpBuff) 1.25 else 1.0)
+            val scoreNeeded = SlayerRngMeterDisplay.rngScore[slayerName]?.get(internalName) ?: return
+
+            event.toolTip.addProfitPerBoss(oddsInfo.toolTipIndex, scoreNeeded, scoreGainedPer, spawnCost, minItemPrice, maxItemPrice)
         }
 
-        for ((index, line) in event.toolTip.withIndex()) {
-            toolTipOddsPattern.matchMatcher(line) {
-                if (convertToFractions) {
-                    event.toolTip.replaceOddsWithFractions(index, group("primary"), groupOrNull("secondary"))
+        if (convertToFractions) event.toolTip.replaceOddsWithFractions(oddsInfo)
+    }
+
+    private fun getOddsInformation(toolTipStrings: List<String>): OddsInfo? =
+        oddsPattern.firstMatcherWithIndex(toolTipStrings) { toolTipIndex ->
+            val primary = group("primary")
+            val secondary = groupOrNull("secondary")
+            OddsInfo(
+                primary,
+                secondary,
+                toolTipIndex,
+            )
+        }
+
+    // This goes through the list of drops per tier in the tooltip and uses the tier that we're currently calculating for
+    // if it is found or the highest amount dropped overall.
+    private fun loopThroughDropAmounts(
+        toolTipStrings: List<String>,
+        internalName: NeuInternalName,
+        tierToCalculateFor: Int,
+    ): Pair<Double, Double?> {
+        var minItemPrice = 0.0
+        var maxItemPrice: Double? = null
+
+        for (line in toolTipStrings) {
+            amountPattern.matchMatcher(line) {
+                minItemPrice = SlayerApi.getItemNameAndPrice(internalName, group("min").formatInt()).second
+                maxItemPrice = groupOrNull("max")?.formatIntOrNull()?.let {
+                    SlayerApi.getItemNameAndPrice(internalName, it).second
                 }
 
-                if (coinsPerBoss) {
-                    event.toolTip.addProfitPerBoss(index, scoreNeeded, scoreGainedPer, spawnCost, minItemPrice, maxItemPrice)
-                }
-                return
+                if (group("tier").romanToDecimal() == tierToCalculateFor) break
             }
         }
+
+        return minItemPrice to maxItemPrice
     }
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Slayer") return
+        if (!SlayerApi.inventoryNamePattern.matches(event.inventoryName)) return
 
         val items = event.inventoryItems
 
@@ -140,7 +158,7 @@ object SlayerRngMeterToolTipFeatures {
             val toolTip = item.getTooltip(false)
 
             bonusRewardsLevelPattern.matchAll(toolTip.map { it.string.removeColor() }) {
-                ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = group("level").formatInt()
+                SlayerApi.bonusRewardsLevel = group("level").formatInt()
             }
         }
     }
@@ -152,24 +170,23 @@ object SlayerRngMeterToolTipFeatures {
         val expectedCoins = SlayerApi.slayerJsonData?.spawnCosts[SlayerApi.activeType]?.get(SlayerApi.tier) ?: return
         val changeNegation = (event.coins * -1).roundToInt()
 
-        val hasSlayerBonusRewards = changeNegation == (expectedCoins * SlayerApi.SLAYER_COST_REDUCTION).roundToInt()
+        val hasSlayerBonusRewards = changeNegation == (expectedCoins * SlayerApi.COST_REDUCTION).roundToInt()
         val hasBartender = changeNegation == (expectedCoins * SlayerApi.BREWERY_CONTRIBUTION_REDUCTION).roundToInt()
 
-        if (hasSlayerBonusRewards) ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel = 7
-        ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction = hasBartender
+        if (hasSlayerBonusRewards) SlayerApi.bonusRewardsLevel = 7
+        SlayerApi.breweryContribution = hasBartender
     }
 
     private fun MutableList<Component>.replaceOddsWithFractions(
-        index: Int,
-        primary: String,
-        secondary: String?,
+        oddsInfo: OddsInfo,
     ) {
+        val (primary, secondary, index) = oddsInfo
         var line = this[index]
-        val firstFraction = primary.toFraction()
-        val secondFraction = secondary?.toFraction()
+        val primaryFraction = primary.toFraction()
+        val secondaryFraction = secondary?.toFraction()
 
-        line = line.replace("$primary%", "1/$firstFraction") ?: line
-        secondary?.let { line = line.replace("$it%", "1/$secondFraction") ?: line }
+        line = line.replace("$primary%", "1/$primaryFraction") ?: line
+        secondary?.let { line = line.replace("$it%", "1/$secondaryFraction") ?: line }
 
         this[index] = line
     }

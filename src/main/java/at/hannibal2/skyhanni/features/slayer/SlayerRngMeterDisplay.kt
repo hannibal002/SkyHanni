@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
@@ -170,9 +171,9 @@ object SlayerRngMeterDisplay {
         update()
     }
 
-    private fun getStorage(): ProfileSpecificStorage.SlayerRngMeterStorage? {
-        return ProfileStorageData.profileSpecific?.slayerRngMeter?.getOrPut(getCurrentSlayer()) {
-            ProfileSpecificStorage.SlayerRngMeterStorage()
+    private fun getStorage(): ProfileSpecificStorage.SlayerStorage.RngMeterStorage? {
+        return ProfileStorageData.profileSpecific?.slayer?.rngMeter?.getOrPut(getCurrentSlayer()) {
+            ProfileSpecificStorage.SlayerStorage.RngMeterStorage()
         }
     }
 
@@ -322,4 +323,10 @@ object SlayerRngMeterDisplay {
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(140, "#profile.slayerRngMeter", "#profile.slayer.rngMeter")
+    }
+
 }

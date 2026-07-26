@@ -137,7 +137,7 @@ object SlayerProfitTracker {
 
         return trackers.getOrPut(category) {
             val getStorage: (ProfileSpecificStorage) -> Data = {
-                it.slayerProfitData.getOrPut(
+                it.slayer.profitData.getOrPut(
                     category,
                 ) { Data() }
             }
@@ -259,6 +259,8 @@ object SlayerProfitTracker {
 
             old
         }
+
+        event.move(140, "#profile.slayerProfitData", "#profile.slayer.profitData")
     }
 
     fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled

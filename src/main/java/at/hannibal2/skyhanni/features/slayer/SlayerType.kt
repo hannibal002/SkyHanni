@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.SlayerApi
 import net.minecraft.world.entity.animal.wolf.Wolf
 import net.minecraft.world.entity.monster.Blaze
@@ -55,15 +54,17 @@ enum class SlayerType(
     ) // previously called "Riftstalker Bloodfiend"
     ;
 
+    // The cost reduction gained by contributing to the Bartender's Brewery project (5%)
+    // overrides the discount gained by having all slayers at level 7 (4%).
     fun calculateSpawnCost(tier: Int): Double? {
         val base = SlayerApi.slayerJsonData?.spawnCosts?.get(this)?.get(tier) ?: return null
 
         val reduction = when {
-            ProfileStorageData.profileSpecific?.slayerBreweryContributionReduction == true ->
+            SlayerApi.breweryContribution ->
                 SlayerApi.BREWERY_CONTRIBUTION_REDUCTION
 
-            ProfileStorageData.profileSpecific?.slayerBonusRewardsLevel == SlayerApi.SLAYER_COST_REDUCTION_LEVEL ->
-                SlayerApi.SLAYER_COST_REDUCTION
+            SlayerApi.bonusRewardsLevel == SlayerApi.COST_REDUCTION_LEVEL ->
+                SlayerApi.COST_REDUCTION
 
             else -> 1.0
         }
