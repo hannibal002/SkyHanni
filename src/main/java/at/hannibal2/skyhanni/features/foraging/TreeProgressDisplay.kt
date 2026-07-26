@@ -46,13 +46,13 @@ object TreeProgressDisplay {
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
     fun onIslandJoin() {
-        display = null
+        clearData()
     }
 
     @HandleEvent
     fun onConfigLoad() {
         config.enabled.onDisable {
-            display = null
+            clearData()
         }
     }
 
@@ -60,8 +60,7 @@ object TreeProgressDisplay {
     fun onEntityTextRemoved(event: EntityTextRemovedEvent) {
         if (!config.enabled.get()) return
         if (event.entity.id == displayEntityId) {
-            display = null
-            displayEntityId = null
+            clearData()
         }
     }
 
@@ -78,6 +77,11 @@ object TreeProgressDisplay {
             displayEntityId = event.entity.id
             display = Renderable.text(component)
         }
+    }
+
+    private fun clearData() {
+        display = null
+        displayEntityId = null
     }
 
     private fun ComponentMatcher.formatCompact(): Component {
