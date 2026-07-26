@@ -6,13 +6,9 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 
 /**
- * A collection of events related to text display entities in Minecraft.
+ * Event that is fired when a text display entity's custom name is updated.
  * This includes both text display and armor stand entities, as they can both have custom names.
  * Only Fires in Hypixel Skyblock
- */
-
-/**
- * Event that is fired when a text display entity's custom name is updated.
  *
  * @property entity The entity whose custom name was updated.
  * @property newName The new custom name of the entity, or null if the name was removed.
@@ -25,6 +21,8 @@ data class TextDisplayUpdateEvent(
 
 /**
  * Event that is fired when a text display entity is removed from the world.
+ * This includes both text display and armor stand entities, as they can both have custom names.
+ * Only Fires in Hypixel Skyblock
  *
  * @property entity The entity that was removed.
  */
