@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.events.entity.EntityRemovedEvent
-import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityTextUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -30,7 +30,7 @@ object FirePillarDisplay {
     private var entityId: Int = 0
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
+    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
         if (!config.firePillarDisplay) return
         val name = event.newName ?: return
         val seconds = entityNamePattern.matchGroup(name, "seconds") ?: return

@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.foraging
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandTypeTag
-import at.hannibal2.skyhanni.events.entity.TextDisplayRemovedEvent
-import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityTextRemovedEvent
+import at.hannibal2.skyhanni.events.entity.EntityTextUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -57,7 +57,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onTextDisplayRemoved(event: TextDisplayRemovedEvent) {
+    fun onTextDisplayRemoved(event: EntityTextRemovedEvent) {
         if (!config.enabled.get()) return
         if (event.entity.id == displayEntityId) {
             display = null
@@ -66,7 +66,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
+    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
         if (!config.enabled.get()) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
             display = null

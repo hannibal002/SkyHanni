@@ -14,7 +14,7 @@ import net.minecraft.world.entity.Entity
  * @property newName The new custom name of the entity, or null if the name was removed.
  */
 @PrimaryFunction("onTextDisplayUpdate")
-data class TextDisplayUpdateEvent(
+data class EntityTextUpdateEvent(
     val entity: Entity,
     val newName: Component?,
 ) : SkyHanniEvent()
@@ -27,6 +27,6 @@ data class TextDisplayUpdateEvent(
  * @property entity The entity that was removed.
  */
 @PrimaryFunction("onTextDisplayRemoved")
-data class TextDisplayRemovedEvent(
+data class EntityTextRemovedEvent(
     val entity: Entity,
 ) : SkyHanniEvent()

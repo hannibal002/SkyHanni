@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityTextUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -369,7 +369,7 @@ object CarnivalFruitDigging {
     }
 
     @HandleEvent
-    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
+    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
         if (!isEnabled()) return
 
         // Armor stand appears when a fruit is dug or exposed by watermelon

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.entity.TextDisplayUpdateEvent
+import at.hannibal2.skyhanni.events.entity.EntityTextUpdateEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -65,7 +65,7 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTextDisplayUpdate(event: TextDisplayUpdateEvent) {
+    fun onTextDisplayUpdate(event: EntityTextUpdateEvent) {
         analyzeArmorStand(event.entity)
     }
 
