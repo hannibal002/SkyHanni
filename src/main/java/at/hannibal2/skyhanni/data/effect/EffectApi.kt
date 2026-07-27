@@ -135,18 +135,6 @@ object EffectApi {
         "tab.footer.effects",
         " Press TAB or type /effects to view your active effects!",
     )
-
-    /**
-     * REGEX-TEST: Time Remaining: 1h 2m
-     * REGEX-TEST: Time Remaining: 1h 2m 3s
-     * REGEX-TEST: Remaining: 1h 2m 3s
-     * REGEX-FAIL: Time Remaining: Completed!
-     * REGEX-FAIL: PAUSED
-     */
-    private val remainingPattern by RepoPattern.pattern(
-        "effects.remaining",
-        ".*Remaining: (?<time>[dhms0-9 ]+)$",
-    )
     // </editor-fold>
 
     init {
@@ -280,7 +268,7 @@ object EffectApi {
         loop@ for (stack in event.inventoryItems.values) {
             val effect = stack.getNonGodPotEffectOrNull() ?: continue
             val lore = stack.getCleanLore()
-            remainingPattern.firstMatcher(lore) {
+            potionRemainingLoreTimerPattern.firstMatcher(lore) {
                 val duration = try {
                     TimeUtils.getDuration(group("time"))
                 } catch (e: Exception) {
