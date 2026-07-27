@@ -36,47 +36,46 @@ enum class EffectDurationChangeType {
     ;
 
     companion object {
-        // Applies a PARTIAL_SET update by replacing only the specified time units
-        // and preserving lower-order units from the existing duration.
-        //
-        // Examples:
-        // - 2h      -> updates hours only
-        // - 2h 10m  -> updates hours and minutes, preserves seconds
-        // - 2h 10m 5s -> replaces the entire duration
+        /**
+         * Applies a PARTIAL_SET update by constraining the existing ticking estimate
+         * to the range implied by the displayed precision.
+         *
+         * Hypixel truncates omitted units:
+         * - 1h      -> [1h, 2h)
+         * - 1h 20m  -> [1h20m, 1h21m)
+         * - 20m     -> [20m, 21m)
+         * - 20s     -> [20s, 21s)
+         *
+         * The existing estimate is preserved if it falls within the valid range;
+         * otherwise it is clamped to the nearest valid value.
+         */
         fun updateUsingPartialSet(existing: Duration, duration: Duration): Duration {
             if (existing == Duration.ZERO) {
                 return duration
             }
-            val existingMinutes = existing.inWholeMinutes % 60
-            val existingSeconds = existing.inWholeSeconds % 60
-            val newHours = duration.inWholeHours
-            val newMinutes = duration.inWholeMinutes % 60
-            val hasSeconds = duration.inWholeSeconds % 60 != 0L
-            val hasMinutes = newMinutes != 0L || hasSeconds
-            val hasHours = newHours != 0L
-            val result = when {
-                // Full precision update (contains seconds)
-                hasSeconds -> {
-                    duration
-                }
-                // Minutes are known, seconds are not
-                hasMinutes -> {
-                    newHours.hours +
-                        newMinutes.minutes +
-                        existingSeconds.seconds
-                }
-                // Only hours are known
-                hasHours -> {
-                    newHours.hours +
-                        existingMinutes.minutes +
-                        existingSeconds.seconds
-                }
-                // Zero duration
-                else -> {
-                    duration
-                }
+
+            val hours = duration.inWholeHours
+            val minutes = duration.inWholeMinutes % 60
+            val seconds = duration.inWholeSeconds % 60
+
+            val hasHours = hours > 0
+            val hasMinutes = minutes > 0
+            val hasSeconds = seconds > 0
+
+            val lowerBound = duration
+
+            val upperBound = when {
+                hasSeconds -> duration + 1.seconds
+                hasMinutes -> duration + 1.minutes
+                hasHours -> duration + 1.hours
+                else -> duration + 1.seconds
             }
-            return result
+
+            return when {
+                existing < lowerBound -> lowerBound
+                existing >= upperBound -> upperBound - 1.seconds
+                else -> existing
+            }
         }
     }
 }
