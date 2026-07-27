@@ -36,6 +36,7 @@ object GuiChatHook {
         chatGraphicsAccess: ChatComponent.ChatGraphicsAccess,
         screenHeight: Int,
         ticks: Int,
+        //~ if < 26.1 'ChatComponent.DisplayMode' -> 'Boolean'
         displayMode: ChatComponent.DisplayMode,
     ) {
         ChromaFontManager.renderingChat = true
