@@ -177,17 +177,22 @@ object BestiaryData {
                     }
                 }
             }
+            if (totalFamilies == 0L) continue
             catList.add(Category(name, familiesFound, totalFamilies, familiesCompleted))
         }
     }
 
     private fun notInCategory() {
+        // TODO: convert to RepoPattern
+        val levelSuffixPattern = " [IVX0-9]+$".toPattern()
+        val levelPattern = " ([IVX0-9]+$)".toRegex()
+        val killCountPattern = "([0-9,.]+)".toRegex()
         for ((index, stack) in stackList) {
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets() == " ") continue
+            val hoverName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
+            if (hoverName == " ") continue
             if (!indexes.contains(index)) continue
-            val name = " [IVX0-9]+$".toPattern().matcher(stack.hoverName.formattedTextCompatLeadingWhiteLessResets()).replaceFirst("")
-            val level =
-                " ([IVX0-9]+$)".toRegex().find(stack.hoverName.formattedTextCompatLeadingWhiteLessResets())?.groupValues?.get(1) ?: "0"
+            val name = levelSuffixPattern.matcher(hoverName).replaceFirst("")
+            val level = levelPattern.find(hoverName)?.groupValues?.get(1) ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0
@@ -196,7 +201,7 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
                 if (loreLine.startsWith("Kills: ")) {
-                    actualRealTotalKill = "([0-9,.]+)".toRegex().find(loreLine)?.groupValues?.get(1)?.formatLong()
+                    actualRealTotalKill = killCountPattern.find(loreLine)?.groupValues?.get(1)?.formatLong()
                         ?: 0
                 }
                 if (!loreLine.startsWith("                    ")) continue
@@ -214,6 +219,7 @@ object BestiaryData {
                     }
                 }
             }
+            if (totalKillToMax == 0L && totalKillToTier == 0L) continue
             mobList.add(
                 BestiaryMob(
                     name,
