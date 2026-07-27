@@ -69,6 +69,14 @@ object EffectApi {
     )
 
     /**
+     * WRAPPED-REGEX-TEST: " Press TAB or type /effects to view your active effects!"
+     */
+    private val effectsUsageHint by patternGroup.pattern(
+        "chat.effects-hint",
+        " Press TAB or type /effects to view your active effects!",
+    )
+
+    /**
      * REGEX-TEST: (1/2) Active Effects
      */
     private val effectsInventoryPattern by patternGroup.pattern(
@@ -132,14 +140,6 @@ object EffectApi {
     )
 
     /**
-     * WRAPPED-REGEX-TEST: " Press TAB or type /effects to view your active effects!"
-     */
-    private val tabListFooterPattern by patternGroup.pattern(
-        "footer.effects-hint",
-        " Press TAB or type /effects to view your active effects!",
-    )
-
-    /**
      * REGEX-TEST: You have 10 non-god effects.
      */
     private val effectsCountPattern by patternGroup.pattern(
@@ -181,7 +181,7 @@ object EffectApi {
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
 
-        msg = tabListFooterPattern.replace(msg) { "" }.trim()
+        msg = effectsUsageHint.replace(msg) { "" }.trim()
 
         for (effect in NonGodPotEffect.entries) {
             if (effect.effectRemovedPattern?.matches(msg) == true) {
