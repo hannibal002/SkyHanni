@@ -257,6 +257,8 @@ Make sure such pull requests have a good explanation in the **What** section.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
+    - Functions annotated with `@HandleEvent` must be declared `private`.
+      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
