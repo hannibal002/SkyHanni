@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
-import at.hannibal2.skyhanni.features.chroma.renderingChat
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
@@ -38,10 +38,10 @@ object GuiChatHook {
         ticks: Int,
         displayMode: ChatComponent.DisplayMode,
     ) {
-        renderingChat = true
+        ChromaFontManager.renderingChat = true
         ModifyVisualWords.changeWords = false
         original.call(chatGraphicsAccess, screenHeight, ticks, displayMode)
-        renderingChat = false
+        ChromaFontManager.renderingChat = false
         ModifyVisualWords.changeWords = true
     }
 }
