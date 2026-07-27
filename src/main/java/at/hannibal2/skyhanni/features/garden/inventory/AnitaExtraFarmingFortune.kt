@@ -84,7 +84,9 @@ object AnitaExtraFarmingFortune {
             parseExtraFarmingFortuneLore(event.itemStack.getCleanLore()) ?: return
 
         val anitaUpgrade = farmingFortune / 4
-        GardenApi.storage?.fortune?.anitaUpgrade = anitaUpgrade
+        if (anitaUpgrade > 0) {
+            GardenApi.storage?.fortune?.anitaUpgrade = anitaUpgrade
+        }
 
         var goldMedals = 0
         var jacobTickets = 0
