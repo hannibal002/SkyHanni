@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -122,18 +123,20 @@ object AnitaExtraFarmingFortune {
         lore: List<String>,
     ): ExtraFarmingFortuneLore? {
         val farmingFortune = farmingFortunePattern.firstMatcher(lore) {
-            group("farmingFortune").toInt()
+            group("farmingFortune").formatInt()
         } ?: 0
 
-        var contributionFactor = realAmountPattern.firstMatcher(lore) {
+        val realJacobTicket = realAmountPattern.firstMatcher(lore) {
             group("realAmount").formatDouble()
-        } ?: return null
+        } ?: 0.0
 
         val nextUpgrade = farmingFortune / 4 + 1
         val baseAmount = levelPrice[nextUpgrade]?.jacobTickets ?: return null
 
-        if (baseAmount > 0) {
-            contributionFactor /= baseAmount
+        val contributionFactor = if (baseAmount > 0) {
+            realJacobTicket / baseAmount
+        } else {
+            0.0
         }
 
         return ExtraFarmingFortuneLore(
