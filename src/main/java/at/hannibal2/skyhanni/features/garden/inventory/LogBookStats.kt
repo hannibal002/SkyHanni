@@ -2,10 +2,7 @@ package at.hannibal2.skyhanni.features.garden.inventory
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -55,7 +52,7 @@ object LogBookStats {
     private var inInventory = false
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
 
         if (!inventoryNamePattern.matches(event.inventoryName)) return
@@ -89,7 +86,7 @@ object LogBookStats {
     }
 
     @HandleEvent
-    fun onChestGuiRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    private fun onChestGuiRender() {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
         if (inInventory && config.showLogBookStats) {
             config.logBookStatsPos.renderRenderables(
@@ -101,18 +98,18 @@ object LogBookStats {
     }
 
     @HandleEvent
-    fun onProfileChange(event: ProfileJoinEvent) {
+    private fun onProfileJoin() {
         display = emptyList()
         loggedVisitors.clear()
         inInventory = false
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    private fun onInventoryClose() {
         inInventory = false
     }
 
-    data class VisitorInfo(
+    private data class VisitorInfo(
         var timesVisited: Long = 0,
         var timesAccepted: Long = 0,
     )
