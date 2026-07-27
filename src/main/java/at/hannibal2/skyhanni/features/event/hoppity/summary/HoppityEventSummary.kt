@@ -87,7 +87,7 @@ object HoppityEventSummary {
     private fun MutableList<StatString>.addEmptyLine() = this.addStr("", false)
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresethoppityeventstats") {
             description = "Reset Hoppity Event stats for all years."
             category = CommandCategory.USERS_RESET
@@ -105,12 +105,12 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onEggSpawned() {
+    private fun onEggSpawned() {
         yearSpawnCache.remove(currentSbYear)
     }
 
     @HandleEvent
-    fun onRabbitFound(event: RabbitFoundEvent) {
+    private fun onRabbitFound(event: RabbitFoundEvent) {
         yearSpawnCache.remove(currentSbYear)
         val stats = getYearStats() ?: return
         if (!HoppityApi.isHoppityEvent()) {
@@ -134,7 +134,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!HoppityApi.isHoppityEvent()) return
         val stats = getYearStats() ?: return
 
@@ -144,7 +144,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(64, "event.hoppity.preventMissingFish", "event.hoppity.preventMissingRabbitTheFish")
         event.move(65, "hoppityStatLiveDisplayToggled", "hoppityStatLiveDisplayToggledOff")
 
@@ -160,7 +160,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         checkStatsTypeCountInit()
         checkLbUpdateWarning()
         checkEnded()
@@ -169,7 +169,7 @@ object HoppityEventSummary {
     }
 
     @HandleEvent
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         lastSnapshotServer = null
         checkEnded()
     }
@@ -265,11 +265,21 @@ object HoppityEventSummary {
             it.key < currentSbYear || (it.key == currentSbYear && currentSeason > SkyblockSeason.SPRING)
         }.forEach { (year, stats) ->
             storage?.hoppityEventStats?.get(year)?.let {
-                // Only send the message if we're going to be able to set the stats as summarized
-                sendStatsMessage(stats, year)
+                if (stats.hasParticipated()) {
+                    sendStatsMessage(stats, year)
+                }
                 it.summarized = true
             }
         }
+    }
+
+    private fun HoppityEventStats.hasParticipated(): Boolean {
+        if (mealsFound.isNotEmpty()) return true
+        if (rabbitsFound.isNotEmpty()) return true
+
+        if (millisInCf != Duration.ZERO) return true
+
+        return false
     }
 
     private fun inSameServer(): Boolean {
@@ -508,7 +518,7 @@ object HoppityEventSummary {
             ).toMutableList()
         } else statList
 
-        return finalStatList.chromafyHoppityStats()
+        return finalStatList.applyPartyMode()
     }
 
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {
