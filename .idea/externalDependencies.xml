@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <plugin id="com.demonwav.minecraft-dev" />
+    <plugin id="detekt" />
+    <plugin id="dev.kikugie.stonecutter" />
+    <plugin id="org.editorconfig.editorconfigjetbrains" />
+    <plugin id="skyhanni.plugin" />
+  </component>
+</project>
