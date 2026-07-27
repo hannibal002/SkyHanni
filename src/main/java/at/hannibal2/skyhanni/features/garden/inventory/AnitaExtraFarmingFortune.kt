@@ -74,7 +74,7 @@ object AnitaExtraFarmingFortune {
     private var levelPrice = mapOf<Int, AnitaUpgradePrice>()
 
     @HandleEvent
-    fun onToolTip(event: ToolTipTextEvent) {
+    private fun onToolTip(event: ToolTipTextEvent) {
         if (!config.extraFarmingFortune) return
         if (!anitaInventoryDetector.isInside()) return
         if (!extraFarmingFortunePattern.matches(event.itemStack.cleanName)) return
@@ -148,13 +148,13 @@ object AnitaExtraFarmingFortune {
     )
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AnitaUpgradeCostsJson>("AnitaUpgradeCosts")
         levelPrice = data.levelPrice
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.extraFarmingFortune", "garden.anitaShop.extraFarmingFortune")
     }
 }
