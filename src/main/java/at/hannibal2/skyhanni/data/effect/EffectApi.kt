@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.util.EnumSet
@@ -209,7 +208,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!activeEffectsFooterPattern.anyMatchesComponent(event.footer)) return
         event.footer.readNonGodPotEffects()
 

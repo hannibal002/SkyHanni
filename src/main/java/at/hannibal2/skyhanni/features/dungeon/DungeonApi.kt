@@ -314,8 +314,7 @@ object DungeonApi {
     @HandleEvent
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val lines = event.footerList
-        for (line in lines) {
+        for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
