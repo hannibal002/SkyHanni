@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -300,7 +301,8 @@ object EffectApi {
      * to the range implied by the displayed precision.
      *
      * Hypixel truncates omitted units:
-     * - 1h      -> [1h, 2h)
+     * - 1w      -> [1w, 2w)
+     * - 1d 5h   -> [1d5h, 1d6h)
      * - 1h 20m  -> [1h20m, 1h21m)
      * - 20m     -> [20m, 21m)
      * - 20s     -> [20s, 21s)
@@ -313,25 +315,17 @@ object EffectApi {
             return duration
         }
 
-        val hours = duration.inWholeHours
-        val minutes = duration.inWholeMinutes % 60
-        val seconds = duration.inWholeSeconds % 60
-
-        val hasHours = hours > 0
-        val hasMinutes = minutes > 0
-        val hasSeconds = seconds > 0
-
-        val lowerBound = duration
-
         val upperBound = when {
-            hasSeconds -> duration + 1.seconds
-            hasMinutes -> duration + 1.minutes
-            hasHours -> duration + 1.hours
+            duration.inWholeSeconds % 60 != 0L -> duration + 1.seconds
+            duration.inWholeMinutes % 60 != 0L -> duration + 1.minutes
+            duration.inWholeHours % 24 != 0L -> duration + 1.hours
+            duration.inWholeDays % 7 != 0L -> duration + 1.days
+            duration.inWholeDays > 0L -> duration + 7.days
             else -> duration + 1.seconds
         }
 
         return when {
-            existing < lowerBound -> lowerBound
+            existing < duration -> duration
             existing >= upperBound -> upperBound - 1.seconds
             else -> existing
         }
