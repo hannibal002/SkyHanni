@@ -12,7 +12,7 @@ enum class NonGodPotEffect(
     @param:Language("RegExp")
     private val tabListName: String,
     @param:Language("RegExp")
-    private val inventoryItemName: String = ".*${tabListName}.*",
+    private val inventoryItemName: String = ".*$tabListName.*",
     @param:Language("RegExp")
     private val effectGainedMessage: String? = null,
     @param:Language("RegExp")
