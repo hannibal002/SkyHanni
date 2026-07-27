@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.combat.BestiaryConfig.NumberFormatE
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -99,6 +101,22 @@ object BestiaryData {
     private val progressBarLinePattern by patternGroup.pattern(
         "progress.bar.line",
         " {20}.*",
+    )
+
+    /**
+     * REGEX-TEST: You haven't unlocked this Family yet!
+     */
+    private val notUnlockedFamilyPattern by patternGroup.pattern(
+        "progress.not-unlocked-familty",
+        "You haven't unlocked this Family yet!",
+    )
+
+    /**
+     * REGEX-TEST: Overall Progress: SHOWN
+     */
+    private val overallProgressShownPattern by patternGroup.pattern(
+        "progress.overall-shown",
+        "Overall Progress: SHOWN",
     )
 
     private var display = emptyList<Renderable>()
@@ -226,7 +244,7 @@ object BestiaryData {
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
 
-                if (loreLine == "You haven't unlocked this Family yet!") {
+                if (notUnlockedFamilyPattern.matches(loreLine)) {
                     isUnlocked = false
                 }
 
@@ -428,8 +446,8 @@ object BestiaryData {
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, SafeItemStack>): Boolean {
         val stack = inventoryItems[OVERALL_PROGRESS_SLOT]
-        if (stack?.`is`(Items.ENDER_EYE) == true) {
-            return stack.getLore().any { it == "§7Overall Progress: §aSHOWN" }
+        if (stack?.item == Items.ENDER_EYE) {
+            return overallProgressShownPattern.anyMatches(stack.getCleanLore())
         }
 
         indexes.forEach { index ->
