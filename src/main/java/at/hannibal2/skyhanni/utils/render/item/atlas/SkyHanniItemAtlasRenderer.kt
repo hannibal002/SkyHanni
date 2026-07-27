@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.utils.render.item.SkyHanniAbstractItemTexture.Companion.CLEAR_DEPTH
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
@@ -22,7 +23,7 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 *///?}
 
 //? if >= 26.1 {
-import org.joml.Matrix4f
+import net.minecraft.client.renderer.Projection
 //?}
 
 internal class SkyHanniItemAtlasRenderer(
@@ -33,25 +34,21 @@ internal class SkyHanniItemAtlasRenderer(
     private val depthTexture: GpuTexture,
 ) {
 
+    //? if >= 26.1 {
+    private val projection = Projection()
+    //?}
+
     fun render(
         projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        val bufferSlice = projectionBuffer.getBuffer(
-            //? if >= 26.1 {
-            Matrix4f().setOrtho(
-                0f,
-            //?}
-                size,
-                size,
-            //? if >= 26.1 {
-                0f,
-                -1000f,
-                1000f,
-            ),
-            //?}
-        )
+        //? if >= 26.1 {
+        projection.setupOrtho(-1000f, 1000f, size, size, true)
+        val bufferSlice = projectionBuffer.getBuffer(projection)
+        //?} else {
+        /*val bufferSlice = projectionBuffer.getBuffer(size, size)
+        *///?}
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
@@ -124,7 +121,7 @@ internal class SkyHanniItemAtlasRenderer(
             texture,
             GuiRenderer.CLEAR_COLOR,
             depthTexture,
-            1.0,
+            CLEAR_DEPTH,
             x, sizePixels - y - size, size, size,
         )
     }
