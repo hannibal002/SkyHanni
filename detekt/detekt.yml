@@ -9,14 +9,20 @@ CompatRules:
     ForbiddenMethodCall:
         active: true
         methods:
-            - net.minecraft.client.Minecraft.level: "Use MinecraftCompat.localWorldOrNull instead."
-            - net.minecraft.client.Minecraft.player: "Use MinecraftCompat.localPlayerOrNull instead."
-            - net.minecraft.client.Minecraft.user: "Use MinecraftCompat.localUser instead."
-            - net.minecraft.client.Minecraft.screen: "Use MinecraftCompat.screen instead."
-            - net.minecraft.client.Minecraft.gui: "Use MinecraftCompat.hud instead."
-            - net.minecraft.client.Options.hideGui: "Use MinecraftCompat.hideGui instead."
-            - net.minecraft.client.gui.components.debug.DebugScreenEntryList.isOverlayVisible: "Use MinecraftCompat.showDebugHud instead."
-            - net.minecraft.client.renderer.LevelRenderer.allChanged: "Use MinecraftCompat.reloadChunks instead."
+            - value: "net.minecraft.client.Minecraft.level"
+              reason: "Use MinecraftCompat.localWorldOrNull instead."
+            - value: "net.minecraft.client.Minecraft.player"
+              reason: "Use MinecraftCompat.localPlayerOrNull instead."
+            - value: "net.minecraft.client.Minecraft.user"
+              reason: "Use MinecraftCompat.localUser instead."
+            - value: "net.minecraft.client.Minecraft.screen"
+              reason: "Use MinecraftCompat.screen instead."
+            - value: "net.minecraft.client.Minecraft.gui"
+              reason: "Use MinecraftCompat.hud instead."
+            - value: "net.minecraft.client.Options.hideGui"
+              reason: "Use MinecraftCompat.hideGui instead."
+            - value: "net.minecraft.client.renderer.LevelRenderer.allChanged()"
+              reason: "Use MinecraftCompat.reloadChunks instead."
     VanillaItemStackImport:
         active: true
 
