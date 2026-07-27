@@ -59,7 +59,7 @@ object CFBlockOpen {
     private var commandSentTimer = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onEffectUpdate(event: EffectDurationChangeEvent) {
+    private fun onEffectUpdate(event: EffectDurationChangeEvent) {
         if (event.effect != NonGodPotEffect.HOT_CHOCOLATE || event.duration == null) return
         val chocolateFactory = profileStorage?.chocolateFactory ?: return
 
@@ -67,12 +67,16 @@ object CFBlockOpen {
             EffectDurationChangeType.ADD -> chocolateFactory.hotChocolateMixinExpiry + event.duration
             EffectDurationChangeType.REMOVE -> SimpleTimeMark.farPast()
             EffectDurationChangeType.SET -> SimpleTimeMark.now() + event.duration
-            else -> chocolateFactory.hotChocolateMixinExpiry
+            EffectDurationChangeType.PARTIAL_SET ->
+                EffectDurationChangeType.updateUsingPartialSet(
+                    chocolateFactory.hotChocolateMixinExpiry.timeUntil(),
+                    event.duration,
+                ).let { SimpleTimeMark.now() + it }
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val slotDisplayName = event.slot?.item?.hoverName.formattedTextCompatLeadingWhiteLessResets()
         if (!openCfItemPattern.matches(slotDisplayName)) return
         if (EnchantedClockHelper.enchantedClockPattern.matches(InventoryUtils.openInventoryName())) return
@@ -82,7 +86,7 @@ object CFBlockOpen {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onCommandSend(event: MessageSendToServerEvent) {
+    private fun onCommandSend(event: MessageSendToServerEvent) {
         if (!commandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (SkyBlockUtils.isBingoProfile) return

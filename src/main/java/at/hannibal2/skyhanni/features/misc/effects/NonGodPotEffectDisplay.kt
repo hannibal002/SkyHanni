@@ -56,13 +56,13 @@ object NonGodPotEffectDisplay {
     private var totalEffectsCount = 0
 
     @HandleEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
+    private fun onProfileJoin() {
         effectDuration.clear()
         display = emptyList()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (event.message == "§aYou cleared all of your active effects!") {
             effectDuration.clear()
             update()
@@ -70,7 +70,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onEffectUpdate(event: EffectDurationChangeEvent) {
+    private fun onEffectUpdate(event: EffectDurationChangeEvent) {
         val duration = event.duration ?: Duration.ZERO
         when (event.durationChangeType) {
             EffectDurationChangeType.ADD -> {
@@ -89,7 +89,9 @@ object NonGodPotEffectDisplay {
             }
 
             EffectDurationChangeType.PARTIAL_SET -> {
-
+                val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
+                val newDuration = EffectDurationChangeType.updateUsingPartialSet(existing, duration)
+                effectDuration[event.effect] = Timer(newDuration)
             }
         }
         update()
@@ -130,7 +132,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
@@ -153,12 +155,12 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         checkFooter = true
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
         val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         if (!lines.any { it.string.contains("Active Effects") }) return
@@ -170,7 +172,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !config.displayEnabled) return
         if (RiftApi.inRift()) return
 
@@ -182,7 +184,7 @@ object NonGodPotEffectDisplay {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.nonGodPotEffectDisplay", "misc.potionEffect.nonGodPotEffectDisplay")
         event.move(3, "misc.nonGodPotEffectShowMixins", "misc.potionEffect.nonGodPotEffectShowMixins")
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")

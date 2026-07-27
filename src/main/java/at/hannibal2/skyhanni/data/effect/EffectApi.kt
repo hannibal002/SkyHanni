@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data.effect
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -152,7 +150,7 @@ object EffectApi {
 
     // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val msg = event.cleanMessage
         hotChocolateMixinConsumePattern.matchMatcher(msg) {
             val durationAdded = TimeUtils.getDuration(group("time"))
@@ -187,18 +185,44 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
         val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         footerLines.readNonGodPotEffects()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun readEffects(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.ACTIVE_EFFECTS)) return
-        godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
-            profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        when(event.widget) {
+            TabWidget.ACTIVE_EFFECTS -> {
+                godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
+                    profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
+                }
+                event.lines.readNonGodPotEffects()
+            }
+            TabWidget.SALTS -> {
+                saltTabPattern.matchAll(event.lines.map { it.string }) {
+                    val effect = group("effect")
+                    val duration = TimeUtils.getDuration(group("time"))
+                    val salt = NonGodPotEffect.entries.firstOrNull {
+                        it.tablistNamePattern.pattern() == effect
+                    } ?: return@matchAll
+                    EffectDurationChangeEvent(salt, EffectDurationChangeType.PARTIAL_SET, duration).post()
+                }
+            }
+            TabWidget.PESTS -> {
+                repellentPattern.firstMatcher(event.lines.map { it.string }) {
+                    val duration = TimeUtils.getDurationOrNull(group("time")) ?: return@firstMatcher
+                    val tier = group("tier").uppercase()
+                    val propTier = when (tier) {
+                        "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
+                        "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
+                        else -> return@firstMatcher
+                    }
+                    EffectDurationChangeEvent(propTier, EffectDurationChangeType.PARTIAL_SET, duration).post()
+                }
+            }
+            else -> {}
         }
-        event.lines.readNonGodPotEffects()
     }
 
     private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAllComponents(this) {
@@ -213,37 +237,8 @@ object EffectApi {
         }
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun readPestRepellent(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.PESTS)) return
-
-        repellentPattern.firstMatcher(event.lines.map { it.string }) {
-            val duration = TimeUtils.getDurationOrNull(group("time")) ?: return@firstMatcher
-            val tier = group("tier").uppercase()
-            val propTier = when (tier) {
-                "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
-                "REGULAR" -> NonGodPotEffect.PEST_REPELLENT
-                else -> return@firstMatcher
-            }
-            EffectDurationChangeEvent(propTier, EffectDurationChangeType.PARTIAL_SET, duration).post()
-        }
-    }
-
-    @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun readSalts(event: WidgetUpdateEvent) {
-        if (!event.isWidget(TabWidget.SALTS)) return
-        saltTabPattern.matchAll(event.lines.map { it.string }) {
-            val effect = group("effect")
-            val duration = TimeUtils.getDuration(group("time"))
-            val salt = NonGodPotEffect.entries.firstOrNull {
-                it.tablistNamePattern.pattern() == effect
-            } ?: return@matchAll
-            EffectDurationChangeEvent(salt, EffectDurationChangeType.PARTIAL_SET, duration).post()
-        }
-    }
-
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!event.isGodPotEffectsFilterSelect()) return
 
         val potionLore = event.inventoryItems[10]?.getCleanLore() ?: run {
@@ -272,7 +267,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!effectsInventoryPattern.matches(event.inventoryName)) return
 
         loop@ for (stack in event.inventoryItems.values) {

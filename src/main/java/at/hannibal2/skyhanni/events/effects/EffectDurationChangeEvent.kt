@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events.effects
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
+import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -20,6 +21,7 @@ import kotlin.time.Duration.Companion.seconds
  * @param duration The duration value associated with the change.
  *   Always `null` when [durationChangeType] is [EffectDurationChangeType.REMOVE].
  */
+@PrimaryFunction("onEffectUpdate")
 class EffectDurationChangeEvent(
     val effect: NonGodPotEffect,
     val durationChangeType: EffectDurationChangeType,
