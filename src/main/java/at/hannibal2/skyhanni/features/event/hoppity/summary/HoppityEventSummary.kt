@@ -75,7 +75,7 @@ object HoppityEventSummary {
     private var lastSnapshotServer: String? = null
     var statYear: Int = currentSbYear
 
-    private fun MutableList<StatString>.chromafyHoppityStats(): MutableList<StatString> = map {
+    private fun MutableList<StatString>.applyPartyMode(): MutableList<StatString> = map {
         if (CFApi.config.partyMode.get()) it.copy(string = CFApi.partyModeReplace(it.string))
         else it
     }.toMutableList()
