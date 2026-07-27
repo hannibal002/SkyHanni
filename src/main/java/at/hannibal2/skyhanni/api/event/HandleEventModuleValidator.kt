@@ -41,7 +41,7 @@ object HandleEventModuleValidator {
     private val settings = CoroutineSettings("@HandleEvent module validation", Duration.INFINITE).withIOContext()
 
     @HandleEvent
-    fun onInitFinished(event: InitFinishedEvent) {
+    private fun onInitFinished(event: InitFinishedEvent) {
         settings.launch { validate() }
     }
 

@@ -43,7 +43,7 @@ class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFil
         }
 
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(3, "dev.printUnfilteredDebugs", "dev.minecraftConsoles.printUnfilteredDebugs")
             event.move(3, "dev.logUnfilteredFile", "dev.minecraftConsoles.logUnfilteredFile")
             event.move(
