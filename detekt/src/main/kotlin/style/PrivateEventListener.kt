@@ -15,7 +15,7 @@ class PrivateEventListener(config: Config) : SkyHanniRule(
     override fun visitNamedFunction(function: KtNamedFunction) {
         if (function.hasAnnotation("HandleEvent") && !isEffectivelyPrivate(function)) {
             function.reportIssue(
-                "Event listener functions should be private. Please change the visibility of this function to private.",
+                "Event listener functions should be private.",
             )
         }
         super.visitNamedFunction(function)
