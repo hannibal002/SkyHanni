@@ -421,6 +421,8 @@ object GardenNextJacobContest {
         addString("§7(§b${duration.format()}§7)")
     }
 
+    private fun shouldOpenPopup() = config.warnPopup && Minecraft.getInstance().isWindowActive
+
     private fun EliteFarmingContest.warnAbout() {
         val timeUntil = startTime.timeUntil()
         if (!config.warn || config.warnTime.seconds <= timeUntil) return
@@ -436,15 +438,16 @@ object GardenNextJacobContest {
         TitleManager.sendTitle("§eFarming Contest!")
         SoundUtils.playBeepSound()
 
-        if (config.warnPopup && !Minecraft.getInstance().isWindowActive) {
-            val cropTextNoColor = crops.joinToString(", ") {
-                if (it == boostedCrop) "${it.cropName} (boosted)" else it.cropName
-            }
-            DialogUtils.openPopupWindow(
-                title = "SkyHanni Jacob Contest Notification",
-                message = "Farming Contest soon!\nCrops: $cropTextNoColor",
-            )
+        if (!shouldOpenPopup()) return
+
+        val cropTextNoColor = crops.joinToString(", ") {
+            if (it == boostedCrop) "${it.cropName} (boosted)" else it.cropName
         }
+        DialogUtils.openPopupWindow(
+            title = "SkyHanni Jacob Contest Notification",
+            message = "Farming Contest soon!\nCrops: $cropTextNoColor",
+            condition = ::shouldOpenPopup,
+        )
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)

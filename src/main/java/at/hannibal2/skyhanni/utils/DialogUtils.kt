@@ -43,37 +43,38 @@ object DialogUtils {
     private fun currentBackend(): String? = TinyFileDialogs.tinyfd_getGlobalChar("tinyfd_response")
 
     /**
-     * Opens a modal message box outside of the game window.
+     * Opens a modal message box outside the game window.
      *
      * [message] is plain text; only `\n` is supported for line breaks.
      */
-    fun openPopupWindow(title: String, message: String) {
-        popupCoroutine.launch {
-            runCatching {
-                if (!hasGraphicalBackend) {
-                    ErrorManager.logErrorStateWithData(
-                        "Failed to open a popup window",
-                        "No graphical dialog backend is available",
-                        "backend" to currentBackend(),
-                        // tinyfd unconditionally falls back to the console when this is set, even if empty
-                        "SSH_TTY" to System.getenv("SSH_TTY"),
-                        "title" to title,
-                        "message" to message,
-                    )
-                    return@runCatching
-                }
-                messageBox(title.stripQuotes(), message.stripQuotes())
-            }.onFailure { e ->
-                ErrorManager.logErrorWithData(
-                    e, "Failed to open a popup window",
+    fun openPopupWindow(title: String, message: String, condition: () -> Boolean = { true }) = popupCoroutine.launch {
+        runCatching {
+            if (!condition()) return@runCatching
+
+            if (!hasGraphicalBackend) {
+                ErrorManager.logErrorStateWithData(
+                    "Failed to open a popup window",
+                    "No graphical dialog backend is available",
+                    "backend" to currentBackend(),
+                    // tinyfd unconditionally falls back to the console when this is set, even if empty
+                    "SSH_TTY" to System.getenv("SSH_TTY"),
                     "title" to title,
                     "message" to message,
                 )
+                return@runCatching
             }
+
+            messageBox(title.stripForbiddenChars(), message.stripForbiddenChars())
+        }.onFailure { e ->
+            ErrorManager.logErrorWithData(
+                e, "Failed to open a popup window",
+                "title" to title,
+                "message" to message,
+            )
         }
     }
 
-    private fun String.stripQuotes(): String = filterNot { it in forbiddenCharacters }
+    private fun String.stripForbiddenChars(): String = filterNot { it in forbiddenCharacters }
 
     private fun messageBox(title: String, message: String): Boolean {
         //? if >= 26.1 {
