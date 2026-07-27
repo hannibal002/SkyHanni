@@ -40,10 +40,11 @@ object LogBookStats {
     /**
      * REGEX-TEST: Visitor's Logbook
      * REGEX-TEST: (1/5) Visitor's Logbook
+     * REGEX-TEST: (10/11) Visitor's Logbook
      */
     private val inventoryNamePattern by groupPattern.pattern(
         "inventory-name",
-        "(?:\\(\\d+/\\d\\)+ )?Visitor's Logbook",
+        "(?:\\(\\d+/\\d+\\) )?Visitor's Logbook",
     )
 
     private val config get() = GardenApi.config
@@ -60,7 +61,7 @@ object LogBookStats {
         inInventory = true
 
         for ((_, item) in event.inventoryItems) {
-            val visitorName = item.hoverName.string
+            val visitorName = item.hoverName.string.takeIf { it.isNotEmpty() } ?: continue
             var timesVisited = 0L
             var timesAccepted = 0L
             val lore = item.getCleanLore()
