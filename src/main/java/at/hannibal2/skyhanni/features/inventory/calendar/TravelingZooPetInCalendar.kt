@@ -56,16 +56,7 @@ object TravelingZooPetInCalendar {
         val extraSeason = when (getSeasonByMonth(time.month).first) {
             SkyblockSeason.SUMMER -> 0
             SkyblockSeason.WINTER -> 1
-            SkyblockSeason.AUTUMN, SkyblockSeason.SPRING -> {
-                ErrorManager.logErrorStateWithData(
-                    "Unexpected season",
-                    "Unexpected season for Traveling Zoo",
-                    "time" to time.toString(),
-                    "month" to time.month.toString(),
-                    "year" to time.year.toString()
-                )
-                return null
-            }
+            SkyblockSeason.AUTUMN, SkyblockSeason.SPRING -> return null
         }
 
         return (time.year * 2 + extraSeason)
