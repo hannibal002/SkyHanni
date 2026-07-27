@@ -520,6 +520,11 @@ fun runDetektMode(prNumber: String) {
     val sarifFile = artifactDir / "main.sarif"
 
     if (!sarifFile.exists()) {
+        val conclusion = System.getenv("WORKFLOW_CONCLUSION")
+            ?: error("WORKFLOW_CONCLUSION is not set")
+        if (conclusion != "success") {
+            error("Detekt workflow did not complete successfully (conclusion: $conclusion). Check the workflow run for details.")
+        }
         println("No SARIF found, removing detekt label")
         setLabel(prNumber, detektLabel, false)
         exitProcess(0)
