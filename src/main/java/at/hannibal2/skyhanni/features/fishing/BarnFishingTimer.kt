@@ -159,8 +159,14 @@ object BarnFishingTimer {
     }
 
     private fun calculateOldest() {
-        oldestSeaCreature = SeaCreatureDetectionApi.getSeaCreatures().minByOrNull { it.spawnTime }
-        oldestTime = oldestSeaCreature?.spawnTime ?: ServerTimeMark.farPast()
+        val oldest = SeaCreatureDetectionApi.getSeaCreatures().minByOrNull { it.spawnTime }
+        oldestSeaCreature = oldest
+
+        if (oldest != null) {
+            oldestTime = oldest.spawnTime
+        } else {
+            reset()
+        }
     }
 
     private fun reset() {
