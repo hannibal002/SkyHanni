@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -70,7 +71,7 @@ object EffectApi {
      * REGEX-TEST: Filter
      */
     private val filterPattern by RepoPattern.pattern(
-        "inventory.effects.filter.colorlesss",
+        "inventory.effects.filter.colorless",
         "Filter",
     )
 
@@ -192,15 +193,15 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onWidgetUpdate(event: WidgetUpdateEvent) {
-        when(event.widget) {
+        when (event.widget) {
             TabWidget.ACTIVE_EFFECTS -> {
-                godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
+                godPotTabPattern.firstMatcher(event.cleanLines) {
                     profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
                 }
                 event.lines.readNonGodPotEffects()
             }
             TabWidget.SALTS -> {
-                saltTabPattern.matchAll(event.lines.map { it.string }) {
+                saltTabPattern.matchAll(event.cleanLines) {
                     val effect = group("effect")
                     val duration = TimeUtils.getDuration(group("time"))
                     val salt = NonGodPotEffect.entries.firstOrNull {
@@ -210,8 +211,9 @@ object EffectApi {
                 }
             }
             TabWidget.PESTS -> {
-                repellentPattern.firstMatcher(event.lines.map { it.string }) {
-                    val duration = TimeUtils.getDurationOrNull(group("time")) ?: return@firstMatcher
+                repellentPattern.firstMatcher(event.cleanLines) {
+                    val timeStr = groupOrNull("time") ?: return@firstMatcher
+                    val duration = TimeUtils.getDurationOrNull(timeStr) ?: return@firstMatcher
                     val tier = group("tier").uppercase()
                     val propTier = when (tier) {
                         "MAX" -> NonGodPotEffect.PEST_REPELLENT_MAX
@@ -231,8 +233,8 @@ object EffectApi {
         } ?: return@matchAllComponents
         try {
             val duration = TimeUtils.getDuration(group("time"))
-            EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.SET, duration).post()
-        } catch (e: Exception) {
+            EffectDurationChangeEvent(nonGodPotEffect, EffectDurationChangeType.PARTIAL_SET, duration).post()
+        } catch (_: Exception) {
             ChatUtils.debug("Error while reading non god pot effects from tab list! line: '$this'")
         }
     }
