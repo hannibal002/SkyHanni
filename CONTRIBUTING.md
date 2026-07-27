@@ -234,6 +234,9 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
       after the first build.
+- All functions and properties must be defined inside a class or object. Top-level Kotlin functions and properties are not
+  permitted.
+- Use `Unit` instead of `Void` in Kotlin code.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
