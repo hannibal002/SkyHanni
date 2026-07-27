@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -72,6 +73,32 @@ object BestiaryData {
     private val titlePattern by patternGroup.pattern(
         "title",
         "^(?:\\(\\d+\\/\\d+\\) )?(?<title>Bestiary|.+) ➜ .+\$",
+    )
+
+    /**
+     * REGEX-TEST: Blobfish XIV
+     * REGEX-TEST: Cave Spider 5
+     */
+    private val mobLevelPattern by patternGroup.pattern(
+        "mob.level",
+        " (?<level>[IVX0-9]+)$",
+    )
+
+    /**
+     * REGEX-TEST: Kills: 1,234
+     * REGEX-TEST: Kills: 9,876,543
+     */
+    private val killsLinePattern by patternGroup.pattern(
+        "kills.line",
+        "Kills: (?<kills>[0-9,.]+)",
+    )
+
+    /**
+     * REGEX-TEST:                     9/10
+     */
+    private val progressBarLinePattern by patternGroup.pattern(
+        "progress.bar.line",
+        " {20}.*",
     )
 
     private var display = emptyList<Renderable>()
@@ -183,16 +210,12 @@ object BestiaryData {
     }
 
     private fun notInCategory() {
-        // TODO: convert to RepoPattern
-        val levelSuffixPattern = " [IVX0-9]+$".toPattern()
-        val levelPattern = " ([IVX0-9]+$)".toRegex()
-        val killCountPattern = "([0-9,.]+)".toRegex()
         for ((index, stack) in stackList) {
             val hoverName = stack.hoverName.formattedTextCompatLeadingWhiteLessResets()
             if (hoverName == " ") continue
             if (!indexes.contains(index)) continue
-            val name = levelSuffixPattern.matcher(hoverName).replaceFirst("")
-            val level = levelPattern.find(hoverName)?.groupValues?.get(1) ?: "0"
+            val name = mobLevelPattern.matcher(hoverName).replaceFirst("")
+            val level = mobLevelPattern.findMatcher(hoverName) { group("level") } ?: "0"
             var totalKillToMax: Long = 0
             var currentTotalKill: Long = 0
             var totalKillToTier: Long = 0
@@ -200,19 +223,18 @@ object BestiaryData {
             var actualRealTotalKill: Long = 0
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
-                if (loreLine.startsWith("Kills: ")) {
-                    actualRealTotalKill = killCountPattern.find(loreLine)?.groupValues?.get(1)?.formatLong()
-                        ?: 0
+                killsLinePattern.findMatcher(loreLine) {
+                    actualRealTotalKill = group("kills").formatLong()
                 }
-                if (!loreLine.startsWith("                    ")) continue
+                if (!progressBarLinePattern.matches(loreLine)) continue
                 val previousLine = stack.getLore()[lineIndex - 1]
                 val progress = loreLine.substring(loreLine.lastIndexOf(' ') + 1)
-                if (previousLine.contains("Progress to Tier")) {
+                if (tierProgressPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToTier = group("needed").formatLong()
                         currentKillToTier = group("current").formatLong()
                     }
-                } else if (previousLine.contains("Overall Progress")) {
+                } else if (overallProgressPattern.matches(previousLine)) {
                     progressPattern.matchMatcher(progress) {
                         totalKillToMax = group("needed").formatLong()
                         currentTotalKill = group("current").formatLong()
