@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import org.lwjgl.util.tinyfd.TinyFileDialogs
 import kotlin.time.Duration
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
@@ -47,7 +48,11 @@ object DialogUtils {
      *
      * [message] is plain text; only `\n` is supported for line breaks.
      */
-    fun openPopupWindow(title: String, message: String, condition: () -> Boolean = { true }) = popupCoroutine.launch {
+    fun openPopupWindow(
+        title: String,
+        message: String,
+        condition: () -> Boolean = { true },
+    ): Job = popupCoroutine.launch {
         runCatching {
             if (!condition()) return@runCatching
 
