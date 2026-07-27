@@ -322,7 +322,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         val savedContests = SkyHanniMod.jacobContestsData.knownContests
         val savedYear = savedContests.firstOrNull()?.endTime?.toSkyBlockTime()?.year ?: return
         // Clear contests if from previous year
@@ -451,14 +451,14 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val display = display ?: simpleDisplay ?: return
         config.position.renderRenderable(display, posLabel = "Next Jacob Contest")
     }
 
     @HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class)
-    fun onChestGuiRender() {
+    private fun onChestGuiRender() {
         if (!config.display || !calendarDetector.isInside()) return
         val display = display ?: return
         config.inventoryPosition.renderRenderable(display, posLabel = "Load SkyBlock Calendar")
@@ -518,7 +518,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
         event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")
         event.move(3, "garden.nextJacobContestOtherGuis", "garden.nextJacobContests.otherGuis")
