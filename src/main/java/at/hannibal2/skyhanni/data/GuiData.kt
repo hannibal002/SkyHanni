@@ -34,27 +34,21 @@ object GuiData {
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onGuiKeyPress(event: GuiKeyPressEvent) {
-        if (!event.isMouseBasedEvent) {
-            val allowedKeys = with(Minecraft.getInstance().options) {
-                listOf(
-                    keyInventory,
-                    keyScreenshot,
-                    keyFullscreen,
-                )
-            }
-            if (allowedKeys.any { it.isActive() }) return
-            if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
-
-            if (CustomWardrobeKeybinds.allowKeyboardClick()) return
-            if (CustomLoadoutKeybinds.allowKeyboardClick()) return
-
-            if (preDrawEventCancelled) event.cancel()
-        } else {
-            if (CustomWardrobeKeybinds.allowMouseClick()) return
-            if (CustomLoadoutKeybinds.allowMouseClick()) return
-
-            if (preDrawEventCancelled) event.cancel()
+        val allowedKeys = with(Minecraft.getInstance().options) {
+            listOf(
+                keyInventory,
+                keyScreenshot,
+                keyFullscreen,
+            )
         }
+        if (allowedKeys.any { it.isActive() }) return
+        if (GLFW.GLFW_KEY_ESCAPE.isKeyHeld()) return
+
+        if (CustomWardrobeKeybinds.allowKeyboardClick()) return
+        if (CustomLoadoutKeybinds.allowKeyboardClick()) return
+
+        if (preDrawEventCancelled) event.cancel()
+
     }
 
     @HandleEvent
