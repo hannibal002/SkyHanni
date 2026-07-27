@@ -6,8 +6,17 @@ GrammarRules:
         active: true
 
 CompatRules:
-    MinecraftCompat:
+    ForbiddenMethodCall:
         active: true
+        methods:
+            - net.minecraft.client.Minecraft.level: "Use MinecraftCompat.localWorldOrNull instead."
+            - net.minecraft.client.Minecraft.player: "Use MinecraftCompat.localPlayerOrNull instead."
+            - net.minecraft.client.Minecraft.user: "Use MinecraftCompat.localUser instead."
+            - net.minecraft.client.Minecraft.screen: "Use MinecraftCompat.screen instead."
+            - net.minecraft.client.Minecraft.gui: "Use MinecraftCompat.hud instead."
+            - net.minecraft.client.Options.hideGui: "Use MinecraftCompat.hideGui instead."
+            - net.minecraft.client.gui.components.debug.DebugScreenEntryList.isOverlayVisible: "Use MinecraftCompat.showDebugHud instead."
+            - net.minecraft.client.renderer.LevelRenderer.allChanged: "Use MinecraftCompat.reloadChunks instead."
     VanillaItemStackImport:
         active: true
 

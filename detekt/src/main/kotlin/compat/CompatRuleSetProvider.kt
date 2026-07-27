@@ -14,7 +14,7 @@ class CompatRuleSetProvider : RuleSetProvider {
         return RuleSet(
             ruleSetId,
             mapOf(
-                RuleName("MinecraftCompat") to ::MinecraftCompat,
+                RuleName("ForbiddenMethodCall") to ::ForbiddenMethodCall,
                 RuleName("VanillaItemStackImport") to ::VanillaItemStackImport,
             ),
         )
