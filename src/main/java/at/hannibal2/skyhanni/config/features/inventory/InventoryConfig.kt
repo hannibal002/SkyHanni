@@ -188,6 +188,12 @@ class InventoryConfig {
     val trade: TradeConfig = TradeConfig()
 
     @Expose
+    @ConfigOption(name = "Hub Selector", desc = "Highlight near-capacity lobbies in the hub selector.")
+    @Accordion
+    @SearchTag("lobby capacity full players")
+    val hubSelector: HubSelectorConfig = HubSelectorConfig()
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Show the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     @SearchTag(EVOLVING_ITEMS_SEARCH_TAG)
