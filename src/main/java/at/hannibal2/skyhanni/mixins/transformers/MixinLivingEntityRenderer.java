@@ -33,12 +33,12 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     extends EntityRenderer<T, S>
     implements RenderLayerParent<S, M> {
 
-    protected MixinLivingEntityRenderer(EntityRendererProvider.Context context) {
-        super(context);
-    }
-
     @Shadow
     public abstract Identifier getTextureLocation(LivingEntityRenderState par1);
+
+    protected MixinLivingEntityRenderer(EntityRendererProvider.Context dontCare) {
+        super(dontCare);
+    }
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "TAIL"))
     public void updateRenderState(LivingEntity livingEntity, LivingEntityRenderState livingEntityRenderState, float f, CallbackInfo ci) {

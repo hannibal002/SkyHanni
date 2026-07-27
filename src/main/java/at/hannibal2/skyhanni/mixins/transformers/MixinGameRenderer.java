@@ -16,8 +16,6 @@ import at.hannibal2.skyhanni.events.render.gui.RenderingTickEvent;
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 *///?}
 
 @Mixin(GameRenderer.class)

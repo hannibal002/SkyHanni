@@ -20,10 +20,7 @@ public abstract class MixinGlyphRenderTypes {
     private Identifier skyhanni$identifier;
 
     @ModifyReturnValue(method = {"createForColorTexture", "createForIntensityTexture"}, at = @At("RETURN"))
-    private static GlyphRenderTypes ofMethods(
-        GlyphRenderTypes original,
-        @Local(argsOnly = true) Identifier identifier
-    ) {
+    private static GlyphRenderTypes ofMethods(GlyphRenderTypes original, @Local(argsOnly = true) Identifier identifier) {
         ((MixinGlyphRenderTypes) (Object) original).skyhanni$identifier = identifier;
         return original;
     }

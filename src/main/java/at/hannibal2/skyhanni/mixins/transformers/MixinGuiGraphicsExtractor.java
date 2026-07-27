@@ -72,7 +72,7 @@ public abstract class MixinGuiGraphicsExtractor {
         method = "text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/util/FormattedCharSequence;IIIZ)V",
         at = @At(
             value = "INVOKE",
-            //~ if < 26.1 'add' -> 'submit'
+            //~ if < 26.1 'addText' -> 'submitText'
             target = "Lnet/minecraft/client/renderer/state/gui/GuiRenderState;addText(Lnet/minecraft/client/renderer/state/gui/GuiTextRenderState;)V"
         ),
         index = 0

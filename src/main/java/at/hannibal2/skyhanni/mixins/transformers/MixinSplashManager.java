@@ -18,20 +18,16 @@ import java.util.List;
 public abstract class MixinSplashManager {
 
     @Shadow
+    private List<Component> splashes;
+
+    @Shadow
     @Final
     private static RandomSource RANDOM;
 
-    @Shadow
-    private List<Component> splashes;
-
     @Inject(method = "getSplash", at = @At("HEAD"), cancellable = true)
-    public void addSkyHanniSplash(CallbackInfoReturnable<SplashRenderer> cir) {
+    public void addSkyhanniSplash(CallbackInfoReturnable<SplashRenderer> cir) {
         if (RANDOM.nextInt(this.splashes.size() + 1) == this.splashes.size()) {
-            cir.setReturnValue(
-                new SplashRenderer(
-                    TextHelper.INSTANCE.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, "SkyHanni!")
-                )
-            );
+            cir.setReturnValue(new SplashRenderer(TextHelper.INSTANCE.createGradientText(LorenzColor.YELLOW, LorenzColor.GOLD, "SkyHanni!")));
         }
     }
 }

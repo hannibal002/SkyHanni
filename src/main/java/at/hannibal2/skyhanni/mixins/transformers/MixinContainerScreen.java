@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ContainerScreen.class)
-public abstract class MixinContainerScreen {
+abstract class MixinContainerScreen {
 
     @Unique
     private final GenericContainerScreenHook skyhanni$hook = new GenericContainerScreenHook();

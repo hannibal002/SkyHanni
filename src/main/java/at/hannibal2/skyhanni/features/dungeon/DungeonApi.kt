@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.append
@@ -275,7 +274,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
         floorPattern.firstMatcher(cleanAdded) {
@@ -297,7 +296,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateEvent) {
+    private fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
@@ -313,10 +312,9 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
-        for (line in lines) {
+        for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
@@ -334,7 +332,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         dungeonFloor = null
         started = false
         inBossRoom = false

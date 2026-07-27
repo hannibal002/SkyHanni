@@ -21,7 +21,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * {@link StringDecomposer#iterateFormatted}. Each hex digit is encoded as a
  * §-prefixed character, e.g. §#§6§a§e§e§4§8§/ renders text in RGB(0x6a, 0xee, 0x48).
  *
- * Also implements some chroma handling.
+ * Also includes some chroma handling.
  */
 @Mixin(StringDecomposer.class)
 public abstract class MixinStringDecomposer {
@@ -130,11 +130,7 @@ public abstract class MixinStringDecomposer {
         ),
         ordinal = 2
     )
-    private static Style onColorCodeCheck(
-        Style style,
-        @Local(argsOnly = true) String text,
-        @Local(index = 9) char colorCode
-    ) {
+    private static Style onColorCodeCheck(Style style, @Local(argsOnly = true) String text, @Local(index = 9) char colorCode) {
         return ChromaFontManagerKt.setChromaColorStyle(style, text, colorCode);
     }
 }

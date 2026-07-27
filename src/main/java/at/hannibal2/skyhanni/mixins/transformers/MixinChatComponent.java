@@ -25,13 +25,35 @@ import net.minecraft.util.FormattedCharSequence;
 public abstract class MixinChatComponent {
 
     @Shadow
-    public static int getHeight(double pct) {
+    @Final
+    private Minecraft minecraft;
+
+    @Shadow
+    public static int getHeight(double heightOption) {
         return 0;
     }
 
-    @Shadow
-    @Final
-    private Minecraft minecraft;
+    //? if < 26.1 {
+    /*@WrapOperation(
+        method = "addMessageToDisplayQueue",
+        at = @At(
+            value = "NEW",
+            target = "net/minecraft/client/GuiMessage$Line"
+        )
+    )
+    private GuiMessage.Line addMessageId(
+        int addedTime,
+        FormattedCharSequence content,
+        GuiMessageTag tag,
+        boolean endOfEntry,
+        Operation<GuiMessage.Line> original,
+        GuiMessage message
+    ) {
+        GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
+        line.skyhanni$setParent(message);
+        return line;
+    }
+    *///?}
 
     @Inject(method = "getHeight()I", at = @At("HEAD"), cancellable = true)
     private void getHeight(CallbackInfoReturnable<Integer> cir) {
@@ -61,26 +83,4 @@ public abstract class MixinChatComponent {
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
     }
-
-    //? if < 26.1 {
-    /*@WrapOperation(
-        method = "addMessageToDisplayQueue",
-        at = @At(
-            value = "NEW",
-            target = "net/minecraft/client/GuiMessage$Line"
-        )
-    )
-    private GuiMessage.Line addParent(
-        int addedTime,
-        FormattedCharSequence content,
-        GuiMessageTag tag,
-        boolean endOfEntry,
-        Operation<GuiMessage.Line> original,
-        GuiMessage message
-    ) {
-        GuiMessage.Line line = original.call(addedTime, content, tag, endOfEntry);
-        line.skyhanni$setParent(message);
-        return line;
-    }
-    *///?}
 }
