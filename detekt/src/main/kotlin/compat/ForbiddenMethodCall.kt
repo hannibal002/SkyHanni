@@ -33,8 +33,11 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 import utils.FunctionMatcher
 import utils.FunctionMatcher.Companion.fromFunctionSignature
 
-// https://github.com/detekt/detekt/blob/main/detekt-rules-style/src/main/kotlin/dev/detekt/rules/style/ForbiddenMethodCall.kt
 /**
+ * This file is copied from:
+ * https://github.com/detekt/detekt/blob/main/detekt-rules-style/src/main/kotlin/dev/detekt/rules/style/ForbiddenMethodCall.kt
+ * With any differences having a comment "SKYHANNI:" in front of it.
+ *
  * Reports all method or property invocations that are forbidden.
  */
 class ForbiddenMethodCall(config: Config) :
@@ -148,6 +151,7 @@ class ForbiddenMethodCall(config: Config) :
                     sequenceOf(expressionSymbol)
                         .plus(expressionSymbol.allOverriddenSymbols)
                         .map {
+                            // SKYHANNI: Made it support direct property access (java field access) as well as getter/setter access
                             if (it is KaPropertySymbol) {
                                 it to it
                             } else {

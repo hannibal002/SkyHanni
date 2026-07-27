@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.analysis.api.types.symbol
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.psi.KtNamedFunction
 
-// https://github.com/detekt/detekt/blob/35ad7c07723eb609ecabb63962293186f51ffe11/detekt-psi-utils/src/main/kotlin/dev/detekt/psi/FunctionMatcher.kt#L104
+// https://github.com/detekt/detekt/blob/main/detekt-psi-utils/src/main/kotlin/dev/detekt/psi/FunctionMatcher.kt#L104
 sealed class FunctionMatcher {
 
     abstract fun match(function: KtNamedFunction, fullAnalysis: Boolean): Boolean
