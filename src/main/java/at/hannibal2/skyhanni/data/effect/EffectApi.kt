@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAllComponents
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -152,7 +153,7 @@ object EffectApi {
     // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
-        val msg = event.cleanMessage
+        var msg = event.cleanMessage
         hotChocolateMixinConsumePattern.matchMatcher(msg) {
             val durationAdded = TimeUtils.getDuration(group("time"))
             EffectDurationChangeEvent(
@@ -166,9 +167,8 @@ object EffectApi {
             val existingValue = profileStorage?.godPotExpiry?.takeIfInitialized() ?: SimpleTimeMark.now()
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
-        if (tabListFooterPattern.matches(msg)) {
-            return
-        }
+
+        msg = tabListFooterPattern.replace(msg) { "" }.trim()
 
         for (effect in NonGodPotEffect.entries) {
             if (effect.effectRemovedPattern?.pattern() == msg) {
