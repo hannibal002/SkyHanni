@@ -32,12 +32,15 @@ object GuiChatHook {
 
     @JvmStatic
     fun wrapChatRender(
-        original: Operation<Void>,
+        original: Operation<Unit>,
         chatGraphicsAccess: ChatComponent.ChatGraphicsAccess,
         screenHeight: Int,
         ticks: Int,
-        //~ if < 26.1 'ChatComponent.DisplayMode' -> 'Boolean'
+        //? if >= 26.1 {
         displayMode: ChatComponent.DisplayMode,
+        //?} else {
+        /*displayMode: Boolean,*/
+        //?}
     ) {
         ChromaFontManager.renderingChat = true
         ModifyVisualWords.changeWords = false

@@ -27,7 +27,7 @@ object ChromaFontManager {
     }
 
     @JvmStatic
-    fun setChromaColorStyle(style: Style, text: String, colorCode: Char): Style {
+    fun setChromaColorStyle(style: Style, @Suppress("unused") text: String, colorCode: Char): Style {
         if (!SkyHanniMod.feature.gui.chroma.enabled.get()) return style
         if (colorCode.lowercaseChar() == 'z' || colorCode == CHROMA_PREVIEW_COLOR_CODE) {
             return Style.EMPTY.withColor(textColor)
