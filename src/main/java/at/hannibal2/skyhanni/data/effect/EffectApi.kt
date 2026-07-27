@@ -176,12 +176,12 @@ object EffectApi {
         msg = tabListFooterPattern.replace(msg) { "" }.trim()
 
         for (effect in NonGodPotEffect.entries) {
-            if (effect.effectRemovedPattern?.pattern() == msg) {
+            if (effect.effectRemovedPattern?.matches(msg) == true) {
                 EffectDurationChangeEvent(effect, EffectDurationChangeType.REMOVE, null).post()
                 return
             }
 
-            if (effect.effectGainedPattern?.pattern() != msg) continue
+            if (effect.effectGainedPattern?.matches(msg) != true) continue
             val changeType = effect.effectChangeType ?: continue
             val duration = effect.effectDuration ?: continue
 
