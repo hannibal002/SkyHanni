@@ -37,7 +37,7 @@ object BestiaryData {
 
     private val config get() = SkyHanniMod.feature.combat.bestiary
 
-    private val patternGroup = RepoPattern.group("combat.bestiary.data")
+    private val patternGroup = RepoPattern.group("combat.bestiary.data2")
 
     /**
      * REGEX-TEST: §7Progress to Tier 14: §b26%
