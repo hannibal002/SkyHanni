@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
+import java.util.EnumSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -160,6 +161,14 @@ object EffectApi {
         NonGodPotEffect.entries.forEach { it.displayName }
     }
 
+    private val saltEffects = EnumSet.of<NonGodPotEffect>(
+        LUSHLILAC_BONBON,
+        PRIME_LUSHLILAC_BONBON,
+        EXALTED_LUSHLILAC_BONBON,
+        OCEANDY,
+        CANDYCOMB,
+    )
+
     private val profileStorage get() = ProfileStorageData.profileSpecific
     internal var totalEffectsCount = 0
 
@@ -221,8 +230,8 @@ object EffectApi {
                 saltTabPattern.matchAll(event.cleanLines) {
                     val effect = group("effect")
                     val duration = TimeUtils.getDuration(group("time"))
-                    val salt = NonGodPotEffect.entries.firstOrNull {
-                        it.tablistNamePattern.pattern() == effect
+                    val salt = saltEffects.firstOrNull {
+                        it.tablistNamePattern.matches(effect)
                     } ?: return@matchAll
                     EffectDurationChangeEvent(salt, EffectDurationChangeType.PARTIAL_SET, duration).post()
                 }
