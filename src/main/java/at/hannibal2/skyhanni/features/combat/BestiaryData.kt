@@ -94,7 +94,7 @@ object BestiaryData {
     )
 
     /**
-     * REGEX-TEST:                     9/10
+     * WRAPPED-REGEX-TEST: "                    9/10"
      */
     private val progressBarLinePattern by patternGroup.pattern(
         "progress.bar.line",
