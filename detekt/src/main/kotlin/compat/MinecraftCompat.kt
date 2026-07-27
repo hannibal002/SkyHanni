@@ -4,49 +4,72 @@ import SkyHanniRule
 import dev.detekt.api.Config
 import org.jetbrains.kotlin.psi.KtDotQualifiedExpression
 import org.jetbrains.kotlin.psi.KtExpression
+import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtProperty
 
 class MinecraftCompat(config: Config) : SkyHanniRule(config, "Ensure you are using the MinecraftCompat methods") {
+    private val minecraftReplacements = mapOf(
+        "level" to "MinecraftCompat.localWorldOrNull",
+        "player" to "MinecraftCompat.localPlayerOrNull",
+        "user" to "MinecraftCompat.localUser",
+        "screen" to "MinecraftCompat.screen",
+        "gui" to "MinecraftCompat.hud",
+        "options.hideGui" to "MinecraftCompat.hideGui",
+        "levelRenderer.allChanged()" to "MinecraftCompat.reloadChunks()",
+    )
+
+    private val replacements = buildList {
+        listOf(
+            "Minecraft.getInstance()",
+            "mc",
+            "client",
+        ).forEach { prefix ->
+            minecraftReplacements.forEach { (access, replacement) ->
+                add(
+                    Regex(
+                        """\b${Regex.escape("$prefix.$access")}(?=\.|\(|$)"""
+                    ) to replacement
+                )
+            }
+        }
+    }
+
+    private val allowedPaths = listOf(
+        "at\\hannibal2\\skyhanni\\utils\\compat",
+        "at/hannibal2/skyhanni/utils/compat",
+        "at\\hannibal2\\skyhanni\\test",
+        "at/hannibal2/skyhanni/test"
+    )
 
     override fun visitProperty(property: KtProperty) {
         if (shouldIgnore(property)) return
-        if (checkForMinecraftPlayer(property.initializer)) return
-        if (checkForMinecraftWorld(property.initializer)) return
+        checkMinecraftCompat(property.initializer)
         super.visitProperty(property)
     }
 
     override fun visitDotQualifiedExpression(expression: KtDotQualifiedExpression) {
         if (shouldIgnore(expression)) return
-        if (checkForMinecraftPlayer(expression)) return
-        if (checkForMinecraftWorld(expression)) return
+        checkMinecraftCompat(expression)
         super.visitDotQualifiedExpression(expression)
     }
 
     private fun shouldIgnore(element: KtExpression): Boolean {
+        if (element.parent is KtImportDirective) return true
+
         val filePath = element.containingFile.virtualFile.path
-        return filePath.contains("at\\hannibal2\\skyhanni\\utils\\compat") ||
-            filePath.contains("at/hannibal2/skyhanni/utils/compat")
+        return allowedPaths.any { filePath.contains(it) }
     }
 
-    private fun checkForMinecraftPlayer(element: KtExpression?): Boolean {
-        if (element?.text?.contains("Minecraft.getMinecraft().thePlayer") == true) {
-            element.reportIssue(
-                "Usage of Minecraft.getMinecraft().thePlayer detected. Please replace this with " +
-                    "`MinecraftCompat.localPlayer` instead.",
-            )
-            return true
-        }
-        return false
-    }
+    private fun checkMinecraftCompat(element: KtExpression?) {
+        val text = element?.text ?: return
 
-    private fun checkForMinecraftWorld(element: KtExpression?): Boolean {
-        if (element?.text?.contains("Minecraft.getMinecraft().theWorld") == true) {
+        replacements.forEach { (regex, replacement) ->
+            val match = regex.find(text) ?: return@forEach
+
             element.reportIssue(
-                "Usage of Minecraft.getMinecraft().theWorld detected. Please replace this with " +
-                    "`MinecraftCompat.world` instead.",
+                "Usage of `${match.value}` detected. Please replace this with `$replacement` instead.",
             )
-            return true
+            return
         }
-        return false
     }
 }

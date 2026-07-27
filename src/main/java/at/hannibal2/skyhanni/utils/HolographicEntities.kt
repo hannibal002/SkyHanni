@@ -125,7 +125,7 @@ object HolographicEntities {
      */
     class HolographicBase<T : LivingEntity> internal constructor(internal val entityType: EntityType<T>) {
         fun instance(position: LorenzVec, yaw: Float): HolographicEntity<T>? {
-            val level = Minecraft.getInstance().level ?: return null
+            val level = MinecraftCompat.localWorldOrNull ?: return null
             val entity = entityType.create(level, EntitySpawnReason.COMMAND) ?: return null
             return HolographicEntity(entity, position, yaw)
         }
@@ -133,7 +133,7 @@ object HolographicEntities {
 
     private var _internalEntityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>>? = null
     val entityHoloBases: Map<KClass<out LivingEntity>, HolographicBase<out LivingEntity>> get() = _internalEntityHoloBases ?: run {
-        val level = Minecraft.getInstance().level ?: return@run emptyMap()
+        val level = MinecraftCompat.localWorldOrNull ?: return@run emptyMap()
         BuiltInRegistries.ENTITY_TYPE.associateNotNull type@{ entityType ->
             // Create a throwaway instance only to determine the KClass key.
             val testEntity: LivingEntity = runCatching {
@@ -189,7 +189,7 @@ object HolographicEntities {
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)
         (entityRenderState as? LivingEntityRenderState)?.isBaby = holographicEntity.isChild
-        client.level?.let { level ->
+        MinecraftCompat.localWorldOrNull?.let { level ->
             //~ if < 26.1 'getLightCoords' -> 'getLightColor'
             entityRenderState.lightCoords = LevelRenderer.getLightCoords(level, mobPosition.toBlockPos())
         }
