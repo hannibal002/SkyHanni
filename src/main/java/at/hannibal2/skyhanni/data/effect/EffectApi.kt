@@ -234,7 +234,7 @@ object EffectApi {
 
     private fun List<Component>.readNonGodPotEffects() = tabEffectPattern.matchAllComponents(this) {
         val nonGodPotEffect = NonGodPotEffect.entries.firstOrNull { effect ->
-            effect.tablistNamePattern.pattern() == group("effect")
+            effect.tablistNamePattern.matches(group("effect"))
         } ?: return@matchAllComponents
         try {
             val duration = TimeUtils.getDuration(group("time"))
