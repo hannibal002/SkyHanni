@@ -9,17 +9,15 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.world.item.Items
 
 @SkyHanniModule
 object LogBookStats {
@@ -27,50 +25,48 @@ object LogBookStats {
     private val groupPattern = RepoPattern.group("garden.inventory.logbook")
 
     /**
-     * REGEX-TEST: §7Times Visited: §a22
+     * REGEX-TEST: Times Visited: 22
      */
     private val visitedPattern by groupPattern.pattern(
-        "visited",
-        "§7Times Visited: §a(?<timesVisited>[0-9,.]+)",
+        "visited.colorless",
+        "Times Visited: (?<timesVisited>[0-9,.]+)",
     )
 
     /**
-     * REGEX-TEST: §7Offers Accepted: §a21
+     * REGEX-TEST: Offers Accepted: 21
      */
     private val acceptedPattern by groupPattern.pattern(
-        "accepted",
-        "§7Offers Accepted: §a(?<timesAccepted>[0-9,.]+)",
+        "accepted.colorless",
+        "Offers Accepted: (?<timesAccepted>[0-9,.]+)",
     )
 
     /**
-     * REGEX-TEST: §ePage 3
+     * REGEX-TEST: Visitor's Logbook
+     * REGEX-TEST: (1/5) Visitor's Logbook
      */
-    private val pagePattern by groupPattern.pattern(
-        "page.current",
-        "§ePage (?<page>\\d)",
+    private val inventoryNamePattern by groupPattern.pattern(
+        "inventory-name",
+        "(?:\\(\\d+/\\d\\)+ )?Visitor's Logbook",
     )
 
     private val config get() = GardenApi.config
     private var display = emptyList<Renderable>()
-    private val loggedVisitors = mutableMapOf<Int, List<VisitorInfo>>()
+    private val loggedVisitors = mutableMapOf<String, VisitorInfo>()
     private var inInventory = false
-    private var currentPage = 0
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (IslandType.GARDEN_GUEST.isInIsland()) return
-        val inventoryName = event.inventoryName
-        if (inventoryName != "Visitor's Logbook") return
+
+        if (!inventoryNamePattern.matches(event.inventoryName)) return
 
         inInventory = true
-        checkPages(event)
-        val list = mutableListOf<VisitorInfo>()
 
-        for ((index, item) in event.inventoryItems) {
-            val visitorName = item.hoverName.formattedTextCompatLeadingWhiteLessResets().takeIfNotEmpty() ?: continue
+        for ((_, item) in event.inventoryItems) {
+            val visitorName = item.hoverName.string
             var timesVisited = 0L
             var timesAccepted = 0L
-            val lore = item.getLore()
+            val lore = item.getCleanLore()
             visitedPattern.firstMatcher(lore) {
                 timesVisited += group("timesVisited").formatLong()
             }
@@ -78,13 +74,12 @@ object LogBookStats {
                 timesAccepted += group("timesAccepted").formatLong()
             }
 
-            val visitor = VisitorInfo(index, visitorName, timesVisited, timesAccepted)
-            list.add(visitor)
+            loggedVisitors[visitorName] = VisitorInfo(timesVisited, timesAccepted)
         }
-        loggedVisitors[currentPage] = list
+
         display = buildList {
-            val visited = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesVisited } }
-            val accepted = loggedVisitors.values.sumOf { it.sumOf { visitor -> visitor.timesAccepted } }
+            val visited = loggedVisitors.values.sumOf { it.timesVisited }
+            val accepted = loggedVisitors.values.sumOf { it.timesAccepted }
             val visitingNow = VisitorApi.getVisitors().size
             val denied = visited - accepted - visitingNow
             addString("§6Times Visited: §b${visited.addSeparators()}")
@@ -109,7 +104,6 @@ object LogBookStats {
     fun onProfileChange(event: ProfileJoinEvent) {
         display = emptyList()
         loggedVisitors.clear()
-        currentPage = 0
         inInventory = false
     }
 
@@ -118,23 +112,7 @@ object LogBookStats {
         inInventory = false
     }
 
-    private fun checkPages(event: InventoryFullyOpenedEvent) {
-        val next = event.inventoryItems[53]
-        if (next?.`is`(Items.ARROW) != true) {
-            currentPage++
-            return
-        }
-        for (item in event.inventoryItems.values) {
-            if (item.hoverName.string != "Next Page") continue
-            pagePattern.firstMatcher(item.getLore()) {
-                currentPage = group("page").toInt() - 1
-            }
-        }
-    }
-
     data class VisitorInfo(
-        var index: Int = -1,
-        var displayName: String = "",
         var timesVisited: Long = 0,
         var timesAccepted: Long = 0,
     )
