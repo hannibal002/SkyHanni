@@ -221,8 +221,14 @@ object BestiaryData {
             var totalKillToTier: Long = 0
             var currentKillToTier: Long = 0
             var actualRealTotalKill: Long = 0
+            var isUnlocked = true
             for ((lineIndex, line) in stack.getLore().withIndex()) {
                 val loreLine = line.removeColor()
+
+                if (loreLine == "You haven't unlocked this Family yet!") {
+                    isUnlocked = false
+                }
+
                 killsLinePattern.findMatcher(loreLine) {
                     actualRealTotalKill = group("kills").formatLong()
                 }
@@ -241,7 +247,7 @@ object BestiaryData {
                     }
                 }
             }
-            if (totalKillToMax == 0L && totalKillToTier == 0L) continue
+            if (totalKillToMax == 0L && totalKillToTier == 0L && isUnlocked) continue
             mobList.add(
                 BestiaryMob(
                     name,
