@@ -57,12 +57,12 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
+import kotlinx.coroutines.sync.Mutex
 import net.minecraft.client.Minecraft
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
-import kotlinx.coroutines.sync.Mutex
 
 @SkyHanniModule
 object GardenNextJacobContest {
@@ -145,7 +145,7 @@ object GardenNextJacobContest {
     )
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
         if (!GardenApi.inGarden()) {
@@ -193,7 +193,7 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.JACOB_CONTEST)) return
         simpleDisplay = Renderable.vertical {
             event.lines.forEach { add(Renderable.text(it)) }
@@ -218,19 +218,19 @@ object GardenNextJacobContest {
     }
 
     @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled() || calendarDetector.isInside()) return
         update()
     }
 
     @HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (!isEnabled()) return
         update()
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled() || !calendarDetector.isInside()) return
         val (monthGroup, yearGroup) = monthPattern.matchGroups(
             event.inventoryName,
