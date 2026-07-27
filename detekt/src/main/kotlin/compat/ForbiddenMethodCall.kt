@@ -40,6 +40,7 @@ import utils.FunctionMatcher.Companion.fromFunctionSignature
  *
  * Reports all method or property invocations that are forbidden.
  */
+// TODO: Replace with the offical detekt one when it supports public java properties
 class ForbiddenMethodCall(config: Config) :
     SkyHanniRule(
         config,
