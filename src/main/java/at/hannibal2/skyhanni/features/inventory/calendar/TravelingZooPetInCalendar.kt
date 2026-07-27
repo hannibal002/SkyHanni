@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.CalendarApi
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SkyblockSeason.Companion.getSeasonByMonth
@@ -23,7 +22,7 @@ object TravelingZooPetInCalendar {
     )
 
     @HandleEvent
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
 
         if (CalendarApi.inCalendar) {
@@ -31,6 +30,7 @@ object TravelingZooPetInCalendar {
             for (sbEvent in skyblockEvents) {
                 if (sbEvent.name == "Traveling Zoo") {
                     val pet = getZooPet(sbEvent.startTime) ?: return
+                    event.toolTip.add("")
                     event.toolTip.add(pet)
                 }
             }
@@ -41,6 +41,7 @@ object TravelingZooPetInCalendar {
             if (sbEvent.name == "Traveling Zoo") {
                 val approximateTime = SkyBlockTime.fromTimeMark(sbEvent.startTime)
                 val pet = getZooPet(approximateTime) ?: return
+                event.toolTip.add("")
                 event.toolTip.add(pet)
             }
         }
