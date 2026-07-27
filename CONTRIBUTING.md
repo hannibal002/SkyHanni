@@ -217,6 +217,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
+  same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -257,6 +259,9 @@ Make sure such pull requests have a good explanation in the **What** section.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
+    - Functions annotated with `@HandleEvent` must be declared `private`.
+      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
@@ -331,6 +336,17 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 ### [Stonecutter Development](https://plugins.jetbrains.com/plugin/25044-stonecutter-dev)
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
+
+### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+
+An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
+declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
+annotations, resolves config paths, and suppresses false-positive IntelliJ warnings in SkyHanni-specific
+patterns such as RepoPattern keys and Brigadier command names.
+
+Install it manually: download the latest release from the
+[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+<kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
 
 ## Software Used in SkyHanni
 
