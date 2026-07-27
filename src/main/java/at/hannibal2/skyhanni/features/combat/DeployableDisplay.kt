@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -36,7 +37,7 @@ object DeployableDisplay {
         if (!config.enabled) return
         val entity = event.entity
         for (deployable in Deployable.entries) {
-            deployable.pattern.matchMatcher(entity.name) {
+            deployable.pattern.matchMatcher(entity.cleanName) {
                 if (!deployable.isInRange(entity)) return@matchMatcher
                 val time = SimpleTimeMark.now() + group("time").formatInt().toDuration(DurationUnit.SECONDS)
                 if (deployable.expiryTime > time && deployable.isActive()) return@matchMatcher
