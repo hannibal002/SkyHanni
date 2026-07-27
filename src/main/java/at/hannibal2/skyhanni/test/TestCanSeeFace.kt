@@ -27,13 +27,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawFaceRayWorld
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.fillFace
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.core.Direction
 import net.minecraft.world.phys.AABB
@@ -55,7 +55,7 @@ object TestCanSeeFace {
 
         fun refreshAABBsFromBlockState() {
             val blockPos = blockPos ?: return
-            val level = Minecraft.getInstance().level ?: return
+            val level = MinecraftCompat.localWorldOrNull ?: return
 
             val mcBlockPos = blockPos.toBlockPos()
             val currentState = level.getBlockState(mcBlockPos)

@@ -16,6 +16,7 @@ object RepoPatternDumpTest : FabricClientGameTest {
     override fun runTest(context: ClientGameTestContext) {
         val dumpDirective = PlatformUtils.getRepoPatternDumpLocation() ?: return
         context.waitFor { mc ->
+            @Suppress("ForbiddenMethodCall")
             mc.screen is TitleScreen
         }
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)

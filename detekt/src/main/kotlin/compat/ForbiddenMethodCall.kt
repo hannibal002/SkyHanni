@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.resolve.calls.util.getCalleeExpressionIfAny
 import utils.FunctionMatcher
 import utils.FunctionMatcher.Companion.fromFunctionSignature
 
+// https://github.com/detekt/detekt/blob/main/detekt-rules-style/src/main/kotlin/dev/detekt/rules/style/ForbiddenMethodCall.kt
 /**
  * Reports all method or property invocations that are forbidden.
  */
