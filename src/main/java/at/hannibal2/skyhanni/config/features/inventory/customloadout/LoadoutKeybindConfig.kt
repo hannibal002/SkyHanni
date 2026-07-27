@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.inventory.customloadout
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
@@ -17,6 +18,27 @@ class LoadoutKeybindConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var slotKeybindsToggle: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Cycle Key",
+        desc = "Cycles through the ordered loadouts below. The loadout menu must be closed before cycling again.",
+    )
+    @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
+    var cycleKey: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    @Expose
+    @ConfigOption(name = "Cycle Order", desc = "The normal loadout cycle order.")
+    @ConfigEditorDraggableList
+    val cycleOrder: MutableList<CycleLoadout> = mutableListOf()
+
+    @Expose
+    @ConfigOption(
+        name = "Contest Cycle Order",
+        desc = "The loadout cycle order used automatically during a Jacob's Contest. Uses the normal order when empty.",
+    )
+    @ConfigEditorDraggableList
+    val contestCycleOrder: MutableList<CycleLoadout> = mutableListOf()
 
     @Expose
     @ConfigOption(name = "Slot 1", desc = "Keybind for loadout slot 1.")
@@ -137,4 +159,22 @@ class LoadoutKeybindConfig {
     @ConfigOption(name = "Contest Slot 12", desc = "Alternate keybind for loadout slot 12 during a Jacob's Contest.")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
     var contestSlot12: Int = GLFW.GLFW_KEY_UNKNOWN
+
+    enum class CycleLoadout(private val displayName: String) {
+        LOADOUT_1("Loadout 1"),
+        LOADOUT_2("Loadout 2"),
+        LOADOUT_3("Loadout 3"),
+        LOADOUT_4("Loadout 4"),
+        LOADOUT_5("Loadout 5"),
+        LOADOUT_6("Loadout 6"),
+        LOADOUT_7("Loadout 7"),
+        LOADOUT_8("Loadout 8"),
+        LOADOUT_9("Loadout 9"),
+        LOADOUT_10("Loadout 10"),
+        LOADOUT_11("Loadout 11"),
+        LOADOUT_12("Loadout 12"),
+        ;
+
+        override fun toString() = displayName
+    }
 }

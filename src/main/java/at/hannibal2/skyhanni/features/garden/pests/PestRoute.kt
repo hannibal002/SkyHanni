@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.features.garden.pests.PestEntityResolver.LoadedPest
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.BlockUtils.raycast
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -18,6 +20,8 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.phys.HitResult
 import kotlin.math.floor
 
@@ -26,8 +30,8 @@ object PestRoute {
 
     private data class EtherwarpTarget(val block: LorenzVec, val nearbyPests: Int)
 
-    private val config get() = PestApi.config
-    private val routeColor = LorenzColor.RED.toColor()
+    private val config get() = PestApi.config.pestHighlights
+    private val routeLabelBackground = LorenzColor.BLACK.toColor().addAlpha(160).rgb
     private var route = emptyList<LoadedPest>()
     private var etherwarpTarget: EtherwarpTarget? = null
 
@@ -60,28 +64,33 @@ object PestRoute {
         if (visibleRoute.isEmpty()) return
 
         if (config.shortestPestRoute) {
-            event.drawLineToCrosshair(visibleRoute.first().location, routeColor, lineWidth = 3, depth = true)
+            val routeColor = config.lineColor.toColor()
+            event.drawLineToCrosshair(visibleRoute.first().location, routeColor, lineWidth = config.lineWidth, depth = true)
 
             visibleRoute.zipWithNext().forEach { (previous, next) ->
-                event.draw3DLine(previous.location, next.location, routeColor, lineWidth = 3, depth = true)
+                event.draw3DLine(previous.location, next.location, routeColor, lineWidth = config.lineWidth, depth = true)
             }
 
             var previousLocation = LocationUtils.playerLocation()
             visibleRoute.forEachIndexed { index, pest ->
                 val location = pest.location
+                val labelLocation = location.add(y = 0.75)
+                val labelsBehindGlass = isObstructedOnlyByGlass(labelLocation)
                 val rightClicks = (previousLocation.distance(location) / RIGHT_CLICK_TELEPORT_DISTANCE).toInt()
                 event.drawDynamicText(
-                    location.add(y = 0.75),
+                    labelLocation,
                     "§8[§e§l$rightClicks RC§8]",
                     scaleMultiplier = 1.35,
                     yOff = RIGHT_CLICK_LABEL_SCREEN_OFFSET,
-                    seeThroughBlocks = false,
+                    seeThroughBlocks = labelsBehindGlass,
+                    backGroundColor = routeLabelBackground,
                 )
                 event.drawDynamicText(
-                    location.add(y = 0.75),
+                    labelLocation,
                     "§c§l${index + 1} §7${pest.type.displayName}",
                     scaleMultiplier = 1.8,
-                    seeThroughBlocks = false,
+                    seeThroughBlocks = labelsBehindGlass,
+                    backGroundColor = routeLabelBackground,
                 )
                 previousLocation = location
             }
@@ -112,8 +121,12 @@ object PestRoute {
     private fun isEtherwarpTargetEnabled() =
         config.etherwarpPestTarget && InventoryUtils.getItemInHand()?.hasEtherwarp() == true
 
-    private fun LoadedPest.isVisiblePest() =
-        !entity.deceased && canBeSeen(viewDistance = PEST_VIEW_DISTANCE)
+    private fun LoadedPest.isVisiblePest(): Boolean {
+        if (entity.deceased) return false
+        if (canBeSeen(viewDistance = PEST_VIEW_DISTANCE)) return true
+        if (LocationUtils.playerEyeLocation().distance(location) >= PEST_VIEW_DISTANCE) return false
+        return isObstructedOnlyByGlass(location)
+    }
 
     private fun calculateRoute(start: LorenzVec, pests: List<LoadedPest>): List<LoadedPest> {
         if (pests.size <= 1) return pests
@@ -169,6 +182,38 @@ object PestRoute {
 
         val hit = raycast(playerEye, targetCenter)
         return hit.type == HitResult.Type.BLOCK && hit.blockPos == toBlockPos()
+    }
+
+    private fun isObstructedOnlyByGlass(target: LorenzVec): Boolean {
+        var rayStart = LocationUtils.playerEyeLocation()
+        val direction = (target - rayStart).normalize()
+        var foundGlass = false
+
+        repeat(MAX_GLASS_BLOCKS_IN_VIEW) {
+            val hit = raycast(rayStart, target)
+            if (hit.type == HitResult.Type.MISS) return foundGlass
+
+            val block = hit.blockPos.toLorenzVec().getBlockStateAt().block
+            if (!BuiltInRegistries.BLOCK.getKey(block).path.contains("glass")) return false
+
+            foundGlass = true
+            rayStart = rayStart.movePastBlock(hit.blockPos.x, hit.blockPos.y, hit.blockPos.z, direction)
+            if (rayStart.distance(target) <= GLASS_RAY_EPSILON) return true
+        }
+        return false
+    }
+
+    private fun LorenzVec.movePastBlock(blockX: Int, blockY: Int, blockZ: Int, direction: LorenzVec): LorenzVec {
+        val distances = buildList {
+            if (direction.x > 0) add((blockX + 1.0 - x) / direction.x)
+            if (direction.x < 0) add((blockX.toDouble() - x) / direction.x)
+            if (direction.y > 0) add((blockY + 1.0 - y) / direction.y)
+            if (direction.y < 0) add((blockY.toDouble() - y) / direction.y)
+            if (direction.z > 0) add((blockZ + 1.0 - z) / direction.z)
+            if (direction.z < 0) add((blockZ.toDouble() - z) / direction.z)
+        }
+        val distanceToExit = distances.filter { it >= 0.0 }.minOrNull() ?: return this
+        return this + direction * (distanceToExit + GLASS_RAY_EPSILON)
     }
 
     /**
@@ -236,10 +281,12 @@ object PestRoute {
     private const val MAX_EXACT_PESTS = 10
     private const val PEST_VIEW_DISTANCE = 400
     private const val RIGHT_CLICK_TELEPORT_DISTANCE = 12.0
-    private const val RIGHT_CLICK_LABEL_SCREEN_OFFSET = 14f
+    private const val RIGHT_CLICK_LABEL_SCREEN_OFFSET = -14f
     private const val MIN_ETHERWARP_DISTANCE = 8.0
     private const val MAX_ETHERWARP_DISTANCE = 61.0
     private const val TARGET_SEARCH_RADIUS = 4
     private const val TARGET_VERTICAL_SEARCH = 3
     private const val PEST_CLUSTER_RADIUS = 18.0
+    private const val MAX_GLASS_BLOCKS_IN_VIEW = 64
+    private const val GLASS_RAY_EPSILON = 0.01
 }

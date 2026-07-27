@@ -9,9 +9,7 @@ import at.hannibal2.skyhanni.features.garden.contest.FarmingContestApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
-import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CustomLoadoutKeybinds {
@@ -49,7 +47,7 @@ object CustomLoadoutKeybinds {
             config.contestSlot11,
             config.contestSlot12,
         )
-    private var lastClick = SimpleTimeMark.farPast()
+    private var waitingForMenuClose = false
     private var debugEnabled = false
 
     @HandleEvent
@@ -77,11 +75,20 @@ object CustomLoadoutKeybinds {
 
     private fun handlePress(): Boolean {
         if (!isEnabled()) return false
-        val slots = LoadoutApi.slots.filter { it.isInCurrentPage() }
+        if (waitingForMenuClose) {
+            debug("§cIgnored key press until the loadout menu is closed.")
+            return false
+        }
 
-        for ((index, key, contest) in activeKeybinds()) {
+        val slots = LoadoutApi.slots.filter { it.isInCurrentPage() }
+        if (config.cycleKey.isKeyHeld()) {
+            return cycleLoadout(slots)
+        }
+
+        val bindings = activeKeybinds()
+
+        for ((index, key, contest) in bindings) {
             if (!key.isKeyHeld()) continue
-            if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index)
             if (slot == null) {
                 debug("§cKey $key matched slot ${index + 1}, but that slot is not on the current page.")
@@ -89,20 +96,61 @@ object CustomLoadoutKeybinds {
             }
 
             val clicked = LoadoutApi.clickSlot(slot)
-            lastClick = SimpleTimeMark.now()
             debug(
                 "§7Key §e$key §7-> contest active: §e${FarmingContestApi.isContestActive}§7, " +
                     "binding: §e${if (contest) "contest" else "normal"}§7, chosen slot: §e${index + 1}§7, " +
                     "click sent: §e$clicked",
             )
-            return true
+            if (clicked) {
+                waitingForMenuClose = true
+                return true
+            }
         }
 
         return false
     }
 
-    fun allowMouseClick() = isEnabled() && activeKeybinds().any { it.key < 0 && it.key.isKeyHeld() }
-    fun allowKeyboardClick() = isEnabled() && activeKeybinds().any { it.key > 0 && it.key.isKeyHeld() }
+    private fun cycleLoadout(slots: List<LoadoutSlot>): Boolean {
+        val contestOrder = config.contestCycleOrder
+        val configuredOrder = if (FarmingContestApi.isContestActive && contestOrder.isNotEmpty()) {
+            contestOrder
+        } else {
+            config.cycleOrder
+        }
+        val orderedSlots = configuredOrder.mapNotNull { slots.getOrNull(it.ordinal) }
+        val currentIndex = orderedSlots.indexOfFirst { it.id == LoadoutApi.currentSlot }
+        val cycle = if (currentIndex == -1) {
+            orderedSlots
+        } else {
+            orderedSlots.drop(currentIndex + 1) + orderedSlots.take(currentIndex + 1)
+        }
+
+        for (slot in cycle) {
+            if (!LoadoutApi.clickSlot(slot)) continue
+            waitingForMenuClose = true
+            debug(
+                "§7Cycle key -> contest active: §e${FarmingContestApi.isContestActive}§7, " +
+                    "chosen slot: §e${slot.id + 1}",
+            )
+            return true
+        }
+        debug("§cCycle key pressed, but its active order has no available loadouts on this page.")
+        return false
+    }
+
+    @HandleEvent
+    fun onInventoryClose() {
+        if (waitingForMenuClose) {
+            waitingForMenuClose = false
+            debug("§7Loadout menu closed; cycle key unlocked.")
+        }
+    }
+
+    fun allowMouseClick() = isEnabled() && (config.cycleKey < 0 && config.cycleKey.isKeyHeld() ||
+        activeKeybinds().any { it.key < 0 && it.key.isKeyHeld() })
+
+    fun allowKeyboardClick() = isEnabled() && (config.cycleKey > 0 && config.cycleKey.isKeyHeld() ||
+        activeKeybinds().any { it.key > 0 && it.key.isKeyHeld() })
 
     private fun activeKeybinds(): List<LoadoutBinding> = buildList {
         if (FarmingContestApi.isContestActive) {

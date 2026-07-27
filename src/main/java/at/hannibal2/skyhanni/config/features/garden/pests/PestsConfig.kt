@@ -12,29 +12,9 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 
 class PestsConfig {
     @Expose
-    @ConfigOption(
-        name = "Pest Highlight",
-        desc = "Highlights visible pests with a §cred outline§7.",
-    )
-    @ConfigEditorBoolean
-    var pestHighlight: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Shortest Pest Route",
-        desc = "Shows the shortest route from you through every visible pest.",
-    )
-    @ConfigEditorBoolean
-    var shortestPestRoute: Boolean = false
-
-    @Expose
-    @ConfigOption(
-        name = "Etherwarp Pest Target",
-        desc = "Suggests a reachable Etherwarp landing block near the largest group of visible pests. " +
-            "You must aim, sneak, and right-click manually.",
-    )
-    @ConfigEditorBoolean
-    var etherwarpPestTarget: Boolean = false
+    @ConfigOption(name = "Pest Highlights", desc = "")
+    @Accordion
+    val pestHighlights: PestHighlightsConfig = PestHighlightsConfig()
 
     @Expose
     @ConfigOption(name = "Pest Spawn", desc = "")
