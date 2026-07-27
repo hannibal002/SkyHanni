@@ -421,7 +421,7 @@ object GardenNextJacobContest {
         addString("§7(§b${duration.format()}§7)")
     }
 
-    private fun shouldOpenPopup() = config.warnPopup && Minecraft.getInstance().isWindowActive
+    private fun shouldOpenPopup() = config.warnPopup && !Minecraft.getInstance().isWindowActive
 
     private fun EliteFarmingContest.warnAbout() {
         val timeUntil = startTime.timeUntil()
