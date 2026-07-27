@@ -275,7 +275,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
         floorPattern.firstMatcher(cleanAdded) {
@@ -297,7 +297,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateEvent) {
+    private fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
@@ -313,7 +313,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         for (line in lines) {
@@ -334,7 +334,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         dungeonFloor = null
         started = false
         inBossRoom = false
@@ -349,7 +349,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
@@ -376,7 +376,7 @@ object DungeonApi {
 
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
         if (bossCollectionsInventoryPattern.matches(event.inventoryName)) {
@@ -436,7 +436,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {
@@ -492,7 +492,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val position = event.position
@@ -527,7 +527,7 @@ object DungeonApi {
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
     @HandleEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    private fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
         playerDungeonTeamPattern.matchAllComponents(event.tabList) {

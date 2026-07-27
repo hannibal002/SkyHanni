@@ -168,13 +168,13 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
         footerLines.readNonGodPotEffects()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun readEffects(event: WidgetUpdateEvent) {
+    private fun readEffects(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.ACTIVE_EFFECTS)) return
         godPotTabPattern.firstMatcher(event.lines.map { it.string }) {
             profileStorage?.godPotExpiry = SimpleTimeMark.now() + TimeUtils.getDuration(group("time"))
@@ -213,7 +213,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun readSalts(event: WidgetUpdateEvent) {
+    private fun readSalts(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SALTS)) return
         saltTabPattern.matchAll(event.lines.map { it.string }) {
             val effect = group("effect")
