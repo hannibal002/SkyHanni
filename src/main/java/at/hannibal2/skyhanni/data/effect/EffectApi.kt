@@ -150,7 +150,7 @@ object EffectApi {
     // </editor-fold>
 
     init {
-        NonGodPotEffect.entries.forEach { it.tabListName }
+        NonGodPotEffect.entries.forEach { it.displayName }
     }
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
@@ -270,7 +270,7 @@ object EffectApi {
             } ?: false
 
     private fun SafeItemStack.getNonGodPotEffectOrNull(): NonGodPotEffect? = NonGodPotEffect.entries.firstOrNull {
-        cleanName.contains(it.inventoryItemName)
+        it.inventoryItemNamePattern.matches(cleanName)
     }
 
     @HandleEvent(onlyOnSkyblock = true)

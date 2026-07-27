@@ -9,12 +9,16 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 enum class NonGodPotEffect(
-    val tabListName: String,
-    val isMixin: Boolean = false,
-    val inventoryItemName: String = tabListName,
+    @param:Language("RegExp")
+    private val tabListName: String,
+    @param:Language("RegExp")
+    private val inventoryItemName: String = ".*${tabListName}.*",
+    @param:Language("RegExp")
+    private val effectGainedMessage: String? = null,
+    @param:Language("RegExp")
+    private val effectRemovedMessage: String? = null,
     val displayName: String,
-    @param:Language("RegExp") val effectGainedMessage: String? = null,
-    @param:Language("RegExp") val effectRemovedMessage: String? = null,
+    val isMixin: Boolean = false,
     val effectDuration: Duration? = null,
     val effectChangeType: EffectDurationChangeType? = null,
 ) {
@@ -112,7 +116,7 @@ enum class NonGodPotEffect(
 
     GREAT_SPOOK(
         "Great Spook I",
-        inventoryItemName = "Great Spook Potion",
+        inventoryItemName = ".*Great Spook Potion.*",
         displayName = "Great Spook I",
         effectGainedMessage = "You consumed a Great Spook Potion!",
         effectDuration = 24.hours,
@@ -217,5 +221,10 @@ enum class NonGodPotEffect(
                 it
             )
         },
+    )
+
+    val inventoryItemNamePattern by RepoPattern.pattern(
+        "misc.nongodpot.effects.inventoryitemname.$patternName",
+        inventoryItemName,
     )
 }
