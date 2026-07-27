@@ -37,7 +37,7 @@ object HolographicEntities {
     private var debugHologramTransparency: Float = 1f
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebughologram") {
             description = "Spawns a holographic zombie 5 blocks in front of you for testing"
             category = CommandCategory.DEVELOPER_TEST
@@ -73,7 +73,7 @@ object HolographicEntities {
 
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         val hologram = debugHologram ?: return
         event.renderHolographicEntity(hologram, opacity = debugHologramTransparency)
     }
