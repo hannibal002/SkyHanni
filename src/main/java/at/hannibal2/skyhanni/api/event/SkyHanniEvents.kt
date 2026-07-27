@@ -99,6 +99,13 @@ object SkyHanniEvents {
 
     private fun getEventData(method: Method): Pair<HandleEvent, List<Class<out SkyHanniEvent>>>? {
         val options = method.getAnnotation(HandleEvent::class.java) ?: return null
+        if (!method.declaringClass.isAnnotationPresent(SkyHanniModule::class.java)) {
+            ErrorManager.crashInDevEnv(
+                "Function ${method.fullyQualifiedName} must be declared directly inside a class " +
+                    "annotated with @SkyHanniModule because it is annotated with @HandleEvent",
+            )
+            return null
+        }
         return when (method.parameterCount) {
             0 -> handleZeroParameterMethod(method, options)
             1 -> handleSingleParameterMethod(method, options)

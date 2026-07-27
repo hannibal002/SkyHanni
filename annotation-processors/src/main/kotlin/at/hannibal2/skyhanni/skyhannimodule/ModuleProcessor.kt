@@ -12,10 +12,15 @@ import com.google.devtools.ksp.symbol.FileLocation
 import com.google.devtools.ksp.symbol.KSAnnotated
 import com.google.devtools.ksp.symbol.KSAnnotation
 import com.google.devtools.ksp.symbol.KSClassDeclaration
+import com.google.devtools.ksp.symbol.KSFunctionDeclaration
 import com.google.devtools.ksp.symbol.KSType
 import com.google.devtools.ksp.validate
 import java.io.File
 import java.io.OutputStreamWriter
+
+// Both annotations live in the main source set rather than here, so they can only be matched by name.
+private const val SKY_HANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
+private const val HANDLE_EVENT = "at.hannibal2.skyhanni.api.event.HandleEvent"
 
 class ModuleProcessor(
     codeGenerator: CodeGenerator,
@@ -38,7 +43,7 @@ class ModuleProcessor(
         )?.asStarProjectedType()
 
         val symbols = processBuildPaths(
-            resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList(),
+            resolver.getSymbolsWithAnnotation(SKY_HANNI_MODULE).toList(),
         )
         val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()
@@ -47,6 +52,8 @@ class ModuleProcessor(
                 annotation?.arguments?.firstOrNull()?.value as? String
             }
             .toSet()
+
+        validateModuleMembership(resolver)
 
         val filePaths = symbols.mapNotNull { it.containingFile?.filePath }.toSet()
         val outputFile = cache.outputFile("at/hannibal2/skyhanni/skyhannimodule", "LoadedModules")
@@ -77,7 +84,7 @@ class ModuleProcessor(
         return emptyList()
     }
 
-    private fun processBuildPaths(symbols: List<KSAnnotated>): List<KSAnnotated> {
+    private fun <T : KSAnnotated> processBuildPaths(symbols: List<T>): List<T> {
         val buildPathsFile = buildPaths?.let { File(it) }?.takeIf { it.exists() } ?: return symbols
         val validPaths = buildPathsFile.readText().lineSequence()
             .map { it.substringBefore("#").replace(Regex("\\.(?!kt|java|\\()"), "/").trim() }
@@ -86,6 +93,33 @@ class ModuleProcessor(
         return symbols.filter {
             val path = it.containingFile?.filePath ?: return@filter false
             path.substringAfter("/main/java/") !in validPaths
+        }
+    }
+
+    /**
+     * Validates that every `@HandleEvent` function is declared directly inside a `@SkyHanniModule` class.
+     *
+     * Handlers declared anywhere else are never registered, because `SkyHanniEvents.register` only reads
+     * `declaredMethods` of the objects listed in the generated `LoadedModules`, making them dead code.
+     *
+     * This runs on every build and ignores [KspIncrementalCache], because files that contain `@HandleEvent`
+     * but no `@SkyHanniModule` are never tracked by the cache and could therefore never be reported.
+     */
+    private fun validateModuleMembership(resolver: Resolver) {
+        val functions = processBuildPaths(
+            resolver.getSymbolsWithAnnotation(HANDLE_EVENT)
+                .filterIsInstance<KSFunctionDeclaration>()
+                .toList(),
+        )
+        for (function in functions) {
+            val parent = function.parentDeclaration as? KSClassDeclaration
+            if (parent?.annotations?.any { it.shortName.asString() == "SkyHanniModule" } == true) continue
+            val name = (function.qualifiedName ?: function.simpleName).asString()
+            logger.error(
+                "Function $name must be declared directly inside a class annotated with @SkyHanniModule " +
+                    "because it is annotated with @HandleEvent, otherwise it is never registered",
+                function,
+            )
         }
     }
 
@@ -132,6 +166,7 @@ class ModuleProcessor(
                                 "Function $name must have an event parameter, a primary function " +
                                     "name, or an explicit event specification because it is " +
                                     "annotated with @HandleEvent",
+                                function,
                             )
                         }
 
@@ -139,6 +174,7 @@ class ModuleProcessor(
                             logger.error(
                                 "Function $name must have an event assignable from SkyHanniEvent " +
                                     "because it is annotated with @HandleEvent",
+                                function,
                             )
                         }
 
@@ -147,6 +183,7 @@ class ModuleProcessor(
                                 "event parameter, or be parameterless with a primary function " +
                                 "name or an explicit event specification because it is annotated " +
                                 "with @HandleEvent",
+                            function,
                         )
                     }
                 }

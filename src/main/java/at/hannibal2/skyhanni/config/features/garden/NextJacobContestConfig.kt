@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.enums.SharePolicy
 import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
@@ -104,19 +105,23 @@ class NextJacobContestConfig {
     @ConfigLink(owner = NextJacobContestConfig::class, field = "display")
     val inventoryPosition: Position = Position(394, 124)
 
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(133, "garden.jacobContest.nextContest.shareAutomatically", ::fixEnum)
-    }
+    @SkyHanniModule
+    companion object {
 
-    private fun fixEnum(jsonElement: JsonElement): JsonElement {
-        val oldValue = jsonElement.asString
-        val newValue = when (oldValue) {
-            "ASK" -> SharePolicy.ASK
-            "AUTO" -> SharePolicy.AUTO
-            "DISABLED" -> SharePolicy.DISABLED
-            else -> return jsonElement
+        @HandleEvent
+        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+            event.transform(133, "garden.jacobContest.nextContest.shareAutomatically", ::fixEnum)
         }
-        return ConfigManager.gson.toJsonTree(newValue)
+
+        private fun fixEnum(jsonElement: JsonElement): JsonElement {
+            val oldValue = jsonElement.asString
+            val newValue = when (oldValue) {
+                "ASK" -> SharePolicy.ASK
+                "AUTO" -> SharePolicy.AUTO
+                "DISABLED" -> SharePolicy.DISABLED
+                else -> return jsonElement
+            }
+            return ConfigManager.gson.toJsonTree(newValue)
+        }
     }
 }
