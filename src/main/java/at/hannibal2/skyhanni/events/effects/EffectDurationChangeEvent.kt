@@ -4,9 +4,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Fired when the tracked duration of a [NonGodPotEffect] changes.
@@ -32,10 +29,5 @@ enum class EffectDurationChangeType {
     ADD,
     REMOVE,
     SET,
-    PARTIAL_SET,
-    ;
-
-    companion object {
-
-    }
+    PARTIAL_SET
 }
