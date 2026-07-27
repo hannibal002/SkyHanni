@@ -114,6 +114,7 @@ object BestiaryData {
         28..34,
         37..43,
     ).flatten()
+    private const val OVERALL_PROGRESS_SLOT = 52
 
     @HandleEvent
     fun onChestGuiRender() {
@@ -426,8 +427,9 @@ object BestiaryData {
     }
 
     private fun isOverallProgressEnabled(inventoryItems: Map<Int, SafeItemStack>): Boolean {
-        if (inventoryItems[52]?.`is`(Items.ENDER_EYE) == true) {
-            return inventoryItems[52]?.getLore()?.any { it == "§7Overall Progress: §aSHOWN" } == true
+        val stack = inventoryItems[OVERALL_PROGRESS_SLOT]
+        if (stack?.`is`(Items.ENDER_EYE) == true) {
+            return stack.getLore().any { it == "§7Overall Progress: §aSHOWN" }
         }
 
         indexes.forEach { index ->
