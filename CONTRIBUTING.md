@@ -217,6 +217,8 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
+  same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
