@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction
+import at.hannibal2.skyhanni.utils.chat.TextHelper
 import net.minecraft.network.chat.Component
 
 /**
@@ -10,4 +11,7 @@ import net.minecraft.network.chat.Component
  * @param footer The new footer [Component].
  */
 @PrimaryFunction("onTabListFooterUpdate")
-class TablistFooterUpdateEvent(val footer: Component) : SkyHanniEvent()
+class TablistFooterUpdateEvent(val footer: Component) : SkyHanniEvent() {
+
+    val footerList: List<Component> by lazy { TextHelper.split(footer, "\n") ?: listOf(footer) }
+}

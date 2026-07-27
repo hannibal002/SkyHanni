@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
@@ -169,7 +168,7 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
-        val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        val footerLines = event.footerList
         footerLines.readNonGodPotEffects()
     }
 

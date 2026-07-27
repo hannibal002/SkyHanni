@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -154,7 +153,7 @@ object NonGodPotEffectDisplay {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!checkFooter) return
-        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        val lines = event.footerList
         if (!lines.any { it.string.contains("Active Effects") }) return
 
         checkFooter = false

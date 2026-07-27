@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.append
@@ -315,7 +314,7 @@ object DungeonApi {
     @HandleEvent
     private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
+        val lines = event.footerList
         for (line in lines) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
