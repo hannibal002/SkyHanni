@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
@@ -68,7 +69,7 @@ object CFBlockOpen {
             EffectDurationChangeType.REMOVE -> SimpleTimeMark.farPast()
             EffectDurationChangeType.SET -> SimpleTimeMark.now() + event.duration
             EffectDurationChangeType.PARTIAL_SET ->
-                EffectDurationChangeType.updateUsingPartialSet(
+                EffectApi.clampUsingPartialSet(
                     chocolateFactory.hotChocolateMixinExpiry.timeUntil(),
                     event.duration,
                 ).let { SimpleTimeMark.now() + it }

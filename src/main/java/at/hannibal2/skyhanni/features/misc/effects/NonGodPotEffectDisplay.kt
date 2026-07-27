@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.effect.EffectApi
 import at.hannibal2.skyhanni.data.effect.NonGodPotEffect
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -86,7 +87,7 @@ object NonGodPotEffectDisplay {
 
             EffectDurationChangeType.PARTIAL_SET -> {
                 val existing = effectDuration[event.effect]?.duration ?: Duration.ZERO
-                val newDuration = EffectDurationChangeType.updateUsingPartialSet(existing, duration)
+                val newDuration = EffectApi.clampUsingPartialSet(existing, duration)
                 effectDuration[event.effect] = Timer(newDuration)
             }
         }
