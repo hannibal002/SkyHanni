@@ -40,7 +40,7 @@ import utils.FunctionMatcher.Companion.fromFunctionSignature
  *
  * Reports all method or property invocations that are forbidden.
  */
-// TODO: Replace with the offical detekt one when it supports public java properties
+// TODO: Replace with the offical detekt rule when it supports public java properties
 class ForbiddenMethodCall(config: Config) :
     SkyHanniRule(
         config,
@@ -72,6 +72,7 @@ class ForbiddenMethodCall(config: Config) :
         }
     }
 
+    // SKYHANNI: Ignore the compat folder
     private fun shouldIgnore(element: KtExpression): Boolean {
         val filePath = element.containingFile.virtualFile.path
         return filePath.contains("at\\hannibal2\\skyhanni\\utils\\compat") ||
@@ -112,6 +113,7 @@ class ForbiddenMethodCall(config: Config) :
     }
 
     private fun check(expression: KtExpression) {
+        // SKYHANNI: Ignore the compat folder
         if (shouldIgnore(expression)) return
         analyze(expression) {
             val call = expression.resolveToCall()
@@ -134,6 +136,7 @@ class ForbiddenMethodCall(config: Config) :
                         "The method `${forbiddenMethod.value}` has been forbidden in the detekt config."
                     }
 
+                    // SKYHANNI: we got reportIssue from the SkyHanniRule
                     expression.reportIssue(message)
                 }
             }
