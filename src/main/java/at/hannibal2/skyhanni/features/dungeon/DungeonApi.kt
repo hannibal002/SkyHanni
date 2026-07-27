@@ -274,7 +274,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         val cleanAdded = event.added.map { it.removeColor() }
         // TODO: move this under inDungeon check when we use Hypixel's ModAPI for island detection
         floorPattern.firstMatcher(cleanAdded) {
@@ -296,7 +296,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTablistChange(event: TabListUpdateEvent) {
+    private fun onTablistChange(event: TabListUpdateEvent) {
         if (!inDungeon()) return
         if (dungeonFloor == null || playerClass != null) return
 
@@ -312,7 +312,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
@@ -332,7 +332,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         dungeonFloor = null
         started = false
         inBossRoom = false

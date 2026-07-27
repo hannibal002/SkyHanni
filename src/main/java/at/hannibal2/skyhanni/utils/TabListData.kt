@@ -79,12 +79,12 @@ object TabListData {
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    private fun onPacketReceive(event: PacketReceivedEvent) {
         if (event.packet is ClientboundPlayerInfoUpdatePacket) dirty = true
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!dirty) return
         dirty = false
 
@@ -111,7 +111,7 @@ object TabListData {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shcopytablistcomponent") {
             description = "Copies the tab list data to the clipboard"
             category = CommandCategory.DEVELOPER_DEBUG

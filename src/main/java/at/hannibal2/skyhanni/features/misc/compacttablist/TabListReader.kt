@@ -127,20 +127,20 @@ object TabListReader {
     )
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.enabled) {
             rebuildRenderColumns()
         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    private fun onTabListUpdate(event: TabListUpdateEvent) {
         lastTab = event.tabList
         rebuildRenderColumns()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         lastFooter = event.footer
         rebuildRenderColumns()
     }
