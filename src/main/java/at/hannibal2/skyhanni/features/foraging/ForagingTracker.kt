@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.features.foraging.ForagingTrackerConfig
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TreeGiftBonusDropsJson
-import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
@@ -358,8 +357,8 @@ object ForagingTracker : SkyHanniBucketedItemTracker<ForagingTrackerLegacy.TreeT
         lastHover = null
     }
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    @HandleEvent
+    fun onIslandLeave() {
         if (!isInIsland()) return
         firstUpdate()
     }
