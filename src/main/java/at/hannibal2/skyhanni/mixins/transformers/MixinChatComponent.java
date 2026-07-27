@@ -56,12 +56,7 @@ public abstract class MixinChatComponent {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
-        original.call(
-            chatGraphicsAccess,
-            screenHeight,
-            ticks,
-            displayMode
-        );
+        original.call(chatGraphicsAccess, screenHeight, ticks, displayMode);
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);
