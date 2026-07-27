@@ -36,6 +36,13 @@ enum class EffectDurationChangeType {
     ;
 
     companion object {
+        // Applies a PARTIAL_SET update by replacing only the specified time units
+        // and preserving lower-order units from the existing duration.
+        //
+        // Examples:
+        // - 2h      -> updates hours only
+        // - 2h 10m  -> updates hours and minutes, preserves seconds
+        // - 2h 10m 5s -> replaces the entire duration
         fun updateUsingPartialSet(existing: Duration, duration: Duration): Duration {
             if (existing == Duration.ZERO) {
                 return duration
