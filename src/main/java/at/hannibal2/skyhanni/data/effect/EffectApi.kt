@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatchesComponent
+import at.hannibal2.skyhanni.utils.RegexUtils.firstComponentMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
@@ -25,7 +27,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.replace
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import kotlin.time.Duration
@@ -38,11 +39,13 @@ import kotlin.time.Duration.Companion.seconds
 object EffectApi {
 
     // <editor-fold desc="Patterns">
+    private val patternGroup = RepoPattern.group("api.effects")
+
     /**
      * REGEX-TEST: God Potion: 4d
      */
-    private val godPotTabPattern by RepoPattern.pattern(
-        "stats.tabpatterns.godpot-no-color",
+    private val godPotTabPattern by patternGroup.pattern(
+        "tab.god-pot",
         "God Potion: (?<time>[dhms0-9 ]+)",
     )
 
@@ -50,8 +53,8 @@ object EffectApi {
      * REGEX-TEST: SCHLURP! The effects of the Hot Chocolate Mixin have been extended by 86h 24m!
      * They will pause if your God Potion expires.
      */
-    private val hotChocolateMixinConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.hotchocolatemixinconsume.colorless",
+    private val hotChocolateMixinConsumePattern by patternGroup.pattern(
+        "chat.hot-chocolate-mixin-consume",
         ".*Hot Chocolate Mixin have been extended by (?<time>[dhms0-9 ]*)!.*",
     )
 
@@ -60,40 +63,40 @@ object EffectApi {
      * REGEX-TEST: SIP! The God Potion grants you powers for 28h 48m!
      * REGEX-TEST: SLURP! The God Potion grants you powers for 28h 48m!
      */
-    private val godPotConsumePattern by RepoPattern.pattern(
-        "stats.chatpatterns.godpotconsume.colorless",
+    private val godPotConsumePattern by patternGroup.pattern(
+        "chat.god-pot-consume",
         ".*God Potion grants you powers for (?<time>[dhms0-9 ]*)!.*",
     )
 
     /**
      * REGEX-TEST: (1/2) Active Effects
      */
-    private val effectsInventoryPattern by RepoPattern.pattern(
-        "inventory.effects",
+    private val effectsInventoryPattern by patternGroup.pattern(
+        "inventory.title",
         "(?:\\(\\d+/\\d+\\) )?Active Effects",
     )
 
     /**
      * REGEX-TEST: Filter
      */
-    private val filterPattern by RepoPattern.pattern(
-        "inventory.effects.filter.colorless",
+    private val filterPattern by patternGroup.pattern(
+        "inventory.filter",
         "Filter",
     )
 
     /**
      * REGEX-TEST: ▶ God Potion Effects
      */
-    private val godPotEffectsFilterSelectPattern by RepoPattern.pattern(
-        "inventory.effects.filtergodpotselect.colorless",
+    private val godPotEffectsFilterSelectPattern by patternGroup.pattern(
+        "inventory.filter.god-pot-selected",
         "▶ God Potion Effects",
     )
 
     /**
      * REGEX-TEST: Remaining: 105:01:34
      */
-    private val potionRemainingLoreTimerPattern by RepoPattern.pattern(
-        "inventory.effects.effecttimeleft.colorless",
+    private val potionRemainingLoreTimerPattern by patternGroup.pattern(
+        "inventory.effect-remaining",
         "Remaining: (?<time>[\\d:]+)",
     )
 
@@ -102,8 +105,8 @@ object EffectApi {
      * WRAPPED-REGEX-TEST: " Repellent: Regular (58m)"
      * WRAPPED-REGEX-TEST: " Repellent: Max (58m)"
      */
-    private val repellentPattern by RepoPattern.pattern(
-        "misc.nongodpot.repellant-no-color",
+    private val repellentPattern by patternGroup.pattern(
+        "tab.repellent",
         "(?: +)?Repellent: (?<tier>\\w+)?(?: \\((?<time>[dhms0-9 ]+)\\))?",
     )
 
@@ -113,8 +116,8 @@ object EffectApi {
      * WRAPPED-REGEX-TEST: "     Mushed Glowy Tonic I 43m"
      * REGEX-TEST: Wisp's Ice-Flavored Water I 10m
      */
-    private val tabEffectPattern by RepoPattern.pattern(
-        "tab.effects-no-color",
+    private val tabEffectPattern by patternGroup.pattern(
+        "tab.effect",
         " *(?<effect>[\\w\\-' ]+ (?<tier>[IVXLC]+)) ?(?:|[: ])+(?<time>[dhms0-9 ]+)",
     )
 
@@ -123,17 +126,33 @@ object EffectApi {
      * REGEX-TEST: Prime Lushlilac Bonbon: 18h
      * REGEX-TEST: Prime Lushlilac Bonbon: 17h 58m
      */
-    private val saltTabPattern by RepoPattern.pattern(
-        "tab.salts-no-color",
+    private val saltTabPattern by patternGroup.pattern(
+        "tab.salt",
         " (?<effect>[\\w\\-' ]+)*: *(?<time>[dhms0-9 ]+)",
     )
 
     /**
      * WRAPPED-REGEX-TEST: " Press TAB or type /effects to view your active effects!"
      */
-    private val tabListFooterPattern by RepoPattern.pattern(
-        "tab.footer.effects",
+    private val tabListFooterPattern by patternGroup.pattern(
+        "footer.effects-hint",
         " Press TAB or type /effects to view your active effects!",
+    )
+
+    /**
+     * REGEX-TEST: You have 10 non-god effects.
+     */
+    private val effectsCountPattern by patternGroup.pattern(
+        "footer.effects-count",
+        "You have (?<count>\\d+) non-god effects\\.",
+    )
+
+    /**
+     * REGEX-TEST: Active Effects
+     */
+    private val activeEffectsFooterPattern by patternGroup.pattern(
+        "footer.title",
+        "Active Effects",
     )
     // </editor-fold>
 
@@ -142,6 +161,7 @@ object EffectApi {
     }
 
     private val profileStorage get() = ProfileStorageData.profileSpecific
+    internal var totalEffectsCount = 0
 
     // Todo: Add support for poison candy I, and add support for splash / other formats
     @HandleEvent(onlyOnSkyblock = true)
@@ -180,8 +200,12 @@ object EffectApi {
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onTabUpdate(event: TablistFooterUpdateEvent) {
-        val footerLines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
-        footerLines.readNonGodPotEffects()
+        if (!activeEffectsFooterPattern.anyMatchesComponent(event.footer)) return
+        event.footer.readNonGodPotEffects()
+
+        totalEffectsCount = effectsCountPattern.firstComponentMatcher(event.footer) {
+            group("count").toIntOrNull()
+        } ?: 0
     }
 
     @HandleEvent(onlyOnSkyblock = true)

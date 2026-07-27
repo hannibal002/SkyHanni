@@ -315,8 +315,7 @@ object DungeonApi {
     @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val lines = TextHelper.split(event.footer, "\n") ?: listOf(event.footer)
-        for (line in lines) {
+        for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return

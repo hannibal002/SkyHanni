@@ -28,7 +28,7 @@ object TabListReader {
         private set
 
     private var lastTab: List<Component>? = null
-    private var lastFooter: Component? = null
+    private var lastFooter: List<Component>? = null
 
     private var inUpgrades = false
 
@@ -267,10 +267,8 @@ object TabListReader {
     // TODO refactor
     @Suppress("CyclomaticComplexMethod")
     private fun parseFooterAsColumn(): TabColumn? {
-        val component = lastFooter ?: return null
+        val lines = lastFooter ?: return null
         inUpgrades = false
-
-        val lines = TextHelper.split(component, "\n") ?: listOf(component)
 
         val godPotTimer = lines.firstNotNullOfOrNull {
             godPotPattern.matchMatcher(it.string) { group("timer") }
