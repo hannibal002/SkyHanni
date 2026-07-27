@@ -19,7 +19,7 @@ import java.io.File
 import java.io.OutputStreamWriter
 
 // Both annotations live in the main source set rather than here, so they can only be matched by name.
-private const val SKY_HANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
+private const val SKYHANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
 private const val HANDLE_EVENT = "at.hannibal2.skyhanni.api.event.HandleEvent"
 
 class ModuleProcessor(
@@ -43,7 +43,7 @@ class ModuleProcessor(
         )?.asStarProjectedType()
 
         val symbols = processBuildPaths(
-            resolver.getSymbolsWithAnnotation(SKY_HANNI_MODULE).toList(),
+            resolver.getSymbolsWithAnnotation(SKYHANNI_MODULE).toList(),
         )
         val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()
