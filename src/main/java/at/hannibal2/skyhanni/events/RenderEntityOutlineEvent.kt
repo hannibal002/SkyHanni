@@ -36,7 +36,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     init {
         type = theType
         entitiesToChooseFrom = potentialEntities
-        if (potentialEntities != null) {
+        if (!potentialEntities.isEmpty()) {
             entitiesToOutline = HashMap(potentialEntities.size)
         }
     }
