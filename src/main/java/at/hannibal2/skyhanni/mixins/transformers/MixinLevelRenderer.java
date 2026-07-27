@@ -113,17 +113,13 @@ public abstract class MixinLevelRenderer {
 
     @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))
     public void resetRealGlowing(CallbackInfo ci) {
-        RenderLivingEntityHelper.check();
-        RenderEntityOutlineEvent noXrayOutlineEvent = new RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.NO_XRAY, null);
-        RenderLivingEntityHelper.setCurrentGlowEvent(noXrayOutlineEvent);
-        noXrayOutlineEvent.post();
+        RenderLivingEntityHelper.postNoXrayOutlineEvent();
     }
 
     @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
     public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
-        if (glowColor == null) return original.call(instance);
-        return true;
+        return glowColor != null || original.call(instance);
     }
 
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))

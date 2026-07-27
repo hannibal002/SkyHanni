@@ -3,20 +3,16 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
 import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.components.ChatComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import java.util.ListIterator;
 
 //? if < 26.1 {
 /*import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -82,12 +78,7 @@ public abstract class MixinChatComponent {
         ChromaFontManagerKt.setRenderingChat(true);
         ModifyVisualWords.INSTANCE.setChangeWords(false);
 
-        original.call(
-            chatGraphicsAccess,
-            screenHeight,
-            ticks,
-            displayMode
-        );
+        original.call(chatGraphicsAccess, screenHeight, ticks, displayMode);
 
         ChromaFontManagerKt.setRenderingChat(false);
         ModifyVisualWords.INSTANCE.setChangeWords(true);

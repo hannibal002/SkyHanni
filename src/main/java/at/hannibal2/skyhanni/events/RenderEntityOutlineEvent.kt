@@ -8,7 +8,7 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.decoration.ItemFrame
 import java.awt.Color
 
-class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
+class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity> = emptySet()) : SkyHanniEvent() {
 
     /**
      * The phase of the event (see [Type]

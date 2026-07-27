@@ -23,16 +23,19 @@ object RenderLivingEntityHelper {
     var isUsingCustomGlow = false
         private set
 
-    @JvmStatic
-    var currentGlowEvent: RenderEntityOutlineEvent? = null
+    private var currentGlowEvent: RenderEntityOutlineEvent? = null
 
     private fun getEntityGlowEventColor(entity: Entity): Int? =
         currentGlowEvent?.entitiesToOutline?.get(entity)?.rgb?.takeIf { it != 0 }
 
     @JvmStatic
-    fun check() {
-        isUsingCustomGlow =
-            entityColorCondition.values.any { it() } || currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+    fun postNoXrayOutlineEvent() {
+        isUsingCustomGlow = entityColorCondition.values.any { it() } ||
+            currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+
+        val event = RenderEntityOutlineEvent(NO_XRAY)
+        currentGlowEvent = event
+        event.post()
     }
 
     @JvmStatic
