@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-//? if >= 26.2 {
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
 import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -14,9 +13,15 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 
+//? if < 26.2 {
+/*import net.minecraft.client.renderer.OutlineBufferSource;
+import net.minecraft.client.renderer.SubmitNodeStorage;
+*///?}
+
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
 
+    //? if >= 26.2 {
     @WrapOperation(
         method = "prepareModel",
         at = @At(
@@ -40,34 +45,8 @@ public abstract class MixinModelFeatureRenderer {
         }
         return original.call(instance, renderType);
     }
-
-    @Unique
-    private boolean skyhanni$usesCustomOutline(ModelFeatureRenderer.Submit<?> submit) {
-        Object obj = submit;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) return true;
-        return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
-    }
-}
-//?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.OutlineBufferSource;
-import net.minecraft.client.renderer.SubmitNodeStorage;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-
-@Mixin(ModelFeatureRenderer.class)
-public abstract class MixinModelFeatureRenderer {
-
-    @WrapOperation(
+    //?} else {
+    /*@WrapOperation(
         method = "renderModel",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
@@ -104,6 +83,7 @@ public abstract class MixinModelFeatureRenderer {
         }
         return original.call(outlineBufferSource, renderType);
     }
+    *///?}
 
     @Unique
     private boolean skyhanni$usesCustomOutline(ModelFeatureRenderer.Submit<?> submit) {
@@ -112,4 +92,3 @@ public abstract class MixinModelFeatureRenderer {
         return submit.state() instanceof EntityRenderState currentState && currentState.skyhanni$isUsingCustomOutline();
     }
 }
-*///?}
