@@ -29,20 +29,37 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
-    //? if >= 26.2 {
     @WrapOperation(
+        //? if >= 26.2 {
         method = "prepareOutlineSubmit",
+        //?} elif >= 26.1 {
+        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        *///?} else {
+        /*method = "render",
+        *///?}
+        //~ if < 26.2 'com/mojang/blaze3d/vertex/QuadInstance' -> 'net/minecraft/client/renderer/OutlineBufferSource'
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
+        //~ if < 26.2 'QuadInstance' -> 'OutlineBufferSource'
         QuadInstance instance,
         int color,
         Operation<Void> original,
-        @Local(argsOnly = true, name = "submit") ItemFeatureRenderer.Submit submit
+        //? if >= 26.1 {
+        @Local(argsOnly = true, name = "submit")
+        //?} else {
+        /*@Local
+        *///?}
+        ItemFeatureRenderer.Submit submit
     ) {
+        //? if < 26.2 {
+        /*if (submit.skyhanni$isUsingCustomOutline()) {
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
+            return;
+        }
+        *///?}
         original.call(instance, color);
     }
-    //?}
 
     //? if >= 26.1 {
     @ModifyArg(
@@ -126,7 +143,7 @@ public abstract class MixinItemFeatureRenderer {
     )
     private MultiBufferSource wrapOutlineVertexConsumer(
         MultiBufferSource bufferSource,
-        @Local SubmitNodeStorage.ItemSubmit submit
+        @Local ItemFeatureRenderer.Submit submit
     ) {
         Object value = submit;
         if (value instanceof GlowingStateStore state && state.skyhanni$isUsingCustomOutline()) {

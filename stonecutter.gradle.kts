@@ -179,7 +179,7 @@ stonecutter parameters {
         }
 
         string(current.parsed < "26.1") {
-            replace(";text", ";drawString")
+            replace(";text(", ";drawString(")
             replace("ProjectionMatrixBuffer", "CachedOrthoProjectionMatrixBuffer")
             replace("\"extractSlot\"", "\"renderSlot\"")
             replace("addBlitToCurrentLayer", "submitBlitToCurrentLayer")
