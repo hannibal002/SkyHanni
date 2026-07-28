@@ -31,8 +31,8 @@ object CorpseSharing {
 
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
 
-    // This list only keeps track of already shared waypoints by anyone in the chat.
-    // They don't get rendered.
+    // This list keeps track of already shared waypoints by anyone in the chat.
+    // They aren't rendered and are only intended to prevent sharing the same waypoint multiple times.
     private val sharedWaypoints = mutableListOf<LorenzVec>()
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
@@ -44,7 +44,7 @@ object CorpseSharing {
     }
 
     private fun shareCorpse() {
-        val closestCorpse = MineshaftWaypoints.waypoints.filter { it.isCorpse && !it.shared }
+        val closestCorpse = MineshaftWaypoints.waypoints.filter { it.type.isCorpse && !it.shared }
             .filterNot { corpse ->
                 sharedWaypoints.any { corpse.location.distance(it) <= 5 }
             }
@@ -52,18 +52,18 @@ object CorpseSharing {
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val location = closestCorpse.location.toChatFormat()
-        val type = closestCorpse.waypointType.display
+        val type = closestCorpse.type.display
 
         HypixelCommands.partyChat("$location | ($type)")
         closestCorpse.shared = true
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onPartyChat(event: PartyChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onAllChat(event: PlayerAllChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
@@ -74,7 +74,6 @@ object CorpseSharing {
     }
 
     private fun handleChatEvent(author: String, message: String) {
-        if (!config.enabled || !IslandType.MINESHAFT.isInIsland()) return
         if (PlayerUtils.getName() in author) return
 
         mineshaftCoordsPattern.matchMatcher(message) {
