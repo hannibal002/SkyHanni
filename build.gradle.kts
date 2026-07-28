@@ -217,8 +217,18 @@ dependencies {
     }
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    val reiVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "26.1.819"
+        ProjectTarget.MODERN_12111 -> "21.11.816"
+    }
+    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
+    if (isDeobf) compileOnly(reiApi) { isTransitive = false }
+    else modCompileOnly(reiApi) { isTransitive = false }
+    "minecraftTestClientRuntimeLibraries"(reiApi) {
+        isTransitive = false
+    }
+    compileOnly(libs.basicMath)
+    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     includeImplementation(libs.commons.net)
