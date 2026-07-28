@@ -52,6 +52,8 @@ loom.apply {
 
     runs {
         named("client") {
+            isIdeConfigGenerated = true
+            preferGradleTask = true
             appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
             if (System.getenv("repo_action") != "true") {
