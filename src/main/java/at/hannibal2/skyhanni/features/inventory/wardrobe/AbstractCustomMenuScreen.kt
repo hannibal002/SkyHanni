@@ -1,0 +1,64 @@
+package at.hannibal2.skyhanni.features.inventory.wardrobe
+
+import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
+import net.minecraft.client.Minecraft
+import net.minecraft.client.input.KeyEvent
+import net.minecraft.network.chat.Component
+import net.minecraft.world.inventory.AbstractContainerMenu
+import net.minecraft.world.inventory.ChestMenu
+import net.minecraft.world.inventory.ContainerListener
+
+// Reference: https://github.com/SkyblockerMod/Skyblocker/blob/main/src/main/java/de/hysky/skyblocker/skyblock/dungeon/LeapOverlay.java
+abstract class AbstractCustomMenuScreen(
+    initialMenu: ChestMenu,
+    title: Component,
+) : SkyHanniBaseScreen(title), ContainerListener {
+
+    var menu: ChestMenu = initialMenu
+        private set
+
+    init {
+        menu.addSlotListener(this)
+        ToolTipData.lastSlot = null
+    }
+
+    fun changeHandler(newMenu: ChestMenu) {
+        menu.removeSlotListener(this)
+        menu = newMenu
+        menu.addSlotListener(this)
+        ToolTipData.lastSlot = null
+    }
+
+    override fun keyPressed(input: KeyEvent): Boolean {
+        if (super.keyPressed(input)) {
+            return true
+        }
+        if (Minecraft.getInstance().options.keyInventory.matches(input)) {
+            this.onClose()
+            return true
+        }
+        return false
+    }
+
+    override fun tick() {
+        super.tick()
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        if (!player.isAlive) {
+            player.closeContainer()
+        }
+    }
+
+    override fun guiClosed() {
+        MinecraftCompat.localPlayerOrNull?.closeContainer()
+    }
+
+    override fun removed() {
+        val player = MinecraftCompat.localPlayerOrNull ?: return
+        menu.removed(player)
+        menu.removeSlotListener(this)
+    }
+
+    override fun dataChanged(container: AbstractContainerMenu, property: Int, value: Int) = Unit
+}
