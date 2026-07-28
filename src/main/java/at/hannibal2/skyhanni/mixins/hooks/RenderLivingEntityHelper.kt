@@ -31,7 +31,7 @@ object RenderLivingEntityHelper {
     @JvmStatic
     fun postNoXrayOutlineEvent() {
         isUsingCustomGlow = entityColorCondition.values.any { it() } ||
-            currentGlowEvent?.entitiesToOutline?.isNotEmpty() == true
+            currentGlowEvent?.entitiesToOutline.orEmpty().isNotEmpty()
 
         val event = RenderEntityOutlineEvent(NO_XRAY)
         currentGlowEvent = event
