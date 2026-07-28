@@ -136,8 +136,8 @@ object SkyHanniEvents {
             -> listenerCacheGeneration.incrementAndGet()
 
             DirtyReason.LOCATION_CHANGED -> {
-                currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
                 listenerCacheGeneration.incrementAndGet()
+                currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
             }
 
             DirtyReason.SERVER_DISCONNECTED -> {
