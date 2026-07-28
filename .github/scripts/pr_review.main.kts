@@ -49,8 +49,11 @@ var errorCommentPosted = false
 fun error(message: String, commentError: Boolean = true): Nothing {
     System.err.println(message)
     if (commentError && !errorCommentPosted) {
-        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildErrorComment(message)))
-        postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)", commentError = false)
+        postPrComment(
+            prNumber = prNumber,
+            body = buildErrorComment(message),
+            commentError = false
+        ) { "Error: could not post workflow error as comment (HTTP $it)" }
         errorCommentPosted = true
     }
     exitProcess(1)
@@ -118,6 +121,18 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     return response.statusCode() to body
 }
 
+fun ghRepoGet(path: String): Pair<Int, JsonElement> = ghRequest("GET", "/repos/$repo$path")
+
+fun postComment(prNumber: String, body: String): Int {
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
+    return status
+}
+
+fun postPrComment(prNumber: String, body: String, commentError: Boolean = true, errorMessage: (Int) -> String) {
+    val status = postComment(prNumber, body)
+    status.requireSuccess(errorMessage(status), commentError)
+}
+
 fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
     if (hasFindings) {
         val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/labels", mapOf("labels" to listOf(label)))
@@ -130,7 +145,7 @@ fun setLabel(prNumber: String, label: String, hasFindings: Boolean) {
 }
 
 fun getPrLabels(prNumber: String): Set<String> {
-    val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/labels")
+    val (status, body) = ghRepoGet("/issues/$prNumber/labels")
     if (status.isHttpError) return emptySet()
     val array = body as? JsonArray ?: return emptySet()
     return array.mapNotNull {
@@ -207,7 +222,7 @@ fun StringBuilder.appendFull(findings: List<Finding>) {
 fun findExistingComment(prNumber: String, searchMarker: String): Long? {
     var page = 1
     while (true) {
-        val (status, body) = ghRequest("GET", "/repos/$repo/issues/$prNumber/comments?per_page=100&page=$page")
+        val (status, body) = ghRepoGet("/issues/$prNumber/comments?per_page=100&page=$page")
         status.requireSuccess("Error: could not fetch PR comments (HTTP $status), aborting")
         val array = body as? JsonArray ?: error("Error: unexpected response format for PR comments, aborting")
         if (array.size() == 0) return null
@@ -222,7 +237,7 @@ fun findExistingComment(prNumber: String, searchMarker: String): Long? {
 }
 
 fun getCommentBody(commentId: Long): String? {
-    val (status, body) = ghRequest("GET", "/repos/$repo/issues/comments/$commentId")
+    val (status, body) = ghRepoGet("/issues/comments/$commentId")
     status.requireSuccess("Error: could not fetch comment body (HTTP $status), aborting")
     return (body as? JsonObject)?.get("body")?.takeIf { it.isJsonPrimitive }?.asString
 }
@@ -259,11 +274,7 @@ fun markCommentAsStale(
         appendLine("</details>")
     }
 
-    val (status, _) = ghRequest(
-        "PATCH",
-        "/repos/$repo/issues/comments/$commentId",
-        mapOf("body" to staleBody)
-    )
+    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
 
     status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
 }
@@ -359,7 +370,7 @@ fun filterStonecutterDuplicates(versions: List<Pair<String, String?>>): List<Pai
 }
 
 fun getJobIdsByVersion(runId: String, versionLabels: List<String>): Map<String, Long> {
-    val (status, body) = ghRequest("GET", "/repos/$repo/actions/runs/$runId/jobs?per_page=100")
+    val (status, body) = ghRepoGet("/actions/runs/$runId/jobs?per_page=100")
     if (status.isHttpError) return emptyMap()
     val jobs = (body as? JsonObject)?.get("jobs") as? JsonArray ?: return emptyMap()
     val result = mutableMapOf<String, Long>()
@@ -430,7 +441,7 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
 }
 
 fun getMergeableState(prNumber: String): Boolean? {
-    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$prNumber")
+    val (status, body) = ghRepoGet("/pulls/$prNumber")
     status.requireSuccess("Error: could not fetch PR mergeable state (HTTP $status), aborting")
     val mergeableElement = (body as? JsonObject)?.get("mergeable") ?: return null
     if (mergeableElement.isJsonNull) return null
@@ -441,7 +452,7 @@ fun getAllOpenPRNumbers(): List<String> {
     val numbers = mutableListOf<String>()
     var page = 1
     while (true) {
-        val (status, body) = ghRequest("GET", "/repos/$repo/pulls?state=open&per_page=100&page=$page")
+        val (status, body) = ghRepoGet("/pulls?state=open&per_page=100&page=$page")
         status.requireSuccess("Error: could not fetch open PRs (HTTP $status), aborting")
         val array = body as? JsonArray ?: error("Error: unexpected response format for open PRs, aborting")
         for (element in array) {
@@ -481,8 +492,7 @@ fun runMergeConflictMode(prNumber: String) {
             conflictStaleMarker,
             "Show previous conflicts",
         )
-        val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildConflictBody()))
-        postStatus.requireSuccess("Error: could not post conflict comment (HTTP $postStatus)")
+        postPrComment(prNumber, buildConflictBody()) { "Error: could not post conflict comment (HTTP $it)" }
         setLabel(prNumber, conflictLabel, true)
         println("PR #$prNumber: conflicts found, comment posted")
     } else {
@@ -537,8 +547,7 @@ fun runDetektMode(prNumber: String) {
             val logContent = runCatching { logFile.takeIf { it.exists() }?.readText() }.getOrNull()
             if (!logContent.isNullOrBlank()) {
                 val body = buildDetektCrashBody(logContent)
-                val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
-                postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)")
+                postPrComment(prNumber, body) { "Error: could not post workflow error as comment (HTTP $it)" }
                 println("Detekt workflow did not complete successfully; posted explanatory comment")
                 exitProcess(0)
             } else {
@@ -567,8 +576,7 @@ fun runDetektMode(prNumber: String) {
         exitProcess(0)
     }
 
-    val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildDetektBody(findings)))
-    postStatus.requireSuccess("Error: could not post comment (HTTP $postStatus)")
+    postPrComment(prNumber, buildDetektBody(findings)) { "Error: could not post comment (HTTP $it)" }
     setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
 }
@@ -625,8 +633,7 @@ fun runBuildMode(prNumber: String) {
     )
 
     val versions = filterStonecutterDuplicates(listOf("1.21.11" to log1, "26.1" to log2))
-    val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to buildBuildFailureBody(versions)))
-    postStatus.requireSuccess("Error: could not post build failure comment (HTTP $postStatus)")
+    postPrComment(prNumber, buildBuildFailureBody(versions)) { "Error: could not post build failure comment (HTTP $it)" }
     setLabel(prNumber, buildLabel, true)
     println("Done: build failure comment posted, added label")
 }
@@ -668,12 +675,7 @@ fun runChangelogMode(prNumber: String) {
 
     staleExisting()
 
-    val (postStatus, _) = ghRequest(
-        "POST",
-        "/repos/$repo/issues/$prNumber/comments",
-        mapOf("body" to buildChangelogBody(errors)),
-    )
-    postStatus.requireSuccess("Error: could not post changelog comment (HTTP $postStatus)")
+    postPrComment(prNumber, buildChangelogBody(errors)) { "Error: could not post changelog comment (HTTP $it)" }
     setLabel(prNumber, changelogLabel, true)
     println("Done: changelog check comment posted")
 }
@@ -715,7 +717,7 @@ fun isDependencyOpen(dep: Dependency): Boolean {
 
 
 fun checkPrDependencies(issueNumber: String): Boolean {
-    val (status, body) = ghRequest("GET", "/repos/$repo/pulls/$issueNumber")
+    val (status, body) = ghRepoGet("/pulls/$issueNumber")
     if (status.isHttpError) {
         error("Error: could not fetch PR #$issueNumber (HTTP $status)")
     }
@@ -748,7 +750,7 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     val encoded = URLEncoder.encode(dependencyLabel, StandardCharsets.UTF_8).replace("+", "%20")
     var page = 1
     while (true) {
-        val (status, body) = ghRequest("GET", "/repos/$repo/issues?labels=$encoded&state=open&per_page=100&page=$page")
+        val (status, body) = ghRepoGet("/issues?labels=$encoded&state=open&per_page=100&page=$page")
         if (status.isHttpError) {
             error("Error: could not fetch labeled PRs (HTTP $status)")
         }
@@ -769,7 +771,7 @@ fun fetchAllOpenPRs(): List<JsonObject> {
     val result = mutableListOf<JsonObject>()
     var page = 1
     while (true) {
-        val (status, body) = ghRequest("GET", "/repos/$repo/issues?state=open&per_page=100&page=$page")
+        val (status, body) = ghRepoGet("/issues?state=open&per_page=100&page=$page")
         if (status.isHttpError) {
             error("Error: could not fetch open PRs (HTTP $status)", commentError = false)
         }
@@ -817,14 +819,14 @@ fun buildDependencyWaitingComment(deps: List<Dependency>): String = buildString 
 
 fun postDependencyWaitingComment(prNum: String, openDeps: List<Dependency>) {
     val message = buildDependencyWaitingComment(openDeps)
-    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    val status = postComment(prNum, message)
     if (status.isHttpError) System.err.println("Warning: could not post dependency waiting comment on PR #$prNum (HTTP $status)")
     else println("PR #$prNum: posted dependency waiting comment")
 }
 
 fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
     val message = buildDependencyNotificationMessage(closedPrNum, merged, remainingOpen)
-    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNum/comments", mapOf("body" to message))
+    val status = postComment(prNum, message)
     if (status.isHttpError) System.err.println("Warning: could not post notification on PR #$prNum (HTTP $status)")
     else println("PR #$prNum: posted dependency notification")
 }
