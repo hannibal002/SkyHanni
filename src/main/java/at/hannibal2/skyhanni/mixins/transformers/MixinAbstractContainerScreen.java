@@ -203,7 +203,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
             shift = At.Shift.AFTER
         )
     )
-    private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+    private void renderTooltipBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         ToolTipData.INSTANCE.setLastSlot(this.hoveredSlot);
     }
 }
