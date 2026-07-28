@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBoundingBox
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesInBox
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SafeItemStack
@@ -53,6 +54,9 @@ object MissingCropWarning {
     private val storage get() = ProfileStorageData.profileSpecific?.garden?.greenhouse
     private val fallbackStorage get() = ProfileStorageData.playerSpecific?.greenhouseDiagnosedCropPositionsByPlot
     private val fallbackDetectedStorage get() = ProfileStorageData.playerSpecific?.greenhouseDetectedCropPositionsByPlot
+    private val fallbackMutationStorage get() = ProfileStorageData.playerSpecific?.greenhouseMutationCropCategoriesByPlot
+    private val fallbackIgnoredReplacements get() =
+        ProfileStorageData.playerSpecific?.greenhouseIgnoredCropReplacementsByPlot
 
     private var previousScan: Set<CropCategory>? = null
     private var stableScanCount = 0
@@ -63,6 +67,8 @@ object MissingCropWarning {
     private val runtimeDetectedCropsByPlot = mutableMapOf<Int, MutableSet<String>>()
     private val runtimeDetectedCropPositionsByPlot = mutableMapOf<Int, MutableMap<String, LorenzVec>>()
     private val runtimeDiagnosedPositionsByPlot = mutableMapOf<Int, MutableMap<String, LorenzVec>>()
+    private val runtimeMutationCropCategoriesByPlot = mutableMapOf<Int, MutableSet<String>>()
+    private val runtimeIgnoredReplacementsByPlot = mutableMapOf<Int, MutableSet<String>>()
     private var pendingPersistentSave = false
     private var missingCropWaypointsPlotId: Int? = null
     private var missingCropWaypoints: Map<CropCategory, LorenzVec> = emptyMap()
@@ -72,6 +78,7 @@ object MissingCropWarning {
     private val announcedCompletePlots = mutableSetOf<Int>()
     private var lastProcessedPlotId: Int? = null
     private var checkerRunCount = 0
+    private val replacementPrompts = mutableMapOf<CropCategory, CropReplacement>()
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
@@ -102,6 +109,21 @@ object MissingCropWarning {
         }
         val plotId = GardenPlotApi.getCurrentPlot()?.id ?: return
         val targeted = pendingDiagnostic ?: lastTargetedCrop
+        if (event.inventoryItems.values.any { item ->
+                item.getLore().any { it.removeColor().trim() == MUTATION_CROP_LORE }
+            }) {
+            val mutationCategory = targeted?.first
+                ?: lastTargetedPosition?.getBlockStateAt()?.block?.let(CropCategory::fromBlock)
+            if (mutationCategory != null) {
+                rememberMutationCropCategory(plotId, mutationCategory)
+                ChatUtils.chat(
+                    "§eIgnored decorative ${mutationCategory.displayName} blocks in this mutation. " +
+                        "§7Use Crop Diagnostics on the real crop to save it.",
+                )
+            }
+            clearTargetedCrop()
+            return
+        }
         val category = event.inventoryItems.values.firstNotNullOfOrNull {
             CropCategory.fromDisplayName(it.hoverName.string.removeColor())
         } ?: targeted?.first
@@ -152,7 +174,16 @@ object MissingCropWarning {
 
     private fun findNearbyCropPosition(category: CropCategory, center: LorenzVec): LorenzVec? {
         val world = MinecraftCompat.localWorldOrNull ?: return null
+        if (category in headOnlyCrops) return findNearbyFloatingCropHead(category, center)
+
         val centerPos = center.toBlockPos()
+        // Crop Diagnostics can open when the player right-clicks the farmland below a crop.
+        // Prefer the clicked block and the block directly above it before searching the surrounding
+        // mutation. Otherwise decorative blocks of the same crop type can steal the diagnosed position.
+        listOf(centerPos, centerPos.above()).firstOrNull {
+            CropCategory.fromBlock(world.getBlockState(it).block) == category
+        }?.let { return it.toLorenzVec() }
+
         val from = centerPos.offset(-DIAGNOSTIC_SEARCH_RADIUS, -DIAGNOSTIC_SEARCH_RADIUS, -DIAGNOSTIC_SEARCH_RADIUS)
         val to = centerPos.offset(DIAGNOSTIC_SEARCH_RADIUS, DIAGNOSTIC_SEARCH_RADIUS, DIAGNOSTIC_SEARCH_RADIUS)
         val nearbyPositions = BlockPos.betweenClosed(from, to).toList()
@@ -161,12 +192,17 @@ object MissingCropWarning {
             .minByOrNull { it.distSqr(centerPos) }
         if (matchingCrop != null) return matchingCrop.toLorenzVec()
 
-        if (category !in diagnosticOnlyCrops) return null
-        return nearbyPositions
-            .filter { world.getBlockState(it).block in greenhouseStemBlocks }
-            .minByOrNull { it.distSqr(centerPos) }
-            ?.toLorenzVec()
+        return null
     }
+
+    private fun findNearbyFloatingCropHead(category: CropCategory, center: LorenzVec): LorenzVec? = buildList {
+        getEntitiesInBox<ArmorStand>(center, FLOATING_HEAD_SEARCH_RADIUS) { stand ->
+            listOf(stand.getStandHelmet(), stand.getHandItem()).any { it.isFloatingCropHead(category) }
+        }.mapTo(this) { it.getLorenzVec() }
+        getEntitiesInBox<Display.ItemDisplay>(center, FLOATING_HEAD_SEARCH_RADIUS) {
+            it.itemStack.isFloatingCropHead(category)
+        }.mapTo(this) { it.getLorenzVec() }
+    }.minByOrNull { it.distanceSq(center) }
 
     @HandleEvent(SecondPassedEvent::class, onlyOnIsland = IslandType.GARDEN)
     fun onSecondPassed() {
@@ -196,10 +232,33 @@ object MissingCropWarning {
                 saved.getOrPut(plotId) { mutableMapOf() }.putAll(positions)
             }
         }
+        storage?.mutationCropCategoriesByPlot?.let { saved ->
+            runtimeMutationCropCategoriesByPlot.forEach { (plotId, categories) ->
+                saved.getOrPut(plotId) { mutableSetOf() }.addAll(categories)
+            }
+        }
+        fallbackMutationStorage?.let { saved ->
+            runtimeMutationCropCategoriesByPlot.forEach { (plotId, categories) ->
+                saved.getOrPut(plotId) { mutableSetOf() }.addAll(categories)
+            }
+        }
+        storage?.ignoredCropReplacementsByPlot?.let { saved ->
+            runtimeIgnoredReplacementsByPlot.forEach { (plotId, categories) ->
+                saved.getOrPut(plotId) { mutableSetOf() }.addAll(categories)
+            }
+        }
+        fallbackIgnoredReplacements?.let { saved ->
+            runtimeIgnoredReplacementsByPlot.forEach { (plotId, categories) ->
+                saved.getOrPut(plotId) { mutableSetOf() }.addAll(categories)
+            }
+        }
         savePendingData()
 
         val plot = GardenPlotApi.getCurrentPlot() ?: return
         if (lastProcessedPlotId != plot.id) {
+            previousScan = null
+            stableScanCount = 0
+            lastReportedMissing = null
             announcedCompletePlots.remove(plot.id)
             previousRememberedMissingByPlot.remove(plot.id)
             stableRememberedChecksByPlot.remove(plot.id)
@@ -208,7 +267,25 @@ object MissingCropWarning {
         }
         missingCropWaypointsPlotId = plot.id
         missingCropWaypoints = emptyMap()
-        val scannedPositions = scanGreenhousePositions(plot)
+
+        val allRememberedPositions = rememberedCropPositions()
+        val allRememberedCategories = allRememberedPositions.values.flatMapTo(mutableSetOf()) { it.keys }
+        val rawScannedPositions = scanGreenhousePositions(plot)
+            .filterKeys { it !in mutationCropCategoriesByPlot()[plot.id].orEmpty() }
+        promptForCropReplacements(plot.id, rawScannedPositions, allRememberedPositions)
+
+        // Once every unique crop has a remembered home, those positions are authoritative. The live scan
+        // above may offer a replacement, but it must never save one until the player confirms it.
+        if (allRememberedCategories.size >= CropCategory.entries.size) {
+            validateRememberedCropsInPlot(plot.id, allRememberedPositions[plot.id].orEmpty())
+            return
+        }
+
+        val scannedPositions = rawScannedPositions.filterKeys { category ->
+                allRememberedPositions.none { (rememberedPlotId, positions) ->
+                    rememberedPlotId != plot.id && category in positions
+                }
+            }
         val present = scannedPositions.keys - missingDiagnosedCropsOnPlot(plot.id)
 
         // Positive sightings do not need stabilization. Floating display entities can fluctuate between
@@ -227,13 +304,6 @@ object MissingCropWarning {
             if (announcedCompletePlots.add(plot.id)) {
                 ChatUtils.chat("§aAll 12 unique Greenhouse crops are planted in Plot §e${plot.id}§a!")
             }
-            return
-        }
-
-        val allRememberedPositions = rememberedCropPositions()
-        val allRememberedCategories = allRememberedPositions.values.flatMapTo(mutableSetOf()) { it.keys }
-        if (allRememberedCategories.size >= CropCategory.entries.size) {
-            validateRememberedCropsInPlot(plot.id, allRememberedPositions[plot.id].orEmpty())
             return
         }
 
@@ -257,16 +327,14 @@ object MissingCropWarning {
         saveDetectedCropPositions(plot.id, scannedPositions)
         savePendingData()
 
-        // Only crops that have actually been seen are expected. Their remembered XYZ remains authoritative
-        // when the player visits another Greenhouse plot that never contained a unique crop.
+        // Only validate positions belonging to the plot the player is currently inside. Positions from a
+        // neighbouring Greenhouse may also be in loaded chunks, but loading must not make them current.
         val rememberedPositions = rememberedCropPositions()
-        val missingByPlot = rememberedPositions.mapValues { (_, positions) ->
-            positions.filter { (category, position) ->
-                position.isInLoadedChunk() && position.isMissingCrop(category)
-            }
+        val missingPositions = rememberedPositions[plot.id].orEmpty().filter { (category, position) ->
+            position.isInLoadedChunk() && position.isMissingCrop(category)
         }
-        val missing = missingByPlot.values.flatMapTo(mutableSetOf()) { it.keys }
-        missingCropWaypoints = missingByPlot[plot.id].orEmpty()
+        val missing = missingPositions.keys
+        missingCropWaypoints = missingPositions
         if (missing == lastReportedMissing) return
         lastReportedMissing = missing
 
@@ -292,7 +360,7 @@ object MissingCropWarning {
             for (pos in BlockPos.betweenClosed(from, to)) {
                 val block = world.getBlockState(pos).block
                 CropCategory.fromBlock(block)?.let {
-                    putIfAbsent(it, pos.toLorenzVec())
+                    if (it !in headOnlyCrops) putIfAbsent(it, pos.toLorenzVec())
                 }
                 if (size == CropCategory.entries.size) return@buildMap
             }
@@ -362,6 +430,7 @@ object MissingCropWarning {
             GardenPlotApi.plots.firstOrNull { it.id == plotId }
                 ?.let(::scanGreenhousePositions)
                 .orEmpty()
+                .filterKeys { it !in mutationCropCategoriesByPlot()[plotId].orEmpty() }
                 .filterKeys { it in initiallyMissing && it !in diagnosedCategories }
         }
         replacements.forEach { (category, position) ->
@@ -538,6 +607,33 @@ object MissingCropWarning {
             category = CommandCategory.USERS_ACTIVE
             simpleCallback { clearDiagnosticCropPositions() }
         }
+        event.registerBrigadier("shresetgreenhousecropdata") {
+            description = "Clears all remembered Greenhouse crop locations"
+            category = CommandCategory.USERS_ACTIVE
+            simpleCallback { resetGreenhouseCropData() }
+        }
+    }
+
+    private fun resetGreenhouseCropData() {
+        runtimeDetectedCropsByPlot.clear()
+        runtimeDetectedCropPositionsByPlot.clear()
+        runtimeDiagnosedPositionsByPlot.clear()
+        runtimeMutationCropCategoriesByPlot.clear()
+        runtimeIgnoredReplacementsByPlot.clear()
+        replacementPrompts.clear()
+        storage?.detectedCropsByPlot?.clear()
+        storage?.detectedCropPositionsByPlot?.clear()
+        storage?.diagnosedCropPositionsByPlot?.clear()
+        storage?.mutationCropCategoriesByPlot?.clear()
+        storage?.ignoredCropReplacementsByPlot?.clear()
+        fallbackDetectedStorage?.clear()
+        fallbackStorage?.clear()
+        fallbackMutationStorage?.clear()
+        fallbackIgnoredReplacements?.clear()
+        reset()
+        pendingPersistentSave = true
+        savePendingData()
+        ChatUtils.chat("§aCleared all remembered Greenhouse crop locations.")
     }
 
     private fun clearDiagnosticCropPositions() {
@@ -549,6 +645,9 @@ object MissingCropWarning {
         runtimeDiagnosedPositionsByPlot.clear()
         storage?.diagnosedCropPositionsByPlot?.clear()
         fallbackStorage?.clear()
+        runtimeMutationCropCategoriesByPlot.clear()
+        storage?.mutationCropCategoriesByPlot?.clear()
+        fallbackMutationStorage?.clear()
         clearTargetedCrop()
         missingCropWaypoints = emptyMap()
         pendingPersistentSave = true
@@ -608,6 +707,8 @@ object MissingCropWarning {
                 appendLine(" §7Checker runs this session: §e$checkerRunCount")
                 appendLine(" §7Live scan: §e${liveCrops.namesOrNone()}")
                 appendLine(" §7Saved crops: §e${savedCrops.namesOrNone()}")
+                val mutationCategories = mutationCropCategoriesByPlot()[plot?.id].orEmpty()
+                appendLine(" §7Mutation decorations: §e${mutationCategories.namesOrNone()}")
                 val allPresent = savedCrops + diagnosedPresentCrops(plot?.id)
                 appendLine(" §7Missing: §e${(CropCategory.entries.toSet() - allPresent).namesOrNone()}")
                 append(" §7Diagnosed positions: §e")
@@ -625,6 +726,146 @@ object MissingCropWarning {
 
     private fun Collection<CropCategory>.namesOrNone(): String =
         ifEmpty { return "none" }.joinToString(", ") { it.displayName }
+
+    private fun promptForCropReplacements(
+        newPlotId: Int,
+        scannedPositions: Map<CropCategory, LorenzVec>,
+        rememberedPositions: Map<Int, Map<CropCategory, LorenzVec>>,
+    ) {
+        scannedPositions.forEach { (category, newPosition) ->
+            val oldPlotId = rememberedPositions.entries.firstOrNull { (plotId, positions) ->
+                plotId != newPlotId && category in positions
+            }?.key ?: return@forEach
+            val replacement = CropReplacement(category, oldPlotId, newPlotId, newPosition)
+            if (category.name in ignoredCropReplacementsByPlot()[newPlotId].orEmpty()) return@forEach
+            replacementPrompts[category]?.let { existing ->
+                if (existing.oldPlotId == oldPlotId && existing.newPlotId == newPlotId) {
+                    // Keep the actionable position fresh without repeating the same prompt.
+                    replacementPrompts[category] = replacement
+                    return@forEach
+                }
+            }
+            replacementPrompts[category] = replacement
+
+            ChatUtils.chat(
+                "§e${category.displayName} was remembered in Greenhouse Plot §6$oldPlotId§e, " +
+                    "but was also found in Plot §6$newPlotId§e. Replace its remembered location?",
+            )
+            ChatUtils.clickableChat(
+                "§a[Replace with Plot $newPlotId]",
+                onClick = {
+                    replacementPrompts[category]
+                        ?.takeIf { it.oldPlotId == oldPlotId && it.newPlotId == newPlotId }
+                        ?.let(::acceptCropReplacement)
+                        ?: ChatUtils.chat("§cThat Greenhouse crop replacement is no longer pending.")
+                },
+                hover = "§eMove the remembered ${category.displayName} location to Plot $newPlotId.",
+            )
+            ChatUtils.clickableChat(
+                "§c[Keep Plot $oldPlotId]",
+                onClick = {
+                    val pending = replacementPrompts[category]
+                    if (pending?.oldPlotId == oldPlotId && pending.newPlotId == newPlotId) {
+                        replacementPrompts.remove(category)
+                        rememberIgnoredCropReplacement(newPlotId, category)
+                        ChatUtils.chat("§eKept ${category.displayName} in Greenhouse Plot §6$oldPlotId§e.")
+                    }
+                },
+                hover = "§eKeep the existing location and ignore this candidate.",
+            )
+        }
+    }
+
+    private fun acceptCropReplacement(replacement: CropReplacement) {
+        if (replacementPrompts[replacement.category] != replacement) {
+            ChatUtils.chat("§cThat Greenhouse crop replacement is no longer pending.")
+            return
+        }
+        if (!replacement.position.isInLoadedChunk() || replacement.position.isMissingCrop(replacement.category)) {
+            replacementPrompts.remove(replacement.category)
+            ChatUtils.chat("§cThe replacement ${replacement.category.displayName} is no longer present.")
+            return
+        }
+
+        val name = replacement.category.name
+        listOfNotNull(
+            runtimeDetectedCropPositionsByPlot,
+            storage?.detectedCropPositionsByPlot,
+            fallbackDetectedStorage,
+            runtimeDiagnosedPositionsByPlot,
+            storage?.diagnosedCropPositionsByPlot,
+            fallbackStorage,
+        ).forEach { positionsByPlot ->
+            positionsByPlot.values.forEach { it.remove(name) }
+        }
+        runtimeDetectedCropsByPlot.values.forEach { it.remove(name) }
+        storage?.detectedCropsByPlot?.values?.forEach { it.remove(name) }
+
+        runtimeDetectedCropsByPlot.getOrPut(replacement.newPlotId) { mutableSetOf() }.add(name)
+        storage?.detectedCropsByPlot?.getOrPut(replacement.newPlotId) { mutableSetOf() }?.add(name)
+        runtimeIgnoredReplacementsByPlot.values.forEach { it.remove(name) }
+        storage?.ignoredCropReplacementsByPlot?.values?.forEach { it.remove(name) }
+        fallbackIgnoredReplacements?.values?.forEach { it.remove(name) }
+        saveDetectedCropPositions(
+            replacement.newPlotId,
+            mapOf(replacement.category to replacement.position),
+        )
+        replacementPrompts.remove(replacement.category)
+        pendingPersistentSave = true
+        savePendingData()
+        ChatUtils.chat(
+            "§aMoved ${replacement.category.displayName} from Greenhouse Plot §e${replacement.oldPlotId} " +
+                "§ato Plot §e${replacement.newPlotId}§a.",
+        )
+    }
+
+    private fun rememberIgnoredCropReplacement(plotId: Int, category: CropCategory) {
+        val name = category.name
+        runtimeIgnoredReplacementsByPlot.getOrPut(plotId) { mutableSetOf() }.add(name)
+        storage?.ignoredCropReplacementsByPlot?.getOrPut(plotId) { mutableSetOf() }?.add(name)
+        fallbackIgnoredReplacements?.getOrPut(plotId) { mutableSetOf() }?.add(name)
+        pendingPersistentSave = true
+        savePendingData()
+    }
+
+    private fun ignoredCropReplacementsByPlot(): Map<Int, Set<String>> = buildMap {
+        fun addStored(stored: Map<Int, Set<String>>) {
+            stored.forEach { (plotId, names) ->
+                put(plotId, get(plotId).orEmpty() + names)
+            }
+        }
+        addStored(storage?.ignoredCropReplacementsByPlot.orEmpty())
+        addStored(fallbackIgnoredReplacements.orEmpty())
+        addStored(runtimeIgnoredReplacementsByPlot)
+    }
+
+    private fun rememberMutationCropCategory(plotId: Int, category: CropCategory) {
+        val name = category.name
+        runtimeMutationCropCategoriesByPlot.getOrPut(plotId) { mutableSetOf() }.add(name)
+        storage?.mutationCropCategoriesByPlot?.getOrPut(plotId) { mutableSetOf() }?.add(name)
+        fallbackMutationStorage?.getOrPut(plotId) { mutableSetOf() }?.add(name)
+
+        runtimeDetectedCropsByPlot[plotId]?.remove(name)
+        storage?.detectedCropsByPlot?.get(plotId)?.remove(name)
+        runtimeDetectedCropPositionsByPlot[plotId]?.remove(name)
+        storage?.detectedCropPositionsByPlot?.get(plotId)?.remove(name)
+        fallbackDetectedStorage?.get(plotId)?.remove(name)
+        pendingPersistentSave = true
+        savePendingData()
+    }
+
+    private fun mutationCropCategoriesByPlot(): Map<Int, Set<CropCategory>> = buildMap {
+        fun addStored(stored: Map<Int, Set<String>>) {
+            stored.forEach { (plotId, names) ->
+                val categories = getOrPut(plotId) { mutableSetOf() }.toMutableSet()
+                names.mapNotNullTo(categories, CropCategory::fromStorageName)
+                put(plotId, categories)
+            }
+        }
+        addStored(storage?.mutationCropCategoriesByPlot.orEmpty())
+        addStored(fallbackMutationStorage.orEmpty())
+        addStored(runtimeMutationCropCategoriesByPlot)
+    }
 
     private fun diagnosedPositionsByPlot(): Map<Int, Map<String, LorenzVec>> {
         return buildMap {
@@ -699,7 +940,12 @@ object MissingCropWarning {
     }
 
     private fun savePendingData() {
-        if (!pendingPersistentSave || storage == null && fallbackStorage == null && fallbackDetectedStorage == null) return
+        if (
+            !pendingPersistentSave ||
+            storage == null && fallbackStorage == null &&
+            fallbackDetectedStorage == null && fallbackMutationStorage == null &&
+            fallbackIgnoredReplacements == null
+        ) return
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FEATURES, "greenhouse-crop-detection")
         pendingPersistentSave = false
     }
@@ -747,6 +993,13 @@ object MissingCropWarning {
         }
     }
 
+    private data class CropReplacement(
+        val category: CropCategory,
+        val oldPlotId: Int,
+        val newPlotId: Int,
+        val position: LorenzVec,
+    )
+
     private val deadCropBlocks = setOf(Blocks.DEAD_BUSH, Blocks.CHORUS_PLANT, Blocks.CHORUS_FLOWER)
     private val diagnosticOnlyCrops = setOf(CropCategory.PUMPKIN, CropCategory.COCOA_BEANS)
     private val variableHeightCrops = setOf(CropCategory.CACTUS, CropCategory.SUGAR_CANE)
@@ -757,13 +1010,12 @@ object MissingCropWarning {
         CropCategory.PUMPKIN,
         CropCategory.MELON,
     )
-    private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
-    private val greenhouseStemBlocks = setOf(
-        Blocks.MELON_STEM,
-        Blocks.ATTACHED_MELON_STEM,
-        Blocks.PUMPKIN_STEM,
-        Blocks.ATTACHED_PUMPKIN_STEM,
+    private val headOnlyCrops = setOf(
+        CropCategory.COCOA_BEANS,
+        CropCategory.PUMPKIN,
+        CropCategory.MELON,
     )
+    private val playerHeadBlocks = setOf(Blocks.PLAYER_HEAD, Blocks.PLAYER_WALL_HEAD)
 
     private const val SCAN_RADIUS = 8
     private const val MIN_GARDEN_Y = 60
@@ -774,4 +1026,5 @@ object MissingCropWarning {
     private const val FLOATING_HEAD_HORIZONTAL_RADIUS = 0.75
     private const val REQUIRED_STABLE_SCANS = 2
     private const val REQUIRED_STABLE_REMEMBERED_CHECKS = 3
+    private const val MUTATION_CROP_LORE = "Mutation Crop"
 }

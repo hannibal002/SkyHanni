@@ -33,6 +33,12 @@ class PlayerSpecificStorage {
     var greenhouseDetectedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>> = mutableMapOf()
 
     @Expose
+    var greenhouseMutationCropCategoriesByPlot: MutableMap<Int, MutableSet<String>> = mutableMapOf()
+
+    @Expose
+    var greenhouseIgnoredCropReplacementsByPlot: MutableMap<Int, MutableSet<String>> = mutableMapOf()
+
+    @Expose
     var fameRank: String = "New Player"
 
     @Expose

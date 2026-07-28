@@ -675,6 +675,10 @@ class ProfileSpecificStorage(
             var detectedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>> = mutableMapOf(),
             @Expose
             var diagnosedCropPositionsByPlot: MutableMap<Int, MutableMap<String, LorenzVec>> = mutableMapOf(),
+            @Expose
+            var mutationCropCategoriesByPlot: MutableMap<Int, MutableSet<String>> = mutableMapOf(),
+            @Expose
+            var ignoredCropReplacementsByPlot: MutableMap<Int, MutableSet<String>> = mutableMapOf(),
         )
     }
 
