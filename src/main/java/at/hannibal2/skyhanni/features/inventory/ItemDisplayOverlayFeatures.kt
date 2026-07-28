@@ -168,10 +168,10 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-            if (DUNGEON_ITEM_QUALITY.isSelected()) {
-                val statBoostPercent = item.getDungeonItemQuality() ?.toString().orEmpty()
-                return "$statBoostPercent"
-            }
+        if (DUNGEON_ITEM_QUALITY.isSelected()) {
+            val statBoostPercent = item.getDungeonItemQuality() ?.toString().orEmpty()
+            return "$statBoostPercent"
+        }
 
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".toInternalName()) {
