@@ -153,6 +153,14 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.GALATEA,
     ),
 
+    HIDEONSUN(
+        "hideonsun",
+        LorenzColor.YELLOW,
+        "Hideonsun",
+        "The yellow Shulkers.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
     TREE_PROTECTION_ORDER(
         "tree_protection",
         LorenzColor.RED,
