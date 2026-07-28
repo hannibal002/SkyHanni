@@ -42,6 +42,8 @@ SkyHanniStyle:
         active: true
     OnlyOnIslandSpecificity:
         active: true
+    PrivateEventListener:
+        active: true
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
