@@ -41,7 +41,6 @@ import net.minecraft.network.protocol.game.ServerboundAttackPacket
 
 @SkyHanniModule
 object VisitorListener {
-
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
         "§7Offers Accepted: §a(?<offersAccepted>\\d+)",
