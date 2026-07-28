@@ -11,7 +11,7 @@ class WaypointTypesConfig {
         desc = "Mark the location of the entrance with a waypoint."
     )
     @ConfigEditorBoolean
-    var entrance: Boolean = false 
+    var entrance: Boolean = true
 
     @Expose
     @ConfigOption(
