@@ -172,8 +172,6 @@ object ItemDisplayOverlayFeatures {
             val statBoostPercent = item.getDungeonItemQuality() ?.toString().orEmpty()
             return "$statBoostPercent"
         }
-
-
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".toInternalName()) {
             val year = item.getNewYearCake()?.toString().orEmpty()
             return "§b$year"
