@@ -53,10 +53,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     @ModifyArg(
         //~ if < 26.1 'state/level/CameraRenderState;' -> 'state/CameraRenderState;'
         method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"
-        ),
+        at = @At(value = "INVOKE",target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"),
         index = 6
     )
     private int modifyRenderAlpha(int argb) {
@@ -76,10 +73,7 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     @WrapWithCondition(
         //~ if < 26.1 'state/level/CameraRenderState;' -> 'state/CameraRenderState;'
         method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V"
-        )
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitModel(Lnet/minecraft/client/model/Model;Ljava/lang/Object;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/rendertype/RenderType;IIILnet/minecraft/client/renderer/texture/TextureAtlasSprite;ILnet/minecraft/client/renderer/feature/ModelFeatureRenderer$CrumblingOverlay;)V")
     )
     private boolean shouldSubmitEntityModel(
         SubmitNodeCollector submitNodeCollector,
@@ -94,19 +88,13 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
         int outlineColor,
         ModelFeatureRenderer.CrumblingOverlay crumblingOverlay
     ) {
-        return !(state instanceof LivingEntityRenderState livingState
-            && livingState.isInvisible
-            && livingState.skyhanni$isUsingCustomOutline());
+        return !(state instanceof LivingEntityRenderState livingState &&
+            livingState.isInvisible &&
+            livingState.skyhanni$isUsingCustomOutline());
     }
 
     @Inject(method = "getRenderType", at = @At("HEAD"), cancellable = true)
-    public void getRenderState(
-        LivingEntityRenderState state,
-        boolean showBody,
-        boolean translucent,
-        boolean showOutline,
-        CallbackInfoReturnable<RenderType> cir
-    ) {
+    public void getRenderState(LivingEntityRenderState state, boolean showBody, boolean translucent, boolean showOutline, CallbackInfoReturnable<RenderType> cir) {
         if (showBody && EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return;
             //~ if < 26.1 'entityTranslucentCullItemTarget' -> 'itemEntityTranslucentCull'

@@ -1,4 +1,4 @@
-@file:Suppress("UnsafeCallOnNullableType", "VanillaItemStackImport")
+@file:Suppress("VanillaItemStackImport", "UnsafeCAllOnNullableType")
 
 package at.hannibal2.skyhanni.utils
 
@@ -6,9 +6,8 @@ import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.item.Items
 
-//? if >= 26.1 {
+//? if >= 26.1
 import net.minecraft.world.item.ItemStackTemplate
-//?}
 
 /**
  * Crash-safe drop-in replacement for [ItemStack] in Minecraft 26.1+.
@@ -30,12 +29,8 @@ typealias SafeItemStack = ItemStack
  */
 fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
     if (count <= 0 || item == Items.AIR) return ItemStack.EMPTY
-
-    //? if >= 26.1 {
+    //~ if < 26.1 'DeferredItemStack(item, { ItemStackTemplate(item, count) }, count)' -> 'ItemStack(item, count)'
     return DeferredItemStack(item, { ItemStackTemplate(item, count) }, count)
-    //?} else {
-    /*return ItemStack(item, count)
-    *///?}
 }
 
 /**
@@ -44,12 +39,8 @@ fun SafeItemStack(item: Item, count: Int = 1): SafeItemStack {
  */
 fun SafeItemStack(item: Item, count: Int = 1, extraOps: SafeItemStack.() -> Unit): SafeItemStack {
     if (count <= 0 || item == Items.AIR) return ItemStack.EMPTY
-
-    //? if >= 26.1 {
+    //~ if < 26.1 'DeferredItemStack(item, { createItemStackTemplate(item, count, extraOps) }, count)' -> 'ItemStack(item, count).also(extraOps)'
     return DeferredItemStack(item, { createItemStackTemplate(item, count, extraOps) }, count)
-    //?} else {
-    /*return ItemStack(item, count).also(extraOps)
-    *///?}
 }
 
 //? if >= 26.1 {

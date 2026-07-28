@@ -1,8 +1,8 @@
+//? if >= 26.1 {
 @file:Suppress("VanillaItemStackImport")
 
 package at.hannibal2.skyhanni.utils
 
-//? if >= 26.1 {
 import net.minecraft.core.Holder
 import net.minecraft.core.component.DataComponentMap
 import net.minecraft.core.component.DataComponentPatch

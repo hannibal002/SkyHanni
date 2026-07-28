@@ -180,11 +180,11 @@ object NumberUtil {
         runCatching { romanToDecimal() }.getOrElse { null }
 
     fun Int.toRoman(): String {
-        require(this > 0) { "$this must be positive!" }
-
-        val (value, symbol) = romanSymbols.floorEntry(this) ?: error("No Roman symbol found for $this")
-
-        return if (this == value) symbol else symbol + (this - value).toRoman()
+        if (this <= 0) error("$this must be positive!")
+        val l = romanSymbols.floorKey(this)
+        return if (this == l) {
+            romanSymbols[this]!!
+        } else romanSymbols[l] + (this - l).toRoman()
     }
 
     fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()

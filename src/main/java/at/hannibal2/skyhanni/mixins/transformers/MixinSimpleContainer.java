@@ -11,10 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(SimpleContainer.class)
 public abstract class MixinSimpleContainer {
 
-    @ModifyExpressionValue(
-        method = "getItem",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;get(I)Ljava/lang/Object;")
-    )
+    @ModifyExpressionValue(method = "getItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;get(I)Ljava/lang/Object;"))
     public Object getStack(Object original, @Local(argsOnly = true) int slot) {
         return ReplaceItemEvent.postEvent((SimpleContainer) (Object) this, (ItemStack) original, slot);
     }

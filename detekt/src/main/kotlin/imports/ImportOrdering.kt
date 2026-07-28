@@ -6,7 +6,7 @@ object ImportOrdering {
     private val packageImportOrdering = listOf("java.", "javax.", "kotlin.", "kotlinx.")
 
     fun getOrdering(): Comparator<String> = importOrder
-
+    
     private fun compareImports(import1: String, import2: String): Int {
         val path1 = import1.removePrefix("import ").substringBefore(" as ")
         val path2 = import2.removePrefix("import ").substringBefore(" as ")

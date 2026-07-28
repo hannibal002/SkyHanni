@@ -1,6 +1,6 @@
+//? if >= 26.1 {
 package at.hannibal2.skyhanni.utils.compat
 
-//? if >= 26.1 {
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.state.level.CameraRenderState

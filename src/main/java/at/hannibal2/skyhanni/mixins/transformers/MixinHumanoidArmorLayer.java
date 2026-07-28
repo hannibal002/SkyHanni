@@ -17,13 +17,7 @@ public abstract class MixinHumanoidArmorLayer {
 
     @Inject(method = "renderArmorPiece", at = @At("HEAD"), cancellable = true)
     private void onRenderArmor(
-        PoseStack poseStack,
-        SubmitNodeCollector submitNodeCollector,
-        ItemStack itemStack,
-        EquipmentSlot slot,
-        int i,
-        HumanoidRenderState humanoidRenderState,
-        CallbackInfo ci
+        PoseStack poseStack, SubmitNodeCollector submitNodeCollector, ItemStack itemStack, EquipmentSlot slot, int i, HumanoidRenderState humanoidRenderState, CallbackInfo ci
     ) {
         if (HideArmorHookKt.shouldHideHead(slot)) {
             ci.cancel();

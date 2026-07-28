@@ -18,37 +18,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PreparedTextBuilder.class)
 public abstract class MixinPreparedTextBuilder {
 
-    @Inject(
-        method = "visit",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/Font$GlyphVisitor;acceptGlyph(Lnet/minecraft/client/gui/font/TextRenderable$Styled;)V"
-        )
-    )
+    @Inject(method = "visit", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Font$GlyphVisitor;acceptGlyph(Lnet/minecraft/client/gui/font/TextRenderable$Styled;)V"))
     private void checkIfGlyphIsChroma(CallbackInfo ci, @Local TextRenderable.Styled textDrawable) {
         if (textDrawable instanceof BakedSheetGlyph.GlyphInstance drawnGlyph) {
             ChromaFontManagerKt.checkIfGlyphIsChroma(drawnGlyph);
         }
     }
 
-    @WrapOperation(
-        method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"
-        )
-    )
+    @WrapOperation(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/chat/Style;getColor()Lnet/minecraft/network/chat/TextColor;"))
     private TextColor wrapGetColor(Style original, Operation<TextColor> operation) {
         return ChromaFontManagerKt.forceWhiteTextColorForChroma(original.getColor());
     }
 
-    @ModifyArg(
-        method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;createGlyph(FFIILnet/minecraft/network/chat/Style;FF)Lnet/minecraft/client/gui/font/TextRenderable$Styled;"
-        )
-    )
+    @ModifyArg(method = "accept(ILnet/minecraft/network/chat/Style;Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;)Z", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/font/glyphs/BakedGlyph;createGlyph(FFIILnet/minecraft/network/chat/Style;FF)Lnet/minecraft/client/gui/font/TextRenderable$Styled;"))
     private Style forceChromaIfNecessary(Style style) {
         return ChromaFontManagerKt.forceChromaStyleIfNecessary(style);
     }

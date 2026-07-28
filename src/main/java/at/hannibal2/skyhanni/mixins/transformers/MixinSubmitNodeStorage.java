@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
     /*SubmitNodeStorage.ModelPartSubmit.class,
     *///?}
 })
-public class MixinSubmitNode implements GlowingStateStore {
+public class MixinSubmitNodeStorage implements GlowingStateStore {
 
     @Unique
     private boolean skyhanni$usingCustomOutline = false;

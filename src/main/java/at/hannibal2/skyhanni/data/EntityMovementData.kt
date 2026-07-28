@@ -95,7 +95,7 @@ object EntityMovementData {
             if (entity.deceased) continue
 
             val newLocation = entity.getLorenzVec()
-            val oldLocation = entityLocation[entity] ?: continue
+            val oldLocation = entityLocation[entity]!!
             val distance = newLocation.distance(oldLocation)
             if (distance > 0.01) {
                 entityLocation[entity] = newLocation

@@ -159,11 +159,10 @@ object CommunityFix {
     private fun nextMax(tier: Int, crop: CropType): Long =
         crop.milestoneTotalCropsForTier(tier).let { crop.milestoneTotalCropsForTier(tier + 1).minus(it) }
 
+    @Suppress("UnsafeCallOnNullableType")
     private fun fix(crop: CropType, map: MutableMap<CropType, List<Int>>, tier: Int, amount: Int) {
-        map[crop]?.let {
-            map[crop] = it.editCopy {
-                this[tier] = amount
-            }
+        map[crop] = map[crop]!!.editCopy {
+            this[tier] = amount
         }
     }
 

@@ -98,14 +98,15 @@ object ReminderManager {
 
         if (args.first() == "-l") {
             if (args.size < arguments.size + 1) return ChatUtils.userError("/shremind $command -l $argumentText")
-            val reminder = storage[args.drop(1).first()] ?: return ChatUtils.userError("Reminder not found!")
-            action(args.drop(2), reminder).apply {
+            if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found!")
+            action(args.drop(2), storage[args.drop(1).first()]!!).apply {
                 listReminders(1)
                 sendMessage(this)
             }
+        } else if (storage[args.first()] == null) {
+            return ChatUtils.userError("Reminder not found!")
         } else {
-            val reminder = storage[args.first()] ?: return ChatUtils.userError("Reminder not found!")
-            sendMessage(action(args.drop(1), reminder))
+            sendMessage(action(args.drop(1), storage[args.first()]!!))
         }
     }
 

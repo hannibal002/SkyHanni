@@ -11,14 +11,9 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(Model.class)
 public abstract class MixinModel {
 
-    @ModifyArg(
-        method = "renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"
-        ),
-        index = 4
-    )
+    // prevent replacement
+    //~ if < 26.1 ';render(' -> ';render('
+    @ModifyArg(method = "renderToBuffer(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/geom/ModelPart;render(Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;III)V"), index = 4)
     private int modifyRenderAlpha(int argb) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);

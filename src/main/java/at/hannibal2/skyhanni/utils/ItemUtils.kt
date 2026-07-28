@@ -600,7 +600,9 @@ object ItemUtils {
         // This workaround fixes 'Turbo Cacti I Book'
         val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
-        itemAmountCache[input]?.let { return it }
+        if (itemAmountCache.containsKey(input)) {
+            return itemAmountCache[input]!!
+        }
 
         UtilsPatterns.readAmountBeforePattern.matchMatcher(input) {
             val itemName = group("name")
@@ -720,8 +722,8 @@ object ItemUtils {
         repoSkullProviders.forEach { it.reset() }
         coinSkullCache.clear()
         transientCoinSkullCache.clear()
-        // If compactNames is null, we want the NPE to happen in onRepoReload(), not in getRepoCompactName()
-        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION", "MapGetWithNotNullAssertionOperator")
+        // if compactNames is null, we want the npe to happen in onRepoReload(), not in getRepoCompactName()
+        @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
         compactNameReplace = event.getConstant<ItemsJson>("Items").compactNames!!
     }
 

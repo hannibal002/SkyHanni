@@ -9,7 +9,9 @@ import net.minecraft.world.entity.player.Player
 class TabLine(val component: Component, val type: TabStringType, val customName: Component? = null) {
 
     fun getWidth(): Int {
-        var width = Minecraft.getInstance().font.width(customName ?: component)
+        val mc = Minecraft.getInstance()
+        var width = if (customName == null) mc.font.width(component)
+        else mc.font.width(customName)
 
         if (type === TabStringType.PLAYER) width += 8 + 2
         if (type === TabStringType.TEXT) width += 4

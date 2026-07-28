@@ -226,7 +226,7 @@ object CropMoneyDisplay {
         prices: List<Double>,
         extraMoneyPerHour: Double,
     ): Renderable? {
-        val crop = cropNames[internalName] ?: return null
+        val crop = cropNames[internalName]!!
         val isCurrent = crop == GardenApi.getCurrentlyFarmedCrop()
         if (number > config.showOnlyBest && (!config.showCurrent || !isCurrent)) return null
 
@@ -288,7 +288,7 @@ object CropMoneyDisplay {
     private fun calculateCropMoney(internalName: NeuInternalName, onlyNpcPrice: Boolean, amount: Int): CropMoneyData? {
         if (internalName == BOX_OF_SEEDS.getInternalName()) return null
 
-        val crop = cropNames[internalName] ?: return null
+        val crop = cropNames[internalName]!!
 
         // When only the NPC price is shown, display the price only for the base item
         if (onlyNpcPrice) {

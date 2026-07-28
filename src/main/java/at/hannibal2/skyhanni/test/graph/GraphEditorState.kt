@@ -87,8 +87,8 @@ class GraphEditorState {
         }
 
         for (oldEdge in this.edges) {
-            val n1 = nodeMap[oldEdge.node1] ?: continue
-            val n2 = nodeMap[oldEdge.node2] ?: continue
+            val n1 = nodeMap[oldEdge.node1]!!
+            val n2 = nodeMap[oldEdge.node2]!!
             val newEdge = GraphingEdge(n1, n2, oldEdge.direction)
             newState.edges.add(newEdge)
         }

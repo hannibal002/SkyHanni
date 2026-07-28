@@ -51,7 +51,7 @@ object GardenPlotIcon {
         }
         val plotList = plotList ?: return
         for ((index, internalName) in plotList) {
-            val old = originalStack[index] ?: continue
+            val old = originalStack[index]!!
             val new = internalName.getItemStack()
             cachedStack[index] = new.editItemInfo(old.hoverName, old.getLoreComponent())
         }

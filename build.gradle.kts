@@ -176,7 +176,6 @@ dependencies {
     target.modMenuVersion?.let {
         if (isDeobf) implementation("maven.modrinth:modmenu:$it")
         else modImplementation("maven.modrinth:modmenu:$it")
-        "productionRuntimeMods"("maven.modrinth:modmenu:$it")
     }
 
     if (isDeobf) runtimeOnly(libs.devauth)
@@ -539,8 +538,7 @@ tasks.matching { it.name == "kspTestKotlin" || it.name == "kspTestJava" }.config
 }
 
 tasks.withType<ValidateAccessWidenerTask>().configureEach {
-    if (isDeobf) enabled = false
-    else dependsOn("stonecutterPrepare")
+    dependsOn("stonecutterPrepare")
 }
 
 repositories {

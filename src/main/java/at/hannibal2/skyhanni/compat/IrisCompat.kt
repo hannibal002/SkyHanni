@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.compat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.utils.InitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipeline
@@ -30,7 +31,7 @@ object IrisCompat {
     }
 
     @HandleEvent
-    fun onInitFinished() {
+    fun onInitFinished(event: InitFinishedEvent) {
         if (!isIrisLoaded) return
         try {
             val irisApiClass = Class.forName(IRIS_API_PATH)

@@ -52,7 +52,7 @@ object PlatformUtils {
     }
 
     @HandleEvent
-    fun onDebug(event: DebugDataCollectEvent) {
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Loaded Mods")
         event.addIrrelevant {
             getLoadedMods().forEach { (_, name, version, origin) ->

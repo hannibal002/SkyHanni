@@ -17,6 +17,7 @@ interface MessageStore {
     }
 
     companion object {
+
         var GuiMessage.Line.parent: GuiMessage?
             get() = (this as MessageStore).`skyhanni$getParent`()
             set(value) {

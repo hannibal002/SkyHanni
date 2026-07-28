@@ -45,10 +45,6 @@ import java.util.List;
 @Mixin(AbstractContainerScreen.class)
 public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMenu> extends Screen {
 
-    protected MixinAbstractContainerScreen(Component title) {
-        super(title);
-    }
-
     @Shadow
     @Nullable
     protected Slot hoveredSlot;
@@ -56,89 +52,11 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Unique
     private final GuiContainerHook skyhanni$hook = new GuiContainerHook(this);
 
-    @Inject(
-        method = "keyPressed",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V",
-            shift = At.Shift.BEFORE
-        ),
-        cancellable = true
-    )
-    private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
-        skyhanni$hook.closeWindowPressed(cir);
+    protected MixinAbstractContainerScreen(Component title) {
+        super(title);
     }
 
-    @Inject(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractContents",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
-        )
-    )
-    private void backgroundDrawn(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyhanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
-    }
-
-    //~ if < 26.1 'extractRenderState' -> 'render'
-    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
-    private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
-    }
-
-    //~ if < 26.1 'extractRenderState' -> 'render'
-    @Inject(method = "extractRenderState", at = @At("TAIL"))
-    private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyhanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
-    }
-
-    @Inject(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractContents",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
-            shift = At.Shift.AFTER
-        )
-    )
-    private void onForegroundDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        skyhanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
-    }
-
-    @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
-    private void onDrawSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
-        skyhanni$hook.onDrawSlot(slot, ci);
-    }
-
-    @Inject(method = "extractSlot", at = @At("RETURN"))
-    private void onDrawSlotReturn(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
-        skyhanni$hook.onDrawSlotPost(slot);
-    }
-
-    @Inject(
-        method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V",
-        at = @At("HEAD"),
-        cancellable = true
-    )
-    private void onMouseClick(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo cir) {
-        skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
-    }
-
-    @Inject(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractContents",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
-            shift = At.Shift.AFTER
-        )
-    )
-    private void renderSlotBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
-        ToolTipData.INSTANCE.setLastSlot(this.hoveredSlot);
-    }
-
-    //~ if < 26.1 'extractRenderState' -> 'render'
+    //~ if < 26.1 '"extractRenderState"' -> '"render"' {
     @Inject(method = "extractRenderState", at = @At(value = "HEAD"), cancellable = true)
     private void renderHead(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (GlobalRender.getRenderDisabled()) return;
@@ -151,37 +69,21 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    //~ if < 26.1 'extractRenderState' -> 'render'
     @Inject(method = "extractRenderState", at = @At(value = "TAIL"), cancellable = true)
     private void renderTail(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (new DrawScreenAfterEvent(context, mouseX, mouseY, ci).post().isCancelled()) ci.cancel();
     }
 
-    @Inject(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractContents",
-        at = @At(
-            value = "INVOKE",
-            //~ if < 26.1 'extractRenderState' -> 'render'
-            target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V",
-            shift = At.Shift.AFTER
-        )
-    )
+    @Inject(method = "extractContents", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;IIF)V", shift = At.Shift.AFTER))
     private void renderBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
         if (MinecraftCompat.getLocalWorldExists() && MinecraftCompat.getLocalPlayerExists()) {
             new DrawBackgroundEvent(context).post();
         }
     }
+    //~}
 
-    @ModifyArg(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractTooltip",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"
-        ),
-        index = 1
-    )
+    //~ if < 26.1 'extractTooltip' -> 'renderTooltip'
+    @ModifyArg(method = "extractTooltip", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;setTooltipForNextFrame(Lnet/minecraft/client/gui/Font;Ljava/util/List;Ljava/util/Optional;IILnet/minecraft/resources/Identifier;)V"), index = 1)
     private List<Component> renderBackground(List<Component> textTooltip, @Local ItemStack itemStack, @Local(argsOnly = true) GuiGraphicsExtractor drawContext) {
         if (CustomWardrobe.shouldHideNormalTooltip()) {
             return new ArrayList<>();
@@ -210,15 +112,8 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
         }
     }
 
-    @ModifyArg(
-        //~ if < 26.1 'extract' -> 'render'
-        method = "extractLabels",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"
-        ),
-        index = 4
-    )
+    //~ if < 26.1 'extractLabels' -> 'renderLabels'
+    @ModifyArg(method = "extractLabels", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphicsExtractor;text(Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIZ)V"), index = 4)
     private int customForegroundTextColor(int colour) {
         return BetterContainers.getTextColor(colour);
     }
@@ -243,5 +138,72 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     private boolean fixMiddleClick(boolean original) {
         if (!MiddleClickFix.INSTANCE.isEnabled()) return original;
         return true;
+    }
+
+    @Inject(method = "keyPressed", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;onClose()V", shift = At.Shift.BEFORE), cancellable = true)
+    private void closeWindowPressed(KeyEvent input, CallbackInfoReturnable<Boolean> cir) {
+        skyhanni$hook.closeWindowPressed(cir);
+    }
+
+    @Inject(
+        method = "extractContents",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V"
+        )
+    )
+    private void backgroundDrawn(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        skyhanni$hook.backgroundDrawn(context, mouseX, mouseY, deltaTicks);
+    }
+
+    //~ if < 26.1 'extractRenderState' -> 'render' {
+    @Inject(method = "extractRenderState", at = @At("HEAD"), cancellable = true)
+    private void preDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        skyhanni$hook.preDraw(context, mouseX, mouseY, deltaTicks, ci);
+    }
+
+    @Inject(method = "extractRenderState", at = @At("TAIL"))
+    private void postDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        skyhanni$hook.postDraw(context, mouseX, mouseY, deltaTicks);
+    }
+    //~}
+
+    @Inject(
+        method = "extractContents",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightFront(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void onForegroundDraw(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        skyhanni$hook.foregroundDrawn(context, mouseX, mouseY, deltaTicks);
+    }
+
+    @Inject(method = "extractSlot", at = @At("HEAD"), cancellable = true)
+    private void onDrawSlot(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+        skyhanni$hook.onDrawSlot(slot, ci);
+    }
+
+    @Inject(method = "extractSlot", at = @At("RETURN"))
+    private void onDrawSlotReturn(GuiGraphicsExtractor guiGraphics, Slot slot, int i, int j, CallbackInfo ci) {
+        skyhanni$hook.onDrawSlotPost(slot);
+    }
+
+    @Inject(method = "slotClicked(Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ContainerInput;)V", at = @At("HEAD"), cancellable = true)
+    private void onMouseClick(Slot slot, int slotId, int button, ContainerInput actionType, CallbackInfo cir) {
+        skyhanni$hook.onMouseClick(slot, slotId, button, actionType, cir);
+    }
+
+    @Inject(
+        method = "extractContents",
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;extractSlotHighlightBack(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V",
+            shift = At.Shift.AFTER
+        )
+    )
+    private void renderTooltipBackgroundTexture(GuiGraphicsExtractor context, int mouseX, int mouseY, float deltaTicks, CallbackInfo ci) {
+        ToolTipData.INSTANCE.setLastSlot(this.hoveredSlot);
     }
 }
