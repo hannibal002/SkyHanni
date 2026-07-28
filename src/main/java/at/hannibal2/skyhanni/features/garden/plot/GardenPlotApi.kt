@@ -259,20 +259,20 @@ object GardenPlotApi {
         plotSprayedPattern.matchMatcher(event.cleanMessage) {
             val plotName = group("plot")
             val sprayName = group("spray")
-            val amount = group("amount").toInt()
+            val amount = group("amount").toIntOrNull() ?: 1
 
-            val plot = getPlotByName(plotName)
+            val plot = getPlotByName(plotName) ?: return
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
 
             GardenPlotSprayEvent.GardenPlotSprayAddedEvent(plot, spray, amount).post()
-            plot?.setSpray(spray, 30.minutes)
+            plot.setSpray(spray, 30.minutes)
 
         }
         plotSprayExpiredPattern.matchMatcher(event.cleanMessage) {
             val sprayName = group("spray")
             val plotName = group("plot")
 
-            val plot = getPlotByName(plotName)
+            val plot = getPlotByName(plotName) ?: return
             val spray = SprayType.getByNameOrNull(sprayName) ?: return
             GardenPlotSprayEvent.GardenPlotSprayExpiredEvent(plot, spray).post()
         }

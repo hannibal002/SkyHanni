@@ -256,7 +256,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     }
 
     @HandleEvent
-    fun onGardenPlotSprayAddedEvent(event: GardenPlotSprayEvent.GardenPlotSprayAddedEvent) {
+    private fun onGardenPlotSprayAdded(event: GardenPlotSprayEvent.GardenPlotSprayAddedEvent) {
         event.type.addSprayUsed(event.amount)
     }
 

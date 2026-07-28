@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.IslandLeaveEvent
 import at.hannibal2.skyhanni.events.garden.PlotChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlot
 import at.hannibal2.skyhanni.features.garden.plot.GardenPlotApi.plots
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,45 +27,60 @@ object SprayDisplay {
     private val config get() = PestApi.config.spray
     private var display: Component = Component.empty()
     private var currentSprayPlot: GardenPlot? = null
+    private var builtDisplay: Renderable? = null
 
-    @HandleEvent
-    fun onSecondPassed() {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    private fun onSecondPassed() {
         if (config.expiryNotification) {
             sendExpiredPlotsToChat(false)
         }
     }
 
-    @HandleEvent
-    fun onPlotChange(event: PlotChangeEvent) {
-        val newPlot = event.plot
-        if (newPlot == null) {
-            currentSprayPlot = null
-            return
-        }
-        if (config.displayEnabled) display = buildDisplay()
-        currentSprayPlot = newPlot.takeUnless { it.isBarn() }
-    }
-
-    @HandleEvent
-    fun onGardenPlotSprayChanged() {
-        if (config.displayEnabled) display = buildDisplay()
-    }
-
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onIslandJoin() {
-        if (!config.expiryNotification) return
-        sendExpiredPlotsToChat(true)
-    }
-
-    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onGuiRenderOverlay() {
-        if (!config.displayEnabled) return
-        val display = Renderable.text(
+    private fun onTick(event: SkyHanniTickEvent) {
+        if (!event.isMod(5)) return
+        builtDisplay = Renderable.text(
             componentBuilder {
                 append(display)
                 append(buildTimerComponent())
             },
         )
+    }
+
+    @HandleEvent
+    private fun onPlotChange(event: PlotChangeEvent) {
+        val newPlot = event.plot
+        if (newPlot == null) {
+            currentSprayPlot = null
+            builtDisplay = null
+            return
+        }
+        currentSprayPlot = newPlot.takeUnless { it.isBarn() }
+        if (config.displayEnabled) display = buildDisplay()
+    }
+
+    @HandleEvent
+    private fun onGardenPlotSprayChanged() {
+        if (config.displayEnabled) display = buildDisplay()
+    }
+
+    @HandleEvent
+    private fun onIslandLeave(event: IslandLeaveEvent) {
+        if (event.island == IslandType.GARDEN) {
+            builtDisplay = null
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    private fun onIslandJoin() {
+        if (!config.expiryNotification) return
+        sendExpiredPlotsToChat(true)
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    private fun onGuiRenderOverlay() {
+        if (!config.displayEnabled) return
+        val display = builtDisplay ?: return
 
         config.displayPosition.renderRenderable(display, posLabel = "Active Plot Spray Display")
     }
