@@ -202,6 +202,7 @@ class InventoryConfig {
         MASTER_STAR_TIER("§bMaster Star Tier"),
         MASTER_SKULL_TIER("§bMaster Skull Tier"),
         DUNGEON_HEAD_FLOOR_NUMBER("§bDungeon Head Floor Number"),
+        DUNGEON_ITEM_QUALITY("§bDungeon Item Quality"),
         NEW_YEAR_CAKE("§bNew Year Cake"),
         PET_LEVEL("§bPet Level"),
         MINION_TIER("§bMinion Tier"),
