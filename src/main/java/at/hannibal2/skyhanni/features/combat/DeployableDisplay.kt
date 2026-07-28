@@ -85,6 +85,6 @@ object DeployableDisplay {
     }
 
     fun getActiveDeployables(): List<Deployable> {
-        return activeDeployables.toList()
+        return activeDeployables.filter { it.isActive() }
     }
 }
