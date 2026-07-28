@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_ITEM_QUALITY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EVOLVING_ITEMS
@@ -165,6 +166,12 @@ object ItemDisplayOverlayFeatures {
                 internalName.contains("NECRON") -> return "7"
             }
         }
+
+            if (DUNGEON_ITEM_QUALITY.isSelected()) {
+                val statBoostPercent = item.getDungeonItemQuality() ?.toString().orEmpty()
+                return "$statBoostPercent"
+            }
+
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".toInternalName()) {
             val year = item.getNewYearCake()?.toString().orEmpty()
