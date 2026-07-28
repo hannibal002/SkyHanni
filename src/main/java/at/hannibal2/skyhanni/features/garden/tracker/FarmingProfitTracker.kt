@@ -344,7 +344,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.perTrackerConfig.trackerConfig.defaultDisplayMode,
             SkyHanniMod.feature.misc.tracker.defaultDisplayMode,
@@ -358,14 +358,14 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCropCollectionAdd(event: CropCollectionAddEvent) {
+    private fun onCropCollectionAdd(event: CropCollectionAddEvent) {
         val source = event.cropCollectionType.toTrackedSource() ?: return
         if (!shouldTrack(source)) return
         trackCropAmount(event.crop, source, event.amount)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onCropClick(event: CropClickEvent) {
+    private fun onCropClick(event: CropClickEvent) {
         clearSessionStateIfSessionWasReset()
         blocksBrokenCache.addOrPut(event.crop, 1)
         queueReplenishCost(event)
@@ -374,7 +374,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         if (!event.isMod(5) || blocksBrokenCache.isEmpty()) return
         val pending = EnumMap<CropType, Long>(blocksBrokenCache)
         blocksBrokenCache.clear()
@@ -386,13 +386,13 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onToolChange(event: GardenToolChangeEvent) {
+    private fun onToolChange(event: GardenToolChangeEvent) {
         currentToolHasBountiful = event.toolItem?.getReforgeModifier() == "bountiful"
         firstUpdate()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (!shouldTrack(TrackedSource.BOUNTIFUL)) return
         if (!currentToolHasBountiful) return
         if (lastFarmingActivity.passedSince() > 2.seconds) return
@@ -409,8 +409,8 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        checkPotionConsumption(event.message)
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        checkPotionConsumption(event.cleanMessage)
         checkRareCropDrop(event.cleanMessage)
         checkBlessedDrop(event.cleanMessage)
         checkCropFeverStart(event.cleanMessage)
@@ -429,7 +429,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onPestKill(event: PestKillEvent) {
+    private fun onPestKill(event: PestKillEvent) {
         if (!shouldTrack(TrackedSource.PESTS)) return
         modify {
             it.pestKills.addOrPut(event.pestType, 1)
@@ -442,14 +442,14 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onShardGain(event: ShardGainEvent) {
+    private fun onShardGain(event: ShardGainEvent) {
         if (!shouldTrack(TrackedSource.PESTS)) return
         if (event.shardInternalName != pestShard) return
         addTrackedItem(TrackedSource.PESTS, pestShard, event.amount.toLong())
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onVisitorAccept(event: VisitorAcceptEvent) {
+    private fun onVisitorAccept(event: VisitorAcceptEvent) {
         if (!shouldTrack(TrackedSource.VISITORS)) return
         modify {
             it.visitorsServed++
@@ -465,7 +465,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         when (event.source) {
             ItemAddManager.Source.COMMAND -> if (config.enabled) event.addItemFromEvent()
             ItemAddManager.Source.ITEM_ADD,
@@ -477,7 +477,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!VisitorApi.inInventory) return
         if (!shouldTrack(TrackedSource.VISITORS)) return
         val item = event.item ?: return
@@ -488,7 +488,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         val pending = pendingVisitorVinylGift ?: return
         if (!VisitorApi.inInventory || pending.created.passedSince() > 5.seconds) {
             pendingVisitorVinylGift = null
@@ -508,7 +508,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN, priority = HandleEvent.LOWEST)
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (event.sackChanges.isNotEmpty()) {
             recentSpecialCropItems.clear()
         }
@@ -851,7 +851,7 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetfarmingprofittracker") {
             aliases = listOf("shresetfarmingtracker")
             description = "Resets the Farming Profit Tracker"

@@ -58,7 +58,7 @@ object PurseApi {
         private set
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryName = InventoryUtils.openInventoryName()
         val item = event.item ?: return
         val itemName = item.cleanName
@@ -84,7 +84,7 @@ object PurseApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (auctionHouseSaleClaimPattern.matches(event.cleanMessage)) {
             lastAuctionHouseCoinClaim = SimpleTimeMark.now()
         }

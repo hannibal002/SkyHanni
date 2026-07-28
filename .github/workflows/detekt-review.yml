@@ -75,11 +75,12 @@ jobs:
                     echo "$HOME/kotlinc/bin" >> "$GITHUB_PATH"
 
             -   name: Post review and manage label
-                if: steps.pr.outputs.number != '' && steps.check_sha.outputs.current == 'true' && steps.download.outcome == 'success'
+                if: steps.pr.outputs.number != '' && steps.check_sha.outputs.current == 'true'
                 env:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
                     ARTIFACT_DIR: ${{ runner.temp }}/detekt-artifact
+                    WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
                     MODE: detekt
                 run: kotlinc -script .github/scripts/pr_review.main.kts

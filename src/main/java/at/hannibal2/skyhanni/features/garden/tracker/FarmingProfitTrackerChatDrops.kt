@@ -38,7 +38,7 @@ object FarmingProfitTrackerChatDrops {
     )
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (overclockerPityPattern.matches(event.cleanMessage)) {
             FarmingProfitTracker.addPestItem(overclocker, 1)
         }
