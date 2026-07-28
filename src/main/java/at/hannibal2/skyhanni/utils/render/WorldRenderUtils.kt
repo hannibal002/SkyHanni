@@ -44,10 +44,14 @@ import net.minecraft.util.FormattedCharSequence
 /*import net.minecraft.client.renderer.MultiBufferSource
 import org.joml.Matrix4f
 *///?}
-//? if = 26.1
-/*import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT*/
-//? if < 26.1
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT*/
+
+//? if = 26.1 {
+/*import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
+*///?}
+
+//? if < 26.1 {
+/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
+*///?}
 
 // TODO refactor
 @Suppress("LargeClass")
@@ -367,7 +371,7 @@ object WorldRenderUtils {
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         //? if = 26.1 {
-        if (seeThroughBlocks) {
+        /*if (seeThroughBlocks) {
             deferredSeeThroughText.add { deferredBufferSource ->
                 fr.drawInBatch(
                     text,
@@ -384,7 +388,7 @@ object WorldRenderUtils {
             }
             return
         }
-        //?}
+        *///?}
 
         fr.drawInBatch(
             text,
@@ -466,7 +470,7 @@ object WorldRenderUtils {
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
         //? if = 26.1 {
-        if (seeThroughBlocks) {
+        /*if (seeThroughBlocks) {
             deferredSeeThroughText.add { deferredBufferSource ->
                 fr.drawInBatch(
                     text,
@@ -483,7 +487,7 @@ object WorldRenderUtils {
             }
             return
         }
-        //?}
+        *///?}
 
         fr.drawInBatch(
             text,

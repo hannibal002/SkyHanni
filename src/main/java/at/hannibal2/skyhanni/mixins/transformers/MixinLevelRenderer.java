@@ -102,8 +102,8 @@ public abstract class MixinLevelRenderer {
         //? if >= 26.1 {
         skyhanni$currentCameraState = cameraState;
         //?} else {
-        //skyhanni$currentCamera = camera;
-        //?}
+        /*skyhanni$currentCamera = camera;
+        *///?}
         skyhanni$currentDeltaTracker = deltaTracker;
     }
 
