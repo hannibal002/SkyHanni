@@ -720,6 +720,8 @@
 + Fixed some Magical Power features not working. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6172)
 + Fixed Pest Repellent time not being detected. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6203)
 + Fixed Profile Join Message Hider not working. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6181)
++ Fixed some glow-related SkyHanni features potentially not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
++ Fixed various GUI-related SkyHanni features being broken because some code was accidentally deleted. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
 
 ### Technical Details
 
