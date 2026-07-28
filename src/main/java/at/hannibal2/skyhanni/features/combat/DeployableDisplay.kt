@@ -30,7 +30,7 @@ object DeployableDisplay {
     }
 
     // todo should this be a set?
-    private val activeDeployables = mutableListOf<Deployable>()
+    private val knownDeployables = mutableListOf<Deployable>()
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onEntitySpawn(event: EntityCustomNameUpdateEvent<ArmorStand>) {
@@ -44,11 +44,11 @@ object DeployableDisplay {
                 if (deployable.expiryTime > time && deployable.isActive()) return@matchMatcher
                 deployable.entity = entity
                 deployable.expiryTime = time
-                for (entry in activeDeployables) {
+                for (entry in knownDeployables) {
                     val entryEntity = entry.entity ?: continue
                     if (entryEntity.getLorenzVec().equalsIgnoreY(entity.getLorenzVec())) return@matchMatcher
                 }
-                activeDeployables.add(deployable)
+                knownDeployables.add(deployable)
             }
         }
     }
@@ -69,22 +69,22 @@ object DeployableDisplay {
 
     @HandleEvent
     fun onWorldChange() {
-        activeDeployables.clear()
+        knownDeployables.clear()
         Deployable.entries.forEach { it.reset() }
     }
 
     private fun buildDisplay() {
-        activeDeployables.removeIf { !it.isActive() }
+        knownDeployables.removeIf { !it.isActive() }
         Deployable.entries.forEach { if (!it.isActive()) it.reset() }
         display.clear()
-        for (deployable in activeDeployables) {
+        for (deployable in knownDeployables) {
             if (deployable.type !in config.displayTypes) continue
-            if (config.highestTierOnly && activeDeployables.any { it.type == deployable.type && it.tier > deployable.tier }) continue
+            if (config.highestTierOnly && knownDeployables.any { it.type == deployable.type && it.tier > deployable.tier }) continue
             display.add(Renderable.text("$deployable §e${deployable.expiryTime.timeUntil().format()}"))
         }
     }
 
     fun getActiveDeployables(): List<Deployable> {
-        return activeDeployables.filter { it.isActive() }
+        return knownDeployables.filter { it.isActive() }
     }
 }
