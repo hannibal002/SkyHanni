@@ -208,7 +208,7 @@ object EffectApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!activeEffectsFooterPattern.anyMatchesComponent(event.footer)) return
         event.footer.readNonGodPotEffects()
 

@@ -312,7 +312,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    private fun onTabUpdate(event: TablistFooterUpdateEvent) {
+    private fun onTabListFooterUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         for (line in event.footer) {
             if (noBlessingPattern.matches(line)) {
@@ -347,7 +347,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
@@ -374,7 +374,7 @@ object DungeonApi {
 
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
         if (bossCollectionsInventoryPattern.matches(event.inventoryName)) {
@@ -434,7 +434,7 @@ object DungeonApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
         if (!inDungeon()) {
@@ -490,7 +490,7 @@ object DungeonApi {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != InteractClickType.RIGHT_CLICK) return
 
         val position = event.position
@@ -525,7 +525,7 @@ object DungeonApi {
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
     @HandleEvent
-    fun onTabUpdate(event: TabListUpdateEvent) {
+    private fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() || !started || completed) return
 
         playerDungeonTeamPattern.matchAllComponents(event.tabList) {
