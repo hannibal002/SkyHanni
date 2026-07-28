@@ -52,7 +52,7 @@ public abstract class MixinAbstractContainerScreen<T extends AbstractContainerMe
     @Unique
     private final GuiContainerHook skyhanni$hook = new GuiContainerHook(this);
 
-    protected MixinGuiContainer(Component title) {
+    protected MixinAbstractContainerScreen(Component title) {
         super(title);
     }
 
