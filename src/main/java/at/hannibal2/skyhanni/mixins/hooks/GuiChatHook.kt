@@ -30,9 +30,10 @@ object GuiChatHook {
         return replacementComponent ?: "No replacement component was set".asComponent()
     }
 
+    @Suppress("ForbiddenVoid") // Required for Java interop with Operation<Void>
     @JvmStatic
     fun wrapChatRender(
-        original: Operation<Unit>,
+        original: Operation<Void>,
         chatGraphicsAccess: ChatComponent.ChatGraphicsAccess,
         screenHeight: Int,
         ticks: Int,
