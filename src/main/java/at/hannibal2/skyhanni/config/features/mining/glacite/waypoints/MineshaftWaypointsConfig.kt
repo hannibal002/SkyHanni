@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.mining.glacite.waypoints
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
@@ -12,12 +11,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.glfw.GLFW
 
 class MineshaftWaypointsConfig {
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable features related to Glacite Mineshaft waypoints.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var enabled: Boolean = true
-
     @Expose
     @ConfigOption(name = "Waypoint Types", desc = "")
     @Accordion
@@ -44,11 +37,6 @@ class MineshaftWaypointsConfig {
     companion object {
         @HandleEvent
         fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(
-                140,
-                "mining.glaciteMineshaft.mineshaftWaypoints.enabled",
-                "mining.glaciteMineshaft.waypointsConfig.enabled",
-            )
             event.move(
                 140,
                 "mining.glaciteMineshaft.mineshaftWaypoints.entranceLocation",
