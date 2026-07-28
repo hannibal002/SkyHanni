@@ -18,7 +18,7 @@ class MineshaftWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Auto Share Found Corpses",
+        name = "Auto Share Corpses",
         desc = "Automatically share the location and type of found corpses in party chat.",
     )
     @ConfigEditorBoolean
@@ -26,7 +26,7 @@ class MineshaftWaypointsConfig {
 
     @Expose
     @ConfigOption(
-        name = "Share Found Corpse Keybind",
+        name = "Share Corpse Keybind",
         desc = "Share the location of the nearest found corpse upon key press.\n" +
             "§eYou can share the location even if it has already been shared!",
     )
