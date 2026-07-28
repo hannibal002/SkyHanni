@@ -101,6 +101,7 @@ object RareCropTracker {
         RAREFINDER_CHIP("§9Rarefinder Chip"),
         BURROWING_SPORES("§9Burrowing Spores"),
         WARTY("§5Warty"),
+        WILD_STRAWBERRY_DYE("§dWild Strawberry Dye"),
         ;
 
         val cleanName = dropName.removeColor()

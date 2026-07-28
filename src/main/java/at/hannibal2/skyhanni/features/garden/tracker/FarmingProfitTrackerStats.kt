@@ -18,12 +18,6 @@ import kotlin.math.absoluteValue
 object FarmingProfitTrackerStats {
 
     private val config get() = SkyHanniMod.feature.garden.farmingProfitTracker
-    private val trackerDisplayConfig
-        get() = if (config.perTrackerConfig.useUniversalConfig) {
-            SkyHanniMod.feature.misc.tracker
-        } else {
-            config.perTrackerConfig.trackerConfig
-        }
 
     fun addStats(list: MutableList<Searchable>, data: Data) {
         list.addConfiguredStats(data)
@@ -179,7 +173,8 @@ object FarmingProfitTrackerStats {
             visitorItems.entries.sortedBy { it.key.itemNameWithoutColor }.forEach { (internalName, item) ->
                 val amount = item.totalAmount
                 if (amount == 0L) return@forEach
-                val countedInProfit = !item.hidden || !trackerDisplayConfig.itemTracker.excludeHiddenItemsInPrice
+                val countedInProfit =
+                    !item.hidden || !FarmingProfitTracker.trackerDisplayConfig.itemTracker.excludeHiddenItemsInPrice
                 val displayAmount = if (internalName == SKYBLOCK_COIN && data.visitorCopper > 0) {
                     data.visitorCopper
                 } else {

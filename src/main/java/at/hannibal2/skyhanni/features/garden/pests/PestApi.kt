@@ -55,6 +55,9 @@ object PestApi {
     private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
     private val SALTY_SPRAYONATOR = "SALTY_SPRAYONATOR".toInternalName()
 
+    val BITS = "SKYBLOCK_BIT".toInternalName()
+    const val KILL_BITS = 5
+
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
 

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.SkyblockStat.FARMING_FORTUNE
 import at.hannibal2.skyhanni.data.model.SkyblockStat.OVERBLOOM
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.garden.tracker.RareCropTracker.RareCropDropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PlayerUtils
@@ -45,7 +46,7 @@ object FarmingProfitTrackerChatDrops {
         dyeDropPattern.matchMatcher(event.cleanMessage) {
             if (!group("player").endsWith(PlayerUtils.getName())) return@matchMatcher
             if (group("item") != "Wild Strawberry Dye") return@matchMatcher
-            FarmingProfitTracker.addRareCropItem(wildStrawberryDye)
+            FarmingProfitTracker.addRareCropItem(wildStrawberryDye, RareCropDropType.WILD_STRAWBERRY_DYE)
         }
     }
 }

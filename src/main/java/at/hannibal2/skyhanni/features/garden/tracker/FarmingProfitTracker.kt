@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.features.garden.CropCollectionType
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.features.garden.farming.HoeLevelDisplay
+import at.hannibal2.skyhanni.features.garden.pests.PestApi
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.garden.tracker.FarmingProfitTracker.drawDisplay
@@ -167,6 +168,12 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         if (amount.absoluteValue >= 1_000_000L) amount.shortFormat() else amount.addSeparators()
 
     private val config: FarmingProfitTrackerConfig get() = SkyHanniMod.feature.garden.farmingProfitTracker
+    internal val trackerDisplayConfig
+        get() = if (config.perTrackerConfig.useUniversalConfig) {
+            SkyHanniMod.feature.misc.tracker
+        } else {
+            config.perTrackerConfig.trackerConfig
+        }
     private val blocksBrokenCache: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
     private val pendingReplenishCosts: MutableMap<CropType, Long> = EnumMap(CropType::class.java)
     private val cropInternalNames = mutableMapOf<CropType, NeuInternalName>()
@@ -229,11 +236,11 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         }
 
         override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double =
-            if (internalName == PestProfitTracker.BITS) getBitsPrice() else super.getCustomPricePer(internalName, tracker)
+            if (internalName == PestApi.BITS) getBitsPrice() else super.getCustomPricePer(internalName, tracker)
 
         private fun getBitsPrice(): Double =
             if (SkyHanniMod.feature.misc.tracker.priceSource == ItemPriceSource.NPC_SELL) 0.0
-            else PestProfitTracker.config.coinsPerBit.get().toDouble()
+            else PestApi.config.pestProfitTracker.coinsPerBit.get().toDouble()
 
         override fun TrackedSource.isBucketSelectable() = true
 
@@ -434,9 +441,9 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         modify {
             it.pestKills.addOrPut(event.pestType, 1)
         }
-        if (BitsApi.bitsAvailable > 0 && PestProfitTracker.config.includeBits.get()) {
-            val bitsAmount = PestProfitTracker.KILL_BITS * BitsApi.bitsMultiplier()
-            addTrackedItem(TrackedSource.PESTS, PestProfitTracker.BITS, bitsAmount.toLong(), message = false)
+        if (BitsApi.bitsAvailable > 0 && PestApi.config.pestProfitTracker.includeBits.get()) {
+            val bitsAmount = PestApi.KILL_BITS * BitsApi.bitsMultiplier()
+            addTrackedItem(TrackedSource.PESTS, PestApi.BITS, bitsAmount.toLong(), message = false)
         }
         lastFarmingActivity = SimpleTimeMark.now()
     }
@@ -547,9 +554,13 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
         lastFarmingActivity = SimpleTimeMark.now()
     }
 
-    fun addRareCropItem(internalName: NeuInternalName) {
+    fun addRareCropItem(internalName: NeuInternalName, dropType: RareCropDropType) {
+        rememberSpecialCropItem(internalName, 1)
         if (!shouldTrack(TrackedSource.RARE_CROPS)) return
         addTrackedItem(TrackedSource.RARE_CROPS, internalName, 1L)
+        modify {
+            it.rareCropDrops.addOrPut(dropType, 1)
+        }
         lastFarmingActivity = SimpleTimeMark.now()
     }
 
@@ -568,14 +579,9 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
                 if (shouldTrack(TrackedSource.RARE_CROPS)) addSeasoningDrop()
                 return
             }
-            val internalName = NeuInternalName.fromItemNameOrNull(dropType.dropName.removeColor()) ?: dropType.name.toInternalName()
-            rememberSpecialCropItem(internalName, 1)
-            if (!shouldTrack(TrackedSource.RARE_CROPS)) return
-            addTrackedItem(TrackedSource.RARE_CROPS, internalName, 1L)
-            modify {
-                it.rareCropDrops.addOrPut(dropType, 1)
-            }
-            lastFarmingActivity = SimpleTimeMark.now()
+            val internalName =
+                NeuInternalName.fromItemNameOrNull(dropType.dropName.removeColor()) ?: dropType.name.toInternalName()
+            addRareCropItem(internalName, dropType)
             return
         }
     }
@@ -842,13 +848,6 @@ object FarmingProfitTracker : SkyHanniBucketedItemTracker<TrackedSource, Farming
 
     private fun shouldTrack(source: TrackedSource): Boolean =
         GardenApi.inGarden() && source in config.trackedSources
-
-    private val trackerDisplayConfig
-        get() = if (config.perTrackerConfig.useUniversalConfig) {
-            SkyHanniMod.feature.misc.tracker
-        } else {
-            config.perTrackerConfig.trackerConfig
-        }
 
     @HandleEvent
     private fun onCommandRegistration(event: CommandRegistrationEvent) {

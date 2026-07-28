@@ -112,8 +112,6 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     val ENCHANTED_SUNFLOWER_ITEM = "ENCHANTED_SUNFLOWER".toInternalName()
     val OVERCLOCKER = "OVERCLOCKER_3000".toInternalName()
     val DUNG_DYE = "DYE_DUNG".toInternalName()
-    val BITS = "SKYBLOCK_BIT".toInternalName()
-    const val KILL_BITS = 5
     private val PEST_SHARD = "ATTRIBUTE_SHARD_PEST_LUCK;1".toInternalName()
 
     private val noMessageDrops = setOf(
@@ -136,7 +134,7 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         override fun getCustomPricePer(internalName: NeuInternalName, tracker: SkyHanniTracker<*, *>): Double {
-            return if (internalName == BITS) {
+            return if (internalName == PestApi.BITS) {
                 getBitsPrice()
             } else {
                 super.getCustomPricePer(internalName, tracker)
@@ -149,7 +147,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
         }
 
         override val selectedBucketItems
-            get() = if (config.includeBits.get()) super.selectedBucketItems else super.selectedBucketItems.filter { it.key != BITS }
+            get() = if (config.includeBits.get()) super.selectedBucketItems
+            else super.selectedBucketItems.filter { it.key != PestApi.BITS }
                 .toMutableMap()
 
         override fun getCoinName(bucket: PestType?, item: TrackedItem) = "§6Pest Kill Coins"
@@ -208,8 +207,8 @@ object PestProfitTracker : SkyHanniBucketedItemTracker<PestType, PestProfitTrack
     @HandleEvent
     fun onPestKill(event: PestKillEvent) {
         if (BitsApi.bitsAvailable > 0) {
-            val bitsAmount = KILL_BITS * BitsApi.bitsMultiplier()
-            addItem(event.pestType, BITS, bitsAmount.toInt(), false)
+            val bitsAmount = PestApi.KILL_BITS * BitsApi.bitsMultiplier()
+            addItem(event.pestType, PestApi.BITS, bitsAmount.toInt(), false)
         }
     }
 

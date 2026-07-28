@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLoreComponent
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -71,10 +70,6 @@ object PurseApi {
         if (inventoryName.equalsOneOf("Your Bids", "Manage Auctions") && itemName == "Claim All") {
             lastAuctionHouseCoinClaim = SimpleTimeMark.now()
             return
-        }
-
-        if (inventoryName == "Manage Auctions" && item.getLoreComponent().any { it.string == "Status: Sold!" }) {
-            lastAuctionHouseCoinClaim = SimpleTimeMark.now()
         }
     }
 
