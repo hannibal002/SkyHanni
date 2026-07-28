@@ -135,9 +135,9 @@ object MinecraftCompat {
 
     val showDebugHud get(): Boolean = mc.debugEntries.isOverlayVisible
 
-    fun reloadChunks() {
+    fun reloadChunks() = DelayedRun.runOrNextTick {
         //~ if < 26.2 'levelExtractor' -> 'levelRenderer'
-        DelayedRun.runOrNextTick(mc.levelExtractor::allChanged)
+        mc.levelExtractor.allChanged()
     }
     // </editor-fold>
 }
