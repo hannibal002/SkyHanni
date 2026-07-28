@@ -2,23 +2,14 @@
 // Execution context: base branch
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, and check_dependencies.yml
 
-import com.google.gson.Gson
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonNull
-import com.google.gson.JsonObject
-import com.google.gson.JsonParser
+import com.google.gson.*
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
-import kotlin.io.path.Path
-import kotlin.io.path.div
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.readText
+import kotlin.io.path.*
 import kotlin.system.exitProcess
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
@@ -507,6 +498,25 @@ fun runMergeConflictMode(prNumber: String) {
     }
 }
 
+fun buildDetektCrashBody(logContent: String): String = buildString {
+    appendLine(detektMarker)
+    appendWarningTitle("Detekt could not run")
+    appendLine()
+    val oneLiner = parseOneLiner(logContent)
+    if (oneLiner != null) {
+        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
+        appendLine("`$displayLine`")
+        appendLine()
+    }
+    appendLine("<details><summary>Excerpt</summary>")
+    appendLine()
+    appendLine("~~~")
+    appendLine(parseStackTrace(logContent))
+    appendLine("~~~")
+    appendLine()
+    appendLine("</details>")
+}
+
 fun runDetektMode(prNumber: String) {
     val existingId = findExistingComment(prNumber, detektMarker)
     if (existingId != null) markCommentAsStale(
@@ -523,7 +533,21 @@ fun runDetektMode(prNumber: String) {
         val conclusion = System.getenv("WORKFLOW_CONCLUSION")
             ?: error("WORKFLOW_CONCLUSION is not set")
         if (conclusion != "success") {
-            error("Detekt workflow did not complete successfully (conclusion: $conclusion). Check the workflow run for details.")
+            val logFile = artifactDir / "detekt-run.log"
+            val logContent = runCatching { logFile.takeIf { it.exists() }?.readText() }.getOrNull()
+            if (!logContent.isNullOrBlank()) {
+                val body = buildDetektCrashBody(logContent)
+                val (postStatus, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
+                postStatus.requireSuccess("Error: could not post workflow error as comment (HTTP $postStatus)")
+                println("Detekt workflow did not complete successfully; posted explanatory comment")
+                exitProcess(0)
+            } else {
+                error(
+                    "Detekt workflow did not complete successfully AND detekt-run.log does not exist, is null or empty. " +
+                        "(conclusion: $conclusion). " +
+                        "Check the workflow run for details."
+                )
+            }
         }
         println("No SARIF found, removing detekt label")
         setLabel(prNumber, detektLabel, false)
