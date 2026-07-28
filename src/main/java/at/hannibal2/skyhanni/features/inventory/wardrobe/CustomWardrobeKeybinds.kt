@@ -62,5 +62,5 @@ object CustomWardrobeKeybinds {
     fun allowKeyboardClick() = isEnabled() && keybinds.filter { it > 0 }.any { it.isKeyHeld() }
 
     private fun isEnabled() =
-        SkyBlockUtils.inSkyBlock && ArmorWardrobeApi.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
+        SkyBlockUtils.inSkyBlock && CustomWardrobe.inCustomWardrobe && config.keybinds.slotKeybindsToggle && config.enabled
 }
