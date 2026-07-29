@@ -188,10 +188,13 @@ object HolographicEntities {
         val gameRenderer = client.gameRenderer
         val entityRenderState = holographicEntity.cachedRenderState
             ?: renderer.createRenderState().also { holographicEntity.cachedRenderState = it }
-        //~ if < 26.1 'gameRenderState().levelRenderState' -> 'levelRenderState'
+        //? if >= 26.1 {
         val cameraRenderState = gameRenderer.gameRenderState().levelRenderState.cameraRenderState
+        //?} else {
+        /*val cameraRenderState = gameRenderer.levelRenderState.cameraRenderState
+        *///?}
         val cameraPos = cameraRenderState.pos
-        //? if < 26.2 'SubmitNodeStorage()' -> 'gameRenderer.featureRenderDispatcher().submitNodeStorage'
+        //~ if < 26.2 'SubmitNodeStorage()' -> 'gameRenderer.featureRenderDispatcher.submitNodeStorage'
         val submitNodeStorage = SubmitNodeStorage()
         renderer.extractRenderState(entity, entityRenderState, partialTicks)
         entityRenderState.`skyhanni$setEntity`(entity)

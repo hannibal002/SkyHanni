@@ -132,23 +132,17 @@ stonecutter handlers {
 stonecutter parameters {
     replacements {
         string(current.parsed < "26.2") {
-            replace(".gameRenderer.featureRenderDispatcher()", ".gameRenderer.getFeatureRenderDispatcher()")
-            replace(".gameRenderer.gameRenderState()", ".gameRenderer.getGameRenderState()")
-            replace(".gameRenderer.lighting()", ".gameRenderer.getLighting()")
-            replace("CompareOp.GREATER_THAN_OR_EQUAL", "CompareOp.LESS_THAN_OR_EQUAL")
             replace(".mainCamera()", ".mainCamera")
+            replace("CompareOp.GREATER_THAN_OR_EQUAL", "CompareOp.LESS_THAN_OR_EQUAL")
             replace("ItemFeatureRenderer.Submit", "SubmitNodeStorage.ItemSubmit")
             replace("ModelFeatureRenderer.Submit", "SubmitNodeStorage.ModelSubmit")
-            replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.getFeatureRenderDispatcher()")
-            replace("gameRenderer.gameRenderState()", "gameRenderer.getGameRenderState()")
-            replace("gameRenderer.lighting()", "gameRenderer.getLighting()")
+            replace("gameRenderer.featureRenderDispatcher()", "gameRenderer.featureRenderDispatcher")
+            replace("gameRenderer.gameRenderState()", "gameRenderer.gameRenderState")
+            replace("gameRenderer.lighting()", "gameRenderer.lighting")
             replace("gui.hud.chat", "gui.chat")
             replace("gui.hud.guiTicks", "gui.guiTicks")
             replace("gui.hud.tabList", "gui.tabList")
-            replace(
-                "net.minecraft.world.entity.monster.cubemob.MagmaCube",
-                "net.minecraft.world.entity.monster.MagmaCube",
-            )
+            replace("net.minecraft.world.entity.monster.cubemob.MagmaCube", "net.minecraft.world.entity.monster.MagmaCube")
             replace("net.minecraft.world.entity.monster.cubemob.Slime", "net.minecraft.world.entity.monster.Slime")
 
             val dyeColors = mapOf(
