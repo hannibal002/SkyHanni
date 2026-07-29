@@ -9,18 +9,20 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.events.minecraft.KeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
+import net.minecraft.world.entity.monster.Shulker
 
 @SkyHanniModule
 object ShulkerFinder {
     private val config get() = SkyHanniMod.feature.hunting
 
     private var route: MutableList<LorenzVec>? = null
-    private var storedRoute: MutableList<LorenzVec>? = null
+    private var storedRoute: MutableList<LorenzVec> = mutableListOf()
 
     private var navigating = false
 
@@ -33,13 +35,17 @@ object ShulkerFinder {
         val shulkerType = ShulkerType.entries.firstOrNull { it.island.isInIsland() } ?: return
 
         val currentRoute = route?.takeIfNotEmpty() ?: run {
-            calculateRoute(shulkerType).also {
-                route = it
-                storedRoute = it
+            calculateRoute(shulkerType).also { newRoute ->
+                route = newRoute
+                newRoute?.let { storedRoute.addAll(it) }
             } ?: error("Current island graph is null and there is a mistake")
             // TODO add generic repo outdated error logic here
         }
 
+        navigateToNextShulker(currentRoute, shulkerType)
+    }
+
+    private fun navigateToNextShulker(currentRoute: MutableList<LorenzVec>, shulkerType: ShulkerType) {
         val goal = currentRoute.removeFirstOrNull() ?: error("No shulker route found!")
 
         if (currentRoute.isEmpty()) {
@@ -50,10 +56,14 @@ object ShulkerFinder {
         IslandGraphs.pathFind(
             goal,
             "nearest ${shulkerType.displayName}",
-            LorenzColor.DARK_GREEN.toColor(),
+            shulkerType.color.toColor(),
             onFound = {
-                // TODO auto start navigating to next if no shulker nearby
-                navigating = false
+                val nearby = goal.getEntitiesNearby<Shulker>(3.0)
+                if (nearby.isEmpty()) {
+                    navigateToNextShulker(currentRoute, shulkerType)
+                } else {
+                    navigating = false
+                }
             },
             condition = { config.shulkerFinder },
         )
@@ -63,6 +73,7 @@ object ShulkerFinder {
     private fun onIslandChange() {
         navigating = false
         route = null
+        storedRoute.clear()
     }
 
     private fun calculateRoute(shulkerType: ShulkerType): MutableList<LorenzVec>? {
@@ -79,7 +90,7 @@ object ShulkerFinder {
     }
 }
 
-private enum class ShulkerType(val displayName: String, val island: IslandType, val nodeTag: GraphNodeTag) {
-    HIDEONLEAF("§2Hideonleaf", IslandType.GALATEA, GraphNodeTag.HIDEONLEAF),
-    HIDEONSUN("§eHideonleaf", IslandType.TORRHUS_CANYON, GraphNodeTag.HIDEONSUN),
+private enum class ShulkerType(val displayName: String, val island: IslandType, val nodeTag: GraphNodeTag, val color: LorenzColor) {
+    HIDEONLEAF("§2Hideonleaf", IslandType.GALATEA, GraphNodeTag.HIDEONLEAF, LorenzColor.DARK_GREEN),
+    HIDEONSUN("§eHideonleaf", IslandType.TORRHUS_CANYON, GraphNodeTag.HIDEONSUN, LorenzColor.YELLOW),
 }
