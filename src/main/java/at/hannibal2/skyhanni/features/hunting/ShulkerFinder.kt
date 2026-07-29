@@ -92,5 +92,5 @@ object ShulkerFinder {
 
 private enum class ShulkerType(val displayName: String, val island: IslandType, val nodeTag: GraphNodeTag, val color: LorenzColor) {
     HIDEONLEAF("§2Hideonleaf", IslandType.GALATEA, GraphNodeTag.HIDEONLEAF, LorenzColor.DARK_GREEN),
-    HIDEONSUN("§eHideonleaf", IslandType.TORRHUS_CANYON, GraphNodeTag.HIDEONSUN, LorenzColor.YELLOW),
+    HIDEONSUN("§eHideonsun", IslandType.TORRHUS_CANYON, GraphNodeTag.HIDEONSUN, LorenzColor.YELLOW),
 }
