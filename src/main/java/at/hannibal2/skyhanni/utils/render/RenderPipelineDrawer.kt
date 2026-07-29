@@ -23,16 +23,17 @@ object RenderPipelineDrawer {
 
     val matrices: Matrix3x2f get() = Matrix3x2f(DrawContextUtils.drawContext.pose())
 
-    fun getBuffer(pipeline: RenderPipeline): BufferBuilder =
+    fun getBuffer(pipeline: RenderPipeline): BufferBuilder {
         //? if >= 26.2 {
-        BufferBuilder(
+        return BufferBuilder(
             ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE),
             pipeline.primitiveTopology,
             pipeline.getVertexFormatBinding(0) ?: error("Pipeline $pipeline has no vertex format binding 0"),
         )
         //?} else {
-        /*Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
+        /*return Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
         *///?}
+    }
 
     /**
      * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/main/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)

@@ -223,15 +223,18 @@ enum class SkyHanniRenderPipeline(
                 }
 
                 //? if >= 26.2 {
-                if (sampler != null || uniforms.isNotEmpty()) withBindGroupLayout(
-                    BindGroupLayout.builder().apply {
-                //?}
-                        sampler?.let(this::withSampler)
-                        uniforms.forEach(this::withUniform)
-                //? if >= 26.2 {
-                    }.build()
-                )
-                //?}
+                if (sampler != null || uniforms.isNotEmpty()) {
+                    withBindGroupLayout(
+                        BindGroupLayout.builder().apply {
+                            sampler?.let(this::withSampler)
+                            uniforms.forEach(this::withUniform)
+                        }.build(),
+                    )
+                }
+                //?} else {
+                /*sampler?.let(this::withSampler)
+                uniforms.forEach(this::withUniform)
+                *///?}
 
                 if (!depthWrite) {
                     //? if >= 26.1 {
@@ -249,12 +252,12 @@ enum class SkyHanniRenderPipeline(
 
 private object SkyHanniRenderPipelineUtils {
 
+    //? if >= 26.2 {
     val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
-        //? if >= 26.2 {
         RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-        //?} else {
-        /*RenderPipelines.MATRICES_PROJECTION_SNIPPET
-        *///?}
+    //?} else {
+    /*val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET
+    *///?}
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)

@@ -139,10 +139,6 @@ ktlint:
         active: false
     TrailingCommaOnCallSite:
         active: false
-    # causes a lot of false positives with Stonecutter annotations forcing ugly indentation
-    # TODO implement a custom rule to handle this
-    Indentation:
-        active: false
 
 complexity:
     CyclomaticComplexMethod: # default allowedComplexity of 14, caught almost every complex method

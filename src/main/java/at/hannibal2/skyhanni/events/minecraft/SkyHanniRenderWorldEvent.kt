@@ -35,19 +35,11 @@ class SkyHanniRenderWorldEvent(
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent() {
 
-    val cameraPos: Vec3 =
-        //? if >= 26.1 {
-        cameraState.pos
-        //?} else {
-        /*camera.position
-        *///?}
+    //~ if < 26.1 'cameraState.pos' -> 'camera.position'
+    val cameraPos: Vec3 = cameraState.pos
 
-    val cameraRotation: Quaternionf =
-        //? if >= 26.1 {
-        cameraState.orientation
-        //?} else {
-        /*camera.rotation()
-        *///?}
+    //~ if < 26.1 'cameraState.orientation' -> 'camera.rotation()'
+    val cameraRotation: Quaternionf = cameraState.orientation
 
     //? if >= 26.2 {
     internal var skyHanniTextSubmitOrder = 0

@@ -2,9 +2,19 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
+import com.mojang.blaze3d.vertex.VertexConsumer
+import net.minecraft.client.renderer.rendertype.RenderType
 import java.awt.Color
 
 class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
+
+    private fun SkyHanniRenderWorldEvent.submitCustomGeometry(layer: RenderType, block: (VertexConsumer) -> Unit) {
+        //? if >= 26.2 {
+        event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf -> block(buf) }
+        //?} else {
+        /*block(event.bufferSource.getBuffer(layer))
+        *///?}
+    }
 
     fun draw(
         middlePoint: LorenzVec,
@@ -13,13 +23,9 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         c: Color,
     ) {
         event.matrices.pushPose()
-        val layer = SkyHanniRenderLayers.getQuads(false)
+        val layer = SkyHanniRenderLayers.getQuads(throughWalls = false)
 
-        //? if >= 26.2 {
-        event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf ->
-        //?} else {
-        /*event.bufferSource.getBuffer(layer).let { buf ->
-        *///?}
+        event.submitCustomGeometry(layer) { buf ->
             val viewerPos = WorldRenderUtils.getViewerPos()
             val newMidPoint = middlePoint - viewerPos
             val newSidePoint1 = sidePoint1 - viewerPos
