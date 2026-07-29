@@ -22,7 +22,7 @@ class MineshaftWaypointsConfig {
         desc = "Automatically share the location and type of found corpses in party chat.",
     )
     @ConfigEditorBoolean
-    var autoShareFoundCorpses: Boolean = false
+    var autoShareCorpses: Boolean = false
 
     @Expose
     @ConfigOption(
@@ -31,7 +31,7 @@ class MineshaftWaypointsConfig {
             "§eYou can share the location even if it has already been shared!",
     )
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var shareFoundCorpseKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+    var shareCorpseKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @SkyHanniModule
     companion object {
