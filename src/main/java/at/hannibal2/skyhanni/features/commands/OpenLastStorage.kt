@@ -37,6 +37,7 @@ object OpenLastStorage {
     }
 
     private fun openLastStoragePage(type: StorageType) {
+        PreventEarlyCommands.allowNextSkyHanniSender()
         val message = storage?.page?.let { page ->
             type.runCommand(page)
             "Opened last ${type.storageName} $page."

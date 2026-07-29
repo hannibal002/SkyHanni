@@ -26,6 +26,7 @@ import kotlin.time.DurationUnit
 object PreventEarlyCommands {
     private val config get() = SkyHanniMod.feature.misc.commands
 
+    private var allowSkyHanniSender = false
     private var commandExecuted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var worldChanged: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastCommand: String? = null
@@ -38,12 +39,22 @@ object PreventEarlyCommands {
         "§cYou may only use this command after (?<cooldown>\\d+)s on the server!",
     )
 
+    fun allowNextSkyHanniSender() {
+        allowSkyHanniSender = true
+    }
+
     @HandleEvent
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.preventEarlyExecution) return
         if (!SkyBlockUtils.onHypixel) return
         if (!event.isAnyCommand) return
-        if (event.senderIsSkyhanni()) return
+        if (event.senderIsSkyhanni()) {
+            if (allowSkyHanniSender) {
+                allowSkyHanniSender = false
+            } else {
+                return
+            }
+        }
         val command = event.message.removePrefix("/").lowercase()
         lastCommand = command
 
