@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.mining.glacite.waypoints
+package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -14,7 +14,7 @@ class MineshaftWaypointsConfig {
     @Expose
     @ConfigOption(name = "Waypoint Types", desc = "")
     @Accordion
-    val types: WaypointTypesConfig = WaypointTypesConfig()
+    val types: MineshaftWaypointTypesConfig = MineshaftWaypointTypesConfig()
 
     @Expose
     @ConfigOption(
