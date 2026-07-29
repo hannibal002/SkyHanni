@@ -24,4 +24,12 @@ class LastStorageConfig {
     )
     @ConfigEditorText
     var fallbackCommand: String = "ec 1"
+
+    @Expose
+    @ConfigOption(
+        name = "Show Chat Message",
+        desc = "Show a chat message when opening the last storage."
+    )
+    @ConfigEditorBoolean
+    var showChatMessage: Boolean = true
 }

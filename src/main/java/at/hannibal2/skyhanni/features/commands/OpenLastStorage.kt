@@ -45,11 +45,13 @@ object OpenLastStorage {
             ChatUtils.sendMessageToServer("/${config.fallbackCommand}")
             "No last ${type.storageName} found. Running /${config.fallbackCommand}."
         }
-        ChatUtils.chat(message)
+        if (config.showChatMessage) {
+            ChatUtils.chat(message)
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+    private fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!isEnabled()) return
         if (event.senderIsSkyhanni()) return
         val args = event.message.lowercase().split(" ")
@@ -61,7 +63,7 @@ object OpenLastStorage {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shlastopened") {
             description = "Opens the storage page last accessed by either /ec or /bp"
             category = CommandCategory.USERS_ACTIVE
@@ -98,7 +100,7 @@ object OpenLastStorage {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(71, "misc.openLastStorage", "misc.lastStorage.openLastStorage")
     }
 

@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -44,7 +43,7 @@ object PreventEarlyCommands {
     }
 
     @HandleEvent
-    fun onMessageSendToServer(event: MessageSendToServerEvent) {
+    private fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.preventEarlyExecution) return
         if (!SkyBlockUtils.onHypixel) return
         if (!event.isAnyCommand) return
@@ -62,13 +61,13 @@ object PreventEarlyCommands {
     }
 
     @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
+    private fun onWorldChange() {
         worldChanged = SimpleTimeMark.now()
         lastCommand = null
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!SkyBlockUtils.onHypixel) return
         if (!config.preventEarlyExecution) return
         val lastCommand = lastCommand ?: return
