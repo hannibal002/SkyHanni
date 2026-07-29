@@ -14,7 +14,7 @@ class MineshaftWaypointsConfig {
     @Expose
     @ConfigOption(name = "Waypoint Types", desc = "")
     @Accordion
-    var types: WaypointTypesConfig = WaypointTypesConfig()
+    val types: WaypointTypesConfig = WaypointTypesConfig()
 
     @Expose
     @ConfigOption(
@@ -36,7 +36,7 @@ class MineshaftWaypointsConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.move(
                 140,
                 "mining.glaciteMineshaft.mineshaftWaypoints.entranceLocation",

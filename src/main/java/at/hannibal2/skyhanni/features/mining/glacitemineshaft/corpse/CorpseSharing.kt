@@ -59,12 +59,12 @@ object CorpseSharing {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onPartyChat(event: PartyChatEvent.Allow) {
+    private fun onPartyChat(event: PartyChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onAllChat(event: PlayerAllChatEvent.Allow) {
+    private fun onAllChat(event: PlayerAllChatEvent.Allow) {
         handleChatEvent(event.author, event.message)
     }
 
