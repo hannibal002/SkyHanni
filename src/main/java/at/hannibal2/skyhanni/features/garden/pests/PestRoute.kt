@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.world.phys.HitResult
+import kotlin.math.ceil
 import kotlin.math.floor
 
 @SkyHanniModule
@@ -36,7 +37,7 @@ object PestRoute {
     private var etherwarpTarget: EtherwarpTarget? = null
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         val enabled = isEnabled()
         if (!enabled) {
             route = emptyList()
@@ -57,7 +58,7 @@ object PestRoute {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || route.isEmpty()) return
 
         val visibleRoute = route.filter { it.isVisiblePest() }
@@ -76,7 +77,9 @@ object PestRoute {
                 val location = pest.location
                 val labelLocation = location.add(y = 0.75)
                 val labelsBehindGlass = isObstructedOnlyByGlass(labelLocation)
-                val rightClicks = (previousLocation.distance(location) / RIGHT_CLICK_TELEPORT_DISTANCE).toInt()
+                val rightClicks = ceil(
+                    previousLocation.distance(location) / RIGHT_CLICK_TELEPORT_DISTANCE,
+                ).toInt()
                 event.drawDynamicText(
                     labelLocation,
                     "§8[§e§l$rightClicks RC§8]",

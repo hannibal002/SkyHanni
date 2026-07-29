@@ -13,7 +13,7 @@ object PestHighlighter {
     private val config get() = PestApi.config.pestHighlights
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
-    fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
+    private fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (!config.pestHighlight) return
         if (event.type !== RenderEntityOutlineEvent.Type.NO_XRAY) return
         val highlightColor = config.highlightColor.toColor()

@@ -51,7 +51,7 @@ object CustomLoadoutKeybinds {
     private var debugEnabled = false
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shloadoutdebug") {
             description = "Toggles contest loadout keybind decision logging."
             category = CommandCategory.DEVELOPER_DEBUG
@@ -139,18 +139,22 @@ object CustomLoadoutKeybinds {
     }
 
     @HandleEvent
-    fun onInventoryClose() {
+    private fun onInventoryClose() {
         if (waitingForMenuClose) {
             waitingForMenuClose = false
             debug("§7Loadout menu closed; cycle key unlocked.")
         }
     }
 
-    fun allowMouseClick() = isEnabled() && (config.cycleKey < 0 && config.cycleKey.isKeyHeld() ||
-        activeKeybinds().any { it.key < 0 && it.key.isKeyHeld() })
+    fun allowMouseClick() = isEnabled() && (
+        config.cycleKey < 0 && config.cycleKey.isKeyHeld() ||
+            activeKeybinds().any { it.key < 0 && it.key.isKeyHeld() }
+        )
 
-    fun allowKeyboardClick() = isEnabled() && (config.cycleKey > 0 && config.cycleKey.isKeyHeld() ||
-        activeKeybinds().any { it.key > 0 && it.key.isKeyHeld() })
+    fun allowKeyboardClick() = isEnabled() && (
+        config.cycleKey > 0 && config.cycleKey.isKeyHeld() ||
+            activeKeybinds().any { it.key > 0 && it.key.isKeyHeld() }
+        )
 
     private fun activeKeybinds(): List<LoadoutBinding> = buildList {
         if (FarmingContestApi.isContestActive) {

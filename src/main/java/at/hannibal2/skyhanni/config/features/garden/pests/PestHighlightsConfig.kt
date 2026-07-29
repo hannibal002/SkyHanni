@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden.pests
 
+import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -12,6 +13,7 @@ class PestHighlightsConfig {
     @Expose
     @ConfigOption(name = "Pest Highlight", desc = "Highlights visible pests with an outline.")
     @ConfigEditorBoolean
+    @FeatureToggle
     var pestHighlight: Boolean = false
 
     @Expose
@@ -25,6 +27,7 @@ class PestHighlightsConfig {
         desc = "Shows the shortest route from you through every visible pest.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var shortestPestRoute: Boolean = false
 
     @Expose
@@ -44,5 +47,6 @@ class PestHighlightsConfig {
             "You must aim, sneak, and right-click manually.",
     )
     @ConfigEditorBoolean
+    @FeatureToggle
     var etherwarpPestTarget: Boolean = false
 }
