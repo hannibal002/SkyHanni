@@ -37,7 +37,7 @@ object CorpseSharing {
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
     fun onSecondPassed() {
-        if (!config.autoShareFoundCorpses) return
+        if (!config.autoShareCorpses) return
         if (MineshaftWaypoints.waypoints.isEmpty()) return
         if (PartyApi.partyMembers.isEmpty()) return
         shareCorpse()
