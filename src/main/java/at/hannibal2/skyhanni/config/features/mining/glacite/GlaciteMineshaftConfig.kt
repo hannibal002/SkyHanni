@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.mining.glacite
 
-import at.hannibal2.skyhanni.config.features.mining.glacite.waypoints.MineshaftWaypointsConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption

@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.config.features.mining.glacite.waypoints
+package at.hannibal2.skyhanni.config.features.mining.glacite
 
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-class WaypointTypesConfig {
+class MineshaftWaypointTypesConfig {
     @Expose
     @ConfigOption(
         name = "Entrance",
