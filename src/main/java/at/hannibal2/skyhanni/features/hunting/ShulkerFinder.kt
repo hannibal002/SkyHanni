@@ -22,7 +22,7 @@ object ShulkerFinder {
     private val config get() = SkyHanniMod.feature.hunting
 
     private var route: MutableList<LorenzVec>? = null
-    private var storedRoute: MutableList<LorenzVec> = mutableListOf()
+    private val storedRoute: MutableList<LorenzVec> = mutableListOf()
 
     private var navigating = false
 
