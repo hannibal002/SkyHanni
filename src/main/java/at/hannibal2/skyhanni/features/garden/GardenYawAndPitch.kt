@@ -29,7 +29,7 @@ object GardenYawAndPitch {
         if (GardenApi.hideExtraGuis()) return
         if (GardenApi.toolInHand == null && !config.showWithoutTool) return
 
-        val player = MinecraftCompat.localPlayer
+        val player = MinecraftCompat.localPlayerOrThrow
         val yaw = LocationUtils.calculatePlayerYaw()
         val pitch = player.xRot
 

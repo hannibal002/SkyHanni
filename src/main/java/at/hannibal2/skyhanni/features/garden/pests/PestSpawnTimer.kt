@@ -25,7 +25,8 @@ import at.hannibal2.skyhanni.features.garden.GardenApi.pestCooldownEndTime
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasLassoInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.hasVacuumInHand
 import at.hannibal2.skyhanni.features.garden.pests.PestApi.lastPestSpawnTime
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.EquipmentWardrobeApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -181,7 +182,7 @@ object PestSpawnTimer {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTick(event: SkyHanniTickEvent) {
         if (shouldRepeatWarning) {
-            if (WardrobeApi.inWardrobe()) {
+            if (ArmorWardrobeApi.inWardrobe() || EquipmentWardrobeApi.inWardrobe()) {
                 shouldRepeatWarning = false
                 countdownTitleContext?.stop()
                 countdownTitleContext = null

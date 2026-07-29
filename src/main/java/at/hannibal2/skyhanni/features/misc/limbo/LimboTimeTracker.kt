@@ -76,7 +76,7 @@ object LimboTimeTracker {
         inFakeLimbo = inBedWarsLobby && bedWarsLobbyLimbo.isPlayerInside()
         updateLimboState(wasInLimbo)
         if (inLimbo) {
-            onFire = MinecraftCompat.localPlayer.isOnFire
+            onFire = MinecraftCompat.localPlayerOrThrow.isOnFire
         }
     }
 
@@ -149,7 +149,7 @@ object LimboTimeTracker {
 
     private fun enterLimbo() {
         limboJoinTime = SimpleTimeMark.now()
-        onFire = MinecraftCompat.localPlayer.isOnFire
+        onFire = MinecraftCompat.localPlayerOrThrow.isOnFire
     }
 
     private fun leaveLimbo() {

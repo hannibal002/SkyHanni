@@ -64,7 +64,7 @@ class MouseSensitivityReducerConfig {
     @Expose
     @ConfigOption(name = "Lock on Mousemat", desc = "Lock mouse when snapping to Squeaky Mousemat.")
     @ConfigEditorBoolean
-    var lockOnMousemat: Boolean = true
+    var lockOnMousemat: Boolean = false
 
     @Expose
     @ConfigOption(name = "Only on Ground", desc = "When enabled, lower sensitivity only while on or near the ground.")

@@ -18,6 +18,7 @@ class RepoRuleSetProvider : RuleSetProvider {
                 RuleName("RepoPatternRegexTestFailed") to ::RepoPatternRegexTestFailed,
                 RuleName("RepoPatternRegexTestMissing") to ::RepoPatternRegexTestMissing,
                 RuleName("RepoPatternUnnamedGroup") to ::RepoPatternUnnamedGroup,
+                RuleName("RepoPatternPassesShapeRequirement") to ::RepoPatternPassesShapeRequirement,
             ),
         )
     }

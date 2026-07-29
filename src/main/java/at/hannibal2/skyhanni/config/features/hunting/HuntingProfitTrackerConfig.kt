@@ -23,10 +23,18 @@ class HuntingProfitTrackerConfig {
     @Expose
     @ConfigOption(
         name = "Show When Pickup",
-        desc = "Show the hunting tracker for a couple of seconds after hunting something."
+        desc = "Show the hunting tracker for a couple of seconds after hunting something.\n§eIgnored if Always Show is enabled."
     )
     @ConfigEditorBoolean
     var showWhenPickup: Boolean = true
+
+    @Expose
+    @ConfigOption(
+        name = "Always Show",
+        desc = "Always show the tracker, regardless of what you are holding.\n§eIf enabled, ignore the Show When Pickup setting."
+    )
+    @ConfigEditorBoolean
+    var alwaysShow: Boolean = false
 
     @Expose
     @ConfigOption(

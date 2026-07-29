@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 enum class ElectionCandidate(
     val mayorName: String,
     val color: String,
-    vararg val perks: Perk,
+    vararg val allPerks: Perk,
 ) {
     AATROX(
         "Aatrox",
@@ -116,12 +116,12 @@ enum class ElectionCandidate(
     DISABLED("§cDisabled", "§7"),
     ;
 
-    val activePerks get() = this.perks.filter { it.isActive }
+    val activePerks get() = this.allPerks.filter { it.isActive }
 
     override fun toString() = mayorName
 
     fun addPerks(perks: List<Perk>) {
-        this.perks.forEach { it.isActive = false }
+        allPerks.forEach { it.isActive = false }
         perks.forEach { it.isActive = true }
     }
 
@@ -130,7 +130,7 @@ enum class ElectionCandidate(
     }
 
     fun addAllPerks(): ElectionCandidate {
-        this.perks.forEach { it.isActive = true }
+        allPerks.forEach { it.isActive = true }
         return this
     }
 
@@ -140,7 +140,7 @@ enum class ElectionCandidate(
 
         fun getMayorFromName(name: String): ElectionCandidate? = entries.firstOrNull { it.mayorName == name || it.name == name }
 
-        fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.perks.contains(perk) }
+        fun getMayorFromPerk(perk: Perk): ElectionCandidate? = entries.firstOrNull { it.allPerks.contains(perk) }
 
         fun setAssumeMayorJson(name: String, perksJson: List<MayorPerk>?): ElectionCandidate? {
             val mayor = getMayorFromName(name) ?: run {

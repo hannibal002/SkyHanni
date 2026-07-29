@@ -138,6 +138,11 @@ class GuiConfig {
     var beaconPowerStat: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Compress Beacon Stat", desc = "Compress the beacon stat display to only show the value.")
+    @ConfigEditorBoolean
+    var beaconPowerCompressStat: Boolean = false
+
+    @Expose
     @ConfigLink(owner = GuiConfig::class, field = "beaconPower")
     val beaconPowerPosition: Position = Position(10, 10)
 

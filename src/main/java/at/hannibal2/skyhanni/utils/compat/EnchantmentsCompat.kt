@@ -13,7 +13,7 @@ enum class EnchantmentsCompat(
     val enchantment: Holder<Enchantment>,
 ) {
     PROTECTION(
-        MinecraftCompat.localWorld.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
+        MinecraftCompat.localWorldOrThrow.registryAccess().lookupOrThrow(Registries.ENCHANTMENT)
             .get(Identifier.withDefaultNamespace("protection")).get(),
     ),
 }

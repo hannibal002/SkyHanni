@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.UserLuckCalculateEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
@@ -66,7 +65,7 @@ object UserLuckBreakdown {
     private val validItemSlots = (10..53).filter { it !in listOf(17, 18, 26, 27, 35, 36) && it !in 44..53 }
     private val invalidItemSlots = (0..53).filter { it !in validItemSlots }
 
-    private val skillOverflowLuck = mutableMapOf<SkillType, Int>()
+    private var skillOverflowLuck = mapOf<SkillType, Int>()
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
@@ -135,7 +134,7 @@ object UserLuckBreakdown {
     }
 
     @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    fun onInventoryClose() {
         inMiscStats = false
         inCustomBreakdown = false
     }
@@ -208,7 +207,7 @@ object UserLuckBreakdown {
 
     private fun tryTruncateFloat(input: Float): String {
         val string = input.addSeparators()
-        return if (string.endsWith(".0")) return string.dropLast(2)
+        return if (string.endsWith(".0")) string.dropLast(2)
         else string
     }
 
@@ -328,12 +327,13 @@ object UserLuckBreakdown {
 
     private fun calcSkillLuck() {
         val storage = ProfileStorageData.profileSpecific?.skills?.skillData ?: return
-        skillOverflowLuck.clear()
-        for ((skillType, skillInfo) in storage) {
-            val level = skillInfo.level
-            val overflow = skillInfo.overflowLevel
-            val luck = ((overflow - level) / 5) * 50
-            skillOverflowLuck.addOrPut(skillType, luck)
+        skillOverflowLuck = buildMap {
+            for ((skillType, skillInfo) in storage) {
+                val level = skillInfo.level
+                val overflow = skillInfo.overflowLevel
+                val luck = ((overflow - level) / 5) * 50
+                addOrPut(skillType, luck)
+            }
         }
     }
 

@@ -187,22 +187,25 @@ internal fun combineMainAndExpShareTextRenderables(
     )
 }
 
-internal fun buildWidgetMessageRenderable(
-    lines: List<String>,
+internal fun Renderable.withWidgetWarning(
+    warning: String?,
     textConfig: TextPetDisplayConfig.EquippedPetTextConfig,
 ): Renderable {
+    warning ?: return this
     val textScale = textConfig.textScale.get().toDouble()
     val horizontalAlign = textConfig.horizontalAlign.get()
     return Renderable.vertical(
-        lines.map {
+        listOf(
+            this,
             StringRenderable(
-                it,
+                warning,
                 scale = textScale,
                 horizontalAlign = horizontalAlign,
-            )
-        },
-        horizontalAlign = horizontalAlign,
-        verticalAlign = textConfig.verticalAlign.get(),
+            ),
+        ),
+        spacing = 2,
+        horizontalAlign = this.horizontalAlign,
+        verticalAlign = this.verticalAlign,
     )
 }
 

@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -238,7 +239,7 @@ object BazaarApi {
                 continue
             }
 
-            if (stack.hoverName.formattedTextCompatLeadingWhiteLessResets().removeColor() == currentSearchedItem) {
+            if (stack.cleanName == currentSearchedItem) {
                 slot.highlight(LorenzColor.GREEN)
             }
         }

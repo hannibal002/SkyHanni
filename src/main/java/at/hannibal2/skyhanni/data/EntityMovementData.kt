@@ -89,7 +89,7 @@ object EntityMovementData {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTick() {
-        addToTrack(MinecraftCompat.localPlayer)
+        addToTrack(MinecraftCompat.localPlayerOrThrow)
 
         for (entity in entityLocation.keys) {
             if (entity.deceased) continue

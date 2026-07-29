@@ -7,6 +7,6 @@ import at.hannibal2.skyhanni.api.event.SkyHanniEvent
  *
  * @param dropName The display name of the uncovered item.
  * @param isBook Whether the drop is an enchanted book. False for non-book Ultra Rare items,
- *               which are detected via the post-experiment summary rather than the card flip lore.
+ *               which are detected at card-flip time via internal-name matching against the repo list.
  */
 class TableRareUncoverEvent(val dropName: String, val isBook: Boolean = true) : SkyHanniEvent()

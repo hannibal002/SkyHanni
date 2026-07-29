@@ -1,11 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory.loadout
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -31,6 +34,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object LoadoutApi {
 
     val storage get() = ProfileStorageData.profileSpecific?.loadout
+    val config get() = SkyHanniMod.feature.inventory.customLoadout
 
     private val patternGroup = RepoPattern.group("inventory.loadout")
 
@@ -201,6 +205,13 @@ object LoadoutApi {
         data.tunings = itemsList[TUNINGS_SLOT].parseTunings()
         data.hotm = itemsList[HOTM_SLOT].parseCurrentSelection()
         data.hotf = itemsList[HOTF_SLOT].parseCurrentSelection()
+
+        EquipmentSlot.entries.forEach {
+            val itemStack = data.equipment[it.ordinal]
+            if (itemStack != null && !itemStack.isStainedGlassPane()) {
+                EquipmentApi.setEquipment(it, itemStack)
+            } else EquipmentApi.setEquipment(it, null)
+        }
     }
 
     // This is for Hotm, Hotf and Powerstone
@@ -228,6 +239,12 @@ object LoadoutApi {
         val loadoutSlotFromId = getLoadoutSlotFromId(currentSlot) ?: return
         if (!(loadoutSlotFromId.isInCurrentPage())) return
         event.container.getSlot(loadoutSlotFromId.inventorySlot).highlight(LorenzColor.GREEN)
+    }
+
+    fun clickSlot(slot: LoadoutSlot) {
+        if (!slot.isInCurrentPage() || slot.locked) return
+        currentSlot = slot.id
+        InventoryUtils.clickSlot(slot.inventorySlot)
     }
 
     @HandleEvent

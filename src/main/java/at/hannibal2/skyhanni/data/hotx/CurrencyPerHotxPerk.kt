@@ -2,14 +2,13 @@ package at.hannibal2.skyhanni.data.hotx
 
 import at.hannibal2.skyhanni.events.minecraft.ToolTipTextEvent
 import at.hannibal2.skyhanni.events.minecraft.add
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import org.lwjgl.glfw.GLFW
 
 abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val hotx: HotxType, private val displayText: String) {
@@ -21,8 +20,8 @@ abstract class CurrencyPerHotxPerk<HotxType : HotxHandler<*, *, *>>(private val 
         showCurrentCurrency: Boolean,
         currencySpentDesign: CurrencySpentDesign,
     ) {
-        val itemName = event.itemStack.hoverName.formattedTextCompatLeadingWhiteLessResets()
-        val perk = hotx.getPerkByNameOrNull(itemName.removeColor()) ?: return
+        val itemName = event.itemStack.cleanName
+        val perk = hotx.getPerkByNameOrNull(itemName) ?: return
 
         if (perk.getLevelUpCost() == null) return
         if (showCurrencySpent) event.toolTip.add(2, handleCurrencySpent(currencySpentDesign, perk))

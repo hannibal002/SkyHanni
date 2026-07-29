@@ -61,7 +61,7 @@ object CosmeticFollowingLine {
     }
 
     private fun updateClose(event: SkyHanniRenderWorldEvent) {
-        val playerLocation = event.exactLocation(MinecraftCompat.localPlayer).up(0.3)
+        val playerLocation = event.exactLocation(MinecraftCompat.localPlayerOrThrow).up(0.3)
         latestLocations[playerLocation] = LocationSpot(SimpleTimeMark.now(), PlayerUtils.onGround())
         latestLocations.values.removeIf { it.time.passedSince() > 600.milliseconds }
     }

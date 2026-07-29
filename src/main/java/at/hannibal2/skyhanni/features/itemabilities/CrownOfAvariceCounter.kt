@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.itemability.CrownOfAvariceConfig.CrownOfAvariceLines
 import at.hannibal2.skyhanni.data.Perk
-import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.IslandJoinEvent
 import at.hannibal2.skyhanni.events.OwnInventoryArmorUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.Stopwatch
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -47,6 +48,7 @@ object CrownOfAvariceCounter {
         InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
     }
 
+    private var currentUUID: String = ""
     private var totalCoins: Long? = null
     private var coinsEarned: Long = 0L
     private var sessionUptime: Stopwatch = Stopwatch()
@@ -88,6 +90,15 @@ object CrownOfAvariceCounter {
         val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return
         val coins = item.getCoinsOfAvarice() ?: return
+        val itemUUID = item.getItemUuid() ?: return // this should never return unless hypixel changed something
+        // Changing the current crown uuid and then returning ensures no coin change happens (like swapping in 482m coa => 1b)
+        if (currentUUID != itemUUID) {
+            currentUUID = itemUUID
+            totalCoins = coins
+            update()
+            return
+        }
+
         if (totalCoins == null) totalCoins = coins
         coinsDifference = coins - (totalCoins ?: 0)
 
@@ -110,8 +121,8 @@ object CrownOfAvariceCounter {
     fun isAvariceConsuming(): Boolean =
         isWearingCrown && (totalCoins ?: 0) < MAX_AVARICE_COINS
 
-    @HandleEvent(IslandChangeEvent::class)
-    fun onIslandChange() {
+    @HandleEvent(IslandJoinEvent::class)
+    fun onIslandJoin() {
         if (config.resetOnWorldChange) reset()
         totalCoins = InventoryUtils.getHelmet()?.getCoinsOfAvarice()
     }

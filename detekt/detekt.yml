@@ -28,6 +28,8 @@ RepoRules:
         active: true
     RepoPatternUnnamedGroup:
         active: true
+    RepoPatternPassesShapeRequirement:
+        active: true
 
 ImportRules:
     CustomImportOrdering:

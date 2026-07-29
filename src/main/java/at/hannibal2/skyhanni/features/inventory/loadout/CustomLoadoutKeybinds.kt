@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object CustomLoadoutKeybinds {
 
-    private val config get() = CustomLoadout.config.keybinds
+    private val config get() = LoadoutApi.config.keybinds
     private val keybinds
         get() = listOf(
             config.slot1,
@@ -50,7 +50,7 @@ object CustomLoadoutKeybinds {
             if (lastClick.passedSince() < 200.milliseconds) break
             val slot = slots.getOrNull(index) ?: continue
 
-            CustomLoadout.clickSlot(slot)
+            LoadoutApi.clickSlot(slot)
             lastClick = SimpleTimeMark.now()
             return true
         }

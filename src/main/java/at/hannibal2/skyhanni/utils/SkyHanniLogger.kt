@@ -13,15 +13,15 @@ import kotlin.time.Duration.Companion.days
 open class SkyHanniLogger(filePath: String) {
 
     private val format = SimpleDateFormat("HH:mm:ss")
-    private val fullFormat by lazy {
-        SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
-    }
     internal open val logsDir = File("config/skyhanni/logs")
     internal open val timedFormattedDir by lazy { "$logsDir/$fullFormat" }
     private val logFileName by lazy { "$timedFormattedDir/$filePath.log" }
 
     companion object {
         private var deletedExpired = false
+        private val fullFormat by lazy {
+            SimpleDateFormat("yyyy_MM_dd/HH_mm_ss").formatCurrentTime()
+        }
     }
 
     @Suppress("PrintStackTrace")

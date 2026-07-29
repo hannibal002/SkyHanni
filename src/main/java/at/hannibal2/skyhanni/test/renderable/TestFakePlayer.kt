@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.test.renderable
 
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
+import at.hannibal2.skyhanni.utils.ItemUtils.addEnchantGlint
 import at.hannibal2.skyhanni.utils.SafeItemStack
-import at.hannibal2.skyhanni.utils.compat.EnchantmentsCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.fakePlayer
@@ -15,18 +15,13 @@ import kotlin.random.Random
 @SkyHanniModule(devOnly = true)
 object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
 
-
-    private val fakePlayer1 by lazy {
+    private fun lazyFakePlayer() = lazy {
         Renderable.fakePlayer(createFakePlayer(), followMouse = true)
     }
 
-    private val fakePlayer2 by lazy {
-        Renderable.fakePlayer(createFakePlayer(), followMouse = true)
-    }
-
-    private val fakePlayer3 by lazy {
-        Renderable.fakePlayer(createFakePlayer(), followMouse = true)
-    }
+    private val fakePlayer1 by lazyFakePlayer()
+    private val fakePlayer2 by lazyFakePlayer()
+    private val fakePlayer3 by lazyFakePlayer()
 
     private val helmetList = setOf(
         Items.IRON_HELMET,
@@ -60,14 +55,13 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
         Items.CHAINMAIL_BOOTS,
     )
 
-    private fun createRandomArmorPiece(armorPieces: Set<Item>): SafeItemStack = SafeItemStack(armorPieces.random()).also {
-        if (Random.nextBoolean()) it.enchant(
-            EnchantmentsCompat.PROTECTION.enchantment, 1,
-        )
-    }
+    private fun createRandomArmorPiece(armorPieces: Collection<Item>): SafeItemStack =
+        SafeItemStack(armorPieces.random()).also {
+            if (Random.nextBoolean()) it.addEnchantGlint()
+        }
 
     private fun createFakePlayer(): FakePlayer {
-        val fakePlayer = FakePlayer()
+        val fakePlayer = FakePlayer.fromLocalPlayerOrThrow()
 
         val helmet = createRandomArmorPiece(helmetList)
         val chestplate = createRandomArmorPiece(chestplateList)
@@ -84,14 +78,9 @@ object TestFakePlayer : RenderableTestSuite.TestRenderable("fakeplayer") {
         return fakePlayer
     }
 
-    override fun renderable(): Renderable {
-        return with(Renderable) {
-            horizontal(
-                fakePlayer1,
-                fakePlayer2,
-                fakePlayer3,
-            )
-        }
-    }
-
+    override fun renderable() = Renderable.horizontal(
+        fakePlayer1,
+        fakePlayer2,
+        fakePlayer3,
+    )
 }

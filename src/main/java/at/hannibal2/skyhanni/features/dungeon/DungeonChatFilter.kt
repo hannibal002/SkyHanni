@@ -1,9 +1,12 @@
+@file:Suppress("MaxLineLength")
+
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -26,7 +29,6 @@ object DungeonChatFilter {
         " Experience §r§b(Team Bonus)",
     )
 
-    @Suppress("MaxLineLength")
     private val abilityPatterns = listOf(
         "§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.".toPattern(),
         "§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!".toPattern(),
@@ -92,10 +94,10 @@ object DungeonChatFilter {
         "§6§lDUNGEON BUFF! §r§fA §r§dBlessing of (.*)§r§f was found! (.*)".toPattern(),
         "§eA §r§a§r§dBlessing of (.*)§r§e was picked up!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§dBlessing of (.*)§r§e!".toPattern(),
-        " {5}§r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c❁ Strength§r§7.".toPattern(),
-        " {5}§r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9☠ Crit Damage§r§7.".toPattern(),
+        " {5}§r§7Granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§c${SkyblockStat.STRENGTH.hypixelIcon} Strength§r§7.".toPattern(),
+        " {5}§r§7Also granted you §r§a§r§a(.*)§r§7 & §r§a(.*)x §r§9${SkyblockStat.CRIT_DAMAGE.hypixelIcon} Crit Damage§r§7.".toPattern(),
         " {5}§r§7(Grants|Granted) you §r§a(.*) Defense §r§7and §r§a+(.*) Damage§r§7.".toPattern(),
-        " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c❣ Health Regen§r§7.".toPattern(),
+        " {5}§r§7Granted you §r§a§r§a(.*)x HP §r§7and §r§a§r§a(.*)x §r§c${SkyblockStat.HEALTH_REGEN.hypixelIcon} Health Regen§r§7.".toPattern(),
         " {5}§r§7(Grants|Granted) you §r§a(.*) Intelligence §r§7and §r§a+(.*)? Speed§r§7.".toPattern(),
         " {5}§r§7Granted you §r§a+(.*) HP§r§7, §r§a(.*) Defense§r§7, §r§a(.*) Intelligence§r§7, and §r§a(.*) Strength§r§7.".toPattern(),
     )
@@ -103,14 +105,12 @@ object DungeonChatFilter {
         "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!",
     )
 
-    @Suppress("MaxLineLength")
     private val puzzlePatterns = listOf(
         "§a§lPUZZLE SOLVED! (.*) §r§ewasn't fooled by §r§c(.*)§r§e! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§a§lPUZZLE SOLVED! (.*) §r§etied Tic Tac Toe! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§4\\[STATUE] Oruo the Omniscient§r§f: §r(.*) §r§fthinks the answer is §r§6 . §r(.*)§r§f! §r§fLock in your party's answer in my Chamber!".toPattern(),
     )
 
-    @Suppress("MaxLineLength")
     private val puzzleMessages = listOf(
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fThough I sit stationary in this prison that is §r§cThe Catacombs§r§f, my knowledge knows no bounds.",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
@@ -130,7 +130,6 @@ object DungeonChatFilter {
         "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
     )
 
-    @Suppress("MaxLineLength")
     private val pickupPatterns = listOf(
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!".toPattern(),
@@ -170,7 +169,6 @@ object DungeonChatFilter {
         "§aDungeon starts in (.*) seconds.".toPattern(),
     )
 
-    @Suppress("MaxLineLength")
     private val prepareMessages = listOf(
         "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
         "§aDungeon starts in 1 second.",

@@ -22,6 +22,14 @@ class HarvestFeastConfig {
 
     @Expose
     @ConfigOption(
+        name = "Show outside Garden",
+        desc = "Display the current in-season Harvest Feast crops outside of the Garden."
+    )
+    @ConfigEditorBoolean
+    var showOutsideGarden: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Fetch Upcoming Feast Data",
         desc = "Automatically fetch Feast Data from eliteskyblock.com for the current year if they're uploaded already.",
     )

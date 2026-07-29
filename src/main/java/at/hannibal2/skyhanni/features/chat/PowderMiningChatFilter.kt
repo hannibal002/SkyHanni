@@ -256,7 +256,7 @@ object PowderMiningChatFilter {
     @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa95][❤❈☘⸕✎✧❁] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone(?: §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa95]. (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz|Jasper) Gemstone(?: §r§8x(?<amount>[\\d,]+))?",
     )
 
     @Suppress("CyclomaticComplexMethod")

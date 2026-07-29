@@ -231,7 +231,7 @@ object PacketTest {
     }
 
     private fun getEntity(packet: Packet<*>, id: Int?): Entity? {
-        val world = MinecraftCompat.localWorld
+        val world = MinecraftCompat.localWorldOrThrow
         if (packet is ClientboundMoveEntityPacket) {
             return packet.getEntity(world)
         }

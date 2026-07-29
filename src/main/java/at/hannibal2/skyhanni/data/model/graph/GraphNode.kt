@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 class GraphNode(
     val id: Int,
@@ -12,6 +13,9 @@ class GraphNode(
     val tagNames: List<String> = emptyList(),
     val extraWeight: Int = 0,
 ) : GraphUtils.GenericNode {
+
+    val cleanName: String?
+        get() = name?.removeColor()
 
     val tags: List<GraphNodeTag> by lazy {
         tagNames.mapNotNull { GraphNodeTag.byId(it) }

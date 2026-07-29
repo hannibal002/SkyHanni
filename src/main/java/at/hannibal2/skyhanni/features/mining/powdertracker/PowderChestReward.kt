@@ -11,104 +11,104 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
 
     ROUGH_RUBY_GEMSTONE(
         "§fRough Ruby Gemstone",
-        " {4}§r§f❤ Rough Ruby Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Ruby Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_RUBY_GEMSTONE(
         "§aFlawed Sapphire Gemstone",
-        " {4}§r§a❤ Flawed Ruby Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Ruby Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_RUBY_GEMSTONE(
         "§9Fine Ruby Gemstone",
-        " {4}§r§9❤ Fine Ruby Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Ruby Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_RUBY_GEMSTONE(
         "§5Flawless Ruby Gemstone",
-        " {4}§r§5❤ Flawless Ruby Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Ruby Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_SAPPHIRE_GEMSTONE(
         "§fRough Sapphire Gemstone",
-        " {4}§r§f✎ Rough Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_SAPPHIRE_GEMSTONE(
         "§aFlawed Sapphire Gemstone",
-        " {4}§r§a✎ Flawed Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_SAPPHIRE_GEMSTONE(
         "§9Fine Sapphire Gemstone",
-        " {4}§r§9✎ Fine Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_SAPPHIRE_GEMSTONE(
         "§5Flawless Sapphire Gemstone",
-        " {4}§r§5✎ Flawless Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_AMBER_GEMSTONE(
         "§fRough Amber Gemstone",
-        " {4}§r§f⸕ Rough Amber Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Amber Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_AMBER_GEMSTONE(
         "§aFlawed Amber Gemstone",
-        " {4}§r§a⸕ Flawed Amber Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Amber Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_AMBER_GEMSTONE(
         "§9Fine Amber Gemstone",
-        " {4}§r§9⸕ Fine Amber Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Amber Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_AMBER_GEMSTONE(
         "§5Flawless Amber Gemstone",
-        " {4}§r§5⸕ Flawless Amber Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Amber Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_AMETHYST_GEMSTONE(
         "§fRough Amethyst Gemstone",
-        " {4}§r§f❈ Rough Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_AMETHYST_GEMSTONE(
         "§aFlawed Amethyst Gemstone",
-        " {4}§r§a❈ Flawed Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_AMETHYST_GEMSTONE(
         "§9Fine Amethyst Gemstone",
-        " {4}§r§9❈ Fine Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_AMETHYST_GEMSTONE(
         "§5Flawless Amethyst Gemstone",
-        " {4}§r§5❈ Flawless Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_JADE_GEMSTONE(
         "§fRough Jade Gemstone",
-        " {4}§r§f☘ Rough Jade Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Jade Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_JADE_GEMSTONE(
         "§aFlawed Jade Gemstone",
-        " {4}§r§a☘ Flawed Jade Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Jade Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_JADE_GEMSTONE(
         "§9Fine Jade Gemstone",
-        " {4}§r§9☘ Fine Jade Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Jade Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_JADE_GEMSTONE(
         "§5Flawless Jade Gemstone",
-        " {4}§r§5☘ Flawless Jade Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Jade Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_TOPAZ_GEMSTONE(
         "§fRough Topaz Gemstone",
-        " {4}§r§f✧ Rough Topaz Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§f. Rough Topaz Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWED_TOPAZ_GEMSTONE(
         "§aFlawed Topaz Gemstone",
-        " {4}§r§a✧ Flawed Topaz Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§a. Flawed Topaz Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FINE_TOPAZ_GEMSTONE(
         "§9Fine Topaz Gemstone",
-        " {4}§r§9✧ Fine Topaz Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§9. Fine Topaz Gemstone(?: §r§8x(?<amount>.*))?",
     ),
     FLAWLESS_TOPAZ_GEMSTONE(
         "§5Flawless Topaz Gemstone",
-        " {4}§r§5✧ Flawless Topaz Gemstone(?: §r§8x(?<amount>.*))?",
+        " {4}§r§5. Flawless Topaz Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     FTX_3070(

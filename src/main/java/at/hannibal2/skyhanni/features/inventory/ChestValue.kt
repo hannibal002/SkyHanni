@@ -191,7 +191,7 @@ object ChestValue {
         } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
             InventoryUtils.getItemsInOpenChest().filter {
-                it.hasItem() && it.container != MinecraftCompat.localPlayer.inventory && (!isMinion || it.index % 9 != 1)
+                it.hasItem() && it.container != MinecraftCompat.localPlayerOrThrow.inventory && (!isMinion || it.index % 9 != 1)
             }
         }
         val stacks = buildMap {

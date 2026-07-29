@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.hotx.HotmData
 import at.hannibal2.skyhanni.data.hotx.HotxPatterns.asPatternId
 import at.hannibal2.skyhanni.data.hotx.RotatingPerk
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -48,11 +49,11 @@ object HotmApi {
 
         val heartPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.heart",
-            "§7$displayName Powder: §a§.(?<powder>[\\d,]+)",
+            "$displayName Powder: (?<powder>[\\d,]+)",
         )
         val resetPattern by RepoPattern.pattern(
             "inventory.${name.lowercase()}.reset",
-            "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder",
+            "\\s+- (?<powder>[\\d,]+) $displayName Powder",
         )
 
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
@@ -108,39 +109,39 @@ object HotmApi {
     var mineshaftMayhem: MayhemPerk? = null
 
     enum class SkymallPerk(
-        override val perkDescription: String,
+        override val displayDescription: String,
         @field:Language("RegExp") val chatFallback: String,
         @field:Language("RegExp") val itemFallback: String,
     ) : RotatingPerk {
         MINING_SPEED(
-            perkDescription = "§6+100⸕ Mining Speed",
-            chatFallback = "Gain §r§6\\+100⸕ Mining Speed§r§f\\.",
-            itemFallback = "Gain §6\\+100⸕ Mining Speed§7\\.",
+            displayDescription = "§6+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed",
+            chatFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
+            itemFallback = "Gain \\+100${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed\\.",
         ),
         MINING_FORTUNE(
-            perkDescription = "§6+50☘ Mining Fortune",
-            chatFallback = "Gain §r§6\\+50☘ Mining Fortune§r§f\\.",
-            itemFallback = "Gain §6\\+50☘ Mining Fortune§7\\.",
+            displayDescription = "§6+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune",
+            chatFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
+            itemFallback = "Gain \\+50${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune\\.",
         ),
         EXTRA_POWDER(
-            perkDescription = "§a+15% §7more Powder",
-            chatFallback = "Gain §r§a\\+15% §r§fmore Powder while mining\\.",
-            itemFallback = "Gain §a\\+15% §7more Powder while mining\\.",
+            displayDescription = "§a+15% §7more Powder",
+            chatFallback = "Gain \\+15% more Powder while mining\\.",
+            itemFallback = "Gain \\+15% more Powder while mining\\.",
         ),
         ABILITY_COOLDOWN(
-            perkDescription = "§a-20% §7Pickaxe Ability cooldowns",
-            chatFallback = "§r§a-20%§r§f Pickaxe Ability cooldowns\\.",
-            itemFallback = "§a-20%§7 Pickaxe Ability cooldowns\\.",
+            displayDescription = "§a-20% §7Pickaxe Ability cooldowns",
+            chatFallback = "-20% Pickaxe Ability cooldowns\\.",
+            itemFallback = "-20% Pickaxe Ability cooldowns\\.",
         ),
         GOBLIN_CHANCE(
-            perkDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
-            chatFallback = "§r§a10x §r§fchance to find Golden and Diamond Goblins\\.",
-            itemFallback = "§a10x §7chance to find Golden and",
+            displayDescription = "§a10x §6Gold §7& §bDiamond §7Goblin chance",
+            chatFallback = "10x chance to find Golden and Diamond Goblins\\.",
+            itemFallback = "10x chance to find Golden and",
         ),
         TITANIUM(
-            perkDescription = "§a5x §9Titanium §7drops",
-            chatFallback = "Gain §r§a5x §r§9Titanium §r§fdrops",
-            itemFallback = "Gain §a5x §9Titanium §7drops\\.",
+            displayDescription = "§a5x §9Titanium §7drops",
+            chatFallback = "Gain 5x Titanium drops",
+            itemFallback = "Gain 5x Titanium drops\\.",
         ),
         ;
 
@@ -149,14 +150,15 @@ object HotmApi {
         override val itemPattern by RepoPattern.pattern("$basePath.item.${asPatternId()}", itemFallback)
     }
 
+    @Suppress("MaxLineLength")
     enum class MayhemPerk(
         @field:Language("RegExp") val chatFallback: String,
     ) {
-        SCRAP_CHANCE("Your §r§9Suspicious Scrap §r§7chance was buffed by your §r§aMineshaft Mayhem §r§7perk!"),
-        MINING_FORTUNE("You received a §r§a§r§6☘ Mining Fortune §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
-        MINING_SPEED("You received a §r§a§r§6⸕ Mining Speed §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
-        COLD_RESISTANCE("You received a §r§a§r§b❄ Cold Resistance §r§7buff from your §r§aMineshaft Mayhem §r§7perk!"),
-        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced §r§7from your §r§aMineshaft Mayhem §r§7perk!"),
+        SCRAP_CHANCE("Your Suspicious Scrap chance was buffed by your Mineshaft Mayhem perk!"),
+        MINING_FORTUNE("You received a ${SkyblockStat.MINING_FORTUNE.hypixelIcon} Mining Fortune buff from your Mineshaft Mayhem perk!"),
+        MINING_SPEED("You received a ${SkyblockStat.MINING_SPEED.hypixelIcon} Mining Speed buff from your Mineshaft Mayhem perk!"),
+        COLD_RESISTANCE("You received a ${SkyblockStat.COLD_RESISTANCE.hypixelIcon} Cold Resistance buff from your Mineshaft Mayhem perk!"),
+        ABILITY_COOLDOWN("Your Pickaxe Ability cooldown was reduced from your Mineshaft Mayhem perk!"),
         ;
 
         val chatPattern by RepoPattern.pattern("mining.hotm.mayhem.chat.${asPatternId()}", chatFallback)

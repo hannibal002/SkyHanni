@@ -24,7 +24,7 @@ object GardenNextPlotPrice {
 
         if (InventoryUtils.openInventoryName() != "Configure Plots") return
 
-        if (!event.itemStack.cleanName().startsWith("Plot")) return
+        if (!event.itemStack.cleanName.startsWith("Plot")) return
 
         var next = false
         val list = event.toolTip

@@ -58,6 +58,12 @@ class EstimatedItemValueConfig {
     var armor: Boolean = true
 
     @Expose
+    @ConfigOption(name = "Show Equipment Value", desc = "Show the value of the full equipment set in the Equipment Wardrobe inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var equipment: Boolean = true
+
+    @Expose
     @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")
     @ConfigEditorBoolean
     val ignoreHelmetSkins: Property<Boolean> = Property.of(false)

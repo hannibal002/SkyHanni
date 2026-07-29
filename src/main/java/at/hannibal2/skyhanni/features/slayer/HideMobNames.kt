@@ -46,7 +46,7 @@ object HideMobNames {
     }
 
     private fun addMobToHide(bossName: String) {
-        patterns.add("§8\\[§7Lv\\d+§8] (?<mobType>(§.[✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿ൠ⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? §c$bossName§r §[ae](?<min>.+)§f\\/§a(?<max>.+)§c❤(§r)?".toPattern())
+        patterns.add("§8\\[§7Lv\\d+§8] (?<mobType>(§.[✈☮⚓♃Ж⚙⚂♣⊙☃❄✰♨♆✿⛨\uD83E\uDDB4☽⛏༕☠⸙])+)? §c$bossName§r §[ae](?<min>.+)§f\\/§a(?<max>.+)§c❤(§r)?".toPattern())
     }
 
     @HandleEvent(onlyOnSkyblock = true)

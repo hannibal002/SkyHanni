@@ -24,8 +24,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
-import at.hannibal2.skyhanni.utils.ItemUtils.getSingleLineLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
+import at.hannibal2.skyhanni.utils.ItemUtils.toSingleLineLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -82,7 +83,7 @@ object CFStrayWarning {
     }
 
     private fun handleRabbitWarnings(item: SafeItemStack) {
-        if (caughtRabbitPattern.matches(item.getSingleLineLore())) return
+        if (caughtRabbitPattern.matches(item.getLore().toSingleLineLore())) return
 
         val clickMeMatches = clickMeRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
         val goldenClickMeMatches = clickMeGoldenRabbitPattern.matches(item.hoverName.formattedTextCompatLeadingWhiteLessResets())
@@ -131,7 +132,7 @@ object CFStrayWarning {
         }
         val strayStacks = HoppityApi.filterMayBeStray(event.inventoryItems)
         strayStacks.forEach { handleRabbitWarnings(it.value) }
-        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getSingleLineLore()) }
+        val activeStrays = strayStacks.filterValues { !caughtRabbitPattern.matches(it.getLore().toSingleLineLore()) }
         activeStraySlots = activeStrays.keys
         flashScreen = activeStrays.any {
             val stack = it.value
