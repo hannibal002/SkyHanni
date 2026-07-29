@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.calculateSkillLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ColorUtils.toColor
@@ -417,22 +416,13 @@ object SkillProgress {
         val skill = skillMap[activeSkill] ?: return@buildList
         val useCustomGoalLevel = skill.customGoalLevel != 0 && skill.customGoalLevel > skill.overflowLevel
         val targetLevel = skill.customGoalLevel
+        // `totalXp` is the cumulative xp of the skill, matching what `xpRequiredForLevel` returns
         val xp = skill.totalXp
-        val lvl = skill.level
-        val cap = activeSkill.maxLevel
-        // This code is probably still wrong for hunting
-        // But I can not understand why we are doing this in the first place
-        val add = if (lvl >= 50) {
-            SkillUtil.xpRequiredForLevel(cap)
-        } else {
-            0
-        }
-        val (currentLevel, _, _, xpTotalCurrent) = calculateSkillLevel(xp + add, cap)
         val need = SkillUtil.xpRequiredForLevel(targetLevel)
 
         val (level, currentXP, currentXPMax, _) =
             if (useCustomGoalLevel && customGoalConfig.enableInDisplay)
-                SkillLevel(currentLevel, xp + add, need, xpTotalCurrent)
+                SkillLevel(skill.overflowLevel, xp, need, xp)
             else if (config.overflowConfig.enableInDisplay.get())
                 SkillLevel(skill.overflowLevel, skill.overflowCurrentXp, skill.overflowCurrentXpMax, skill.overflowTotalXp)
             else
