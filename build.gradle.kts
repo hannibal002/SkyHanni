@@ -80,7 +80,6 @@ loom.apply {
         named("client") {
             appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
-            property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
