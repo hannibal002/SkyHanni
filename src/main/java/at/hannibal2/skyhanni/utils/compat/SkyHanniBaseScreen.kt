@@ -166,4 +166,8 @@ abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen
         //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
         extractMenuBackground(DrawContextUtils.drawContext)
     }
+
+    open fun getDimensions(): Pair<Int, Int> = Pair(width, height)
+    open fun getTopLeft(): Pair<Int, Int> = Pair(0, 0)
+    open fun shouldShowItemList(): Boolean = false
 }

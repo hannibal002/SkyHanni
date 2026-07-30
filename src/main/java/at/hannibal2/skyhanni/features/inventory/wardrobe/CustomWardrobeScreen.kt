@@ -52,10 +52,12 @@ class CustomWardrobeScreen(
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
-    var renderableTopCorner: Pair<Int, Int> = 0 to 0
-        private set
-    var renderableDimensions: Pair<Int, Int> = 0 to 0
-        private set
+    private var renderableTopCorner: Pair<Int, Int> = 0 to 0
+    private var renderableDimensions: Pair<Int, Int> = width to height
+
+    override fun getDimensions(): Pair<Int, Int> = renderableDimensions
+    override fun getTopLeft(): Pair<Int, Int> = renderableTopCorner
+    override fun shouldShowItemList(): Boolean = config.showReiItems
 
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
