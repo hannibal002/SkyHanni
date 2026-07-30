@@ -234,59 +234,86 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §aYou caught §7x2 §5Bal §aShards§a!
-     * REGEX-TEST: §aYou caught a §fBirries §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught §7x2 §fHideonleaf §aShards§a!
-     * REGEX-TEST: §aYou caught §7x2 §fVoracious Spider §aShards§a!
+     * REGEX-TEST: You caught x2 Bal Shards!
+     * REGEX-TEST: You caught a Birries Shard!
+     * REGEX-TEST: You caught an Invisibug Shard!
+     * REGEX-TEST: You caught an Invisibug Shard!
+     * REGEX-TEST: You caught x2 Hideonleaf Shards!
+     * REGEX-TEST: You caught x2 Voracious Spider Shards!
      */
     private val caughtShardsPattern by patternGroup.pattern(
-        "caught.shards",
-        "§aYou caught(?: [an]+)?(?: §7x(?<amount>\\d+))? §.(?<shardName>.+) §aShard(?:s§a)?!",
+        "caught.shards.colorless",
+        "You caught(?: [an]+)?(?: x(?<amount>\\d+))? (?<shardName>.+) Shards?!",
     )
 
     /**
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received a §9Glacite Walker §fShard for assisting §bMealoan§f!
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received §b2 §aMossybit §fShards for assisting §bFallenYeti§f!
+     * REGEX-TEST: LOOT SHARE You received a Glacite Walker Shard for assisting Mealoan!
+     * REGEX-TEST: LOOT SHARE You received 2 Mossybit Shards for assisting FallenYeti!
      */
     private val lootShareShardPattern by patternGroup.pattern(
-        "loot.share.shard",
-        "§e§lLOOT SHARE §fYou received (?:an?|§.(?<amount>\\d+)) §.(?<shardName>.+) §fShards? for assisting .*§f!",
+        "loot.share.shard.colorless",
+        "LOOT SHARE You received (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? for assisting .*!",
     )
 
     /**
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7! §d§lNEW!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7! §d§lNEW!
+     * REGEX-TEST: FUSION! You obtained Bolt Shard x2!
+     * REGEX-TEST: FUSION! You obtained Bolt Shard x2! NEW!
+     * REGEX-TEST: FUSION! You obtained a Tadgang Shard!
+     * REGEX-TEST: FUSION! You obtained a Tadgang Shard! NEW!
      */
     private val fusionShardPattern by patternGroup.pattern(
-        "fusion.shard",
-        "§5§lFUSION! §7You obtained(?: an?)? (?:§.)+(?<shardName>.+) Shard(?: §8x(?<amount>\\d+))?§7!(?: §d§lNEW!)?",
+        "fusion.shard.colorless",
+        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!(?: NEW!)?",
     )
 
     /**
-     * REGEX-TEST: §d§lSALT§7 You charmed a §aMagma Slug§7 and captured §93 Shards §7from it.§r
-     * REGEX-TEST: §d§lSALT§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §5§lCHARM§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §6§lNAGA§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * REGEX-TEST: SALT You charmed a Magma Slug and captured 3 Shards from it.
+     * REGEX-TEST: SALT You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: CHARM You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: NAGA You charmed a Lapis Zombie and captured its Shard.
      */
-    @Suppress("MaxLineLength")
     private val charmedShardPattern by patternGroup.pattern(
-        "charmed.shard",
-        "§.§l(?<charmType>CHARM|SALT|NAGA)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
+        "charmed.shard.colorless",
+        "(?<charmType>CHARM|SALT|NAGA) You charmed an? (?<shardName>.+) and captured (?:(?<amount>\\d+) Shards from it|its Shard)\\.",
     )
 
     /**
-     * REGEX-TEST: §7You sent §aan §9Invisibug Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §a6 §fVoracious Spider Shards §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §aa §fVoracious Spider Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent a §fVerdant Shard §7to your §aHunting Box§7.
+     * REGEX-TEST: You sent an Invisibug Shard to your Hunting Box.
+     * REGEX-TEST: You sent 6 Voracious Spider Shards to your Hunting Box.
+     * REGEX-TEST: You sent a Voracious Spider Shard to your Hunting Box.
+     * REGEX-TEST: You sent a Verdant Shard to your Hunting Box.
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
-        "sent.to.hunting.box",
-        "§7You sent (?:§a)?(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
+        "sent.to.hunting.box.colorless",
+        "You sent (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? to your Hunting Box.",
+    )
+
+    /**
+     * REGEX-TEST: CAPTURE! You caught a Strongarm and gained a Strongarm Shard!
+     * REGEX-TEST: CAPTURE! You caught a Gimmiegold and gained a Gimmiegold Shard!
+     * REGEX-TEST: CAPTURE! You caught an Areita and gained an Areita Shard!
+     * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
+     */
+    private val capturedShardPattern by patternGroup.pattern(
+        "captured.shard",
+        "CAPTURE! You caught an? .+ and gained (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!"
+    )
+
+    /**
+     * REGEX-TEST: FLOOR DROP! You found Litterbug Shard on the ground!
+     * REGEX-TEST: FLOOR DROP! You found Solsnatcher Shard on the ground!
+     */
+    private val floorDropShardPattern by patternGroup.pattern(
+        "floor-drop.shard",
+        "FLOOR DROP! You found (?<shardName>.+) Shard on the ground!"
+    )
+
+    /**
+     * REGEX-TEST: You have been given a Gimmiegold!
+     */
+    private val givenShardsPattern by patternGroup.pattern(
+        "given.shards",
+        "You have been given a (?<shardName>.+)!"
     )
 
     // the boolean is if it should post the shard gain event
@@ -295,6 +322,9 @@ object AttributeShardsData {
         lootShareShardPattern to (true to ShardSource.HUNT),
         charmedShardPattern to (true to null),
         sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
+        capturedShardPattern to (true to ShardSource.CAPTURED),
+        floorDropShardPattern to (true to ShardSource.FLOOR_DROP),
+        givenShardsPattern to (true to ShardSource.GIVEN),
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
@@ -368,7 +398,7 @@ object AttributeShardsData {
         }
 
         for ((pattern, shouldPostGainEvent) in shardGainChatPatterns) {
-            pattern.matchMatcher(message) {
+            pattern.matchMatcher(event.cleanMessage) {
                 val shardName = group("shardName")
                 val amount = groupOrNull("amount")?.toInt() ?: 1
 

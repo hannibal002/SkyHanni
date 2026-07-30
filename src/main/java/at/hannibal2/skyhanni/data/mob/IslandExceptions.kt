@@ -53,6 +53,7 @@ object IslandExceptions {
             IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
             IslandType.WINTER -> winterIsland(baseEntity)
             IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
+            IslandType.TORRHUS_CANYON -> ModernIslandExceptions.torrhus(baseEntity, armorStand, nextEntity)
 
             else -> null
         }

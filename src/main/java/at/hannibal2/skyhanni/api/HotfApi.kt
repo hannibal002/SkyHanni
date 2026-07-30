@@ -32,6 +32,11 @@ object HotfApi {
             chatFallback = "Gain \\+50 ${SkyblockStat.FIG_FORTUNE.hypixelIcon} Fig Fortune\\.",
             itemFallback = "Gain \\+50 ${SkyblockStat.FIG_FORTUNE.hypixelIcon} Fig Fortune\\.",
         ),
+        HELIX_FORTUNE(
+            displayDescription = "§a+50 §r§6${SkyblockStat.HELIX_FORTUNE.hypixelIcon} Helix Fortune",
+            chatFallback = "Gain \\+50 ${SkyblockStat.HELIX_FORTUNE.hypixelIcon} Helix Fortune\\.",
+            itemFallback = "Gain \\+50 ${SkyblockStat.HELIX_FORTUNE.hypixelIcon} Helix Fortune\\.",
+        ),
         ;
 
         private val basePath = "foraging.hotf.lottery"
