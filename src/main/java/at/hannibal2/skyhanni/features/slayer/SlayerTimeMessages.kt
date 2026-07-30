@@ -27,7 +27,7 @@ object SlayerTimeMessages {
     private val templates get() = config.templates
 
     @HandleEvent
-    fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
+    private fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val data = event.data
         val bossType = data.bossType
 
@@ -84,7 +84,7 @@ object SlayerTimeMessages {
     }
 
     @HandleEvent
-    fun onSlayerQuestComplete() {
+    private fun onSlayerQuestComplete() {
         val startTime = SlayerApi.questStartTime
         if (!config.questComplete || startTime.isFarPast()) return
 
@@ -143,14 +143,14 @@ object SlayerTimeMessages {
     )
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(132, "slayer.timeToKillMessage", "slayer.slayerTimeMessages.timeToKill")
         event.move(132, "slayer.questCompleteMessage", "slayer.slayerTimeMessages.questComplete")
         event.move(132, "slayer.compactTimeMessage", "slayer.slayerTimeMessages.compact")
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shtestslayertimemessage") {
             description = "Tests the slayer time messages (chat and titles)"
             category = CommandCategory.DEVELOPER_TEST
