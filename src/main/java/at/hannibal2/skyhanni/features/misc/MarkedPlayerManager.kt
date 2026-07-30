@@ -52,18 +52,12 @@ object MarkedPlayerManager {
     private val currentLobbyPlayers = mutableSetOf<String>()
     private var personOfInterest = listOf<String>()
 
-    fun isMarkedPlayer(name: String): Boolean =
-        playerNamesToMark.any { it.equals(name, ignoreCase = true) }
-
-    private fun getStoredName(name: String): String? =
-        playerNamesToMark.firstOrNull { it.equals(name, ignoreCase = true) }
-
     @HandleEvent
     private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
         val name = entity.cleanName
-        if (isMarkedPlayer(name)) {
+        if (name in playerNamesToMark) {
             markedPlayers[name] = entity
             entity.setColor()
         }
@@ -76,7 +70,7 @@ object MarkedPlayerManager {
             if (entity in markedPlayers.values) continue
 
             val name = entity.cleanName
-            if (isMarkedPlayer(name)) {
+            if (name in playerNamesToMark) {
                 markedPlayers[name] = entity
                 entity.setColor()
             }
@@ -96,6 +90,8 @@ object MarkedPlayerManager {
         )
     }
 
+    fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
+
     @Suppress("DEPRECATION")
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
         config.highlightInWorld.get()
@@ -104,16 +100,11 @@ object MarkedPlayerManager {
         if (!config.highlightInChat) return string
 
         val color = config.chatColor.getChatColor()
-
-        val markedPlayer = playerNamesToMark.firstOrNull { player ->
-            string.contains(player, ignoreCase = true)
-        } ?: return string
-
-        return string.replaceFirst(
-            markedPlayer,
-            "$color$markedPlayer§r",
-            ignoreCase = true,
-        )
+        var text = string
+        for (markedPlayer in playerNamesToMark) {
+            text = text.replace(markedPlayer, "$color$markedPlayer§r")
+        }
+        return text
     }
 
     @HandleEvent
@@ -121,13 +112,11 @@ object MarkedPlayerManager {
         config.markOwnName.whenChanged { _, new ->
             val name = PlayerUtils.getName()
             if (new) {
-                if (!isMarkedPlayer(name)) {
+                if (!playerNamesToMark.contains(name)) {
                     playerNamesToMark.add(name)
                 }
             } else {
-                getStoredName(name)?.let {
-                    playerNamesToMark.remove(it)
-                }
+                playerNamesToMark.remove(name)
             }
         }
         config.entityColor.onToggle(::refreshColors)
@@ -146,7 +135,7 @@ object MarkedPlayerManager {
         currentLobbyPlayers.clear()
         if (config.markOwnName.get()) {
             val name = PlayerUtils.getName()
-            if (!isMarkedPlayer(name)) {
+            if (!playerNamesToMark.contains(name)) {
                 playerNamesToMark.add(name)
             }
         }
@@ -162,7 +151,7 @@ object MarkedPlayerManager {
 
         tabPlayerName.matchAll(event.lines.map { it.string }) {
             val name = group("name")
-            if (!name.equals(PlayerUtils.getName(), ignoreCase = true)) {
+            if (name != PlayerUtils.getName()) {
                 currentLobbyPlayers.add(name)
             }
         }
@@ -204,26 +193,23 @@ object MarkedPlayerManager {
                     includePlayers(playerNamesToMark)
                     exclude(PlayerNameSource.SELF)
                 },
-            ) { name ->
+            ) { displayName ->
+                val name = displayName.lowercase()
 
-                if (name.equals(PlayerUtils.getName(), ignoreCase = true)) {
+                if (name == PlayerUtils.getName().lowercase()) {
                     ChatUtils.userError("You can't add or remove yourself this way! Go to the settings and toggle 'Mark your own name'.")
                     return@argCallback
                 }
 
-                val storedName = getStoredName(name)
-
-                if (storedName == null) {
+                if (name !in playerNamesToMark) {
                     playerNamesToMark.add(name)
                     findPlayers()
-                    ChatUtils.chat("§aMarked §eplayer §b$name§e!")
+                    ChatUtils.chat("§aMarked §eplayer §b$displayName§e!")
                 } else {
-                    markedPlayers[storedName]?.let {
-                        RenderLivingEntityHelper.removeEntityColor(it)
-                    }
-                    markedPlayers.remove(storedName)
-                    playerNamesToMark.remove(storedName)
-                    ChatUtils.chat("§cUnmarked §eplayer §b$name§e!")
+                    playerNamesToMark.remove(name)
+                    markedPlayers[name]?.let { RenderLivingEntityHelper.removeEntityColor(it) }
+                    markedPlayers.remove(name)
+                    ChatUtils.chat("§cUnmarked §eplayer §b$displayName§e!")
                 }
             }
             simpleCallback {
