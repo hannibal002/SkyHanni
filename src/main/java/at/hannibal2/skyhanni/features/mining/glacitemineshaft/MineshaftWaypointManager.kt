@@ -28,7 +28,6 @@ import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket
 import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO rename to something else to reduce confusion
 @SkyHanniModule
 object MineshaftWaypointManager {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
