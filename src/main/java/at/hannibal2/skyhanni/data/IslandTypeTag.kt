@@ -19,7 +19,7 @@ enum class IslandTypeTag(vararg types: Any) {
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
     PERSONAL_ISLAND(PRIVATE_ISLAND, GARDEN_ISLAND),
 
-    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT),
+    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.SAFARI),
     NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
     ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
     MINING(NORMAL_MINING, ADVANCED_MINING),
@@ -53,6 +53,8 @@ enum class IslandTypeTag(vararg types: Any) {
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
+        IslandType.SPIDER_DEN,
+        IslandType.TORRHUS_CANYON,
     ),
     WORMHOLE(
         IslandType.LOTUS_ATOLL,
