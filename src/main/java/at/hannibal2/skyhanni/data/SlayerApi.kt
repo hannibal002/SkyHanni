@@ -130,9 +130,9 @@ object SlayerApi {
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT || state == ActiveQuestState.COCOONED
 
     /**
-     * For how many scoreboard updates have we seen a category that is invalid?
+     * How many consecutive updates have we seen a category that is invalid?
      */
-    private var invalidCategoryTicks = 0
+    private var invalidCategoryUpdates = 0
 
     // This Timer is mostly just a fail-safe so it doesn't get stuck in COCOONED state
     private var cocoonTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
@@ -265,9 +265,9 @@ object SlayerApi {
             val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
 
             if (category.isNotEmpty() && parsedTier == null) {
-                invalidCategoryTicks++
+                invalidCategoryUpdates++
 
-                if (invalidCategoryTicks >= 2) {
+                if (invalidCategoryUpdates >= 2) {
                     ErrorManager.skyHanniError(
                         "latestCategory does not contain roman number or int: '$category'",
                         "lines" to lines,
@@ -277,7 +277,7 @@ object SlayerApi {
                 return
             }
 
-            invalidCategoryTicks = 0
+            invalidCategoryUpdates = 0
 
             val old = latestCategory
             latestCategory = category
@@ -285,7 +285,7 @@ object SlayerApi {
 
             SlayerChangeEvent(old, category).post()
         } else {
-            invalidCategoryTicks = 0
+            invalidCategoryUpdates = 0
         }
 
         if (progress != latestProgress) {
