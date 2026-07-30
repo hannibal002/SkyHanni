@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.xpRequiredForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -65,6 +66,7 @@ object SkillApi {
 
     /**
      * REGEX-TEST: +6.3 Foraging (24/750)
+     * REGEX-TEST: +207.2 Hunting (5,183,244/0)
      */
     private val skillMultiplierPattern by patternGroup.pattern(
         "skill.multiplier",
@@ -132,13 +134,22 @@ object SkillApi {
     )
 
     /**
-     * Regex-TEST: Max Skill level reached!
+     * REGEX-TEST: Max Skill level reached!
      */
     private val skillMaxLevelMenuPattern by patternGroup.pattern(
         "skill.menu.maxreached",
         "Max Skill level reached!"
     )
 
+    /**
+     * REGEX-TEST: Your Skills
+     */
+    private val skillMenuNamePattern by patternGroup.pattern(
+        "skill.menu.name",
+        "Your Skills"
+    )
+
+    val skillMenuDetector = InventoryDetector { skillMenuNamePattern }
     var skillXPInfoMap = mutableMapOf<SkillType, SkillXPInfo>()
     var oldSkillInfoMap = mutableMapOf<SkillType?, SkillInfo?>()
     private val skillStorage get() = ProfileStorageData.profileSpecific?.skills
@@ -331,7 +342,7 @@ object SkillApi {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Your Skills") return
+        if (!skillMenuNamePattern.matches(event.inventoryName)) return
         for (stack in event.inventoryItems.values) {
             val lore = stack.getLore()
             if (lore.none { it.contains("Click to view!") || it.contains("Not unlocked!") }) continue
@@ -563,7 +574,7 @@ object SkillApi {
         val minus = if (maxXP == 0L) 0 else 1
         val level = getLevelExact(maxXP) - minus
 
-        val levelXP = if (maxXP == 0L) currentXP else calculateLevelXP(level - 1).toLong() + currentXP
+        val levelXP = calculateLevelXP(level - 1).toLong() + currentXP
         val (currentLevel, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(levelXP, skillType.maxLevel)
 

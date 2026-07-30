@@ -51,8 +51,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.world.inventory.ChestMenu
 import kotlin.time.Duration.Companion.seconds
@@ -141,7 +141,7 @@ object HideNotClickableItems {
         if (!isEnabled()) return
         if (bypassActive()) return
 
-        val guiChest = Minecraft.getInstance().screen
+        val guiChest = MinecraftCompat.screen
         if (guiChest !is ContainerScreen) return
         val chestName = InventoryUtils.openInventoryName()
 
@@ -210,7 +210,7 @@ object HideNotClickableItems {
             hidePotionBag(chestName, stack) -> true
             hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
-            hideYourEquipment(chestName, stack) -> true
+            hideYourEquipment(stack) -> true
             hideComposter(stack) -> true
             hideRiftMotesGrubber(chestName, stack) -> true
             hideRiftTransferChest(chestName, stack) -> true
@@ -303,8 +303,8 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hideYourEquipment(chestName: String, stack: SafeItemStack): Boolean {
-        if (!chestName.startsWith("Your Equipment")) return false
+    private fun hideYourEquipment(stack: SafeItemStack): Boolean {
+        if (!CurrentEquipmentApi.inventory.isInside()) return false
 
         val list = listOf(
             "HELMET",

@@ -18,10 +18,10 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.ChatScreen
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -133,7 +133,7 @@ object CurrentChatDisplay {
     @HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class)
     fun onGuiRenderOverlay() {
         if (!isEnabled()) return
-        if (Minecraft.getInstance().screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
+        if (MinecraftCompat.screen !is ChatScreen && lastClosedChatTime.passedSince() > 2.seconds) return
         val display = display ?: return
         config.currentChatDisplayPos.renderRenderable(display, posLabel = "Current Chat")
     }

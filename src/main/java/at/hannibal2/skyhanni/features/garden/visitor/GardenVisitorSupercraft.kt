@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
@@ -74,8 +75,7 @@ object GardenVisitorSupercraft {
         if (amountInSacks >= amount) return
 
         val ingredients = NeuItems.getRecipes(internalName)
-            // TODO describe what this line does
-            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            .firstOrNull { it.recipeType == NeuRecipeType.CRAFTING }
             ?.ingredients ?: return
         val requiredIngredients = mutableMapOf<NeuInternalName, Int>()
         for ((key, count) in ingredients.toPrimitiveItemStacks()) {

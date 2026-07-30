@@ -25,7 +25,6 @@ object ParticleHider {
 
     @HandleEvent
     fun onParticle(event: ParticleEvent) {
-        if (!MinecraftCompat.localPlayerExists) return
         with(event) {
             val hideFarCancel = (config.hideFarParticles && distanceToPlayer > 40 && !inM7Boss())
             val hideCloseRedstoneCancel = (config.hideCloseRedstoneParticles && type == ParticleTypes.DUST && distanceToPlayer < 2)

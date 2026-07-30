@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -28,7 +28,6 @@ import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
@@ -94,6 +93,14 @@ object EnigmaSoulWaypoints {
         "SOUL! You unlocked an Enigma Soul!|You have already found that Enigma Soul!",
     )
 
+    /**
+     * REGEX-TEST: Rift Guide ➜ Enigma Souls
+     */
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        ".*Enigma Souls$",
+    )
+
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
@@ -107,12 +114,12 @@ object EnigmaSoulWaypoints {
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         inInventory = false
-        if (!event.inventoryName.contains("Enigma Souls")) return
+        if (!inventoryNamePattern.matches(event.inventoryName)) return
         inInventory = true
 
         for (stack in event.inventoryItems.values) {
-            stack.getLore().lastOrNull()?.let {
-                if (notCompletedPattern.matches(it.removeColor())) {
+            stack.getCleanLore().lastOrNull()?.let {
+                if (notCompletedPattern.matches(it)) {
                     enigmaTitlePattern.matchMatcher(stack.cleanName) {
                         inventoryUnfound.add(group("name"))
                     }
@@ -240,8 +247,8 @@ object EnigmaSoulWaypoints {
         }
     }
 
-    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(40)?.item?.getLore()?.firstOrNull()?.let {
-        guideAreaPattern.matchMatcher(it.removeColor()) {
+    private fun getSelectedArea(): String? = InventoryUtils.getSlotAtIndex(39)?.item?.getCleanLore()?.firstOrNull()?.let {
+        guideAreaPattern.matchMatcher(it) {
             group("area")
         }
     }

@@ -1,12 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.compacttablist
 
-//~ if < 26.1 'PlayerFaceExtractor' -> 'PlayerFaceRenderer' {
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.minecraftevents.RenderLayer
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GlobalRender
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkipTabListLineEvent
 import at.hannibal2.skyhanni.events.render.gui.GameOverlayRenderPreEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,10 +16,16 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterToMutable
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.components.PlayerFaceExtractor
 import net.minecraft.network.chat.Component
+
+//? if >= 26.1 {
+import net.minecraft.client.gui.components.PlayerFaceExtractor
+//?} else {
+/*import net.minecraft.client.gui.components.PlayerFaceRenderer
+*///?}
 
 @SkyHanniModule
 object TabListRenderer {
@@ -46,9 +50,9 @@ object TabListRenderer {
     private var isTabToggled = false
 
     @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOWEST)
-    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderOverlay() {
         if (GlobalRender.renderDisabled || !config.enabled.get() || !config.toggleTab) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
 
         val playerListKeyActive = Minecraft.getInstance().options.keyPlayerList.isActive()
         if (playerListKeyActive && !isPressed) {
@@ -143,7 +147,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.SUB_TITLE) {
                     lastSubTitle = tabLine
                 }
-                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post().isCancelled
             }.let(::RenderColumn)
 
             GuiRenderUtils.drawRect(
@@ -159,13 +163,23 @@ object TabListRenderer {
 
                 val hideIcons = config.advancedPlayerList.hidePlayerIcons && !AdvancedPlayerList.ignoreCustomTabList()
                 if (tabLine.type == TabStringType.PLAYER && !hideIcons) {
-                    val playerInfo = tabLine.getInfo()
-                    if (playerInfo != null) {
+                    tabLine.getInfo()?.let { playerInfo ->
                         //~ if < 26.1 'texturePath' -> 'id'
                         val texture = playerInfo.skin.body().texturePath()
-                        //~ if < 26.1 'extractRenderState' -> 'draw'
+
+                        //? if >= 26.1 {
                         PlayerFaceExtractor.extractRenderState(
-                            DrawContextUtils.drawContext, texture, middleX, middleY, 8, playerInfo.showHat(), false, -1,
+                            //?} else {
+                        /*PlayerFaceRenderer.draw(
+                        *///?}
+                            DrawContextUtils.drawContext,
+                            texture,
+                            middleX,
+                            middleY,
+                            8,
+                            playerInfo.showHat(),
+                            false,
+                            -1,
                         )
                     }
                     middleX += 8 + 2
@@ -203,4 +217,3 @@ object TabListRenderer {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }
 }
-//~}

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -30,6 +31,7 @@ import kotlin.time.DurationUnit
 
 @Suppress("TooManyFunctions")
 object TimeUtils {
+    private val patternGroup = RepoPattern.group("timeutils")
 
     val isAprilFoolsDay: Boolean by RecalculatingValue(1.seconds) {
         val itsTime = LocalDate.now().let { it.month == Month.APRIL && it.dayOfMonth == 1 }
@@ -115,6 +117,31 @@ object TimeUtils {
         getDurationOrNull(string) ?: throw RuntimeException("Invalid format: '$string'")
 
     fun getDurationOrNull(string: String): Duration? = getMillis(string.preFixDurationString())
+
+
+    /**
+     * REGEX-TEST: 12:00 am
+     * REGEX-TEST: 11:59 pm
+     * REGEX-TEST: 12:41 am
+     */
+    private val skyblockTimePattern by patternGroup.pattern(
+        "24-hour-time",
+        "(?<hour>\\d+):(?<minute>\\d+)\\s*(?<period>am|pm)"
+    )
+
+    fun String.parse12HourTime(): Pair<Int, Int>? {
+        return skyblockTimePattern.matchMatcher(trim().lowercase()) {
+            var hour = group("hour").toInt()
+            val minute = group("minute").toInt()
+
+            when (group("period")) {
+                "pm" -> if (hour != 12) hour += 12
+                "am" -> if (hour == 12) hour = 0
+            }
+
+            hour to minute
+        }
+    }
 
     private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         years("y") + days("d") + hours("h") + minutes("m") + seconds("s")

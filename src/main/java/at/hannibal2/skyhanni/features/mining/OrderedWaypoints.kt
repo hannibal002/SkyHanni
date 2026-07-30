@@ -34,9 +34,9 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawLineToCrosshair
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawString
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawWaypointFilled
-import kotlinx.coroutines.Job
 import java.util.Locale
 import java.util.ServiceLoader
+import kotlinx.coroutines.Job
 
 @SkyHanniModule
 object OrderedWaypoints {

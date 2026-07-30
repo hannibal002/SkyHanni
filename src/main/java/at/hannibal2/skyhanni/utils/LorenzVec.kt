@@ -148,7 +148,7 @@ data class LorenzVec(
 
     fun roundToBlock() = LorenzVec(floor(x), floor(y), floor(z))
 
-    fun blockCenter() = roundToBlock().add(0.5, 0.5, 0.5)
+    fun blockCenter() = roundToBlock().addHalf()
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 

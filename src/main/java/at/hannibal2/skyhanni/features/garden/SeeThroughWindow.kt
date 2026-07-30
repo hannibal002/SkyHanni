@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.minecraft.KeyDownEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import net.minecraft.client.Minecraft
 import org.lwjgl.glfw.GLFW
 
@@ -27,7 +28,7 @@ object SeeThroughWindow {
     @HandleEvent
     fun onKeyPressed(event: KeyDownEvent) {
         if (event.keyCode != config.keybind) return
-        if (Minecraft.getInstance().screen != null) return
+        if (MinecraftCompat.screen != null) return
         isActive = !isActive
         setOpacity()
     }

@@ -42,7 +42,7 @@ object HoppityNpc {
 
     @HandleEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (event.inventoryName != "Hoppity") return
+        if (!HoppityApi.hoppityDetector.isInside()) return
         // TODO maybe we could add an annoying chat message that tells you how many years you have skipped
         //  or the last year you have opened the shop before.
         //  that way we verbally punish non active users in a funny and non harmful way

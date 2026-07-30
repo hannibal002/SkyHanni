@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Style;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-
 import java.util.List;
 
 @Mixin(StringSplitter.class)
@@ -31,5 +30,4 @@ public abstract class MixinStringSplitter {
     private FormattedText modifyStringVisitable(FormattedText visitable) {
         return VisualWordsHook.modifyFormattedText(visitable);
     }
-
 }

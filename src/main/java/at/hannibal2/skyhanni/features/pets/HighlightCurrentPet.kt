@@ -31,7 +31,7 @@ object HighlightCurrentPet {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        inInventory = PetStorageApi.isMainPetMenuName(event.inventoryName)
+        inInventory = PetStorageApi.inMainPetMenuName()
         if (!inInventory) return
         val currentPetUuid = CurrentPetApi.currentPet?.uuid ?: return
         highlightSlot = event.inventoryItems.entries.firstOrNull {

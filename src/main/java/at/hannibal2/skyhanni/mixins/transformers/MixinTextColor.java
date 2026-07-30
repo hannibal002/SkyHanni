@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(TextColor.class)
-public class MixinTextColor {
+public abstract class MixinTextColor {
 
     @Inject(
         method = "equals",

@@ -3,46 +3,51 @@ package at.hannibal2.skyhanni.data.effect
 import at.hannibal2.skyhanni.events.effects.EffectDurationChangeType
 import at.hannibal2.skyhanni.utils.repopatterns.NullableRepoPatternDelegate
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import org.intellij.lang.annotations.Language
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
 enum class NonGodPotEffect(
-    val tabListName: String,
-    val isMixin: Boolean = false,
-    val inventoryItemName: String = tabListName,
+    @param:Language("RegExp")
+    private val tabListName: String,
+    @param:Language("RegExp")
+    private val inventoryItemName: String = ".*$tabListName.*",
+    @param:Language("RegExp")
+    private val effectGainedMessage: String? = null,
+    @param:Language("RegExp")
+    private val effectRemovedMessage: String? = null,
     val displayName: String,
-    val effectGainedMessage: String? = null,
-    val effectRemovedMessage: String? = null,
+    val isMixin: Boolean = false,
     val effectDuration: Duration? = null,
     val effectChangeType: EffectDurationChangeType? = null,
 ) {
     SMOLDERING(
         "Smoldering Polarization I",
         displayName = "§aSmoldering Polarization I",
-        effectGainedMessage = "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!",
+        effectGainedMessage = "You ate a Re-heated Gummy Polar Bear!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.ADD,
     ),
     GLOWY(
         "Mushed Glowy Tonic I",
         displayName = "§2Mushed Glowy Tonic I",
-        effectGainedMessage = "§a§lBUFF! §fYou have gained §r§2Mushed Glowy Tonic I§r§f!",
+        effectGainedMessage = "BUFF! You have gained Mushed Glowy Tonic I!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
     WISP(
         "Wisp's Ice-Flavored Water I",
         displayName = "§bWisp's Ice-Flavored Water I",
-        effectGainedMessage = "§a§lBUFF! §fYou splashed yourself with §r§bWisp's Ice-Flavored Water I§r§f!",
+        effectGainedMessage = "BUFF! You splashed yourself with Wisp's Ice-Flavored Water I!",
         effectDuration = 5.minutes,
         effectChangeType = EffectDurationChangeType.SET,
     ),
     GOBLIN(
         "King's Scent I",
         displayName = "§2King's Scent I",
-        effectGainedMessage = "§e[NPC] §6King Yolkaar§f: §rThis egg will help me stomach my pain.",
-        effectRemovedMessage = "§cThe Goblin King's §r§afoul stench §r§chas dissipated!",
+        effectGainedMessage = "[NPC] King Yolkar: This egg will help me stomach my pain.",
+        effectRemovedMessage = "The Goblin King's foul stench has dissipated!",
         effectDuration = 20.minutes,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -111,9 +116,9 @@ enum class NonGodPotEffect(
 
     GREAT_SPOOK(
         "Great Spook I",
-        inventoryItemName = "§fGreat Spook Potion",
+        inventoryItemName = ".*Great Spook Potion.*",
         displayName = "Great Spook I",
-        effectGainedMessage = "§eYou consumed a §r§fGreat Spook Potion§r§e!",
+        effectGainedMessage = "You consumed a Great Spook Potion!",
         effectDuration = 24.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -121,7 +126,7 @@ enum class NonGodPotEffect(
     DOUCE_PLUIE_DE_STINKY_CHEESE(
         "Douce Pluie de Stinky Cheese I",
         displayName = "§eDouce Pluie de Stinky Cheese I",
-        effectGainedMessage = "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f!",
+        effectGainedMessage = "BUFF! You have gained Douce Pluie de Stinky Cheese I!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -129,7 +134,7 @@ enum class NonGodPotEffect(
     HARVEST_HARBINGER(
         "Harvest Harbinger V",
         displayName = "§6Harvest Harbinger V",
-        effectGainedMessage = "§a§lBUFF! §fYou have gained §r§6Harvest Harbinger V§r§f!",
+        effectGainedMessage = "BUFF! You have gained Harvest Harbinger V!",
         effectDuration = 25.minutes,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -137,14 +142,14 @@ enum class NonGodPotEffect(
     PEST_REPELLENT(
         "Pest Repellent I",
         displayName = "§6Pest Repellent I§r",
-        effectGainedMessage = "§a§lYUM! §r§2 Pests §r§7will now spawn §r§a2x §r§7less while you break crops for the next §r§a60m§r§7!",
+        effectGainedMessage = "YUM!  Pests will now spawn 2x less while you break crops for the next 60m!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
     PEST_REPELLENT_MAX(
         "Pest Repellent II",
         displayName = "§6Pest Repellent II",
-        effectGainedMessage = "§a§lYUM! §r§2 Pests §r§7will now spawn §r§a4x §r§7less while you break crops for the next §r§a60m§r§7!",
+        effectGainedMessage = "YUM!  Pests will now spawn 4x less while you break crops for the next 60m!",
         effectDuration = 1.hours,
         effectChangeType = EffectDurationChangeType.SET,
     ),
@@ -202,13 +207,24 @@ enum class NonGodPotEffect(
     )
     val effectGainedPattern by NullableRepoPatternDelegate(
         effectGainedMessage?.let {
-            RepoPattern.pattern("misc.nongodpot.effects.gained.$patternName", it)
+            RepoPattern.pattern(
+                "misc.nongodpot.effects.gained.$patternName.colorless",
+                it
+            )
         },
     )
 
     val effectRemovedPattern by NullableRepoPatternDelegate(
         effectRemovedMessage?.let {
-            RepoPattern.pattern("misc.nongodpot.effects.removed.$patternName", it)
+            RepoPattern.pattern(
+                "misc.nongodpot.effects.removed.$patternName.colorless",
+                it
+            )
         },
+    )
+
+    val inventoryItemNamePattern by RepoPattern.pattern(
+        "misc.nongodpot.effects.inventoryitemname.$patternName",
+        inventoryItemName,
     )
 }

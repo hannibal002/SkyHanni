@@ -15,7 +15,6 @@ class ImportRuleSetProvider : RuleSetProvider {
             ruleSetId,
             mapOf(
                 RuleName("CustomImportOrdering") to ::CustomImportOrdering,
-                RuleName("PreprocessingImportOrdering") to ::PreprocessingImportOrdering,
             ),
         )
     }

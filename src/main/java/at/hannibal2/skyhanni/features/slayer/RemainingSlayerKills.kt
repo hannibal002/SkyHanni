@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -237,7 +237,7 @@ object RemainingSlayerKills {
             }
 
             data.equipments[SlayerApi.activeType]?.let { equipments ->
-                for (internalName in EquipmentApi.getAll().map { it.getInternalNameOrNull() }) {
+                for (internalName in CurrentEquipmentApi.getAll().map { it.getInternalNameOrNull() }) {
                     equipments[internalName]?.let { wisdom ->
                         combatWisdom += wisdom
                     }

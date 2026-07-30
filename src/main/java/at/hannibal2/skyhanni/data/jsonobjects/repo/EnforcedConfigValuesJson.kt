@@ -10,13 +10,17 @@ data class EnforcedConfigValuesJson(
 )
 
 data class EnforcedValueData(
-    @Expose val enforcedValues: List<EnforcedValue> = listOf(),
-    @Expose val notificationPSA: List<String>? = null,
-    @Expose val chatPSA: List<String>? = null,
-    @Expose val minimumAffectedVersion: ModVersion? = null,
-    @Expose val affectedVersion: ModVersion,
-    @Expose val affectedMinecraftVersions: List<String>? = null,
-    @Expose val extraMessage: String? = null,
+    @Expose @SerializedName(value = "enforced_values", alternate = ["enforcedValues"]) val enforcedValues: List<EnforcedValue> = listOf(),
+    @Expose @SerializedName(value = "notification_psa", alternate = ["notificationPSA"]) val notificationPSA: List<String>? = null,
+    @Expose @SerializedName(value = "chat_psa", alternate = ["chatPSA"]) val chatPSA: List<String>? = null,
+    @Expose
+    @SerializedName(value = "minimum_affected_version", alternate = ["minimumAffectedVersion"])
+    val minimumAffectedVersion: ModVersion? = null,
+    @Expose @SerializedName(value = "affected_version", alternate = ["affectedVersion"]) val affectedVersion: ModVersion,
+    @Expose
+    @SerializedName(value = "affected_minecraft_versions", alternate = ["affectedMinecraftVersions"])
+    val affectedMinecraftVersions: List<String>? = null,
+    @Expose @SerializedName(value = "extra_message", alternate = ["extraMessage"]) val extraMessage: String? = null,
 )
 
 data class EnforcedValue(

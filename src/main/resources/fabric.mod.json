@@ -55,7 +55,9 @@
     },
     "breaks": {
         "clientspoofer": "*",
-        "exordium": "*"
+        "exordium": "*",
+        "opsec": "*",
+        "spoofified": "*"
     },
     "contact": {
         "homepage": "https://modrinth.com/mod/skyhanni",

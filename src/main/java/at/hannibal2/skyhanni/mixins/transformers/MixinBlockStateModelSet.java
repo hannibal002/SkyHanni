@@ -1,6 +1,6 @@
-//? if >= 26.1 {
 package at.hannibal2.skyhanni.mixins.transformers;
 
+//? if >= 26.1 {
 import at.hannibal2.skyhanni.mixins.hooks.BlockRendererDispatcherHookKt;
 import net.minecraft.client.renderer.block.BlockStateModelSet;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
@@ -11,7 +11,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(BlockStateModelSet.class)
-public class MixinBlockStateModelSet {
+public abstract class MixinBlockStateModelSet {
+
     @Inject(method = "get", at = @At("HEAD"), cancellable = true)
     public void getModel(BlockState state, CallbackInfoReturnable<BlockStateModel> cir) {
         BlockRendererDispatcherHookKt.modifyGetModelFromBlockState((BlockStateModelSet) (Object) this, state, cir);

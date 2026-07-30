@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniGuiContainer
@@ -41,6 +42,7 @@ import org.lwjgl.glfw.GLFW
 import kotlin.reflect.full.createInstance
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.javaField
+
 //? if < 26.1 {
 /*import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -298,7 +300,7 @@ class GuiPositionEditor(
         if (oldScreen == null) {
             super.onClose()
         } else {
-            Minecraft.getInstance().screen = oldScreen
+            MinecraftCompat.screen = oldScreen
         }
     }
 }
@@ -418,7 +420,7 @@ private class OldScreenRenderContext(
         val top = oldScreen.containerTop()
         val entityScale = (30 * ((scaleX + scaleY) / 2f)).roundToInt()
 
-        //~ if < 26.1 'extractEntityInInventoryFollowsMouse' -> 'renderEntityInInventoryFollowsMouse'
+        //~ if < 26.1 'extract' -> 'render'
         InventoryScreen.extractEntityInInventoryFollowsMouse(
             DrawContextUtils.drawContext,
             ((left + 26) * scaleX).roundToInt(),

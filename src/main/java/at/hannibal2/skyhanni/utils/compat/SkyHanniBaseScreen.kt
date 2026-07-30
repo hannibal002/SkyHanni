@@ -10,7 +10,7 @@ import net.minecraft.client.input.MouseButtonEvent
 import net.minecraft.network.chat.Component
 
 @Suppress("UnusedParameter", "TooManyFunctions")
-abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
+abstract class SkyHanniBaseScreen(title: Component = Component.empty()) : Screen(title) {
 
     val mc: Minecraft = Minecraft.getInstance()
 
@@ -166,4 +166,8 @@ abstract class SkyHanniBaseScreen : Screen(Component.empty()) {
         //~ if < 26.1 'extractMenuBackground' -> 'renderMenuBackground'
         extractMenuBackground(DrawContextUtils.drawContext)
     }
+
+    open fun getDimensions(): Pair<Int, Int> = Pair(width, height)
+    open fun getTopLeft(): Pair<Int, Int> = Pair(0, 0)
+    open fun shouldShowItemList(): Boolean = false
 }

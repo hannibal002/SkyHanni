@@ -47,4 +47,13 @@ class GreenhouseConfig {
     @Expose
     @ConfigLink(owner = GreenhouseConfig::class, field = "showDisplay")
     val position: Position = Position(180, 40)
+
+    @Expose
+    @ConfigOption(
+        name = "Phantomleaf Solver",
+        desc = "When harvesting Phantomleaf, highlight the hiding spot in green. §eStand still for best results.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var phantomleafSolver: Boolean = true
 }

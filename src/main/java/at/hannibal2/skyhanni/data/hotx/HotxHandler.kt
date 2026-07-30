@@ -179,7 +179,7 @@ abstract class HotxHandler<Data : HotxData<Reward>, Reward, RotPerkE>(val data: 
 
     private val treeInventoryDetector by lazy {
         InventoryDetector(
-            pattern = inventoryPattern,
+            repoPattern = { inventoryPattern },
             onOpenInventory = {
                 DelayedRun.runNextTick {
                     InventoryUtils.getItemsInOpenChest().forEach { it.parse() }

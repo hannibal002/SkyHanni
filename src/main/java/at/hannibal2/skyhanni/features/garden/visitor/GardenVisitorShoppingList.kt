@@ -33,10 +33,10 @@ import at.hannibal2.skyhanni.utils.collection.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addString
 import at.hannibal2.skyhanni.utils.compat.InventoryGuiScaleCompat
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import net.minecraft.client.gui.screens.inventory.SignEditScreen
 import kotlin.time.Duration.Companion.minutes
@@ -152,7 +152,7 @@ object GardenVisitorShoppingList {
                     tips = internalName.createBuyTip(),
                     onLeftClick = {
                         if (!GardenApi.inGarden()) return@clickable
-                        if (Minecraft.getInstance().screen is SignEditScreen) {
+                        if (MinecraftCompat.screen is SignEditScreen) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
                             internalName.buy(amount)
@@ -221,7 +221,7 @@ object GardenVisitorShoppingList {
             val renderable = Renderable.clickable(
                 "§aCraftable!",
                 {
-                    if (Minecraft.getInstance().screen is SignEditScreen) {
+                    if (MinecraftCompat.screen is SignEditScreen) {
                         SignUtils.setTextIntoSign("$leftToCraft")
                     } else {
                         HypixelCommands.viewRecipe(internalName)
@@ -343,7 +343,7 @@ object GardenVisitorShoppingList {
         if (VisitorApi.inInventory) return true
         if (BazaarApi.inBazaarInventory) return true
 
-        val currentScreen = Minecraft.getInstance().screen ?: return true
+        val currentScreen = MinecraftCompat.screen ?: return true
         val isInOwnInventory = currentScreen is InventoryScreen
         if (isInOwnInventory) return true
         if (currentScreen is SignEditScreen &&

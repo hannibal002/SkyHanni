@@ -39,7 +39,7 @@ object FishyTreatProfit {
 
     private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
     private var display = emptyList<Renderable>()
-    private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
+    private val inventory = InventoryDetector { inventoryNamePattern }
     private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
 
     // idk why this fetches price source based on tracker config,
@@ -54,6 +54,11 @@ object FishyTreatProfit {
     private val coinsPattern by patternGroup.pattern(
         "coins",
         "§6(?<coins>.*) Coins",
+    )
+
+    private val inventoryNamePattern by patternGroup.pattern(
+        "inventory",
+        "Lukas the Aquarist",
     )
 
     @HandleEvent(onlyOnSkyblock = true)

@@ -44,7 +44,7 @@ object SnakeGame {
         }
 
     @HandleEvent
-    fun onGui(event: GuiKeyPressEvent) {
+    fun onGuiKeyPress(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 
@@ -68,8 +68,8 @@ object SnakeGame {
         inInventory = pattern.matches(event.inventoryName)
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() {
         inInventory = false
     }
 

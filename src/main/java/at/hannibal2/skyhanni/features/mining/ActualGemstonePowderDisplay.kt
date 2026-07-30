@@ -222,7 +222,7 @@ object ActualGemstonePowderDisplay {
     fun onChat(event: SkyHanniChatEvent.Modify) {
         if (!isEnabled()) return
 
-        PowderChestReward.GEMSTONE_POWDER.chatPattern.matchMatcher(event.message) {
+        PowderChestReward.GEMSTONE_POWDER.chatPattern.matchMatcher(event.cleanMessage) {
             val amountStr = groupOrNull("amount") ?: return
             val originalAmount = amountStr.formatInt()
 

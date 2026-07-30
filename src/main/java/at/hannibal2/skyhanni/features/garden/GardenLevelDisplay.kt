@@ -65,9 +65,13 @@ object GardenLevelDisplay {
         "inventory.name",
         "Garden (?:Desk|Level (?<currentLevel>.*))",
     )
+
+    /**
+     * REGEX-TEST: §e§l§m                     §6325,396
+     */
     private val overflowPattern by patternGroup.pattern(
         "inventory.overflow",
-        ".*§r §6(?<overflow>.*)",
+        "§e§l§m\\s+ §6(?<overflow>[\\d,]+)",
     )
 
     /**

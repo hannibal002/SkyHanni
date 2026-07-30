@@ -24,5 +24,4 @@ object FlamingFlayHider {
         if (!ParticleType.entries.any { it.check(event) }) return
         event.cancel()
     }
-
 }

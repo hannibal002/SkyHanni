@@ -20,6 +20,7 @@ class MinionsConfig {
     @ConfigEditorBoolean
     var nameOnlyTier: Boolean = false
 
+    // TODO rename minionConfigHelper to minionUpgradeHelper
     @Expose
     @ConfigOption(
         name = "Minion Upgrade Helper",

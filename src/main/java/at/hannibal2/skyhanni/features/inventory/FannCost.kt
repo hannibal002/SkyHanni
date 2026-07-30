@@ -64,9 +64,19 @@ object FannCost {
     private val patternGroup = RepoPattern.group("fann.inventory")
     private val currentFannData: FannData = FannData()
     private val generatedTooltips: MutableMap<Pattern, String> = mutableMapOf()
-    private val trainingSlotInventoryDetector = InventoryDetector { name -> name.contains("Training Slot") }
+    private val trainingSlotInventoryDetector = InventoryDetector { trainingSlotInventoryPattern }
 
     private var lastStartTrainingLoreHash: Int = 0
+
+    /**
+     * REGEX-TEST: Training Slot 1
+     * REGEX-TEST: Training Slot 2
+     * REGEX-TEST: Training Slot 3
+     */
+    private val trainingSlotInventoryPattern by patternGroup.pattern(
+        "training.slot.inventory",
+        "Training Slot \\d+",
+    )
 
     /**
      * REGEX-TEST: §7§8Will earn a total of 55,000 EXP

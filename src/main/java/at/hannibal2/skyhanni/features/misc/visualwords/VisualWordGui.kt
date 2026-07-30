@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.DrawContextUtils
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
 import at.hannibal2.skyhanni.utils.renderables.container.HorizontalContainerRenderable.Companion.horizontal
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.renderables.primitives.ItemStackRenderable.Co
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import com.google.gson.JsonObject
 import io.github.notenoughupdates.moulconfig.ChromaColour
-import net.minecraft.client.Minecraft
 import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
@@ -85,7 +85,7 @@ object VisualWordGui {
         }
     }
 
-    fun isInGui(): Boolean = Minecraft.getInstance().screen is VisualWordScreen
+    fun isInGui(): Boolean = MinecraftCompat.screen is VisualWordScreen
 
     fun onCommand() {
         if (!SkyBlockUtils.onHypixel && !OutsideSBFeature.MODIFY_VISUAL_WORDS.isSelected()) {

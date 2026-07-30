@@ -227,6 +227,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.minionGuide },
                 "minion",
+                // TODO: Not duplicate from MinionCraftHelper
                 "Crafted Minions",
                 "§c ?✖.*|§7You haven't crafted this minion.",
             )
@@ -272,7 +273,8 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { SkyHanniMod.feature.inventory.attributeShards.highlightDisabledAttributes },
                 "attribute.disable",
-                "Attribute Menu",
+                // TODO: Not duplicate from AttributeShardsData
+                "(?:\\(\\d+/\\d+\\) )?Attribute Menu",
                 "§7Enabled: §cNo",
             )
         }

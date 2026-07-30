@@ -53,6 +53,8 @@ enum class IslandTypeTag(vararg types: Any) {
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
+        IslandType.SPIDER_DEN,
+        IslandType.TORRHUS_CANYON,
     ),
     WORMHOLE(
         IslandType.LOTUS_ATOLL,
@@ -80,6 +82,8 @@ enum class IslandTypeTag(vararg types: Any) {
     fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
+
+    fun getTypes(): Set<IslandType> = types.toSet()
 
     @SkyHanniModule
     companion object {

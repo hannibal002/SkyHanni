@@ -21,12 +21,12 @@ import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.client.Minecraft
 import kotlin.reflect.KProperty0
 
 @SkyHanniModule
@@ -240,7 +240,7 @@ object MouseSensitivityReducer {
     }
 
     enum class AutoEnableMode(private val displayName: String, val condition: () -> Boolean) {
-        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && Minecraft.getInstance().screen == null }),
+        KEYBIND("Holding Keybind", { config.keybind.isKeyHeld() && MinecraftCompat.screen == null }),
         TOOL("Farming tool", { GardenApi.hasFarmingToolInHand() }),
         FISHING_ROD("Fishing Rod", { FishingApi.holdingRod }),
         MOUSEMAT("Squeaky Mousemat", { GardenApi.hasMousematInHand() }),

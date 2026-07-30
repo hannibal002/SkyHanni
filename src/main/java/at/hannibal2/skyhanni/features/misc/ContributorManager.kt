@@ -311,10 +311,11 @@ object ContributorManager {
             }
         }
 
-        ChatUtils.chat("Total contributor mentions: ${contributorMentions.size}")
+        val totalAmount = contributorMentions.size
+        ChatUtils.chat("Total contributor mentions: $totalAmount")
         saveConfig("added contributor mention record")
 
-        ContributorAchievement.onContributorMention(amount)
+        ContributorAchievement.onContributorMention(totalAmount)
     }
 
     private fun isContributorMentionMessage(message: String): Boolean {

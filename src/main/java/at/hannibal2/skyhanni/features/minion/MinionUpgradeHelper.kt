@@ -13,16 +13,16 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLoreString
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.withWrappedLines
 import at.hannibal2.skyhanni.utils.compat.setCustomItemName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.world.entity.player.Inventory
@@ -39,11 +39,12 @@ object MinionUpgradeHelper {
     private var itemsInSacks: Int = 0
 
     /**
-     * REGEX-TEST: §7§cYou need §6512 §cmore Nether Quartz.
+     * REGEX-TEST: You need 512 more Nether Quartz.
+     * WRAPPED-REGEX-TEST: " You need 8 more Condensed Lily Pad."
      */
     private val requiredItemsPattern by RepoPattern.pattern(
-        "minion.items.upgrade",
-        "§7§cYou need §6(?<amount>\\d+) §cmore (?<itemName>.+)\\.",
+        "minion.items.upgrade.colorless",
+        "(?: +)?You need (?<amount>\\d+) more (?<itemName>.+)\\.",
     )
 
     private var lastMinionOpen = SimpleTimeMark.farPast()
@@ -52,9 +53,9 @@ object MinionUpgradeHelper {
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.minionConfigHelper) return
         lastMinionOpen = SimpleTimeMark.now()
-        val lore = event.inventoryItems[50]?.getLore()?.joinToString(" ") ?: return
-        requiredItemsPattern.findMatcher(lore) {
-            internalName = NeuInternalName.fromItemName(group("itemName").removeColor())
+        val lore = event.inventoryItems[50]?.getCleanLore() ?: return
+        requiredItemsPattern.firstMatcher(lore.withWrappedLines()) {
+            internalName = NeuInternalName.fromItemName(group("itemName"))
             itemsNeeded = group("amount")?.toInt() ?: 0
         } ?: resetItems()
 

@@ -124,7 +124,7 @@ object ContributorAchievement {
         AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
     }
 
-    fun onContributorMention(amount: Int) {
-        AchievementManager.updateTieredAchievement(CONTRIBUTOR_FAMOUS_ACHIEVEMENT, amount)
+    fun onContributorMention(totalAmount: Int) {
+        AchievementManager.updateTieredAchievement(CONTRIBUTOR_FAMOUS_ACHIEVEMENT, totalAmount)
     }
 }

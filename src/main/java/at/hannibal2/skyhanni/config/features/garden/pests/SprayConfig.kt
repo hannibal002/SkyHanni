@@ -8,24 +8,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class SprayConfig {
-    @Expose
-    @ConfigOption(
-        name = "Pest Spray Selector",
-        desc = "Show the pests that are attracted when changing the selected material of the §aSprayonator§7.",
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    var pestWhenSelector: Boolean = true
 
     @Expose
     @ConfigOption(name = "Draw Plot Border", desc = "Draw plots border when holding the Sprayonator.")
     @ConfigEditorBoolean
     @FeatureToggle
     var drawPlotsBorderWhenInHands: Boolean = true
-
-    @Expose
-    @ConfigLink(owner = SprayConfig::class, field = "pestWhenSelector")
-    val position: Position = Position(315, -200, 2.3f)
 
     @Expose
     @ConfigOption(name = "Spray Display", desc = "Show the active spray and duration for your current plot.")

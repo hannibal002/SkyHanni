@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.weekToLocalDate
 import at.hannibal2.skyhanni.utils.TimeUtils.yearFormatter
 import at.hannibal2.skyhanni.utils.TimeUtils.yearToLocalDate
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addAll
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -41,7 +42,6 @@ import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRender
 import at.hannibal2.skyhanni.utils.renderables.primitives.empty
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toRenderable
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
 import net.minecraft.client.gui.screens.inventory.InventoryScreen
 import java.time.LocalDate
@@ -126,7 +126,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     fun renderDisplay(position: Position) {
         if (hideInEstimatedItemValue() && EstimatedItemValue.isCurrentlyShowing()) return
 
-        var currentlyOpen = Minecraft.getInstance().screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
+        var currentlyOpen = MinecraftCompat.screen?.let { it is InventoryScreen || it is ContainerScreen } ?: false
         if (!currentlyOpen && hideOutsideInventory() && this is SkyHanniItemTracker) {
             return
         }
@@ -167,6 +167,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 add(buildSessionResetButton())
+                add(buildSessionPauseButton())
             }
         }
     }
@@ -205,7 +206,7 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
     open fun pauseSessionUptime() {
         if (!this.trackUptime) return
         val sharedTracker = getSharedTracker() ?: return
-        sharedTracker.modify { it.getActiveStopwatch()?.pause(true) }
+        sharedTracker.modify { it.getActiveStopwatch()?.pause(false) }
         if (!customUptimeControl) unpausedTrackers.remove(this)
         update()
     }
@@ -255,6 +256,29 @@ open class SkyHanniTracker<Data : TrackerData<*>, Config : GenericIndividualTrac
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()
+            }
+        },
+    )
+    protected fun buildSessionPauseButton() = Renderable.clickable(
+        if (isPaused()) "§aResume session!" else "§cPause session!",
+        tips = if (isPaused()) {
+            listOf(
+                "§aThis will resume your",
+                "§acurrent session of",
+                "§a$name",
+            )
+        } else {
+            listOf(
+                "§cThis will pause your",
+                "§ccurrent session of",
+                "§c$name",
+            )
+        },
+        onLeftClick = {
+            if (isPaused()) {
+                startSessionUptime()
+            } else {
+                pauseSessionUptime()
             }
         },
     )

@@ -7,14 +7,49 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.compat.replace
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 
 @SkyHanniModule
 object FixIronman {
-    private val selectModeInventory = InventoryDetector { name -> name == "Select a Special Mode" }
-    private val profileManagementInventory = InventoryDetector { name -> name == "Profile Management" }
-    private val visitInventory = InventoryDetector { name -> name.startsWith("Visit ") }
-    private val sbLevelingInventory = InventoryDetector { name -> name == "SkyBlock Leveling" }
+    private val patternGroup = RepoPattern.group("data.fixironman")
+
+    /**
+     * REGEX-TEST: Select a Special Mode
+     */
+    private val selectModePattern by patternGroup.pattern(
+        "selectmode",
+        "Select a Special Mode",
+    )
+
+    /**
+     * REGEX-TEST: Profile Management
+     */
+    private val profileManagementPattern by patternGroup.pattern(
+        "profilemanagement",
+        "Profile Management",
+    )
+
+    /**
+     * REGEX-TEST: Visit liron150
+     */
+    private val visitPattern by patternGroup.pattern(
+        "visit",
+        "Visit .*",
+    )
+
+    /**
+     * REGEX-TEST: SkyBlock Leveling
+     */
+    private val sbLevelingPattern by patternGroup.pattern(
+        "sbleveling",
+        "SkyBlock Leveling",
+    )
+
+    private val selectModeInventory = InventoryDetector { selectModePattern }
+    private val profileManagementInventory = InventoryDetector { profileManagementPattern }
+    private val visitInventory = InventoryDetector { visitPattern }
+    private val sbLevelingInventory = InventoryDetector { sbLevelingPattern }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltipEvent(event: ToolTipTextEvent) {

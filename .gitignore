@@ -2,6 +2,7 @@
 .idea/**/*.*
 !.idea/icon.svg
 !.idea/dictionaries/default_user.xml
+!.idea/externalDependencies.xml
 !.idea/scopes/Mixins.xml
 !.idea/liveTemplates/SkyHanni.xml
 .vscode/

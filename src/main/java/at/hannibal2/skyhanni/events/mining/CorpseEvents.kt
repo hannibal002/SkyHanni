@@ -16,4 +16,4 @@ class CorpseFoundEvent(
 /**
  * Fired when a Mineshaft corpse is looted, signaled in the chat.
  */
-class CorpseLootedEvent(val corpseType: CorpseType, val loot: List<Pair<String, Int>>) : SkyHanniEvent()
+class CorpseLootedEvent(val corpseType: CorpseType, val loot: List<Pair<String, Int>>, val keyConsumed: Boolean = true) : SkyHanniEvent()
