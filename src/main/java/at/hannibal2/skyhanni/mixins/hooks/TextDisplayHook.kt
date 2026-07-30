@@ -19,22 +19,22 @@ object TextDisplayHook {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         EntityTextUpdateEvent(event.entity, event.newName).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onDisplayTextUpdate(event: DisplayTextUpdateEvent) {
+    private fun onDisplayTextUpdate(event: DisplayTextUpdateEvent) {
         EntityTextUpdateEvent(event.entity, event.newText).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onArmorStandRemoved(event: EntityRemovedEvent<ArmorStand>) {
+    private fun onArmorStandRemoved(event: EntityRemovedEvent<ArmorStand>) {
         EntityTextRemovedEvent(event.entity).post()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTextDisplayRemoved(event: EntityRemovedEvent<Display.TextDisplay>) {
+    private fun onTextDisplayRemoved(event: EntityRemovedEvent<Display.TextDisplay>) {
         EntityTextRemovedEvent(event.entity).post()
     }
 }

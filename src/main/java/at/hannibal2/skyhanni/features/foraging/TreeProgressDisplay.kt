@@ -37,7 +37,7 @@ object TreeProgressDisplay {
     )
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!config.enabled.get()) return
         display?.let {
             config.position.renderRenderable(it, posLabel = "Tree Progress")
@@ -45,19 +45,19 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onIslandJoin() {
+    private fun onIslandJoin() {
         clearData()
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         config.enabled.onDisable {
             clearData()
         }
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onEntityTextRemoved(event: EntityTextRemovedEvent) {
+    private fun onEntityTextRemoved(event: EntityTextRemovedEvent) {
         if (!config.enabled.get()) return
         if (event.entity.id == displayEntityId) {
             clearData()
@@ -65,7 +65,7 @@ object TreeProgressDisplay {
     }
 
     @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES])
-    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
+    private fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         if (!config.enabled.get()) return
         if (config.onlyHoldingAxe && InventoryUtils.getItemInHand()?.getItemCategoryOrNull() != ItemCategory.AXE) {
             display = null

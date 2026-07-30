@@ -99,7 +99,7 @@ object CakeCounterFeatures {
     private var lastSoulFoundBySelf = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
+    private fun onEntityNameUpdate(event: EntityCustomNameUpdateEvent<ArmorStand>) {
         val entity = event.entity
         val name = event.newName?.string?.removeColor() ?: return
         val entityId = entity.id
@@ -227,7 +227,7 @@ object CakeCounterFeatures {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (cakeSoulFoundPattern.matches(event.cleanMessage)) {
             lastSoulFoundBySelf = SimpleTimeMark.now()
         }
@@ -259,7 +259,7 @@ object CakeCounterFeatures {
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
         cakesEatenEntityId = null
         soulsFoundEntityId = null
         statsToBeSent = true

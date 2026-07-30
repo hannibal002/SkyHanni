@@ -65,12 +65,12 @@ object UniqueGiftingOpportunitiesFeatures {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
+    private fun onEntityTextUpdate(event: EntityTextUpdateEvent) {
         analyzeArmorStand(event.entity)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
+    private fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
         playerColor(event)
         val entity = event.entity as? ArmorStand ?: return
         analyzeArmorStand(entity)
@@ -95,7 +95,7 @@ object UniqueGiftingOpportunitiesFeatures {
         !SkyBlockUtils.noTradeMode && entity.displayName.string.endsWith("♲")
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         giftedPattern.matchMatcher(event.cleanMessage) {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
