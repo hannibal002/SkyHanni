@@ -396,7 +396,9 @@ object EnchantParser {
             }
 
             if (fromChatComponent) {
-                if (!(loreList[i].contents as PlainTextContents.LiteralContents).text.contains("\n")) {
+                // Only the component's own text matters here, siblings are separate tooltip lines
+                val ownText = (loreList[i].contents as? PlainTextContents)?.text().orEmpty()
+                if (!ownText.contains("\n")) {
                     maxComponentEnchantsPerLine++
                 } else {
                     maxEnchantsPerLine =
