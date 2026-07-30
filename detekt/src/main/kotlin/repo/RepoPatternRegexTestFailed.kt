@@ -14,6 +14,10 @@ class RepoPatternRegexTestFailed(config: Config, private val ctx: RepoPatternCon
         val variableName = repoPatternElement.variableName
         val rawPattern = repoPatternElement.rawPattern
 
+        repoPatternElement.kDocErrors.forEach { error ->
+            delegate.reportIssue("Repo pattern `$variableName`: $error")
+        }
+
         if (!rawPattern.needsRegexTest()) return
 
         if (repoPatternElement.regexTests.isEmpty()) return
