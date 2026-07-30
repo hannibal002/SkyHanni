@@ -18,6 +18,7 @@ class SkyHanniStyleProvider : RuleSetProvider {
                 RuleName("IsInIslandEarlyReturn") to ::IsInIslandEarlyReturn,
                 RuleName("OnlyOnIslandSpecificity") to ::OnlyOnIslandSpecificity,
                 RuleName("MaxLineLength") to ::MaxLineLength,
+                RuleName("PrivateEventListener") to ::PrivateEventListener,
             ),
         )
     }

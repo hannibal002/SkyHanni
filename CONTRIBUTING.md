@@ -208,6 +208,7 @@ Make sure such pull requests have a good explanation in the **What** section.
       blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
     - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
@@ -217,6 +218,18 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- **Setting up the Detekt IntelliJ plugin (one time, per machine)**
+    - Install the [Detekt](https://plugins.jetbrains.com/plugin/10761-detekt) plugin from the JetBrains Marketplace to
+      see Detekt findings inline while editing.
+    - Open `Settings → Tools → Detekt` and set:
+        - `Configuration Files` to `detekt/detekt.yml`
+        - `Baseline File` to `detekt/baseline-main.xml`
+  - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+    is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+    repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+    already covered by the baseline).
+- When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
+  same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -232,6 +245,9 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
       after the first build.
+- All functions and properties must be defined inside a class or object. Top-level Kotlin functions and properties are not
+  permitted.
+- Use `Unit` instead of `Void` in Kotlin code.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -257,6 +273,9 @@ Make sure such pull requests have a good explanation in the **What** section.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
+    - Functions annotated with `@HandleEvent` must be declared `private`.
+      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
@@ -331,6 +350,17 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 ### [Stonecutter Development](https://plugins.jetbrains.com/plugin/25044-stonecutter-dev)
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
+
+### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+
+An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
+declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
+annotations, resolves config paths, and suppresses false-positive IntelliJ warnings in SkyHanni-specific
+patterns such as RepoPattern keys and Brigadier command names.
+
+Install it manually: download the latest release from the
+[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+<kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
 
 ## Software Used in SkyHanni
 
