@@ -202,6 +202,7 @@ object SlayerApi {
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
                 if (data.currentState != FAILED) {
+                    data.currentStateRaw = "no slayer"
                     data.currentState = FAILED
                     SlayerStateChangeEvent(FAILED).post()
                 }
