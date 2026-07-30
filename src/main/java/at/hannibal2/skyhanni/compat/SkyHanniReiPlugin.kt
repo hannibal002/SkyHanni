@@ -34,21 +34,18 @@ private class CustomDisplayBoundsProvider :
             else -> fullRectangle()
         }
 
-    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R): InteractionResult =
-        when (screen) {
-            is CustomWardrobeScreen ->
-                if (SkyHanniMod.feature.inventory.customWardrobe.showReiItems) {
-                    InteractionResult.SUCCESS
-                } else {
-                    InteractionResult.PASS
-                }
-
-            else -> InteractionResult.PASS
+    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R): InteractionResult {
+        val showReiItems = when (screen) {
+            is CustomWardrobeScreen -> SkyHanniMod.feature.inventory.customWardrobe.showReiItems
+            else -> false
         }
+        return if (showReiItems) InteractionResult.CONSUME else InteractionResult.PASS
+    }
 
     override fun getScreenBounds(screen: AbstractCustomMenuScreen): Rectangle =
         screen.customExclusionRect()
 
-    override fun <R : Screen> isHandingScreen(screen: Class<R>): Boolean =
-        screen == CustomWardrobeScreen::class.java
+    override fun <R : Screen> isHandingScreen(screen: Class<R>): Boolean {
+        return screen == CustomWardrobeScreen::class.java
+    }
 }
