@@ -18,9 +18,10 @@ import com.google.devtools.ksp.validate
 import java.io.File
 import java.io.OutputStreamWriter
 
-// Both annotations live in the main source set rather than here, so they can only be matched by name.
-private const val SKYHANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
+// These annotations live in the main source set rather than here, so they can only be matched by name.
 private const val HANDLE_EVENT = "at.hannibal2.skyhanni.api.event.HandleEvent"
+private const val PRIMARY_FUNCTION = "at.hannibal2.skyhanni.skyhannimodule.PrimaryFunction"
+private const val SKYHANNI_MODULE = "at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule"
 
 class ModuleProcessor(
     codeGenerator: CodeGenerator,
@@ -48,7 +49,7 @@ class ModuleProcessor(
         val primaryFunctionNames = resolver.getSymbolsWithAnnotation(PrimaryFunction::class.qualifiedName!!)
             .filterIsInstance<KSClassDeclaration>()
             .mapNotNull { symbol ->
-                val annotation = symbol.annotations.firstOrNull { it.shortName.asString() == "PrimaryFunction" }
+                val annotation = symbol.annotations.firstOrNull { it.getQualifiedName() == PRIMARY_FUNCTION }
                 annotation?.arguments?.firstOrNull()?.value as? String
             }
             .toSet()
@@ -113,7 +114,7 @@ class ModuleProcessor(
         )
         for (function in functions) {
             val parent = function.parentDeclaration as? KSClassDeclaration
-            if (parent?.annotations?.any { it.shortName.asString() == "SkyHanniModule" } == true) continue
+            if (parent?.annotations.orEmpty().any { it.getQualifiedName() == SKYHANNI_MODULE }) continue
             val name = (function.qualifiedName ?: function.simpleName).asString()
             logger.error(
                 "Function $name must be declared directly inside a class annotated with @SkyHanniModule " +
@@ -150,48 +151,51 @@ class ModuleProcessor(
 
         if (isDirty) {
             for (function in symbol.getDeclaredFunctions()) {
-                if (function.annotations.any { it.shortName.asString() == "HandleEvent" }) {
-                    val event = skyHanniEvent ?: return symbol
-                    val handleEvent = function.annotations.find { it.shortName.asString() == "HandleEvent" }
-                    val eventParameterType = function.extensionReceiver?.resolve()
-                        ?: function.parameters.firstOrNull()?.type?.resolve()
-                    val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
-                    val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
-                    val hasExplicitEventSpec = handleEvent?.hasExplicitEventSpec() == true
-                    val name = (function.qualifiedName ?: function.simpleName).asString()
+                val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT }
+                    ?: continue
 
-                    when (parameterCount) {
-                        0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
-                            logger.error(
-                                "Function $name must have an event parameter, a primary function " +
-                                    "name, or an explicit event specification because it is " +
-                                    "annotated with @HandleEvent",
-                                function,
-                            )
-                        }
+                val event = skyHanniEvent ?: return symbol
+                val eventParameterType = function.extensionReceiver?.resolve()
+                    ?: function.parameters.firstOrNull()?.type?.resolve()
+                val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
+                val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
+                val hasExplicitEventSpec = handleEvent?.hasExplicitEventSpec() == true
+                val name = (function.qualifiedName ?: function.simpleName).asString()
 
-                        1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
-                            logger.error(
-                                "Function $name must have an event assignable from SkyHanniEvent " +
-                                    "because it is annotated with @HandleEvent",
-                                function,
-                            )
-                        }
-
-                        else -> logger.error(
-                            "Function $name has too many parameters. It must have exactly one " +
-                                "event parameter, or be parameterless with a primary function " +
-                                "name or an explicit event specification because it is annotated " +
-                                "with @HandleEvent",
+                when (parameterCount) {
+                    0 -> if (!hasPrimaryFunction && !hasExplicitEventSpec) {
+                        logger.error(
+                            "Function $name must have an event parameter, a primary function " +
+                                "name, or an explicit event specification because it is " +
+                                "annotated with @HandleEvent",
                             function,
                         )
                     }
+
+                    1 -> if (eventParameterType == null || !event.isAssignableFrom(eventParameterType)) {
+                        logger.error(
+                            "Function $name must have an event assignable from SkyHanniEvent " +
+                                "because it is annotated with @HandleEvent",
+                            function,
+                        )
+                    }
+
+                    else -> logger.error(
+                        "Function $name has too many parameters. It must have exactly one " +
+                            "event parameter, or be parameterless with a primary function " +
+                            "name or an explicit event specification because it is annotated " +
+                            "with @HandleEvent",
+                        function,
+                    )
                 }
             }
         }
 
         return symbol
     }
+
+    private fun KSAnnotation.getQualifiedName(): String? =
+        annotationType.resolve().declaration.qualifiedName?.asString()
 
     private fun KSAnnotation.hasExplicitEventSpec(): Boolean {
         val annotationFilePath = (location as? FileLocation)?.filePath ?: return false
@@ -207,7 +211,7 @@ class ModuleProcessor(
     }
 
     private fun isDevOnly(klass: KSClassDeclaration): Boolean =
-        klass.annotations.find { it.shortName.asString() == "SkyHanniModule" }
+        klass.annotations.find { it.getQualifiedName() == SKYHANNI_MODULE }
             ?.arguments?.find { it.name?.asString() == "devOnly" }?.value as? Boolean ?: false
 
     private fun generateFile(symbols: List<KSClassDeclaration>) {
