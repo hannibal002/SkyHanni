@@ -19,7 +19,7 @@ object SlayerTimeMessages {
     private val config get() = SkyHanniMod.feature.slayer.slayerTimeMessages
 
     @HandleEvent
-    private fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
+    fun onDamageIndicatorDeathEvent(event: DamageIndicatorDeathEvent) {
         val data = event.data
         val bossType = data.bossType
         if (!bossType.isSlayer || !data.entity.belongsToPlayer()) return
@@ -75,7 +75,7 @@ object SlayerTimeMessages {
     }
 
     @HandleEvent
-    private fun onSlayerQuestComplete() {
+    fun onSlayerQuestComplete() {
         val startTime = SlayerApi.questStartTime
         if (!config.questComplete || startTime.isFarPast()) return
 
@@ -90,7 +90,7 @@ object SlayerTimeMessages {
     }
 
     @HandleEvent
-    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(132, "slayer.timeToKillMessage", "slayer.slayerTimeMessages.timeToKill")
         event.move(132, "slayer.questCompleteMessage", "slayer.slayerTimeMessages.questComplete")
         event.move(132, "slayer.compactTimeMessage", "slayer.slayerTimeMessages.compact")
