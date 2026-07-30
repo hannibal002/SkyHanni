@@ -46,6 +46,6 @@ private class CustomDisplayBoundsProvider :
         screen.customExclusionRect()
 
     override fun <R : Screen> isHandingScreen(screen: Class<R>): Boolean {
-        return screen == CustomWardrobeScreen::class.java
+        return screen.isAssignableFrom(AbstractCustomMenuScreen::class.java)
     }
 }
