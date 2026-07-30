@@ -70,7 +70,7 @@ object TreasureFishingTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
 
         treasureCatchPattern.matchMatcher(event.cleanMessage.trim()) {
@@ -101,13 +101,13 @@ object TreasureFishingTracker {
     }
 
     @HandleEvent
-    fun onBobberCast() {
+    private fun onBobberCast() {
         tracker.firstUpdate()
         if (config.enabled && isEnabled()) tracker.startSessionUptime()
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(config.showPercentage) {
             tracker.update()
         }
@@ -126,7 +126,7 @@ object TreasureFishingTracker {
         !KuudraApi.inKuudra
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresettreasurefishingtracker") {
             description = "Resets the Treasure Fishing Tracker"
             category = CommandCategory.USERS_RESET
