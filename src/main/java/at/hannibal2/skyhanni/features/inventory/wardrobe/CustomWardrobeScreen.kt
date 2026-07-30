@@ -52,6 +52,11 @@ class CustomWardrobeScreen(
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
+    var renderableTopCorner: Pair<Int, Int> = 0 to 0
+        private set
+    var renderableDimensions: Pair<Int, Int> = 0 to 0
+        private set
+
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
     }
@@ -98,9 +103,12 @@ class CustomWardrobeScreen(
         }
 
         val (width, height) = renderable.width to renderable.height
+        renderableDimensions = width to height
+
         val left = (screenWidth - width) / 2
         val top = (screenHeight - height) / 2
         position.moveTo(left, top)
+        renderableTopCorner = left to top
 
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.text(
