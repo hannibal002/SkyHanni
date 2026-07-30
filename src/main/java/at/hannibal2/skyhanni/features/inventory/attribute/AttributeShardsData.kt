@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
@@ -58,9 +59,7 @@ object AttributeShardsData {
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
     ) { attributeMenuPattern }
-    val huntingBoxInventory = InventoryDetector(
-        onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { huntingBoxPattern }
+    val huntingBoxInventory = InventoryDetector { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     ) { bazaarShardsInventoryPattern }
@@ -316,7 +315,7 @@ object AttributeShardsData {
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
         attributeLevelling = attributesJson.attributeLevelling
         unconsumableAttributes = attributesJson.unconsumableAttributes
@@ -331,7 +330,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.message
         shardSyphonedPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
@@ -429,7 +428,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Active Attribute Levels")
         event.addIrrelevant {
             for (shardName in attributeInfo.keys) {
@@ -480,10 +479,11 @@ object AttributeShardsData {
         }
     }
 
-    private fun processHuntingBoxItems() {
-        val slots = InventoryUtils.getItemsInOpenChest()
-        val items = slots.map { it.item }
-        for (item in items) {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!huntingBoxInventory.isInside()) return
+        val items = event.inventoryItems
+        for ((_, item) in items) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
             var tier = 0
@@ -505,11 +505,11 @@ object AttributeShardsData {
             }
             processShard(internalName, tier, toNextTier)
         }
-        HuntingBoxValue.processInventory(slots)
+        HuntingBoxValue.processInventory(items)
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onShardGain(event: ShardEvent) {
+    private fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
         val newAmount = (existing + event.amount).coerceAtLeast(0)
@@ -651,7 +651,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresethuntingbox") {
             description = "Resets stored hunting box shards"
             category = CommandCategory.USERS_RESET
