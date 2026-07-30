@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 
 
@@ -40,6 +41,8 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
+    val debugConfig get() = SkyHanniMod.feature.dev.debug.slayerDebug
+
     private val trackerConfig get() = config.itemProfitTracker
 
     private val patternGroup = RepoPattern.group("slayer.api")
@@ -131,6 +134,8 @@ object SlayerApi {
      */
     private var invalidCategoryTicks = 0
 
+    private var cocoonTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
+
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
         var currentStateRaw: String? = null
@@ -203,6 +208,7 @@ object SlayerApi {
             slayerCocoonPattern.matches(message) -> {
                 val data = getCurrentData()
                 if (data.currentState != COCOONED) {
+                    cocoonTimestamp = SimpleTimeMark.now()
                     data.currentStateRaw = "cocooned"
                     data.currentState = COCOONED
                     SlayerStateChangeEvent(COCOONED).post()
@@ -293,10 +299,7 @@ object SlayerApi {
         if (oldStateRaw != progress) {
             data.currentStateRaw = progress
 
-            val newState = detectState(oldStateRaw, progress)
-            if (data.currentState == COCOONED && newState == SLAIN) {
-                return
-            }
+            val newState = detectState(data.currentState, oldStateRaw, progress)
             if (newState != data.currentState) {
                 ChatUtils.debug("${data.currentState} -> $newState")
                 data.currentState = newState
@@ -332,12 +335,14 @@ object SlayerApi {
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(old: String, new: String): ActiveQuestState = when {
-        new.inGrind() -> ActiveQuestState.GRINDING
-        new.inBoss() -> ActiveQuestState.BOSS_FIGHT
-        old.inBoss() && new.noSlayer() -> ActiveQuestState.FAILED
-        new.bossSlain() -> ActiveQuestState.SLAIN
-        else -> ActiveQuestState.NO_ACTIVE_QUEST
+    private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState = when {
+        // The scoreboard says "Boss slain!" While the boss is cocooned
+        new.bossSlain() && currentState == COCOONED && cocoonTimestamp.passedSince() <= 5.seconds -> COCOONED
+        new.inGrind() -> GRINDING
+        new.inBoss() -> BOSS_FIGHT
+        old.inBoss() && new.noSlayer() -> FAILED
+        new.bossSlain() -> SLAIN
+        else -> NO_ACTIVE_QUEST
     }
 
     @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
@@ -415,4 +420,28 @@ object SlayerApi {
         val category: String,
         val progress: String,
     )
+
+    @HandleEvent
+    private fun onSlayerChange(event: SlayerChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.chat("SlayerChangeEvent: ${event.oldSlayer} -> ${event.newSlayer}")
+    }
+
+    @HandleEvent
+    private fun onSlayerStateChange(event: SlayerStateChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.chat("SlayerStateChangeEvent: ${event.state}")
+    }
+
+    @HandleEvent
+    private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.chat("SlayerProgressChangeEvent: ${event.oldProgress} -> ${event.newProgress}")
+    }
+
+    @HandleEvent
+    private fun onSlayerQuestComplete() {
+        if (!debugConfig) return
+        ChatUtils.chat("SlayerQuestCompleteEvent")
+    }
 }
