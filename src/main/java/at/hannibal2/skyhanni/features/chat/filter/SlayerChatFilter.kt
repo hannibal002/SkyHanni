@@ -17,7 +17,7 @@ object SlayerChatFilter : ChatFilterGroup() {
     private fun isEnabled(): Boolean = config.others.get()
 
     @HandleEvent
-    fun onIslandJoin() {
+    private fun onIslandJoin() {
         if (!isEnabled()) return
         if (SlayerApi.activeType != null) {
             ChatFilterManager.register(filters)
@@ -27,7 +27,7 @@ object SlayerChatFilter : ChatFilterGroup() {
     }
 
     @HandleEvent
-    fun onSlayerStateChange(event: SlayerStateChangeEvent) {
+    private fun onSlayerStateChange(event: SlayerStateChangeEvent) {
         when (event.state) {
             GRINDING,
             BOSS_FIGHT,

@@ -78,7 +78,7 @@ class IslandDetector(
         private val detectors = mutableSetOf<IslandDetector>()
 
         @HandleEvent(priority = HandleEvent.HIGHEST)
-        fun onIslandChange(event: IslandChangeEvent) {
+        private fun onIslandChange(event: IslandChangeEvent) {
             detectors.forEach {
                 it.updateIslandState(event.oldIsland, event.newIsland)
             }

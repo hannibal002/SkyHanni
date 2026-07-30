@@ -57,7 +57,7 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onConfigLoad(event: ConfigLoadEvent) {
+    private fun onConfigLoad(event: ConfigLoadEvent) {
         groups.forEach { group ->
             group.activation.bind { groupActive ->
                 if (groupActive) {
@@ -84,7 +84,7 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SkyHanniChatEvent.Allow) {
+    private fun onSystemMessage(event: SkyHanniChatEvent.Allow) {
         var blockReason = block(event.cleanMessage)
         if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
@@ -93,7 +93,7 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Modify) {
+    private fun onChat(event: SkyHanniChatEvent.Modify) {
         if (config.powderMining.enabled) powderMiningBlock(event)
         if (config.crystalNucleus.enabled) crystalNucleusBlock(event)
     }
@@ -174,7 +174,7 @@ object ChatFilterManager {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")
         event.move(3, "chat.warping", "chat.filterType.warping")
