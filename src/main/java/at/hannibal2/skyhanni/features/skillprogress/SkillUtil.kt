@@ -8,8 +8,9 @@ import com.google.common.base.Splitter
 
 object SkillUtil {
 
-    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
     private const val XP_NEEDED_FOR_60 = 111_672_425L
+
+    val SPACE_SPLITTER = Splitter.on("  ").omitEmptyStrings().trimResults()
 
     fun getSkillInfo(skill: SkillType): SkillApi.SkillInfo? {
         return SkillApi.storage?.get(skill)
@@ -61,7 +62,7 @@ object SkillUtil {
         var xpCurrent = currentXP
         var level = 0
 
-        // up to level 60 the cost of every single level is listed in the leveling table
+        // Up to level 60 the cost of every single level is listed in the leveling table
         while (level < 60) {
             val xpForNextLevel = levelingMap[level + 1]?.toLong() ?: break
             if (xpCurrent < xpForNextLevel) break
@@ -71,7 +72,7 @@ object SkillUtil {
 
         var xpForNext = levelingMap[level + 1]?.toLong() ?: 0L
 
-        // past level 60 the cost grows by a slope that doubles every tenth level instead
+        // Past level 60 the cost grows by a slope that doubles every tenth level instead
         if (level >= 60) {
             var slope = 600_000L
             xpForNext = 7_000_000L + slope
@@ -88,5 +89,4 @@ object SkillUtil {
 
         return SkillLevel(level, xpCurrent, xpForNext, overflowXP)
     }
-
 }
