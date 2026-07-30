@@ -67,6 +67,9 @@ jobs:
                     if [ -f "build/reports/detekt/main.sarif" ]; then
                         cp build/reports/detekt/main.sarif detekt-artifact/main.sarif
                     fi
+                    if [ "${{ steps.run_detekt.outcome }}" == "failure" ] || [ "${{ steps.run_detekt_fork.outcome }}" == "failure" ]; then
+                        cp "$GITHUB_WORKSPACE/gradle-output.log" detekt-artifact/detekt-run.log 2>/dev/null || true
+                    fi
 
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
