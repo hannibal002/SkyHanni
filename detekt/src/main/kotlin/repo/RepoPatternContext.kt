@@ -2,6 +2,7 @@ package repo
 
 import org.jetbrains.kotlin.psi.KtPropertyDelegate
 import repo.RepoPatternElement.Companion.asRepoPatternElement
+import utils.IdentityCharacteristics
 import java.util.concurrent.ConcurrentHashMap
 
 class RepoPatternContext {
@@ -15,16 +16,5 @@ class RepoPatternContext {
         }
 
         return result.takeUnless { it === RepoPatternElement.SENTINEL_VALUE }
-    }
-
-    private class IdentityCharacteristics<T>(val value: T) {
-        override fun equals(other: Any?): Boolean {
-            if (other !is IdentityCharacteristics<*>) return false
-            return this.value === other.value
-        }
-
-        override fun hashCode(): Int {
-            return System.identityHashCode(value)
-        }
     }
 }
