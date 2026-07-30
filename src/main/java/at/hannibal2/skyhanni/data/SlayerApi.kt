@@ -135,7 +135,7 @@ object SlayerApi {
         }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Slayer")
 
         if (!hasActiveQuest()) {
@@ -163,7 +163,7 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         val message = event.cleanMessage
 
         if (questStartPattern.matches(message)) {
@@ -176,7 +176,7 @@ object SlayerApi {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onTick(event: SkyHanniTickEvent) {
         // wait with sending SlayerChangeEvent until profile is detected
         if (ProfileStorageData.profileSpecific == null) return
 
@@ -248,12 +248,12 @@ object SlayerApi {
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
-    fun onScoreboardChange() {
+    private fun onScoreboardChange() {
         updateSlayerState()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.SLAYER)) return
         updateSlayerState()
     }
@@ -280,13 +280,13 @@ object SlayerApi {
     }
 
     @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
-    fun onAreaChange() {
+    private fun onAreaChange() {
         currentAreaType = checkTypeForCurrentArea()
         updateArea()
     }
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         with(trackerConfig) {
             ConditionalUtils.onToggle(revenantInGraveyard, voidgloomInNest, voidgloomInNoArea) {
                 currentAreaType = checkTypeForCurrentArea()
