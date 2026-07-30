@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -31,7 +30,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 // TODO rename to something else to reduce confusion
 @SkyHanniModule
-object MineshaftWaypoints {
+object MineshaftWaypointManager {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.waypointsConfig
 
     private const val LADDER_BLOCKS_FORWARD = 7
@@ -42,13 +41,13 @@ object MineshaftWaypoints {
     private var isWorldLoaded = false
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         waypoints.clear()
         isWorldLoaded = false
     }
 
     @HandleEvent
-    fun onIslandJoin(event: IslandJoinEvent) {
+    private fun onIslandJoin(event: IslandJoinEvent) {
         if (event.island != IslandType.MINESHAFT) return
 
         val spawnLocation = LocationUtils.getBlockBelowPlayer()
@@ -58,7 +57,7 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onPacketReceived(event: PacketReceivedEvent) {
+    private fun onPacketReceived(event: PacketReceivedEvent) {
         if (isWorldLoaded) return
 
         when (event.packet) {
@@ -75,9 +74,8 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onCorpseFound(event: CorpseFoundEvent) {
-        val waypoint = MineshaftWaypoint(event.corpseType.waypointType, event.location)
-        waypoints.add(waypoint)
+    private fun onCorpseFound(event: CorpseFoundEvent) {
+        waypoints.add(MineshaftWaypoint(MineshaftWaypoint.Type.FOUND_CORPSE, event.location, event.corpseType))
 
         // Only display a message when Found Corpse waypoints are enabled.
         if (config.types.foundCorpse) {
@@ -87,15 +85,15 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onCorpseLooted(event: CorpseLootedEvent) {
-        val closestWaypoint = waypoints.filter { it.type.isCorpse && it.location.distanceToPlayer() <= 5 }
+    private fun onCorpseLooted(event: CorpseLootedEvent) {
+        val closestWaypoint = waypoints.filter { it.isCorpse && it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
-        closestWaypoint.isLootedCorpse = true
+        closestWaypoint.markAsLooted()
     }
 
     @HandleEvent
-    fun onKeyPress(event: KeyPressEvent) {
+    private fun onKeyPress(event: KeyPressEvent) {
         if (MinecraftCompat.screen != null) return
         if (event.keyCode != config.shareCorpseKeybind) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
@@ -105,7 +103,7 @@ object MineshaftWaypoints {
 
         timeLastShared = SimpleTimeMark.now()
         val location = closestWaypoint.location.toChatFormat()
-        val type = closestWaypoint.type.display
+        val type = closestWaypoint.type.displayText
         val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
@@ -116,18 +114,18 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         waypoints
             .filter { it.type.renderCondition() }
             .forEach {
-                val color = (if (it.isLootedCorpse) LorenzColor.GREEN else LorenzColor.YELLOW).getChatColor()
-                event.drawWaypointFilled(it.location, it.type.color.toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, "$color${it.type.display}", 1.0)
+                val displayText = it.type.displayTextColor.getChatColor() + it.type.displayText(it)
+                event.drawWaypointFilled(it.location, it.type.fillColor(it).toColor(), seeThroughBlocks = true)
+                event.drawDynamicText(it.location, displayText, it.type.displayTextScale)
             }
     }
 
     private fun addEntranceWaypoints(entranceLocation: LorenzVec, direction: Vec3i) {
-        waypoints.removeIf { it.type in listOf(MineshaftWaypointType.ENTRANCE, MineshaftWaypointType.LADDER) }
+        waypoints.removeIf { it.type in listOf(MineshaftWaypoint.Type.ENTRANCE, MineshaftWaypoint.Type.LADDER) }
 
         val ladderLocation = entranceLocation
             // Move 7 blocks in front of the player to be in the ladder shaft
@@ -137,7 +135,7 @@ object MineshaftWaypoints {
             // Move 15 blocks down to be at the bottom of the ladder shaft
             .add(y = LADDER_BLOCKS_DOWN)
 
-        waypoints.add(MineshaftWaypoint(type = MineshaftWaypointType.ENTRANCE, location = entranceLocation))
-        waypoints.add(MineshaftWaypoint(type = MineshaftWaypointType.LADDER, location = ladderLocation))
+        waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.ENTRANCE, location = entranceLocation))
+        waypoints.add(MineshaftWaypoint(type = MineshaftWaypoint.Type.LADDER, location = ladderLocation))
     }
 }
