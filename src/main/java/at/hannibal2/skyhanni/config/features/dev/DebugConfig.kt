@@ -249,7 +249,7 @@ class DebugConfig {
 
     @Expose
     @ConfigOption(name = "Slayer Debug", desc = "Enable extra debug messages for Slayer features.")
-    val slayerDebug: Boolean = false
+    var slayerDebug: Boolean = false
 
     @Expose
     @ConfigLink(owner = DebugConfig::class, field = "addonsDebug")

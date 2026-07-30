@@ -130,10 +130,11 @@ object SlayerApi {
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT || state == ActiveQuestState.COCOONED
 
     /**
-     * How many ticks have we seen a category that is invalid?
+     * For how many scoreboard updates have we seen a category that is invalid?
      */
     private var invalidCategoryTicks = 0
 
+    // This Timer is mostly just a fail-safe so it doesn't get stuck in COCOONED state
     private var cocoonTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
 
     private class SlayerData {
@@ -337,7 +338,8 @@ object SlayerApi {
 
     private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState = when {
         // The scoreboard says "Boss slain!" While the boss is cocooned
-        new.bossSlain() && currentState == COCOONED && cocoonTimestamp.passedSince() <= 5.seconds -> COCOONED
+        // This is 6 seconds instead of 5 seconds just to be safe
+        new.bossSlain() && currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds -> COCOONED
         new.inGrind() -> GRINDING
         new.inBoss() -> BOSS_FIGHT
         old.inBoss() && new.noSlayer() -> FAILED
