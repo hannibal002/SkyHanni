@@ -235,7 +235,8 @@ class CustomWardrobeScreen(
                     inPage = slot.isInCurrentPage(),
                     playerWidth = playerWidth,
                     containerHeight = containerHeight,
-                    containerWidth = containerWidth
+                    containerWidth = containerWidth,
+                    eyesFollowMouse = config.eyesFollowMouse
                 )
 
                 Renderable.doubleLayered(
