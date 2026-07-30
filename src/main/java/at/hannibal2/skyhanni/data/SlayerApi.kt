@@ -294,6 +294,9 @@ object SlayerApi {
             data.currentStateRaw = progress
 
             val newState = detectState(oldStateRaw, progress)
+            if (data.currentState == COCOONED && newState == SLAIN) {
+                return
+            }
             if (newState != data.currentState) {
                 ChatUtils.debug("${data.currentState} -> $newState")
                 data.currentState = newState
