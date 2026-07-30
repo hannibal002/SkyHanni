@@ -53,6 +53,8 @@ enum class IslandTypeTag(vararg types: Any) {
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
+        IslandType.SPIDER_DEN,
+        IslandType.TORRHUS_CANYON,
     ),
     WORMHOLE(
         IslandType.LOTUS_ATOLL,
