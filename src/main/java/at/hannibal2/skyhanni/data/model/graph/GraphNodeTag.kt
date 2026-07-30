@@ -177,6 +177,14 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.TORRHUS_CANYON,
     ),
 
+    SAFARI_BELL(
+        "safari_bell",
+        LorenzColor.GOLD,
+        "Safari Bell",
+        "Bells to be rung in the Safari.",
+        onlyIsland = IslandType.TORRHUS_CANYON,
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName

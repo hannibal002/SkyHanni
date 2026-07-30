@@ -16,6 +16,11 @@ class GalateaMobHighlightConfig {
     var hideonleaf = HideonleafHighlightConfig()
 
     @Expose
+    @ConfigOption(name = "Hideonsun Highlight", desc = "")
+    @Accordion
+    var hideonsun = HideonsunHighlightConfig()
+
+    @Expose
     @ConfigOption(name = "Invisibug Highlight", desc = "")
     @Accordion
     var invisibug = InvisibugHighlightConfig()
