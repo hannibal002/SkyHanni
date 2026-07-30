@@ -34,7 +34,7 @@ object InvincibilityTimer {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         if (config.mobTypes.contains(MobType.SEA_CREATURE)) {
