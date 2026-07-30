@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ResourcePackReloadEvent
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EnumUtils.toFormattedName
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import org.intellij.lang.annotations.Language
@@ -227,7 +229,7 @@ enum class SkyblockStat(
         private const val PLAYER_STATS_SLOT_INDEX = 13
 
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
-            if (event.inventoryName != "SkyBlock Menu") return
+            if (!UtilsPatterns.skyblockMenuInventory.isInside()) return
             val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getCleanLore() ?: return
             DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }
@@ -237,7 +239,7 @@ enum class SkyblockStat(
         private val statsMenuRelevantSlotIndexes = listOf(14, 15, 16, 23, 24, 25, 32, 33, 34)
 
         private fun onStatsMenu(event: InventoryFullyOpenedEvent) {
-            if (event.inventoryName != "Your Equipment and Stats") return
+            if (!CurrentEquipmentApi.inventory.isInside()) return
             val list = statsMenuRelevantSlotIndexes
                 .mapNotNull { event.inventoryItems[it]?.getCleanLore() }
                 .flatten()
