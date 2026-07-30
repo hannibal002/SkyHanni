@@ -977,7 +977,7 @@ object ScoreboardPattern {
         "§eMiria's Contest §a.*",
     )
 
-    // Galatea
+    // Safari
     private val safariSB = scoreboardGroup.group("safari")
 
     /**
