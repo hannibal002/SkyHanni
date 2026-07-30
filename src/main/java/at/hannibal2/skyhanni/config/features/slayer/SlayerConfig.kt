@@ -82,6 +82,11 @@ class SlayerConfig {
     val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
+    @ConfigOption(name = "Rod Swap Alert", desc = "")
+    @Accordion
+    val rodSwapAlert: SlayerSwapReminderConfig = SlayerSwapReminderConfig()
+
+    @Expose
     @ConfigOption(
         name = "Block Not Spawnable",
         desc = "Prevent clicking slayer bosses that cannot be spawned in the current dimension in Maddox's menu.",
