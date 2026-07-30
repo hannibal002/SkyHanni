@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.Shadow;
 //?}
 
 @Mixin(ItemStack.class)
-public class MixinItemStack {
+public abstract class MixinItemStack {
 
     //? if >= 26.1 {
     @Shadow private Holder<Item> item;
