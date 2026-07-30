@@ -56,7 +56,7 @@ object MarkedPlayerManager {
     private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
-        val name = entity.cleanName
+        val name = entity.cleanName.lowercase()
         if (name in playerNamesToMark) {
             markedPlayers[name] = entity
             entity.setColor()
@@ -69,7 +69,7 @@ object MarkedPlayerManager {
         for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
-            val name = entity.cleanName
+            val name = entity.cleanName.lowercase()
             if (name in playerNamesToMark) {
                 markedPlayers[name] = entity
                 entity.setColor()
