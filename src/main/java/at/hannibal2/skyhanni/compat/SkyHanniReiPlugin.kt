@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.compat
 
-import at.hannibal2.skyhanni.features.inventory.wardrobe.AbstractCustomMenuScreen
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
@@ -12,14 +11,14 @@ import kotlin.jvm.java
 
 class SkyHanniReiPlugin : REIClientPlugin {
     override fun registerScreens(registry: ScreenRegistry) {
-        registry.registerDecider(CustomDisplayBoundsProvider())
+        registry.registerDecider(SkyHanniDisplayBoundsProvider())
     }
 }
 
-private class CustomDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBaseScreen> {
+private class SkyHanniDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBaseScreen> {
     override fun <R : Screen> shouldScreenBeOverlaid(screen: R): InteractionResult {
-        val skyhanniScreen = screen as? AbstractCustomMenuScreen ?: return InteractionResult.PASS
-        return if (skyhanniScreen.shouldShowItemList()) InteractionResult.CONSUME else InteractionResult.PASS
+        val customScreen = screen as? SkyHanniBaseScreen ?: return InteractionResult.PASS
+        return if (customScreen.shouldShowItemList()) InteractionResult.CONSUME else InteractionResult.PASS
     }
 
     override fun getScreenBounds(screen: SkyHanniBaseScreen): Rectangle {
