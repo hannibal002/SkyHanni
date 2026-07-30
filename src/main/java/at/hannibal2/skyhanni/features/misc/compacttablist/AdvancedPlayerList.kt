@@ -63,7 +63,7 @@ object AdvancedPlayerList {
 
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         ConditionalUtils.onToggle(
             config.hideEmblem,
             config.hideFactions,
@@ -219,6 +219,7 @@ object AdvancedPlayerList {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
                 CrimsonIsleFaction.entries.firstOrNull { it.isLine(line.string) }?.let {
                     faction = it
+                    nameSuffix = nameSuffix.removeSuffix(it.icon.orEmpty())
                     nameSuffix = nameSuffix.removeSuffix(it.symbol.orEmpty())
                 }
             }
