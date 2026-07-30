@@ -96,13 +96,14 @@ object MarkedPlayerManager {
     private fun isEnabled() = (SkyBlockUtils.inSkyBlock || OutsideSBFeature.MARKED_PLAYERS.isSelected()) &&
         config.highlightInWorld.get()
 
-    fun replaceInChat(string: String): String {
-        if (!config.highlightInChat) return string
+    fun replaceInChat(text: String): String {
+        if (!config.highlightInChat) return text
 
         val color = config.chatColor.getChatColor()
-        var text = string
         for (markedPlayer in playerNamesToMark) {
-            text = text.replace(markedPlayer, "$color$markedPlayer§r")
+            val index = text.indexOf(markedPlayer, ignoreCase = true)
+            if (index < 0) continue
+            return text.replaceRange(index, index + markedPlayer.length, "$color$markedPlayer§r")
         }
         return text
     }

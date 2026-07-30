@@ -18,7 +18,7 @@ class PlayerSuggestions private constructor(
     fun getPlayers(): List<String> =
         getSequence().toList()
 
-    fun getSequence(): Sequence<String> = sequence.distinct()
+    fun getSequence(): Sequence<String> = sequence.distinctBy { it.lowercase() }
 
     fun toSuggestionProvider(): SuggestionProvider<FabricClientCommandSource> {
         return dynamicSuggestionProvider { getPlayers() }
@@ -48,9 +48,10 @@ class PlayerSuggestions private constructor(
                 val excluded = categories
                     .asSequence()
                     .flatMap { it.usernames }
+                    .map { it.lowercase() }
                     .toSet()
 
-                yieldAll(oldSeq.filterNot { it in excluded })
+                yieldAll(oldSeq.filterNot { it.lowercase() in excluded })
             }
             return this
         }
@@ -66,8 +67,8 @@ class PlayerSuggestions private constructor(
         }
 
         fun excludePlayers(vararg players: String): Builder {
-            val excluded = players.toSet()
-            seq = seq.filterNot { it in excluded }
+            val excluded = players.map { it.lowercase() }.toSet()
+            seq = seq.filterNot { it.lowercase() in excluded }
             return this
         }
 
