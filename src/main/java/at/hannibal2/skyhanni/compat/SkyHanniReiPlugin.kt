@@ -16,21 +16,21 @@ class SkyHanniReiPlugin : DisplayBoundsProvider<AbstractCustomMenuScreen> {
     private fun Screen.customExclusionRect(): Rectangle {
         return when(this) {
             is CustomWardrobeScreen -> {
-                val showReiItems = SkyHanniMod.feature.inventory.customWardrobe.showReiItems
-                if (!showReiItems) {
-                    fullRectangle()
-                }
                 Rectangle(
                     this.renderableTopCorner.first, this.renderableTopCorner.second,
                     this.renderableDimensions.first, this.renderableDimensions.second,
                 )
             }
-            else -> fullRectangle()
+            else -> this.fullRectangle()
         }
     }
 
-    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R?): InteractionResult {
-        return InteractionResult.SUCCESS
+    override fun <R : Screen?> shouldScreenBeOverlaid(screen: R): InteractionResult {
+        val showReiItems = when(screen) {
+            is CustomWardrobeScreen -> SkyHanniMod.feature.inventory.customWardrobe.showReiItems
+            else -> false
+        }
+        return if (showReiItems) InteractionResult.SUCCESS else InteractionResult.PASS
     }
 
     override fun getScreenBounds(screen: AbstractCustomMenuScreen): Rectangle {
