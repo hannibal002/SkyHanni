@@ -80,7 +80,6 @@ loom.apply {
         named("client") {
             appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
-            property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
@@ -217,13 +216,24 @@ dependencies {
     }
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
+    val reiVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "26.1.819"
+        ProjectTarget.MODERN_12111 -> "21.11.816"
+    }
+    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
     if (isDeobf) {
-        compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-        compileOnly(libs.skyblockitemlist)
+        compileOnly(reiApi) { isTransitive = false }
+         compileOnly(libs.skyblockitemlist)
     } else {
-        modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+        modCompileOnly(reiApi) { isTransitive = false }
         modCompileOnly(libs.skyblockitemlist)
     }
+    "minecraftTestClientRuntimeLibraries"(reiApi) {
+        isTransitive = false
+    }
+    "minecraftTestClientRuntimeLibraries"(libs.skyblockitemlist)
+    compileOnly(libs.basicMath)
+    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     includeImplementation(libs.commons.net)
