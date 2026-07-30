@@ -14,9 +14,9 @@ enum class CorpseType(
     keyInternalName: String? = null,
 ) {
     LAPIS("Lapis", LorenzColor.BLUE, "LAPIS_ARMOR_HELMET"),
-    TUNGSTEN("Tungsten", LorenzColor.GRAY,  "MINERAL_HELMET", "TUNGSTEN_KEY"),
+    TUNGSTEN("Tungsten", LorenzColor.GRAY, "MINERAL_HELMET", "TUNGSTEN_KEY"),
     UMBER("Umber", LorenzColor.GOLD, "ARMOR_OF_YOG_HELMET", "UMBER_KEY"),
-    VANGUARD("Vanguard", LorenzColor.WHITE,  "VANGUARD_HELMET", "SKELETON_KEY"),
+    VANGUARD("Vanguard", LorenzColor.WHITE, "VANGUARD_HELMET", "SKELETON_KEY"),
     ;
 
     val displayName = color.getChatColor() + type
