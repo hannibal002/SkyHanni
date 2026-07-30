@@ -127,7 +127,7 @@ object SlayerApi {
     /**
      * Are we currently fighting a slayer boss?
      */
-    fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT || state == ActiveQuestState.COCOONED
+    fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
 
     /**
      * How many consecutive updates have we seen a category that is invalid?
