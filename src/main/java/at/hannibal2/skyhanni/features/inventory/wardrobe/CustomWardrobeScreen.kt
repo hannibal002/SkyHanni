@@ -61,12 +61,11 @@ class CustomWardrobeScreen(
     }
 
     override fun slotChanged(container: AbstractContainerMenu, slotId: Int, stack: SafeItemStack) {
-        waitingForInventoryUpdate = false
-
         if (updateScheduled) return
         updateScheduled = true
 
         DelayedRun.runNextTick {
+            waitingForInventoryUpdate = false
             updateScheduled = false
             update()
         }
