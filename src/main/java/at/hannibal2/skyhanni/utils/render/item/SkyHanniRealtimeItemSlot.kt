@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
 //? if >= 26.1
-import org.joml.Matrix4f
+import net.minecraft.client.renderer.Projection
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
 
@@ -40,8 +40,8 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(texture, 0, depthTexture, 1.0)
 
         val size = slotSize.toFloat()
-        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
-        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
+        //~ if < 26.1 'Projection().apply{ this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply{ this.setupOrtho(-1000f, 1000f, size, size, true) })
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
