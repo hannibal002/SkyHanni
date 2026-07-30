@@ -8,20 +8,20 @@ class GalateaMobHighlightConfig {
     @Expose
     @ConfigOption(name = "Birries Highlight", desc = "")
     @Accordion
-    var birries = BirriesHighlightConfig()
+    val birries = BirriesHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Hideonleaf Highlight", desc = "")
     @Accordion
-    var hideonleaf = HideonleafHighlightConfig()
+    val hideonleaf = HideonleafHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Hideonsun Highlight", desc = "")
     @Accordion
-    var hideonsun = HideonsunHighlightConfig()
+    val hideonsun = HideonsunHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Invisibug Highlight", desc = "")
     @Accordion
-    var invisibug = InvisibugHighlightConfig()
+    val invisibug = InvisibugHighlightConfig()
 }
