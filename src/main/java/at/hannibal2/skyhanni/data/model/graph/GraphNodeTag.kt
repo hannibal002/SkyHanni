@@ -182,7 +182,7 @@ enum class GraphNodeTag(
         LorenzColor.GOLD,
         "Safari Bell",
         "Bells to be rung in the Safari.",
-        onlyIsland = IslandType.TORRHUS_CANYON,
+        onlyIsland = IslandType.SAFARI,
     ),
 
     ;

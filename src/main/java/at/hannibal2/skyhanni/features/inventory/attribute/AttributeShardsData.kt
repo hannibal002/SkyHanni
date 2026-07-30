@@ -290,10 +290,22 @@ object AttributeShardsData {
 
     /**
      * REGEX-TEST: CAPTURE! You caught a Strongarm and gained a Strongarm Shard!
+     * REGEX-TEST: CAPTURE! You caught a Gimmiegold and gained a Gimmiegold Shard!
+     * REGEX-TEST: CAPTURE! You caught an Areita and gained an Areita Shard!
+     * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
      */
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You caught an? .+ and gained a (?<shardName>.+) Shard!"
+        "CAPTURE! You caught an? .+ and gained (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!"
+    )
+
+    /**
+     * REGEX-TEST: FLOOR DROP! You found Litterbug Shard on the ground!
+     * REGEX-TEST: FLOOR DROP! You found Solsnatcher Shard on the ground!
+     */
+    private val floorDropShardPattern by patternGroup.pattern(
+        "floor-drop.shard",
+        "FLOOR DROP! You found (?<shardName>.+) Shard on the ground!"
     )
 
     /**
@@ -311,6 +323,7 @@ object AttributeShardsData {
         charmedShardPattern to (true to null),
         sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
         capturedShardPattern to (true to ShardSource.CAPTURED),
+        floorDropShardPattern to (true to ShardSource.FLOOR_DROP),
         givenShardsPattern to (true to ShardSource.GIVEN),
     )
 

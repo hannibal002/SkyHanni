@@ -22,6 +22,7 @@ enum class ShardSource {
     HUNT,
     SENT_TO_HUNTING_BOX,
     CAPTURED,
+    FLOOR_DROP,
     GIVEN,
     UNKNOWN,
 }
