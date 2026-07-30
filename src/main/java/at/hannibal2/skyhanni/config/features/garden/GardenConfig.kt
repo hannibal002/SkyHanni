@@ -250,6 +250,7 @@ class GardenConfig {
 
     @Expose
     @ConfigOption(name = "Log Book Stats", desc = "Show total visited/accepted/denied visitors stats.")
+    @SearchTag("logbook")
     @ConfigEditorBoolean
     @FeatureToggle
     var showLogBookStats: Boolean = true
