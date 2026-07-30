@@ -107,9 +107,8 @@ class NextJacobContestConfig {
 
     @SkyHanniModule
     companion object {
-
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             event.transform(133, "garden.jacobContest.nextContest.shareAutomatically", ::fixEnum)
         }
 
