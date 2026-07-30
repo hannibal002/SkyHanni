@@ -10,7 +10,7 @@ import net.minecraft.world.entity.decoration.ItemFrame
 import java.awt.Color
 
 @Thread(RENDER)
-class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) : SkyHanniEvent() {
+class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity> = hashSetOf()) : SkyHanniEvent() {
 
     /**
      * The phase of the event (see [Type]
@@ -20,12 +20,17 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     /**
      * The entities to outline. This is progressively cumulated from [.entitiesToChooseFrom]
      */
-    var entitiesToOutline: HashMap<Entity, Color>? = null
+    var entitiesToOutline: HashMap<Entity, Color> = hashMapOf()
 
     /**
      * The entities we can outline. Note that this set and [.entitiesToOutline] are disjoint at all times.
      */
-    var entitiesToChooseFrom: HashSet<Entity>? = null
+    var entitiesToChooseFrom: HashSet<Entity> = hashSetOf()
+
+    /**
+     * Whether [.entitiesToChooseFrom] has been computed already.
+     */
+    private var computed: Boolean = false
 
     /**
      * Constructs the event, given the type and optional entities to outline.
@@ -38,7 +43,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     init {
         type = theType
         entitiesToChooseFrom = potentialEntities
-        if (potentialEntities != null) {
+        if (!potentialEntities.isEmpty()) {
             entitiesToOutline = HashMap(potentialEntities.size)
         }
     }
@@ -58,15 +63,13 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         if (outlineColor == null) {
             return
         }
-        if (entitiesToChooseFrom == null) {
-            computeAndCacheEntitiesToChooseFrom()
-        }
-        val itr: MutableIterator<Entity> = entitiesToChooseFrom!!.iterator()
+        computeAndCacheEntitiesToChooseFrom()
+        val itr: MutableIterator<Entity> = entitiesToChooseFrom.iterator()
         while (itr.hasNext()) {
             val e: Entity = itr.next()
             val i: Color? = outlineColor(e)
             if (i != null) {
-                entitiesToOutline!![e] = i
+                entitiesToOutline[e] = i
                 itr.remove()
             }
         }
@@ -82,20 +85,21 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         if (entity == null) {
             return
         }
-        if (entitiesToChooseFrom == null) {
-            computeAndCacheEntitiesToChooseFrom()
-        }
-        if (!entitiesToChooseFrom!!.contains(entity)) {
+        computeAndCacheEntitiesToChooseFrom()
+        if (!entitiesToChooseFrom.contains(entity)) {
             return
         }
-        entitiesToOutline!![entity] = outlineColor
-        entitiesToChooseFrom!!.remove(entity)
+        entitiesToOutline[entity] = outlineColor
+        entitiesToChooseFrom.remove(entity)
     }
 
     /**
      * Used for on-the-fly generation of entities. Driven by event handlers in a decentralized fashion
      */
-    private fun computeAndCacheEntitiesToChooseFrom() {
+    private fun computeAndCacheEntitiesToChooseFrom(force: Boolean = false) {
+        if (computed && !force) return
+        computed = true
+
         @OptIn(AllEntitiesGetter::class)
         val entities: List<Entity> = EntityUtils.getAllEntities().toList()
         // Only render outlines around non-null entities within the camera frustum
@@ -103,10 +107,10 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
         // Empty invisible armor stands are common and never render an outlineable model
         for (entity in entities) {
             if (!entity.isEmptyInvisibleArmorStand() && entity !is ItemFrame) {
-                entitiesToChooseFrom!!.add(entity)
+                entitiesToChooseFrom.add(entity)
             }
         }
-        entitiesToOutline = HashMap(entitiesToChooseFrom!!.size)
+        entitiesToOutline = HashMap(entitiesToChooseFrom.size)
     }
 
     /**
@@ -115,7 +119,6 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
      * [.NO_XRAY] means that this directly precedes entities whose outlines are rendered only when visible to the client
      */
     enum class Type {
-
         XRAY,
         NO_XRAY
     }
