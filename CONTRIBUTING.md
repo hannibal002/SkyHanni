@@ -208,6 +208,7 @@ Make sure such pull requests have a good explanation in the **What** section.
       blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
     - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
@@ -217,6 +218,16 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- **Setting up the Detekt IntelliJ plugin (one time, per machine)**
+    - Install the [Detekt](https://plugins.jetbrains.com/plugin/10761-detekt) plugin from the JetBrains Marketplace to
+      see Detekt findings inline while editing.
+    - Open `Settings → Tools → Detekt` and set:
+        - `Configuration Files` to `detekt/detekt.yml`
+        - `Baseline File` to `detekt/baseline-main.xml`
+  - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+    is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+    repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+    already covered by the baseline).
 - When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
   same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
@@ -234,6 +245,9 @@ Make sure such pull requests have a good explanation in the **What** section.
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
       after the first build.
+- All functions and properties must be defined inside a class or object. Top-level Kotlin functions and properties are not
+  permitted.
+- Use `Unit` instead of `Void` in Kotlin code.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
