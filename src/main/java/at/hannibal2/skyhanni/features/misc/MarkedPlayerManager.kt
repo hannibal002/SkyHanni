@@ -63,9 +63,10 @@ object MarkedPlayerManager {
         if (!isEnabled()) return
         val entity = event.entity
         val name = entity.cleanName
-        val storedName = getStoredName(name) ?: return
-        markedPlayers[storedName] = entity
-        entity.setColor()
+        if (isMarkedPlayer(name)) {
+            markedPlayers[name] = entity
+            entity.setColor()
+        }
     }
 
     // only gets called on command or on config change, so performance impact is minimal
@@ -75,9 +76,10 @@ object MarkedPlayerManager {
             if (entity in markedPlayers.values) continue
 
             val name = entity.cleanName
-            val storedName = getStoredName(name) ?: return
-            markedPlayers[storedName] = entity
-            entity.setColor()
+            if (isMarkedPlayer(name)) {
+                markedPlayers[name] = entity
+                entity.setColor()
+            }
         }
     }
 
