@@ -160,7 +160,7 @@ object MarkedPlayerManager {
 
         currentLobbyPlayers.clear()
 
-        tabPlayerName.matchAll(event.lines.map { it.string }) {
+        tabPlayerName.matchAll(event.cleanLines) {
             val name = group("name")
             if (!name.equals(PlayerUtils.getName(), ignoreCase = true)) {
                 currentLobbyPlayers.add(name)
