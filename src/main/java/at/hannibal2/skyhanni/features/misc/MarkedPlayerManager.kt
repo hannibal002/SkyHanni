@@ -18,11 +18,11 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
 
@@ -53,10 +53,10 @@ object MarkedPlayerManager {
     private var personOfInterest = listOf<String>()
 
     @HandleEvent
-    fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
+    private fun onEntityEnterWorld(event: EntityEnterWorldEvent<RemotePlayer>) {
         if (!isEnabled()) return
         val entity = event.entity
-        val name = entity.name.formattedTextCompatLessResets().lowercase()
+        val name = entity.cleanName
         if (name in playerNamesToMark) {
             markedPlayers[name] = entity
             entity.setColor()
@@ -69,7 +69,7 @@ object MarkedPlayerManager {
         for (entity in EntityUtils.getPlayerEntities()) {
             if (entity in markedPlayers.values) continue
 
-            val name = entity.name.formattedTextCompatLessResets().lowercase()
+            val name = entity.cleanName
             if (name in playerNamesToMark) {
                 markedPlayers[name] = entity
                 entity.setColor()
@@ -108,7 +108,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         config.markOwnName.whenChanged { _, new ->
             val name = PlayerUtils.getName()
             if (new) {
@@ -127,7 +127,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         if (!MinecraftCompat.localPlayerExists) return
 
         markedPlayers.clear()
@@ -142,7 +142,7 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!config.joinLeaveMessage.enabled) return
         if (!event.isWidget(TabWidget.PLAYER_LIST)) return
@@ -177,12 +177,12 @@ object MarkedPlayerManager {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "markedPlayers", "gui.markedPlayers")
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shmarkplayer") {
             description = "Add a highlight effect to a player for better visibility"
             argCallback(
