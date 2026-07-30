@@ -3642,8 +3642,6 @@
     <ID>UnsafeCallOnNullableType:NumberUtil.kt:NumberUtil$romanSymbols[this]!!</ID>
     <ID>UnsafeCallOnNullableType:ReminderManager.kt:ReminderManager$storage[args.drop(1).first()]!!</ID>
     <ID>UnsafeCallOnNullableType:ReminderManager.kt:ReminderManager$storage[args.first()]!!</ID>
-    <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt:RenderEntityOutlineEvent$entitiesToChooseFrom!!</ID>
-    <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt:RenderEntityOutlineEvent$entitiesToOutline!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt:SackApi$match.groups[1]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt:SackApi$match.groups[2]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt:SackApi$match.groups[3]!!</ID>
