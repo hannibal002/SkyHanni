@@ -142,8 +142,10 @@ object SkyHanniEvents {
             DirtyReason.OUTSIDE_SB_FEATURE_CHANGED,
             -> listenerCacheGeneration.incrementAndGet()
 
-            DirtyReason.LOCATION_CHANGED ->
+            DirtyReason.LOCATION_CHANGED -> {
+                listenerCacheGeneration.incrementAndGet()
                 currentStateIndex.set(ListenerCollection.getCurrentStateIndex())
+            }
 
             DirtyReason.SERVER_DISCONNECTED -> {
                 listenerCacheGeneration.incrementAndGet()
