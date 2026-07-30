@@ -114,7 +114,7 @@ class AreaType private constructor(
         private val repoReloadCoroutine = CoroutineSettings("area type repo reload")
 
         @HandleEvent(priority = HIGHEST)
-        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             val data = event.getConstantAsync<AreaTypeJson>("misc/AreaType")
 
             entries.forEach { areaType ->

@@ -17,16 +17,16 @@ object AreaLocationApi {
     fun String.isInArea(): Boolean = SkyBlockUtils.rawArea == this
 
     @HandleEvent(priority = HIGHEST)
-    fun onGraphAreaChange() {
+    private fun onGraphAreaChange() {
         postAreaChangeEvent()
     }
 
     @HandleEvent(priority = HIGHEST)
-    fun onScoreboardAreaChange() {
+    private fun onScoreboardAreaChange() {
         postAreaChangeEvent()
     }
 
-    fun postAreaChangeEvent() {
+    private fun postAreaChangeEvent() {
         val areaString = SkyBlockUtils.rawArea ?: "???"
         val newArea = AreaType.getByNameOrUnknown(areaString)
         if (newArea == currentArea) return
@@ -36,7 +36,7 @@ object AreaLocationApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Area")
         event.addIrrelevant {
             add("Current Area Identifier: ${currentArea.identifier}")

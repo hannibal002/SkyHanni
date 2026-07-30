@@ -40,7 +40,7 @@ object MatriarchHelper {
     private var exitNode: GraphNode? = null
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onMobSpawn(event: MobEvent.Spawn.Special) {
+    private fun onMobSpawn(event: MobEvent.Spawn.Special) {
         if (!isHeavyPearl(event)) return
         val node = IslandGraphs.findClosestNode(event.mob.baseEntity.getLorenzVec().up(1.2), { true })
         if (node == null) {
@@ -67,7 +67,7 @@ object MatriarchHelper {
     private fun isHeavyPearl(event: MobEvent) = isEnabled() && event.mob.name == "Heavy Pearl"
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
+    private fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
         if (!isHeavyPearl(event)) return
         pearlList.removeIf { it.first == event.mob }
     }
@@ -96,7 +96,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onTick() {
+    private fun onTick() {
         if (AreaType.BELLY_OF_THE_BEAST.isInGraphArea()) return
         path.clear()
         path.addAll(accessPearls())
@@ -107,7 +107,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGraphAreaChange() {
+    private fun onGraphAreaChange() {
         if (AreaType.BELLY_OF_THE_BEAST.isInGraphArea()) {
             tspCache = null
             lastTspPearls = 0
@@ -117,7 +117,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {
             val color = config.highlightColor
@@ -144,7 +144,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent
-    fun onIslandGraphReload() {
+    private fun onIslandGraphReload() {
         exitNode = null
     }
 

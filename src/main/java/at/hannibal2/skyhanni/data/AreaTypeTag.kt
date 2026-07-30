@@ -157,7 +157,7 @@ class AreaTypeTag private constructor(
         private val repoReloadCoroutine = CoroutineSettings("area type tag repo reload")
 
         @HandleEvent
-        fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+        private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
             event.getConstantAsync<Map<String, List<String>>>("AreaTypeTags")
                 .forEach { (name, values) ->
                     entriesList
