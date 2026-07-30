@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
-import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
@@ -74,6 +73,5 @@ public abstract class MixinChatComponent {
         ChatComponent.DisplayMode displayMode,
         Operation<Void> original
     ) {
-        GuiChatHook.wrapChatRender(original, chatGraphicsAccess, screenHeight, ticks, displayMode);
     }
 }
