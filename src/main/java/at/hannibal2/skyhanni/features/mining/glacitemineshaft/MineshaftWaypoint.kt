@@ -16,7 +16,7 @@ data class MineshaftWaypoint(
     enum class Type(
         val label: (MineshaftWaypoint) -> String,
         val labelColor: LorenzColor,
-        val displayTextScale: Double = 1.0,
+        val labelScale: Double = 1.0,
         val fillColor: (MineshaftWaypoint) -> LorenzColor,
         val renderCondition: () -> Boolean,
     ) {
