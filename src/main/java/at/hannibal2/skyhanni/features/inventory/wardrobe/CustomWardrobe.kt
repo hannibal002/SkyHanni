@@ -61,6 +61,11 @@ object CustomWardrobe {
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
 
+    var renderableTopCorner: Pair<Int, Int> = 0 to 0
+        private set
+    var renderableDimensions: Pair<Int, Int> = 0 to 0
+        private set
+
     internal const val GUI_NAME = "Custom Wardrobe"
 
     // Called by MenuScreensHook
@@ -92,11 +97,6 @@ object CustomWardrobe {
             screen.title,
         )
     }
-
-    var renderableTopCorner: Pair<Int, Int> = 0 to 0
-        private set
-    var renderableDimensions: Pair<Int, Int> = 0 to 0
-        private set
 
     fun renderWardrobeOverlay(screenWidth: Int, screenHeight: Int) {
         val renderable = displayRenderable ?: run {
@@ -609,7 +609,7 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && ArmorWardrobeApi.inWardrobe()
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     private fun centerString(
         text: String,

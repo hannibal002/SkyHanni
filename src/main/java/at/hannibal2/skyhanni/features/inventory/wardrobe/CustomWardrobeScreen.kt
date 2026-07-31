@@ -27,6 +27,7 @@ class CustomWardrobeScreen(
 
     override fun onInitGui() {
         CustomWardrobe.switchingScreens = false
+        CustomWardrobe.update()
     }
 
     override fun onDrawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -45,7 +46,6 @@ class CustomWardrobeScreen(
     }
 
     override fun removed() {
-        CustomWardrobe.reset()
         val player = MinecraftCompat.localPlayerOrNull ?: return
         if (!CustomWardrobe.switchingScreens) {
             menu.removed(player)
