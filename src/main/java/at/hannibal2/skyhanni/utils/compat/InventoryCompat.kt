@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.SafeItemStack
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
 import net.minecraft.client.gui.screens.inventory.ContainerScreen
+import net.minecraft.client.gui.screens.inventory.MenuAccess
 import net.minecraft.client.player.LocalPlayer
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ContainerInput
@@ -63,7 +64,7 @@ object InventoryCompat {
         container.menu.slots
 
     fun getWindowIdOrNull(): Int? =
-        (MinecraftCompat.screen as? ContainerScreen)?.menu?.containerId
+        (MinecraftCompat.screen as? MenuAccess<*>)?.menu?.containerId
 
     fun getWindowId(): Int =
         getWindowIdOrNull() ?: ErrorManager.skyHanniError("windowId is null")
