@@ -209,7 +209,7 @@ object DraconicSacrificeTracker {
             val oldMap = element.asJsonObject
             val newMap = JsonObject()
             for ((displayName, value) in oldMap.entrySet()) {
-                val internalName = NeuInternalName.fromItemNameOrNull(displayName.removeColor()) ?: continue
+                val internalName = NeuInternalName.fromItemNameOrNull(displayName.removeColor().trim()) ?: continue
                 newMap.addProperty(internalName.asString(), value.asLong)
             }
             newMap
