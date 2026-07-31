@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -105,9 +106,9 @@ object DraconicSacrificeTracker {
         val profit = tracker.drawItems(data, { true }, this)
 
         val sacrificedItems = data.sacrificedItemsMap.map { (item, amount) ->
-            val price = item.getAdjustedPrice()
+            val price = item.getAdjustedPrice(config.perTrackerConfig.trackerConfig.priceSource)
             Triple(item, amount, -amount * price)
-        }
+        }.sortedBy { it.third }
         val sacrificedCost = sacrificedItems.sumOf { (_, _, totalCost) -> totalCost }
 
         add(
@@ -141,12 +142,12 @@ object DraconicSacrificeTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun NeuInternalName.getAdjustedPrice(): Double {
+    private fun NeuInternalName.getAdjustedPrice(priceSource: ItemPriceSource): Double {
         if (!config.fragmentPrice) return getPrice()
         val ingredients = NeuItems.getRecipes(this)
             .firstOrNull { it.recipeType == NeuRecipeType.CRAFTING }
             ?.ingredients
-            ?: return getPrice()
+            ?: return getPrice(priceSource)
 
         val uniqueIngredients = ingredients
             .groupBy { it.internalName }
@@ -156,11 +157,11 @@ object DraconicSacrificeTracker {
         if (uniqueIngredients.size == 1) {
             val (ingredient, amount) = uniqueIngredients.entries.first()
             if ("FRAGMENT" in ingredient.asString()) {
-                return ingredient.getPrice() * amount
+                return ingredient.getPrice(priceSource) * amount
             }
         }
 
-        return getPrice()
+        return getPrice(priceSource)
     }
 
     @HandleEvent
