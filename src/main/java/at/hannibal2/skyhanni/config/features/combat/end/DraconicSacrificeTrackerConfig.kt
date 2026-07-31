@@ -24,7 +24,7 @@ class DraconicSacrificeTrackerConfig {
     @Expose
     @ConfigOption(name = "Take Dragon Fragment Price", desc = "Will use the recipe cost rather than the auction house price for dragon armor.")
     @ConfigEditorBoolean
-    val fragmentPrice: Boolean = true
+    var fragmentPrice: Boolean = true
 
     @Expose
     @ConfigOption(
