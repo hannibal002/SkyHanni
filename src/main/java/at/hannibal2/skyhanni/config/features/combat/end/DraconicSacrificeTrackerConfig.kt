@@ -22,7 +22,10 @@ class DraconicSacrificeTrackerConfig {
     var onlyInVoidSlate: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Take Dragon Fragment Price", desc = "Will use the recipe cost rather than the auction house price for dragon armor.")
+    @ConfigOption(
+        name = "Take Dragon Fragment Price",
+        desc = "Will use the recipe cost rather than the auction house price for dragon armor."
+    )
     @ConfigEditorBoolean
     var fragmentPrice: Boolean = true
 
