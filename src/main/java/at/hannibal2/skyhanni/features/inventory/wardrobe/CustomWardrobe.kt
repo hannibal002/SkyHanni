@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.renderables.CustomRenderUtils
@@ -58,14 +59,14 @@ object CustomWardrobe {
         if (isInCurrentPage()) {
             if (isEmpty() || locked || screen.waitingForInventoryUpdate) return
             ArmorWardrobeApi.currentSlot = if (isCurrentSlot()) null else id
-            screen.clickContainerSlot(inventorySlot)
+            InventoryUtils.clickSlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
                 ArmorWardrobeApi.currentPage = wardrobePage - 1
-                screen.clickContainerSlot(previousPageSlot)
+                InventoryUtils.clickSlot(previousPageSlot)
             } else if (page > wardrobePage) {
                 ArmorWardrobeApi.currentPage = wardrobePage + 1
-                screen.clickContainerSlot(nextPageSlot)
+                InventoryUtils.clickSlot(nextPageSlot)
             }
         }
     }

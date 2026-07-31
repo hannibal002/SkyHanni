@@ -298,7 +298,7 @@ class CustomWardrobeScreen(
         val backButton = CustomWardrobe.createLabeledButton(
             "§aBack",
             onClick = {
-                clickContainerSlot(48)
+                InventoryUtils.clickSlot(48)
                 reset()
                 ArmorWardrobeApi.currentPage = null
             },
@@ -307,7 +307,7 @@ class CustomWardrobeScreen(
         val exitButton = CustomWardrobe.createLabeledButton(
             "§cClose",
             onClick = {
-                clickContainerSlot(49)
+                InventoryUtils.clickSlot(49)
                 reset()
                 ArmorWardrobeApi.currentPage = null
             },
@@ -385,11 +385,6 @@ class CustomWardrobeScreen(
         }
 
         return Renderable.vertical(list, 1, HorizontalAlignment.RIGHT)
-    }
-
-    fun clickContainerSlot(slot: Int) {
-        InventoryUtils.clickSlot(slot, windowId = menu.containerId)
-        waitingForInventoryUpdate = true
     }
 
     fun addGuiBackground(renderable: Renderable, borderPadding: Int): Renderable =
