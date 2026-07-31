@@ -18,7 +18,10 @@ class EndIslandConfig {
     val dragon: DragonConfig = DragonConfig()
 
     @Expose
-    @ConfigOption(name = "Weight Endstone Protector", desc = "Shows your Endstone Protector weight in chat after it died.")
+    @ConfigOption(
+        name = "Weight Endstone Protector",
+        desc = "Shows your Endstone Protector weight in chat after it died."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     var endstoneProtectorChat: Boolean = true
