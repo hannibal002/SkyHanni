@@ -38,7 +38,7 @@ object HubSelectorCapacityHighlight {
     private val hubSelectorInventory = InventoryDetector { inventoryPattern }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    private fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!config.enabled) return
         if (!hubSelectorInventory.isInside()) return
 

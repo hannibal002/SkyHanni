@@ -34,7 +34,7 @@ class HubSelectorConfig {
     var moderateColor: ChromaColour = LorenzColor.YELLOW.toChromaColor(255)
 
     @Expose
-    @ConfigOption(name = "Quiet Color (under 15)", desc = "Color for lobbies with fewer than 15 players. Transparent by default.")
+    @ConfigOption(name = "Quiet Color (under 15)", desc = "Color for lobbies with fewer than 15 players. §eTransparent by default.")
     @ConfigEditorColour
     var quietColor: ChromaColour = LorenzColor.WHITE.toChromaColor(0)
 }
