@@ -347,6 +347,8 @@ object SlayerApi {
         new.inBoss() -> BOSS_FIGHT
         old.inBoss() && new.noSlayer() -> FAILED
         new.bossSlain() -> SLAIN
+        // Sometimes Hypixel doesn't even show the "Boss slain!" message
+        currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds -> COCOONED
         else -> NO_ACTIVE_QUEST
     }
 
