@@ -14,31 +14,33 @@ data class MineshaftWaypoint(
     val isCorpse get() = corpseType != null
 
     enum class Type(
-        val displayText: (MineshaftWaypoint) -> String,
-        val displayTextColor: LorenzColor = LorenzColor.WHITE,
+        val label: (MineshaftWaypoint) -> String,
+        val labelColor: LorenzColor,
         val displayTextScale: Double = 1.0,
         val fillColor: (MineshaftWaypoint) -> LorenzColor,
         val renderCondition: () -> Boolean,
     ) {
         ENTRANCE(
-            displayText = { "Entrance" },
+            label = { "Entrance" },
+            labelColor = LorenzColor.YELLOW,
             fillColor = { LorenzColor.YELLOW },
             renderCondition = { config.types.entrance },
         ),
         LADDER(
-            displayText = { "Ladder" },
+            label = { "Ladder" },
+            labelColor = LorenzColor.YELLOW,
             fillColor = { LorenzColor.YELLOW },
             renderCondition = { config.types.ladder },
         ),
         FOUND_CORPSE(
-            displayText = { "${it.corpseType?.type ?: "???"} Corpse" },
-            displayTextColor = LorenzColor.YELLOW,
+            label = { "${it.corpseType?.type ?: "Unknown"} Corpse" },
+            labelColor = LorenzColor.YELLOW,
             fillColor = { it.corpseType?.color ?: LorenzColor.DARK_GRAY },
             renderCondition = { config.types.foundCorpse },
         ),
         LOOTED_CORPSE(
-            displayText = { "${it.corpseType?.type ?: "???"} Corpse" },
-            displayTextColor = LorenzColor.GREEN,
+            label = { "${it.corpseType?.type ?: "Unknown"} Corpse" },
+            labelColor = LorenzColor.GREEN,
             fillColor = { it.corpseType?.color ?: LorenzColor.DARK_GRAY },
             renderCondition = { config.types.lootedCorpse },
         ),

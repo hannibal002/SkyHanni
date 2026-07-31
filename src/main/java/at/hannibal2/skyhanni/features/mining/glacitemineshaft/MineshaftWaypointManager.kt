@@ -102,7 +102,7 @@ object MineshaftWaypointManager {
 
         timeLastShared = SimpleTimeMark.now()
         val location = closestWaypoint.location.toChatFormat()
-        val type = closestWaypoint.type.displayText
+        val type = closestWaypoint.type.label
         val message = "$location | ($type)"
 
         if (PartyApi.partyMembers.isNotEmpty()) {
@@ -117,7 +117,7 @@ object MineshaftWaypointManager {
         waypoints
             .filter { it.type.renderCondition() }
             .forEach {
-                val displayText = it.type.displayTextColor.getChatColor() + it.type.displayText(it)
+                val displayText = it.type.labelColor.getChatColor() + it.type.label(it)
                 event.drawWaypointFilled(it.location, it.type.fillColor(it).toColor(), seeThroughBlocks = true)
                 event.drawDynamicText(it.location, displayText, it.type.displayTextScale)
             }

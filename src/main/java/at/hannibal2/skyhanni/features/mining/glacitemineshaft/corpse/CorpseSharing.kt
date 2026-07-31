@@ -79,7 +79,7 @@ object CorpseSharing {
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val location = closestCorpse.location.toChatFormat()
-        val type = closestCorpse.type.displayText
+        val type = closestCorpse.type.label
 
         HypixelCommands.partyChat("$location | ($type)")
         closestCorpse.isShared = true
