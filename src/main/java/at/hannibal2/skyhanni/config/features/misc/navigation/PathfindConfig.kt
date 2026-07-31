@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc.navigation
 
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
@@ -54,4 +55,9 @@ class PathfindConfig {
 
         override fun toString() = displayName
     }
+
+    @Expose
+    @ConfigOption(name = "Start From Eye", desc = "Starts the navigation line from where you are looking instead of your feet.")
+    @ConfigEditorBoolean
+    var startFromEye: Boolean = true
 }
