@@ -264,7 +264,7 @@ object SlayerApi {
         if (category.isNotEmpty() && parsedTier == null) {
             invalidCategoryUpdates++
 
-            if (invalidCategoryUpdates >= 3) {
+            if (invalidCategoryUpdates == 3) {
                 ErrorManager.skyHanniError(
                     "latestCategory does not contain roman number or int: '$category'",
                     "lines" to lines,
