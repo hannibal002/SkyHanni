@@ -2,11 +2,17 @@ package at.hannibal2.skyhanni.config.features.combat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MobsConfig {
+    @Expose
+    @ConfigOption(name = "Marked Mobs", desc = "Mark mobs from bestiary entries and highlight them in the world.")
+    @Accordion
+    val markedMobs: MarkedMobConfig = MarkedMobConfig()
+
     @Expose
     @ConfigOption(
         name = "Area Boss Highlighter",
