@@ -340,16 +340,20 @@ object SlayerApi {
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState = when {
+    private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState {
         // This is 6 seconds instead of 5 seconds just to be safe
-        currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds && (new.bossSlain() || new.noSlayer()) -> COCOONED
-        new.inGrind() -> GRINDING
-        new.inBoss() -> BOSS_FIGHT
-        old.inBoss() && new.noSlayer() -> FAILED
-        new.bossSlain() -> SLAIN
-        // Sometimes Hypixel doesn't even show the "Boss slain!" message
-        currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds -> COCOONED
-        else -> NO_ACTIVE_QUEST
+        val cocooned = currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds
+
+        return when {
+            cocooned && (new.bossSlain() || new.noSlayer()) -> COCOONED
+            new.inGrind() -> GRINDING
+            new.inBoss() -> BOSS_FIGHT
+            old.inBoss() && new.noSlayer() -> FAILED
+            new.bossSlain() -> SLAIN
+            // Sometimes Hypixel doesn't even show the "Boss slain!" message
+            cocooned -> COCOONED
+            else -> NO_ACTIVE_QUEST
+        }
     }
 
     @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
