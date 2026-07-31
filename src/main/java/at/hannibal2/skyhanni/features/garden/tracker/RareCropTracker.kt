@@ -106,6 +106,7 @@ object RareCropTracker {
         PLANT_MATTER("§aPlant Matter"),
         DUNG("§aDung"),
         HONEY_JAR("§aHoney Jar"),
+        // TODO why does this not match?
         CHEESE_FUEL("§aTasty Cheese"),
         JELLY("§aJelly"),
         ;

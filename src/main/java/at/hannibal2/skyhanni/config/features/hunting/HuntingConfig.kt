@@ -26,7 +26,7 @@ class HuntingConfig {
 
     @Expose
     @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights")
-    var mobHighlight = GalateaMobHighlightConfig()
+    val mobHighlight: GalateaMobHighlightConfig = GalateaMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
@@ -55,7 +55,7 @@ class HuntingConfig {
     @Expose
     @ConfigOption(
         name = "Shulker Finder",
-        desc = "Shows a route from your position to the nearest possibly spawn point for a Shulker for easy hunting."
+        desc = "Shows a route from your position to the nearest possible spawn point for a Shulker for easy hunting."
     )
     @SearchTag("hideonleaf hideonsun")
     @ConfigEditorBoolean
