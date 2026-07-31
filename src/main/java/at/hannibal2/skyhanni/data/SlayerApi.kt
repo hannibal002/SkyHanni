@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -135,7 +136,7 @@ object SlayerApi {
     private var invalidCategoryUpdates = 0
 
     // This Timer is mostly just a fail-safe so it doesn't get stuck in COCOONED state
-    private var cocoonTimestamp: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var cocoonTimestamp: ServerTimeMark = ServerTimeMark.farPast()
 
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
