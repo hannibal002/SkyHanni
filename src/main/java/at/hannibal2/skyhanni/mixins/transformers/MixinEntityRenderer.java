@@ -87,7 +87,7 @@ public abstract class MixinEntityRenderer {
         Minecraft client,
         Entity entity,
         Operation<Boolean> original,
-        //~ if < 26.1 '"state"' -> '"entityRenderState"'
+        //~ if < 26.1 'argsOnly = true, name = "state"' -> 'argsOnly = true'
         @Local(argsOnly = true, name = "state") EntityRenderState state
     ) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);

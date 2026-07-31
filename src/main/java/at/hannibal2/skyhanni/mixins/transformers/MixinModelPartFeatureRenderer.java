@@ -24,6 +24,7 @@ public abstract class MixinModelPartFeatureRenderer {
         OutlineBufferSource outlineBufferSource,
         int color,
         Operation<Void> original,
+        //~ if < 26.1 '@Local(name = "modelPartSubmit")' -> '@Local'
         @Local(name = "modelPartSubmit") SubmitNodeStorage.ModelPartSubmit modelPartSubmit
     ) {
         boolean hasCustomOutline = modelPartSubmit.skyhanni$isUsingCustomOutline();
@@ -46,6 +47,7 @@ public abstract class MixinModelPartFeatureRenderer {
         OutlineBufferSource outlineBufferSource,
         RenderType renderType,
         Operation<VertexConsumer> original,
+        //~ if < 26.1 '@Local(name = "modelPartSubmit")' -> '@Local'
         @Local(name = "modelPartSubmit") SubmitNodeStorage.ModelPartSubmit modelPartSubmit
     ) {
         boolean hasCustomOutline = modelPartSubmit.skyhanni$isUsingCustomOutline();

@@ -68,9 +68,10 @@ public abstract class MixinMinecraft {
     @ModifyVariable(
         at = @At(value = "HEAD"),
         method = "continueAttack",
-        argsOnly = true,
-        //~ if < 26.1 'down' -> 'bl'
-        name = "down"
+        //? if >= 26.1 {
+        name = "down",
+        //?}
+        argsOnly = true
     )
     public boolean handleBlockClick(boolean down) {
         if (down && this.missTime <= 0) {
