@@ -204,11 +204,13 @@
 + Added an option to prevent breaking crops with Sprayonator. - Luna (https://github.com/hannibal002/SkyHanni/pull/5469)
     + The existing feature that includes fishing rods will now only prevent breaking *crops*, not all blocks.
 + Added support for detecting Sprayonator used with Juicy Nozzle and Groovy Nozzle. - Luna (https://github.com/hannibal002/SkyHanni/pull/6115)
++ Added rare Sprayonator material drops from Bee/Mooshroom Cow/Orchid Mantis Pet to the Rare Crop Tracker. - Luna (https://github.com/hannibal002/SkyHanni/pull/6205)
 
 #### Combat
 
 + Added toggle to only show Cocoon Overlay when the player can cocoon. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5538)
 + Added multiplicative pet perk support to Remaining Slayer Kills Display. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5847)
++ Added a button to the No Gummy Warning chat message to open the bazaar for Re-Heated Gummy Polar Bears. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6236)
 
 #### Rift
 
@@ -236,6 +238,8 @@
 
 #### Hunting
 + Added an Always Show option to the Hunting Profit Tracker, to keep it visible on screen at all times. - RemainingDelta (https://github.com/hannibal002/SkyHanni/pull/5997)
++ Shulker Finder now automatically skips to the next shulker location when none are at your current location. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6232)
++ Shulker Finder now has support for Torrhus Canyon. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6232)
 
 #### Foraging
 
@@ -430,6 +434,8 @@
 + Fixed tab widget highlight not working in multi-page settings pages. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6103)
 + Fixed changing loadouts not updating Power Stone and tunings in Custom Scoreboard. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6146)
 + Fixed an issue where forging a pet would incorrectly replace your currently equipped pet in the pet display. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6179)
++ Fixed All Skill Display showing wrong overflow level and current XP for skills with a cap below level 60. - Luna (https://github.com/hannibal002/SkyHanni/pull/6231)
++ Fixed Skill Progress Display adding the level 60 XP twice when custom goal is enabled and set. - Luna (https://github.com/hannibal002/SkyHanni/pull/6231)
 
 #### Item Ability
 
@@ -557,6 +563,9 @@
 + Fixed Croesus Chest Tracker not detecting paged Croesus inventory. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/6180)
 + Fixed Hunting Box and Fusion Box not being detected. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6186)
 + Fixed Minion Upgrade Helper not detecting wrapped ingredient line. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6175)
++ Fixed Bestiary Overlay incorrectly counting decorative glass panes as valid Bestiary entries. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6209)
+    + Applies to both the main Bestiary menu and subcategory views.
++ Fixed Hunting Box Value not showing all shards when switching pages, especially with high server ping. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6226)
 
 #### Commands
 
@@ -593,6 +602,7 @@
 + Fixed occasional error while editing/deleting a message. - Luna (https://github.com/hannibal002/SkyHanni/pull/5843)
 + Fixed potential error message in chat centering when space width is zero. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5966)
 + Fixed Same Chat Color not working. - Tomeko (https://github.com/hannibal002/SkyHanni/pull/6052)
++ Fixed Error while deleting message with Compact Bestiary Messages and rarely with other features (hopefully for real this time). - Luna (https://github.com/hannibal002/SkyHanni/pull/6239)
 
 #### Misc
 
@@ -722,6 +732,9 @@
 + Fixed Profile Join Message Hider not working. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6181)
 + Fixed some glow-related SkyHanni features potentially not working. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
 + Fixed various GUI-related SkyHanni features being broken because some code was accidentally deleted. - Luna (https://github.com/hannibal002/SkyHanni/pull/6228)
++ Fixed certain OnlyOnSkyblock toggles not activating until full server disconnect. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6230)
++ Fixed an error from Enchant Parsing when hovering over a /shown item on Lunar Client. - Luna (https://github.com/hannibal002/SkyHanni/pull/6237)
++ Fixed deployable reminder not detecting deployables when deployable display was turned off. - Avrg (https://github.com/hannibal002/SkyHanni/pull/6224)
 
 ### Technical Details
 
@@ -1070,6 +1083,10 @@
 + Renamed `DelayedRun.runNextTickOld` to `DelayedRun.runNextTickEnd` and better documented the difference. - Luna (https://github.com/hannibal002/SkyHanni/pull/5462)
 + Separated listeners by required island type to avoid unnecessary island checks. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5963)
 + Updated Mixin classes to match latest target names, merged duplicate Mixin classes into one file where appropriate, removed GUI and render subfolders, and added Fabric subfolder for Mixins. - Luna (https://github.com/hannibal002/SkyHanni/pull/6145)
++ Added graph node tags that will be used on Torrhus Canyon. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/6232)
++ Convert ChromaFontManager to object and update all callers. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6221)
++ Extract wrapChatRender logic from mixin into GuiChatHook. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/6221)
++ Mixin Debug is no longer enabled by default in the development environment. - Luna (https://github.com/hannibal002/SkyHanni/pull/6152)
 
 ### Removed Features
 
