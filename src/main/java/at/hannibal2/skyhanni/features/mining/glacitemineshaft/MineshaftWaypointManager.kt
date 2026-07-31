@@ -119,7 +119,7 @@ object MineshaftWaypointManager {
             .forEach {
                 val displayText = it.type.labelColor.getChatColor() + it.type.label(it)
                 event.drawWaypointFilled(it.location, it.type.fillColor(it).toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, displayText, it.type.displayTextScale)
+                event.drawDynamicText(it.location, displayText, it.type.labelScale)
             }
     }
 
