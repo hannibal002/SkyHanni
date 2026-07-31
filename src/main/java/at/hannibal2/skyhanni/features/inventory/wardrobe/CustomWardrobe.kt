@@ -42,7 +42,6 @@ import net.minecraft.world.inventory.ChestMenu
 import java.awt.Color
 import kotlin.math.min
 
-@Suppress("TooManyFunctions")
 object CustomWardrobe {
     val config: CustomWardrobeConfig get() = SkyHanniMod.feature.inventory.customWardrobe
 
