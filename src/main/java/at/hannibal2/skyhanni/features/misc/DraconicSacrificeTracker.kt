@@ -2,27 +2,39 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.recipe.NeuRecipeType
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoinWithBrackets
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatPercentage
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.collection.RenderableCollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.container.VerticalContainerRenderable.Companion.vertical
+import at.hannibal2.skyhanni.utils.renderables.primitives.TextRenderable.Companion.invoke
+import at.hannibal2.skyhanni.utils.renderables.primitives.text
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SessionUptime
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.world.phys.AABB
 
@@ -66,7 +78,7 @@ object DraconicSacrificeTracker {
 
     data class Data(
         @Expose var itemsSacrificed: Long = 0L,
-        @Expose var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf(),
+        @Expose var sacrificedItemsMap: MutableMap<NeuInternalName, Long> = mutableMapOf(),
     ) : ItemTrackerData<SessionUptime.Normal>(SessionUptime.Normal::class) {
         override fun getDescription(timesGained: Long): List<String> {
             val percentage = timesGained.toDouble() / itemsSacrificed
@@ -92,17 +104,63 @@ object DraconicSacrificeTracker {
         addSearchString("§5§lDraconic Sacrifice Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
+        val sacrificedItems = data.sacrificedItemsMap.map { (item, amount) ->
+            val price = item.getAdjustedPrice()
+            Triple(item, amount, -amount * price)
+        }
+        val sacrificedCost = sacrificedItems.sumOf { (_, _, totalCost) -> totalCost }
+
         add(
             Renderable.hoverTips(
                 "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrificed",
-                data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
-            ).toSearchable(),
+                sacrificedItems.map { (item, amount, _) ->
+                    "${item.repoItemName}: §b${amount.addSeparators()}"
+                }
+            ).toSearchable()
+        )
+        add(
+            Renderable.hoverTips(
+                "§6Total Sacrifice Cost: ${sacrificedCost.formatCoinWithBrackets()}",
+                sacrificedItems.map { (item, amount, totalCost) ->
+                    "${item.repoItemName}: §b${amount.addSeparators()} ${totalCost.formatCoinWithBrackets()}"
+                }
+            ).toSearchable()
         )
 
         val duration = data.getTotalUptime()
-        addAll(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice", duration, "Sacrifices"))
+        addAll(
+            tracker.addTotalProfit(
+                profit + sacrificedCost,
+                data.itemsSacrificed,
+                "sacrifice",
+                duration,
+                "Sacrifices"
+            )
+        )
 
         tracker.addPriceFromButton(this)
+    }
+
+    private fun NeuInternalName.getAdjustedPrice(): Double {
+        if (!config.fragmentPrice) return getPrice()
+        val ingredients = NeuItems.getRecipes(this)
+            .firstOrNull { it.recipeType == NeuRecipeType.CRAFTING }
+            ?.ingredients
+            ?: return getPrice()
+
+        val uniqueIngredients = ingredients
+            .groupBy { it.internalName }
+            .mapValues { (_, list) -> list.sumOf { it.count } }
+
+        // Recipe consists solely of one fragment type
+        if (uniqueIngredients.size == 1) {
+            val (ingredient, amount) = uniqueIngredients.entries.first()
+            if ("FRAGMENT" in ingredient.asString()) {
+                return ingredient.getPrice() * amount
+            }
+        }
+
+        return getPrice()
     }
 
     @HandleEvent
@@ -112,9 +170,10 @@ object DraconicSacrificeTracker {
             val amount = group("amount").toInt()
             val item = group("item")
             tracker.addItem(ESSENCE_DRAGON, amount, command = false)
+            val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
             tracker.modify {
                 it.itemsSacrificed += 1
-                it.sacrificedItemsMap.addOrPut(item, 1)
+                it.sacrificedItemsMap.addOrPut(internalName, 1)
             }
         }
 
@@ -144,6 +203,21 @@ object DraconicSacrificeTracker {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
             simpleCallback { tracker.resetCommand() }
+        }
+    }
+
+    @HandleEvent
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.transform(141, "#profile.draconicSacrificeTracker.sacrificedItemsMap") { element ->
+            val oldMap = element.asJsonObject
+            val newMap = JsonObject()
+            for ((displayName, value) in oldMap.entrySet()) {
+                val internalName = displayName
+                    .removeColor()
+                    .toInternalName()
+                newMap.addProperty(internalName.asString(), value.asLong)
+            }
+            newMap
         }
     }
 
