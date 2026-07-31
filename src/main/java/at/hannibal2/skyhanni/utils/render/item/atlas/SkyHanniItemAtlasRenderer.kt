@@ -22,9 +22,8 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
-//? if >= 26.1 {
+//? if >= 26.1
 import net.minecraft.client.renderer.Projection
-//?}
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -34,21 +33,13 @@ internal class SkyHanniItemAtlasRenderer(
     private val depthTexture: GpuTexture,
 ) {
 
-    //? if >= 26.1 {
-    private val projection = Projection()
-    //?}
-
     fun render(
         projectionBuffer: ProjectionMatrixBuffer,
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //? if >= 26.1 {
-        projection.setupOrtho(-1000f, 1000f, size, size, true)
-        val bufferSlice = projectionBuffer.getBuffer(projection)
-        //?} else {
-        /*val bufferSlice = projectionBuffer.getBuffer(size, size)
-        *///?}
+        //~ if < 26.1 'Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView

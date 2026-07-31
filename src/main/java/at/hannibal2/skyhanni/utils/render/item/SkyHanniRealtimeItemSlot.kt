@@ -12,15 +12,10 @@ import net.minecraft.client.renderer.state.gui.BlitRenderState
 import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
-//? if >= 26.1 {
+//? if >= 26.1
 import net.minecraft.client.renderer.Projection
-//?}
 
 internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractItemTexture() {
-
-    //? if >= 26.1 {
-    private val projection = Projection()
-    //?}
 
     init { allocate(slotSize) }
 
@@ -51,12 +46,8 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
         )
 
         val size = slotSize.toFloat()
-        //? if >= 26.1 {
-        projection.setupOrtho(-1000f, 1000f, size, size, true)
-        val bufferSlice = projectionBuffer.getBuffer(projection)
-        //?} else {
-        /*val bufferSlice = projectionBuffer.getBuffer(size, size)
-        *///?}
+        //~ if < 26.1 'Projection().apply{ this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply{ this.setupOrtho(-1000f, 1000f, size, size, true) })
 
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
