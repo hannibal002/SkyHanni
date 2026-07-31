@@ -12,13 +12,18 @@ data class MineshaftWaypoint(
     var isShared: Boolean = false,
 ) {
     val isCorpse get() = corpseType != null
+    val label get() = type.label(this)
+    val labelScale get() = type.labelScale
+    val textDisplay get() = type.labelColor.getChatColor() + label
+    val fillColor get() = type.fillColor(this)
+    val shouldRender get() = type.renderCondition(this)
 
     enum class Type(
         val label: (MineshaftWaypoint) -> String,
         val labelColor: LorenzColor,
         val labelScale: Double = 1.0,
         val fillColor: (MineshaftWaypoint) -> LorenzColor,
-        val renderCondition: () -> Boolean,
+        val renderCondition: (MineshaftWaypoint) -> Boolean,
     ) {
         ENTRANCE(
             label = { "Entrance" },

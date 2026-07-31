@@ -115,10 +115,10 @@ object MineshaftWaypointManager {
     @HandleEvent
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         waypoints
-            .filter { it.type.renderCondition() }
+            .filter { it.shouldRender }
             .forEach {
-                event.drawWaypointFilled(it.location, it.type.fillColor(it).toColor(), seeThroughBlocks = true)
-                event.drawDynamicText(it.location, it.type.labelColor.getChatColor() + it.type.label(it), it.type.labelScale)
+                event.drawWaypointFilled(it.location, it.fillColor.toColor(), seeThroughBlocks = true)
+                event.drawDynamicText(it.location, it.textDisplay, it.labelScale)
             }
     }
 
