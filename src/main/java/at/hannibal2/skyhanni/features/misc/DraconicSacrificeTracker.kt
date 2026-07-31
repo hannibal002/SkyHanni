@@ -138,6 +138,7 @@ object DraconicSacrificeTracker {
         tracker.addPriceFromButton(this)
     }
 
+    // TODO: create getRecipePrice
     private fun NeuInternalName.getAdjustedPrice(priceSource: ItemPriceSource): Double {
         if (!config.fragmentPrice) return getPrice()
         val ingredients = NeuItems.getRecipes(this)
