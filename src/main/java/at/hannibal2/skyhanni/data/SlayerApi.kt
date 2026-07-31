@@ -210,7 +210,7 @@ object SlayerApi {
             }
             cocoonPattern.matches(message) -> {
                 val data = getCurrentData()
-                cocoonTimestamp = SimpleTimeMark.now()
+                cocoonTimestamp = ServerTimeMark.now()
                 data.currentStateRaw = "cocooned"
                 data.currentState = COCOONED
                 SlayerStateChangeEvent(COCOONED).post()
