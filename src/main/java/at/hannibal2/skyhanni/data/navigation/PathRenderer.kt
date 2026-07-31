@@ -254,6 +254,7 @@ class PathRenderer(val path: Graph, private val color: Color, private val target
     companion object {
         private val config get() = SkyHanniMod.feature.misc.navigation.pathfinding
 
+        // TODO fix wrong name
         private fun LorenzVec.calculateEyePos(): LorenzVec {
             return if (config.startFromEye) {
                 this + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)

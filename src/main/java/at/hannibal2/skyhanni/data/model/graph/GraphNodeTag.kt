@@ -161,6 +161,7 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.TORRHUS_CANYON,
     ),
 
+    // TODO fix inconsistent name
     TREE_PROTECTION_ORDER(
         "tree_protection",
         LorenzColor.RED,
@@ -169,6 +170,7 @@ enum class GraphNodeTag(
         onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
     ),
 
+    // TODO fix inconsistent name
     HONEY_HIVE(
         "hive",
         LorenzColor.GOLD,

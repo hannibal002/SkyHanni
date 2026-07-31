@@ -40,7 +40,7 @@ class PathfindConfig {
             "§cOnly in Chat feedback mode.",
     )
     @ConfigEditorDropdown
-    @SearchTag("navigation, pathfind")
+    @SearchTag("navigation pathfind")
     var chatUpdateInterval: UpdateInterval = UpdateInterval.PERFECT
 
     enum class UpdateInterval(private val displayName: String, val duration: Duration) {
@@ -59,5 +59,6 @@ class PathfindConfig {
     @Expose
     @ConfigOption(name = "Start From Eye", desc = "Starts the navigation line from where you are looking instead of your feet.")
     @ConfigEditorBoolean
+    @SearchTag("navigation navigate pathfind")
     var startFromEye: Boolean = true
 }

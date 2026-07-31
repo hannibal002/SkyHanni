@@ -71,6 +71,7 @@ object AttributeShardsData {
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
+    // TODO remove all color codes from all regexes in this file
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
     /**
@@ -296,7 +297,7 @@ object AttributeShardsData {
      */
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You caught an? .+ and gained (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!"
+        "CAPTURE! You caught an? .+ and gained (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
     )
 
     /**
@@ -305,7 +306,7 @@ object AttributeShardsData {
      */
     private val floorDropShardPattern by patternGroup.pattern(
         "floor-drop.shard",
-        "FLOOR DROP! You found (?<shardName>.+) Shard on the ground!"
+        "FLOOR DROP! You found (?<shardName>.+) Shard on the ground!",
     )
 
     /**
@@ -313,7 +314,7 @@ object AttributeShardsData {
      */
     private val givenShardsPattern by patternGroup.pattern(
         "given.shards",
-        "You have been given a (?<shardName>.+)!"
+        "You have been given a (?<shardName>.+)!",
     )
 
     // the boolean is if it should post the shard gain event
