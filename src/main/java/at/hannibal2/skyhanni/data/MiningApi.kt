@@ -81,6 +81,7 @@ object MiningApi {
     // This intentionally uses the old cold icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Cold: §b-1❄
+     * REGEX-TEST: Cold: §b-3❄
      */
     val coldPattern by group.pattern(
         "cold",
