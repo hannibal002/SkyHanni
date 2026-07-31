@@ -576,24 +576,24 @@ object CustomWardrobe {
         }
     }
 
+    // TODO: Make this work outside CustomWardrobe
     fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = ArmorWardrobeApi.currentPage ?: return
-        val screen = MinecraftCompat.screen as? CustomWardrobeScreen ?: return
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
             ArmorWardrobeApi.currentSlot = if (isCurrentSlot()) null else id
-            screen.clickContainerSlot(inventorySlot)
+            InventoryUtils.clickSlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
                 ArmorWardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
-                screen.clickContainerSlot(previousPageSlot)
+                InventoryUtils.clickSlot(previousPageSlot)
             } else if (page > wardrobePage) {
                 ArmorWardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
-                screen.clickContainerSlot(nextPageSlot)
+                InventoryUtils.clickSlot(nextPageSlot)
             }
         }
         update()

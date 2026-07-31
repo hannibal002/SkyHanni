@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.SkyHanniBaseScreen
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.screens.inventory.MenuAccess
 import net.minecraft.client.input.KeyEvent
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -14,10 +15,9 @@ import net.minecraft.world.inventory.ContainerListener
 abstract class AbstractCustomMenuScreen(
     initialMenu: ChestMenu,
     title: Component,
-) : SkyHanniBaseScreen(title), ContainerListener {
+) : SkyHanniBaseScreen(title), ContainerListener, MenuAccess<ChestMenu> {
 
-    var menu: ChestMenu = initialMenu
-        private set
+    private var menu: ChestMenu = initialMenu
 
     init {
         menu.addSlotListener(this)
@@ -29,6 +29,10 @@ abstract class AbstractCustomMenuScreen(
         menu = newMenu
         menu.addSlotListener(this)
         ToolTipData.lastSlot = null
+    }
+
+    override fun getMenu(): ChestMenu {
+        return menu
     }
 
     override fun keyPressed(input: KeyEvent): Boolean {

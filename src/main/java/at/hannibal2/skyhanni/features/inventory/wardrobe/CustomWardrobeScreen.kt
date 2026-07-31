@@ -60,9 +60,4 @@ class CustomWardrobeScreen(
     override fun onMouseClicked(originalMouseX: Int, originalMouseY: Int, mouseButton: Int) {
         CustomWardrobeKeybinds.handlePress()
     }
-
-    fun clickContainerSlot(slot: Int) {
-        InventoryUtils.clickSlot(slot, windowId = menu.containerId)
-        waitingForInventoryUpdate = true
-    }
 }
