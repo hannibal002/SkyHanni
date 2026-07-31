@@ -147,6 +147,7 @@ stonecutter parameters {
             replace("net.minecraft.client.multiplayer.chat.GuiMessage", "net.minecraft.client.GuiMessage")
             replace("net.minecraft.client.multiplayer.chat.GuiMessageTag", "net.minecraft.client.GuiMessageTag")
             replace("net.minecraft.client.renderer.state.gui", "net.minecraft.client.gui.render.state")
+            replace("net/minecraft/client/renderer/state/gui", "net/minecraft/client/gui/render/state")
         }
     }
 

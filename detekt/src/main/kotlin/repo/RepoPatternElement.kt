@@ -17,6 +17,7 @@ class RepoPatternElement private constructor(
     val rawPattern: String,
     val regexTests: List<String>,
     val failingRegexTests: List<String>,
+    val kDocErrors: List<String>,
 ) {
 
     val pattern by lazy { rawPattern.toPattern() }
@@ -31,7 +32,7 @@ class RepoPatternElement private constructor(
     companion object {
         // A sentinel value to indicate that a KtPropertyDelegate has been processed but does not correspond to a valid RepoPatternElement.
         // Must be internal so that it can be accessed from RepoPatternContext.
-        internal val SENTINEL_VALUE = RepoPatternElement("SENTINEL", null, "", emptyList(), emptyList())
+        internal val SENTINEL_VALUE = RepoPatternElement("SENTINEL", null, "", emptyList(), emptyList(), emptyList())
 
         private val wrappedRegexTestPattern = "WRAPPED-REGEX-TEST: \"(?<test>.*)\"".toPattern()
         private val wrappedRegexFailPattern = "WRAPPED-REGEX-FAIL: \"(?<test>.*)\"".toPattern()
@@ -51,8 +52,8 @@ class RepoPatternElement private constructor(
             val parent = parent as? KtProperty ?: return null
             val variableName = parent.name ?: "unknownPattern"
 
-            val (regexTests, failingRegexTests) = findRegexTestInKDoc(parent)
-            return RepoPatternElement(variableName, rawKey, rawPattern, regexTests, failingRegexTests)
+            val (regexTests, failingRegexTests, kDocErrors) = findRegexTestInKDoc(parent)
+            return RepoPatternElement(variableName, rawKey, rawPattern, regexTests, failingRegexTests, kDocErrors)
         }
 
         private fun KtExpression.asPlainStringOrNull(): String? {
@@ -69,11 +70,12 @@ class RepoPatternElement private constructor(
                 .replace("\n", "")
         }
 
-        private fun findRegexTestInKDoc(property: KtProperty): Pair<List<String>, List<String>> {
-            val kDoc = property.docComment ?: return listOf<String>() to listOf()
+        private fun findRegexTestInKDoc(property: KtProperty): Triple<List<String>, List<String>, List<String>> {
+            val kDoc = property.docComment ?: return Triple(emptyList(), emptyList(), emptyList())
 
             val regexTests = mutableListOf<String>()
             val failingRegexTests = mutableListOf<String>()
+            val kDocErrors = mutableListOf<String>()
 
             kDoc.getDefaultSection().getContent().lines().forEach { line ->
                 wrappedRegexTestPattern.matcher(line).let { matcher ->
@@ -90,24 +92,30 @@ class RepoPatternElement private constructor(
                 }
                 if (line.contains("REGEX-TEST: ")) {
                     val test = line.substringAfter("REGEX-TEST: ")
-                    require(test.trim() == test) {
-                        "Plain REGEX-TEST must not contain leading or trailing whitespace. If the whitespace is " +
-                            "intentional, use WRAPPED-REGEX-TEST instead."
+                    if (test.trim() != test) {
+                        kDocErrors.add(
+                            "Plain REGEX-TEST must not contain leading or trailing whitespace. " +
+                                "If the whitespace is intentional, use WRAPPED-REGEX-TEST instead.",
+                        )
+                    } else {
+                        regexTests.add(test)
                     }
-                    regexTests.add(test)
                     return@forEach
                 }
                 if (line.contains("REGEX-FAIL: ")) {
                     val test = line.substringAfter("REGEX-FAIL: ")
-                    require(test.trim() == test) {
-                        "Plain REGEX-FAIL must not contain leading or trailing whitespace. If the whitespace is " +
-                            "intentional, use WRAPPED-REGEX-FAIL instead."
+                    if (test.trim() != test) {
+                        kDocErrors.add(
+                            "Plain REGEX-FAIL must not contain leading or trailing whitespace. " +
+                                "If the whitespace is intentional, use WRAPPED-REGEX-FAIL instead.",
+                        )
+                    } else {
+                        failingRegexTests.add(test)
                     }
-                    failingRegexTests.add(test)
                     return@forEach
                 }
             }
-            return regexTests to failingRegexTests
+            return Triple(regexTests, failingRegexTests, kDocErrors)
         }
     }
 }

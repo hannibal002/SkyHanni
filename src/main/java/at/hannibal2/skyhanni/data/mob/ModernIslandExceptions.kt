@@ -73,4 +73,19 @@ object ModernIslandExceptions {
         else -> null
     }
 
+    internal fun torrhus(
+        baseEntity: LivingEntity,
+        armorStand: ArmorStand?,
+        nextEntity: LivingEntity?,
+    ): MobData.MobResult? = when {
+
+
+        baseEntity is Shulker ->
+            MobData.MobResult.found(
+                Mob(baseEntity, MobCategory.BASIC, name = "Hideonsun"),
+            )
+
+        else -> null
+    }
+
 }
