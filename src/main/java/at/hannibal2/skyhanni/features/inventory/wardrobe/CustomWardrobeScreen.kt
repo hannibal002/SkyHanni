@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.AbstractContainerMenu
 import net.minecraft.world.inventory.ChestMenu
 
-@Suppress("TooManyFunctions", "LongMethod")
 class CustomWardrobeScreen(
     menu: ChestMenu,
     title: Component,

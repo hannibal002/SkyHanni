@@ -608,11 +608,11 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
+    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled && ArmorWardrobeApi.inWardrobe()
+
     private fun centerString(
         text: String,
         scale: Double = 1.0,
         color: Color = Color.WHITE,
     ) = Renderable.text(text, scale, color, horizontalAlign = HorizontalAlignment.CENTER)
-
-    private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 }
