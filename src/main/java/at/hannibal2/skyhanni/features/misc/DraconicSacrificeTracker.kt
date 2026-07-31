@@ -33,22 +33,22 @@ object DraconicSacrificeTracker {
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
     /**
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Old Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
-     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Wise Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     * REGEX-TEST: SACRIFICE! You turned Ender Boots into 3 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Ender Helmet into 3 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Old Dragon Helmet into 25 Dragon Essence!
+     * REGEX-TEST: SACRIFICE! You turned Wise Dragon Helmet into 25 Dragon Essence!
      */
     private val sacrificeLoot by patternGroup.pattern(
-        "sacrifice",
-        "§c§lSACRIFICE! §r§eYou turned §r(?<item>.*) §r§einto §r§d(?<amount>\\d+) Dragon Essence§r§e!",
+        "sacrifice.colorless",
+        "SACRIFICE! You turned (?<item>.*) into (?<amount>\\d+) Dragon Essence!",
     )
 
     /**
-     * REGEX-TEST: §c§lBONUS LOOT! §r§eYou also received §r§817x §r§5Wise Dragon Fragment §r§efrom your sacrifice!
+     * REGEX-TEST: BONUS LOOT! You also received 17x Wise Dragon Fragment from your sacrifice!
      */
     private val bonusLoot by patternGroup.pattern(
-        "bonus",
-        "§c§lBONUS LOOT! §r§eYou also received §r(?:§\\w(?<amount>\\d+)?x)?(?: §r)?(?<item>.*) §r§efrom your sacrifice!",
+        "bonus.colorless",
+        "BONUS LOOT! You also received (?:\\w(?<amount>\\d+)?x)? ?(?<item>.*) from your sacrifice!",
     )
 
     private val tracker =
@@ -106,8 +106,9 @@ object DraconicSacrificeTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        sacrificeLoot.matchMatcher(event.message) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        val msg = event.cleanMessage
+        sacrificeLoot.matchMatcher(msg) {
             val amount = group("amount").toInt()
             val item = group("item")
             tracker.addItem(ESSENCE_DRAGON, amount, command = false)
@@ -117,7 +118,7 @@ object DraconicSacrificeTracker {
             }
         }
 
-        bonusLoot.matchMatcher(event.message) {
+        bonusLoot.matchMatcher(msg) {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
             val internalName = NeuInternalName.fromItemNameOrNull(item) ?: return
@@ -138,7 +139,7 @@ object DraconicSacrificeTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetdraconicsacrificetracker") {
             description = "Resets the Draconic Sacrifice Tracker."
             category = CommandCategory.USERS_RESET
