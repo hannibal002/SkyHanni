@@ -75,7 +75,7 @@ object SlayerApi {
     /**
      * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
      */
-    private val slayerCocoonPattern by patternGroup.pattern(
+    private val cocoonPattern by patternGroup.pattern(
         "cocooned",
         "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
@@ -207,7 +207,7 @@ object SlayerApi {
                     SlayerStateChangeEvent(FAILED).post()
                 }
             }
-            slayerCocoonPattern.matches(message) -> {
+            cocoonPattern.matches(message) -> {
                 val data = getCurrentData()
                 if (data.currentState != COCOONED) {
                     cocoonTimestamp = SimpleTimeMark.now()
@@ -252,6 +252,37 @@ object SlayerApi {
         )
     }
 
+    private fun updateCategory(category: String, lines: List<String>, source: SlayerLinesSource) {
+        if (category == latestCategory) {
+            invalidCategoryUpdates = 0
+            return
+        }
+
+        val tierString = category.substringAfterLast(' ', "")
+        val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
+
+        if (category.isNotEmpty() && parsedTier == null) {
+            invalidCategoryUpdates++
+
+            if (invalidCategoryUpdates >= 2) {
+                ErrorManager.skyHanniError(
+                    "latestCategory does not contain roman number or int: '$category'",
+                    "lines" to lines,
+                    "source" to source.name,
+                )
+            }
+            return
+        }
+
+        invalidCategoryUpdates = 0
+
+        val old = latestCategory
+        latestCategory = category
+        tier = parsedTier ?: 0
+
+        SlayerChangeEvent(old, category).post()
+    }
+
     private fun updateSlayerState() {
         if (ProfileStorageData.profileSpecific == null) return
 
@@ -261,33 +292,7 @@ object SlayerApi {
         val category = parsed?.category.orEmpty()
         val progress = parsed?.progress ?: "no slayer"
 
-        if (category != latestCategory) {
-            val tierString = category.substringAfterLast(' ', "")
-            val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
-
-            if (category.isNotEmpty() && parsedTier == null) {
-                invalidCategoryUpdates++
-
-                if (invalidCategoryUpdates >= 2) {
-                    ErrorManager.skyHanniError(
-                        "latestCategory does not contain roman number or int: '$category'",
-                        "lines" to lines,
-                        "source" to source.name,
-                    )
-                }
-                return
-            }
-
-            invalidCategoryUpdates = 0
-
-            val old = latestCategory
-            latestCategory = category
-            tier = parsedTier ?: 0
-
-            SlayerChangeEvent(old, category).post()
-        } else {
-            invalidCategoryUpdates = 0
-        }
+        updateCategory(category, lines, source)
 
         if (progress != latestProgress) {
             SlayerProgressChangeEvent(latestProgress, progress).post()
