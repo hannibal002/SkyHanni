@@ -343,9 +343,8 @@ object SlayerApi {
     }
 
     private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState = when {
-        // The scoreboard says "Boss slain!" While the boss is cocooned
         // This is 6 seconds instead of 5 seconds just to be safe
-        new.bossSlain() && currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds -> COCOONED
+        currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds && (new.bossSlain() || new.noSlayer()) -> COCOONED
         new.inGrind() -> GRINDING
         new.inBoss() -> BOSS_FIGHT
         old.inBoss() && new.noSlayer() -> FAILED
