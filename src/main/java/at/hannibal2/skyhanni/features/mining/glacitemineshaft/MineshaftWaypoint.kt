@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.corpse.CorpseType
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 
@@ -13,11 +12,6 @@ data class MineshaftWaypoint(
     var isShared: Boolean = false,
 ) {
     val isCorpse get() = corpseType != null
-
-    fun markAsLooted() {
-        if (!isCorpse) ErrorManager.skyHanniError("Attempted to mark non-corpse waypoint as looted.")
-        type = Type.LOOTED_CORPSE
-    }
 
     enum class Type(
         val displayText: (MineshaftWaypoint) -> String,
