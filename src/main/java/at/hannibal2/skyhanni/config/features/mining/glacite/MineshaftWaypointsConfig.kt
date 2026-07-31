@@ -37,31 +37,16 @@ class MineshaftWaypointsConfig {
     companion object {
         @HandleEvent
         private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-            event.move(
-                140,
-                "mining.glaciteMineshaft.mineshaftWaypoints.entranceLocation",
-                "mining.glaciteMineshaft.waypointsConfig.types.entrance",
-            )
-            event.move(
-                140,
-                "mining.glaciteMineshaft.mineshaftWaypoints.ladderLocation",
-                "mining.glaciteMineshaft.waypointsConfig.types.ladder",
-            )
-            event.move(
-                140,
-                "mining.glaciteMineshaft.corpseLocator.enabled",
-                "mining.glaciteMineshaft.waypointsConfig.types.foundCorpse",
-            )
-            event.move(
-                140,
-                "mining.glaciteMineshaft.corpseLocator.autoSendLocation",
-                "mining.glaciteMineshaft.waypointsConfig.autoShareFoundCorpses",
-            )
-            event.move(
-                140,
-                "mining.glaciteMineshaft.shareWaypointLocation",
-                "mining.glaciteMineshaft.waypointsConfig.shareFoundCorpseKeybind",
-            )
+            val basePath = "mining.glaciteMineshaft"
+            event.move(140, "$basePath.mineshaftWaypoints.entranceLocation", "$basePath.waypointsConfig.types.entrance")
+            event.move(140, "$basePath.mineshaftWaypoints.ladderLocation", "$basePath.waypointsConfig.types.ladder")
+            event.move(140, "$basePath.corpseLocator.enabled", "$basePath.waypointsConfig.types.foundCorpse") {
+                event.add(140, "$basePath.waypointsConfig.types.lootedCorpse") { it }
+                it
+            }
+            event.move(140, "$basePath.corpseLocator.autoSendLocation", "$basePath.waypointsConfig.autoShareFoundCorpses")
+            event.move(140, "$basePath.shareWaypointLocation", "$basePath.waypointsConfig.shareFoundCorpseKeybind")
+            event.remove(140, "$basePath.mineshaftWaypoints.enabled")
         }
     }
 }
