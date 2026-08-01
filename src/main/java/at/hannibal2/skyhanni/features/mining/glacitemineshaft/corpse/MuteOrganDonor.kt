@@ -11,24 +11,25 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 object MuteOrganDonor {
 
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft
+    private val isEnabled get() = config.organDonorAccessoryConfig.muteWhenAllFound && config.waypointsConfig.types.foundCorpse
 
     private var allCorpsesFound = false
 
     @HandleEvent(onlyOnIsland = IslandType.MINESHAFT)
-    fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.organDonorAccessoryConfig.muteWhenAllFound || !config.waypointsConfig.types.foundCorpse || !allCorpsesFound) return
+    private fun onPlaySound(event: PlaySoundEvent) {
+        if (!isEnabled || !allCorpsesFound) return
         if (event.soundName == "block.note_block.harp") {
             event.cancel()
         }
     }
 
     @HandleEvent
-    fun onCorpseFound(event: CorpseFoundEvent) {
+    private fun onCorpseFound(event: CorpseFoundEvent) {
         allCorpsesFound = event.isLastCorpse
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         allCorpsesFound = false
     }
 }
