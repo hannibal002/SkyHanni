@@ -26,6 +26,7 @@ data class CustomTodo(
     @Expose var label: String,
     @Expose var timer: Int,
     @Expose var trigger: String,
+    @Expose var antiTrigger: String = "",
     @Expose var icon: String,
     @Expose var isResetOffset: Boolean,
     @Expose var showWhen: Int = 0,
@@ -68,9 +69,9 @@ data class CustomTodo(
         if (triggersLeft > 1 && !this.cronEnabled) {
             this.triggersLeftOnCurrentProfile = triggersLeft - 1
             return
-        } else {
-            this.triggersLeftOnCurrentProfile = this.totalTriggers
         }
+
+        this.triggersLeftOnCurrentProfile = this.totalTriggers
         readyAt[HypixelData.profileName] =
             if (isResetOffset) {
                 val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
@@ -79,6 +80,24 @@ data class CustomTodo(
                 if (this.cronEnabled) now
                 else now + timer.seconds
             }
+        CustomTodos.save()
+    }
+
+    fun antiTriggered() {
+        if (!SkyBlockUtils.inSkyBlock) return
+
+        val profile = HypixelData.profileName
+        val triggersLeft = this.triggersLeftOnCurrentProfile ?: this.totalTriggers
+
+        if (!this.cronEnabled) {
+            if (readyAt[profile]?.isInFuture() == true) {
+                readyAt[profile] = SimpleTimeMark.farPast()
+                this.triggersLeftOnCurrentProfile = 1
+            } else if (triggersLeft < this.totalTriggers) {
+                this.triggersLeftOnCurrentProfile = triggersLeft + 1
+            }
+        }
+
         CustomTodos.save()
     }
 
@@ -125,7 +144,7 @@ data class CustomTodo(
         fun fromTemplate(data: String): CustomTodo {
             return fromTemplateOrNull(data) ?: ErrorManager.skyHanniError(
                 "Invalid todo",
-                "data" to data
+                "data" to data,
             )
         }
     }
@@ -181,12 +200,22 @@ data class CustomTodo(
     }
 
     private var compiledRegex: Regex? = null
+    private var compiledAntiTriggerRegex: Regex? = null
 
     fun getRegex(): Regex? {
         if (this.triggerMatcher != TriggerMatcher.REGEX) return null
         if (compiledRegex != null) return compiledRegex
         val regex = this.trigger.toRegex()
         compiledRegex = regex
+        return regex
+    }
+
+    fun getAntiTriggerRegex(): Regex? {
+        if (this.antiTrigger.isBlank()) return null
+        if (this.triggerMatcher != TriggerMatcher.REGEX) return null
+        if (compiledAntiTriggerRegex != null) return compiledAntiTriggerRegex
+        val regex = this.antiTrigger.toRegex()
+        compiledAntiTriggerRegex = regex
         return regex
     }
 }
