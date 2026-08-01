@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.repoItemName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
@@ -70,7 +70,7 @@ object HuntingBoxValue {
     private fun processAttributeShardSlot(slotNumber: Int, stack: SafeItemStack, table: MutableList<DisplayTableEntry>) {
         val internalName = stack.getInternalNameOrNull() ?: return
 
-        val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getLore()) {
+        val amountOwned = AttributeShardsData.amountOwnedPattern.firstMatcher(stack.getCleanLore()) {
             group("amount").formatInt()
         } ?: return
         totalShards += amountOwned
