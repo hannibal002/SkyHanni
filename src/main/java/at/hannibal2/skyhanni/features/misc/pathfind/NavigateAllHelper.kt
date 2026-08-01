@@ -41,8 +41,8 @@ object NavigateAllHelper {
      * Existing features should be switched to use a more abstract version of this
      * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
      *
-     * As TSP algorithm is so quick, it should be able to recalculate the remaining order
-     * every few targets reached
+     * As TSP algorithm is so quick, in future it should recalculate the remaining order
+     * of nodes every few nodes reached for the most optimal pathing.
      *
      */
     private fun navigateAll(nodeTagType: GraphNodeTag) {

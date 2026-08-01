@@ -109,7 +109,6 @@ object NavigationUtils {
                     val newCost = edge(route[i - 1], route[j], distanceMap) + edge(route[i], route.getOrNull(j + 1), distanceMap)
 
                     if (newCost < oldCost) {
-
                         route.subList(i, j + 1).reverse()
 
                         improved = true
