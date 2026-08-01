@@ -143,9 +143,6 @@
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent fun onMobDeSpawn</ID>
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent(onlyOnSkyblock = true) fun onClickEntity</ID>
     <ID>PrivateEventListener:ActualGemstonePowderDisplay.kt:ActualGemstonePowderDisplay$@HandleEvent(priority = HandleEvent.LOW) fun onChat</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onToolTip</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onInventoryClose</ID>
@@ -209,11 +206,6 @@
     <ID>PrivateEventListener:AttributeOverlay.kt:AttributeOverlay$@HandleEvent fun onRenderItemOverlayPost</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.HIGHEST) fun onShardGain</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.LOWEST) fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:AttributesShardsInventory.kt:AttributesShardsInventory$@HandleEvent(onlyOnSkyblock = true) fun onRenderItemTip</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
@@ -370,9 +362,6 @@
     <ID>PrivateEventListener:CFApi.kt:CFApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onCommandSend</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onConfigFix</ID>
@@ -895,14 +884,6 @@
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onItemAdd</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onScoreboardUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTabUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTablistChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onBlockClick</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:DungeonArchitectFeatures.kt:DungeonArchitectFeatures$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onDungeonEnd</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onWorldChange</ID>
@@ -997,13 +978,6 @@
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun readPestRepellent</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun readSalts</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun readEffects</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent fun onConfigLoad</ID>
@@ -1383,15 +1357,6 @@
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onWidgetUpdate</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN) fun onInventoryClose</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:GardenNextPlotPrice.kt:GardenNextPlotPrice$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent fun onGardenToolChange</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiOpen</ID>
@@ -1569,12 +1534,6 @@
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onKeyPress</ID>
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:GuildApi.kt:GuildApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onAreaChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onArmorChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onEntityClick</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onRenderWorld</ID>
@@ -1629,8 +1588,6 @@
     <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent(priority = HandleEvent.LOWEST) fun onTooltip</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onEntityHealthUpdate</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onParticle</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(IslandChangeEvent::class) fun onIslandChange</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onKeyPress</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent fun onConfigFixEvent</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onMob</ID>
     <ID>PrivateEventListener:HighHeatSound.kt:HighHeatSound$@HandleEvent fun onPlaySound</ID>
@@ -1730,13 +1687,6 @@
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HoppityEggsShared.kt:HoppityEggsShared$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onEggSpawned</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onRabbitFound</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderTop</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onKeyPress</ID>
@@ -1770,7 +1720,6 @@
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onRenderTip</ID>
-    <ID>PrivateEventListener:HuntingBoxValue.kt:HuntingBoxValue$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onRepoReload</ID>
@@ -2008,10 +1957,6 @@
     <ID>PrivateEventListener:LoadoutApi.kt:LoadoutApi$@HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:LoadoutSlotHighlight.kt:LoadoutSlotHighlight$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:LocationFixData.kt:LocationFixData$@HandleEvent(priority = HandleEvent.LOW) fun onRepoReload</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onProfileChange</ID>
     <ID>PrivateEventListener:LowHealthAlert.kt:LowHealthAlert$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onScoreboardChange</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onAccessoryBagUpdate</ID>
@@ -2241,14 +2186,6 @@
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onBlockClick</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onKeyPress</ID>
@@ -2974,12 +2911,6 @@
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryOpen</ID>
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:TabComplete.kt:TabComplete$@HandleEvent fun handleTabComplete</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListFooterUpdate</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListUpdate</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onSkipTablistLine</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent(onlyOnSkyblock = true) fun onRenderOverlayPre</ID>
@@ -3443,6 +3374,268 @@
     <ID>StorageVarOrVal:SuperCraftingConfig.kt:SuperCraftingConfig$@Expose @Accordion @ConfigOption(name = "Presets", desc = "") var presets = SuperCraftPresetsConfig()</ID>
     <ID>StorageVarOrVal:SuperCraftingConfig.kt:SuperCraftingConfig$@Expose @Accordion @ConfigOption(name = "Waste Warning", desc = "") var waste = SuperCraftingWasteConfig()</ID>
     <ID>StorageVarOrVal:SuperCraftingWasteConfig.kt:SuperCraftingWasteConfig$@Expose @Accordion @ConfigOption(name = "Without Cookie", desc = "") var withoutCookie = SuperCraftingWithoutCookieConfig()</ID>
+    <ID>StringShouldBeRawString:AcceptLastPartyInvite.kt:AcceptLastPartyInvite$"§eThe party invite from §r§.(?:\\[.*].)?(?&lt;player&gt;\\S+) §r§ehas expired\\."</ID>
+    <ID>StringShouldBeRawString:AccessoryBagApi.kt:AccessoryBagApi$"Accessory Bag(?: \\(\\d+\\/\\d+\\))?"</ID>
+    <ID>StringShouldBeRawString:ActionBarStatsData.kt:ActionBarStatsData.SKYBLOCK_XP$".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*"</ID>
+    <ID>StringShouldBeRawString:ArachneChatMessageHider.kt:ArachneChatMessageHider$"§c\\[BOSS] Arachne§r§f: (?:The Era of Spiders begins now\\.|Ahhhh\\.\\.\\.A Calling\\.\\.\\.)"</ID>
+    <ID>StringShouldBeRawString:ArmorWardrobeApi.kt:ArmorWardrobeApi$"\\((?&lt;currentPage&gt;\\d+)/\\d+\\) Armor Sets"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"(?:\\(\\d+/\\d+\\) )?Attribute Menu"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"(?:\\(\\d+/\\d+\\) )?Fusion Box"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"(?:\\(\\d+/\\d+\\) )?Hunting Box"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"(?:\\(\\d+/\\d+\\) )?Oddities ➜ Shards"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"§6(?&lt;name&gt;.+?) ?(?&lt;tier&gt;[IVXL]+)? §8\\(\\w+\\)$"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"§a\\+(?&lt;amount&gt;\\d+) (?&lt;attributeName&gt;.+) Attribute §r§7\\(Level (?&lt;level&gt;\\d+)\\) - (?&lt;untilNext&gt;\\d+) more to upgrade!"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"§a\\+(?&lt;amount&gt;\\d+) (?&lt;attributeName&gt;.+) Attribute §r§7\\(Level (?&lt;level&gt;\\d+)\\) §r§a§lMAXED"</ID>
+    <ID>StringShouldBeRawString:AttributeShardsData.kt:AttributeShardsData$"§aand (?&lt;amount&gt;\\d+) more\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:BacteApi.kt:BacteApi$"§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?&lt;name&gt;.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c${SkyblockStat.HEALTH.hypixelIcon} §2﴿"</ID>
+    <ID>StringShouldBeRawString:BazaarApi.kt:BazaarApi$"\\[Bazaar] (?&lt;type&gt;Bought|Buy Order Setup!|Sold|Sell Offer Setup!|Order Flipped!) [\\d,]+x (?&lt;item&gt;.*) for (?&lt;coins&gt;[\\d,.]+) coins.*"</ID>
+    <ID>StringShouldBeRawString:BestiaryData.kt:BestiaryData$"^(?:\\(\\d+\\/\\d+\\) )?(?&lt;title&gt;Bestiary|.+) ➜ .+\$"</ID>
+    <ID>StringShouldBeRawString:BestiaryData.kt:BestiaryData$"§7Overall Progress: §b[\\d.]+%(?: §7\\(§c§lMAX!§7\\))?"</ID>
+    <ID>StringShouldBeRawString:BloodTimer.kt:BloodTimer$"\\[BOSS] The Watcher: Ah, we meet again\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:BloodTimer.kt:BloodTimer$"\\[BOSS] The Watcher: I'm starting to get tired of seeing you around here\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:BloodTimer.kt:BloodTimer$"\\[BOSS] The Watcher: Oh\\.\\. hello\\?"</ID>
+    <ID>StringShouldBeRawString:BloodTimer.kt:BloodTimer$"\\[BOSS] The Watcher: So you made it this far\\.\\.\\. interesting\\."</ID>
+    <ID>StringShouldBeRawString:BroodmotherConfig.kt:BroodmotherConfig$"Send a chat message when the Broodmother enters these stages.\n" + "§cThe 'Alive!' and 'Imminent' stages are overridden by the \"Spawn Alert\" and \"Imminent Warning\" features."</ID>
+    <ID>StringShouldBeRawString:CFApi.kt:CFApi$" \n§7(SkyHanni) §6CF Leaderboard Change§7:\n $message\n "</ID>
+    <ID>StringShouldBeRawString:CFBarnManager.kt:CFBarnManager$"§c§lBARN FULL! §f\\D+ §7got §ccrushed§7! §6\\+(?&lt;amount&gt;[\\d,]+) Chocolate"</ID>
+    <ID>StringShouldBeRawString:CFDataLoader.kt:CFDataLoader$"Rabbit \\S+ - \\[(?&lt;amount&gt;\\d+)].*"</ID>
+    <ID>StringShouldBeRawString:CFDataLoader.kt:CFDataLoader$"§7Purchased slots: §.(?&lt;amount&gt;\\d+)§7\\/§a\\d+"</ID>
+    <ID>StringShouldBeRawString:CFDataLoader.kt:CFDataLoader$"§7What does it do\\? Nobody knows\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:CFStrayRabbitWarningConfig.kt:CFStrayRabbitWarningConfig$"The sound that plays for a special rabbit.\n" + "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" + "§eThen write §bskyhanni:yourfilename\n" + "§cMust be a .ogg file"</ID>
+    <ID>StringShouldBeRawString:CakeCounterFeatures.kt:CakeCounterFeatures$"Couldn't find \"Souls Found\" entity near \"Cakes Eaten\" entity: " + "assuming it doesn't exist"</ID>
+    <ID>StringShouldBeRawString:CakeCounterFeatures.kt:CakeCounterFeatures$"Found \"Souls Found\" entity (from \"Cakes Eaten\" location)"</ID>
+    <ID>StringShouldBeRawString:CakeCounterFeatures.kt:CakeCounterFeatures$"You placed a Cake Counter\\. \\([\\d\\/]+\\)"</ID>
+    <ID>StringShouldBeRawString:CakeCounterFeatures.kt:CakeCounterFeatures$"You removed a Cake Counter\\. \\([\\d\\/]+\\)"</ID>
+    <ID>StringShouldBeRawString:CakeTracker.kt:CakeTracker$"(?:§f§f)?§cNew Year Cake \\(Year (?&lt;year&gt;[\\d,]+)\\)"</ID>
+    <ID>StringShouldBeRawString:CakeTracker.kt:CakeTracker$"Ender Chest \\(\\d{1,2}/\\d{1,2}\\)|.*Backpack(?:§r)? \\(Slot #\\d{1,2}\\)|New Year Cake Bag|(?:Large )?Chest"</ID>
+    <ID>StringShouldBeRawString:CakeTracker.kt:CakeTracker$"§eYou purchased (?:§.)*New Year Cake \\(Year (?&lt;year&gt;[\\d,]+)\\) (?:§.)*for (?:§.)+(?&lt;coins&gt;[\\d,]+) coins(?:§.)+!"</ID>
+    <ID>StringShouldBeRawString:CarnivalFruitDigging.kt:CarnivalFruitDigging$"^(?&lt;name&gt;[A-Za-z ]+)(?: \\(\\+\\d+\\))?$"</ID>
+    <ID>StringShouldBeRawString:CarryTracker.kt:CarryTracker$"Usage:\n" + "§c/shcarry &lt;customer name&gt; &lt;type&gt; &lt;amount requested&gt;\n" + "§c/shcarry &lt;type&gt; &lt;price per&gt;\n" + "§c/shcarry remove &lt;customer name&gt;"</ID>
+    <ID>StringShouldBeRawString:CenturyPartyInvitation.kt:CenturyPartyInvitation$"§8\\[.*]\\+?(?: - \\[.*])? §(?&lt;color&gt;.).*"</ID>
+    <ID>StringShouldBeRawString:CenturyPartyInvitation.kt:CenturyPartyInvitation$"§aYou had already gained the bonus, so\\.\\.\\. at least everyone is now invited!"</ID>
+    <ID>StringShouldBeRawString:CenturyPartyInvitation.kt:CenturyPartyInvitation$"§d§lPARTY! .* SkyBlock level color is .*\\[.*\\] - \\[.*\\] §r§(?&lt;color&gt;.).*§e!"</ID>
+    <ID>StringShouldBeRawString:ChangelogViewer.kt:ChangelogViewer$"(\n[ \t]+)[+\\-*][^+\\-*]"</ID>
+    <ID>StringShouldBeRawString:ChangelogViewer.kt:ChangelogViewer$"[^]]\\(https://github[\\w/.?$&amp;#]*\\)"</ID>
+    <ID>StringShouldBeRawString:ChangelogViewer.kt:ChangelogViewer$"\\*\\*(?&lt;content&gt;.*?)\\*\\*"</ID>
+    <ID>StringShouldBeRawString:ChangelogViewer.kt:ChangelogViewer$"\\[(.+?)]\\(.+?\\)"</ID>
+    <ID>StringShouldBeRawString:ChangelogViewer.kt:ChangelogViewer$"\n[+\\-*][^+\\-*]"</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"(?:§.)*The Frog is exhausted\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"[\\s]*?.*§bFor the best experience, click the text below to enable Snow[\\s]§.*§bParticles in this lobby![\\s]*?.*§3§lClick to enable Snow Particles[\\s]*?"</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§7Request join for Dungeon Hub #(.*)\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§7Request join for Hub (.*)\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§7Sending to server (.*)\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§9§lVERY RARE DROP! {2}§r§7\\(§r§f§r§7\\d+x §r§f§r§9(Glowstone|Blaze Rod|Magma Cream|Nether Wart) Distillate§r§7\\) (.*)"</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§aYou earned §r§[0-9a-f][\\d,]+ (?:GEXP|Event EXP) (?:§r§a\\+ §r§[0-9a-f][\\d,]+ Event EXP )?§r§afrom playing SkyBlock!"</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§c\\s*♨ .* (?:Skin|Rune|Dye) §e(?:for a limited time )?\\(.* §eleft\\)(?:§c|!)"</ID>
+    <ID>StringShouldBeRawString:ChatFilter.kt:ChatFilter$"§e\\[NPC] Jacob§f: §rYour §9Anita's \\w+ §fis giving you §6\\+\\d{1,2}${SkyblockStat.FARMING_FORTUNE.hypixelIcon} .+ Fortune §fduring the contest!"</ID>
+    <ID>StringShouldBeRawString:CommandUtils.kt:CommandUtils$"[a-zA-Z:_\"';]+([:\\-;]\\d+)?"</ID>
+    <ID>StringShouldBeRawString:CompactJacobClaim.kt:CompactJacobClaim$" {3}» (?&lt;crop&gt;[\\w ]+) Contest on (?&lt;season&gt;[\\w ]+) (?&lt;day&gt;\\d+[stndh]{2,3}), Year (?&lt;year&gt;\\d+)"</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"(?:§.)*PERSONAL BEST(?:§.)*: You increased your (?&lt;woodTypeDisplay&gt;(?:§.)*(?&lt;woodType&gt;\\w+)) (?:§.)*Collection by (?&lt;duringContestDisplay&gt;(?:§.)*(?&lt;duringContest&gt;[\\d,]+)) (?:§.)*during the contest! That's (?&lt;aLotMore&gt;(?:§.)*(?&lt;byHowMuch&gt;[\\d,]+)) (?:§.)*more than your previous best!"</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"(?:§.)*\\[NPC] (?&lt;foragingSister&gt;(?:§.)*[\\w ]+)(?:§.)*: (?:§.)*PERSONAL BEST(?:§.)*! You've surpassed your previous record of (?:§.)*§e(?&lt;previousRecord&gt;[\\d,]+) (?:§.)*(?&lt;woodType&gt;[\\S ]+) logs collected in my Contest(?:§.)*!"</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"(?:§.)*\\[NPC] (?&lt;foragingSister&gt;[\\S ]+)(?:§.)*: (?:§.)*Your previous Personal Best was (?&lt;previousBest&gt;(?:§.)*(?&lt;prevBestInt&gt;[\\d,]+))(?:§.)*\\."</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"§eClick to check your personal bests!\n§2Sweep Increase§7: " + "${collectionPB.lastPBSweepIncreaseDisplay}\n" + "§6Collected§7: ${collectionPB.lastPBCollectionIncreaseDuringContestDisplay} " + "${collectionPB.lastPBWoodTypeDisplay} §eLogs\n" + "§6PB Increase: ${collectionPB.lastPBPreviousBestDifferenceDisplay} " + "${collectionPB.lastPBWoodTypeDisplay} §eLogs"</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"§e\\[NPC] (?&lt;foragingSister&gt;[\\S ]+)§f: §rYou earned a total of (?&lt;pointsString&gt;§.(?&lt;pointsInteger&gt;[\\d,]+)) §fpoints!(?&lt;personalBest&gt; That's a new (?:§.)*PERSONAL BEST(?:§.)?!)?"</ID>
+    <ID>StringShouldBeRawString:CompactStarlynSisters.kt:CompactStarlynSisters$"§e\\[NPC] (?&lt;foragingSister&gt;[\\S ]+)§f: §rYou reached the (?&lt;formattingCode&gt;§.)(?:§.)?(?&lt;bracket&gt;\\w+) §fBracket in my contest!"</ID>
+    <ID>StringShouldBeRawString:CompactSweepDetails.kt:CompactSweepDetails$"\\s+(?:§.)+(?&lt;penaltyReason&gt;[\\S ]+): (?&lt;penaltyDisplay&gt;(?:§.)+-(?&lt;penaltyPercent&gt;[\\d,.]+)%) Sweep (?&lt;logsDisplay&gt;(?:§.)?(?&lt;isItGreen&gt;§.)(?&lt;logsAmount&gt;[\\d,.]+)) Logs(?: (?&lt;proTip&gt;(?:§.)+[\\S ]+))?"</ID>
+    <ID>StringShouldBeRawString:CompactSweepDetails.kt:CompactSweepDetails$"\\s+(?:§.)+(?&lt;treeType&gt;[\\S ]+) Tree Toughness: (?&lt;toughnessDisplay&gt;§r§6(?&lt;toughnessAmount&gt;[\\d,.]+)) (?&lt;logsDisplay&gt;(?:§.)+(?&lt;isItGreen&gt;§.)(?&lt;logsAmount&gt;[\\d,.]+)) Logs"</ID>
+    <ID>StringShouldBeRawString:ContestBracket.kt:ContestBracket$"$name \\(Top \\d{1,2}%\\): (?&lt;amount&gt;[\\d,]+)"</ID>
+    <ID>StringShouldBeRawString:CoralFishHelper.kt:CoralFishHelper$"\\(\\d+/\\d+\\) Fish Family"</ID>
+    <ID>StringShouldBeRawString:CorpseFinder.kt:CorpseFinder$"\\s*(?&lt;corpse&gt;\\w+): (?:NOT )?LOOTED\\s*"</ID>
+    <ID>StringShouldBeRawString:CorpseSharing.kt:CorpseSharing$"x: (?&lt;x&gt;-?\\d+), y: (?&lt;y&gt;-?\\d+), z: (?&lt;z&gt;-?\\d+)(?:.+)?"</ID>
+    <ID>StringShouldBeRawString:CroesusChestTracker.kt:CroesusChestTracker$"(?:\\(\\d+/\\d+\\) )?Croesus"</ID>
+    <ID>StringShouldBeRawString:CropFeverTracker.kt:CropFeverTracker$"^(?&lt;rarity&gt;[\\w ]+)! You dropped (?&lt;amount&gt;\\d+)x (?&lt;crop&gt;[\\w ]+)!"</ID>
+    <ID>StringShouldBeRawString:CropUpgrades.kt:CropUpgrades$"\\s+§r§6§lCROP UPGRADE §e(?&lt;crop&gt;[\\w ]+)§7 #(?&lt;tier&gt;\\d)"</ID>
+    <ID>StringShouldBeRawString:CruxTalismanDisplay.kt:CruxTalismanDisplay$".*(?&lt;tier&gt;(?:§.)?[IV1-4-]+)\\s+(?&lt;name&gt;(?:§.)?\\w+)§.:\\s*(?&lt;progress&gt;(?:§.)*MAXED|§.\\d+§./§.\\d+).*"</ID>
+    <ID>StringShouldBeRawString:CrystalNucleusChatFilter.kt:CrystalNucleusChatFilter$"§f *§r§5§l✦ CRYSTAL FOUND §r§7\\((?&lt;count&gt;\\d)§r§7/5§r§7\\)"</ID>
+    <ID>StringShouldBeRawString:CrystalNucleusTracker.kt:CrystalNucleusTracker$"(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?&lt;player&gt;.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?&lt;raritycolor&gt;[65])Bal§r§e!"</ID>
+    <ID>StringShouldBeRawString:CurrentChatDisplay.kt:CurrentChatDisplay$"^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?&lt;player&gt;.*)§r§a for the next 5 minutes\\. Use §r§b\\/chat a§r§a to leave"</ID>
+    <ID>StringShouldBeRawString:DanceRoomHelperConfig.kt:DanceRoomHelperConfig$"Hide Instructions, \"§aIt's happening!\" §7and \"§aKeep it up!\" §7titles."</ID>
+    <ID>StringShouldBeRawString:DarkAuctionItemDisplay.kt:DarkAuctionItemDisplay$"\\[NPC] Sirius: (?:The highest bidder was \\w+ with a bid of [\\d,]+ Coins!|No one made any bids!.*)"</ID>
+    <ID>StringShouldBeRawString:DevConfig.kt:DevConfig$"Change the NTP-Server Address. Default is \"time.google.com\".\n§cONLY CHANGE THIS IF YOU KNOW WHAT YOU'RE DOING!"</ID>
+    <ID>StringShouldBeRawString:DiscordIPCPipeManager.kt:DiscordIPCPipeManager$"\\\\.\\pipe\\discord-ipc-$i"</ID>
+    <ID>StringShouldBeRawString:DojoRankDisplay.kt:DojoRankDisplay$"(?:§\\w)+Your Rank: (?&lt;rank&gt;§\\w.) §8\\((?&lt;score&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:DonExpressoFeedingReminder.kt:DonExpressoFeedingReminder$"\\[NPC] Don Expresso: I DON'T FEEL SO GOOD\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:DragonFeatures.kt:DragonFeatures$"§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)"</ID>
+    <ID>StringShouldBeRawString:DragonFeatures.kt:DragonFeatures$"§f +§r§.§l(?&lt;position&gt;\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?&lt;name&gt;.*)§r§. §r§7- §r§e(?&lt;damage&gt;[\\d.,]+)"</ID>
+    <ID>StringShouldBeRawString:DragonFeatures.kt:DragonFeatures$"§f +§r§eYour Damage: §r§a(?&lt;damage&gt;[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?&lt;position&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:DungeonApi.kt:DungeonApi$"^(?&lt;sbLevel&gt;\\[\\d+]) (?&lt;rank&gt;\\[[^]]+])? ?(?&lt;playerName&gt;\\S+)\\s?(?&lt;symbols&gt;[^(]*) \\((?:(?&lt;className&gt;\\S+) (?&lt;classLevel&gt;[CLXVI0]+)|(?&lt;playerDead&gt;DEAD))\\)\$"</ID>
+    <ID>StringShouldBeRawString:DungeonApi.kt:DungeonApi$"§7\\d+/\\d+/\\d+ §\\w+ (?&lt;roomId&gt;[\\w,-]+)"</ID>
+    <ID>StringShouldBeRawString:DungeonBossApi.kt:DungeonBossApi$"§.(?&lt;playerName&gt;\\w+)§r§a (?:activated|completed) a (?&lt;type&gt;lever|terminal|device)! \\(§r§c(?&lt;currentTerminal&gt;\\d)§r§a/(?&lt;total&gt;\\d)\\)"</ID>
+    <ID>StringShouldBeRawString:DungeonBossApi.kt:DungeonBossApi$"§4\\[BOSS] Necron§r§c: §r§cAll this, for nothing\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:DungeonBossApi.kt:DungeonBossApi$"§c\\[BOSS] Sadan§r§f: So you made it all the way here\\.\\.\\. Now you wish to defy me\\? Sadan\\?!"</ID>
+    <ID>StringShouldBeRawString:DungeonBossApi.kt:DungeonBossApi$"§c\\[BOSS] Sadan§r§f: You did it\\. I understand now, you have earned my respect\\."</ID>
+    <ID>StringShouldBeRawString:DungeonFinderFeatures.kt:DungeonFinderFeatures$" (?&lt;playerName&gt;.*): (?&lt;className&gt;.*?) \\(.*?(?&lt;level&gt;\\d+).*?\\)"</ID>
+    <ID>StringShouldBeRawString:DungeonHighlightClickedBlocks.kt:DungeonHighlightClickedBlocks$"§cYou hear the sound of something opening\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:EffectApi.kt:EffectApi$"(?: +)?Repellent: (?&lt;tier&gt;\\w+)?(?: \\((?&lt;time&gt;[dhms0-9 ]+)\\))?"</ID>
+    <ID>StringShouldBeRawString:EffectApi.kt:EffectApi$"(?:\\(\\d+/\\d+\\) )?Active Effects"</ID>
+    <ID>StringShouldBeRawString:ElectionApi.kt:ElectionApi$"§eThe election room is now closed\\. Clerk Seraphine is doing a final count of the votes\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:EliteDevApi.kt:EliteDevApi$"Error loading user farming weight\n" + "§eLoading the farming weight data from $ELITE_DOMAIN failed!\n" + "§eYou can re-enter the garden to try to fix the problem.\n" + "§cIf this message repeats, please report it on Discord"</ID>
+    <ID>StringShouldBeRawString:EntityMovementData.kt:EntityMovementData$"§7(?:Warping|Warping you to your SkyBlock island|Warping using transfer token|Finding player|Sending a visit request)\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:EquipmentWardrobeApi.kt:EquipmentWardrobeApi$"\\((?&lt;currentPage&gt;\\d+)/\\d+\\) Equipment Sets"</ID>
+    <ID>StringShouldBeRawString:ErrorManager.kt:ErrorManager$"error message in main screen: \n \n \n \n $it"</ID>
+    <ID>StringShouldBeRawString:ErrorManager.kt:ErrorManager$errorMessages[randomId] = "```\n$label: $rawMessage\n \n$stackTrace\n$extraDataString```"</ID>
+    <ID>StringShouldBeRawString:ErrorManager.kt:ErrorManager$fullErrorMessages[randomId] = "```\n$label: $rawMessage\n(full stack trace)\n \n$fullStackTrace\n$extraDataString```"</ID>
+    <ID>StringShouldBeRawString:ExperimentationTableApi.kt:ExperimentationTableApi$"(?:§.)*(?&lt;amount&gt;(?:\\d+|\\d+,\\d+)[MBk]?) Enchanting Exp"</ID>
+    <ID>StringShouldBeRawString:ExperimentationTableApi.kt:ExperimentationTableApi$"§8 \\+(?:§.| )*(?:\\[Lvl \\d+] )?(?&lt;reward&gt;.*?)(?=\\s\\((?:Stakes|Pairs)\\)|\$)(?:\\s\\((?:Stakes|Pairs)\\))?"</ID>
+    <ID>StringShouldBeRawString:ExperimentationTableApi.kt:ExperimentationTableApi$"☕ You bought a bonus charge for the Experimentation Table! \\((?&lt;current&gt;\\d)/3\\)"</ID>
+    <ID>StringShouldBeRawString:FannCost.kt:FannCost$"(?:§.)+(?&lt;coins&gt;[^ ]+) Coins(?: (?:§.)+\\((?&lt;percentOff&gt;[\\d.]+)% off\\))?"</ID>
+    <ID>StringShouldBeRawString:FannCost.kt:FannCost$"(?:§.)+EXP Per Day: (?:§.)+(?&lt;expDaily&gt;\\d[\\d,]*)(?: (?:§.)+\\(\\+(?&lt;extraPercent&gt;[\\d.]+)%\\))?"</ID>
+    <ID>StringShouldBeRawString:FarmingContestApi.kt:FarmingContestApi$"(?:\\(\\d+/\\d+\\) )?Your Contests"</ID>
+    <ID>StringShouldBeRawString:FarmingFortuneDisplay.kt:FarmingFortuneDisplay$"^§7Farming Fortune: §6\\+(?&lt;display&gt;[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?&lt;reforge&gt;\\d+)\\))?(?: §d\\(\\+(?&lt;gemstone&gt;\\d+)\\))?\$"</ID>
+    <ID>StringShouldBeRawString:FarmingPersonalBestGain.kt:FarmingPersonalBestGain$"\\[NPC] Jacob: Your previous Personal Best was (?&lt;collected&gt;[\\d,]+)\\."</ID>
+    <ID>StringShouldBeRawString:FishingHookDisplay.kt:FishingHookDisplay$"§e§l(\\d+(\\.\\d+)?)"</ID>
+    <ID>StringShouldBeRawString:ForagingTrackerLegacy.kt:ForagingTrackerLegacy$" *(?:§.)*§r(?&lt;item&gt;.*) §r§8\\((?:§.)+(?&lt;percentage&gt;[\\d.]+)%(?:§.)+\\)"</ID>
+    <ID>StringShouldBeRawString:ForagingTrackerLegacy.kt:ForagingTrackerLegacy$"(?:§.)* *(?:§.)+\\+(?&lt;count&gt;[\\d,]+) rewards gained!(?: (?:§.)+\\(hover\\))?"</ID>
+    <ID>StringShouldBeRawString:ForagingTrackerLegacy.kt:ForagingTrackerLegacy$"(?:§.)*(?&lt;item&gt;[^§\\s](?:[^§]*[^§\\s])?)(?:§.)*\\s*(?:§.)*§8\\s*x?(?:(?:0-)?(?&lt;amount&gt;[\\d,]+)|\\((?:§.)*(?&lt;percentage&gt;[\\d.]+)%(?:§.)*\\))"</ID>
+    <ID>StringShouldBeRawString:GardenLevelDisplay.kt:GardenLevelDisplay$" \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" + " §8+§aRespect from Elite Farmers and SkyHanni members :)\n "</ID>
+    <ID>StringShouldBeRawString:GardenPlotApi.kt:GardenPlotApi$"Spray: (?&lt;spray&gt;[\\w\\s]+)(?:\\((?&lt;time&gt;.*)\\))?"</ID>
+    <ID>StringShouldBeRawString:GardenVisitorCompactChat.kt:GardenVisitorCompactChat$"^ {4}(?:(?:§.)+\\+)?(?:(?&lt;amountcolor&gt;§.)(?&lt;amount&gt;[\\d,]+(?:\\.?(?:\\d)?k)?)x? )?(?:(?&lt;rewardcolor&gt;(?:§.)+)?(?&lt;reward&gt;.*?))(?: (?:(?:§.)?)?x(?&lt;altamount&gt;\\d+))?\$"</ID>
+    <ID>StringShouldBeRawString:GhostTracker.kt:GhostTracker$"RARE DROP! (?&lt;item&gt;.+) \\(\\+(?&lt;mf&gt;\\d+)%? ${SkyblockStat.MAGIC_FIND.hypixelIcon} Magic Find\\)"</ID>
+    <ID>StringShouldBeRawString:GhostTracker.kt:GhostTracker$"\\s*Ghost (?&lt;level&gt;\\d+|[XVI]+): (?&lt;kills&gt;[\\d,.]+)\\/(?&lt;killsToNext&gt;[\\d,.]+)"</ID>
+    <ID>StringShouldBeRawString:GiftProfitTracker.kt:GiftProfitTracker$"§.§l.*! §r§.\\+(?&lt;amount&gt;[\\d,]+) (?&lt;skill&gt;[\\w ]+) XP §r§egift with §r.*"</ID>
+    <ID>StringShouldBeRawString:GiftProfitTracker.kt:GiftProfitTracker$"§eUsage:\n§6/shaddusedgifts §e&lt;§6giftType§7: white,red,green,party§e&gt; &lt;§6amount§e&gt;\n" + "§eExample: §6/shaddusedgifts white 10\n§eIf no amount is specified, 1 is assumed."</ID>
+    <ID>StringShouldBeRawString:GoldenFishTimer.kt:GoldenFishTimer$"§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:GraphEditorIO.kt:GraphEditorIO$"§lStats\n" + "§eNamed Nodes: $namedNodes\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length"</ID>
+    <ID>StringShouldBeRawString:GriffinBurrowHelper.kt:GriffinBurrowHelper$"§eYou (?&lt;type&gt;finished the Griffin burrow chain!|dug out a Griffin Burrow!) §r§7\\((?&lt;current&gt;\\d+)/(?&lt;max&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:GriffinBurrowParticleFinder.kt:GriffinBurrowParticleFinder$"§eYou finished the Griffin burrow chain! §r§7\\(\\d+/\\d+\\)"</ID>
+    <ID>StringShouldBeRawString:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$"^(?:(?:§.)+You found a Candy Basket! (?:(?:§.)+\\((?:§.)+(?&lt;current&gt;\\d+)(?:§.)+/(?:§.)+(?&lt;max&gt;\\d+)(?:§.)+\\))?|(?:§.)+You already found this Candy Basket!)\$"</ID>
+    <ID>StringShouldBeRawString:HighlightPlaceableNpcs.kt:HighlightPlaceableNpcs$"§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"</ID>
+    <ID>StringShouldBeRawString:HoppityCallWarningConfig.kt:HoppityCallWarningConfig$"The sound that plays when hoppity calls.\n" + "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" + "§eThen write §bskyhanni:yourfilename\n" + "§cMust be a .ogg file"</ID>
+    <ID>StringShouldBeRawString:HoppityChatConfig.kt:HoppityChatConfig$"Show a summary message instead of individual messages for Hitman \"Claim All\"-s including this many eggs or more.\n" + "§eSet to 29 to disable.\n" + "§cRequires Compact Chat enabled to work."</ID>
+    <ID>StringShouldBeRawString:HoppityCollectionStats.kt:HoppityCollectionStats$"(?:\\((?&lt;page&gt;\\d+)/(?&lt;maxPage&gt;\\d+)\\) )?Hoppity's Collection"</ID>
+    <ID>StringShouldBeRawString:HoppityCollectionStats.kt:HoppityCollectionStats$"\\s+(?&lt;current&gt;\\d+)/(?&lt;total&gt;\\d+)"</ID>
+    <ID>StringShouldBeRawString:HoppityEggsShared.kt:HoppityEggsShared$".*\\[SkyHanni] (?&lt;meal&gt;\\w+) Chocolate Egg located at x: (?&lt;x&gt;-?\\d+), y: (?&lt;y&gt;-?\\d+), z: (?&lt;z&gt;-?\\d+)(?: \\((?&lt;note&gt;.*)\\))?"</ID>
+    <ID>StringShouldBeRawString:HoppityEventSummaryConfig.kt:HoppityEventSummaryConfig.HoppityStat.STRAY_RABBITS$"§7Stray Rabbits: §f20\n §f10 §7- §a6 §7- §93 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+8,000,000 Chocolate\n §4* §c§oRequires Stray Tracker being enabled to work§4§o."</ID>
+    <ID>StringShouldBeRawString:HoppityLiveDisplay.kt:HoppityLiveDisplay$"(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman"</ID>
+    <ID>StringShouldBeRawString:HotmData.kt:HotmData.Companion$"\\s*(?&lt;type&gt;\\w+): (?&lt;amount&gt;[\\d,.]+)"</ID>
+    <ID>StringShouldBeRawString:HypixelData.kt:HypixelData$"\\s+§.✌ §.\\(§.(?&lt;currentamount&gt;\\d+)(?:§.)?/(?&lt;maxamount&gt;\\d+)(?:§.)?\\)"</ID>
+    <ID>StringShouldBeRawString:InGameDateConfig.kt:InGameDateConfig$"Change the time in seconds you would like to refresh the In-Game Date Display.\n" + "§eNOTE: If \"Use Scoreboard for Date\" is enabled, this setting is ignored."</ID>
+    <ID>StringShouldBeRawString:ItemAbilityCooldown.kt:ItemAbilityCooldown$".*§b-\\d+ Mana \\(§6(?&lt;type&gt;.*)§b\\).*"</ID>
+    <ID>StringShouldBeRawString:KuudraApi.kt:KuudraApi$" §7⏣ §cKuudra's Hollow §8\\(T(?&lt;tier&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:LoadoutApi.kt:LoadoutApi$"\\((?&lt;currentPage&gt;\\d+)/\\d+\\) Loadouts"</ID>
+    <ID>StringShouldBeRawString:LogBookStats.kt:LogBookStats$"(?:\\(\\d+/\\d+\\) )?Visitor's Logbook"</ID>
+    <ID>StringShouldBeRawString:MagicalPowerDisplay.kt:MagicalPowerDisplay$"Your contacts: (?&lt;contacts&gt;\\d+)\\/\\d+"</ID>
+    <ID>StringShouldBeRawString:MagicalPowerDisplay.kt:MagicalPowerDisplay$"^(?:Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$"</ID>
+    <ID>StringShouldBeRawString:MaxwellApi.kt:MaxwellApi$"(?:\\(\\d/\\d\\) )?Accessory Bag Thaumaturgy"</ID>
+    <ID>StringShouldBeRawString:MinecraftConsoleFilter.kt:MinecraftConsoleFilter$"Biome ID is out of bounds: (\\d+), defaulting to 0 \\(Ocean\\)"</ID>
+    <ID>StringShouldBeRawString:MobDetection.kt:MobDetection$"`${retry.entity.name.formattedTextCompatLessResets()}`${retry.entity.id} missed {\n " + "is already Found: ${MobData.entityToMob[retry.entity] != null})." + "\n Position: ${retry.entity.getLorenzVec()}\n " + "DistanceC: ${ entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation()) }\n" + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " + "}"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"(?:\\[Lv(?&lt;level&gt;\\d+)\\] )?"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"(?:\\[\\w+(?&lt;level&gt;\\d+)] )?.. (?:(?:a(?=a ))?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerrya?)) \\d+ Hits"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"(?&lt;mobType&gt;[^\\w\\s✯\\-]+ )?"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"^$level$mobType(?:(?&lt;star&gt;✯)\\s)?(?:(?&lt;attribute&gt;${DungeonAttribute.toRegexLine})\\s)?(?:\\[[\\w\\d]+\\]\\s)?(?&lt;name&gt;[^ᛤ]+)(?: ᛤ)?\\s[^\\s]+$"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"^. $level$mobType(?&lt;name&gt;[^ᛤ\n]*?)(?: ᛤ)?(?: [\\d\\/BMk.,${SkyblockStat.HEALTH.hypixelIcon}]+| █+)? .$"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"^\\[\\w+ (?&lt;level&gt;\\d+)\\] (?&lt;name&gt;.*)"</ID>
+    <ID>StringShouldBeRawString:MobFilter.kt:MobFilter$"§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c${SkyblockStat.HEALTH.hypixelIcon}"</ID>
+    <ID>StringShouldBeRawString:MouseSensitivityReducer.kt:MouseSensitivityReducer$"(?&lt;plot&gt;Warping\\.\\.\\.)"</ID>
+    <ID>StringShouldBeRawString:NavigationHelper.kt:NavigationHelper$"Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"</ID>
+    <ID>StringShouldBeRawString:NeuItems.kt:NeuItems$"(?i)(?:§.)+\\[lvl (?:\\d+➡\\d+|\\{lvl})\\] "</ID>
+    <ID>StringShouldBeRawString:PabloHelper.kt:PabloHelper$"\\[NPC] Pablo: (?:✆ )?Are you available\\? I desperately need an? (?&lt;flower&gt;[\\w ]+) today\\."</ID>
+    <ID>StringShouldBeRawString:PabloHelper.kt:PabloHelper$"\\[NPC] Pablo: (?:✆ )?Could you bring me an? (?&lt;flower&gt;[\\w ]+)\\?"</ID>
+    <ID>StringShouldBeRawString:PabloHelper.kt:PabloHelper$"\\[NPC] Pablo: (?:✆ )?I really need an? (?&lt;flower&gt;[\\w ]+) today, do you have one you could spare\\?"</ID>
+    <ID>StringShouldBeRawString:PartyApi.kt:PartyApi$"§6Party Members \\(\\d+\\)"</ID>
+    <ID>StringShouldBeRawString:PartyApi.kt:PartyApi$"§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)"</ID>
+    <ID>StringShouldBeRawString:PartyApi.kt:PartyApi$"§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)"</ID>
+    <ID>StringShouldBeRawString:PestProfitTracker.kt:PestProfitTracker$"§6§l(?:RARE|PET) DROP! (?:§r)?(?&lt;item&gt;.+?)(?: §8x(?&lt;amount&gt;\\d+))? (?:§.)*\\((?:§.)?(?:\\+[\\d.,]+[${FARMING_FORTUNE.hypixelIcon}${OVERBLOOM.hypixelIcon}]|Cocoaleech)\\)"</ID>
+    <ID>StringShouldBeRawString:PestSpawnTimer.kt:PestSpawnTimer$"\\sCooldown: (?&lt;time&gt;\\d{1,2}[ms](?: \\d{1,2}s?)?)?(?&lt;ready&gt;READY)?(?&lt;maxPests&gt;MAX PESTS)?.*"</ID>
+    <ID>StringShouldBeRawString:PetNametag.kt:PetNametag$"(?&lt;start&gt;§8\\[§7Lv(?&lt;lvl&gt;\\d+)§8]) (?&lt;rarity&gt;§.)(?&lt;pet&gt;[\\w\\s]+)(?&lt;skin&gt;§. ✦)?"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$" (?:(?&lt;max&gt;MAX LEVEL)|(?:\\+)?(?&lt;current&gt;[\\d,.kM]+)(?:(?:|\\/)*(?&lt;next&gt;[\\d,.kM]+))? XP(?: \\((?&lt;percentage&gt;[\\d.]+)%\\))?)"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$" \\[Lvl (?&lt;level&gt;[\\d,]+)] (?:\\[\\d+(?&lt;altskin&gt;✦)\\] )?(?&lt;pet&gt;[\\w -]+?)(?:(?&lt;skin&gt; ✦))?$"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$"(?:\\(\\d+\\/\\d+\\) )?Pets(?:: \"(?&lt;search&gt;.*)\")?(?: \\(\\d+\\/\\d+\\))? ?"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$"(?:▸| )*(?&lt;current&gt;[\\d,.kM]+)(?: XP|(?:\\/)*(?&lt;next&gt;[\\d,.kM]+))"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$"Autopet equipped your \\[Lvl (?&lt;level&gt;\\d+)] (?:\\[\\d+(?&lt;altskin&gt;✦)\\] )?(?&lt;pet&gt;[\\w -]+)(?&lt;skin&gt; ✦)?! VIEW RULE"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$"\\[Lvl (?&lt;level&gt;[\\d,]+)] (?:\\[\\d+(?&lt;altskin&gt;✦)] )?(?&lt;pet&gt;[\\w -]+?)(?&lt;skin&gt; ✦)?"</ID>
+    <ID>StringShouldBeRawString:PetStoragePatterns.kt:PetStoragePatterns$"§cAutopet §eequipped your §7\\[Lvl (?&lt;level&gt;\\d+)] §(?&lt;rarity&gt;.)(?:\\[(?:§.)*\\d+(?:§.)*(?&lt;altskin&gt;✦)(?:§.)*] (?:§.)*)?(?&lt;pet&gt;[^§!]+?)(?&lt;skin&gt;§. ✦)?§e! §a§lVIEW RULE(?: \\(\\d+\\))?"</ID>
+    <ID>StringShouldBeRawString:PlayerChatManager.kt:PlayerChatManager$"(?&lt;prefix&gt;.*?)(?&lt;privateIslandRank&gt;§.\\[(?!MVP(?:§.\\++)?§.]|VIP\\+*|YOU§.TUBE|ADMIN|MOD|GM)[^]]+\\]) (?&lt;suffix&gt;.*)"</ID>
+    <ID>StringShouldBeRawString:PlayerChatManager.kt:PlayerChatManager$"^(?!From stash: )(?&lt;direction&gt;From|To) (?&lt;rank&gt;\\[[ዞ\\w+]+\\] )?(?&lt;author&gt;[^:]*): (?&lt;message&gt;.*)"</ID>
+    <ID>StringShouldBeRawString:PlayerChatManager.kt:PlayerChatManager$"^(?:\\[(?&lt;level&gt;\\d+)] )?(?&lt;author&gt;(?:[^ ] )?(?:(?:§.)?\\[[^\\]]+\\] )?[^ ]+?)(?&lt;chatColor&gt;§f|§7|): (?&lt;message&gt;.*)\$"</ID>
+    <ID>StringShouldBeRawString:PlayerChatModifier.kt:PlayerChatModifier$"§[ab6]\\[(?:VIP|MVP)(?:§.|\\+)*] {1,2}(?:§[7ab6])?(\\w{2,16})"</ID>
+    <ID>StringShouldBeRawString:PresentWaypoints.kt:PresentWaypoints$"§aYou found a.*present! §r§e\\(§r§b\\d+§r§e/§r§b\\d+§r§e\\)"</ID>
+    <ID>StringShouldBeRawString:PunchcardHighlight.kt:PunchcardHighlight$"§c§lAWKWARD! §r§cThis player has already been punched by you\\.\\.\\. somehow!"</ID>
+    <ID>StringShouldBeRawString:PurseApi.kt:PurseApi$"(?:§.)*(?:Piggy|Purse): §6(?&lt;coins&gt;[\\d,.]+)(?: ?(?:§.)*\\([+-](?&lt;earned&gt;[\\d,.]+)\\)?|.*)?$"</ID>
+    <ID>StringShouldBeRawString:QuiverApi.kt:QuiverApi$"Active Arrow: (?&lt;type&gt;.*) \\((?&lt;amount&gt;[\\d,]+)\\)"</ID>
+    <ID>StringShouldBeRawString:RabbitFoundEvent.kt:RabbitFoundEvent$"§fType§7: ${eggType.coloredName}\n§fDuplicate§7: §b$duplicate\n§fRabbit§7: $rabbitName\n§fChoc Gained§7: §6$chocGained"</ID>
+    <ID>StringShouldBeRawString:RareDropMessages.kt:RareDropMessages$"RARE DROP! Enchanted Book(?: \\(\\+\\d+%? ${MAGIC_FIND.hypixelIcon} Magic Find\\))?.*"</ID>
+    <ID>StringShouldBeRawString:RemainingSlayerKills.kt:RemainingSlayerKills$"\\((?&lt;current&gt;[\\d,.]+[kmb]?)\\/(?&lt;max&gt;[\\d,.]+[kmb]?)\\) .*"</ID>
+    <ID>StringShouldBeRawString:RemainingSlayerKills.kt:RemainingSlayerKills$"\\+\\d+ Kill Combo \\+(?&lt;wisdom&gt;\\d+)☯ Combat Wisdom"</ID>
+    <ID>StringShouldBeRawString:ReplaceRomanNumerals.kt:ReplaceRomanNumerals$"((§\\w)|(\\s+)|(\\W))+|(\\w*)"</ID>
+    <ID>StringShouldBeRawString:RiftGunthersRace.kt:RiftGunthersRace$"§3§lRIFT RACING §r§eRace finished in (?:§.)*\\d+:\\d+.\\d+(?:§.)*!.*"</ID>
+    <ID>StringShouldBeRawString:SackApi.kt:SackApi$" (?:§.)?(?&lt;quality&gt;[A-z]*): §[0-9a-f](?&lt;stored&gt;\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"</ID>
+    <ID>StringShouldBeRawString:SackDisplayConfig.kt:SackDisplayConfig$"Either show Default, Formatted or Unformatted numbers.\n" + "§eDefault: §72,240/2.2k\n" + "§eFormatted: §72.2k/2.2k\n" + "§eUnformatted: §72,240/2,200"</ID>
+    <ID>StringShouldBeRawString:ScoreboardElementMayor.kt:ScoreboardElementMayor$"§2Diana §7(§e4d 12h§7)\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"</ID>
+    <ID>StringShouldBeRawString:ScoreboardElementParty.kt:ScoreboardElementParty$"§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fEmpa_\n §7- §fSkirtwearer"</ID>
+    <ID>StringShouldBeRawString:ScoreboardElementPowder.kt:ScoreboardElementPowder$"§9§lPowder\n §7- §fMithril: §254,646\n §7- §fGemstone: §d51,234\n §7- §fGlacite: §b86,574"</ID>
+    <ID>StringShouldBeRawString:ScoreboardEventMagmaBoss.kt:ScoreboardEventMagmaBoss$"§7(All Magma Boss Lines)\n§7Boss: §c0%\n§7Damage Soaked:\n§e▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎▎§7▎▎▎▎▎"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"(?:§.)*(?&lt;classAbbv&gt;\\[\\w]) (?:§.)*(?&lt;username&gt;\\w{2,16}) (?:(?:§.)*(?&lt;classLevel&gt;\\[Lvl?(?&lt;level&gt;[\\w,.]+)?]?)|(?:§(?&lt;color&gt;.))*(?&lt;health&gt;[\\w,.]+)(?:§.)*.?)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"(?:§.)*Cleared: (?:§.)*(?&lt;percent&gt;[\\w,.]+)% (?:§.)*\\((?:§.)*(?&lt;score&gt;[\\w,.]+)(?:§.)*\\)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"(?:§.)*Wave: (?:§.)*\\d+(?:§.)*(?: §.- §.\\d+:\\d+)?"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"(?:§f)?Accuracy: §.\\d+(?:\\.\\d+)?%"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"Protestors handled: §b\\d+\\/\\d+"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"Tickets: §a\\d+ §7\\(\\d+(?:\\.\\d)?%\\)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"Your kills: §c\\d+ ☠(?: §a\\(\\+\\d+\\))?"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"\\s*(?:§.|[⋖⋗≈])+\\s*(?:§.|[⋖⋗≈])*\\s*"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"\\s*.*Essence: §.(?&lt;essence&gt;-?\\d+(?::?,\\d{3})*(?:\\.\\d+)?)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"\\s*Big damage in: §d[\\w\\s]+"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"\\s*§7\\d+:\\d+(?:am|pm)\\s*(?&lt;symbol&gt;§b☽|§e☀|§.⚡|§.☔)?.*"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"\\s*§a✌ §7\\(§.\\d+(?:§.)?/\\d+(?:§.)?\\)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"^(?:§.)*Sowdust: (?:§.)*[\\d,.kKmMbB]+ §7\\(\\+[\\d.kKmMbB]+\\)"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"§7Waiting for|§7your vote\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"§cNo Alive Dragons|§8- (?:§.)+[\\w\\s]+Dragon§a [\\w,.]+(?:§.${SkyblockStat.HEALTH.hypixelIcon})?"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King|§eBring items to Moby| Glowing Mushroom §8x\\d"</ID>
+    <ID>StringShouldBeRawString:ScoreboardPattern.kt:ScoreboardPattern$"§eProtect Elle §7\\(§.\\d+%§7\\)|\\s*§.\\(§.[\\w,.]+§.\\/§.[\\w,.]+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔]"</ID>
+    <ID>StringShouldBeRawString:ShortenCoins.kt:ShortenCoins$"(?&lt;amount&gt;\\d[\\d,.]+)(?![\\d.,kMB]) "</ID>
+    <ID>StringShouldBeRawString:ShowMotesNpcSellPrice.kt:ShowMotesNpcSellPrice$".*(?:§\\w)+You have (?:§\\w)+(?&lt;amount&gt;\\d) Grubber Stacks.*"</ID>
+    <ID>StringShouldBeRawString:SkillApi.kt:SkillApi$" (?&lt;type&gt;\\w+)(?: (?&lt;level&gt;\\d+))?: (?&lt;current&gt;[0-9,.]+)/(?&lt;needed&gt;[\\d,.]+[kMB]?+)"</ID>
+    <ID>StringShouldBeRawString:SkillApi.kt:SkillApi$"(?:COMMON|RARE|SWEET|SANTA(?: TIER)?|PARTY(?: TIER)?)! \\+(?&lt;gained&gt;[\\d,]+) (?&lt;skillName&gt;[\\w ]+) XP gift with .*!?"</ID>
+    <ID>StringShouldBeRawString:SkillApi.kt:SkillApi$"\\+(?&lt;gained&gt;[\\d,]+) (?&lt;skillName&gt;\\w+) Experience"</ID>
+    <ID>StringShouldBeRawString:SkillApi.kt:SkillApi$"\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;.+) \\((?&lt;current&gt;[\\d.,]+)\\/(?&lt;needed&gt;[\\d,.]+[kmb]?)\\)"</ID>
+    <ID>StringShouldBeRawString:SkillApi.kt:SkillApi$"\\+(?&lt;gained&gt;[\\d.,]+) (?&lt;skillName&gt;.+) \\((?&lt;progress&gt;[\\d.,]+)%\\)"</ID>
+    <ID>StringShouldBeRawString:SkillExperience.kt:SkillExperience$".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*"</ID>
+    <ID>StringShouldBeRawString:SkyBlockXPApi.kt:SkyBlockXPApi$"[§\\w\\s]+§b(?&lt;xp&gt;\\d+)§3\\/§b100 §bXP"</ID>
+    <ID>StringShouldBeRawString:SkyBlockXPApi.kt:SkyBlockXPApi$"§7Your SkyBlock Level: §8\\[§.(?&lt;level&gt;\\d+)§8\\]"</ID>
+    <ID>StringShouldBeRawString:SkyHanniDebugsAndTests.kt:SkyHanniDebugsAndTests$"\"${skinId}_${skinColor}\": {\"ticks\": 1, \"textures\": [$skull]},"</ID>
+    <ID>StringShouldBeRawString:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$"(?:\\(\\d+/\\d+\\) )?Attribute Menu"</ID>
+    <ID>StringShouldBeRawString:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$"§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"</ID>
+    <ID>StringShouldBeRawString:SkyblockGuideHighlightFeature.kt:SkyblockGuideHighlightFeature.Companion$"§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%"</ID>
+    <ID>StringShouldBeRawString:SlayerProfitTracker.kt:SlayerProfitTracker$"Took (?&lt;coins&gt;.+) coins from your bank for auto-slayer\\.\\.\\."</ID>
+    <ID>StringShouldBeRawString:SpiderDenRelicPathfinder.kt:SpiderDenRelicPathfinder$"\\+[\\d,]+ Coins! \\(\\d+/\\d+ Relics\\)"</ID>
+    <ID>StringShouldBeRawString:SpiderEggSacHighlighter.kt:SpiderEggSacHighlighter$"\\d+s \\d+/\\d+"</ID>
+    <ID>StringShouldBeRawString:SpookyAchievement.kt:SpookyAchievement$" +Your Candy: (?&lt;candy&gt;[\\d,]+) \\(Position #[\\d,]+\\)"</ID>
+    <ID>StringShouldBeRawString:StashCompact.kt:StashCompact$"§f *§8\\(This totals (?&lt;count&gt;[\\d,]+) types? of (?&lt;type&gt;item|material)s? stashed!\\).*"</ID>
+    <ID>StringShouldBeRawString:StorageApi.kt:StorageApi$".* Backpack§r \\(Slot #(?&lt;page&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:StorageApi.kt:StorageApi$"Ender Chest(?: \\((?&lt;page&gt;\\d+)/\\d+\\))?"</ID>
+    <ID>StringShouldBeRawString:StorageApi.kt:StorageApi$"Rift Storage(?: \\((?&lt;page&gt;\\d+)/\\d+\\))?"</ID>
+    <ID>StringShouldBeRawString:SummoningMobManager.kt:SummoningMobManager$"§aYou have spawned your .+ §r§asoul! §r§d\\(\\d+ Mana\\)"</ID>
+    <ID>StringShouldBeRawString:TabListData.kt:TabListData$"Header:\n\n$tabHeader\n\nBody:\n\n$joinedResults\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"</ID>
+    <ID>StringShouldBeRawString:TabListReader.kt:TabListReader$"^\\[(?&lt;sblevel&gt;\\d+)] (?:\\[\\w+] )?(?&lt;username&gt;\\w+)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.ACTIVE_EFFECTS$"Active Effects: \\((?&lt;amount&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.DUNGEON_PARTY$"Party \\((?&lt;amount&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.DUNGEON_PUZZLE$"Puzzles: \\((?&lt;amount&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.DUNGEON_SKILLS_AND_STATS$"Skills: \\w+ \\d+: [\\d.]+%"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.FAIRY_SOULS$"Fairy Souls: (?&lt;got&gt;\\d+)\\/(?&lt;max&gt;\\d+)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.FULL_TRAPS$"Full Traps: (?:None|(?&lt;traps&gt;#\\d(?:, #\\d(?:, #\\d)?)?))"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.GUESTS$"Guests \\((?&lt;amount&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.NO_BAIT$"No Bait: (?:None|(?&lt;traps&gt;#\\d(?:, #\\d(?:, #\\d)?)?))"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.PEST_TRAPS$"Pest Traps: (?&lt;count&gt;\\d+)\\/(?&lt;max&gt;\\d+)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.PLAYER_LIST$"Players \\((?&lt;amount&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.SB_LEVEL$"SB Level: \\[(?&lt;level&gt;\\d+)\\] (?&lt;xp&gt;\\d+).*"</ID>
+    <ID>StringShouldBeRawString:TabWidget.kt:TabWidget.VISITORS$"Visitors: \\((?&lt;count&gt;\\d+)\\)"</ID>
+    <ID>StringShouldBeRawString:TabWidgetSettings.kt:TabWidgetSettings$"^(?:\\(\\d+/\\d+\\) )?Widgets (?:in|on) .*$"</ID>
+    <ID>StringShouldBeRawString:TerracottaPhase.kt:TerracottaPhase$"§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!"</ID>
+    <ID>StringShouldBeRawString:TextBoxConfig.kt:TextBoxConfig$"Enter text you want to display here.\n" + "§eUse '&amp;' as the color code character.\n" + "§eUse '\\n' as the line break character."</ID>
+    <ID>StringShouldBeRawString:TextPetDisplayConfig.kt:TextPetDisplayConfig.EquippedPetTextConfig$"Either show default, formatted, or unformatted numbers.\n" + "§eDefault: §72,240/2.2k\n" + "§eFormatted: §72.2k/2.2k\n" + "§eUnformatted: §72,240/2,200"</ID>
+    <ID>StringShouldBeRawString:TextPetDisplayConfig.kt:TextPetDisplayConfig.ExpSharePetTextConfig$"Either show default, formatted, or unformatted numbers.\n" + "§eDefault: §72,240/2.2k\n" + "§eFormatted: §72.2k/2.2k\n" + "§eUnformatted: §72,240/2,200"</ID>
+    <ID>StringShouldBeRawString:TimeUtils.kt:TimeUtils$"(?&lt;hour&gt;\\d+):(?&lt;minute&gt;\\d+)\\s*(?&lt;period&gt;am|pm)"</ID>
+    <ID>StringShouldBeRawString:TitleAndFooterConfig.kt:TitleAndFooterConfig$"What should be displayed as the footer of the scoreboard when on the Alpha Server.\n" + "Use &amp;&amp; for colors.\n" + "Use \"\\n\" for new line."</ID>
+    <ID>StringShouldBeRawString:TitleAndFooterConfig.kt:TitleAndFooterConfig$"What should be displayed as the footer of the scoreboard.\n" + "Use &amp;&amp; for colors.\n" + "Use \"\\n\" for new line."</ID>
+    <ID>StringShouldBeRawString:TitleAndFooterConfig.kt:TitleAndFooterConfig$"What should be displayed as the title of the scoreboard.\n" + "Use &amp;&amp; for colors.\n" + "Use \"\\n\" for new line."</ID>
+    <ID>StringShouldBeRawString:UtilsPatterns.kt:UtilsPatterns$"(?:(?&lt;y&gt;\\d+) ?y(?:\\w* ?)?)?(?:(?&lt;d&gt;\\d+) ?d(?:\\w* ?)?)?(?:(?&lt;h&gt;\\d+) ?h(?:\\w* ?)?)?(?:(?&lt;m&gt;\\d+) ?m(?:\\w* ?)?)?(?:(?&lt;s&gt;\\d+) ?s(?:\\w* ?)?)?"</ID>
+    <ID>StringShouldBeRawString:UtilsPatterns.kt:UtilsPatterns$"^(?:Rarity: )?(?:a )?(?:SHINY )?(?&lt;rarity&gt;$rarities)(?: DUNGEON)? ?(?&lt;itemCategory&gt;[A-Z].*?|)(?: a)?(?: \\(ID \\w\\d+\\))?$"</ID>
+    <ID>StringShouldBeRawString:UtilsPatterns.kt:UtilsPatterns$"^(?:§\\w\\[§\\w\\d+§\\w] )?(?:(?:§\\w)+\\S )?(?&lt;rankedName&gt;(?:§\\w\\[\\w.+] )?(?:§\\w)?(?&lt;username&gt;\\w+))(?: (?:§\\w)?\\[.+?])?"</ID>
+    <ID>StringShouldBeRawString:UtilsPatterns.kt:UtilsPatterns$"§7Source: §.(?&lt;source&gt;.+) Shard §8\\(\\w\\d+\\)"</ID>
+    <ID>StringShouldBeRawString:VampireSlayerFeatures.kt:VampireSlayerFeatures$".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*"</ID>
+    <ID>StringShouldBeRawString:VampireSlayerFeatures.kt:VampireSlayerFeatures$".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)"</ID>
+    <ID>StringShouldBeRawString:VampireSlayerFeatures.kt:VampireSlayerFeatures$".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*"</ID>
+    <ID>StringShouldBeRawString:VanquisherWaypointShare.kt:VanquisherWaypointShare$"^(?&lt;channel&gt;Party &gt; |Guild &gt; |Officer &gt; )?(?&lt;playerName&gt;[^:]+):.*?x:\\s*(?&lt;x&gt;-?[\\d.]+).*?y:\\s*(?&lt;y&gt;-?[\\d.]+).*?z:\\s*(?&lt;z&gt;-?[\\d.]+).*?Vanquisher.*"</ID>
     <ID>ThrowsCount:EliteWeightJson.kt:EliteLeaderboardTypeAdapter$override fun read: EliteLeaderboardType</ID>
     <ID>ThrowsCount:InternalNameArgumentType.kt:InternalNameArgumentType$override fun parse: NeuInternalName</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt:EstimatedItemValueCalculator</ID>
@@ -3648,7 +3841,6 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt:WorldRenderUtils$it.name!!</ID>
-    <ID>UnusedParameter:ChromaFontManager.kt:text: String</ID>
     <ID>UnusedParameter:CropType.kt:CropType.Companion$pos: LorenzVec</ID>
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$armorStand: ArmorStand?</ID>
