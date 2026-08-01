@@ -85,6 +85,8 @@ style:
         maxDestructuringEntries: 5
     AbstractClassCanBeConcreteClass: # this is usually intentional
         active: false
+    StringShouldBeRawString:
+        active: true
 
 ktlint:
     MaximumLineLength: # ktlint - handled by detekt
