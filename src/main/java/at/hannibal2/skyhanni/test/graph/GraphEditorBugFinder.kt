@@ -129,8 +129,8 @@ object GraphEditorBugFinder {
 
     private fun checkConflictingTags(graph: Graph, errorsInWorld: MutableMap<GraphNode, String>) {
         for (node in graph) {
-            if (!node.tags.any { it in NavigationHelper.allowedTags }) continue
-            val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
+            if (!node.tags.any { it in NavigationHelper.allowedSingleNavigationTags }) continue
+            val remainingTags = node.tags.filter { it in NavigationHelper.allowedSingleNavigationTags }
             if (remainingTags.size != 1) {
                 errorsInWorld[node] = "Conflicting tags: $remainingTags"
             }

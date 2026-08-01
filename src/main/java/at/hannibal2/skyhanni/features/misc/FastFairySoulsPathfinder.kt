@@ -52,7 +52,7 @@ object FastFairySoulsPathfinder {
 
     private var data: Data? = null
 
-    private val soulPathFindConfig = CoroutineSettings("fairy souls pathfind")
+    private val pathfindCoroutine = CoroutineSettings("fairy souls pathfind")
     private val patternGroup = RepoPattern.group("misc.fairy-souls")
 
     /**
@@ -268,7 +268,7 @@ object FastFairySoulsPathfinder {
         calculatingStart = SimpleTimeMark.now()
         "§e[SkyHanni] Calculating Fairy Soul route §b0s".asComponent().send(calculatingMessageId)
 
-        soulPathFindConfig.launch {
+        pathfindCoroutine.launch {
             val route = NavigationUtils.getRoute(missingSouls, maxIterations = 300, neighborhoodSize = 50).toMutableList()
             val duration = calculatingStart.passedSince()
             "§e[SkyHanni] Calculated Fairy Soul route in §b${duration.format(showMilliSeconds = true)}".asComponent()

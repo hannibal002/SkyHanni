@@ -51,14 +51,15 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         override fun toVec(x: kotlin.Double, y: kotlin.Double, z: kotlin.Double) =
             LorenzVec(x.toInt(), y.toInt(), z.toInt())
 
-        override fun getExamples(): Collection<String> = listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "LorenzVec(1, 2, 3)")
+        override fun getExamples(): Collection<String> =
+            listOf("1 2 3", "-4 0 5", "~ 64 ~", "1:2:3", "LorenzVec(1, 2, 3), x=-262, y=58, z=117")
     }
 
     data object Double : LorenzVecArgumentType() {
         override fun toVec(x: kotlin.Double, y: kotlin.Double, z: kotlin.Double) = LorenzVec(x, y, z)
 
         override fun getExamples(): Collection<String> =
-            listOf("1.0 2.5 -3", "0.0 0.0 0.0", "-1.7 ~ ~", "-78.8:68.0:-28.7", "LorenzVec(-91.7, 70.0, 29.3)")
+            listOf("1.0 2.5 -3", "0.0 0.0 0.0", "-1.7 ~ ~", "-78.8:68.0:-28.7", "LorenzVec(-91.7, 70.0, 29.3), x=-262.0, y=58.0, z=117.0")
     }
 
     @SkyHanniModule
@@ -74,7 +75,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
          */
         private val lorenzVecPattern by patternGroup.pattern(
             "lorenz",
-            """LorenzVec\((?<x>-?\d+(?:\.\d+)?),\s*(?<y>-?\d+(?:\.\d+)?),\s*(?<z>-?\d+(?:\.\d+)?)\)""",
+            "LorenzVec\\((?<x>-?\\d+(?:\\.\\d+)?),\\s*(?<y>-?\\d+(?:\\.\\d+)?),\\s*(?<z>-?\\d+(?:\\.\\d+)?)\\)",
         )
 
         /**
@@ -85,7 +86,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
          */
         private val colonPattern by patternGroup.pattern(
             "colon",
-            """(?<x>~|-?\d+(?:\.\d+)?):(?<y>~|-?\d+(?:\.\d+)?):(?<z>~|-?\d+(?:\.\d+)?)""",
+            "(?<x>~|-?\\d+(?:\\.\\d+)?):(?<y>~|-?\\d+(?:\\.\\d+)?):(?<z>~|-?\\d+(?:\\.\\d+)?)",
         )
 
         /**
@@ -98,10 +99,18 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
          */
         private val spacePattern by patternGroup.pattern(
             "space",
-            """(?<x>~|-?\d+(?:\.\d+)?)\s+(?<y>~|-?\d+(?:\.\d+)?)\s+(?<z>~|-?\d+(?:\.\d+)?)""",
+            "(?<x>~|-?\\d+(?:\\.\\d+)?)\\s+(?<y>~|-?\\d+(?:\\.\\d+)?)\\s+(?<z>~|-?\\d+(?:\\.\\d+)?)",
         )
 
-        private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern)
+        /**
+         * REGEX-TEST: x=-262.0, y=58.0, z=117.0
+         */
+        private val namedParameterPattern by patternGroup.pattern(
+            "named-parameter",
+            "x=(?<x>-?\\d+(?:\\.\\d+)?),\\s*y=(?<y>-?\\d+(?:\\.\\d+)?),\\s*z=(?<z>-?\\d+(?:\\.\\d+)?)"
+        )
+
+        private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern, namedParameterPattern)
 
         private val invalidCoordinates = SimpleCommandExceptionType(LiteralMessage("Invalid coordinates"))
 
