@@ -29,6 +29,7 @@ object TravelingZooPetInCalendar {
             val skyblockEvents = CalendarApi.parseCalendarItem(event.itemStack) ?: return
             for (sbEvent in skyblockEvents) {
                 if (sbEvent.name == "Traveling Zoo") {
+                    event.toolTip.add("")
                     event.toolTip.add(getZooPet(sbEvent.startTime))
                 }
             }
@@ -38,6 +39,7 @@ object TravelingZooPetInCalendar {
             val sbEvent = CalendarApi.parseMainCalendarItem(event.itemStack) ?: return
             if (sbEvent.name == "Traveling Zoo") {
                 val approximateTime = SkyBlockTime.fromTimeMark(sbEvent.startTime)
+                event.toolTip.add("")
                 event.toolTip.add(getZooPet(approximateTime))
             }
         }
