@@ -1,44 +1,32 @@
-package at.hannibal2.skyhanni.features.mining.crystalhollows
+package at.hannibal2.skyhanni.features.foraging.safari
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 
 @SkyHanniModule
-object CrystalHollowsNamesInCore {
+object SafariNamesInCenter {
 
-    private val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.foraging.safari
     private val coreLocations = mapOf(
-        LorenzVec(550, 116, 550) to "§8Precursor Remnants",
-        LorenzVec(552, 116, 474) to "§bMithril Deposits",
-        LorenzVec(477, 116, 476) to "§aJungle",
-        LorenzVec(474, 116, 554) to "§6Goblin Holdout",
+        LorenzVec(-27.1, 66.0, 22.8) to "§2Forest Biome",
+        LorenzVec(-25.5, 66.0, -23.2) to "§5Haunted Biome",
+        LorenzVec(-73.3, 65.0, -23.4) to "§9Icy Biome",
+        LorenzVec(-72.6, 65.5, 23.9) to "§6Cavern Biome",
     )
 
     private var showWaypoints = false
-    private var inNucleus = false
 
     @HandleEvent
     private fun onAreaChange(event: GraphAreaChangeEvent) {
-        inNucleus = event.area == "Crystal Nucleus"
-        update()
-    }
-
-    private fun update() {
-        showWaypoints = inNucleus && LocationUtils.playerLocation().y > 65
-    }
-
-    @HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true)
-    private fun onSecondPassed() {
-        if (isEnabled()) update()
+        showWaypoints = event.area == AreaNode.NO_AREA
     }
 
     @HandleEvent
@@ -51,5 +39,5 @@ object CrystalHollowsNamesInCore {
         }
     }
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.crystalHollowsNamesInCore
+    fun isEnabled() = IslandType.SAFARI .isInIsland() && config.namesInCenter
 }
