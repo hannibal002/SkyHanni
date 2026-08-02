@@ -367,7 +367,7 @@ object SlayerApi {
     private fun onIslandLeave() {
         currentAreaType = null
         updateArea()
-        val data = getCurrentData()
+        val data = outsideRiftData
         if (data.currentState == COCOONED) {
             data.currentStateRaw = null
             data.currentState = NO_ACTIVE_QUEST
