@@ -96,7 +96,10 @@ value class Graph(
                 if (node.extraWeight != 0) out.name("ExtraWeight").value(node.extraWeight)
                 // JSON key intentionally kept as "Neighbours" for backward compatibility
                 out.name("Neighbours").beginObject()
-                for ((neighbor, weight) in node.neighbors) {
+
+                // sort neighbors by id of the node
+                val sorted = node.neighbors.toList().sortedBy { it.first.id }
+                for ((neighbor, weight) in sorted) {
                     out.name(neighbor.id.toString()).value(weight.roundTo(2))
                 }
                 out.endObject()
