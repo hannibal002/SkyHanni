@@ -293,10 +293,12 @@ object AttributeShardsData {
      * REGEX-TEST: CAPTURE! You caught a Gimmiegold and gained a Gimmiegold Shard!
      * REGEX-TEST: CAPTURE! You caught an Areita and gained an Areita Shard!
      * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
+     * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you a Hideyho Shard!
+     * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you 4x Hideyho Shard!
      */
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You caught an? .+ and gained (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
+        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward he gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
     )
 
     /**
