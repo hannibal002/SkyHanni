@@ -19,8 +19,8 @@ object HotfApi {
     ) : RotatingPerk {
         SWEEP(
             displayDescription = "§a+10§r§2${SkyblockStat.SWEEP.hypixelIcon} Sweep",
-            chatFallback = "Gain \\+10%${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
-            itemFallback = "Gain \\+10%${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
+            chatFallback = "Gain \\+10${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
+            itemFallback = "Gain \\+10${SkyblockStat.SWEEP.hypixelIcon} Sweep\\.",
         ),
         MANGROVE_FORTUNE(
             displayDescription = "§a+50§r§6${SkyblockStat.MANGROVE_FORTUNE.hypixelIcon} Mangrove Fortune",
