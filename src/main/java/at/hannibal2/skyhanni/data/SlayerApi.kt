@@ -321,12 +321,12 @@ object SlayerApi {
     }
 
     private fun detectState(old: String, new: String): ActiveQuestState = when {
-        new.inGrind() -> GRINDING
-        new.inBoss() -> BOSS_FIGHT
-        old.inBoss() && new.noSlayer() -> FAILED
-        new.bossSlain() -> SLAIN
-        else -> NO_ACTIVE_QUEST
-    }
+            new.inGrind() -> GRINDING
+            new.inBoss() -> BOSS_FIGHT
+            old.inBoss() && new.noSlayer() -> FAILED
+            new.bossSlain() -> SLAIN
+            else -> NO_ACTIVE_QUEST
+        }
 
     @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
     private fun onAreaChange() {
