@@ -164,8 +164,8 @@ object GraphEditorBugFinder {
 
     private fun checkConflictingTags(graph: Graph, bugs: BugCollector) {
         for (node in graph) {
-            if (!node.tags.any { it in NavigationHelper.allowedTags }) continue
-            val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
+            if (!node.tags.any { it in NavigationHelper.allowedSingleNavigationTags }) continue
+            val remainingTags = node.tags.filter { it in NavigationHelper.allowedSingleNavigationTags }
             if (remainingTags.size != 1) {
                 bugs.add(node, BugCategory.CONFLICTING_TAGS, "Conflicting tags: $remainingTags")
             }

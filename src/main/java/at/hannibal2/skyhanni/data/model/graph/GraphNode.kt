@@ -37,7 +37,7 @@ class GraphNode(
 
     fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
 
-    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
+    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedSingleNavigationTags }
 
     // Identity is by id alone - two GraphNode references with the same id are the same node regardless
     // of mutable state (neighbors, enabled), which must not participate in equality.
