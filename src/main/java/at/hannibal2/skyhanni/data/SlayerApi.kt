@@ -285,7 +285,7 @@ object SlayerApi {
         if (oldStateRaw != progress) {
             data.currentStateRaw = progress
 
-            val newState = detectState( oldStateRaw, progress)
+            val newState = detectState(oldStateRaw, progress)
             if (newState != data.currentState) {
                 ChatUtils.debug("${data.currentState} -> $newState")
                 data.currentState = newState
