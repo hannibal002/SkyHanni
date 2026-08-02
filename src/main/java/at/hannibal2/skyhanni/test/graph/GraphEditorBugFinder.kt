@@ -29,8 +29,10 @@ import java.awt.Color
 object GraphEditorBugFinder {
 
     private const val ERROR_LINE_HEIGHT = 10f
+    private const val MAX_RENDERED_NODES = 10
 
     private var errorsInWorld = emptyMap<GraphNode, Set<String>>()
+    private var renderedErrors = emptyList<Pair<GraphNode, Set<String>>>()
 
     private enum class BugCategory(val displayName: String) {
         CONFLICTING_TAGS("conflicting tags"),
@@ -74,6 +76,7 @@ object GraphEditorBugFinder {
         checkOneWayEdges(graph, bugs)
 
         errorsInWorld = bugs.errors
+        updateRenderedErrors()
         reportBugCount(bugs)
         bugs.errors.keys.minByOrNull {
             it.distanceSqToPlayer()
@@ -185,10 +188,24 @@ object GraphEditorBugFinder {
     }
 
     @HandleEvent
+    private fun onSecondPassed() {
+        if (!isEnabled()) return
+        updateRenderedErrors()
+    }
+
+    /** Only the closest nodes are rendered, so a graph with many errors stays readable. */
+    private fun updateRenderedErrors() {
+        renderedErrors = errorsInWorld.entries
+            .sortedBy { it.key.distanceSqToPlayer() }
+            .take(MAX_RENDERED_NODES)
+            .map { it.toPair() }
+    }
+
+    @HandleEvent
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
-        for ((node, texts) in errorsInWorld) {
+        for ((node, texts) in renderedErrors) {
             for ((index, text) in texts.withIndex()) {
                 event.drawDynamicText(node.position, text, 1.5, yOff = index * ERROR_LINE_HEIGHT)
             }
