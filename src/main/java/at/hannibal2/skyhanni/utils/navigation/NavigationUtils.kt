@@ -28,7 +28,7 @@ object NavigationUtils {
         if (route.size != nodes.size + amountOffset) {
             ErrorManager.skyHanniError(
                 "calculateTravelingSalesman could not reach all goals",
-                "targetNodes" to nodes.size,
+                "targetNodes" to nodes.size + amountOffset,
                 "output" to route.size,
                 "island" to SkyBlockUtils.currentIsland,
             )
