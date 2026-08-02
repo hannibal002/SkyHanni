@@ -351,7 +351,7 @@ object SlayerApi {
             new.inBoss() -> BOSS_FIGHT
             old.inBoss() && new.noSlayer() -> FAILED
             new.bossSlain() -> SLAIN
-            // Sometimes Hypixel doesn't even show the "Boss slain!" message
+            // Sometimes Hypixel doesn't show any slayer state
             cocooned -> COCOONED
             else -> NO_ACTIVE_QUEST
         }
