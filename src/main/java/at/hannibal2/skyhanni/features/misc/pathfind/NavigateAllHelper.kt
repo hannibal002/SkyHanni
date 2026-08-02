@@ -130,8 +130,8 @@ object NavigateAllHelper {
         }
     }
 
-    private fun getValidTagNames(): List<GraphNodeTag> {
-        val activeTags = IslandGraphs.currentIslandGraph?.getActiveNodeTags() ?: return emptyList()
-        return activeTags.filter { it in allowedMultiNavigationTags }
+    private fun getValidTagNames(): Set<GraphNodeTag> {
+        val activeTags = IslandGraphs.currentIslandGraph?.getActiveNodeTags() ?: return emptySet()
+        return activeTags.filter { it in allowedMultiNavigationTags }.toSet()
     }
 }
