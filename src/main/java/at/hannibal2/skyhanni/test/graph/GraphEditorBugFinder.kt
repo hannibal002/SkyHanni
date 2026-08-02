@@ -180,11 +180,27 @@ object GraphEditorBugFinder {
     private fun checkOneWayEdges(graph: Graph, bugs: BugCollector) {
         for (node in graph) {
             for (neighbor in node.neighbors.keys) {
-                if (node in neighbor.neighbors) continue
-                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here")
+                if (hasPathBack(start = neighbor, target = node)) continue
+
+                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here (no way back)")
                 bugs.add(neighbor, BugCategory.ONE_WAY_EDGES, "one-way edge ends here (no way back)")
             }
         }
+    }
+
+    private fun hasPathBack(start: GraphNode, target: GraphNode): Boolean {
+        val queue = ArrayDeque<GraphNode>().apply { add(start) }
+        val visited = mutableSetOf(start)
+
+        while (queue.isNotEmpty()) {
+            val current = queue.removeFirst()
+            if (current == target) return true
+
+            for (next in current.neighbors.keys) {
+                if (visited.add(next)) queue.add(next)
+            }
+        }
+        return false
     }
 
     @HandleEvent
