@@ -1,11 +1,9 @@
 package at.hannibal2.skyhanni.utils.navigation
 
-import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 
@@ -17,9 +15,8 @@ object NavigationUtils {
         neighborhoodSize: Int = 50,
     ): List<LorenzVec> {
         if (nodes.isEmpty()) return emptyList()
-        val graph = IslandGraphs.currentIslandGraph ?: error("no active island graph")
 
-        val closestNode = graph.minByOrNull { it.position.distanceSqToPlayer() } ?: error("no closest node")
+        val closestNode = GraphUtils.nearestNodeOnCurrentIsland()
         val route = calculateTravelingSalesman(nodes, closestNode, maxIterations, neighborhoodSize)
 
         val closestNodeIsTarget = nodes.any { it.position == closestNode.position }
@@ -93,7 +90,7 @@ object NavigationUtils {
     }
 
     private fun directedTwoOpt(
-        routeInput: MutableList<GraphNode>,
+        routeInput: List<GraphNode>,
         distanceMap: Map<GraphNode, Map<GraphNode, Double>>,
         maxIterations: Int,
         neighborhoodSize: Int,
@@ -130,11 +127,10 @@ object NavigationUtils {
     }
 
     private fun edge(
-        a: GraphNode?,
-        b: GraphNode?,
+        a: GraphNode,
+        b: GraphNode,
         map: Map<GraphNode, Map<GraphNode, Double>>,
     ): Double {
-        if (a == null || b == null) return 0.0
         return map[a]?.get(b) ?: Double.POSITIVE_INFINITY
     }
 

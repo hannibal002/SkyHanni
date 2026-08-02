@@ -48,7 +48,7 @@ object NavigateAllHelper {
      * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
      */
     private fun navigateAll(nodeType: GraphNodeTag) {
-        if (nodeType !in getValidNodeNames()) {
+        if (nodeType !in getValidTagNames()) {
             ChatUtils.userError("Target type is invalid on this island!")
             return
         }
@@ -71,32 +71,38 @@ object NavigateAllHelper {
     private fun recursiveNavigate() {
         if (route.isEmpty()) return
 
-        val target = route.firstOrNull() ?: error("No more nodes found")
+        val target = route.first()
         route = route.drop(1)
 
         IslandGraphs.pathFind(
             target,
             "${currentNodeType?.displayName} ${total - route.size}/$total",
-            onFound = { recursiveNavigate() },
-            condition = { route.isNotEmpty() },
+            onFound = {
+                if (route.isEmpty()) currentNodeType = null
+                recursiveNavigate()
+            },
+            condition = { currentNodeType != null },
         )
     }
 
-    private fun calculateRoute(targetNodes: List<GraphNode>): List<LorenzVec> =
-        NavigationUtils.getRoute(targetNodes)
+    private fun calculateRoute(targetNodes: List<GraphNode>): List<LorenzVec> = NavigationUtils.getRoute(targetNodes)
 
     private fun handleSkip() {
         if (route.isEmpty()) {
-            ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
+            if (currentNodeType != null) {
+                currentNodeType = null
+            } else {
+                ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
+            }
             return
         }
 
-        // TODO handle recalculation of remaining route without the current node
+        // TODO In future it should recalculate the route taking into account that we dont need the skipped node anymore
         recursiveNavigate()
     }
 
     @HandleEvent
-    private fun onIslandChange() {
+    private fun onIslandLeave() {
         route = emptyList()
         total = 0
         currentNodeType = null
@@ -114,7 +120,7 @@ object NavigateAllHelper {
                     { it.cleanName.replace(" ", "_") },
                     isGreedy = true,
                 ) { it in allowedMultiNavigationTags },
-                BrigadierUtils.dynamicSuggestionProvider { getValidNodeNames().map { it.cleanName } },
+                BrigadierUtils.dynamicSuggestionProvider { getValidTagNames().map { it.cleanName } },
             ) { nodeType ->
                 navigateAll(nodeType)
             }
@@ -124,9 +130,8 @@ object NavigateAllHelper {
         }
     }
 
-    private fun getValidNodeNames(): List<GraphNodeTag> {
+    private fun getValidTagNames(): List<GraphNodeTag> {
         val activeTags = IslandGraphs.currentIslandGraph?.getActiveNodeTags() ?: return emptyList()
         return activeTags.filter { it in allowedMultiNavigationTags }
     }
-
 }

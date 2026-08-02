@@ -78,7 +78,7 @@ class EnumArgumentType<E : Enum<E>> private constructor(
         }
 
         /**
-         * To filtering of an enum should not change during runtime.
+         * The filtering of an enum should not change during runtime.
          */
         inline fun <reified E : Enum<E>> filtered(
             noinline toString: (E) -> String,

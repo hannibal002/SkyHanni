@@ -59,7 +59,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
         override fun toVec(x: kotlin.Double, y: kotlin.Double, z: kotlin.Double) = LorenzVec(x, y, z)
 
         override fun getExamples(): Collection<String> =
-            listOf("1.0 2.5 -3", "0.0 0.0 0.0", "-1.7 ~ ~", "-78.8:68.0:-28.7", "LorenzVec(-91.7, 70.0, 29.3), x=-262.0, y=58.0, z=117.0")
+            listOf("1.0 2.5 -3", "0.0 0.0 0.0", "-1.7 ~ ~", "-78.8:68.0:-28.7", "LorenzVec(-91.7, 70.0, 29.3)", "x=-262.0, y=58.0, z=117.0")
     }
 
     @SkyHanniModule
@@ -107,7 +107,7 @@ sealed class LorenzVecArgumentType : ArgumentType<LorenzVec> {
          */
         private val namedParameterPattern by patternGroup.pattern(
             "named-parameter",
-            "x=(?<x>-?\\d+(?:\\.\\d+)?),\\s*y=(?<y>-?\\d+(?:\\.\\d+)?),\\s*z=(?<z>-?\\d+(?:\\.\\d+)?)"
+            "x=(?<x>-?\\d+(?:\\.\\d+)?),\\s*y=(?<y>-?\\d+(?:\\.\\d+)?),\\s*z=(?<z>-?\\d+(?:\\.\\d+)?)",
         )
 
         private val patterns = listOf(lorenzVecPattern, colonPattern, spacePattern, namedParameterPattern)
