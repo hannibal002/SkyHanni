@@ -98,7 +98,7 @@ object HideNotClickableItems {
     private val netherWart = "NETHER_STALK".toInternalName()
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
         hideInStorageFilter.load(hideNotClickable.hideInStorage)
@@ -120,7 +120,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
+    private fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
         if (event.gui !is ContainerScreen) return
@@ -137,7 +137,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onTooltip(event: ToolTipTextEvent) {
+    private fun onTooltip(event: ToolTipTextEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 
@@ -167,7 +167,7 @@ object HideNotClickableItems {
     }
 
     @HandleEvent
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+    private fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
         if (bypassActive()) return
@@ -216,6 +216,7 @@ object HideNotClickableItems {
             hideRiftTransferChest(chestName, stack) -> true
             hideFossilExcavator(stack) -> true
             hideResearchCenter(chestName, stack) -> true
+            hideBirdFeeder(chestName, stack) -> true
 
             else -> false
         }
@@ -262,6 +263,28 @@ object HideNotClickableItems {
         hideReason = "§cNot a fossil!"
         return true
     }
+
+    private fun hideBirdFeeder(chestName: String, stack: SafeItemStack): Boolean {
+        if (chestName != "Birdfeeder") return false
+
+        showGreenLine = true
+
+        val internalName = stack.getInternalNameOrNull() ?: return false
+
+        val list = listOf(
+            "BAG_OF_SEEDS".toInternalName(), // for Bluebirds
+            "WRIGGLEWORM".toInternalName(), // for Parakeets
+            "YOGI_BERRY".toInternalName(), // for Macaws
+        )
+
+        if (internalName in list) {
+            return false
+        }
+
+        hideReason = "§cNot bird food!"
+        return true
+    }
+
 
     private fun hideRiftTransferChest(chestName: String, stack: SafeItemStack): Boolean {
         if (chestName != "Rift Transfer Chest") return false
@@ -622,7 +645,7 @@ object HideNotClickableItems {
     private fun isEnabled() = SkyBlockUtils.inSkyBlock && config.enabled
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
         event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")
         event.move(3, "inventory.hideNotClickableOpacity", "inventory.hideNotClickable.opacity")
