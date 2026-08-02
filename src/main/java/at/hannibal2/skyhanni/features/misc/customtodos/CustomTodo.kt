@@ -68,18 +68,18 @@ data class CustomTodo(
         val triggersLeft = this.triggersLeftOnCurrentProfile ?: 1
         if (triggersLeft > 1 && !this.cronEnabled) {
             this.triggersLeftOnCurrentProfile = triggersLeft - 1
-            return
+        } else {
+            this.triggersLeftOnCurrentProfile = this.totalTriggers
+            readyAt[HypixelData.profileName] =
+                if (isResetOffset) {
+                    val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
+                    if (asTimeMark.isInPast()) asTimeMark + 1.days else asTimeMark
+                } else {
+                    if (this.cronEnabled) now
+                    else now + timer.seconds
+                }
         }
 
-        this.triggersLeftOnCurrentProfile = this.totalTriggers
-        readyAt[HypixelData.profileName] =
-            if (isResetOffset) {
-                val asTimeMark = (now.toMillis() - now.toMillis() % MS_IN_A_DAY + timer * 1000L).asTimeMark()
-                if (asTimeMark.isInPast()) asTimeMark + 1.days else asTimeMark
-            } else {
-                if (this.cronEnabled) now
-                else now + timer.seconds
-            }
         CustomTodos.save()
     }
 
