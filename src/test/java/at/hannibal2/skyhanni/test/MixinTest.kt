@@ -57,7 +57,13 @@ class MixinTest {
 
     private fun mixinClasses(): List<ClassNode> {
         val classLoader = javaClass.classLoader
-        return SkyHanniMixinPlugin().mixins.map { mixin ->
+        val discovered = SkyHanniMixinPlugin().mixins
+        Assertions.assertTrue(discovered.isNotEmpty()) {
+            "Mixin discovery returned nothing, so this test would pass without inspecting a single mixin. " +
+                "SkyHanniMixinPlugin resolves them relative to its own code source, " +
+                "which the mixinTest classpath has to expose."
+        }
+        return discovered.map { mixin ->
             val path = "$MIXIN_PACKAGE_PATH/${mixin.replace('.', '/')}.class"
             val bytes = checkNotNull(classLoader.getResourceAsStream(path)) {
                 "Mixin $mixin was discovered but $path is not on the classpath"

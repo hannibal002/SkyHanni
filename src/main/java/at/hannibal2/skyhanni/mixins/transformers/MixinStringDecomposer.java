@@ -20,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * Implements §#RRGGBB§/ and §#RRGGBBAA§/ hex color codes by hooking into
  * {@link StringDecomposer#iterateFormatted}. Each hex digit is encoded as a
  * §-prefixed character, e.g. §#§6§a§e§e§4§8§/ renders text in RGB(0x6a, 0xee, 0x48).
- *
  * Also includes some chroma handling.
  */
 @Mixin(StringDecomposer.class)
