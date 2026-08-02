@@ -27,14 +27,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessaryOrNull
 import at.hannibal2.skyhanni.utils.PlayerUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 
 
@@ -71,14 +69,6 @@ object SlayerApi {
     private val questFailedPattern by patternGroup.pattern(
         "quest.failed",
         "\\s*SLAYER QUEST FAILED!",
-    )
-
-    /**
-     * WRAPPED-REGEX-TEST: "  YOU COCOONED YOUR SLAYER BOSS"
-     */
-    private val cocoonPattern by patternGroup.pattern(
-        "cocooned",
-        "\\s+YOU COCOONED YOUR SLAYER BOSS",
     )
     // </editor-fold>
 
@@ -134,9 +124,6 @@ object SlayerApi {
      * How many consecutive updates have we seen a category that is invalid?
      */
     private var invalidCategoryUpdates = 0
-
-    // This Timer is mostly just a fail-safe so it doesn't get stuck in COCOONED state
-    private var cocoonTimestamp: ServerTimeMark = ServerTimeMark.farPast()
 
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
@@ -207,13 +194,6 @@ object SlayerApi {
                     data.currentState = FAILED
                     SlayerStateChangeEvent(FAILED).post()
                 }
-            }
-            cocoonPattern.matches(message) -> {
-                val data = getCurrentData()
-                cocoonTimestamp = ServerTimeMark.now()
-                data.currentStateRaw = "cocooned"
-                data.currentState = COCOONED
-                SlayerStateChangeEvent(COCOONED).post()
             }
         }
     }
@@ -305,7 +285,7 @@ object SlayerApi {
         if (oldStateRaw != progress) {
             data.currentStateRaw = progress
 
-            val newState = detectState(data.currentState, oldStateRaw, progress)
+            val newState = detectState( oldStateRaw, progress)
             if (newState != data.currentState) {
                 ChatUtils.debug("${data.currentState} -> $newState")
                 data.currentState = newState
@@ -335,44 +315,23 @@ object SlayerApi {
     enum class ActiveQuestState {
         GRINDING, // spawning, collecting combat xp
         BOSS_FIGHT,
-        COCOONED,
         FAILED,
         SLAIN,
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState {
-        // This is 6 seconds instead of 5 seconds just to be safe
-        val cocooned = currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds
-
-        return when {
-            cocooned && (new.bossSlain() || new.noSlayer()) -> COCOONED
+    private fun detectState(old: String, new: String): ActiveQuestState = when {
             new.inGrind() -> GRINDING
             new.inBoss() -> BOSS_FIGHT
             old.inBoss() && new.noSlayer() -> FAILED
             new.bossSlain() -> SLAIN
-            // Sometimes Hypixel doesn't even show the "Boss slain!" message
-            cocooned -> COCOONED
             else -> NO_ACTIVE_QUEST
         }
-    }
 
     @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
     private fun onAreaChange() {
         currentAreaType = checkTypeForCurrentArea()
         updateArea()
-    }
-
-    @HandleEvent
-    private fun onIslandLeave() {
-        currentAreaType = null
-        updateArea()
-        val data = getCurrentData()
-        if (data.currentState == COCOONED) {
-            data.currentStateRaw = null
-            data.currentState = NO_ACTIVE_QUEST
-            SlayerStateChangeEvent(NO_ACTIVE_QUEST).post()
-        }
     }
 
     @HandleEvent(ConfigLoadEvent::class)
