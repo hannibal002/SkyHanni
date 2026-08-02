@@ -24,6 +24,7 @@ object NavigateAllHelper {
     private val allowedMultiNavigationTags = setOf(
         GraphNodeTag.HOPPITY,
         GraphNodeTag.RIFT_EFFIGY,
+        GraphNodeTag.RIFT_MONTEZUMA,
         GraphNodeTag.CRIMSON_MINIBOSS,
         GraphNodeTag.SPIDER_RELIC,
         GraphNodeTag.END_GOLEM,
@@ -35,7 +36,7 @@ object NavigateAllHelper {
         GraphNodeTag.TREE_PROTECTION_ORDER,
         GraphNodeTag.HONEY_HIVE,
         GraphNodeTag.SAFARI_BELL,
-        GraphNodeTag.HIDEYHO_HIDING_LOCATION,
+        GraphNodeTag.HIDEYHO_LOCATION,
     )
 
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
@@ -57,6 +58,7 @@ object NavigateAllHelper {
         val targetNodes = graph.getNodesWithTags(nodeType)
         currentNodeType = nodeType
 
+        // Coroutine for calculateRoute()
         pathfindCoroutine.launch {
             route = emptyList()
             route = calculateRoute(targetNodes)
@@ -126,6 +128,9 @@ object NavigateAllHelper {
             }
             literalCallback("skip") {
                 handleSkip()
+            }
+            simpleCallback {
+                ChatUtils.userError("Usage: /shnavigateall <location type>")
             }
         }
     }

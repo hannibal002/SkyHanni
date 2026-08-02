@@ -185,11 +185,11 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.SAFARI,
     ),
 
-    HIDEYHO_HIDING_LOCATION(
-        "hideyho_hiding_location",
+    HIDEYHO_LOCATION(
+        "hideyho_location",
         LorenzColor.LIGHT_PURPLE,
-        "Hideyho Hiding Location",
-        "A location that Hideyho can teleport to while hiding.",
+        "Hideyho Location",
+        "A location that Hideyho can be found.",
         onlyIsland = IslandType.SAFARI,
     ),
 
