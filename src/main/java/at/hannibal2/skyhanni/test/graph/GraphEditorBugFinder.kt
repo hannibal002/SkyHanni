@@ -156,7 +156,7 @@ object GraphEditorBugFinder {
                 val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
                 if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    bugs.add(node, BugCategory.CONFLICTING_AREAS, "Conflicting areas $areaNode and$neighboringAreaNode")
+                    bugs.add(node, BugCategory.CONFLICTING_AREAS, "Conflicting areas $areaNode and $neighboringAreaNode")
                 }
             }
         }
@@ -182,7 +182,7 @@ object GraphEditorBugFinder {
             for (neighbor in node.neighbors.keys) {
                 if (hasPathBack(start = neighbor, target = node)) continue
 
-                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here (no way back)")
+                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here")
                 bugs.add(neighbor, BugCategory.ONE_WAY_EDGES, "one-way edge ends here (no way back)")
             }
         }
