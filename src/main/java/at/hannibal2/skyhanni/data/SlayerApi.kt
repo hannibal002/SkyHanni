@@ -305,7 +305,7 @@ object SlayerApi {
         if (oldStateRaw != progress) {
             data.currentStateRaw = progress
 
-            val newState = detectState(data.currentState, oldStateRaw, progress)
+            val newState = detectState(oldStateRaw, progress)
             if (newState != data.currentState) {
                 ChatUtils.debug("${data.currentState} -> $newState")
                 data.currentState = newState
@@ -331,6 +331,7 @@ object SlayerApi {
     private fun String.inBoss() = this == "Slay the boss!"
     private fun String?.bossSlain() = this == "Boss slain!"
     private fun String.noSlayer() = this == "no slayer"
+    private fun String.inCocoon() = this == "cocooned"
 
     enum class ActiveQuestState {
         GRINDING, // spawning, collecting combat xp
@@ -341,9 +342,9 @@ object SlayerApi {
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(currentState: ActiveQuestState?, old: String, new: String): ActiveQuestState {
+    private fun detectState(old: String, new: String): ActiveQuestState {
         // This is 6 seconds instead of 5 seconds just to be safe
-        val cocooned = currentState == COCOONED && cocoonTimestamp.passedSince() <= 6.seconds
+        val cocooned = old.inCocoon() && cocoonTimestamp.passedSince() <= 6.seconds
 
         return when {
             cocooned && (new.bossSlain() || new.noSlayer()) -> COCOONED
