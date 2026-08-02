@@ -15,7 +15,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.GraphUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 import java.awt.Color
@@ -30,12 +32,26 @@ object GraphEditorBugFinder {
 
     private var errorsInWorld = emptyMap<GraphNode, Set<String>>()
 
+    private enum class BugCategory(val displayName: String) {
+        CONFLICTING_TAGS("conflicting tags"),
+        CONFLICTING_AREAS("conflicting areas"),
+        MISSING_DATA("missing data"),
+        DEPRECATED_TAGS("deprecated tags"),
+        INVALID_NAMES("invalid names"),
+        ONE_WAY_EDGES("one-way edges"),
+    }
+
     /** Collects all errors found during a single test run. A node can have more than one error. */
     private class BugCollector {
         val errors = mutableMapOf<GraphNode, MutableSet<String>>()
+        val categoryCounts = mutableMapOf<BugCategory, Int>()
 
-        fun add(node: GraphNode, error: String) {
-            errors.getOrPut(node) { mutableSetOf() }.add(error)
+        val totalErrors get() = categoryCounts.values.sum()
+
+        /** Duplicate messages on the same node are dropped and therefore not counted. */
+        fun add(node: GraphNode, category: BugCategory, error: String) {
+            if (!errors.getOrPut(node) { mutableSetOf() }.add(error)) return
+            categoryCounts.addOrPut(category, 1)
         }
     }
 
@@ -58,16 +74,27 @@ object GraphEditorBugFinder {
         checkOneWayEdges(graph, bugs)
 
         errorsInWorld = bugs.errors
+        reportBugCount(bugs)
         bugs.errors.keys.minByOrNull {
             it.distanceSqToPlayer()
         }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
+    }
+
+    private fun reportBugCount(bugs: BugCollector) {
+        val totalErrors = bugs.totalErrors
+        if (totalErrors == 0) return
+        val breakdown = bugs.categoryCounts.entries.sortedByDescending { it.value }
+            .joinToString("\n") { (category, count) -> " §7${category.displayName}: §e${count.addSeparators()}" }
+        ChatUtils.chat(
+            "§cGraph errors: ${totalErrors.addSeparators()} on ${bugs.errors.size.addSeparators()} nodes\n$breakdown",
+        )
     }
 
     private fun checkDeprecatedTags(graph: Graph, bugs: BugCollector) {
         for (node in graph) {
             @Suppress("DEPRECATION")
             if (node.hasTag(GraphNodeTag.TELEPORT)) {
-                bugs.add(node, "deprecated teleport node")
+                bugs.add(node, BugCategory.DEPRECATED_TAGS, "deprecated teleport node")
             }
         }
     }
@@ -77,15 +104,15 @@ object GraphEditorBugFinder {
             val name = node.name ?: continue
             if (node.hasTag(GraphNodeTag.WARP)) {
                 if (!name.startsWith("/")) {
-                    bugs.add(node, "invalid warp name")
+                    bugs.add(node, BugCategory.INVALID_NAMES, "invalid warp name")
                 }
             }
             if (node.hasTag(GraphNodeTag.JUMP_PAD)) {
                 if (IslandType.entries.none { it.name == name }) {
-                    bugs.add(node, "jump pad name is no known island name")
+                    bugs.add(node, BugCategory.INVALID_NAMES, "jump pad name is no known island name")
                 }
                 if (name == SkyBlockUtils.currentIsland.name) {
-                    bugs.add(node, "jump pad name is current island name")
+                    bugs.add(node, BugCategory.INVALID_NAMES, "jump pad name is current island name")
                 }
             }
         }
@@ -102,10 +129,10 @@ object GraphEditorBugFinder {
             val nameNull = node.name.isNullOrBlank()
             val tagsEmpty = node.tags.isEmpty()
             if (nameNull > tagsEmpty) {
-                bugs.add(node, "Missing name despite having tags")
+                bugs.add(node, BugCategory.MISSING_DATA, "Missing name despite having tags")
             }
             if (tagsEmpty > nameNull) {
-                bugs.add(node, "Missing tags despite having name")
+                bugs.add(node, BugCategory.MISSING_DATA, "Missing tags despite having name")
             }
         }
     }
@@ -126,7 +153,7 @@ object GraphEditorBugFinder {
                 val neighboringAreaNode = nearestArea[neighbor]?.name ?: continue
                 if (neighboringAreaNode == areaNode) continue
                 if ((null == node.getAreaTag())) {
-                    bugs.add(node, "Conflicting areas $areaNode and $neighboringAreaNode")
+                    bugs.add(node, BugCategory.CONFLICTING_AREAS, "Conflicting areas $areaNode and$neighboringAreaNode")
                 }
             }
         }
@@ -137,11 +164,11 @@ object GraphEditorBugFinder {
             if (!node.tags.any { it in NavigationHelper.allowedTags }) continue
             val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
             if (remainingTags.size != 1) {
-                bugs.add(node, "Conflicting tags: $remainingTags")
+                bugs.add(node, BugCategory.CONFLICTING_TAGS, "Conflicting tags: $remainingTags")
             }
             if (node.hasTag(GraphNodeTag.MINES_EMISSARY)) {
                 if (!node.hasTag(GraphNodeTag.NPC)) {
-                    bugs.add(node, "emissary without npc tag")
+                    bugs.add(node, BugCategory.CONFLICTING_TAGS, "emissary without npc tag")
                 }
             }
         }
@@ -151,8 +178,8 @@ object GraphEditorBugFinder {
         for (node in graph) {
             for (neighbor in node.neighbors.keys) {
                 if (node in neighbor.neighbors) continue
-                bugs.add(node, "one-way edge starts here")
-                bugs.add(neighbor, "one-way edge ends here (no way back)")
+                bugs.add(node, BugCategory.ONE_WAY_EDGES, "one-way edge starts here")
+                bugs.add(neighbor, BugCategory.ONE_WAY_EDGES, "one-way edge ends here (no way back)")
             }
         }
     }
