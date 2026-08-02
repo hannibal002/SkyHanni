@@ -26,7 +26,7 @@ class HuntingConfig {
 
     @Expose
     @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights")
-    var mobHighlight = GalateaMobHighlightConfig()
+    val mobHighlight: GalateaMobHighlightConfig = GalateaMobHighlightConfig()
 
     @Expose
     @ConfigOption(name = "Lasso Display", desc = "Displays your lasso progress on screen.")
@@ -54,17 +54,19 @@ class HuntingConfig {
 
     @Expose
     @ConfigOption(
-        name = "Hideonleaf Finder",
-        desc = "Shows a route from your position to the nearest possibly spawn point for Hideonleaf for easy finding."
+        name = "Shulker Finder",
+        desc = "Shows a route from your position to the nearest possible spawn point for a Shulker for easy hunting."
     )
+    @SearchTag("hideonleaf hideonsun")
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideonleafFinder = false
+    var shulkerFinder = false
 
     @Expose
-    @ConfigOption(name = "Show next Hideonleaf", desc = "Press this key to show the next Hideonleaf.")
+    @ConfigOption(name = "Show next Shulker", desc = "Press this key to show the route to the next Shulker.")
+    @SearchTag("hideonleaf hideonsun")
     @ConfigEditorKeybind(defaultKey = GLFW.GLFW_KEY_UNKNOWN)
-    var nextHideonleafKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
+    var nextShulkerKeybind: Int = GLFW.GLFW_KEY_UNKNOWN
 
     @Expose
     @ConfigOption(name = "Fusion Display", desc = "Displays the shard you are fusing and how many you have.")

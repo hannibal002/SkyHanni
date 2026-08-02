@@ -36,8 +36,8 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     @Shadow
     public abstract Identifier getTextureLocation(LivingEntityRenderState par1);
 
-    protected MixinLivingEntityRenderer(EntityRendererProvider.Context dontCare) {
-        super(dontCare);
+    protected MixinLivingEntityRenderer(EntityRendererProvider.Context doNotCare) {
+        super(doNotCare);
     }
 
     @Inject(method = "extractRenderState(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;F)V", at = @At(value = "TAIL"))
