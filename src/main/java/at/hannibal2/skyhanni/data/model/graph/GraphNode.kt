@@ -6,6 +6,9 @@ import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
+/**
+ * The object we work with in code with features that work wiith navigation or area detetion
+ */
 class GraphNode(
     val id: Int,
     override val position: LorenzVec,
