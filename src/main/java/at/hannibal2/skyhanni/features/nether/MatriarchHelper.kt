@@ -84,7 +84,6 @@ object MatriarchHelper {
         if (config.useShortestDistance) {
             val path = tspCache ?: NavigationUtils.getRoute(
                 pearlList.map { it.second },
-                maxIterations = 5,
             ).also {
                 val pearls = path.size
                 if (pearls != lastTspPearls) {

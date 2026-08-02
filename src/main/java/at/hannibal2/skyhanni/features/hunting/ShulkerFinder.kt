@@ -80,7 +80,7 @@ object ShulkerFinder {
         val graph = IslandGraphs.currentIslandGraph ?: return null
         val list = graph.getNodesWithTags(shulkerType.nodeTag)
 
-        return NavigationUtils.getRoute(list, maxIterations = 300, neighborhoodSize = 50).toMutableList()
+        return NavigationUtils.getRoute(list).toMutableList()
     }
 
     @HandleEvent

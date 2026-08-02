@@ -1,24 +1,27 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
+import at.hannibal2.skyhanni.SkyHanniMod.launch
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.commands.brigadier.BrigadierUtils
 import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentType
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.SkyBlockUtils
+import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 
 @SkyHanniModule
 object NavigateAllHelper {
 
-    private val route: MutableList<LorenzVec> = mutableListOf()
+    private var route: List<LorenzVec> = listOf()
     private var total = 0
+    private var currentNodeType: GraphNodeTag? = null
 
-    val allowedMultiNavigationTags = setOf(
+    private val allowedMultiNavigationTags = setOf(
         GraphNodeTag.HOPPITY,
         GraphNodeTag.RIFT_EFFIGY,
         GraphNodeTag.CRIMSON_MINIBOSS,
@@ -34,48 +37,68 @@ object NavigateAllHelper {
         GraphNodeTag.SAFARI_BELL,
     )
 
+    private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
+
     /**
-     * Navigate to all nodes with the selected tag
+     * Navigate to all nodes with the selected [GraphNodeTag]
      *
      * In future this should be changed to take in a predicate for nodes
      * Existing features should be switched to use a more abstract version of this
      * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
-     *
-     * As TSP algorithm is so quick, in future it should recalculate the remaining order
-     * of nodes every few nodes reached for the most optimal pathing.
-     *
      */
-    private fun navigateAll(nodeTagType: GraphNodeTag) {
-        if (nodeTagType !in getValidNodeNames()) {
+    private fun navigateAll(nodeType: GraphNodeTag) {
+        if (nodeType !in getValidNodeNames()) {
             ChatUtils.userError("Target type is invalid on this island!")
             return
         }
 
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val list = graph.getNodesWithTags(nodeTagType)
+        val targetNodes = graph.getNodesWithTags(nodeType)
+        currentNodeType = nodeType
 
-        route.clear()
-        route.addAll(NavigationUtils.getRoute(list, maxIterations = 300, neighborhoodSize = 50))
-        total = route.size
+        pathfindCoroutine.launch {
+            route = emptyList()
+            route = calculateRoute(targetNodes)
+            total = route.size
 
-        recursiveNavigate(nodeTagType)
+            ChatUtils.chat("Navigating to $total ${nodeType.displayName}")
+
+            recursiveNavigate()
+        }
     }
 
-    private fun recursiveNavigate(nodeTagType: GraphNodeTag) {
+    private fun recursiveNavigate() {
         if (route.isEmpty()) return
 
+        val target = route.firstOrNull() ?: error("No more nodes found")
+        route = route.drop(1)
+
         IslandGraphs.pathFind(
-            route.removeFirstOrNull() ?: error("No more nodes found"),
-            "${nodeTagType.displayName} ${total - route.size}/$total",
-            onFound = { recursiveNavigate(nodeTagType) },
-            condition = { SkyBlockUtils.inSkyBlock },
+            target,
+            "${currentNodeType?.displayName} ${total - route.size}/$total",
+            onFound = { recursiveNavigate() },
+            condition = { route.isNotEmpty() },
         )
+    }
+
+    private fun calculateRoute(targetNodes: List<GraphNode>): List<LorenzVec> =
+        NavigationUtils.getRoute(targetNodes)
+
+    private fun handleSkip() {
+        if (route.isEmpty()) {
+            ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
+            return
+        }
+
+        // TODO handle recalculation of remaining route without the current node
+        recursiveNavigate()
     }
 
     @HandleEvent
     private fun onIslandChange() {
-        route.clear()
+        route = emptyList()
         total = 0
+        currentNodeType = null
     }
 
     @HandleEvent
@@ -93,6 +116,9 @@ object NavigateAllHelper {
                 BrigadierUtils.dynamicSuggestionProvider { getValidNodeNames().map { it.cleanName } },
             ) { nodeType ->
                 navigateAll(nodeType)
+            }
+            literalCallback("skip") {
+                handleSkip()
             }
         }
     }
