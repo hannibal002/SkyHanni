@@ -35,6 +35,7 @@ object NavigateAllHelper {
         GraphNodeTag.TREE_PROTECTION_ORDER,
         GraphNodeTag.HONEY_HIVE,
         GraphNodeTag.SAFARI_BELL,
+        GraphNodeTag.HIDEYHO_HIDING_LOCATION,
     )
 
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")

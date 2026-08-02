@@ -185,6 +185,14 @@ enum class GraphNodeTag(
         onlyIsland = IslandType.SAFARI,
     ),
 
+    HIDEYHO_HIDING_LOCATION(
+        "hideyho_hiding_location",
+        LorenzColor.LIGHT_PURPLE,
+        "Hideyho Hiding Location",
+        "A location that Hideyho can teleport to while hiding.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
     ;
 
     val displayName: String = color.getChatColor() + cleanName
