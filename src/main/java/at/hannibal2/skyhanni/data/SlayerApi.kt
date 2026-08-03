@@ -233,8 +233,6 @@ object SlayerApi {
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
         require(parsedTier != null) { "Failed to parse tier from category '$category'" }
 
-        invalidUpdates = 0
-
         return ParsedSlayer(
             type = type,
             category = category,
@@ -261,7 +259,7 @@ object SlayerApi {
             }
             return
         }
-        if (invalidUpdates > 0) return
+        invalidUpdates = 0
 
         val progress = parsed?.progress ?: "no slayer"
 
