@@ -23,6 +23,7 @@ import net.minecraft.network.chat.TextColor
 import net.minecraft.network.chat.contents.PlainTextContents
 import net.minecraft.network.chat.contents.TranslatableContents
 import net.minecraft.resources.Identifier
+import java.awt.Color
 import java.net.URI
 import java.util.Optional
 import kotlin.concurrent.atomics.AtomicBoolean
@@ -403,6 +404,22 @@ fun MutableComponent.appendWithColor(string: String = "", color: TextColor, init
 
 fun MutableComponent.appendWithColor(comp: Component, color: TextColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
     return this.append(comp.copyIfNeeded().withColor(color).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: Color, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(string.asComponent().withColor(color.rgb).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: Color, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color.rgb).also(init))
+}
+
+fun MutableComponent.appendWithColor(string: String = "", color: LorenzColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(string.asComponent().withColor(color.toColor().rgb).also(init))
+}
+
+fun MutableComponent.appendWithColor(comp: Component, color: LorenzColor, init: MutableComponent.() -> Unit = {}): MutableComponent {
+    return this.append(comp.copyIfNeeded().withColor(color.toColor().rgb).also(init))
 }
 
 fun List<Any>.mapToComponents(): List<Component> {

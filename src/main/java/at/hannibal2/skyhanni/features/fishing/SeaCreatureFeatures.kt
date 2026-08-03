@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.compat.EntityCompat.findHealthReal
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.primitives.text
@@ -71,8 +72,7 @@ object SeaCreatureFeatures {
                     append(seaCreature.displayName)
                     append(" NEARBY!")
                 } else {
-                    append(seaCreature.rarity.chatColorCode)
-                    append("RARE SEA CREATURE!")
+                    appendWithColor("RARE SEA CREATURE!", seaCreature.rarity.color)
                 }
             }
             sendTitle(text, duration = 1.5.seconds)
@@ -89,8 +89,7 @@ object SeaCreatureFeatures {
                     append(event.seaCreature.displayName)
                     append("!")
                 } else {
-                    append(event.seaCreature.rarity.chatColorCode)
-                    append("RARE CATCH!")
+                    appendWithColor("RARE CATCH!", event.seaCreature.rarity.color)
                 }
             }
             sendTitle(text)
