@@ -62,6 +62,14 @@ object SlayerApi {
         "quest.complete",
         "\\s*SLAYER QUEST COMPLETE!",
     )
+
+    /**
+     * WRAPPED-REGEX-TEST: "  SLAYER QUEST FAILED!"
+     */
+    private val questFailedPattern by patternGroup.pattern(
+        "quest.failed",
+        "\\s*SLAYER QUEST FAILED!",
+    )
     // </editor-fold>
 
     private val nameCache = TimeLimitedCache<Pair<NeuInternalName, Int>, Pair<String, Double>>(1.minutes)
@@ -179,6 +187,14 @@ object SlayerApi {
             questCompletePattern.matches(message) -> {
                 SlayerQuestCompleteEvent.post()
             }
+            questFailedPattern.matches(message) -> {
+                val data = getCurrentData()
+                if (data.currentState != FAILED) {
+                    SlayerStateChangeEvent(FAILED).post()
+                }
+                data.currentState = ActiveQuestState.FAILED
+                data.currentStateRaw = "no slayer"
+            }
         }
     }
 
@@ -289,7 +305,7 @@ object SlayerApi {
 
         data.currentStateRaw = progress
 
-        val newState = detectState(oldStateRaw, progress)
+        val newState = detectState(progress)
         if (newState != data.currentState) {
             ChatUtils.debug("${data.currentState} -> $newState")
             data.currentState = newState
@@ -321,10 +337,9 @@ object SlayerApi {
         NO_ACTIVE_QUEST,
     }
 
-    private fun detectState(old: String, new: String): ActiveQuestState = when {
+    private fun detectState(new: String): ActiveQuestState = when {
         new.inGrind() -> GRINDING
         new.inBoss() -> BOSS_FIGHT
-        old.inBoss() && new.noSlayer() -> FAILED
         new.bossSlain() -> SLAIN
         else -> NO_ACTIVE_QUEST
     }
