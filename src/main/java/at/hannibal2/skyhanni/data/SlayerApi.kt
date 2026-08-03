@@ -97,7 +97,7 @@ object SlayerApi {
     /**
      * How many consecutive updates have we seen a category that is invalid?
      */
-    private var invalidCategoryUpdates = 0
+    private var invalidUpdates = 0
 
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
@@ -204,10 +204,25 @@ object SlayerApi {
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
+    private fun errorOnInvalid(message: String, lines: List<String>, source: SlayerLinesSource) {
+        invalidUpdates++
+
+        if (invalidUpdates == 3) {
+            ErrorManager.skyHanniError(
+                message,
+                "lines" to lines,
+                "source" to source.name,
+            )
+        }
+    }
+
     private fun getParsedSlayerOrNull(lines: List<String>, source: SlayerLinesSource): ParsedSlayer? {
         val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
+
         if (questIndex == -1) {
-            invalidCategoryUpdates = 0
+            if (hasActiveQuest()) {
+                errorOnInvalid("latestCategory does not contain valid slayer type: '$latestCategory'", lines, source)
+            }
             return null
         }
 
@@ -219,19 +234,11 @@ object SlayerApi {
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
 
         if (parsedTier == null) {
-            invalidCategoryUpdates++
-
-            if (invalidCategoryUpdates == 3) {
-                ErrorManager.skyHanniError(
-                    "latestCategory does not contain roman number or int: '$category'",
-                    "lines" to lines,
-                    "source" to source.name,
-                )
-            }
+            errorOnInvalid("latestCategory does not contain roman number or int: '$category'", lines, source)
             return null
         }
 
-        invalidCategoryUpdates = 0
+        invalidUpdates = 0
 
         return ParsedSlayer(
             type = type,
@@ -242,8 +249,6 @@ object SlayerApi {
     }
 
     private fun updateCategory(parsed: ParsedSlayer?) {
-        if (invalidCategoryUpdates > 0) return
-
         val category = parsed?.category.orEmpty()
         if (category == latestCategory) return
 
@@ -259,6 +264,7 @@ object SlayerApi {
 
         val (lines, source) = getSlayerLines()
         val parsed = getParsedSlayerOrNull(lines, source)
+        if (invalidUpdates > 0) return
         val progress = parsed?.progress ?: "no slayer"
 
         updateCategory(parsed)
