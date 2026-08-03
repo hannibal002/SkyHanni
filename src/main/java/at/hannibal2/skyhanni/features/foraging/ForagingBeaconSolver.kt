@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.filterNotEmptyString
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.itemType
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -273,7 +274,7 @@ object ForagingBeaconSolver {
         NotificationManager.queueNotification(SkyHanniNotification(text, length = 5.seconds, showOverInventory = true))
     }
 
-    private fun SafeItemStack.isPaused(): Boolean = this.`is`(Items.DYED_TERRACOTTA.red())
+    private fun SafeItemStack.isPaused(): Boolean = this.`is`(ColoredBlockCompat.RED.clayBlock.asItem())
 
     @HandleEvent
     fun onTick() {
