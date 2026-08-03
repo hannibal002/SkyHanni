@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
-
     private val trackerConfig get() = config.itemProfitTracker
 
     private val patternGroup = RepoPattern.group("slayer.api")
@@ -104,7 +103,7 @@ object SlayerApi {
     var currentAreaType: SlayerType? = null
 
     /**
-     * How many consecutive updates have we seen a category that is invalid?
+     * How many consecutive updates have we seen that are invalid?
      */
     private var invalidUpdates = 0
 
