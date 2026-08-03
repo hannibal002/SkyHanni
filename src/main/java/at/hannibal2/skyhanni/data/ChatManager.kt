@@ -298,7 +298,7 @@ object ChatManager {
             newComponent,
             id,
             GuiMessageSource.SYSTEM_CLIENT,
-            GuiMessageTag.system()
+            GuiMessageTag.system(),
         )
         chatGui.allMessages[messageIndex] = newMessage
 
