@@ -302,7 +302,7 @@ object SlayerApi {
 
         // If the player kills the boss immediately after the boss spawns
         if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
-            ChatUtils.debug("Intermediate state change detected: BOSS_FIGHT -> GRINDING -> SLAIN")
+            ChatUtils.debug("Intermediate state change detected: BOSS_FIGHT -> SLAIN -> GRINDING")
             SlayerStateChangeEvent(SLAIN).post()
         }
         if (data.currentState == GRINDING && newState == SLAIN) {
