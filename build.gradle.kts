@@ -38,7 +38,6 @@ val primaryTarget = ProjectTarget.MODERN_26100
 val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
 fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
 fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
-fun DependencyHandler.mappings(dep: Any): Dependency? = add("mappings", dep)
 fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
 fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
