@@ -29,15 +29,13 @@ object SafariNamesInCenter {
         showWaypoints = event.area == AreaNode.NO_AREA
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = SAFARI)
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
-        if (!isEnabled() || !showWaypoints) return
+        if (!config.namesInCenter || !showWaypoints) return
         for ((location, name) in areaLocations) {
             if (location.distanceSqToPlayer() > 50) {
                 event.drawDynamicText(location, name, 2.5)
             }
         }
     }
-
-    private fun isEnabled() = IslandType.SAFARI.isInIsland() && config.namesInCenter
 }
