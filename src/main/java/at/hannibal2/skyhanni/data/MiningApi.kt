@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi.dungeonRoomPattern
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -228,7 +228,7 @@ object MiningApi {
     @HandleEvent
     private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTag.IS_COLD.isInIsland()) {
-            dungeonRoomPattern.firstMatcher(event.new) {
+            DungeonApi.dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
 
