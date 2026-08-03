@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.dungeonRoomPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
@@ -56,6 +57,8 @@ object MiningApi {
      * REGEX-TEST: Mines of Divan
      */
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
+
+    private val icyBiomePattern by group.pattern("area.icybiome", "Icy Biome")
 
     /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
@@ -212,20 +215,37 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
+    /**
+     * Whether cold can currently apply to the player.
+     * On the Critter Safari cold only exists inside the Icy Biome, on the other cold islands it applies everywhere.
+     */
+    fun inColdArea(): Boolean {
+        if (!IslandTypeTag.IS_COLD.isInIsland()) return false
+        if (IslandType.SAFARI.isInIsland()) return icyBiomePattern.matches(SkyBlockUtils.graphArea)
+        return true
+    }
+
     @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
 
-            coldPattern.firstMatcher(event.added) {
-                val newCold = group("cold").toInt().absoluteValue
+            var found = false
+            if (inColdArea()) {
+                coldPattern.firstMatcher(event.new) {
+                    found = true
+                    val newCold = group("cold").toInt().absoluteValue
 
-                if (newCold != cold) {
-                    updateCold(newCold)
+                    if (newCold != cold) {
+                        updateCold(newCold)
+                    }
                 }
             }
+            // Cold is reset when the line is gone from the scoreboard, and also when the player left the cold area,
+            // since Hypixel does not reliably remove the line in that case.
+            if (!found) resetCold()
         }
 
         if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
@@ -408,9 +428,15 @@ object MiningApi {
     }
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    private fun onGraphAreaChange() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
+    }
+
+    // Resets cold the moment the player leaves a cold area, without waiting for the scoreboard to catch up.
+    @HandleEvent(GraphAreaChangeEvent::class)
+    private fun onAreaChange() {
+        if (!inColdArea()) resetCold()
     }
 
     @HandleEvent
@@ -517,6 +543,12 @@ object MiningApi {
             add("")
             add("recentlyClickedBlocks: ${recentClickedBlocks.keys.joinToString { "(${it.toCleanString()})" }}")
         }
+    }
+
+    private fun resetCold() {
+        if (cold == 0) return
+        updateCold(0)
+        lastColdReset = SimpleTimeMark.now()
     }
 
     private fun updateCold(newCold: Int) {
