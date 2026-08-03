@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.compat
 
 import at.hannibal2.skyhanni.utils.SafeItemStack
+import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.MouseCompat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import me.shedaniel.math.Point
@@ -10,7 +11,6 @@ import me.shedaniel.rei.api.client.registry.screen.ScreenRegistry
 import me.shedaniel.rei.api.common.entry.type.EntryTypeRegistry
 import me.shedaniel.rei.api.common.entry.type.VanillaEntryTypes
 import me.shedaniel.rei.api.common.plugins.PluginManager
-import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.events.ContainerEventHandler
 import net.minecraft.client.gui.components.events.GuiEventListener
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
@@ -22,7 +22,7 @@ object ReiCompat {
     @JvmStatic
     fun searchHasFocus(): Boolean {
         if (!isReiReady()) return false
-        if (Minecraft.getInstance().screen == null) return false
+        if (MinecraftCompat.screen == null) return false
         return try {
             (REIRuntime.getInstance().searchTextField as? GuiEventListener)?.isFocused == true
         } catch (e: Throwable) {
@@ -33,7 +33,7 @@ object ReiCompat {
     fun getHoveredStackFromRei(): SafeItemStack? {
         if (!isReiReady()) return null
         return try {
-            getItemStackFromItemList() ?: (Minecraft.getInstance().screen as? AbstractContainerScreen<*>)
+            getItemStackFromItemList() ?: (MinecraftCompat.screen as? AbstractContainerScreen<*>)
                 ?.let(::getItemStackFromRecipe)
         } catch (e: Throwable) {
             null
