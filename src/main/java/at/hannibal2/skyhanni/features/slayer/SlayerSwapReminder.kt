@@ -2,76 +2,61 @@ package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerApi
-import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.Mob.Companion.belongsToPlayer
 import at.hannibal2.skyhanni.data.mob.MobCategory
-import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.data.title.TitleManager
+import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object SlayerSwapReminder{
+object SlayerSwapReminder {
 
-    private val config get() = SlayerApi.config.rodSwapAlert
+    private val config get() = SlayerApi.config.slayerSwapReminder
 
     private var hasAlertedForCurrentBoss = false
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onTick(event: SkyHanniTickEvent) {
+    private fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isActive()) return
         if (hasAlertedForCurrentBoss) return
 
-        val myBoss = getMySlayerBoss() ?: return
+        val mob = event.entityData.mob
+        if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
 
-        val health = myBoss.health.toDouble()
-        val maxHealth = myBoss.maxHealth.toDouble()
+        val currentHealth = event.health.toDouble()
+        val maxHealth = event.maxHealth.toDouble()
 
-        if (maxHealth <= 0) return
+        // Ignore uninitialized / zero health states when boss first spawns
+        if (maxHealth <= 0 || currentHealth <= 0) return
 
-        val hpPercentage = (health / maxHealth) * 100.0
-        val threshold = config.hpThreshold
+        val hpPercentage = (currentHealth / maxHealth) * 100.0
+        if (hpPercentage > config.hpThreshold) return
 
-        if (hpPercentage <= threshold) {
-            hasAlertedForCurrentBoss = true
+        hasAlertedForCurrentBoss = true
 
-            // Convert custom user '&' color codes to '§'
-            val formattedTitle = config.titleText.replace('&', '§')
+        val formattedTitle = config.titleText.replace('&', '§')
 
-            // Send title with FORCE_FIRST so it renders instantly over any waiting titles
-            TitleManager.sendTitle(
-                titleText = formattedTitle,
-                duration = 2.seconds,
-                addType = TitleManager.TitleAddType.FORCE_FIRST
-            )
+        TitleManager.sendTitle(
+            titleText = formattedTitle,
+            duration = 2.seconds,
+            addType = TitleManager.TitleAddType.FORCE_FIRST
+        )
 
-            if (config.playSound) {
-                SoundUtils.playPlingSound()
-            }
+        if (config.playSound) {
+            SoundUtils.playPlingSound()
         }
     }
 
     @HandleEvent
-    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
+    private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
-        if (mob.category == MobCategory.SLAYER && mob.belongsToPlayer()) {
-            hasAlertedForCurrentBoss = false
+        if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
 
-            // Uses TitleManager's conditionallyStopTitle to clear the active rod swap alert on boss despawn
-            val targetTitle = config.titleText.replace('&', '§')
-            TitleManager.conditionallyStopTitle { activeText ->
-                activeText == targetTitle
-            }
-        }
+        hasAlertedForCurrentBoss = false
     }
-
-    private fun getMySlayerBoss(): Mob? = MobData.skyblockMobs
-        .firstOrNull { mob ->
-            mob.category == MobCategory.SLAYER && mob.belongsToPlayer()
-        }
 
     private fun isActive() = config.enabled && SlayerApi.isInBossFight()
 }

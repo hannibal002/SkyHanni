@@ -82,9 +82,11 @@ class SlayerConfig {
     val activeBossTransparency: ActiveBossTransparencyConfig = ActiveBossTransparencyConfig()
 
     @Expose
-    @ConfigOption(name = "Rod Swap Alert", desc = "")
+    @ConfigOption(
+        name = "Reminder to swap",
+        desc = "Allows you to set a displayable text on the screen to remind yourself")
     @Accordion
-    val rodSwapAlert: SlayerSwapReminderConfig = SlayerSwapReminderConfig()
+    val slayerSwapReminder: SlayerSwapReminderConfig = SlayerSwapReminderConfig()
 
     @Expose
     @ConfigOption(
