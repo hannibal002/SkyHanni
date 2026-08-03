@@ -265,7 +265,7 @@ object ContributorManager {
 
     @HandleEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent.Allow) {
-        if (isSelfContributor()) return
+        if (!isSelfContributor()) return
         if (!config.contributorMentionTracker) return
         val msg = event.messageComponent.getText()
         if (!isContributorMentionMessage(msg)) return
