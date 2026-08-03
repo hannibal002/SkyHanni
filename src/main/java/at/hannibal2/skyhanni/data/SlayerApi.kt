@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
-    private val debugConfig get() = SkyHanniMod.feature.dev.debug.slayerDebug
 
     private val trackerConfig get() = config.itemProfitTracker
 
@@ -185,17 +184,13 @@ object SlayerApi {
                 questStartTime = SimpleTimeMark.now()
             }
             questCompletePattern.matches(message) -> {
-                if (debugConfig) {
-                    ChatUtils.debug("Slayer quest complete detected, posting SlayerQuestCompleteEvent")
-                }
+                ChatUtils.debug("Slayer quest complete detected, posting SlayerQuestCompleteEvent")
                 SlayerQuestCompleteEvent.post()
             }
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
                 if (data.currentState != FAILED) {
-                    if (debugConfig) {
-                        ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
-                    }
+                    ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
                     SlayerStateChangeEvent(FAILED).post()
                 }
                 data.currentState = ActiveQuestState.FAILED
@@ -300,18 +295,14 @@ object SlayerApi {
         latestCategory = category
         tier = parsed?.tier ?: 0
 
-        if (debugConfig) {
-            ChatUtils.debug("$old -> $category")
-        }
+        ChatUtils.debug("$old -> $category")
         SlayerChangeEvent(old, category).post()
     }
 
     private fun updateProgress(progress: String) {
         if (progress == latestProgress) return
 
-        if (debugConfig) {
-            ChatUtils.debug("$latestProgress -> $progress")
-        }
+        ChatUtils.debug("$latestProgress -> $progress")
         SlayerProgressChangeEvent(latestProgress, progress).post()
         latestProgress = progress
     }
@@ -329,13 +320,16 @@ object SlayerApi {
 
         // If the player kills the boss immediately after the boss spawns
         if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
+            ChatUtils.debug("Intermediate state change detected: BOSS_FIGHT -> GRINDING -> SLAIN")
             SlayerStateChangeEvent(SLAIN).post()
+        }
+        if (data.currentState == GRINDING && newState == SLAIN) {
+            ChatUtils.debug("Intermediate state change detected: GRINDING -> BOSS_FIGHT -> SLAIN")
+            SlayerStateChangeEvent(BOSS_FIGHT).post()
         }
 
         if (newState != data.currentState) {
-            if (debugConfig) {
-                ChatUtils.debug("${data.currentState} -> $newState")
-            }
+            ChatUtils.debug("${data.currentState} -> $newState")
             data.currentState = newState
             SlayerStateChangeEvent(newState).post()
         }
