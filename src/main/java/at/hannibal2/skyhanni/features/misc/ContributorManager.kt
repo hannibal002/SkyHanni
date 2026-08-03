@@ -317,7 +317,7 @@ object ContributorManager {
     }
 
     private fun isContributorMentionMessage(message: String): Boolean {
-        val cleanMessage = message.removeSuffix("[SkyHanni] ")
+        val cleanMessage = message.removePrefix("[SkyHanni] ")
         if (cleanMessage.startsWith(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
         if (cleanMessage.startsWith(FOUND_WILD_CONTRIBUTOR)) return true
 
