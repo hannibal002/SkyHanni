@@ -190,7 +190,7 @@ class InventoryConfig {
     @Expose
     @ConfigOption(name = "Hub Selector", desc = "Highlight near-capacity lobbies in the hub selector.")
     @Accordion
-    @SearchTag("lobby capacity full players")
+    @SearchTag("lobby full players")
     val hubSelector: HubSelectorConfig = HubSelectorConfig()
 
     @Expose

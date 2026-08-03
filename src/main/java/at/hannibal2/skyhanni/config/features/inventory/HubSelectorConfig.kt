@@ -6,6 +6,7 @@ import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class HubSelectorConfig {
@@ -19,22 +20,49 @@ class HubSelectorConfig {
     var enabled: Boolean = false
 
     @Expose
-    @ConfigOption(name = "Very Busy Color (45+)", desc = "Color for lobbies with 45 or more players.")
+    @ConfigOption(
+        name = "Very Busy Threshold",
+        desc = "Lobbies at least this % full use the Very Busy color.",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var veryBusyThreshold: Int = 75
+
+    @Expose
+    @ConfigOption(name = "Very Busy Color", desc = "Color for the Very Busy band.")
     @ConfigEditorColour
     var veryBusyColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
     @Expose
-    @ConfigOption(name = "Busy Color (30+)", desc = "Color for lobbies with 30 to 44 players.")
+    @ConfigOption(
+        name = "Busy Threshold",
+        desc = "Lobbies at least this % full use the Busy color.",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var busyThreshold: Int = 50
+
+    @Expose
+    @ConfigOption(name = "Busy Color", desc = "Color for the Busy band.")
     @ConfigEditorColour
     var busyColor: ChromaColour = LorenzColor.GOLD.toChromaColor(255)
 
     @Expose
-    @ConfigOption(name = "Moderate Color (15+)", desc = "Color for lobbies with 15 to 29 players.")
+    @ConfigOption(
+        name = "Moderate Threshold",
+        desc = "Lobbies at least this % full use the Moderate color.",
+    )
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    var moderateThreshold: Int = 25
+
+    @Expose
+    @ConfigOption(name = "Moderate Color", desc = "Color for the Moderate band.")
     @ConfigEditorColour
     var moderateColor: ChromaColour = LorenzColor.YELLOW.toChromaColor(255)
 
     @Expose
-    @ConfigOption(name = "Quiet Color (under 15)", desc = "Color for lobbies with fewer than 15 players. §eTransparent by default.")
+    @ConfigOption(
+        name = "Quiet Color",
+        desc = "Color for lobbies below the Moderate threshold. §eTransparent by default.",
+    )
     @ConfigEditorColour
     var quietColor: ChromaColour = LorenzColor.WHITE.toChromaColor(0)
 }

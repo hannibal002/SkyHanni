@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
+import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -42,13 +43,22 @@ object HubSelectorCapacityHighlight {
         if (!config.enabled) return
         if (!hubSelectorInventory.isInside()) return
 
+        // Coerce the thresholds into order at read time so bands never overlap, no matter how the
+        // sliders are set (veryBusy >= busy >= moderate).
+        val moderate = config.moderateThreshold
+        val busy = config.busyThreshold.coerceAtLeast(moderate)
+        val veryBusy = config.veryBusyThreshold.coerceAtLeast(busy)
+
         for (slot in event.container.slots) {
             playersPattern.firstMatcher(slot.item.getCleanLore()) {
                 val current = group("current").toInt()
+                val max = group("max").toInt()
+                val percent = current.fractionOf(max) * 100
+
                 val color = when {
-                    current >= 45 -> config.veryBusyColor
-                    current >= 30 -> config.busyColor
-                    current >= 15 -> config.moderateColor
+                    percent >= veryBusy -> config.veryBusyColor
+                    percent >= busy -> config.busyColor
+                    percent >= moderate -> config.moderateColor
                     else -> config.quietColor
                 }
                 slot.highlight(color)
