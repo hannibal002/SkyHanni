@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.chroma.ChromaFontManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation
 import net.minecraft.client.gui.components.ChatComponent
@@ -30,9 +31,11 @@ object GuiChatHook {
         return replacementComponent ?: "No replacement component was set".asComponent()
     }
 
+    // Required for Java interop with Operation<Void>
+    @Suppress("ForbiddenVoid")
     @JvmStatic
     fun wrapChatRender(
-        original: Operation<Unit>,
+        original: Operation<Void>,
         chatGraphicsAccess: ChatComponent.ChatGraphicsAccess,
         screenHeight: Int,
         ticks: Int,
@@ -44,8 +47,13 @@ object GuiChatHook {
     ) {
         ChromaFontManager.renderingChat = true
         ModifyVisualWords.changeWords = false
-        original.call(chatGraphicsAccess, screenHeight, ticks, displayMode)
-        ChromaFontManager.renderingChat = false
-        ModifyVisualWords.changeWords = true
+        try {
+            original.call(chatGraphicsAccess, screenHeight, ticks, displayMode)
+        } catch (e: Throwable) {
+            ErrorManager.logErrorWithData(e, "Error in chat rendering")
+        } finally {
+            ChromaFontManager.renderingChat = false
+            ModifyVisualWords.changeWords = true
+        }
     }
 }

@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi.dungeonRoomPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
@@ -81,6 +80,7 @@ object MiningApi {
     // This intentionally uses the old cold icon, since Hypixel has not updated it in this location.
     /**
      * REGEX-TEST: Cold: §b-1❄
+     * REGEX-TEST: Cold: §b-3❄
      */
     val coldPattern by group.pattern(
         "cold",
@@ -212,7 +212,7 @@ object MiningApi {
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
     @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
@@ -249,7 +249,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.blockState) == null) return
@@ -260,7 +260,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
@@ -290,7 +290,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
+    private fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
         if (event.isSelf) {
             updateCold(0)
             updateHeat(0)
@@ -300,7 +300,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
@@ -344,7 +344,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         val oldState = event.oldState
         val newState = event.newState
@@ -388,7 +388,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 
@@ -406,14 +406,14 @@ object MiningApi {
         }
     }
 
-    @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    @HandleEvent
+    private fun onScoreboardAreaChange() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
 
     @HandleEvent
-    fun onIslandChange() {
+    private fun onIslandChange() {
         updateLocation()
 
         mineshaftRoomId = null
@@ -448,7 +448,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks.clear()
@@ -482,7 +482,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")
@@ -546,7 +546,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val repo = event.getConstant<MiningJson>("Mining")
 
         blockStrengths.clear()
