@@ -13,8 +13,9 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonApi.dungeonRoomPattern
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -56,6 +57,8 @@ object MiningApi {
      * REGEX-TEST: Mines of Divan
      */
     private val minesOfDivanPattern by group.pattern("area.minesofdivan", "Mines of Divan")
+
+    private val icyBiomePattern by group.pattern("area.icybiome", "Icy Biome")
 
     /**
      * REGEX-TEST: §6The warmth of the campfire reduced your §r§b Cold §r§6to §r§a0§r§6!
@@ -212,20 +215,38 @@ object MiningApi {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(SkyBlockUtils.graphArea)
 
+    /**
+     * Whether cold can currently apply to the player.
+     * On the Critter Safari cold is limited to the Icy Biome, which is why the area is checked here.
+     * The other cold islands are not narrowed down further, there we rely on Hypixel removing the scoreboard line.
+     */
+    fun inColdArea(): Boolean {
+        if (!IslandTypeTag.IS_COLD.isInIsland()) return false
+        if (IslandType.SAFARI.isInIsland()) return icyBiomePattern.matches(SkyBlockUtils.graphArea)
+        return true
+    }
+
     @HandleEvent
-    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+    private fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (IslandTypeTag.IS_COLD.isInIsland()) {
-            dungeonRoomPattern.firstMatcher(event.new) {
+            DungeonApi.dungeonRoomPattern.firstMatcher(event.new) {
                 groupOrNull("roomId")?.let { mineshaftRoomId = it }
             }
 
-            coldPattern.firstMatcher(event.added) {
-                val newCold = group("cold").toInt().absoluteValue
+            var found = false
+            if (inColdArea()) {
+                coldPattern.firstMatcher(event.new) {
+                    found = true
+                    val newCold = group("cold").toInt().absoluteValue
 
-                if (newCold != cold) {
-                    updateCold(newCold)
+                    if (newCold != cold) {
+                        updateCold(newCold)
+                    }
                 }
             }
+            // Cold is reset when the line is gone from the scoreboard, and also when the player left the cold area,
+            // since Hypixel only removes the line after a delay.
+            if (!found) resetCold()
         }
 
         if (IslandType.CRYSTAL_HOLLOWS.isInIsland()) {
@@ -250,7 +271,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onBlockClick(event: BlockClickEvent) {
+    private fun onBlockClick(event: BlockClickEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.clickType != InteractClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.blockState) == null) return
@@ -261,7 +282,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (IslandTypeTag.IS_COLD.isInIsland()) {
             if (coldResetPattern.matches(event.message)) {
@@ -291,7 +312,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
+    private fun onPlayerDeath(event: PlayerDeathEvent.Allow) {
         if (event.isSelf) {
             updateCold(0)
             updateHeat(0)
@@ -301,7 +322,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onPlaySound(event: PlaySoundEvent) {
+    private fun onPlaySound(event: PlaySoundEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (event.soundName == "entity.generic.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
             lastPickobulusExplosion = SimpleTimeMark.now()
@@ -345,7 +366,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onBlockChange(event: ServerBlockChangeEvent) {
+    private fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         val oldState = event.oldState
         val newState = event.newState
@@ -389,7 +410,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onTick() {
+    private fun onTick() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
 
@@ -408,13 +429,19 @@ object MiningApi {
     }
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
-    fun onAreaChange() {
+    private fun onScoreboardAreaChange() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
 
+    // Resets cold the moment the player leaves a cold area, without waiting for the scoreboard to catch up.
+    @HandleEvent(GraphAreaChangeEvent::class)
+    private fun onAreaChange() {
+        if (!inColdArea()) resetCold()
+    }
+
     @HandleEvent
-    fun onIslandChange() {
+    private fun onIslandChange() {
         updateLocation()
 
         mineshaftRoomId = null
@@ -449,7 +476,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks.clear()
@@ -483,7 +510,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) {
             event.addIrrelevant("not in a mining island")
@@ -519,6 +546,12 @@ object MiningApi {
         }
     }
 
+    private fun resetCold() {
+        if (cold == 0) return
+        updateCold(0)
+        lastColdReset = SimpleTimeMark.now()
+    }
+
     private fun updateCold(newCold: Int) {
         // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
@@ -547,7 +580,7 @@ object MiningApi {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val repo = event.getConstant<MiningJson>("Mining")
 
         blockStrengths.clear()
