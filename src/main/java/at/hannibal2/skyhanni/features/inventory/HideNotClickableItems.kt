@@ -96,7 +96,7 @@ object HideNotClickableItems {
     )
 
     // TODO add more special named fossils (hypixel why)
-    private val fossilNames = setOf(
+    private val specialFossils = setOf(
         "HELIX".toInternalName(),
     )
 
@@ -262,7 +262,7 @@ object HideNotClickableItems {
             return false
         }
 
-        hideReason = "§cNot a chisel or scrap!"
+        hideReason = "Not a chisel or scrap!"
         return true
     }
 
@@ -273,14 +273,14 @@ object HideNotClickableItems {
 
         val internalName = stack.getInternalNameOrNull() ?: return false
 
-        if (internalName in fossilNames) {
+        if (internalName in specialFossils) {
             return false
         }
         if (internalName.endsWith("_FOSSIL")) {
             return false
         }
 
-        hideReason = "§cNot a fossil!"
+        hideReason = "Not a fossil!"
         return true
     }
 
@@ -295,7 +295,7 @@ object HideNotClickableItems {
             return false
         }
 
-        hideReason = "§cNot bird food!"
+        hideReason = "Not bird food!"
         return true
     }
 
@@ -341,6 +341,7 @@ object HideNotClickableItems {
 
     private fun hideYourEquipment(stack: SafeItemStack): Boolean {
         if (!CurrentEquipmentApi.inventory.isInside()) return false
+
         for (type in equipmentTypes) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
                 showGreenLine = true
