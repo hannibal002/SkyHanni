@@ -43,7 +43,7 @@ object HubSelectorCapacityHighlight {
         if (!config.enabled) return
         if (!hubSelectorInventory.isInside()) return
 
-        // Coerce the thresholds into order at read time so bands never overlap, no matter how the
+        // Coerce the thresholds into order at read time so ranges never overlap, no matter how the
         // sliders are set (veryBusy >= busy >= moderate).
         val moderate = config.moderateThreshold
         val busy = config.busyThreshold.coerceAtLeast(moderate)

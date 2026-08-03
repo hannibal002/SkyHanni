@@ -28,7 +28,7 @@ class HubSelectorConfig {
     var veryBusyThreshold: Int = 75
 
     @Expose
-    @ConfigOption(name = "Very Busy Color", desc = "Color for the Very Busy band.")
+    @ConfigOption(name = "Very Busy Color", desc = "Color for the Very Busy range.")
     @ConfigEditorColour
     var veryBusyColor: ChromaColour = LorenzColor.RED.toChromaColor(255)
 
@@ -41,7 +41,7 @@ class HubSelectorConfig {
     var busyThreshold: Int = 50
 
     @Expose
-    @ConfigOption(name = "Busy Color", desc = "Color for the Busy band.")
+    @ConfigOption(name = "Busy Color", desc = "Color for the Busy range.")
     @ConfigEditorColour
     var busyColor: ChromaColour = LorenzColor.GOLD.toChromaColor(255)
 
@@ -54,7 +54,7 @@ class HubSelectorConfig {
     var moderateThreshold: Int = 25
 
     @Expose
-    @ConfigOption(name = "Moderate Color", desc = "Color for the Moderate band.")
+    @ConfigOption(name = "Moderate Color", desc = "Color for the Moderate range.")
     @ConfigEditorColour
     var moderateColor: ChromaColour = LorenzColor.YELLOW.toChromaColor(255)
 
