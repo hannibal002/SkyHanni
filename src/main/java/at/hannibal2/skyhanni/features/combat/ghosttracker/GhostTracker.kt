@@ -176,7 +176,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onSkillExp(event: SkillExpGainEvent) {
+    private fun onSkillExp(event: SkillExpGainEvent) {
         if (!inArea) return
         if (event.gained > 10_000) return
         tracker.modify {
@@ -185,7 +185,7 @@ object GhostTracker {
     }
 
     @HandleEvent(SecondPassedEvent::class)
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         if (!TabWidget.BESTIARY.isActive && lastNoWidgetWarningTime.passedSince() > 1.minutes) {
             lastNoWidgetWarningTime = SimpleTimeMark.now()
@@ -208,7 +208,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onSackChange(event: SackChangeEvent) {
+    private fun onSackChange(event: SackChangeEvent) {
         if (!inArea || !ProfileStorageData.loaded) return
 
         val allowedChanges = event.sackChanges.filter {
@@ -223,20 +223,20 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onShard(event: ShardGainEvent) {
+    private fun onShard(event: ShardGainEvent) {
         if (event.shardInternalName != ghostShard) return
         tracker.addItem(ghostShard, event.amount, false)
     }
 
     @HandleEvent
-    fun onItemAdd(event: ItemAddEvent) {
+    private fun onItemAdd(event: ItemAddEvent) {
         if (!inArea || event.source != ItemAddManager.Source.COMMAND) return
 
         tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @HandleEvent
-    fun onPurseChange(event: PurseChangeEvent) {
+    private fun onPurseChange(event: PurseChangeEvent) {
         if (!inArea) return
         if (event.reason != PurseChangeCause.GAIN_MOB_KILL) return
         if (event.coins !in 200.0..15_000.0) return
@@ -244,7 +244,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!inArea) return
         itemDropPattern.matchMatcher(event.cleanMessage) {
             val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
@@ -304,7 +304,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+    private fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BESTIARY)) return
         if (isMaxBestiary || !inArea) return
         parseBestiaryWidget(event.lines)
@@ -315,20 +315,20 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val ghostDropsConstant = event.getConstant<GhostDropsJson>("GhostDrops")
         allowedDrops = ghostDropsConstant.ghostDrops
         allowedSackDrops = ghostDropsConstant.sacksDrops
     }
 
     @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
+    private fun onAreaChange(event: GraphAreaChangeEvent) {
         inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
         if (inArea) parseBestiaryWidget(TabWidget.BESTIARY.lines)
     }
 
     @HandleEvent
-    fun onIslandChange(event: IslandChangeEvent) {
+    private fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
@@ -373,7 +373,7 @@ object GhostTracker {
     }
 
     @HandleEvent(ConfigLoadEvent::class)
-    fun onConfigLoad() {
+    private fun onConfigLoad() {
         val storage = storage ?: return
         if (storage.migratedTotalKills) return
         tracker.modify {
@@ -383,7 +383,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresetghosttracker") {
             description = "Resets the Ghost Profit Tracker"
             category = CommandCategory.USERS_RESET
@@ -392,7 +392,7 @@ object GhostTracker {
     }
 
     @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+    private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
 
         fun migrateItem(oldData: JsonElement): JsonElement {
             val oldAmount = oldData.asInt
