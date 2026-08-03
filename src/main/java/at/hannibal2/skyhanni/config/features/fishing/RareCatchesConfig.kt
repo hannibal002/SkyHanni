@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.features.fishing
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 
@@ -54,4 +56,8 @@ class RareCatchesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var highlight: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = RareCatchesConfig::class, field = "alertOwnCatches")
+    var position = Position(500, 500)
 }

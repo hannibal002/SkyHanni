@@ -133,7 +133,7 @@ object SeaCreatureManager {
         val variants = mutableMapOf<String, List<String>>()
 
         for ((variantName, variant) in data) {
-            val rgbColor = variant.rgbColor?: run {
+            val rgbColor = variant.rgbColor ?: run {
                 variant.chatColor[1].toLorenzColor()?.toColor()?.rgb
             } ?: continue
             val variantFishes = mutableListOf<String>()
