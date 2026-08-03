@@ -217,7 +217,8 @@ object MiningApi {
 
     /**
      * Whether cold can currently apply to the player.
-     * On the Critter Safari cold only exists inside the Icy Biome, on the other cold islands it applies everywhere.
+     * On the Critter Safari cold is limited to the Icy Biome, which is why the area is checked here.
+     * The other cold islands are not narrowed down further, there we rely on Hypixel removing the scoreboard line.
      */
     fun inColdArea(): Boolean {
         if (!IslandTypeTag.IS_COLD.isInIsland()) return false
