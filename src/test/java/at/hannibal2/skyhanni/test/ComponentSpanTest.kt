@@ -86,4 +86,5 @@ class ComponentSpanTest {
             assertNull(component("skin") ?: component("altskin"))
         }
     }
+
 }

@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
 import at.hannibal2.skyhanni.mixins.hooks.MinecraftInputHook;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
@@ -15,13 +13,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-//? if < 26.2 {
-/*import at.hannibal2.skyhanni.events.render.gui.GuiScreenOpenEvent;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import net.minecraft.client.gui.screens.Screen;
-import org.objectweb.asm.Opcodes;
-*///?}
-
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
 
@@ -29,7 +20,7 @@ public abstract class MixinMinecraft {
     public HitResult hitResult;
 
     @Shadow
-    protected int missTime;
+    private int missTime;
 
     @Shadow
     @Nullable
@@ -41,18 +32,12 @@ public abstract class MixinMinecraft {
         cancellable = true
     )
     public void handleRightClickMouse(CallbackInfo ci) {
-        if (this.gameMode == null) return;
         if (this.gameMode.isDestroying()) return;
 
         if (MinecraftInputHook.shouldCancelMouseRightClick(this.hitResult)) ci.cancel();
     }
 
-    //? if < 26.2 {
-    /*@Inject(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;"))
-    private void onSetScreen(Screen screen, CallbackInfo ci) {
-        new GuiScreenOpenEvent(screen).post();
-    }
-    *///?}
+    // onSetScreen moved to MixinGui_Minecraft
 
     @Inject(
         at = @At("HEAD"),
@@ -68,18 +53,15 @@ public abstract class MixinMinecraft {
     @ModifyVariable(
         at = @At(value = "HEAD"),
         method = "continueAttack",
-        //? if >= 26.1 {
-        name = "down",
-        //?}
         argsOnly = true
     )
-    public boolean handleBlockClick(boolean down) {
-        if (down && this.missTime <= 0) {
+    public boolean handleBlockClick(boolean isLeftClick) {
+        if (isLeftClick && this.missTime <= 0) {
             if (this.gameMode != null && MinecraftInputHook.shouldCancelContinuedBlockBreak(
                 this.hitResult,
                 this.gameMode.destroyBlockPos
             )) return false;
         }
-        return down;
+        return isLeftClick;
     }
 }

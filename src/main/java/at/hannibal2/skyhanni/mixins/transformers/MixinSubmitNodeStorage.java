@@ -13,23 +13,22 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 
 @Mixin({
     ItemFeatureRenderer.Submit.class,
+    //? if < 26.2
+    //SubmitNodeStorage.ModelPartSubmit.class,
     ModelFeatureRenderer.Submit.class,
-    //? if < 26.2 {
-    /*SubmitNodeStorage.ModelPartSubmit.class,
-    *///?}
 })
-public class MixinSubmitNodeStorage implements GlowingStateStore {
+public abstract class MixinSubmitNodeStorage implements GlowingStateStore {
 
     @Unique
     private boolean skyhanni$usingCustomOutline = false;
 
     @Override
-    public boolean skyhanni$isUsingCustomOutline() {
-        return this.skyhanni$usingCustomOutline;
+    public void skyhanni$setUsingCustomOutline() {
+        this.skyhanni$usingCustomOutline = true;
     }
 
     @Override
-    public void skyhanni$setUsingCustomOutline() {
-        this.skyhanni$usingCustomOutline = true;
+    public boolean skyhanni$isUsingCustomOutline() {
+        return this.skyhanni$usingCustomOutline;
     }
 }

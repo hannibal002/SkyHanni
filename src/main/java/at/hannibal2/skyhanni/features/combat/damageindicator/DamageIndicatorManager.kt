@@ -320,6 +320,7 @@ object DamageIndicatorManager {
 
     private fun EntityData.shouldShowNameAndHealth() = config.enabled && bossType.bossTypeToggle in config.bossesToShow
 
+    @Suppress("Indentation")
     private fun noDeathDisplay(bossType: BossType): Boolean = when (bossType) {
         BossType.SLAYER_BLAZE_TYPHOEUS_1,
         BossType.SLAYER_BLAZE_TYPHOEUS_2,
@@ -332,7 +333,7 @@ object DamageIndicatorManager {
 
         BossType.SLAYER_SPIDER_5_1,
 
-        // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+            // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
         -> true
 
         else -> false

@@ -78,10 +78,8 @@ class ChromaRenderLayer(
 
                     renderPass.enableRenderPassScissorStateIfAble()
 
-                    //~ if < 26.2 'prepareTextures' -> 'getTextures'
-                    for (entry in this.state.prepareTextures()) {
-                        //~ if < 26.2 'name' -> 'key'
-                        renderPass.bindTexture(entry.name, entry.value.textureView, entry.value.sampler)
+                    for (entry in this.state.getTextures()) {
+                        renderPass.bindTexture(entry.key, entry.value.textureView, entry.value.sampler)
                     }
 
                     renderPass.setIndexBuffer(gpuBuffer2, indexType)
@@ -102,5 +100,6 @@ class ChromaRenderLayer(
             matrix4fStack.popMatrix()
         }
     }
+
 }
 *///?}

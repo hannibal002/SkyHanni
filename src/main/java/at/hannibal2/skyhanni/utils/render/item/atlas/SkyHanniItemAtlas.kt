@@ -87,23 +87,12 @@ internal class SkyHanniItemAtlas : SkyHanniAbstractAtlas<SkyHanniAtlasKey, SkyHa
 
         renderer.render(projectionBuffer) {
             for ((key, representative, node, pixelSize) in renderJobs) {
-                renderer.renderItemToAtlas(
-                    representative,
-                    node.x,
-                    node.y,
-                    pixelSize,
-                    //? if >= 26.2 {
-                    submitNodeStorage,
-                    //?} else {
-                    /*bufferSource,
-                    *///?}
-                    featureRenderDispatcher,
-                )
+                //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
+                renderer.renderItemToAtlas(representative, node.x, node.y, pixelSize, submitNodeStorage, featureRenderDispatcher)
                 recordPosition(key, node.x, node.y, pixelSize)
             }
-            //? if < 26.2 {
-            /*bufferSource.endBatch()
-            *///?}
+            //? if < 26.2
+            //bufferSource.endBatch()
         }
     }
 

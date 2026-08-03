@@ -52,15 +52,19 @@ object EntityData {
     }
 
     @JvmStatic
-    fun getDisplayName(entity: Entity, original: Component): Component = nametagCache.getOrPut(entity.uuid) {
-        val event = EntityDisplayNameEvent(entity, original)
-        event.post()
-        event.chatComponent
+    fun getDisplayName(entity: Entity, oldValue: Component): Component {
+        return postRenderNametag(entity, oldValue)
     }
 
     @JvmStatic
     fun despawnEntity(entity: Entity) {
         EntityLeaveWorldEvent(entity).post()
+    }
+
+    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity.uuid) {
+        val event = EntityDisplayNameEvent(entity, chatComponent)
+        event.post()
+        event.chatComponent
     }
 
     @JvmStatic

@@ -20,50 +20,21 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 @Mixin(ScreenEffectRenderer.class)
 abstract class MixinScreenEffectRenderer {
 
-    //~ if < 26.2 'submit' -> 'render'
+    //~ if < 26.2 'submitFire' -> 'renderFire'
     @Inject(method = "submitFire", at = @At("HEAD"), cancellable = true)
-    private static void renderFire(
-        PoseStack poseStack,
-        //? if >= 26.2 {
-        SubmitNodeCollector submitNodeCollector,
-        //?} else {
-        /*MultiBufferSource bufferSource,
-        *///?}
-        TextureAtlasSprite sprite,
-        CallbackInfo ci
-
-    ) {
+    private static void renderFire(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
-    //~ if < 26.2 'submit' -> 'render'
+    //~ if < 26.2 'submitWater' -> 'renderWater'
     @Inject(method = "submitWater", at = @At("HEAD"), cancellable = true)
-    private static void renderWater(
-        Minecraft client,
-        PoseStack matrices,
-        //? if >= 26.2 {
-        SubmitNodeCollector submitNodeCollector,
-        //?} else {
-        /*MultiBufferSource bufferSource,
-        *///?}
-        CallbackInfo ci
-    ) {
+    private static void renderWater(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post().isCancelled()) ci.cancel();
     }
 
     //~ if < 26.2 'submitBlockSprite' -> 'renderTex'
     @Inject(method = "submitBlockSprite", at = @At("HEAD"), cancellable = true)
-    private static void renderBlock(
-        TextureAtlasSprite sprite,
-        PoseStack poseStack,
-        //? if >= 26.2 {
-        SubmitNodeCollector submitNodeCollector,
-        int color,
-        //?} else {
-        /*MultiBufferSource bufferSource,
-        *///?}
-        CallbackInfo ci
-    ) {
+    private static void renderBlock(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post().isCancelled()) ci.cancel();
     }
 }

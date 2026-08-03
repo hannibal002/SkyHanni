@@ -30,22 +30,10 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 @Mixin(EntityRenderer.class)
 public abstract class MixinEntityRenderer {
 
-    @Inject(
-        //? if >= 26.1 {
-        method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else {
-        /*method = "submitNameTag",
-        *///?}
-        at = @At("HEAD"),
-        cancellable = true
-    )
-    public void onRenderLabelHead(
-        EntityRenderState state,
-        PoseStack poseStack,
-        SubmitNodeCollector submitNodeCollector,
-        CameraRenderState cameraRenderState,
-        CallbackInfo ci
-    ) {
+
+    //~ if < 26.1 'submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V' -> 'submitNameTag'
+    @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
+    public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             //noinspection deprecation
             if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post().isCancelled()) {
@@ -54,41 +42,17 @@ public abstract class MixinEntityRenderer {
         }
     }
 
-    @Inject(
-        //? if >= 26.1 {
-        method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-        //?} else {
-        /*method = "submitNameTag",
-        *///?}
-        at = @At("TAIL")
-    )
-    public void onRenderLabelTail(
-        EntityRenderState state,
-        PoseStack poseStack,
-        SubmitNodeCollector submitNodeCollector,
-        CameraRenderState cameraRenderState,
-        CallbackInfo ci
-    ) {
+    //~ if < 26.1 'submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V' -> 'submitNameTag'
+    @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("TAIL"))
+    public void onRenderLabelTail(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             //noinspection deprecation
             new SkyHanniRenderEntityEvent.Specials.Post<>(livingEntity, state.x, state.y, state.z).post();
         }
     }
 
-    @WrapOperation(
-        method = "extractRenderState",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"
-        )
-    )
-    public boolean shouldAlsoGlow(
-        Minecraft client,
-        Entity entity,
-        Operation<Boolean> original,
-        //~ if < 26.1 'argsOnly = true, name = "state"' -> 'argsOnly = true'
-        @Local(argsOnly = true, name = "state") EntityRenderState state
-    ) {
+    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;shouldEntityAppearGlowing(Lnet/minecraft/world/entity/Entity;)Z"))
+    public boolean shouldAlsoGlow(Minecraft client, Entity entity, Operation<Boolean> original, @Local(argsOnly = true) EntityRenderState state) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
             return original.call(client, entity);
@@ -97,10 +61,7 @@ public abstract class MixinEntityRenderer {
         return true;
     }
 
-    @WrapOperation(
-        method = "extractRenderState",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I")
-    )
+    @WrapOperation(method = "extractRenderState", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;getTeamColor()I"))
     public int getCustomGlowColor(Entity entity, Operation<Integer> original) {
         Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
         if (glowColor == null) {
@@ -117,16 +78,10 @@ public abstract class MixinEntityRenderer {
     // See modifyRenderLabelIfPresentArgs in MixinPlayerEntityRenderer.
     //? if >= 26.1 {
     @ModifyArg(
+
         method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;I)V",
-        at = @At(
-            value = "INVOKE",
-            //? if >= 26.2 {
-            target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-            //?} else {
-            /*target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZIDLnet/minecraft/client/renderer/state/level/CameraRenderState;)V",
-            *///?}
-            ordinal = 0
-        ),
+        //~ if < 26.2 'ZI' -> 'ZID'
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/SubmitNodeCollector;submitNameTag(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/world/phys/Vec3;ILnet/minecraft/network/chat/Component;ZILnet/minecraft/client/renderer/state/level/CameraRenderState;)V", ordinal = 0),
         index = 3
     )
     private Component modifyRenderLabelIfPresentArgs(Component text) {

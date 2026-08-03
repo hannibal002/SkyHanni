@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -29,107 +29,78 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
-    @WrapOperation(
-        //? if >= 26.2 {
-        method = "prepareOutlineSubmit",
-        //?} elif >= 26.1 {
-        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        *///?} else {
-        /*method = "render",
-        *///?}
-        //~ if < 26.2 'com/mojang/blaze3d/vertex/QuadInstance' -> 'net/minecraft/client/renderer/OutlineBufferSource'
-        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V")
-    )
-    private void setSkyHanniOutlineColor(
-        //~ if < 26.2 'QuadInstance' -> 'OutlineBufferSource'
-        QuadInstance instance,
-        int color,
-        Operation<Void> original,
-        //? if >= 26.1 {
-        @Local(argsOnly = true, name = "submit")
-        //?} else {
-        /*@Local
-        *///?}
-        ItemFeatureRenderer.Submit submit
-    ) {
-        //? if < 26.2 {
-        /*if (submit.skyhanni$isUsingCustomOutline()) {
-            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
-            return;
-        }
-        *///?}
-        original.call(instance, color);
-    }
-
     //? if >= 26.1 {
     @ModifyArg(
-        //? if >= 26.2 {
+        //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V'
         method = "prepareOutlineSubmit",
-        //?} else {
-        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        *///?}
-        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"),
-        index = 0
-    )
+        at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"), index = 0)
     private int modifyAlpha(int originalColor) {
-        if (!(EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity)) return originalColor;
-
-        Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
-        if (entityAlpha == null) return originalColor;
-        int newAlpha = Math.min(ARGB.alpha(originalColor), entityAlpha);
-        return ARGB.color(newAlpha, ARGB.red(originalColor), ARGB.green(originalColor), ARGB.blue(originalColor));
+        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+            Integer entityAlpha = EntityTransparencyManager.getEntityTransparency(livingEntity);
+            if (entityAlpha == null) return originalColor;
+            int newAlpha = Math.min(ARGB.alpha(originalColor), entityAlpha);
+            return ARGB.color(newAlpha, ARGB.red(originalColor), ARGB.green(originalColor), ARGB.blue(originalColor));
+        }
+        return originalColor;
     }
 
     @ModifyExpressionValue(
-        //? if >= 26.2 {
+        //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V'
         method = "prepareOutlineSubmit",
-        //?} else {
-        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        *///?}
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;")
-    )
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;"))
     private RenderType modifyRenderLayer(RenderType layer) {
-        if (!(EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity)) return layer;
-        if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;
-        return RenderTypes.glintTranslucent();
+        if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
+            if (EntityTransparencyManager.getEntityTransparency(livingEntity) == null) return layer;
+            return RenderTypes.glintTranslucent();
+        }
+        return layer;
     }
     //?}
 
+    //? if < 26.2 {
+    /*@WrapOperation(
+        //? if >= 26.1 {
+        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        //?} else {
+        /^method = "render",
+        ^///?}
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
+    )
+    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
+        Object obj = itemCommand;
+        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
+        } else {
+            original.call(outlineConsumer, i);
+        }
+    }
+    *///?}
+
     //? if >= 26.1 {
     @WrapOperation(
-        //? if >= 26.2 {
+        //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V'
         method = "prepareOutlineSubmit",
-        //?} else {
-        /*method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        *///?}
         at = @At(
             value = "INVOKE",
-            //? if >= 26.2 {
+            //~ if < 26.2 'renderer/feature/ItemFeatureRenderer;getVertexBuilder' -> 'renderer/OutlineBufferSource;getBuffer'
             target = "Lnet/minecraft/client/renderer/feature/ItemFeatureRenderer;getVertexBuilder(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-            //?} else {
-            /*target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
-            *///?}
         )
     )
-    private VertexConsumer wrapOutlineVertexConsumer(
-        //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
-        ItemFeatureRenderer instance,
-        RenderType renderType,
-        Operation<VertexConsumer> original,
-        /*? if < 26.2 {*//*@Local(argsOnly = true, name = "submit") *//*?}*/ItemFeatureRenderer.Submit submit
-    ) {
-        if (!submit.skyhanni$isUsingCustomOutline()) return original.call(instance, renderType);
-
-        //? if >= 26.2 {
-        SkyHanniOutlineHook.beginCustomOutlineBuild();
-        try {
-            return original.call(instance, renderType);
-        } finally {
-            SkyHanniOutlineHook.finishCustomOutlineBuild();
+    //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
+    private VertexConsumer modifyOutlineVertexConsumerProvider(ItemFeatureRenderer outlineConsumer, RenderType renderType, Operation<VertexConsumer> original, /*? if < 26.2 {*//*@Local(argsOnly = true) *//*?}*/ItemFeatureRenderer.Submit itemCommand) {
+        Object obj = (Object) itemCommand;
+        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            //? if >= 26.2 {
+            SkyHanniOutlineVertexConsumerProvider.beginCustomOutlineBuild();
+            try {
+                return original.call(outlineConsumer, renderType);
+            } finally {
+                SkyHanniOutlineVertexConsumerProvider.finishCustomOutlineBuild();
+            }
+            //?} else
+            //return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().getBuffer(renderType);
         }
-        //?} else {
-        /*return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
-        *///?}
+        return original.call(outlineConsumer, renderType);
     }
     //?} else {
     /*@ModifyArg(
@@ -141,15 +112,12 @@ public abstract class MixinItemFeatureRenderer {
         ),
         index = 2
     )
-    private MultiBufferSource wrapOutlineVertexConsumer(
-        MultiBufferSource bufferSource,
-        @Local ItemFeatureRenderer.Submit submit
-    ) {
-        Object value = submit;
-        if (value instanceof GlowingStateStore state && state.skyhanni$isUsingCustomOutline()) {
-            return SkyHanniOutlineHook.getVertexConsumers();
+    private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
+        Object obj = itemCommand;
+        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
+            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
         }
-        return bufferSource;
+        return outlineConsumer;
     }
     *///?}
 }

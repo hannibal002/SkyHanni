@@ -55,8 +55,7 @@ internal class SkyHanniRealtimeItemSlot(val slotSize: Int) : SkyHanniAbstractIte
 
         state.renderItemToTexture(
             //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
-            context.submitNodeStorage,
-            context.featureRenderDispatcher,
+            context.submitNodeStorage, context.featureRenderDispatcher,
             centerX = slotSize / 2.0f,
             centerY = slotSize / 2.0f,
             pixelSize = slotSize,

@@ -15,20 +15,20 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ActiveTextCollector
 import net.minecraft.client.gui.Font
 import net.minecraft.client.gui.TextAlignment
-import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessage
 import net.minecraft.client.renderer.state.gui.GuiTextRenderState
 import net.minecraft.network.chat.Component
 import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix3x2f
 
-//? if < 26.1 {
+//? if >= 26.1 {
+import net.minecraft.client.gui.components.ChatComponent
+//?} else {
 /*import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
 import net.minecraft.util.Mth
 *///?}
 
 object CopyChat {
-
     private val config get() = SkyHanniMod.feature.chat.copyChat
 
     @JvmStatic

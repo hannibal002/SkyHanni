@@ -45,6 +45,11 @@ import net.minecraft.util.FormattedCharSequence
 import org.joml.Matrix4f
 *///?}
 
+//? if >= 26.1 {
+import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
+//?}
+
 //? if = 26.1 {
 /*import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 *///?}
@@ -53,7 +58,6 @@ import org.joml.Matrix4f
 /*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
 *///?}
 
-// TODO refactor
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
@@ -65,7 +69,9 @@ object WorldRenderUtils {
     //?}
 
     //? if = 26.1 {
-    /*private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
+    /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
+    // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
+    private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
 
     @JvmStatic
     fun renderDeferredSeeThroughText(bufferSource: MultiBufferSource.BufferSource) {
@@ -78,9 +84,6 @@ object WorldRenderUtils {
         }
     }
     *///?}
-
-    private fun getDisplayMode(seeThrough: Boolean) =
-        if (seeThrough) DisplayMode.SEE_THROUGH else DisplayMode.POLYGON_OFFSET
 
     private inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
@@ -136,14 +139,11 @@ object WorldRenderUtils {
         rgb: Int,
     ) {
         matrices.pushPose()
-        matrices.translate(x - cameraPos.x, y - cameraPos.y, z - cameraPos.z)
+        matrices.translate(x - camera.position.x, y - camera.position.y, z - camera.position.z)
         BeaconRenderer.submitBeaconBeam(
             matrices,
-            //? if >= 26.2 {
+            //~ if < 26.2 'submitNodeStorage' -> 'Minecraft.getInstance().gameRenderer.featureRenderDispatcher.submitNodeStorage'
             submitNodeStorage,
-            //?} else {
-            /*Minecraft.getInstance().gameRenderer.featureRenderDispatcher().submitNodeStorage,
-            *///?}
             beaconBeam,
             1f,
             Math.floorMod(MinecraftCompat.clientTime, 40) + partialTicks,
@@ -334,6 +334,7 @@ object WorldRenderUtils {
             return
         }
 
+        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -345,7 +346,7 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
-        matrices.mulPose(cameraState.orientation)
+        matrices.mulPose(camera.rotation())
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
         submitOrderedText(
@@ -353,7 +354,7 @@ object WorldRenderUtils {
             0f,
             Component.literal(text).visualOrderText,
             shadow,
-            getDisplayMode(seeThroughBlocks),
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
             15728880,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backGroundColor,
@@ -366,7 +367,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(cameraRotation)
+        ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -398,7 +399,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             bufferSource,
-            getDisplayMode(seeThroughBlocks),
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
             backGroundColor,
             FULL_BRIGHT,
         )
@@ -433,6 +434,7 @@ object WorldRenderUtils {
             return
         }
 
+        val cameraPos = camera.position
         val fr = Minecraft.getInstance().font
         val adjustedScale = (scale * 0.05).toFloat()
         val x = -fr.width(text) / 2f
@@ -444,7 +446,7 @@ object WorldRenderUtils {
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
         )
-        matrices.mulPose(cameraState.orientation)
+        matrices.mulPose(camera.rotation())
         matrices.translate(0f, -yOffset * adjustedScale, 0f)
         matrices.scale(adjustedScale, -adjustedScale, adjustedScale)
         submitOrderedText(
@@ -452,7 +454,7 @@ object WorldRenderUtils {
             0f,
             text.visualOrderText,
             shadow,
-            getDisplayMode(seeThroughBlocks),
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
             15728880,
             color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
             backGroundColor,
@@ -465,7 +467,7 @@ object WorldRenderUtils {
             (location.x - cameraPos.x()).toFloat(),
             (location.y - cameraPos.y()).toFloat(),
             (location.z - cameraPos.z()).toFloat(),
-        ).rotate(cameraRotation)
+        ).rotate(camera.rotation())
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
@@ -497,7 +499,7 @@ object WorldRenderUtils {
             shadow,
             matrix,
             bufferSource,
-            getDisplayMode(seeThroughBlocks),
+            if (seeThroughBlocks) SEE_THROUGH else POLYGON_OFFSET,
             backGroundColor,
             FULL_BRIGHT,
         )
@@ -1147,8 +1149,8 @@ object WorldRenderUtils {
     }
 
     internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        val look = Vector3f(0f, 0f, -1f).rotate(cameraRotation)
-        return cameraPos.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
+        val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
+        return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {

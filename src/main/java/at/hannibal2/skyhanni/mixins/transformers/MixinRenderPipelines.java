@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import net.minecraft.client.renderer.RenderPipelines;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ public abstract class MixinRenderPipelines {
 
     @Inject(method = "getStaticPipelines", at = @At("HEAD"))
     private static void registerSkyHanniOutlinePipelines(CallbackInfoReturnable<List<?>> cir) {
-        SkyHanniOutlineHook.ensureCustomOutlinePipelinesRegistered();
+        SkyHanniOutlineVertexConsumerProvider.ensureCustomOutlinePipelinesRegistered();
     }
 }
 //?}

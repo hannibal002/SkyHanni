@@ -13,12 +13,10 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.mojang.blaze3d.vertex.VertexFormatElement
 *///?}
 
-//? if < 26.2 {
-/*private typealias VFEType = VertexFormatElement.Type
-*///?}
-//? if < 26.1 {
-/*private typealias VFEUsage = VertexFormatElement.Usage
-*///?}
+//? if < 26.2
+//private typealias VFEType = VertexFormatElement.Type
+//? if < 26.1
+//private typealias VFEUsage = VertexFormatElement.Usage
 
 object SkyHanniVertexFormats {
 
@@ -41,6 +39,7 @@ object SkyHanniVertexFormats {
     ) {
         // {radius, smoothness/borderThickness, adjustedHalfSizeX, adjustedHalfSizeY}
         ROUNDED_PARAMS_0,
+
         // {adjustedCenterPosX, adjustedCenterPosY, borderBlur/angle1/0, angle2/0}
         ROUNDED_PARAMS_1,
         // {angle, progress, phaseOffset, reverse(float)}
@@ -58,8 +57,10 @@ object SkyHanniVertexFormats {
         /*// The ID we use to register the format element with Minecraft.
         // see safeRegister() for details on how this is used and determined at runtime.
         private val registrationId: Int by lazy { lastRegisteredId + (ordinal + 1) }
-        //~ if < 26.1 'normalized' -> 'usage'
-        val element by lazy { safeRegister(registrationId, index, type, normalized, count) }
+        val element by lazy {
+            //~ if < 26.1 'false' -> 'usage'
+            safeRegister(registrationId, index, type, false, count)
+        }
         *///?}
     }
 
@@ -84,9 +85,8 @@ object SkyHanniVertexFormats {
         normalized: Boolean = false,
         count: Int = 4,
     ): VertexFormatElement {
-        // TODO it is rare that a user will have enough mods to register 27 more vertex format
-        //  elements, but it has happened to a couple people already, and is something we should
-        //  account for.
+        // Todo, it is exceptionally unlikely that a user will have enough mods to register 27 more vertex format elements,
+        //  but, technically possible, and something we should account for eventually.
         val id = (desiredId until VertexFormatElement.MAX_COUNT).first { VertexFormatElement.byId(it) == null }
         if (id != desiredId && PlatformUtils.isDevEnvironment) ErrorManager.logErrorStateWithData(
             "VertexFormatElement ID $desiredId was already taken, using $id instead",

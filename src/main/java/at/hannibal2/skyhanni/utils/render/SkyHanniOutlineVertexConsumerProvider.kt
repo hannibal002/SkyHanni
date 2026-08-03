@@ -27,35 +27,29 @@ import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 *///?}
 
-// The idea and implementation for this class was inspired by Skyblocker. This implementation has
-// been modified from the original Skyblocker code to work across multiple versions.
-object SkyHanniOutlineHook {
+// The idea and implementation for this class was inspired by SkyBlocker.
+// This implementation has been modified from the original SkyBlocker code to work across multiple versions.
+object SkyHanniOutlineVertexConsumerProvider {
 
     //? if < 26.2 {
-    /*@JvmStatic
-    val vertexConsumers by lazy {
-        SkyHanniOutlineVertexConsumerProvider()
-    }
-
-    class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
-
+    /*class SkyHanniOutlineVertexConsumerProviderImpl : OutlineBufferSource() {
         override fun endOutlineBatch() {
             beginRendering()
-            try {
-                super.endOutlineBatch()
-            } finally {
-                finishRendering()
-            }
+            super.endOutlineBatch()
+            finishRendering()
         }
 
         override fun getBuffer(renderType: RenderType): VertexConsumer {
             beginRendering()
-            try {
-                return super.getBuffer(renderType)
-            } finally {
-                finishRendering()
-            }
+            val returnVal = super.getBuffer(renderType)
+            finishRendering()
+            return returnVal
         }
+    }
+
+    @JvmStatic
+    val vertexConsumers by lazy {
+        SkyHanniOutlineVertexConsumerProviderImpl()
     }
     *///?}
 
@@ -65,70 +59,6 @@ object SkyHanniOutlineHook {
 
     //~ if < 26.2 'GpuFormat' -> 'TextureFormat'
     private var customDepthAttachmentFormat: GpuFormat? = null
-
-    //? if >= 26.2 {
-    private val customOutlineCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_cull", true)
-
-    private val customOutlineNoCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_no_cull", false)
-
-    @JvmStatic
-    fun getCustomOutlinePipeline(pipeline: RenderPipeline): RenderPipeline {
-        if (!currentlyActive) return pipeline
-        return when (pipeline) {
-            RenderPipelines.OUTLINE_CULL -> customOutlineCullPipeline
-            RenderPipelines.OUTLINE_NO_CULL -> customOutlineNoCullPipeline
-            else -> pipeline
-        }
-    }
-
-    private var customOutlineBuildDepth = 0
-
-    @JvmStatic
-    fun beginCustomOutlineBuild() {
-        customOutlineBuildDepth++
-    }
-
-    @JvmStatic
-    fun finishCustomOutlineBuild() {
-        customOutlineBuildDepth--
-    }
-
-    @JvmStatic
-    fun getCustomOutlinePipelineForBuild(pipeline: RenderPipeline): RenderPipeline {
-        if (customOutlineBuildDepth <= 0) return pipeline
-        return when (pipeline) {
-            RenderPipelines.OUTLINE_CULL -> customOutlineCullPipeline
-            RenderPipelines.OUTLINE_NO_CULL -> customOutlineNoCullPipeline
-            else -> pipeline
-        }
-    }
-
-    @JvmStatic
-    fun isCustomOutlinePipeline(pipeline: RenderPipeline): Boolean =
-        pipeline == customOutlineCullPipeline || pipeline == customOutlineNoCullPipeline
-
-    @JvmStatic
-    fun ensureCustomOutlinePipelinesRegistered() {
-        customOutlineCullPipeline
-        customOutlineNoCullPipeline
-    }
-
-    private fun createCustomOutlinePipeline(path: String, cull: Boolean): RenderPipeline =
-        RenderPipelines.register(
-            RenderPipeline.builder()
-                .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, "pipeline/$path"))
-                .withBindGroupLayout(BindGroupLayouts.GLOBALS)
-                .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
-                .withVertexShader("core/rendertype_outline")
-                .withFragmentShader("core/rendertype_outline")
-                .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
-                .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
-                .withPrimitiveTopology(PrimitiveTopology.QUADS)
-                .withDepthStencilState(DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
-                .withCull(cull)
-                .build(),
-        )
-    //?}
 
     @JvmStatic
     var currentlyActive = false
@@ -202,4 +132,69 @@ object SkyHanniOutlineHook {
             ErrorManager.logErrorWithData(e, "Failed to update outline depth attachment")
         }
     }
+
+    //? if >= 26.2 {
+    private val customOutlineCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_cull", true)
+
+    private val customOutlineNoCullPipeline: RenderPipeline = createCustomOutlinePipeline("custom_outline_no_cull", false)
+
+    @JvmStatic
+    fun getCustomOutlinePipeline(pipeline: RenderPipeline): RenderPipeline {
+        if (!currentlyActive) return pipeline
+        return when (pipeline) {
+            RenderPipelines.OUTLINE_CULL -> customOutlineCullPipeline
+            RenderPipelines.OUTLINE_NO_CULL -> customOutlineNoCullPipeline
+            else -> pipeline
+        }
+    }
+
+    private var customOutlineBuildDepth = 0
+
+    @JvmStatic
+    fun beginCustomOutlineBuild() {
+        customOutlineBuildDepth++
+    }
+
+    @JvmStatic
+    fun finishCustomOutlineBuild() {
+        customOutlineBuildDepth--
+    }
+
+    @JvmStatic
+    fun getCustomOutlinePipelineForBuild(pipeline: RenderPipeline): RenderPipeline {
+        if (customOutlineBuildDepth <= 0) return pipeline
+        return when (pipeline) {
+            RenderPipelines.OUTLINE_CULL -> customOutlineCullPipeline
+            RenderPipelines.OUTLINE_NO_CULL -> customOutlineNoCullPipeline
+            else -> pipeline
+        }
+    }
+
+    @JvmStatic
+    fun isCustomOutlinePipeline(pipeline: RenderPipeline): Boolean =
+        pipeline == customOutlineCullPipeline || pipeline == customOutlineNoCullPipeline
+
+    @JvmStatic
+    fun ensureCustomOutlinePipelinesRegistered() {
+        customOutlineCullPipeline
+        customOutlineNoCullPipeline
+    }
+
+    private fun createCustomOutlinePipeline(path: String, cull: Boolean): RenderPipeline =
+        RenderPipelines.register(
+            RenderPipeline.builder()
+                .withLocation(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, "pipeline/$path"))
+                .withBindGroupLayout(BindGroupLayouts.GLOBALS)
+                .withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION)
+                .withVertexShader("core/rendertype_outline")
+                .withFragmentShader("core/rendertype_outline")
+                .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+                .withVertexBinding(0, DefaultVertexFormat.POSITION_TEX_COLOR)
+                .withPrimitiveTopology(PrimitiveTopology.QUADS)
+                //~ if < 26.2 'GREATER_THAN_OR_EQUAL' -> 'LESS_THAN_OR_EQUAL'
+                .withDepthStencilState(DepthStencilState(CompareOp.GREATER_THAN_OR_EQUAL, false))
+                .withCull(cull)
+                .build(),
+        )
+    //?}
 }

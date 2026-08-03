@@ -12,13 +12,11 @@ import net.minecraft.client.renderer.SubmitNodeCollector
 
 @Suppress("EmptyDefaultConstructor")
 class SkyHanniPipCoordinatorRenderer(
-    //? if < 26.2 {
-    /*bufferSource: MultiBufferSource.BufferSource,
-    *///?}
+    //? if < 26.2
+    //bufferSource: MultiBufferSource.BufferSource,
 ) : PictureInPictureRenderer<SkyHanniGuiItemRenderState>(
-    //? if < 26.2 {
-    /*bufferSource,
-    *///?}
+    //? if < 26.2
+    //bufferSource,
 ) {
 
     companion object {
@@ -37,9 +35,8 @@ class SkyHanniPipCoordinatorRenderer(
     override fun renderToTexture(
         state: SkyHanniGuiItemRenderState,
         poseStack: PoseStack,
-        //? if >= 26.2 {
+        //? if >= 26.2
         submitNodeCollector: SubmitNodeCollector,
-        //?}
     ) = Unit
     override fun blitTexture(state: SkyHanniGuiItemRenderState, guiRenderState: GuiRenderState) = Unit
     override fun getRenderStateClass(): Class<SkyHanniGuiItemRenderState> = SkyHanniGuiItemRenderState::class.java

@@ -37,7 +37,6 @@ data class SkyHanniGuiItemRenderState(
     private val frameNumber: Int? = null,
     val alpha: Float = 1f,
 ) : PictureInPictureRenderState {
-
     companion object {
         private var counter = 0
         fun nextStableId() = counter++
@@ -95,11 +94,8 @@ data class SkyHanniGuiItemRenderState(
     private fun setAnimated() = trackingState.setAnimated()
 
     internal fun renderItemToTexture(
-        //? if >= 26.2 {
+        //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
         submitNodeStorage: SubmitNodeStorage,
-        //?} else {
-        /*bufferSource: MultiBufferSource.BufferSource,
-        *///?}
         featureRenderDispatcher: FeatureRenderDispatcher,
         centerX: Float,
         centerY: Float,
@@ -119,17 +115,8 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
-        trackingState.submit(
-            ps,
-            //? if >= 26.2 {
-            submitNodeStorage,
-            //?} else {
-            /*featureRenderDispatcher.submitNodeStorage,
-            *///?}
-            15728880,
-            OverlayTexture.NO_OVERLAY,
-            0,
-        )
+        //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
+        trackingState.submit(ps, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
         //? if >= 26.2 {
         featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
         //?} else {

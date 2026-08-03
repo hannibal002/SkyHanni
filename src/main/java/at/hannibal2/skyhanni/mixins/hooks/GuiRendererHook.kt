@@ -51,10 +51,12 @@ object GuiRendererHook {
         chromaBufferSlice = chromaUniform.writeWith(chromaSize, timeOffset, saturation, forwardDirection)
     }
 
+    //? if >= 26.2 {
     fun clearChromaUniforms() {
         chromaUniform.clear()
         chromaBufferSlice = null
     }
+    //?}
 
     // This 'should' be fine being injected into GuiRenderer's render pass since if the bound pipeline's shader doesn't
     // have a uniform with the given name, then the buffer slice will never be bound
@@ -96,9 +98,8 @@ object GuiRendererHook {
 
     fun preRenderAtlas(
         pictureInPictureRenderers: Map<Class<out PictureInPictureRenderState>, PictureInPictureRenderer<*>>,
-        //? if < 26.2 {
-        /*bufferSource: MultiBufferSource.BufferSource,
-        *///?}
+        //? if < 26.2
+        //bufferSource: MultiBufferSource.BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
@@ -113,9 +114,8 @@ object GuiRendererHook {
 
         SkyHanniItemRenderCoordinator.preRenderAtlas(
             states,
-            //? if < 26.2 {
-            /*bufferSource,
-            *///?}
+            //? if < 26.2
+            //bufferSource,
             featureRenderDispatcher,
             frameNumber
         )
@@ -129,4 +129,5 @@ object GuiRendererHook {
     ) {
         SkyHanniItemRenderCoordinator.submitBlit(state, guiRenderState, frameNumber)
     }
+
 }

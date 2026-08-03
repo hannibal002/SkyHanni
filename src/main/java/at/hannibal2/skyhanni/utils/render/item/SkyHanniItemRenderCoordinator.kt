@@ -29,11 +29,8 @@ internal object SkyHanniItemRenderCoordinator {
     }
 
     private data class FrameRenderResources(
-        //? if >= 26.2 {
+        //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: BufferSource'
         val submitNodeStorage: SubmitNodeStorage,
-        //?} else {
-        /*val bufferSource: BufferSource,
-        *///?}
         val featureRenderDispatcher: FeatureRenderDispatcher,
         val guiScale: Int,
     )
@@ -76,9 +73,8 @@ internal object SkyHanniItemRenderCoordinator {
     // Renders all items to the atlas. Does NOT submit any blits.
     fun preRenderAtlas(
         pipStates: List<SkyHanniGuiItemRenderState>,
-        //? if < 26.2 {
-        /*bufferSource: BufferSource,
-        *///?}
+        //? if < 26.2
+        //bufferSource: BufferSource,
         featureRenderDispatcher: FeatureRenderDispatcher,
         frameNumber: Int,
     ) {
@@ -86,15 +82,8 @@ internal object SkyHanniItemRenderCoordinator {
         handleEviction(frameNumber)
 
         val guiScale = Minecraft.getInstance().window.guiScale
-        frameResources = FrameRenderResources(
-            //? if >= 26.2 {
-            SubmitNodeStorage(),
-            //?} else {
-            /*bufferSource,
-            *///?}
-            featureRenderDispatcher,
-            guiScale,
-        )
+        //~ if < 26.2 'SubmitNodeStorage()' -> 'bufferSource'
+        frameResources = FrameRenderResources(SubmitNodeStorage(), featureRenderDispatcher, guiScale)
         val atlasStates = ArrayList<SkyHanniGuiItemRenderState>(pipStates.size)
 
         for (state in pipStates) {
@@ -116,15 +105,8 @@ internal object SkyHanniItemRenderCoordinator {
         if (atlasStates.isEmpty()) return
 
         val renderContext = SkyHanniItemRenderContext(
-            atlasStates,
-            //? if >= 26.2 {
-            SubmitNodeStorage(),
-            //?} else {
-            /*bufferSource,
-            *///?}
-            featureRenderDispatcher,
-            frameNumber,
-            guiScale,
+            //~ if < 26.2 'SubmitNodeStorage()' -> 'bufferSource'
+            atlasStates, SubmitNodeStorage(), featureRenderDispatcher, frameNumber, guiScale,
         )
 
         with(atlas) { renderContext.setupAtlasRendering(frameNumber, projectionBuffer) }

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -49,86 +49,76 @@ import org.joml.Matrix4f;
 @Mixin(LevelRenderer.class)
 public abstract class MixinLevelRenderer {
 
-    //? if < 26.2 {
-    /*@Final
-    @Shadow
-    private RenderBuffers renderBuffers;
+    //? if < 26.1 {
+    /*@Unique
+    PoseStack contextMatrixStack;
     *///?}
+
+    @Unique
+    //~ if < 26.1 'CameraRenderState currentCameraState' -> 'Camera currentCamera'
+    CameraRenderState currentCameraState;
+
+    @Unique
+    DeltaTracker currentTickCounter;
 
     //? if >= 26.2 {
     @Final
     @Shadow
     private SubmitNodeStorage submitNodeStorage;
-    //?}
-
-    //? if < 26.1 {
-    /*@Unique
-    PoseStack skyhanni$contextPoseStack;
-    *///?}
-
-    @Unique
-    //? if >= 26.1 {
-    CameraRenderState skyhanni$currentCameraState;
     //?} else {
-    /*Camera skyhanni$currentCamera;
+    /*@Final
+    @Shadow
+    private RenderBuffers renderBuffers;
     *///?}
-
-    @Unique
-    DeltaTracker skyhanni$currentDeltaTracker;
 
     //~ if < 26.2 'render' -> 'renderLevel'
     @Inject(method = "render", at = @At("HEAD"))
     private void beginRender(
         GraphicsResourceAllocator resourceAllocator,
-        DeltaTracker deltaTracker,
-        boolean renderOutline,
-        //? if >= 26.1 {
+        DeltaTracker deltaTracker, boolean renderOutline,
+        //~ if < 26.1 'CameraRenderState' -> 'Camera'
         CameraRenderState cameraState,
+        //? if >= 26.1 {
         Matrix4fc modelViewMatrix,
         //?} else {
-        /*Camera camera,
-        Matrix4f positionMatrix,
+        /*Matrix4f positionMatrix,
         Matrix4f matrix4f,
         Matrix4f projectionMatrix,
         *///?}
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
-        //? if = 26.1 {
-        /*ChunkSectionsToRender chunkSectionsToRender,
-        *///?}
+        //? if = 26.1
+        //ChunkSectionsToRender chunkSectionsToRender,
         CallbackInfo ci
     ) {
-        //? if >= 26.1 {
-        skyhanni$currentCameraState = cameraState;
-        //?} else {
-        /*skyhanni$currentCamera = camera;
-        *///?}
-        skyhanni$currentDeltaTracker = deltaTracker;
+        //~ if < 26.1 'currentCameraState' -> 'currentCamera'
+        currentCameraState = cameraState;
+        currentTickCounter = deltaTracker;
     }
 
     //? if >= 26.2 {
     @Inject(
+        //? if >= 26.2 {
         method = "render",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;"
-        )
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;")
+        //?} else {
+        /*method = "lambda$addMainPass$0",
+        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
+        *///?}
     )
-    private void postRenderWorldBeforePrepareFeatures(
-        GraphicsResourceAllocator resourceAllocator,
-        DeltaTracker deltaTracker,
-        boolean renderOutline,
-        CameraRenderState cameraState,
-        Matrix4fc modelViewMatrix,
-        GpuBufferSlice terrainFog,
-        Vector4f fogColor,
-        boolean shouldRenderSky,
-        CallbackInfo ci
-    ) {
+    //? if >= 26.2 {
+    private void onTranslucentRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
+    //?} else
+    //private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
+            //~ if < 26.2 'new PoseStack()' -> 'contextMatrixStack'
             new PoseStack(),
+            //~ if < 26.2 'cameraState' -> 'currentCameraState'
+            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             cameraState,
+            //~ if < 26.2 'submitNodeStorage' -> 'renderBuffers.bufferSource()'
             submitNodeStorage,
             deltaTracker.getGameTimeDeltaPartialTick(true),
             true
@@ -137,76 +127,18 @@ public abstract class MixinLevelRenderer {
     }
     //?}
 
-    //? if < 26.2 {
-    /*@WrapOperation(
-        method = "lambda$addMainPass$0",
-        slice = @Slice(
-            from = @At(
-                value = "INVOKE_STRING",
-                target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V",
-                //~ if < 26.1 'translucentTerrain' -> 'translucent'
-                args = "ldc=translucentTerrain"
-            )
-        ),
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V",
-            ordinal = 0
-        )
-    )
-    private void onTranslucentRender(
-        ChunkSectionsToRender instance,
-        ChunkSectionLayerGroup group,
-        GpuSampler sampler,
-        Operation<Void> original
-    ) {
-        original.call(instance, group, sampler);
-
-        SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
-            new PoseStack(),
-            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
-            skyhanni$currentCameraState,
-            //? if >= 26.2 {
-            submitNodeStorage,
-            //?} else {
-            /^renderBuffers.bufferSource(),
-            ^///?}
-            skyhanni$currentDeltaTracker.getGameTimeDeltaPartialTick(true),
-            true
-        );
-        event.post();
-    }
-    *///?}
-
-    @Inject(
-        method = "lambda$addMainPass$0",
-        at = @At(
-            value = "INVOKE",
-            //? if >= 26.2 {
-            target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V",
-            //?} else {
-            /*target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;ILcom/mojang/blaze3d/textures/GpuTexture;D)V",
-            *///?}
-            ordinal = 0,
-            shift = At.Shift.AFTER
-        )
-    )
+    //~ if < 26.2 ';Lorg/joml/Vector4fc;' -> ';I'
+    @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
-        SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
+        SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
     }
 
     //? if < 26.2 {
-    /*@Inject(
-        method = "lambda$addMainPass$0",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"
-        )
-    )
-    private void renderSkyHanniGlow(CallbackInfo ci) {
+    /*@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
+    private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
-        SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
+        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
     }
     *///?}
 

@@ -49,6 +49,7 @@ public abstract class MixinStringDecomposer {
      * @param d the character that followed the § sign
      * @param original the original getByCode call
      */
+    @SuppressWarnings("InvokeAssignCanReplacedWithExpression")
     @WrapOperation(
         method = "iterateFormatted(Ljava/lang/String;ILnet/minecraft/network/chat/Style;Lnet/minecraft/network/chat/Style;Lnet/minecraft/util/FormattedCharSink;)Z",
         at = @At(

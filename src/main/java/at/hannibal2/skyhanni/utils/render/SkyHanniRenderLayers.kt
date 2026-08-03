@@ -60,9 +60,8 @@ object SkyHanniRenderLayers {
             RenderSetup.builder(SkyHanniRenderPipeline.CHROMA_TEXT())
                 .withTexture("Sampler0", texture)
                 .createRenderSetup(),
-            //?} else {
-            /*texture = texture,
-            *///?}
+            //?} else
+            //texture = texture,
         )
     }
 
@@ -104,4 +103,5 @@ object SkyHanniRenderLayers {
 
     fun getChromaStandard(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_STANDARD()
     fun getChromaTextured(): com.mojang.blaze3d.pipeline.RenderPipeline = SkyHanniRenderPipeline.CHROMA_TEXT()
+
 }

@@ -39,8 +39,8 @@ object RenderPipelineDrawer {
      * Method inspired by SkyOcean's [InventoryRenderer](https://github.com/meowdding/SkyOcean/blob/main/src/client/kotlin/me/owdding/skyocean/utils/rendering/InventoryRenderer.kt)
      */
     fun draw(pipeline: RenderPipeline, mesh: MeshData, pass: (RenderPass) -> Unit) {
-        //? if >= 26.2 {
         val device = RenderSystem.getDevice()
+        //? if >= 26.2 {
         val vertexBuffer = device.createBuffer(
             { "SkyHanni immediate pipeline vertex buffer" },
             GpuBuffer.USAGE_VERTEX,
@@ -57,48 +57,35 @@ object RenderPipelineDrawer {
             val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().primitiveTopology())
             sequentialBuffer.getBuffer(mesh.drawState().indexCount()) to sequentialBuffer.type()
         }
+        //?} else {
+        /*val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
 
+        val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().mode)
+        val indices = sequentialBuffer.getBuffer(mesh.drawState().indexCount)
+        val indexType = sequentialBuffer.type()
+        *///?}
+
+        //~ if < 26.2 'gameRenderer.mainRenderTarget()' -> 'mainRenderTarget'
         val framebuffer = Minecraft.getInstance().gameRenderer.mainRenderTarget()
 
-        RenderSystem.getDevice().createRenderPass(
+        device.createRenderPass(
             "SkyHanni Immediate Pipeline Draw",
             framebuffer,
         ).use { renderPass ->
             pass.invoke(renderPass)
 
             renderPass.setPipeline(pipeline)
+            //~ if < 26.2 'vertexBuffer.slice()' -> 'vertexBuffer'
             renderPass.setVertexBuffer(0, vertexBuffer.slice())
             renderPass.setIndexBuffer(indices, indexType)
 
             renderPass.drawIndexed(mesh.drawState().indexCount())
         }
 
+        //? if >= 26.2 {
         indexBuffer?.close()
         vertexBuffer.close()
+        //?}
         mesh.close()
-        //?} else {
-        /*val vertexBuffer = pipeline.vertexFormat.uploadImmediateVertexBuffer(mesh.vertexBuffer())
-
-        val sequentialBuffer = RenderSystem.getSequentialBuffer(mesh.drawState().mode)
-        val indexBuffer = sequentialBuffer.getBuffer(mesh.drawState().indexCount)
-        val indexType = sequentialBuffer.type()
-
-        val framebuffer = Minecraft.getInstance().mainRenderTarget
-
-        RenderSystem.getDevice().createRenderPass(
-            "SkyHanni Immediate Pipeline Draw",
-            framebuffer,
-        ).use { renderPass ->
-            pass.invoke(renderPass)
-
-            renderPass.setPipeline(pipeline)
-            renderPass.setVertexBuffer(0, vertexBuffer)
-            renderPass.setIndexBuffer(indexBuffer, indexType)
-
-            renderPass.drawIndexed(mesh.drawState().indexCount)
-        }
-
-        mesh.close()
-        *///?}
     }
 }

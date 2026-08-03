@@ -34,84 +34,21 @@ import java.util.function.Supplier;
 @Mixin(GuiRenderer.class)
 public abstract class MixinGuiRenderer {
 
+    @Inject(method = "executeDrawRange", at = @At("HEAD"))
+    public void computeChromaBufferSlice(
+        CallbackInfo ci) {
+        GuiRendererHook.INSTANCE.computeChromaBufferSlice();
+    }
+
     //? if >= 26.2 {
-    @Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
-        at = @At("HEAD")
-    )
-    public void computeChromaBufferSlice(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        int from,
-        int _to,
-        CallbackInfo ci
-    ) {
-        GuiRendererHook.INSTANCE.computeChromaBufferSlice();
-    }
-
-    @Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;II)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
-            shift = At.Shift.AFTER
-        )
-    )
+    @Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
+    //?} else
+    //@Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1))
     public void insertChromaSetUniform(
-        Supplier<String> nameSupplier,
-        RenderTarget framebuffer,
-        GpuBufferSlice dynamicTransformsBuffer,
-        int from,
-        int _to,
         CallbackInfo ci,
-        @Local RenderPass renderPass
-    ) {
+        @Local RenderPass renderPass) {
         GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
     }
-    //?} else {
-    /*@Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
-        at = @At("HEAD")
-    )
-    public void computeChromaBufferSlice(
-        Supplier<String> label,
-        RenderTarget mainRenderTarget,
-        GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransforms,
-        GpuBuffer indexBuffer,
-        VertexFormat.IndexType indexType,
-        int startIndex,
-        int endIndex,
-        CallbackInfo ci
-    ) {
-        GuiRendererHook.INSTANCE.computeChromaBufferSlice();
-    }
-
-    @Inject(
-        method = "executeDrawRange(Ljava/util/function/Supplier;Lcom/mojang/blaze3d/pipeline/RenderTarget;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lcom/mojang/blaze3d/buffers/GpuBuffer;Lcom/mojang/blaze3d/vertex/VertexFormat$IndexType;II)V",
-        at = @At(
-            value = "INVOKE",
-            target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V",
-            ordinal = 1,
-            shift = At.Shift.AFTER
-        )
-    )
-    public void insertChromaSetUniform(
-        Supplier<String> label,
-        RenderTarget mainRenderTarget,
-        GpuBufferSlice fogBuffer,
-        GpuBufferSlice dynamicTransforms,
-        GpuBuffer indexBuffer,
-        VertexFormat.IndexType indexType,
-        int startIndex,
-        int endIndex,
-        CallbackInfo ci,
-        @Local RenderPass renderPass
-    ) {
-        GuiRendererHook.INSTANCE.insertChromaSetUniform(renderPass);
-    }
-    *///?}
 
     @WrapOperation(
         method = "addElementToMesh",
@@ -119,15 +56,12 @@ public abstract class MixinGuiRenderer {
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
-    }
+	}
 
-    //? if >= 26.1 {
+    //~ if < 26.1 'Unique' -> 'Shadow'
     @Unique
+    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
     private int skyhanni$frameNumber;
-    //?} else {
-    /*@Shadow
-    private int frameNumber;
-    *///?}
 
     //? if >= 26.1 {
     @Inject(method = "render", at = @At("HEAD"))
@@ -136,15 +70,20 @@ public abstract class MixinGuiRenderer {
     }
     //?}
 
-    @Shadow
-    @Final
-    private FeatureRenderDispatcher featureRenderDispatcher;
-
     //? if < 26.2 {
     /*@Shadow
     @Final
     private MultiBufferSource.BufferSource bufferSource;
+
+    @Unique
+    public MultiBufferSource.BufferSource getBufferSource() {
+        return bufferSource;
+    }
     *///?}
+
+    @Shadow
+    @Final
+    private FeatureRenderDispatcher featureRenderDispatcher;
 
     @Shadow
     @Final
@@ -161,9 +100,8 @@ public abstract class MixinGuiRenderer {
     private void skyhanni$preRenderAtlas(CallbackInfo ci) {
         GuiRendererHook.INSTANCE.preRenderAtlas(
             pictureInPictureRenderers,
-            //? if < 26.2 {
-            /*bufferSource,
-            *///?}
+            //? if < 26.2
+            //getBufferSource(),
             featureRenderDispatcher,
             //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber

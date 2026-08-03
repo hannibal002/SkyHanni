@@ -27,9 +27,8 @@ import java.util.Optional
 /*import com.mojang.blaze3d.platform.DepthTestFunction
 *///?}
 
-//? if < 26.2 {
-/*typealias PrimitiveTopology = VertexFormat.Mode
-*///?}
+//? if < 26.2
+//typealias PrimitiveTopology = VertexFormat.Mode
 
 enum class SkyHanniRenderPipeline(
     snippet: RenderPipeline.Snippet,
@@ -206,9 +205,8 @@ enum class SkyHanniRenderPipeline(
             //? if >= 26.2 {
             .withVertexBinding(0, vFormat)
             .withPrimitiveTopology(vDrawMode)
-            //?} else {
-            /*.withVertexFormat(vFormat, vDrawMode)
-            *///?}
+            //?} else
+            //.withVertexFormat(vFormat, vDrawMode)
             .apply {
                 // One or the other, never both
                 //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
@@ -253,11 +251,9 @@ enum class SkyHanniRenderPipeline(
 private object SkyHanniRenderPipelineUtils {
 
     //? if >= 26.2 {
-    val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet =
-        RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
-    //?} else {
-    /*val MATRICES_PROJECTION_SNIPPET: RenderPipeline.Snippet = RenderPipelines.MATRICES_PROJECTION_SNIPPET
-    *///?}
+    val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
+    //?} else
+    //val MATRICES_PROJECTION_SNIPPET = RenderPipelines.MATRICES_PROJECTION_SNIPPET
 
     fun getCommonRoundedUniforms(): Map<String, UniformType> = mapOf("SkyHanniRoundedUniforms" to UniformType.UNIFORM_BUFFER)
     val commonChromaUniforms = mapOf("SkyHanniChromaUniforms" to UniformType.UNIFORM_BUFFER)

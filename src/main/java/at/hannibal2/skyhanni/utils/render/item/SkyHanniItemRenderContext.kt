@@ -10,11 +10,8 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 
 internal class SkyHanniItemRenderContext(
     val atlasStates: List<SkyHanniGuiItemRenderState>,
-    //? if >= 26.2 {
+    //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: BufferSource'
     val submitNodeStorage: SubmitNodeStorage,
-    //?} else {
-    /*val bufferSource: BufferSource,
-    *///?}
     val featureRenderDispatcher: FeatureRenderDispatcher,
     val frameNumber: Int,
     val guiScale: Int,

@@ -24,13 +24,13 @@ class LineDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
         for (line in queuedLines) {
             gizmos.addLine(line.p1.toVec3(), line.p2.toVec3(), line.color.rgb, lineWidth.toFloat())
         }
-        gizmos.submit(event.submitNodeStorage, event.cameraState, !depth)
+        gizmos.submit(event.submitNodeStorage, event.camera, !depth)
         //?} else {
         /*val layer = SkyHanniRenderLayers.getLines(!depth)
         val buf = event.bufferSource.getBuffer(layer)
         val matrix = event.matrices.last()
 
-        // TODO reshape to avoid code duplication
+        // Todo reshape to avoid code duplication
         for (line in queuedLines) {
             buf.addVertex(matrix.pose(), line.p1.x.toFloat(), line.p1.y.toFloat(), line.p1.z.toFloat())
                 .setNormal(matrix, line.normal.x.toFloat(), line.normal.y.toFloat(), line.normal.z.toFloat())

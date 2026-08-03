@@ -6,18 +6,16 @@ import org.gradle.jvm.toolchain.JavaLanguageVersion
  * @param versionNameOverride Specify a version name override for stuff like snapshots
  * @param moulconfigMinecraftVersionOverride Specify a version of moulconfig that isn't the same
  * as the mc version for when you are still waiting for the next moulconfig release
- * @param fabricModJsonVersionOverride Specify the version predicate used in fabric.mod.json
  */
 enum class MinecraftVersion(
     val versionName: String,
     val javaVersion: Int,
     val versionNameOverride: String? = null,
     val moulconfigMinecraftVersionOverride: String? = null,
-    val fabricModJsonVersionOverride: String? = null,
 ) {
     MC12111("1.21.11", 21),
     MC26100("26.1", 25, versionNameOverride = "26.1.2"),
-    MC26200("26.2", 25)
+    MC26200("26.2", 25),
     ;
 
     val javaLanguageVersion = JavaLanguageVersion.of(javaVersion)
@@ -40,5 +38,5 @@ enum class MinecraftVersion(
      * For versions using the new 26.x+ versioning scheme, a tilde is prepended to allow compatible patch versions.
      */
     val fabricModJsonVersion: String
-        get() = fabricModJsonVersionOverride ?: if (versionNumber >= 260100) "~$versionName" else versionName
+        get() = if (versionNumber >= 260100) "~$versionName" else versionName
 }

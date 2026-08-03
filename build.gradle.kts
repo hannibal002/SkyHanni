@@ -384,7 +384,7 @@ tasks.withType<KotlinCompile> {
         allWarningsAsErrors = true
         optIn.addAll(
             "kotlin.concurrent.atomics.ExperimentalAtomicApi",
-            "kotlin.time.ExperimentalTime",
+            "kotlin.time.ExperimentalTime"
         )
         freeCompilerArgs.addAll(
             // 0 (all cores) triggers a race condition in JvmIrCodegenFactory's parallel codegen on Kotlin 2.4.x,

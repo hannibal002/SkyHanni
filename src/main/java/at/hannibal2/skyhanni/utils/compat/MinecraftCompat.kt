@@ -120,11 +120,8 @@ object MinecraftCompat {
             mc.gui.setScreen(value)
         }
 
-    //? if >= 26.2 {
+    //~ if < 26.2 'Hud = mc.gui.hud' -> 'Gui = mc.gui'
     val hud get(): Hud = mc.gui.hud
-    //?} else {
-    /*val hud get(): Gui = mc.gui
-    *///?}
 
     //~ if < 26.2 'hud.isHidden()' -> 'mc.options.hideGui'
     val hideGui get(): Boolean = hud.isHidden()

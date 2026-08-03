@@ -24,23 +24,24 @@ import net.fabricmc.fabric.api.client.rendering.v1.PictureInPictureRendererRegis
 
 @SkyHanniModule
 object RenderEvents {
-
     private val config get() = SkyHanniMod.feature.gui
 
     init {
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.SLEEP,
             Identifier.fromNamespaceAndPath("skyhanni", "gui_render_layer"),
-            RenderEvents::postGui,
+            RenderEvents::postGui
         )
 
-        //? if >= 26.2 {
-        PictureInPictureRendererRegistry.register { _ -> SkyHanniPipCoordinatorRenderer() }
-        //?} elif >= 26.1 {
-        /*PictureInPictureRendererRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.bufferSource()) }
-        *///?} else {
-        /*SpecialGuiElementRegistry.register { ctx -> SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers()) }
-        *///?}
+        //~ if < 26.1 'PictureInPictureRendererRegistry' -> 'SpecialGuiElementRegistry'
+        PictureInPictureRendererRegistry.register { ctx ->
+            //? if >= 26.2 {
+            SkyHanniPipCoordinatorRenderer()
+            //?} elif >= 26.1 {
+            /*SkyHanniPipCoordinatorRenderer(ctx.bufferSource())
+            *///?} else
+            //SkyHanniPipCoordinatorRenderer(ctx.vertexConsumers())
+        }
     }
 
     @HandleEvent
@@ -49,16 +50,14 @@ object RenderEvents {
         SkyHanniRoundedShapeRenderManager.invalidateAtlas()
     }
 
-    // The unused parameter is required to conform to the HudElement interface.
-    @Suppress("unused")
-    private fun postGui(context: GuiGraphicsExtractor, deltaTracker: DeltaTracker) {
+    private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
         if (MinecraftCompat.hideGui) return
         if (config.hideGuiInDebugMenu && MinecraftCompat.showDebugHud) return
         RenderData.postRenderOverlay(context)
     }
 
     // GameOverlayRenderPreEvent
-    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPre(context: GuiGraphicsExtractor) =
         GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
@@ -76,7 +75,7 @@ object RenderEvents {
         GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
 
     // GameOverlayRenderPostEvent
-    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()
@@ -106,8 +105,6 @@ object RenderEvents {
         GameOverlayRenderPostEvent(context, RenderLayer.ACTION_BAR).post()
 }
 
-// We intentionally define render layers that may be used in the future
-@Suppress("unused")
 enum class RenderLayer {
     ALL,
     HELMET,

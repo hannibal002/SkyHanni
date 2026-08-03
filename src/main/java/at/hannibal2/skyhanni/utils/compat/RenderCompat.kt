@@ -31,9 +31,8 @@ object RenderCompat {
             0,
             indices,
             1,
-            //? if >= 26.2 {
+            //? if >= 26.2
             0,
-            //?}
         )
     }
 
@@ -44,12 +43,13 @@ object RenderCompat {
     fun GpuDevice.createRenderPass(name: String, framebuffer: RenderTarget): RenderPass {
         val colorAttachment = framebuffer.findColorAttachment() ?: error("color attachment is null")
         return this.createCommandEncoder().createRenderPass(
-            { name }, // label
-            colorAttachment, // colorTexture
+            { name },
+            colorAttachment,
             //~ if < 26.2 'Optional' -> 'OptionalInt'
             Optional.empty(),
-            framebuffer.findDepthAttachment(), // depthTexture
-            OptionalDouble.empty(), // clearDepth
+            framebuffer.findDepthAttachment(),
+            OptionalDouble.empty(),
         )
     }
+
 }

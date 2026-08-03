@@ -30,7 +30,9 @@ import java.text.DecimalFormat
 import kotlin.math.min
 import kotlin.math.sqrt
 
-// Some functions taken from NotEnoughUpdates
+/**
+ * Some functions taken from NotEnoughUpdates
+ */
 @Suppress("UnusedParameter")
 object GuiRenderUtils {
 
@@ -342,17 +344,6 @@ object GuiRenderUtils {
     )
 
     /**
-     * This is used to render items that fit these criteria:
-     *  - Uses block light (mostly skulls)
-     *  - Has a rotation (either from the GUI editor or from the animation)
-     *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
-     *  - Needs to be rendered at a higher resolution (scale > 1)
-     *
-     *  Any place that this function is called (e.g. from calling .render() on an AnimatedItemStackRenderable),
-     *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this
-     *  logic, the item will render correctly, but will end up "on top" of almost all other GUI elements, including
-     *  our own config. It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
-     *
      * Returns either the stable ID of the custom render (if used) or -1 if the item was
      * rendered using the normal method (either is static, or 'small')
      */
@@ -381,7 +372,7 @@ object GuiRenderUtils {
 
         val matrices2D = DrawContextUtils.drawContext.pose()
 
-        // We need to extract the scaling from the GUI editor as well, since we're building our own stack.
+        // And similarly, we need to extract the scaling from the GUI editor as well, since we're building our own stack.
         val guiScaleX = sqrt(matrices2D.m00() * matrices2D.m00() + matrices2D.m01() * matrices2D.m01())
         val guiScaleY = sqrt(matrices2D.m10() * matrices2D.m10() + matrices2D.m11() * matrices2D.m11())
         val totalItemScale = ((guiScaleX + guiScaleY) * 0.5f) * finalItemScale
@@ -393,17 +384,27 @@ object GuiRenderUtils {
         if (rotationVec == Vec3.ZERO && (totalItemScale <= 1 || !trackingState.usesBlockLight()))
             return item.normalRenderOnScreen(translateX, translateY, finalItemScale.toFloat())
 
+        /**
+         * This is used to render items that fit these criteria:
+         *  - Uses block light (mostly skulls)
+         *  - Has a rotation (either from the GUI editor or from the animation)
+         *  - Has animations (either animated skins/items, or a bounce animation from AnimatedItemStackRenderable)
+         *  - Needs to be rendered at a higher resolution (scale > 1)
+         *
+         *  Any place that this function is called (I.e., from calling .render() on an AnimatedItemStackRenderable),
+         *  we _MUST_ do so from a GameOverlayRenderPostEvent. If an item is rendered in a GuiRenderEvent with this logic,
+         *  the item will render correctly, but will end up "on top" of almost all other GUI elements, including our own config.
+         *  It also will not correctly adhere to other GUI transforms (such as blurring when in a menu).
+         */
         val guiItemRenderState = GuiItemRenderState(
-            //? if < 26.1 {
-            /*this.item.name.toString(),
-            *///?}
+            //? if < 26.1
+            //this.item.name.toString(),
             Matrix3x2f(DrawContextUtils.drawContext.pose()),
             trackingState,
             0,
             0,
             DrawContextUtils.drawContext.scissorStack.peek()
         )
-
         val newRenderState = SkyHanniGuiItemRenderState(
             itemStack = this,
             guiItemRenderState,
@@ -416,15 +417,12 @@ object GuiRenderUtils {
             frameNumber = frameNumber,
             alpha = alpha,
         )
-
-        val renderer = Minecraft.getInstance().gameRenderer
-
         //? if >= 26.2 {
-        renderer.gameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
+        Minecraft.getInstance().gameRenderer.gameRenderState().guiRenderState.addPicturesInPictureState(newRenderState)
         //?} elif >= 26.1 {
-        /*renderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
+        /*Minecraft.getInstance().gameRenderer.gameRenderState.guiRenderState.addPicturesInPictureState(newRenderState)
         *///?} else {
-        /*renderer.guiRenderState.submitPicturesInPictureState(newRenderState)
+        /*Minecraft.getInstance().gameRenderer.guiRenderState.submitPicturesInPictureState(newRenderState)
         *///?}
 
         return newRenderState.stableId

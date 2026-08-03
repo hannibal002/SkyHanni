@@ -11,9 +11,8 @@ class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWor
     private fun SkyHanniRenderWorldEvent.submitCustomGeometry(layer: RenderType, block: (VertexConsumer) -> Unit) {
         //? if >= 26.2 {
         event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf -> block(buf) }
-        //?} else {
-        /*block(event.bufferSource.getBuffer(layer))
-        *///?}
+        //?} else
+        //block(event.bufferSource.getBuffer(layer))
     }
 
     fun draw(

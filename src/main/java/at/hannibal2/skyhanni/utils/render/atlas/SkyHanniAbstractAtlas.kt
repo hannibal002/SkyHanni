@@ -42,13 +42,8 @@ abstract class SkyHanniAbstractAtlas<K : Any, E : SkyHanniAbstractAtlasEntry> : 
 
     protected fun ensureAllocated() {
         if (texture != null) return
-        //? if >= 26.2 {
-        val maxTextureSize =
-            RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM)
-        //?} else {
-        /*val maxTextureSize = RenderSystem.getDevice().maxTextureSize
-        *///?}
-        val size = 512.coerceAtMost(maxTextureSize)
+        //~ if < 26.2 'getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM)' -> 'maxTextureSize'
+        val size = 512.coerceAtMost(RenderSystem.getDevice().getDeviceInfo().limits().maxTextureSizeForFormat(GpuFormat.RGBA8_UNORM))
         sizePixels = size
         allocateTextures(size, colorLabel, depthLabel, textureUsage)
         packer = SkyHanniAtlasBinPacker(size)

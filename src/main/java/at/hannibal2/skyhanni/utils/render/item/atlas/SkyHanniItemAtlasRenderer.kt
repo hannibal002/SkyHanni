@@ -53,23 +53,16 @@ internal class SkyHanniItemAtlasRenderer(
         slotX: Int,
         slotY: Int,
         pixelSize: Int,
-        //? if >= 26.2 {
+        //~ if < 26.2 'submitNodeStorage: SubmitNodeStorage' -> 'bufferSource: MultiBufferSource.BufferSource'
         submitNodeStorage: SubmitNodeStorage,
-        //?} else {
-        /*bufferSource: MultiBufferSource.BufferSource,
-        *///?}
         featureRenderDispatcher: FeatureRenderDispatcher,
     ) {
         RenderSystem.enableScissorForRenderTypeDraws(
             slotX, sizePixels - slotY - pixelSize, pixelSize, pixelSize,
         )
         shState.renderItemToTexture(
-            //? if >= 26.2 {
-            submitNodeStorage,
-            //?} else {
-            /*bufferSource,
-            *///?}
-            featureRenderDispatcher,
+            //~ if < 26.2 'submitNodeStorage' -> 'bufferSource'
+            submitNodeStorage, featureRenderDispatcher,
             centerX = slotX.toFloat() + pixelSize / 2.0f,
             centerY = slotY.toFloat() + pixelSize / 2.0f,
             pixelSize = pixelSize,
@@ -109,10 +102,7 @@ internal class SkyHanniItemAtlasRenderer(
 
     fun clearSlot(x: Int, y: Int, size: Int) {
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
-            texture,
-            GuiRenderer.CLEAR_COLOR,
-            depthTexture,
-            CLEAR_DEPTH,
+            texture, GuiRenderer.CLEAR_COLOR, depthTexture, CLEAR_DEPTH,
             x, sizePixels - y - size, size, size,
         )
     }
