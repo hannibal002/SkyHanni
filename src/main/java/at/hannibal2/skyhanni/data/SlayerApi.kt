@@ -45,6 +45,8 @@ object SlayerApi {
 
     private val patternGroup = RepoPattern.group("slayer.api")
 
+    const val GRACE_UPDATE_COUNT = 3
+
     // <editor-fold desc="Patterns">
     /**
      * WRAPPED-REGEX-TEST: "  SLAYER QUEST STARTED!"
@@ -223,7 +225,7 @@ object SlayerApi {
 
     private fun errorOnInvalid(message: String, lines: List<String>, source: SlayerLinesSource) {
         invalidUpdates++
-        if (invalidUpdates == 3) {
+        if (invalidUpdates == GRACE_UPDATE_COUNT) {
             ErrorManager.skyHanniError(
                 message,
                 "lines" to lines,
@@ -238,7 +240,7 @@ object SlayerApi {
         if (questIndex == -1) {
             if (hasActiveQuest()) {
                 invalidUpdates++
-                if (invalidUpdates >= 3) {
+                if (invalidUpdates >= GRACE_UPDATE_COUNT) {
                     invalidUpdates = 0 // Grace period over: quest is genuinely gone
                 }
             } else {
