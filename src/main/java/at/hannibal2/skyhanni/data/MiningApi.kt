@@ -428,7 +428,7 @@ object MiningApi {
     }
 
     @HandleEvent(ScoreboardAreaChangeEvent::class)
-    private fun onGraphAreaChange() {
+    private fun onScoreboardAreaChange() {
         if (!IslandTypeTag.CUSTOM_MINING.isInIsland()) return
         updateLocation()
     }
