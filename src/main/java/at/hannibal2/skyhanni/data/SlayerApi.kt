@@ -164,7 +164,7 @@ object SlayerApi {
                 add(" /shtestwaypoint ${PlayerUtils.blockPosition().toLocalFormat()} pathfind")
             }
             add("isInAnyArea: $isInAnyArea")
-            add("latestProgress: '${latestProgress}'")
+            add("latestProgress: '$latestProgress'")
 
             val data = getCurrentData()
             add("active data:")
