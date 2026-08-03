@@ -58,5 +58,7 @@ object ColdOverlay {
         inSafariIceBiome = event.area == "Icy Biome"
     }
 
-    private fun isEnabled() = IslandTypeTag.IS_COLD.isInIsland() && config.enabled && (!IslandType.SAFARI.isInIsland() || inSafariIceBiome)
+    fun shouldShowCold() = IslandTypeTag.IS_COLD.isInIsland() && (!IslandType.SAFARI.isInIsland() || inSafariIceBiome)
+
+    private fun isEnabled() = config.enabled && shouldShowCold()
 }

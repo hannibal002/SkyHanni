@@ -39,5 +39,5 @@ object SafariNamesInCenter {
         }
     }
 
-    fun isEnabled() = IslandType.SAFARI .isInIsland() && config.namesInCenter
+    private fun isEnabled() = IslandType.SAFARI.isInIsland() && config.namesInCenter
 }

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.data.MiningApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
+import at.hannibal2.skyhanni.features.mining.ColdOverlay
 
 // internal
 // update with cold update event
@@ -20,6 +21,8 @@ object ScoreboardElementCold : ScoreboardElement() {
     override val elementPatterns = listOf(MiningApi.coldPattern)
 
     override fun showIsland() = IslandTypeTag.IS_COLD.isInIsland()
+
+    override fun showWhen(): Boolean = ColdOverlay.shouldShowCold()
 }
 
 // click: warp basecamp
