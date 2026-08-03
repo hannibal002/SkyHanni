@@ -92,7 +92,7 @@ object BestiaryData {
      */
     private val killsLinePattern by patternGroup.pattern(
         "kills.line",
-        "Kills: (?<kills>[0-9,.]+)",
+        "^Kills: (?<kills>[0-9,.]+)",
     )
 
     /**
@@ -107,7 +107,7 @@ object BestiaryData {
      * REGEX-TEST: You haven't unlocked this Family yet!
      */
     private val notUnlockedFamilyPattern by patternGroup.pattern(
-        "progress.not-unlocked-familty",
+        "progress.not-unlocked-family",
         "You haven't unlocked this Family yet!",
     )
 

@@ -78,9 +78,9 @@ object ShulkerFinder {
 
     private fun calculateRoute(shulkerType: ShulkerType): MutableList<LorenzVec>? {
         val graph = IslandGraphs.currentIslandGraph ?: return null
-        val list = graph.filter { it.hasTag(shulkerType.nodeTag) }
+        val list = graph.getNodesWithTags(shulkerType.nodeTag)
 
-        return NavigationUtils.getRoute(list, maxIterations = 300, neighborhoodSize = 50).toMutableList()
+        return NavigationUtils.getRoute(list).toMutableList()
     }
 
     @HandleEvent

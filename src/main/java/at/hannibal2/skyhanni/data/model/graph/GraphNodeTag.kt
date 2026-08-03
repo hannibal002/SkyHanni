@@ -162,7 +162,7 @@ enum class GraphNodeTag(
     ),
 
     TREE_PROTECTION_ORDER(
-        "tree_protection",
+        "tree_protection_order",
         LorenzColor.RED,
         "Tree Protection Order",
         "Tree Protected by the Protection Order.",
@@ -170,7 +170,7 @@ enum class GraphNodeTag(
     ),
 
     HONEY_HIVE(
-        "hive",
+        "honey_hive",
         LorenzColor.GOLD,
         "Honey Hive",
         "Lootable Honey Hive.",
@@ -182,6 +182,14 @@ enum class GraphNodeTag(
         LorenzColor.GOLD,
         "Safari Bell",
         "Bells to be rung in the Safari.",
+        onlyIsland = IslandType.SAFARI,
+    ),
+
+    HIDEYHO_LOCATION(
+        "hideyho_location",
+        LorenzColor.LIGHT_PURPLE,
+        "Hideyho Location",
+        "A location that Hideyho can be found.",
         onlyIsland = IslandType.SAFARI,
     ),
 
