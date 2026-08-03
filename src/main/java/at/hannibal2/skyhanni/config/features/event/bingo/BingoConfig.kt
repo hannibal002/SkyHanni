@@ -48,6 +48,20 @@ class BingoConfig {
     @ConfigLink(owner = BingoConfig::class, field = "minionCraftHelperEnabled")
     val minionCraftHelperPos: Position = Position(10, 10)
 
+    @Expose
+    @ConfigOption(
+        name = "Active Effects Display",
+        desc = "Show your total active effects and when they expire, so you know when your god " +
+            "splash runs out. Only shows on a Bingo profile."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var activeEffectsDisplay: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = BingoConfig::class, field = "activeEffectsDisplay")
+    val activeEffectsPosition: Position = Position(-200, 10)
+
     @ConfigOption(name = "Bingo Boop Party", desc = "Bingo Boop Party has been moved to Misc. Click here to jump straight to it.")
     @ConfigEditorButton(buttonText = "Go")
     val boopPartyJumpButton = Runnable { SkyHanniMod.feature.misc.boopParty::boopPartyBingo.jumpToEditor() }
