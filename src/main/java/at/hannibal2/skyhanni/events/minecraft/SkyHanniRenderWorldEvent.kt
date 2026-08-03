@@ -11,7 +11,6 @@ import net.minecraft.client.renderer.SubmitNodeStorage
 /*import net.minecraft.client.renderer.MultiBufferSource
 *///?}
 
-
 @PrimaryFunction("onRenderWorld")
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,

@@ -29,8 +29,10 @@ object RenderEvents {
         )
 
         PictureInPictureRendererRegistry.register { ctx ->
-            //~ if <= 26.2 '()' -> '(ctx.bufferSource())'
-            SkyHanniPipCoordinatorRenderer()
+            SkyHanniPipCoordinatorRenderer(
+                //~ if < 26.2
+                ctx.bufferSource()
+            )
         }
     }
 
