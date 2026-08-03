@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -70,7 +71,6 @@ object AttributeShardsData {
 
     private var lastSyphonedMessage = SimpleTimeMark.farPast()
 
-    // TODO remove all color codes from all regexes in this file
     private val patternGroup = RepoPattern.group("inventory.attributeshards")
 
     /**
@@ -180,7 +180,7 @@ object AttributeShardsData {
      */
     val requiredToFusePattern by patternGroup.pattern(
         "fuse.required.colorless",
-        "Required to fuse: (?<amount>\\d)",
+        "Required to fuse: (?<amount>\\d+)",
     )
 
     /**
@@ -212,7 +212,7 @@ object AttributeShardsData {
         "and (?<amount>\\d+) more\\.\\.\\.",
     )
 
-    private val advancedModeNotUnlocked by patternGroup.pattern(
+    private val advancedModeNotUnlockedPattern by patternGroup.pattern(
         "advanced.mode.colorless",
         "Advanced Mode unlocked at 30",
     )
@@ -298,7 +298,7 @@ object AttributeShardsData {
      */
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
-        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward he gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
+        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
     )
 
     /**
@@ -459,7 +459,7 @@ object AttributeShardsData {
             if (!isAttributeShard(internalName)) continue
             var tier = 0
             var toNextTier = 0
-            attributeShardNamePattern.matchMatcher(item.hoverName.string) {
+            attributeShardNamePattern.matchMatcher(item.cleanName) {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
             val lore = item.getCleanLore()
@@ -475,7 +475,7 @@ object AttributeShardsData {
 
         val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.item?.orNull()
         val advancedModeLore = advancedModeStack?.getCleanLore().orEmpty()
-        advancedModeNotUnlocked.firstMatcher(advancedModeLore) {
+        advancedModeNotUnlockedPattern.firstMatcher(advancedModeLore) {
             addAllMissingShards()
         }
 
