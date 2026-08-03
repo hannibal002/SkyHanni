@@ -25,7 +25,7 @@ jobs:
                 uses: actions/checkout@v7
 
             -   name: Download build failure artifact (26.1)
-                id: download_2
+                id: download_1
                 uses: actions/download-artifact@v8
                 with:
                     name: build-failure-output-26.1
