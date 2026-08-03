@@ -49,11 +49,13 @@ object MinionCraftHelper {
     )
 
     /**
-     * REGEX-TEST: Crafted Minions
+     * REGEX-TEST: (1/3) Crafted Minions
+     * REGEX-TEST: (2/3) Crafted Minions
+     * REGEX-TEST: (3/3) Crafted Minions
      */
     private val craftedMinionsInventoryPattern by patternGroup.pattern(
         "inventory",
-        "Crafted Minions",
+        "(?:\\(\\d/\\d\\) )?Crafted Minions",
     )
 
     private var display = emptyList<String>()
