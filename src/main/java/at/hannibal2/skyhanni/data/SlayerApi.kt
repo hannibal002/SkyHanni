@@ -220,46 +220,18 @@ object SlayerApi {
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
-    private fun errorOnInvalid(message: String, lines: List<String>, source: SlayerLinesSource) {
-        invalidUpdates++
-        if (invalidUpdates == GRACE_UPDATE_COUNT) {
-            ErrorManager.skyHanniError(
-                message,
-                "lines" to lines,
-                "source" to source.name,
-            )
-        }
-    }
-
-    private fun getParsedSlayerOrNull(lines: List<String>, source: SlayerLinesSource): ParsedSlayer? {
+    private fun getParsedSlayerOrNull(lines: List<String>): ParsedSlayer? {
         val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
-
-        if (questIndex == -1) {
-            if (hasActiveQuest()) {
-                invalidUpdates++
-                if (invalidUpdates >= GRACE_UPDATE_COUNT) {
-                    invalidUpdates = 0 // Grace period over: quest is genuinely gone
-                }
-            } else {
-                invalidUpdates = 0
-            }
-            return null
-        }
+        if (questIndex == -1) return null
 
         val category = lines[questIndex]
         val type = Type.getByName(category) ?: return null
         val progress = lines.getOrNull(questIndex + 1)
-        if (progress == null) {
-            errorOnInvalid("Progress line missing for category '$category'", lines, source)
-            return null
-        }
+        require(progress != null) { "Progress line missing for category '$category'" }
 
         val tierString = category.substringAfterLast(' ', "")
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
-        if (parsedTier == null) {
-            errorOnInvalid("latestCategory does not contain roman number or int: '$category'", lines, source)
-            return null
-        }
+        require(parsedTier != null) { "Failed to parse tier from category '$category'" }
 
         invalidUpdates = 0
 
@@ -275,7 +247,20 @@ object SlayerApi {
         if (ProfileStorageData.profileSpecific == null) return
 
         val (lines, source) = getSlayerLines()
-        val parsed = getParsedSlayerOrNull(lines, source)
+        val parsed = try {
+            getParsedSlayerOrNull(lines)
+        } catch (e: Exception) {
+            invalidUpdates++
+            if (invalidUpdates == GRACE_UPDATE_COUNT) {
+                val message = "Slayer Exception: ${e.message}"
+                ErrorManager.skyHanniError(
+                    message,
+                    "lines" to lines,
+                    "source" to source.name,
+                )
+            }
+            return
+        }
         if (invalidUpdates > 0) return
 
         val progress = parsed?.progress ?: "no slayer"
