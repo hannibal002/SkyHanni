@@ -40,7 +40,7 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Safari Features", desc = "")
+    @ConfigOption(name = "Safari", desc = "")
     @Accordion
     val safari = SafariConfig()
 

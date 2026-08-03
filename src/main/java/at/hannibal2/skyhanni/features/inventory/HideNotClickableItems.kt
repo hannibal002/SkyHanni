@@ -73,6 +73,33 @@ object HideNotClickableItems {
     private val hidePlayerTradeFilter = MultiFilter()
     private val notAuctionableFilter = MultiFilter()
 
+    private val netherWart = "NETHER_STALK".toInternalName()
+
+    private val birdFood = setOf(
+        "BAG_OF_SEEDS".toInternalName(), // for Bluebirds
+        "WRIGGLEWORM".toInternalName(), // for Parakeets
+        "YOGI_BERRY".toInternalName(), // for Macaws
+    )
+
+    private val equipmentTypes = setOf(
+        "HELMET",
+        "CARNIVAL MASK",
+        "CHESTPLATE",
+        "LEGGINGS",
+        "BOOTS",
+
+        "NECKLACE",
+        "CLOAK",
+        "BELT",
+        "GLOVES",
+        "BRACELET",
+    )
+
+    // TODO add more special named fossils (hypixel why)
+    private val fossilNames = setOf(
+        "HELIX".toInternalName(),
+    )
+
     private val patternGroup = RepoPattern.group("inventory.hidenotclickable")
 
     private val clickToSellPattern by patternGroup.pattern(
@@ -94,8 +121,6 @@ object HideNotClickableItems {
         "inventory.hidenotclickable.seeds",
         "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3|DOUBLE_PLANT|MOONFLOWER|WILD_ROSE",
     )
-
-    private val netherWart = "NETHER_STALK".toInternalName()
 
     @HandleEvent
     private fun onRepoReload(event: RepositoryReloadEvent) {
@@ -248,12 +273,7 @@ object HideNotClickableItems {
 
         val internalName = stack.getInternalNameOrNull() ?: return false
 
-        // TODO add more special named fossils (hypixel why)
-        val list = listOf(
-            "HELIX".toInternalName(),
-        )
-
-        if (internalName in list) {
+        if (internalName in fossilNames) {
             return false
         }
         if (internalName.endsWith("_FOSSIL")) {
@@ -271,20 +291,13 @@ object HideNotClickableItems {
 
         val internalName = stack.getInternalNameOrNull() ?: return false
 
-        val list = listOf(
-            "BAG_OF_SEEDS".toInternalName(), // for Bluebirds
-            "WRIGGLEWORM".toInternalName(), // for Parakeets
-            "YOGI_BERRY".toInternalName(), // for Macaws
-        )
-
-        if (internalName in list) {
+        if (internalName in birdFood) {
             return false
         }
 
         hideReason = "§cNot bird food!"
         return true
     }
-
 
     private fun hideRiftTransferChest(chestName: String, stack: SafeItemStack): Boolean {
         if (chestName != "Rift Transfer Chest") return false
@@ -328,21 +341,7 @@ object HideNotClickableItems {
 
     private fun hideYourEquipment(stack: SafeItemStack): Boolean {
         if (!CurrentEquipmentApi.inventory.isInside()) return false
-
-        val list = listOf(
-            "HELMET",
-            "CARNIVAL MASK",
-            "CHESTPLATE",
-            "LEGGINGS",
-            "BOOTS",
-
-            "NECKLACE",
-            "CLOAK",
-            "BELT",
-            "GLOVES",
-            "BRACELET",
-        )
-        for (type in list) {
+        for (type in equipmentTypes) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
                 showGreenLine = true
                 return false

@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 object SafariNamesInCenter {
 
     private val config get() = SkyHanniMod.feature.foraging.safari
-    private val coreLocations = mapOf(
+    private val areaLocations = mapOf(
         LorenzVec(-27.1, 66.0, 22.8) to "§2Forest Biome",
         LorenzVec(-25.5, 66.0, -23.2) to "§5Haunted Biome",
         LorenzVec(-73.3, 65.0, -23.4) to "§9Icy Biome",
@@ -32,7 +32,7 @@ object SafariNamesInCenter {
     @HandleEvent
     private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || !showWaypoints) return
-        for ((location, name) in coreLocations) {
+        for ((location, name) in areaLocations) {
             if (location.distanceSqToPlayer() > 50) {
                 event.drawDynamicText(location, name, 2.5)
             }

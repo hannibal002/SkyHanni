@@ -10,7 +10,7 @@ class SafariConfig {
     @Expose
     @ConfigOption(
         name = "Names in Center",
-        desc = "Show the names of the 4 areas while in the center of the Critter Safari.",
+        desc = "Shows the names of the 4 areas while in the center of the Critter Safari.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
