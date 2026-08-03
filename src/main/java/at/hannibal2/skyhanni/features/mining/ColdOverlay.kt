@@ -2,10 +2,9 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.IslandTypeTag
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
@@ -26,7 +25,7 @@ object ColdOverlay {
     private val textureLocation = createResourceLocation("minecraft", "textures/misc/powder_snow_outline.png")
 
     @HandleEvent
-    private fun onGuiRenderOverlay() {
+    fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val alpha = getColdAlpha()
         if (alpha == 0f) return
@@ -42,7 +41,7 @@ object ColdOverlay {
     }
 
     @HandleEvent
-    private fun onColdUpdate(event: ColdUpdateEvent) {
+    fun onColdUpdate(event: ColdUpdateEvent) {
         val duration = if (event.cold == 0) 1.seconds else 0.seconds
         DelayedRun.runDelayed(duration) {
             lastCold = cold
@@ -51,14 +50,5 @@ object ColdOverlay {
         }
     }
 
-    var inSafariIceBiome = false
-
-    @HandleEvent
-    private fun onAreaChange(event: GraphAreaChangeEvent) {
-        inSafariIceBiome = event.area == "Icy Biome"
-    }
-
-    fun shouldShowCold() = IslandTypeTag.IS_COLD.isInIsland() && (!IslandType.SAFARI.isInIsland() || inSafariIceBiome)
-
-    private fun isEnabled() = config.enabled && shouldShowCold()
+    private fun isEnabled() = IslandTypeTag.IS_COLD.isInIsland() && config.enabled
 }
