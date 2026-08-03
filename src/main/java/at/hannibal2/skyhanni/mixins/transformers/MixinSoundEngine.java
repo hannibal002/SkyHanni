@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(SoundEngine.class)
-public class MixinSoundEngine {
+public abstract class MixinSoundEngine {
 
     @Inject(
         method = "play",
@@ -28,10 +28,9 @@ public class MixinSoundEngine {
                 new LorenzVec(soundInstance.getX(), soundInstance.getY(), soundInstance.getZ()),
                 soundInstance.getPitch(),
                 soundInstance.getVolume()
-            ).post()
+            ).post().isCancelled()
         ) {
             cir.setReturnValue(SoundEngine.PlayResult.NOT_STARTED);
         }
     }
-
 }

@@ -17,26 +17,25 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 //? if >= 26.1 {
+import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import at.hannibal2.skyhanni.data.EntityData;
-import at.hannibal2.skyhanni.utils.SkyBlockUtils;
 //?} else {
 /*import net.minecraft.client.renderer.state.CameraRenderState;
 *///?}
 
 @Mixin(EntityRenderer.class)
-public class MixinEntityRenderer {
+public abstract class MixinEntityRenderer {
 
     //~ if < 26.1 'submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V' -> 'submitNameTag'
     @Inject(method = "submitNameDisplay(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/level/CameraRenderState;)V", at = @At("HEAD"), cancellable = true)
     public void onRenderLabelHead(EntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo ci) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
             //noinspection deprecation
-            if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post()) {
+            if (new SkyHanniRenderEntityEvent.Specials.Pre<>(livingEntity, state.x, state.y, state.z).post().isCancelled()) {
                 ci.cancel();
             }
         }
@@ -83,7 +82,7 @@ public class MixinEntityRenderer {
         index = 3
     )
     private Component modifyRenderLabelIfPresentArgs(Component text) {
-        if (SkyBlockUtils.INSTANCE.getInSkyBlock()) {
+        if (SkyBlockUtils.getInSkyBlock()) {
             return EntityData.getHealthDisplay(text);
         }
         return text;

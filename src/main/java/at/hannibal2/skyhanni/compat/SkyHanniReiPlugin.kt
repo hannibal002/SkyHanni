@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.compat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import at.hannibal2.skyhanni.features.inventory.wardrobe.ArmorWardrobeApi
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe
 import me.shedaniel.math.Rectangle
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin
 import me.shedaniel.rei.api.client.registry.screen.ExclusionZones

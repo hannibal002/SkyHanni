@@ -36,6 +36,25 @@ enum class SkyblockSeason(
 
         private fun getSeasonByName(name: String): SkyblockSeason? =
             seasonPattern.matchMatcher(name) { entries.find { it.season.endsWith(group("season")) } }
+
+        fun getSeasonByMonth(month: Int): Pair<SkyblockSeason, SkyblockSeasonModifier?> {
+            val season = when ((month - 1) / 3) {
+                0 -> SPRING
+                1 -> SUMMER
+                2 -> AUTUMN
+                3 -> WINTER
+                else -> throw IllegalArgumentException("Invalid month: $month")
+            }
+
+            val modifier = when ((month - 1) % 3) {
+                0 -> SkyblockSeasonModifier.EARLY
+                1 -> null
+                2 -> SkyblockSeasonModifier.LATE
+                else -> throw IllegalArgumentException("Invalid month: $month")
+            }
+
+            return season to modifier
+        }
     }
 }
 
