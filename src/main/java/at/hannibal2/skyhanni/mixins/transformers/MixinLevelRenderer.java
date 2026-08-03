@@ -14,6 +14,8 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayerGroup;
 import net.minecraft.client.renderer.chunk.ChunkSectionsToRender;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -37,14 +39,6 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 *///?}
 
-//? if >= 26.1 {
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import org.joml.Matrix4fc;
-//?} else {
-/*import net.minecraft.client.Camera;
-import org.joml.Matrix4f;
-*///?}
-
 // Adapted from Fabric API implementation
 // The Fabric API event makes our lines render strange
 @Mixin(LevelRenderer.class)
@@ -56,7 +50,6 @@ public abstract class MixinLevelRenderer {
     *///?}
 
     @Unique
-    //~ if < 26.1 'CameraRenderState currentCameraState' -> 'Camera currentCamera'
     CameraRenderState currentCameraState;
 
     @Unique
@@ -77,23 +70,15 @@ public abstract class MixinLevelRenderer {
     private void beginRender(
         GraphicsResourceAllocator resourceAllocator,
         DeltaTracker deltaTracker, boolean renderOutline,
-        //~ if < 26.1 'CameraRenderState' -> 'Camera'
         CameraRenderState cameraState,
-        //? if >= 26.1 {
         Matrix4fc modelViewMatrix,
-        //?} else {
-        /*Matrix4f positionMatrix,
-        Matrix4f matrix4f,
-        Matrix4f projectionMatrix,
-        *///?}
         GpuBufferSlice terrainFog,
         Vector4f fogColor,
         boolean shouldRenderSky,
-        //? if = 26.1
+        //? if < 26.2
         //ChunkSectionsToRender chunkSectionsToRender,
         CallbackInfo ci
     ) {
-        //~ if < 26.1 'currentCameraState' -> 'currentCamera'
         currentCameraState = cameraState;
         currentTickCounter = deltaTracker;
     }
@@ -138,7 +123,6 @@ public abstract class MixinLevelRenderer {
 
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
             contextMatrixStack,
-            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             currentCameraState,
             renderBuffers.bufferSource(),
             currentTickCounter.getGameTimeDeltaPartialTick(true),
@@ -179,9 +163,7 @@ public abstract class MixinLevelRenderer {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
         SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
     }
-    *///?}
-
-    //? if = 26.1 {
+    *///?} else {
     /*@Inject(
         method = "lambda$addLateDebugPass$0",
         at = @At(

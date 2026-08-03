@@ -29,18 +29,13 @@ import net.minecraft.ChatFormatting
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.components.ChatComponent
 import net.minecraft.client.multiplayer.chat.GuiMessage
+import net.minecraft.client.multiplayer.chat.GuiMessageSource
 import net.minecraft.client.multiplayer.chat.GuiMessageTag
 import net.minecraft.network.chat.Component
 import net.minecraft.network.protocol.Packet
 import net.minecraft.network.protocol.game.ServerboundChatCommandPacket
 import net.minecraft.network.protocol.game.ServerboundChatPacket
 import kotlin.math.floor
-
-//? if >= 26.1 {
-import net.minecraft.client.multiplayer.chat.GuiMessageSource
-//?} else {
-/*import at.hannibal2.skyhanni.mixins.hooks.MessageStore.Companion.parent
-*///?}
 
 @SkyHanniModule
 object ChatManager {
@@ -302,10 +297,8 @@ object ChatManager {
             counter,
             newComponent,
             id,
-            //? if >= 26.1 {
             GuiMessageSource.SYSTEM_CLIENT,
-            //?}
-            GuiMessageTag.system(),
+            GuiMessageTag.system()
         )
         chatGui.allMessages[messageIndex] = newMessage
 
@@ -326,12 +319,7 @@ object ChatManager {
         val lines = newMessage.splitLines(mc.font, maxWidth)
         for ((lineIndex, line) in lines.withIndex()) {
             val endOfEntry = lineIndex == lines.size - 1
-            //? if >= 26.1 {
             val newLine = GuiMessage.Line(newMessage, line, endOfEntry)
-            //?} else {
-            /*val newLine = GuiMessage.Line(newMessage.addedTime(), line, newMessage.tag(), endOfEntry)
-            newLine.parent = newMessage
-            *///?}
             // Minecraft stores the lines of a message in reverse, so every line goes to the same index
             chatGui.trimmedMessages.add(insertIndex, newLine)
         }

@@ -21,15 +21,10 @@ import net.minecraft.client.gui.Gui;
 /*import net.minecraft.client.renderer.GameRenderer;
 *///?}
 
-//? if < 26.1 {
-/*import com.llamalad7.mixinextras.sugar.Local;
-*///?}
-
 //~ if < 26.2 'Gui' -> 'GameRenderer'
 @Mixin(Gui.class)
 public abstract class MixinGui_GameRenderer {
 
-    //? if >= 26.1 {
     @Unique
     private GuiGraphicsExtractor skyhanni$guiGraphics;
 
@@ -39,9 +34,7 @@ public abstract class MixinGui_GameRenderer {
         skyhanni$guiGraphics = graphics;
         return graphics;
     }
-    //?}
 
-    //? if >= 26.1 {
     //~ if < 26.2 '"extractRenderState' -> '"extractGui' {
     //~ if < 26.2 'Hud;' -> 'Gui;' {
     @Inject(method = "extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Hud;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
@@ -60,20 +53,4 @@ public abstract class MixinGui_GameRenderer {
     }
     //~}
     //~}
-    //?} else {
-    /*@Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/profiling/ProfilerFiller;popPush(Ljava/lang/String;)V"))
-    private void onRenderStartPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, true).post();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;renderSavingIndicator(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V"))
-    private void onRenderEndPhase(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        if (MinecraftCompat.getLocalPlayerExists()) new RenderingTickEvent(context, false).post();
-    }
-
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;extractRenderState(Lnet/minecraft/client/gui/GuiGraphicsExtractor;Lnet/minecraft/client/DeltaTracker;)V", shift = At.Shift.AFTER))
-    private void onRenderTail(DeltaTracker tickCounter, boolean tick, CallbackInfo ci, @Local GuiGraphicsExtractor context) {
-        GuiEditManager.renderLast(context);
-    }
-    *///?}
 }

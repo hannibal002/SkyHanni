@@ -10,16 +10,6 @@ enum class ProjectTarget(
     val modMenuVersion: String,
     val modrinthInfo: ModrinthInfo,
 ) {
-    MODERN_12111(
-        "1.21.11",
-        MinecraftVersion.MC12111,
-        fabricLoaderVersion = "net.fabricmc:fabric-loader:0.19.3",
-        fabricApiVersion = "net.fabricmc.fabric-api:fabric-api:0.141.5+1.21.11",
-        hypixelModApiVersion = "net.hypixel:mod-api:1.0.1",
-        hypixelModApiFabricVersion = "maven.modrinth:hypixel-mod-api:1.0.1+build.1+mc1.21",
-        modMenuVersion = "17.0.0",
-        modrinthInfo = ModrinthInfo.FABRIC_1_21_11,
-    ),
     MODERN_26100(
         "26.1",
         MinecraftVersion.MC26100,

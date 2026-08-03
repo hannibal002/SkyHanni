@@ -91,7 +91,6 @@ object MinecraftCompat {
 
 
     // <editor-fold desc="World Time">
-    //~ if < 26.1 'defaultClockTime' -> 'dayTime'
     val clientTime get(): Long = localWorldOrNull?.defaultClockTime ?: 0L
 
     @JvmStatic
@@ -101,12 +100,8 @@ object MinecraftCompat {
     @HandleEvent
     internal fun onPacketReceived(event: PacketReceivedEvent) {
         val packet = event.packet as? ClientboundSetTimePacket ?: return
-        //? if >= 26.1 {
         val defaultClock = localWorldOrNull?.dimensionType()?.defaultClock()?.orElse(null) ?: return
         serverTime = packet.clockUpdates[defaultClock]?.totalTicks() ?: serverTime
-        //?} else {
-        /*serverTime = packet.dayTime
-        *///?}
     }
     // </editor-fold>
 

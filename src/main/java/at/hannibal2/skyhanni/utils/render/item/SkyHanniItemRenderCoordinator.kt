@@ -42,11 +42,6 @@ internal object SkyHanniItemRenderCoordinator {
     private val projectionBuffer by lazy {
         ProjectionMatrixBuffer(
             "SkyHanni items",
-            //? if < 26.1 {
-            /*-1000.0f,
-            1000.0f,
-            true,
-            *///?}
         )
     }
     private val realtimeSlots = LinkedHashMap<Int, SkyHanniRealtimeItemSlot>()

@@ -29,7 +29,6 @@ import net.minecraft.client.renderer.SubmitNodeStorage;
 @Mixin(ItemFeatureRenderer.class)
 public abstract class MixinItemFeatureRenderer {
 
-    //? if >= 26.1 {
     @ModifyArg(
         //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V'
         method = "prepareOutlineSubmit",
@@ -55,15 +54,10 @@ public abstract class MixinItemFeatureRenderer {
         }
         return layer;
     }
-    //?}
 
     //? if < 26.2 {
     /*@WrapOperation(
-        //? if >= 26.1 {
         method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
-        //?} else {
-        /^method = "render",
-        ^///?}
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
@@ -76,7 +70,6 @@ public abstract class MixinItemFeatureRenderer {
     }
     *///?}
 
-    //? if >= 26.1 {
     @WrapOperation(
         //~ if < 26.2 'prepareOutlineSubmit' -> 'renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V'
         method = "prepareOutlineSubmit",
@@ -102,22 +95,4 @@ public abstract class MixinItemFeatureRenderer {
         }
         return original.call(instance, renderType);
     }
-    //?} else {
-    /*@ModifyArg(
-        method = "render",
-        at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/entity/ItemRenderer;renderItem(Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II[ILjava/util/List;Lnet/minecraft/client/renderer/rendertype/RenderType;Lnet/minecraft/client/renderer/item/ItemStackRenderState$FoilType;)V",
-            ordinal = 1
-        ),
-        index = 2
-    )
-    private MultiBufferSource modifyOutlineVertexConsumerProvider(MultiBufferSource outlineConsumer, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
-        Object obj = itemCommand;
-        if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers();
-        }
-        return outlineConsumer;
-    }
-    *///?}
 }

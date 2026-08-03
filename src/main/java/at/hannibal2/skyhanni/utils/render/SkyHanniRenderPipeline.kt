@@ -7,25 +7,20 @@ import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.PosColorNo
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.commonChromaUniforms
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderPipelineUtils.getCommonRoundedUniforms
 import com.mojang.blaze3d.pipeline.BlendFunction
+import com.mojang.blaze3d.pipeline.ColorTargetState
 import com.mojang.blaze3d.pipeline.RenderPipeline
 import com.mojang.blaze3d.shaders.UniformType
 import com.mojang.blaze3d.vertex.DefaultVertexFormat
 import com.mojang.blaze3d.vertex.VertexFormat
 import net.minecraft.client.renderer.RenderPipelines
 import net.minecraft.resources.Identifier
+import java.util.Optional
 
 //? if >= 26.2 {
 import com.mojang.blaze3d.PrimitiveTopology
 import com.mojang.blaze3d.pipeline.BindGroupLayout
 import net.minecraft.client.renderer.BindGroupLayouts
 //?}
-
-//? if >= 26.1 {
-import com.mojang.blaze3d.pipeline.ColorTargetState
-import java.util.Optional
-//?} else {
-/*import com.mojang.blaze3d.platform.DepthTestFunction
-*///?}
 
 //? if < 26.2
 //typealias PrimitiveTopology = VertexFormat.Mode
@@ -209,7 +204,6 @@ enum class SkyHanniRenderPipeline(
             //.withVertexFormat(vFormat, vDrawMode)
             .apply {
                 // One or the other, never both
-                //~ if < 26.1 'withColorTargetState(ColorTargetState(it))' -> 'withBlend(it)'
                 blend?.let { withColorTargetState(ColorTargetState(it)) } ?: withCull?.let(this::withCull)
                 vertexShaderPath?.let { withVertexShader(Identifier.fromNamespaceAndPath(SkyHanniMod.MODID, it)) }
                 fragmentShaderPath?.let {
@@ -235,12 +229,7 @@ enum class SkyHanniRenderPipeline(
                 *///?}
 
                 if (!depthWrite) {
-                    //? if >= 26.1 {
                     withDepthStencilState(Optional.empty())
-                    //?} else {
-                    /*withDepthWrite(depthWrite)
-                    withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                    *///?}
                 }
             }.build(),
     )

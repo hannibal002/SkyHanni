@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -42,33 +44,18 @@ import kotlin.math.sqrt
 import net.minecraft.util.FormattedCharSequence
 //?} else {
 /*import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import org.joml.Matrix4f
-*///?}
-
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.compat.position
-import at.hannibal2.skyhanni.utils.compat.rotation
-//?}
-
-//? if = 26.1 {
-/*import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
-*///?}
-
-//? if < 26.1 {
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
 *///?}
 
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
     //? if >= 26.2 {
     private const val SKYHANNI_TEXT_SUBMIT_ORDER = 10_000
-    //?}
-
-    //? if = 26.1 {
+    //?} else {
     /*// 26.1 composites entity render targets over the main target after the normal world-render hook.
     // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
     private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
@@ -371,8 +358,7 @@ object WorldRenderUtils {
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
-        //? if = 26.1 {
-        /*if (seeThroughBlocks) {
+        if (seeThroughBlocks) {
             deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
                     text,
@@ -389,7 +375,6 @@ object WorldRenderUtils {
             }
             return
         }
-        *///?}
 
         fr.drawInBatch(
             text,
@@ -471,8 +456,7 @@ object WorldRenderUtils {
             .translate(0f, -yOffset * adjustedScale, 0f)
             .scale(adjustedScale, -adjustedScale, adjustedScale)
 
-        //? if = 26.1 {
-        /*if (seeThroughBlocks) {
+        if (seeThroughBlocks) {
             deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
                     text,
@@ -489,7 +473,6 @@ object WorldRenderUtils {
             }
             return
         }
-        *///?}
 
         fr.drawInBatch(
             text,

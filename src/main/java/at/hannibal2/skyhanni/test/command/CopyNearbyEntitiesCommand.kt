@@ -254,13 +254,9 @@ object CopyNearbyEntitiesCommand {
         val transformation = entity.renderState()?.transformation?.get(0f) ?: return
 
         add("-  rotation: $rotation")
-        //~ if < 26.1 '.scale()' -> '.scale'
         add("-  transformation scale: ${transformation.scale()}")
-        //~ if < 26.1 'leftRotation()' -> 'leftRotation'
         add("-  transformation left rotation: ${transformation.leftRotation()}")
-        //~ if < 26.1 'rightRotation()' -> 'rightRotation'
         add("-  transformation right rotation: ${transformation.rightRotation()}")
-        //~ if < 26.1 '.translation()' -> '.translation'
         add("-  transformation translations: ${transformation.translation()}")
     }
 

@@ -5,33 +5,21 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.OpaqueWaterFluid
+import at.hannibal2.skyhanni.mixins.hooks.FluidModelTransparencyOverride.Companion.transparency
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
-import net.minecraft.core.Registry
-import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.world.level.material.Fluid
-import net.minecraft.world.level.material.Fluids
-
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.mixins.hooks.FluidModelTransparencyOverride.Companion.transparency
 import com.mojang.blaze3d.platform.Transparency
 import net.minecraft.client.renderer.block.FluidModel
 import net.minecraft.client.renderer.block.FluidStateModelSet
 import net.minecraft.client.resources.model.sprite.MaterialBaker
-//?} else {
-/*import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry
-import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler
-import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap
-import net.minecraft.client.renderer.BiomeColors
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer
-import net.minecraft.core.BlockPos
-import net.minecraft.world.level.BlockAndTintGetter
-import net.minecraft.world.level.material.FluidState
-*///?}
+import net.minecraft.core.Registry
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.world.level.material.Fluid
+import net.minecraft.world.level.material.Fluids
 
 @SkyHanniModule
 object LavaReplacement {
@@ -53,34 +41,12 @@ object LavaReplacement {
         OpaqueWaterFluid.Flowing,
     )
 
-    //? if >= 26.1 {
     private val OPAQUE_WATER_MODEL = FluidModel.Unbaked(
         FluidStateModelSet.WATER_MODEL.stillMaterial(),
         FluidStateModelSet.WATER_MODEL.flowingMaterial(),
         FluidStateModelSet.WATER_MODEL.overlayMaterial(),
         FluidStateModelSet.WATER_MODEL.tintSource(),
     )
-    //?} else {
-    /*init {
-        FluidRenderHandlerRegistry.INSTANCE.register(
-            OPAQUE_WATER,
-            OPAQUE_FLOWING_WATER,
-            object : SimpleFluidRenderHandler(
-                WATER_STILL,
-                WATER_FLOWING,
-                WATER_OVERLAY,
-            ) {
-                override fun getFluidColor(view: BlockAndTintGetter?, pos: BlockPos?, state: FluidState): Int =
-                    MinecraftCompat.localWorldOrNull?.calculateBlockTint(
-                        pos ?: BlockPos.ZERO,
-                        BiomeColors.WATER_COLOR_RESOLVER,
-                    ) ?: super.getFluidColor(view, pos, state)
-            }
-        )
-        BlockRenderLayerMap.putFluids(ChunkSectionLayer.SOLID, OPAQUE_WATER, OPAQUE_FLOWING_WATER)
-    }
-    *///?}
-
     private val config get() = SkyHanniMod.feature.fishing.lavaReplacement
 
     private var isActive: Boolean = false
@@ -106,7 +72,6 @@ object LavaReplacement {
         return config.islands.get().any(IslandsToReplace::inIsland)
     }
 
-    //? if >= 26.1 {
     @JvmStatic
     fun addOpaqueWaterModel(original: Map<Fluid, FluidModel>, materials: MaterialBaker) = buildMap {
         val opaqueWaterModel = OPAQUE_WATER_MODEL.bake(materials) { "Opaque Water" }
@@ -116,7 +81,6 @@ object LavaReplacement {
         put(OPAQUE_WATER, opaqueWaterModel)
         put(OPAQUE_FLOWING_WATER, opaqueWaterModel)
     }
-    //?}
 
     @JvmStatic
     fun getReplacementFluid(original: Fluid): Fluid {
