@@ -609,6 +609,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Cocoon Timer & Mob Name Overlay. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/5113)
 + Added line to Tarantula Boss. - SillyGirlMarina (https://github.com/hannibal002/SkyHanni/pull/5392)
 + Added Egg Sac highlight during the Tarantula Broodfather boss fight. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5919)
++ Added line to Voidgloom Seraph boss. - Marina (https://github.com/hannibal002/SkyHanni/pull/5669)
++ Added No Gummy Warning. - PuppyGirlAbora (https://github.com/hannibal002/SkyHanni/pull/5871)
+    + Added a warning when killing mobs without a Re-Heated Gummy Polar Bear active.
 
 </details>
 <details open><summary>
@@ -878,6 +881,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Hide annoying messages about Kernels getting added to your purse while farming. - Shana (https://github.com/hannibal002/SkyHanni/pull/5679)
 + Added current Harvest Feast in-season crop display. - Marie (https://github.com/hannibal002/SkyHanni/pull/5653)
     + Displays the currently in-season Harvest Feast crops and how long they will be in season for.
++ Added Phantomleaf Solver. - mzhaodev (https://github.com/hannibal002/SkyHanni/pull/6101)
+    + When harvesting Phantomleaf in the Garden, highlight the hiding spot in green.
+    + Stand still for best results.
++ Added Charmed Visitor Display. - FabiHBBBT (https://github.com/hannibal002/SkyHanni/pull/5832)
 
 ### Garden Pests
 
@@ -1158,6 +1165,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows cave-in countdown, elapsed time, and estimated time until cold reaches 100.
 + Added option to mute treasure chest sounds. - ItsRealHim (https://github.com/hannibal002/SkyHanni/pull/5896)
 + Added a clickable chat reminder to teleport to Don Expresso when he is full. - Ambrosy (https://github.com/hannibal002/SkyHanni/pull/5580)
++ Added Mute when all Mineshaft Corpses are found. - Piggered (https://github.com/hannibal002/SkyHanni/pull/5929)
+    + Mutes the sounds made from the Organ Donor accessory once all Frozen Corpses in the Mineshaft have been found.
+    + Requires Corpse Locator to be enabled.
 
 </details>
 <details open><summary>
@@ -1893,6 +1903,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Crash on Tic-Tac-Toe Fail in Dungeons. - Webhead1104 (https://github.com/hannibal002/SkyHanni/pull/5589)
 + Added Lotus Atoll island support. - legentpc (https://github.com/hannibal002/SkyHanni/pull/5745)
 + Added support for Minecraft 26.1–26.1.2. - nopo, Daveed, Luna, Alex, Rain (https://github.com/hannibal002/SkyHanni/pull/5763)
++ Added Oringo Pet in Calendar. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5931)
+    + Show the future legendary pet Oringo will offer in the Calendar.
++ Added Deployable Reminder. - Avrg (https://github.com/hannibal002/SkyHanni/pull/5886)
+    + A reminder to place down your power orb for Slayer, umbrella for Trophy Fishing, and lantern for Mineshafts.
++ Re-added the old Glowing Dropped Items feature for the items Hypixel doesn't glow. - Luna (https://github.com/hannibal002/SkyHanni/pull/5758)
+    + This does not glow them through walls, unlike the old feature.
 
 </details>
 <details open><summary>

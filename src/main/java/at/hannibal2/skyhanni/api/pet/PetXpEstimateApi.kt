@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeShardsData
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getSkillInfo
@@ -471,7 +471,7 @@ object PetXpEstimateApi {
         beastmasterMultiplierCache ?: readBeastmasterMultiplier().also { beastmasterMultiplierCache = it }
 
     private fun readBeastmasterMultiplier(): Double =
-        (InventoryUtils.getItemsInOwnInventory() + EquipmentApi.getAll())
+        (InventoryUtils.getItemsInOwnInventory() + CurrentEquipmentApi.getAll())
             .asSequence()
             .mapNotNull { it.readBeastmasterMultiplierOrNull() }
             .maxOrNull()

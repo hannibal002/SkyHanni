@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 class WardrobeSlot(
-    private val api: WardrobeApi,
+    private val api: AbstractWardrobeApi,
     val id: Int,
     val page: Int,
     val inventorySlot: Int,
@@ -11,9 +11,9 @@ class WardrobeSlot(
     val item4Slot: Int,
 ) {
     fun getData() = api.storage?.data?.getOrPut(id) {
-        WardrobeApi.WardrobeData(
+        AbstractWardrobeApi.WardrobeData(
             id,
-            armor = WardrobeApi.emptyItems(),
+            armor = AbstractWardrobeApi.emptyItems(),
             locked = true,
             favorite = false,
         )
@@ -31,7 +31,7 @@ class WardrobeSlot(
             getData()?.favorite = value
         }
 
-    val armor get() = getData()?.armor ?: WardrobeApi.emptyItems()
+    val armor get() = getData()?.armor ?: AbstractWardrobeApi.emptyItems()
 
     val inventorySlots = listOf(item1Slot, item2Slot, item3Slot, item4Slot)
 

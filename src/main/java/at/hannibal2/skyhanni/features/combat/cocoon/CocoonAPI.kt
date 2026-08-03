@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.entity.EntityMoveEvent
 import at.hannibal2.skyhanni.events.skyblock.SkyblockEquipmentDataUpdateEvent
 import at.hannibal2.skyhanni.features.fishing.LivingSeaCreatureData
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureDetectionApi.seaCreature
-import at.hannibal2.skyhanni.features.inventory.EquipmentApi
+import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.inventory.EquipmentSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -84,7 +84,7 @@ object CocoonAPI {
     )
 
     private fun playerCanCocoon(): Boolean {
-        val belt = EquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
+        val belt = CurrentEquipmentApi.getEquipment(EquipmentSlot.BELT) ?: return false
         return belt.canCocoon()
     }
 

@@ -1,4 +1,3 @@
-import at.skyhanni.sharedvariables.MappingStyle
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import dev.detekt.gradle.Detekt
@@ -32,7 +31,7 @@ plugins {
 
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 val primaryTarget = ProjectTarget.MODERN_26100
-val isDeobf = target.mappingStyle == MappingStyle.NONE
+val isDeobf = target.minecraftVersion.versionNumber >= 260100
 
 if (isDeobf) apply(plugin = "net.fabricmc.fabric-loom")
 else apply(plugin = "net.fabricmc.fabric-loom-remap")
@@ -79,10 +78,8 @@ loom.apply {
 
     runs {
         named("client") {
-            isIdeConfigGenerated = true
-            appendProjectPathToConfigName.set(true)
+            appendProjectPathToDisplayName.set(true)
             this.runDir(rootProject.file("versions/${target.projectName}/run").relativeTo(projectDir).toString())
-            property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
@@ -103,6 +100,11 @@ val shadowModImpl: Configuration by configurations.creating {
 }
 
 val shadowOnly: Configuration by configurations.creating
+
+val mixinTestRuntime: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    extendsFrom(configurations.testRuntimeClasspath.get())
+}
 
 val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
     this.user = "hannibal002"
@@ -147,11 +149,7 @@ dependencies {
     minecraft("com.mojang:minecraft:$versionName")
     @Suppress("UnstableApiUsage")
     if (!isDeobf) {
-        if (target.mappingDependency == "official") {
-            mappings(loom.officialMojangMappings())
-        } else {
-            mappings(target.mappingDependency)
-        }
+        mappings(loom.officialMojangMappings())
     }
 
     compileOnly(libs.jbAnnotations)
@@ -163,6 +161,7 @@ dependencies {
     target.fabricLoaderVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
         "productionRuntimeMods"(it)
+        mixinTestRuntime("net.fabricmc:fabric-loader-junit:${it.substringAfterLast(':')}")
     }
     target.fabricApiVersion?.let {
         if (isDeobf) implementation(it) else modImplementation(it)
@@ -217,8 +216,18 @@ dependencies {
     }
     "productionRuntimeMods"(target.hypixelModApiFabricVersion)
 
-    if (isDeobf) compileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
-    else modCompileOnly(libs.roughlyenoughitems) { exclude(group = "net.fabricmc.fabric-api") }
+    val reiVersion = when (target) {
+        ProjectTarget.MODERN_26100 -> "26.1.819"
+        ProjectTarget.MODERN_12111 -> "21.11.816"
+    }
+    val reiApi = "me.shedaniel:RoughlyEnoughItems-api:$reiVersion"
+    if (isDeobf) compileOnly(reiApi) { isTransitive = false }
+    else modCompileOnly(reiApi) { isTransitive = false }
+    "minecraftTestClientRuntimeLibraries"(reiApi) {
+        isTransitive = false
+    }
+    compileOnly(libs.basicMath)
+    "minecraftTestClientRuntimeLibraries"(libs.basicMath)
 
     // getting clock offset
     includeImplementation(libs.commons.net)
@@ -279,6 +288,22 @@ tasks.withType<Test> {
         // Tests start NPE-ing without this on Java 25
         "-Dnet.bytebuddy.experimental=true",
     )
+}
+
+val mixinTest by tasks.registering(Test::class) {
+    description = "Audits mixin application under Fabric Loader."
+    group = "verification"
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().output + sourceSets.main.get().output + mixinTestRuntime
+    systemProperty("skyhanni.minecraftIsObfuscated", !isDeobf)
+    filter {
+        includeTestsMatching("at.hannibal2.skyhanni.test.MixinTest")
+    }
+}
+
+tasks.test {
+    dependsOn(mixinTest)
+    exclude("at/hannibal2/skyhanni/test/MixinTest.class")
 }
 
 kotlin {

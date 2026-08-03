@@ -20,7 +20,7 @@ class ForagingConfig {
 
     @Expose
     @ConfigOption(name = "Starlyn Contests", desc = "")
-    @SearchTag("Agatha")
+    @SearchTag("Agatha Miria")
     @Accordion
     val starlynContest: StarlynContestsConfig = StarlynContestsConfig()
 
@@ -30,9 +30,9 @@ class ForagingConfig {
     val tutorialQuest: ForagingTutorialQuestConfig = ForagingTutorialQuestConfig()
 
     @Expose
-    @ConfigOption(name = "Moonglade Beacon", desc = "Settings for the moonglade beacon.")
+    @ConfigOption(name = "Foraging Beacon", desc = "Settings for the foraging beacons.")
     @Accordion
-    var moongladeBeacon = MoongladeBeaconConfig()
+    val foragingBeacon = ForagingBeaconConfig()
 
     @Expose
     @ConfigOption(name = "Foraging Tracker", desc = "")
@@ -40,13 +40,13 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     var mutePhantoms = true
 
     @Expose
-    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Galatea.")
+    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in the Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("box firework")

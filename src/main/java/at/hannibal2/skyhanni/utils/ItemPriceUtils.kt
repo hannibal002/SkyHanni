@@ -158,7 +158,7 @@ object ItemPriceUtils {
     }
 
     private val lowBinStatic = ApiStaticGetPath(
-        "https://api.eliteskyblock.com/resources/auctions/neu",
+        "https://api.eliteskyblock.com/resources/auctions/neu?mode=smooth",
         "EliteSkyblock Lowest Bin"
     )
 
