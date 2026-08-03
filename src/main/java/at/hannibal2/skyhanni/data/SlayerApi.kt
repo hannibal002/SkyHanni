@@ -227,11 +227,11 @@ object SlayerApi {
         val category = lines[questIndex]
         val type = Type.getByName(category) ?: return null
         val progress = lines.getOrNull(questIndex + 1)
-        require(progress != null) { "Progress line missing for category '$category'" }
+        requireNotNull(progress) { "Progress line missing for category '$category'" }
 
         val tierString = category.substringAfterLast(' ', "")
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
-        require(parsedTier != null) { "Failed to parse tier from category '$category'" }
+        requireNotNull(parsedTier) { "Failed to parse tier from category '$category'" }
 
         return ParsedSlayer(
             type = type,
