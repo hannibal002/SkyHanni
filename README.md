@@ -44,7 +44,3 @@ Give feedback or just chat with others on our community Discord!
 ## Contributing
 
 Are you interested in writing your own SkyHanni feature? Do you want to fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information!
-
----
-
-**SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) for even more SkyBlock features!**
