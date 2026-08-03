@@ -28,7 +28,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.renderer.SubmitNodeStorage;
 import net.minecraft.client.renderer.feature.FeatureRenderDispatcher;
 //?} else {
-/*import com.llamalad7.mixinextras.sugar.Local;
+/*import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.renderer.OutlineBufferSource;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -49,7 +50,7 @@ import org.joml.Matrix4f;
 @Mixin(LevelRenderer.class)
 public abstract class MixinLevelRenderer {
 
-    //? if < 26.1 {
+    //? if < 26.2 {
     /*@Unique
     PoseStack contextMatrixStack;
     *///?}
@@ -99,33 +100,71 @@ public abstract class MixinLevelRenderer {
 
     //? if >= 26.2 {
     @Inject(
-        //? if >= 26.2 {
         method = "render",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;")
-        //?} else {
-        /*method = "lambda$addMainPass$0",
-        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
-        *///?}
+        at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher;prepareFrame(Lnet/minecraft/client/renderer/SubmitNodeStorage;)Lnet/minecraft/client/renderer/feature/FeatureRenderDispatcher$PreparedFrame;"
+        )
     )
-    //? if >= 26.2 {
-    private void onTranslucentRender(GraphicsResourceAllocator resourceAllocator, DeltaTracker deltaTracker, boolean renderOutline, CameraRenderState cameraState, Matrix4fc modelViewMatrix, GpuBufferSlice terrainFog, Vector4f fogColor, boolean shouldRenderSky, CallbackInfo ci) {
-    //?} else
-    //private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
+    private void postRenderWorldBeforePrepareFeatures(
+        GraphicsResourceAllocator resourceAllocator,
+        DeltaTracker deltaTracker,
+        boolean renderOutline,
+        CameraRenderState cameraState,
+        Matrix4fc modelViewMatrix,
+        GpuBufferSlice terrainFog,
+        Vector4f fogColor,
+        boolean shouldRenderSky,
+        CallbackInfo ci
+    ) {
         SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
-            //~ if < 26.2 'new PoseStack()' -> 'contextMatrixStack'
             new PoseStack(),
-            //~ if < 26.2 'cameraState' -> 'currentCameraState'
-            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
             cameraState,
-            //~ if < 26.2 'submitNodeStorage' -> 'renderBuffers.bufferSource()'
             submitNodeStorage,
             deltaTracker.getGameTimeDeltaPartialTick(true),
             true
         );
         event.post();
     }
-    //?}
+    //?} else {
+    /*@WrapOperation(
+        method = "lambda$addMainPass$0",
+        slice = @Slice(from = @At(value = "INVOKE_STRING", target = "Lnet/minecraft/util/profiling/ProfilerFiller;push(Ljava/lang/String;)V", args = "ldc=translucent")),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;renderGroup(Lnet/minecraft/client/renderer/chunk/ChunkSectionLayerGroup;Lcom/mojang/blaze3d/textures/GpuSampler;)V", ordinal = 0)
+    )
+    private void onTranslucentRender(ChunkSectionsToRender instance, ChunkSectionLayerGroup group, GpuSampler gpuSampler, Operation<Void> original) {
+        original.call(instance, group, gpuSampler);
+        if (contextMatrixStack == null) return;
+
+        SkyHanniRenderWorldEvent event = new SkyHanniRenderWorldEvent(
+            contextMatrixStack,
+            //~ if < 26.1 'currentCameraState' -> 'currentCamera'
+            currentCameraState,
+            renderBuffers.bufferSource(),
+            currentTickCounter.getGameTimeDeltaPartialTick(true),
+            true
+        );
+        event.post();
+        contextMatrixStack = null;
+    }
+
+    @ModifyExpressionValue(method = "lambda$addMainPass$0", at = @At(value = "NEW", target = "()Lcom/mojang/blaze3d/vertex/PoseStack;"))
+    private PoseStack onCreateMatrixStack(PoseStack matrixStack) {
+        contextMatrixStack = matrixStack;
+        return matrixStack;
+    }
+
+    @Inject(method = "extractVisibleEntities", at = @At(value = "HEAD"))
+    public void resetRealGlowing(CallbackInfo ci) {
+        RenderLivingEntityHelper.postNoXrayOutlineEvent();
+    }
+
+    @WrapOperation(method = "extractVisibleEntities", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/state/EntityRenderState;appearsGlowing()Z"))
+    public boolean shouldAlsoGlow(EntityRenderState instance, Operation<Boolean> original, @Local Entity entity) {
+        Integer glowColor = RenderLivingEntityHelper.getEntityGlowColor(entity);
+        return glowColor != null || original.call(instance);
+    }
+    *///?}
 
     //~ if < 26.2 ';Lorg/joml/Vector4fc;' -> ';I'
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))

@@ -56,7 +56,7 @@ public abstract class MixinGuiRenderer {
     )
     public RenderPipeline replacePipeline(GuiElementRenderState state, Operation<RenderPipeline> original) {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
-	}
+    }
 
     //~ if < 26.1 'Unique' -> 'Shadow'
     @Unique
