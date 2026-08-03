@@ -61,7 +61,6 @@ object CopyChat {
     private fun getChatLine(mouseX: Int, mouseY: Int): GuiMessage? {
         val mc = Minecraft.getInstance()
         val chatGui = MinecraftCompat.hud.chat
-
         val finder = HoveredTextFinder(mc.font, mouseX, mouseY)
         chatGui.captureClickableText(finder, mc.window.guiScaledHeight, MinecraftCompat.hud.guiTicks, ChatComponent.DisplayMode.FOREGROUND)
         val visibleLine = chatGui.trimmedMessages.firstOrNull { it.content === finder.hoveredText } ?: return null
