@@ -87,20 +87,20 @@ public abstract class MixinItemFeatureRenderer {
         )
     )
     //~ if < 26.2 'ItemFeatureRenderer' -> 'OutlineBufferSource'
-    private VertexConsumer modifyOutlineVertexConsumerProvider(ItemFeatureRenderer outlineConsumer, RenderType renderType, Operation<VertexConsumer> original, /*? if < 26.2 {*//*@Local(argsOnly = true) *//*?}*/ItemFeatureRenderer.Submit itemCommand) {
+    private VertexConsumer modifyOutlineVertexConsumerProvider(ItemFeatureRenderer instance, RenderType renderType, Operation<VertexConsumer> original, /*? if < 26.2 {*//*@Local(argsOnly = true) *//*?}*/ItemFeatureRenderer.Submit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
             //? if >= 26.2 {
             SkyHanniOutlineVertexConsumerProvider.beginCustomOutlineBuild();
             try {
-                return original.call(outlineConsumer, renderType);
+                return original.call(instance, renderType);
             } finally {
                 SkyHanniOutlineVertexConsumerProvider.finishCustomOutlineBuild();
             }
             //?} else
             //return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().getBuffer(renderType);
         }
-        return original.call(outlineConsumer, renderType);
+        return original.call(instance, renderType);
     }
     //?} else {
     /*@ModifyArg(

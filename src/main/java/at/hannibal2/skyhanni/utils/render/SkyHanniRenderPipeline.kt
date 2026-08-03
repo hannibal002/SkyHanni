@@ -249,7 +249,6 @@ enum class SkyHanniRenderPipeline(
 }
 
 private object SkyHanniRenderPipelineUtils {
-
     //? if >= 26.2 {
     val MATRICES_PROJECTION_SNIPPET = RenderPipeline.builder().withBindGroupLayout(BindGroupLayouts.MATRICES_PROJECTION).buildSnippet()
     //?} else

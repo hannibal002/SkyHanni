@@ -30,9 +30,8 @@ object RenderPipelineDrawer {
             pipeline.primitiveTopology,
             pipeline.getVertexFormatBinding(0) ?: error("Pipeline $pipeline has no vertex format binding 0"),
         )
-        //?} else {
-        /*return Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
-        *///?}
+        //?} else
+        //return Tesselator.getInstance().begin(pipeline.vertexFormatMode, pipeline.vertexFormat)
     }
 
     /**

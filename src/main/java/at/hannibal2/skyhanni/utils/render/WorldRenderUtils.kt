@@ -373,7 +373,7 @@ object WorldRenderUtils {
 
         //? if = 26.1 {
         /*if (seeThroughBlocks) {
-            deferredSeeThroughText.add { deferredBufferSource ->
+            deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
                     text,
                     x,
@@ -381,8 +381,8 @@ object WorldRenderUtils {
                     color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
                     shadow,
                     matrix,
-                    deferredBufferSource,
-                    DisplayMode.SEE_THROUGH,
+                    bufferSource,
+                    SEE_THROUGH,
                     backGroundColor,
                     FULL_BRIGHT,
                 )
@@ -473,7 +473,7 @@ object WorldRenderUtils {
 
         //? if = 26.1 {
         /*if (seeThroughBlocks) {
-            deferredSeeThroughText.add { deferredBufferSource ->
+            deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
                     text,
                     x,
@@ -481,8 +481,8 @@ object WorldRenderUtils {
                     color?.rgb ?: LorenzColor.WHITE.toColor().rgb,
                     shadow,
                     matrix,
-                    deferredBufferSource,
-                    DisplayMode.SEE_THROUGH,
+                    bufferSource,
+                    SEE_THROUGH,
                     backGroundColor,
                     FULL_BRIGHT,
                 )
