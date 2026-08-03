@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ComponentUtils
+import at.hannibal2.skyhanni.utils.DeferredItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeUnusedDecimal
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.mapNotNullAsync
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.takeIfNotEmpty
-// this is not unused
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.isNotEmpty
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.compat.getIdentifierString
@@ -39,18 +39,14 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import net.minecraft.nbt.StringTag
+import net.minecraft.world.item.Item
+import net.minecraft.world.item.ItemStackTemplate
 import java.io.File
 import java.util.TreeMap
 import kotlin.math.floor
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.DeferredItemStack
-import net.minecraft.world.item.Item
-import net.minecraft.world.item.ItemStackTemplate
-//?}
 
 // Most functions are taken from NotEnoughUpdates
 @SkyHanniModule
@@ -199,37 +195,9 @@ object EnoughUpdatesManager {
         val convertedItem = ComponentUtils.convertMinecraftIdToModern(itemId, damage ?: 0)
         val baseItem = convertedItem.getVanillaItem() ?: return SafeItemStack.EMPTY
 
-        //? if >= 26.1 {
         return buildDeferredStack(baseItem, count ?: 1, useReplacements).also { if (usingCache) itemStackCache[internalName] = it }.copy()
-        //?} else {
-        /*val stack = SafeItemStack(baseItem).takeIf { it.isNotEmpty() } ?: return SafeItemStack.EMPTY
-
-        count?.let { stack.count = it }
-        ComponentUtils.convertToComponents(stack, neuNbt)
-
-        var replacements = mapOf<String, String>()
-        if (useReplacements) {
-            replacements = stack.getPetLoreReplacements()
-            displayName?.let {
-                var name = it
-                for ((key, value) in replacements) {
-                    name = name.replace("{$key}", value)
-                }
-                stack.setCustomItemName(name)
-            }
-        }
-
-        lore.takeIfNotEmpty()?.let {
-            val componentLore = processLore(lore, replacements).map { it.value.asComponent() }
-            stack.setLore(componentLore)
-        }
-
-        if (usingCache) itemStackCache[internalName] = stack
-        return stack.copy()
-        *///?}
     }
 
-    //? if >= 26.1 {
     private fun NeuItemJson.buildDeferredStack(baseItem: Item, countVal: Int, useReplacements: Boolean): SafeItemStack {
         val neuItemRef = this
         val factory: () -> ItemStackTemplate = {
@@ -252,7 +220,6 @@ object EnoughUpdatesManager {
         }
         return DeferredItemStack(baseItem, factory, countVal)
     }
-    //?}
 
     private fun SafeItemStack?.getPetLoreReplacements(): Map<String, String> {
         val petInfo = this?.getPetInfo() ?: return emptyMap()

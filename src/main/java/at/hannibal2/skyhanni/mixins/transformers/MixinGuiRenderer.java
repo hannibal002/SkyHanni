@@ -64,17 +64,13 @@ public abstract class MixinGuiRenderer {
         return GuiRendererHook.INSTANCE.replacePipeline(state, original);
     }
 
-    //~ if < 26.1 'Unique' -> 'Shadow'
     @Unique
-    //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
     private int skyhanni$frameNumber;
 
-    //? if >= 26.1 {
     @Inject(method = "render", at = @At("HEAD"))
     private void skyhanni$trackFrameNumber(GpuBufferSlice fogBuffer, CallbackInfo ci) {
         skyhanni$frameNumber++;
     }
-    //?}
 
     @Shadow
     @Final
@@ -106,7 +102,6 @@ public abstract class MixinGuiRenderer {
             pictureInPictureRenderers,
             getBufferSource(),
             featureRenderDispatcher,
-            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
         );
     }
@@ -124,7 +119,6 @@ public abstract class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.submitBlitForState(
             skyHanniState,
             renderState,
-            //~ if < 26.1 'skyhanni$frameNumber' -> 'frameNumber'
             skyhanni$frameNumber
         );
     }

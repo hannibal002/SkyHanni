@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
 import at.hannibal2.skyhanni.utils.compat.createResourceLocation
 import at.hannibal2.skyhanni.utils.compat.deceased
+import at.hannibal2.skyhanni.utils.compat.position
+import at.hannibal2.skyhanni.utils.compat.rotation
 import at.hannibal2.skyhanni.utils.expand
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -24,9 +26,11 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
@@ -36,22 +40,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-//? if >= 26.1 {
-import at.hannibal2.skyhanni.utils.compat.position
-import at.hannibal2.skyhanni.utils.compat.rotation
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
-//?} else {
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
-*///?}
-
 @Suppress("LargeClass")
 object WorldRenderUtils {
 
-    //~ if < 26.1 'entity/beacon/' -> 'entity/'
     private val beaconBeam = createResourceLocation("textures/entity/beacon/beacon_beam.png")
 
-    //? if >= 26.1 {
     // 26.1 composites entity render targets over the main target after the normal world-render hook.
     // Drawing see-through text in the late pass prevents entities from covering it (MC-265743).
     private val deferredSeeThroughText = mutableListOf<(MultiBufferSource.BufferSource) -> Unit>()
@@ -66,7 +59,6 @@ object WorldRenderUtils {
             deferredSeeThroughText.clear()
         }
     }
-    //?}
 
     fun SkyHanniRenderWorldEvent.renderBeaconBeam(vec: LorenzVec, rgb: Int) {
         this.renderBeaconBeam(vec.x, vec.y, vec.z, rgb)
@@ -291,7 +283,6 @@ object WorldRenderUtils {
 
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.1 {
         if (seeThroughBlocks) {
             deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
@@ -309,7 +300,6 @@ object WorldRenderUtils {
             }
             return
         }
-        //?}
 
         fr.drawInBatch(
             text,
@@ -368,7 +358,6 @@ object WorldRenderUtils {
 
         val x = -fr.width(text) / 2f
 
-        //? if >= 26.1 {
         if (seeThroughBlocks) {
             deferredSeeThroughText.add { bufferSource ->
                 fr.drawInBatch(
@@ -386,7 +375,6 @@ object WorldRenderUtils {
             }
             return
         }
-        //?}
 
         fr.drawInBatch(
             text,

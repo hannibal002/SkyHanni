@@ -13,7 +13,6 @@ enum class MinecraftVersion(
     val versionNameOverride: String? = null,
     val moulconfigMinecraftVersionOverride: String? = null,
 ) {
-    MC12111("1.21.11", 21),
     MC26100("26.1", 25, versionNameOverride = "26.1.2"),
     ;
 
@@ -37,5 +36,5 @@ enum class MinecraftVersion(
      * For versions using the new 26.x+ versioning scheme, a tilde is prepended to allow compatible patch versions.
      */
     val fabricModJsonVersion: String
-        get() = if (versionNumber >= 260100) "~$versionName" else versionName
+        get() = "~$versionName"
 }
