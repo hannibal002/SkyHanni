@@ -59,5 +59,5 @@ class RareCatchesConfig {
 
     @Expose
     @ConfigLink(owner = RareCatchesConfig::class, field = "alertOwnCatches")
-    var position = Position(500, 500)
+    val position = Position(500, 500)
 }
