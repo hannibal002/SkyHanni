@@ -296,6 +296,7 @@ object AttributeShardsData {
      * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you a Hideyho Shard!
      * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you 4x Hideyho Shard!
      */
+    @Suppress("MaxLineLength")
     private val capturedShardPattern by patternGroup.pattern(
         "captured.shard",
         "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
