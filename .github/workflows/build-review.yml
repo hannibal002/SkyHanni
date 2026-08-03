@@ -24,16 +24,6 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v7
 
-            -   name: Download build failure artifact (1.21.11)
-                id: download_1
-                uses: actions/download-artifact@v8
-                with:
-                    name: build-failure-output-1.21.11
-                    run-id: ${{ github.event.workflow_run.id }}
-                    github-token: ${{ secrets.GITHUB_TOKEN }}
-                    path: ${{ runner.temp }}/build-failure-1.21.11/
-                continue-on-error: true
-
             -   name: Download build failure artifact (26.1)
                 id: download_2
                 uses: actions/download-artifact@v8
@@ -90,8 +80,7 @@ jobs:
                     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                     GITHUB_REPOSITORY: ${{ github.repository }}
                     PR_NUMBER: ${{ steps.pr.outputs.number }}
-                    ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-1.21.11
-                    ARTIFACT_DIR_2: ${{ runner.temp }}/build-failure-26.1
+                    ARTIFACT_DIR_1: ${{ runner.temp }}/build-failure-26.1
                     WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id }}
                     HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
                     MODE: build
