@@ -61,7 +61,7 @@ object ContributorManager {
     private val contributorMentions get() = SkyHanniMod.seenContributorStorage.contributorMentions
     private val contributorMentionersThisSession = mutableSetOf<String>()
 
-    private const val CONTRIBUTOR_ACHIEVEMENT_GOT = "[SkyHanni] Achievement Get! EEEEKK!!"
+    private const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
     const val FOUND_WILD_CONTRIBUTOR = "A wild SkyHanni contributor appears!"
     private val patternGroup = RepoPattern.group("contributor")
 
@@ -265,7 +265,7 @@ object ContributorManager {
 
     @HandleEvent
     fun onPlayerAllChat(event: PlayerAllChatEvent.Allow) {
-        if (!isSelfContributor()) return
+        if (isSelfContributor()) return
         if (!config.contributorMentionTracker) return
         val msg = event.messageComponent.getText()
         if (!isContributorMentionMessage(msg)) return
@@ -317,10 +317,11 @@ object ContributorManager {
     }
 
     private fun isContributorMentionMessage(message: String): Boolean {
-        if (message.startsWith(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
-        if (message.startsWith(FOUND_WILD_CONTRIBUTOR)) return true
+        val cleanMessage = message.removeSuffix("[SkyHanni] ")
+        if (cleanMessage.startsWith(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
+        if (cleanMessage.startsWith(FOUND_WILD_CONTRIBUTOR)) return true
 
-        val msg = message.lowercase()
+        val msg = cleanMessage.lowercase()
         return contribMentionPattern.find(msg)
     }
 
