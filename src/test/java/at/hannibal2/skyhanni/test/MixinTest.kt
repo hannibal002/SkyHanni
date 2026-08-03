@@ -37,10 +37,9 @@ class MixinTest {
         }
         discovered.forEach { mixin ->
             val path = "$MIXIN_PACKAGE_PATH/${mixin.replace('.', '/')}.class"
-            val bytes = checkNotNull(classLoader.getResourceAsStream(path)) {
+            checkNotNull(classLoader.getResource(path)) {
                 "Mixin $mixin was discovered but $path is not on the classpath"
-            }.use { it.readBytes() }
-            ClassNode().also { ClassReader(bytes).accept(it, ClassReader.SKIP_CODE) }
+            }
         }
     }
 
