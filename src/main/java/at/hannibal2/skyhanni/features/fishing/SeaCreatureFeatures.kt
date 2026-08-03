@@ -57,6 +57,7 @@ object SeaCreatureFeatures {
 
         if (mob.name == "Water Hydra" && entity.findHealthReal() == (entity.baseMaxHealth.toFloat() / 2)) return
         if (config.alertOtherCatches && shouldNotify && SeaCreatureSettings.getConfig(mob)?.shouldNotifyForNonOwn == true) {
+            // TODO: use componentBuilder and not TitleManager
             val text = if (config.creatureName) "${seaCreature.displayName} NEARBY!"
             else "${seaCreature.rarity.chatColorCode}RARE SEA CREATURE!"
             TitleManager.sendTitle(text, duration = 1.5.seconds)
@@ -68,6 +69,7 @@ object SeaCreatureFeatures {
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         val fishedSCSettings = SeaCreatureSettings.getConfig(event.seaCreature) ?: return
         if (config.alertOwnCatches && fishedSCSettings.shouldSelfNotifyOnCatch == true) {
+            // TODO: use componentBuilder and not TitleManager
             val text = if (config.creatureName) "${event.seaCreature.displayName}!"
             else "${event.seaCreature.rarity.chatColorCode}RARE CATCH!"
             TitleManager.sendTitle(text)
