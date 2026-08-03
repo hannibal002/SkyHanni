@@ -45,13 +45,13 @@ class ForagingConfig {
     val safari = SafariConfig()
 
     @Expose
-    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Galatea.")
+    @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in the Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     var mutePhantoms = true
 
     @Expose
-    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Galatea.")
+    @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in the Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
     @SearchTag("box firework")
