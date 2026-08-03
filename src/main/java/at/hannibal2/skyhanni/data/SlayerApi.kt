@@ -204,27 +204,21 @@ object SlayerApi {
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
-    private fun getParsedSlayerOrNull(lines: List<String>): ParsedSlayer? {
+    private fun getParsedSlayerOrNull(lines: List<String>, source: SlayerLinesSource): ParsedSlayer? {
         val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
-        if (questIndex == -1) return null
-
-        return ParsedSlayer(
-            type = Type.getByName(lines[questIndex]),
-            category = lines[questIndex],
-            progress = lines.getOrNull(questIndex + 1) ?: "no slayer",
-        )
-    }
-
-    private fun updateCategory(category: String, lines: List<String>, source: SlayerLinesSource) {
-        if (category == latestCategory) {
+        if (questIndex == -1) {
             invalidCategoryUpdates = 0
-            return
+            return null
         }
+
+        val type = Type.getByName(lines[questIndex]) ?: return null
+        val category = lines[questIndex]
+        val progress = lines.getOrNull(questIndex + 1) ?: return null
 
         val tierString = category.substringAfterLast(' ', "")
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
 
-        if (category.isNotEmpty() && parsedTier == null) {
+        if (parsedTier == null) {
             invalidCategoryUpdates++
 
             if (invalidCategoryUpdates == 3) {
@@ -234,14 +228,28 @@ object SlayerApi {
                     "source" to source.name,
                 )
             }
-            return
+            return null
         }
 
         invalidCategoryUpdates = 0
 
+        return ParsedSlayer(
+            type = type,
+            category = category,
+            tier = parsedTier,
+            progress = progress,
+        )
+    }
+
+    private fun updateCategory(parsed: ParsedSlayer?) {
+        if (invalidCategoryUpdates > 0) return
+
+        val category = parsed?.category.orEmpty()
+        if (category == latestCategory) return
+
         val old = latestCategory
         latestCategory = category
-        tier = parsedTier ?: 0
+        tier = parsed?.tier ?: 0
 
         SlayerChangeEvent(old, category).post()
     }
@@ -250,34 +258,37 @@ object SlayerApi {
         if (ProfileStorageData.profileSpecific == null) return
 
         val (lines, source) = getSlayerLines()
-        val parsed = getParsedSlayerOrNull(lines)
-
-        val category = parsed?.category.orEmpty()
+        val parsed = getParsedSlayerOrNull(lines, source)
         val progress = parsed?.progress ?: "no slayer"
 
-        updateCategory(category, lines, source)
+        updateCategory(parsed)
+        updateProgress(progress)
+        updateActiveState(parsed, progress)
+        updateArea()
+    }
 
-        if (progress != latestProgress) {
-            SlayerProgressChangeEvent(latestProgress, progress).post()
-            latestProgress = progress
-        }
+    private fun updateProgress(progress: String) {
+        if (progress == latestProgress) return
 
+        SlayerProgressChangeEvent(latestProgress, progress).post()
+        latestProgress = progress
+    }
+
+    private fun updateActiveState(parsed: ParsedSlayer?, progress: String) {
         val data = getCurrentData()
         data.type = parsed?.type
 
         val oldStateRaw = data.currentStateRaw ?: "no slayer"
-        if (oldStateRaw != progress) {
-            data.currentStateRaw = progress
+        if (oldStateRaw == progress) return
 
-            val newState = detectState(oldStateRaw, progress)
-            if (newState != data.currentState) {
-                ChatUtils.debug("${data.currentState} -> $newState")
-                data.currentState = newState
-                SlayerStateChangeEvent(newState).post()
-            }
+        data.currentStateRaw = progress
+
+        val newState = detectState(oldStateRaw, progress)
+        if (newState != data.currentState) {
+            ChatUtils.debug("${data.currentState} -> $newState")
+            data.currentState = newState
+            SlayerStateChangeEvent(newState).post()
         }
-
-        updateArea()
     }
 
     @HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true)
@@ -395,8 +406,9 @@ object SlayerApi {
     }
 
     private data class ParsedSlayer(
-        val type: Type?,
+        val type: Type,
         val category: String,
+        val tier: Int,
         val progress: String,
     )
 }
