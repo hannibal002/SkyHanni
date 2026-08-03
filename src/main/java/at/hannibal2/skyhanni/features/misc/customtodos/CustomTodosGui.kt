@@ -49,7 +49,7 @@ object CustomTodosGui {
 
             CustomTodo.TriggerMatcher.EQUALS -> {
                 if (cleanedText == todo.trigger) return MatchType.MATCH
-                if (cleanedText == todo.antiTrigger) return MatchType.ANTI_MATCH
+                if (todo.antiTrigger.isNotBlank() && cleanedText == todo.antiTrigger) return MatchType.ANTI_MATCH
             }
         }
         return MatchType.NO_MATCH
