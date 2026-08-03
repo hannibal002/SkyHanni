@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerType as Type
 object SlayerApi {
 
     val config get() = SkyHanniMod.feature.slayer
-    val debugConfig get() = SkyHanniMod.feature.dev.debug.slayerDebug
+    private val debugConfig get() = SkyHanniMod.feature.dev.debug.slayerDebug
 
     private val trackerConfig get() = config.itemProfitTracker
 
@@ -102,6 +102,11 @@ object SlayerApi {
      */
     var currentAreaType: SlayerType? = null
 
+    /**
+     * How many consecutive updates have we seen a category that is invalid?
+     */
+    private var invalidCategoryUpdates = 0
+
     private val outsideRiftData = SlayerData()
     private val insideRiftData = SlayerData()
 
@@ -119,11 +124,6 @@ object SlayerApi {
      * Are we currently fighting a slayer boss?
      */
     fun isInBossFight() = state == ActiveQuestState.BOSS_FIGHT
-
-    /**
-     * How many consecutive updates have we seen a category that is invalid?
-     */
-    private var invalidCategoryUpdates = 0
 
     private class SlayerData {
         var currentState: ActiveQuestState? = ActiveQuestState.NO_ACTIVE_QUEST
@@ -220,7 +220,7 @@ object SlayerApi {
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
-    private fun getParsedSlayer(lines: List<String>): ParsedSlayer? {
+    private fun getParsedSlayerOrNull(lines: List<String>): ParsedSlayer? {
         val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
         if (questIndex == -1) return null
 
@@ -266,7 +266,7 @@ object SlayerApi {
         if (ProfileStorageData.profileSpecific == null) return
 
         val (lines, source) = getSlayerLines()
-        val parsed = getParsedSlayer(lines)
+        val parsed = getParsedSlayerOrNull(lines)
 
         val category = parsed?.category.orEmpty()
         val progress = parsed?.progress ?: "no slayer"
@@ -344,6 +344,30 @@ object SlayerApi {
         }
     }
 
+    @HandleEvent
+    private fun onSlayerChange(event: SlayerChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.debug("SlayerChangeEvent: ${event.oldSlayer} -> ${event.newSlayer}")
+    }
+
+    @HandleEvent
+    private fun onSlayerStateChange(event: SlayerStateChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.debug("SlayerStateChangeEvent: ${event.state}")
+    }
+
+    @HandleEvent
+    private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
+        if (!debugConfig) return
+        ChatUtils.debug("SlayerProgressChangeEvent: ${event.oldProgress} -> ${event.newProgress}")
+    }
+
+    @HandleEvent
+    private fun onSlayerQuestComplete() {
+        if (!debugConfig) return
+        ChatUtils.debug("SlayerQuestCompleteEvent")
+    }
+
     // TODO USE SH-REPO
     private fun checkTypeForCurrentArea() = when (SkyBlockUtils.graphArea) {
         "Graveyard" -> if (trackerConfig.revenantInGraveyard.get() && IslandType.HUB.isInIsland()) Type.REVENANT else null
@@ -391,28 +415,4 @@ object SlayerApi {
         val category: String,
         val progress: String,
     )
-
-    @HandleEvent
-    private fun onSlayerChange(event: SlayerChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.chat("SlayerChangeEvent: ${event.oldSlayer} -> ${event.newSlayer}")
-    }
-
-    @HandleEvent
-    private fun onSlayerStateChange(event: SlayerStateChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.chat("SlayerStateChangeEvent: ${event.state}")
-    }
-
-    @HandleEvent
-    private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.chat("SlayerProgressChangeEvent: ${event.oldProgress} -> ${event.newProgress}")
-    }
-
-    @HandleEvent
-    private fun onSlayerQuestComplete() {
-        if (!debugConfig) return
-        ChatUtils.chat("SlayerQuestCompleteEvent")
-    }
 }
