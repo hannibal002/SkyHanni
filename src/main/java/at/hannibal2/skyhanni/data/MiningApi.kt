@@ -245,7 +245,7 @@ object MiningApi {
                 }
             }
             // Cold is reset when the line is gone from the scoreboard, and also when the player left the cold area,
-            // since Hypixel does not reliably remove the line in that case.
+            // since Hypixel only removes the line after a delay.
             if (!found) resetCold()
         }
 
