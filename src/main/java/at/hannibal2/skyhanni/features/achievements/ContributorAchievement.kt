@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.achievements
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.FriendApi
 import at.hannibal2.skyhanni.data.achievements.Achievement
@@ -9,13 +10,18 @@ import at.hannibal2.skyhanni.events.FriendRequestExpiredEvent
 import at.hannibal2.skyhanni.events.achievements.AchievementRegistrationEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.chat.TextHelper
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
+import at.hannibal2.skyhanni.utils.compat.hover
+import net.minecraft.ChatFormatting
 
 @SkyHanniModule
 object ContributorAchievement {
+    private val config get() = SkyHanniMod.feature.dev
+
     private const val CONTRIBUTOR_ACHIEVEMENT = "Contrib Achievement"
     private const val CONTRIBUTOR_FRIEND_ACHIEVEMENT = "Contrib Friend"
     private const val CONTRIBUTOR_NOBODY_ACHIEVEMENT = "Contrib Stranger"
@@ -120,8 +126,19 @@ object ContributorAchievement {
         }
     }
 
-    fun onUniqueContributorSeen() {
-        AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+    fun onUniqueContributorSeen(username: String) {
+        val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
+        if (completed || config.discoverContributorMessage) {
+            ChatUtils.chat {
+                appendWithColor(ContributorManager.FOUND_WILD_CONTRIBUTOR, ChatFormatting.GOLD)
+                appendWithColor(" (hover)", ChatFormatting.GRAY)
+                hover = componentBuilder {
+                    appendWithColor("You have encountered ", ChatFormatting.GRAY)
+                    appendWithColor(username, ChatFormatting.AQUA)
+                    appendWithColor(" for the first time!", ChatFormatting.GRAY)
+                }
+            }
+        }
     }
 
     fun onContributorMention(totalAmount: Int) {
