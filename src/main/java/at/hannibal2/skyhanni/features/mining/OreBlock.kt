@@ -146,85 +146,85 @@ enum class OreBlock(
         fun getByStateOrNull(state: BlockState): OreBlock? = currentAreaOreBlocks.find { it.checkBlock(state) }
 
         fun getByNameOrNull(string: String) = entries.firstOrNull { it.name == string }
+
+        private fun isLowTierMithril(state: BlockState): Boolean = state.block.equalsOneOf(
+            ColoredBlockCompat.GRAY.woolBlock,
+            ColoredBlockCompat.CYAN.clayBlock,
+        )
+
+        private fun isMidTierMithril(state: BlockState): Boolean = state.block.equalsOneOf(
+            Blocks.PRISMARINE,
+            Blocks.PRISMARINE_BRICKS,
+            Blocks.DARK_PRISMARINE,
+        )
+
+        private fun isHighTierMithril(state: BlockState): Boolean =
+            state.block == ColoredBlockCompat.LIGHT_BLUE.woolBlock
+
+        fun isTitanium(state: BlockState): Boolean =
+            state.block == Blocks.POLISHED_DIORITE
+
+        private fun isStone(state: BlockState): Boolean =
+            state.block == Blocks.STONE
+
+        private fun isHardStoneHollows(state: BlockState): Boolean = state.block.equalsOneOf(
+            ColoredBlockCompat.GRAY.woolBlock,
+            ColoredBlockCompat.GREEN.woolBlock,
+            ColoredBlockCompat.CYAN.clayBlock,
+            ColoredBlockCompat.BROWN.clayBlock,
+            ColoredBlockCompat.GRAY.clayBlock,
+            ColoredBlockCompat.BLACK.clayBlock,
+            ColoredBlockCompat.LIME.clayBlock,
+            ColoredBlockCompat.GREEN.clayBlock,
+            ColoredBlockCompat.BLUE.clayBlock,
+            ColoredBlockCompat.RED.clayBlock,
+            ColoredBlockCompat.LIGHT_GRAY.clayBlock,
+            Blocks.CLAY,
+            Blocks.STONE_BRICKS,
+            Blocks.MOSSY_STONE_BRICKS,
+            Blocks.CRACKED_STONE_BRICKS,
+            Blocks.CHISELED_STONE_BRICKS,
+            Blocks.STONE,
+            Blocks.DIORITE,
+            Blocks.GRANITE,
+            Blocks.ANDESITE,
+        )
+
+        private fun isHardstoneTunnels(state: BlockState): Boolean = state.block.equalsOneOf(
+            Blocks.INFESTED_STONE,
+            ColoredBlockCompat.LIGHT_GRAY.woolBlock,
+        )
+
+        private fun isHardstoneMineshaft(state: BlockState): Boolean = state.block.equalsOneOf(
+            Blocks.STONE,
+            ColoredBlockCompat.LIGHT_GRAY.woolBlock,
+        )
+
+        private fun isRedSand(state: BlockState): Boolean =
+            state.block == Blocks.RED_SAND
+
+        private fun isLowTierUmber(state: BlockState): Boolean =
+            state.block == Blocks.TERRACOTTA
+
+        private fun isMidTierUmber(state: BlockState): Boolean =
+            state.block == ColoredBlockCompat.BROWN.clayBlock
+
+        private fun isHighTierUmber(state: BlockState): Boolean =
+            state.block == Blocks.SMOOTH_RED_SANDSTONE
+
+        private fun isLowTierTungstenTunnels(state: BlockState): Boolean =
+            state.block == Blocks.INFESTED_COBBLESTONE
+
+        private fun isLowTierTungstenMineshaft(state: BlockState): Boolean = state.block.equalsOneOf(
+            Blocks.COBBLESTONE_SLAB,
+            Blocks.COBBLESTONE,
+            Blocks.COBBLESTONE_STAIRS,
+        )
+
+        private fun BlockState.isGemstoneWithColor(color: DyeColor): Boolean = when (block) {
+            is StainedGlassBlock -> (block as StainedGlassBlock).color == color
+            is StainedGlassPaneBlock -> (block as StainedGlassPaneBlock).color == color
+            else -> false
+        }
     }
-}
-
-private fun isLowTierMithril(state: BlockState): Boolean = state.block.equalsOneOf(
-    ColoredBlockCompat.GRAY.woolBlock,
-    ColoredBlockCompat.CYAN.clayBlock,
-)
-
-private fun isMidTierMithril(state: BlockState): Boolean = state.block.equalsOneOf(
-    Blocks.PRISMARINE,
-    Blocks.PRISMARINE_BRICKS,
-    Blocks.DARK_PRISMARINE,
-)
-
-private fun isHighTierMithril(state: BlockState): Boolean =
-    state.block == ColoredBlockCompat.LIGHT_BLUE.woolBlock
-
-fun isTitanium(state: BlockState): Boolean =
-    state.block == Blocks.POLISHED_DIORITE
-
-private fun isStone(state: BlockState): Boolean =
-    state.block == Blocks.STONE
-
-private fun isHardStoneHollows(state: BlockState): Boolean = state.block.equalsOneOf(
-    ColoredBlockCompat.GRAY.woolBlock,
-    ColoredBlockCompat.GREEN.woolBlock,
-    ColoredBlockCompat.CYAN.clayBlock,
-    ColoredBlockCompat.BROWN.clayBlock,
-    ColoredBlockCompat.GRAY.clayBlock,
-    ColoredBlockCompat.BLACK.clayBlock,
-    ColoredBlockCompat.LIME.clayBlock,
-    ColoredBlockCompat.GREEN.clayBlock,
-    ColoredBlockCompat.BLUE.clayBlock,
-    ColoredBlockCompat.RED.clayBlock,
-    ColoredBlockCompat.LIGHT_GRAY.clayBlock,
-    Blocks.CLAY,
-    Blocks.STONE_BRICKS,
-    Blocks.MOSSY_STONE_BRICKS,
-    Blocks.CRACKED_STONE_BRICKS,
-    Blocks.CHISELED_STONE_BRICKS,
-    Blocks.STONE,
-    Blocks.DIORITE,
-    Blocks.GRANITE,
-    Blocks.ANDESITE,
-)
-
-private fun isHardstoneTunnels(state: BlockState): Boolean = state.block.equalsOneOf(
-    Blocks.INFESTED_STONE,
-    ColoredBlockCompat.LIGHT_GRAY.woolBlock,
-)
-
-private fun isHardstoneMineshaft(state: BlockState): Boolean = state.block.equalsOneOf(
-    Blocks.STONE,
-    ColoredBlockCompat.LIGHT_GRAY.woolBlock,
-)
-
-private fun isRedSand(state: BlockState): Boolean =
-    state.block == Blocks.RED_SAND
-
-private fun isLowTierUmber(state: BlockState): Boolean =
-    state.block == Blocks.TERRACOTTA
-
-private fun isMidTierUmber(state: BlockState): Boolean =
-    state.block == ColoredBlockCompat.BROWN.clayBlock
-
-private fun isHighTierUmber(state: BlockState): Boolean =
-    state.block == Blocks.SMOOTH_RED_SANDSTONE
-
-private fun isLowTierTungstenTunnels(state: BlockState): Boolean =
-    state.block == Blocks.INFESTED_COBBLESTONE
-
-private fun isLowTierTungstenMineshaft(state: BlockState): Boolean = state.block.equalsOneOf(
-    Blocks.COBBLESTONE_SLAB,
-    Blocks.COBBLESTONE,
-    Blocks.COBBLESTONE_STAIRS,
-)
-
-private fun BlockState.isGemstoneWithColor(color: DyeColor): Boolean = when (block) {
-    is StainedGlassBlock -> (block as StainedGlassBlock).color == color
-    is StainedGlassPaneBlock -> (block as StainedGlassPaneBlock).color == color
-    else -> false
 }
