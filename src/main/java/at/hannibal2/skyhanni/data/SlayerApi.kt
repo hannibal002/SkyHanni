@@ -185,11 +185,17 @@ object SlayerApi {
                 questStartTime = SimpleTimeMark.now()
             }
             questCompletePattern.matches(message) -> {
+                if (debugConfig) {
+                    ChatUtils.debug("Slayer quest complete detected, posting SlayerQuestCompleteEvent")
+                }
                 SlayerQuestCompleteEvent.post()
             }
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
                 if (data.currentState != FAILED) {
+                    if (debugConfig) {
+                        ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
+                    }
                     SlayerStateChangeEvent(FAILED).post()
                 }
                 data.currentState = ActiveQuestState.FAILED
@@ -222,7 +228,6 @@ object SlayerApi {
 
     private fun errorOnInvalid(message: String, lines: List<String>, source: SlayerLinesSource) {
         invalidUpdates++
-
         if (invalidUpdates == 3) {
             ErrorManager.skyHanniError(
                 message,
@@ -237,18 +242,26 @@ object SlayerApi {
 
         if (questIndex == -1) {
             if (hasActiveQuest()) {
-                errorOnInvalid("latestCategory does not contain valid slayer type: '$latestCategory'", lines, source)
+                invalidUpdates++
+                if (invalidUpdates >= 3) {
+                    invalidUpdates = 0 // Grace period over: quest is genuinely gone
+                }
+            } else {
+                invalidUpdates = 0
             }
             return null
         }
 
-        val type = Type.getByName(lines[questIndex]) ?: return null
         val category = lines[questIndex]
-        val progress = lines.getOrNull(questIndex + 1) ?: return null
+        val type = Type.getByName(category) ?: return null
+        val progress = lines.getOrNull(questIndex + 1)
+        if (progress == null) {
+            errorOnInvalid("Progress line missing for category '$category'", lines, source)
+            return null
+        }
 
         val tierString = category.substringAfterLast(' ', "")
         val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
-
         if (parsedTier == null) {
             errorOnInvalid("latestCategory does not contain roman number or int: '$category'", lines, source)
             return null
@@ -264,23 +277,13 @@ object SlayerApi {
         )
     }
 
-    private fun updateCategory(parsed: ParsedSlayer?) {
-        val category = parsed?.category.orEmpty()
-        if (category == latestCategory) return
-
-        val old = latestCategory
-        latestCategory = category
-        tier = parsed?.tier ?: 0
-
-        SlayerChangeEvent(old, category).post()
-    }
-
     private fun updateSlayerState() {
         if (ProfileStorageData.profileSpecific == null) return
 
         val (lines, source) = getSlayerLines()
         val parsed = getParsedSlayerOrNull(lines, source)
         if (invalidUpdates > 0) return
+
         val progress = parsed?.progress ?: "no slayer"
 
         updateCategory(parsed)
@@ -289,9 +292,26 @@ object SlayerApi {
         updateArea()
     }
 
+    private fun updateCategory(parsed: ParsedSlayer?) {
+        val category = parsed?.category.orEmpty()
+        if (category == latestCategory) return
+
+        val old = latestCategory
+        latestCategory = category
+        tier = parsed?.tier ?: 0
+
+        if (debugConfig) {
+            ChatUtils.debug("$old -> $category")
+        }
+        SlayerChangeEvent(old, category).post()
+    }
+
     private fun updateProgress(progress: String) {
         if (progress == latestProgress) return
 
+        if (debugConfig) {
+            ChatUtils.debug("$latestProgress -> $progress")
+        }
         SlayerProgressChangeEvent(latestProgress, progress).post()
         latestProgress = progress
     }
@@ -306,8 +326,16 @@ object SlayerApi {
         data.currentStateRaw = progress
 
         val newState = detectState(progress)
+
+        // If the player kills the boss immediately after the boss spawns
+        if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
+            SlayerStateChangeEvent(SLAIN).post()
+        }
+
         if (newState != data.currentState) {
-            ChatUtils.debug("${data.currentState} -> $newState")
+            if (debugConfig) {
+                ChatUtils.debug("${data.currentState} -> $newState")
+            }
             data.currentState = newState
             SlayerStateChangeEvent(newState).post()
         }
@@ -358,30 +386,6 @@ object SlayerApi {
                 updateArea()
             }
         }
-    }
-
-    @HandleEvent
-    private fun onSlayerChange(event: SlayerChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.debug("SlayerChangeEvent: ${event.oldSlayer} -> ${event.newSlayer}")
-    }
-
-    @HandleEvent
-    private fun onSlayerStateChange(event: SlayerStateChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.debug("SlayerStateChangeEvent: ${event.state}")
-    }
-
-    @HandleEvent
-    private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
-        if (!debugConfig) return
-        ChatUtils.debug("SlayerProgressChangeEvent: ${event.oldProgress} -> ${event.newProgress}")
-    }
-
-    @HandleEvent
-    private fun onSlayerQuestComplete() {
-        if (!debugConfig) return
-        ChatUtils.debug("SlayerQuestCompleteEvent")
     }
 
     // TODO USE SH-REPO
