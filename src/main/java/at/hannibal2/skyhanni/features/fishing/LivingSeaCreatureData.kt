@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.ServerTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactBoundingBoxExtraEntities
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.exactLocation
+import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.phys.AABB
 
@@ -51,7 +52,7 @@ class LivingSeaCreatureData(
 
     inline val name: String get() = seaCreature.name
 
-    inline val displayName: String get() = seaCreature.displayName
+    inline val displayName: Component get() = seaCreature.displayName
 
     inline val isRare: Boolean get() = seaCreature.rare
 

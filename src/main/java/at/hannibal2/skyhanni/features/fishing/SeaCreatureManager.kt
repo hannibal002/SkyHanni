@@ -10,11 +10,17 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.fishing.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.seaCreatureXMLGui.SpecificSeaCreatures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
+import at.hannibal2.skyhanni.utils.chat.TextHelper.style
+import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.network.chat.Style
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -86,7 +92,7 @@ object SeaCreatureManager {
 
             if (config.shortenFishingMessage) {
                 val name = it.displayName
-                val aOrAn = StringUtils.optionalAn(name.removeColor())
+                val aOrAn = StringUtils.optionalAn(name.string)
                 edited = "§9You caught $aOrAn $name§9!".asComponent()
             }
 
@@ -133,7 +139,9 @@ object SeaCreatureManager {
         val variants = mutableMapOf<String, List<String>>()
 
         for ((variantName, variant) in data) {
-            val chatColor = variant.chatColor
+            val rgbColor = variant.rgbColor?: run {
+                variant.chatColor[1].toLorenzColor()?.toColor()?.rgb
+            } ?: continue
             val variantFishes = mutableListOf<String>()
             variants[variantName] = variantFishes
             for ((name, seaCreature) in variant.seaCreatures) {
@@ -144,7 +152,7 @@ object SeaCreatureManager {
                 val lootshareSphere = seaCreature.lootshareSphereOverride
                 val oldNames = seaCreature.oldNames.orEmpty()
 
-                val creature = SeaCreature(name, fishingExperience, chatColor, rare, rarity, lootshareSphere, oldNames)
+                val creature = SeaCreature(name, fishingExperience, rgbColor, rare, rarity, lootshareSphere, oldNames)
                 seaCreatureMap[chatMessage] = creature
                 for (alternateMessage in seaCreature.alternateMessages.orEmpty()) {
                     seaCreatureMap[alternateMessage] = creature

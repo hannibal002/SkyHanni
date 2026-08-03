@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import com.google.gson.reflect.TypeToken
+import net.minecraft.network.chat.Component
 import java.lang.reflect.Type
 
 data class SeaCreatureJson(
     @Expose @SerializedName("chat_color") val chatColor: String,
+    @Expose @SerializedName("rgb_color") val rgbColor: Int? = null,
     @Expose @SerializedName("sea_creatures") val seaCreatures: Map<String, SeaCreatureInfo>,
 ) {
     companion object {
