@@ -190,12 +190,10 @@ object SlayerApi {
             }
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
-                if (data.currentState != FAILED) {
-                    ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
-                    SlayerStateChangeEvent(FAILED).post()
-                }
+                ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
                 data.currentState = ActiveQuestState.FAILED
                 data.currentStateRaw = "no slayer"
+                SlayerStateChangeEvent(FAILED).post()
             }
         }
     }
