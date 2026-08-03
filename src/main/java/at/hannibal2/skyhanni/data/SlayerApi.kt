@@ -3,12 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerQuestCompleteEvent
@@ -44,7 +42,7 @@ object SlayerApi {
 
     private val patternGroup = RepoPattern.group("slayer.api")
 
-    const val GRACE_UPDATE_COUNT = 3
+    private const val GRACE_UPDATE_COUNT = 3
 
     // <editor-fold desc="Patterns">
     /**
@@ -166,7 +164,7 @@ object SlayerApi {
                 add(" /shtestwaypoint ${PlayerUtils.blockPosition().toLocalFormat()} pathfind")
             }
             add("isInAnyArea: $isInAnyArea")
-            add("latestProgress: '${latestProgress.removeColor()}'")
+            add("latestProgress: '${latestProgress}'")
 
             val data = getCurrentData()
             add("active data:")
@@ -331,7 +329,6 @@ object SlayerApi {
     private fun String.inGrind() = contains("Combat") || contains("Kills")
     private fun String.inBoss() = this == "Slay the boss!"
     private fun String?.bossSlain() = this == "Boss slain!"
-    private fun String.noSlayer() = this == "no slayer"
 
     enum class ActiveQuestState {
         GRINDING, // spawning, collecting combat xp
@@ -348,13 +345,13 @@ object SlayerApi {
         else -> NO_ACTIVE_QUEST
     }
 
-    @HandleEvent(GraphAreaChangeEvent::class, priority = -1)
+    @HandleEvent(priority = HandleEvent.LOW)
     private fun onAreaChange() {
         currentAreaType = checkTypeForCurrentArea()
         updateArea()
     }
 
-    @HandleEvent(ConfigLoadEvent::class)
+    @HandleEvent
     private fun onConfigLoad() {
         with(trackerConfig) {
             ConditionalUtils.onToggle(revenantInGraveyard, voidgloomInNest, voidgloomInNoArea) {
