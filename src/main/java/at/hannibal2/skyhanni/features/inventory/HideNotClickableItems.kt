@@ -81,20 +81,6 @@ object HideNotClickableItems {
         "YOGI_BERRY".toInternalName(), // for Macaws
     )
 
-    private val equipmentTypes = setOf(
-        "HELMET",
-        "CARNIVAL MASK",
-        "CHESTPLATE",
-        "LEGGINGS",
-        "BOOTS",
-
-        "NECKLACE",
-        "CLOAK",
-        "BELT",
-        "GLOVES",
-        "BRACELET",
-    )
-
     // TODO add more special named fossils (hypixel why)
     private val specialFossils = setOf(
         "HELIX".toInternalName(),
@@ -342,8 +328,9 @@ object HideNotClickableItems {
     private fun hideYourEquipment(stack: SafeItemStack): Boolean {
         if (!CurrentEquipmentApi.inventory.isInside()) return false
 
-        for (type in equipmentTypes) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
+
+        if (stack.getItemCategoryOrNull() in ItemCategory.armorAndEquipmentAndMasks) {
+            if (stack.getLore().any { it.contains("§l") }) {
                 showGreenLine = true
                 return false
             }
