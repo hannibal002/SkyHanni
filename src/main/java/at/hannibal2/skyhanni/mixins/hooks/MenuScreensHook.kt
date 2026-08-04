@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeEditScree
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeScreen
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
+import at.hannibal2.skyhanni.utils.compat.unformattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.network.chat.Component
 import net.minecraft.world.inventory.AbstractContainerMenu
@@ -25,7 +26,7 @@ object MenuScreensHook {
 
         val inventory = player.inventory
         val menu = type.create(id, inventory)
-        val inventoryName = name.string.trim()
+        val inventoryName = name.unformattedTextCompat()
 
         if (menu is ChestMenu && CustomWardrobe.shouldReplace(inventoryName)) {
             player.containerMenu = menu

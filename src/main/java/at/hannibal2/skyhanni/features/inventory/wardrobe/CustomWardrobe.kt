@@ -51,7 +51,6 @@ object CustomWardrobe {
     val editMode get() = MinecraftCompat.screen is CustomWardrobeEditScreen
 
     private var displayRenderable: Renderable? = null
-    private var inventoryButton: Renderable? = null
     private var waitingForInventoryUpdate = false
 
     private val position: Position = Position().ignoreScale()
@@ -87,7 +86,7 @@ object CustomWardrobe {
     }
 
     fun exitEditMode() {
-        val screen = MinecraftCompat.screen ?: return
+        val screen = MinecraftCompat.screen as? CustomWardrobeEditScreen ?: return
         val player = MinecraftCompat.localPlayerOrNull ?: return
         val handler = player.containerMenu as? ChestMenu ?: return
 
@@ -142,6 +141,7 @@ object CustomWardrobe {
     }
 
     internal fun update() {
+        waitingForInventoryUpdate = false
         displayRenderable = createRenderables()
     }
 
@@ -386,7 +386,6 @@ object CustomWardrobe {
 
     internal fun reset() {
         displayRenderable = null
-        inventoryButton = null
     }
 
     private fun addButtons(): Renderable {

@@ -12,8 +12,6 @@ class CustomWardrobeScreen(
     menu: ChestMenu,
     title: Component,
 ) : AbstractCustomMenuScreen(menu, title) {
-    var waitingForInventoryUpdate = false
-        private set
     private var updateScheduled = false
 
     override fun getRectangle(): ScreenRectangle = ScreenRectangle(
@@ -38,7 +36,6 @@ class CustomWardrobeScreen(
         updateScheduled = true
 
         DelayedRun.runNextTick {
-            waitingForInventoryUpdate = false
             updateScheduled = false
             CustomWardrobe.update()
         }
