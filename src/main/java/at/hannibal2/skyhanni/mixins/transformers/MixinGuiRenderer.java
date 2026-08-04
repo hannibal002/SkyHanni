@@ -40,10 +40,8 @@ public abstract class MixinGuiRenderer {
         GuiRendererHook.INSTANCE.computeChromaBufferSlice();
     }
 
-    //? if >= 26.2 {
+    //~ if < 26.2 'shift = At.Shift.AFTER' -> 'ordinal = 1'
     @Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", shift = At.Shift.AFTER))
-    //?} else
-    //@Inject(method = "executeDrawRange", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderPass;setUniform(Ljava/lang/String;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;)V", ordinal = 1))
     public void insertChromaSetUniform(
         CallbackInfo ci,
         @Local RenderPass renderPass) {
