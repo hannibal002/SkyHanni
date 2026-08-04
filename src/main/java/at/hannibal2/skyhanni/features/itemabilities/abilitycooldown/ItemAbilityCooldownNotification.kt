@@ -28,7 +28,7 @@ object ItemAbilityCooldownNotification {
     private var currentDisplay: DisplayAbility? = null
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
+    private fun onItemAbilityActivate(event: ItemAbilityActivateEvent) {
         if (!isEnabled()) return
         val ability = event.ability
         if (ability !in config.enabledAbilities) return
@@ -42,12 +42,12 @@ object ItemAbilityCooldownNotification {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         currentDisplay = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
 
         val display = currentDisplay ?: return
