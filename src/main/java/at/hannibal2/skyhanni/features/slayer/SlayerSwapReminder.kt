@@ -21,7 +21,7 @@ object SlayerSwapReminder {
     @HandleEvent(onlyOnSkyblock = true)
     private fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isActive()) return
-        if (hasAlertedForCurrentBoss) return
+        if (hasRemindedForCurrentBoss) return
 
         val mob = event.entityData.mob
         if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
