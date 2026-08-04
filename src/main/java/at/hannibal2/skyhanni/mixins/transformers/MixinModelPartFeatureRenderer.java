@@ -22,7 +22,7 @@ public abstract class MixinModelPartFeatureRenderer {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
     private void setSkyHanniOutlineColor(
-        OutlineBufferSource outlineConsumer,
+        OutlineBufferSource instance,
         int color,
         Operation<Void> original,
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
@@ -30,7 +30,7 @@ public abstract class MixinModelPartFeatureRenderer {
         if (skyhanni$usesCustomOutline(modelPart)) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
-            original.call(outlineConsumer, color);
+            original.call(instance, color);
         }
     }
 
@@ -42,7 +42,7 @@ public abstract class MixinModelPartFeatureRenderer {
         )
     )
     private VertexConsumer getSkyHanniOutlineBuffer(
-        OutlineBufferSource outlineConsumer,
+        OutlineBufferSource instance,
         RenderType layer,
         Operation<VertexConsumer> original,
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
@@ -50,7 +50,7 @@ public abstract class MixinModelPartFeatureRenderer {
         if (skyhanni$usesCustomOutline(modelPart)) {
             return original.call(SkyHanniOutlineHook.getVertexConsumers(), layer);
         } else {
-            return original.call(outlineConsumer, layer);
+            return original.call(instance, layer);
         }
     }
 

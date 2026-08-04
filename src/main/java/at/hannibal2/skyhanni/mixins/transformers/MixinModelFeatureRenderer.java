@@ -19,20 +19,20 @@ import org.spongepowered.asm.mixin.injection.At;
 public abstract class MixinModelFeatureRenderer {
 
     @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
-    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
+    private void setSkyHanniOutlineColor(OutlineBufferSource instance, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
-            original.call(outlineConsumer, color);
+            original.call(instance, color);
         }
     }
 
     @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
-    private VertexConsumer getSkyHanniOutlineBuffer(OutlineBufferSource outlineConsumer, RenderType layer, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
+    private VertexConsumer getSkyHanniOutlineBuffer(OutlineBufferSource instance, RenderType layer, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
             return original.call(SkyHanniOutlineHook.getVertexConsumers(), layer);
         } else {
-            return original.call(outlineConsumer, layer);
+            return original.call(instance, layer);
         }
     }
 
