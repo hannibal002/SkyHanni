@@ -200,6 +200,15 @@ class DungeonConfig {
 
     @Expose
     @ConfigOption(
+        name = "Spirit Bear Alert",
+        desc = "Shows a title and highlights Spirit Bear in red when it spawns during the F4/M4 boss fight.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var spiritBearAlert: Boolean = false
+
+    @Expose
+    @ConfigOption(
         name = "Secret Tracker Locator",
         desc = "Shows the secret that the secret tracker is pointing to.",
     )
