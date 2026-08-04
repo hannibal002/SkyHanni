@@ -31,23 +31,8 @@ plugins {
 val target = ProjectTarget.entries.find { it.projectPath == project.path }!!
 val primaryTarget = ProjectTarget.MODERN_26100
 
-// Manual accessors for the conditionally-applied loom plugin.
-// These replace the typed accessors that Kotlin DSL would normally generate for
-// plugins applied in the plugins block. Since both loom plugins are declared with
-// apply false, no accessors are auto-generated, so we define them explicitly.
-val loom: LoomGradleExtensionAPI get() = extensions.getByType(LoomGradleExtensionAPI::class.java)
 fun dependencyNotation(dep: Any): Any = (dep as? Provider<*>)?.get() ?: dep
-fun DependencyHandler.minecraft(dep: Any): Dependency? = add("minecraft", dep)
-fun DependencyHandler.include(dep: Any): Dependency? = add("include", dependencyNotation(dep))
-fun DependencyHandler.modImplementation(dep: Any): Dependency? = add("modImplementation", dependencyNotation(dep))
-fun DependencyHandler.modImplementation(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modImplementation", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
 
-fun DependencyHandler.modCompileOnly(dep: Any): Dependency? = add("modCompileOnly", dependencyNotation(dep))
-fun DependencyHandler.modCompileOnly(dep: Any, configure: ExternalModuleDependency.() -> Unit): Dependency? =
-    add("modCompileOnly", dependencyNotation(dep)).also { (it as? ExternalModuleDependency)?.configure() }
-
-fun DependencyHandler.modRuntimeOnly(dep: Any): Dependency? = add("modRuntimeOnly", dependencyNotation(dep))
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
@@ -227,7 +212,6 @@ afterEvaluate {
     ksp {
         arg("skyhanni.modver", version.toString())
         arg("skyhanni.mcver", target.minecraftVersion.versionName)
-        //arg("skyhanni.cachedir", layout.buildDirectory.get().asFile.absolutePath)
         arg("skyhanni.buildpaths", project.file("buildpaths-excluded.txt").absolutePath)
     }
 }

@@ -76,10 +76,8 @@ object RoundedShapeDrawer {
             RenderSystem.backupProjectionMatrix()
             val w = window.width.toFloat() / window.guiScale.toFloat()
             val h = window.height.toFloat() / window.guiScale.toFloat()
-            RenderSystem.setProjectionMatrix(
-                projectionMatrix.getBuffer(Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) }),
-                ProjectionType.ORTHOGRAPHIC,
-            )
+            val projectionMatrixBuffer = projectionMatrix.getBuffer(Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) })
+            RenderSystem.setProjectionMatrix(projectionMatrixBuffer, ProjectionType.ORTHOGRAPHIC)
             val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(
                 Matrix4f().setTranslation(0.0f, 0.0f, -11000.0f),
                 Vector4f(1.0F, 1.0F, 1.0F, 1.0F),
