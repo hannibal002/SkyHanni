@@ -358,12 +358,14 @@ data class StateComment(val comment: PrComment, val state: String)
 
 // Iterates every comment of a pull request, oldest first, which is the order the API documents. [action]
 // returns false to stop early.
-fun forEachComment(prNumber: String, action: (PrComment) -> Boolean) {
+//
+// [onFailure] must not return: continuing would hand out the pages read so far as if they were the whole listing.
+fun forEachComment(prNumber: String, onFailure: (String) -> Nothing = { error(it) }, action: (PrComment) -> Boolean) {
     var page = 1
     while (true) {
         val (status, body) = ghRepoGet("/issues/$prNumber/comments?per_page=100&page=$page")
-        status.requireSuccess("Error: could not fetch PR comments (HTTP $status), aborting")
-        val array = body as? JsonArray ?: error("Error: unexpected response format for PR comments, aborting")
+        if (status.isHttpError) onFailure("Error: could not fetch PR comments (HTTP $status)")
+        val array = body as? JsonArray ?: onFailure("Error: unexpected response format for PR comments")
         for (element in array) {
             val obj = element as? JsonObject ?: continue
             val id = obj.get("id")?.takeIf { it.isJsonPrimitive }?.asLong ?: continue
@@ -391,9 +393,9 @@ fun CommentType.findExisting(prNumber: String): PrComment? {
 
 // Walks every page and keeps the last hit, because the issue specific comments endpoint accepts only since,
 // per_page and page. There is no way to ask for the newest comment directly.
-fun CommentType.findNewestState(prNumber: String): StateComment? {
+fun CommentType.findNewestState(prNumber: String, onFailure: (String) -> Nothing = { error(it) }): StateComment? {
     var newest: StateComment? = null
-    forEachComment(prNumber) { comment ->
+    forEachComment(prNumber, onFailure) { comment ->
         val state = comment.body.lineSequence()
             .firstNotNullOfOrNull { stateMarkerRegex.matchEntire(it.trim()) }
             ?.groupValues?.get(1)
@@ -417,7 +419,12 @@ fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> Stri
 //
 // Every body posted under a CommentType needs a line starting with "### ", it becomes the title of the spoiler
 // the collapsed comment turns into. A body without one ends up under [fallbackTitle].
-fun CommentType.markAsStale(comment: PrComment, fallbackTitle: String = "Unknown") {
+// A failed collapse is harmless, so [onFailure] may return: the newest-state lookup ignores the leftover.
+fun CommentType.markAsStale(
+    comment: PrComment,
+    fallbackTitle: String = "Unknown",
+    onFailure: (String) -> Unit = { error(it) },
+) {
     val cleanedOld = comment.body
         .lineSequence()
         .filterNot { it.trim() == marker || stateMarkerRegex.matches(it.trim()) }
@@ -445,7 +452,7 @@ fun CommentType.markAsStale(comment: PrComment, fallbackTitle: String = "Unknown
 
     val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/${comment.id}", mapOf("body" to staleBody))
 
-    status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
+    if (status.isHttpError) onFailure("Error: could not mark comment as stale (HTTP $status)")
 }
 
 fun CommentType.staleExisting(prNumber: String, fallbackTitle: String = "Unknown") {
@@ -1051,7 +1058,9 @@ fun handleDependencyComment(
         dependencies.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closed.pullNumber }
     }
 
-    val announced = dependencyComment.findNewestState(issueNumber)
+    // Skips this pull request instead of ending the loop over all of them. Reading no comments must not count as
+    // nothing announced, the missing marker would read as resolved and post the announcement twice.
+    val announced = dependencyComment.findNewestState(issueNumber) { dependencyError(it) }
     // A pull request that was never announced is in the same position as one whose dependencies are all closed.
     val announcedState = announced?.state ?: dependencyStateResolved
     val currentState = if (openDependencies.isEmpty()) dependencyStateResolved else dependencyStateWaiting
@@ -1080,9 +1089,13 @@ fun handleDependencyComment(
         return
     }
     println("PR #$issueNumber: posted dependency comment")
-    // Collapsed after the new comment exists. A failed collapse leaves a second comment the lookup ignores, a
-    // failed post after a collapse would leave no announcement at all and read as resolved.
-    announced?.let { dependencyComment.markAsStale(it.comment) }
+    // Collapsed after the new comment exists, a failed post before that would leave no announcement at all.
+    // The leftover of a failed collapse is harmless, so this only warns.
+    announced?.let { previous ->
+        dependencyComment.markAsStale(previous.comment) {
+            System.err.println("Warning: $it on PR #$issueNumber")
+        }
+    }
 }
 
 fun runDependenciesModeForOpenPr(prNum: String?) {
