@@ -111,10 +111,11 @@ object HideyhoFinder {
 
                 if (isNearby) {
                     finishNavigation()
+                    return@SecondPassed false
                 }
 
                 // If there is no Hideyho nearby then we go to the next location
-                !isNearby
+                return@SecondPassed true
             },
             condition = { config.hideyhoFinder && currentlyNavigating },
         )
