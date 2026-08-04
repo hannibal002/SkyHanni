@@ -3437,7 +3437,6 @@
     <ID>StatementWrapping:SkyHanniRealtimeItemSlot.kt:SkyHanniRealtimeItemSlot${ allocate(slotSize) }</ID>
     <ID>StorageVarOrVal:ChatSoundResponseConfig.kt:ChatSoundResponseConfig$@Expose @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.") @ConfigEditorDraggableList var soundResponses = SoundResponseTypes.entries.toMutableList()</ID>
     <ID>StorageVarOrVal:GuiConfig.kt:GuiConfig$@Expose @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.") @Accordion var mayorOverlay = MayorOverlayConfig()</ID>
-    <ID>StorageVarOrVal:HuntingConfig.kt:HuntingConfig$@Expose @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds") @SearchTag("hunting box") var fusionKeybinds = FusionKeybindsConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Colors", desc = "Configure colors for each class and dead teammates.", ) @Accordion var colorConfig = SpiritLeapColorConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Keybinds", desc = "Set keybinds and show keybind hints for Spirit Leap." ) @Accordion var spiritLeapKeybindConfig = SpiritLeapKeybindConfig()</ID>
     <ID>StorageVarOrVal:SuperCraftingConfig.kt:SuperCraftingConfig$@Expose @Accordion @ConfigOption(name = "Presets", desc = "") var presets = SuperCraftPresetsConfig()</ID>
