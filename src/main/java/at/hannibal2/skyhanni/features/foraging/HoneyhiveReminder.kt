@@ -8,16 +8,19 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
 import at.hannibal2.skyhanni.data.title.TitleManager
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -26,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoneyhiveReminder {
 
-    private val config get() = SkyHanniMod.feature.foraging.honeyhive
+    private val config get() = SkyHanniMod.feature.foraging.honeyhiveConfig
 
     private val storage get() = ProfileStorageData.profileSpecific?.foraging
 
@@ -49,9 +52,20 @@ object HoneyhiveReminder {
     )
 
     private var notifyOnIslandSwap = false
+    private var currentlyNavigating = true
 
     @HandleEvent(onlyOnIsland = IslandType.TORRHUS_CANYON)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!config.enabled) return
+
+        if (!currentlyNavigating && hiveLootedPattern.matches(event.cleanMessage)) {
+            val location = LocationUtils.playerLocation()
+
+            startHiveNavigation("You looted a honeyhive, want to collect the rest?", location)
+
+            return
+        }
+
         if (!config.queenBeeNotification) return
         if (!queenBeePattern.matches(event.cleanMessage)) return
         TitleManager.sendTitle("§6Honeyhive Instantly Refilled!")
@@ -64,30 +78,10 @@ object HoneyhiveReminder {
         if (!config.enabled) return
         if (storage.honeyhiveRemindTime.isInFuture()) return
 
-        if (NavigateAllHelper.currentlyNavigating) return
+        if (currentlyNavigating || ReminderUtils.isBusy()) return
 
         if (IslandType.TORRHUS_CANYON.isInIsland()) {
-            val graph = IslandGraphs.currentIslandGraph ?: return
-            val nodes = graph.getNodesWithTags(GraphNodeTag.HONEYHIVE)
-
-            ChatUtils.clickToActionOrDisable(
-                "Honeyhives are ready to be collected.",
-                config::enabled,
-                actionName = "navigate to all Honeyhives",
-                action = {
-                    NavigateAllHelper.navigateAll(
-                        nodes,
-                        GraphNodeTag.HONEYHIVE.displayName,
-                        LorenzColor.GOLD.toColor(),
-                        onFinish = {
-                            ChatUtils.chat("You visited all ${GraphNodeTag.HONEYHIVE.displayName}s")
-                            storage.honeyhiveRemindTime = 1.hours.fromNow()
-                        },
-                        continueNavigationCondition = NavigationCondition.ChatMessage { message -> hiveLootedPattern.matches(message) },
-                        condition = { config.enabled },
-                    )
-                },
-            )
+            startHiveNavigation("Honeyhives are ready to be collected.")
         } else if (config.reminderOutsideTorrhus) {
             ChatUtils.clickToActionOrDisable(
                 "Honeyhives are ready to be collected on the Torrhus Canyon.",
@@ -102,6 +96,47 @@ object HoneyhiveReminder {
             return
         }
         storage.honeyhiveRemindTime = 5.minutes.fromNow()
+    }
+
+    // If location is null then we are excluding the closest hive to that location
+    private fun startHiveNavigation(startMessage: String, location: LorenzVec? = null) {
+        val storage = storage ?: return
+
+        val graph = IslandGraphs.currentIslandGraph ?: return
+        val nodes = graph.getNodesWithTags(GraphNodeTag.HONEYHIVE).toMutableList()
+
+        location?.let {
+            val closest = nodes.minBy { it.position.distance(location) }
+            nodes.remove(closest)
+        }
+
+        if (nodes.isEmpty()) return
+
+        currentlyNavigating = true
+        ChatUtils.clickToActionOrDisable(
+            startMessage,
+            config::enabled,
+            actionName = "navigate to all Honeyhives",
+            action = {
+                NavigateAllHelper.navigateAll(
+                    nodes,
+                    GraphNodeTag.HONEYHIVE.displayName,
+                    GraphNodeTag.HONEYHIVE.color.toColor(),
+                    onFinish = {
+                        ChatUtils.chat("You visited all ${StringUtils.pluralize(nodes.size, GraphNodeTag.HONEYHIVE.displayName)}s§e.")
+                        storage.honeyhiveRemindTime = 1.hours.fromNow()
+                        currentlyNavigating = false
+                    },
+                    continueNavigationCondition = NavigationCondition.ChatMessage { message -> hiveLootedPattern.matches(message) },
+                    condition = { config.enabled },
+                )
+            },
+        )
+    }
+
+    @HandleEvent
+    private fun onIslandLeave() {
+        currentlyNavigating = false
     }
 
     @HandleEvent(onlyOnIsland = IslandType.TORRHUS_CANYON)
