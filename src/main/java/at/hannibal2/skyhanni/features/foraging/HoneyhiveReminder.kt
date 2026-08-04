@@ -107,8 +107,8 @@ object HoneyhiveReminder {
 
         if (nodes.isEmpty()) return
 
-        location?.let { location ->
-            val closest = nodes.minBy { it.position.distance(location) }
+        location?.let { startLocation ->
+            val closest = nodes.minBy { it.position.distance(startLocation) }
             nodes.remove(closest)
         }
 
