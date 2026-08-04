@@ -8,18 +8,17 @@ import at.hannibal2.skyhanni.config.commands.brigadier.arguments.EnumArgumentTyp
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.graph.GraphNode
 import at.hannibal2.skyhanni.data.model.graph.GraphNodeTag
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
 
 @SkyHanniModule
 object NavigateAllHelper {
 
-    private var route: List<LorenzVec> = listOf()
-    private var total = 0
-    private var currentNodeType: GraphNodeTag? = null
 
     private val allowedMultiNavigationTags = setOf(
         GraphNodeTag.HOPPITY,
@@ -34,80 +33,169 @@ object NavigateAllHelper {
         GraphNodeTag.HIDEONLEAF,
         GraphNodeTag.HIDEONSUN,
         GraphNodeTag.TREE_PROTECTION_ORDER,
-        GraphNodeTag.HONEY_HIVE,
+        GraphNodeTag.HONEYHIVE,
         GraphNodeTag.SAFARI_BELL,
         GraphNodeTag.HIDEYHO_LOCATION,
     )
 
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
 
+    val currentlyNavigating get() = currentTargetName != null
+
+    private var route: List<GraphNode> = listOf()
+    private var total = 0
+    private var currentTarget: GraphNode? = null
+    private var currentTargetName: String? = null
+    private var waitingOnCondition: Boolean = false
+
+    private var onFound: (GraphNode) -> Unit = {}
+    private var onFinish: () -> Unit = {}
+    private var continueNavigationCondition: NavigationCondition = NavigationCondition.None
+    private var condition: () -> Boolean = { true }
+
     /**
      * Navigate to all nodes with the selected [GraphNodeTag]
-     *
-     * In future this should be changed to take in a predicate for nodes
-     * Existing features should be switched to use a more abstract version of this
-     * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
      */
-    private fun navigateAll(nodeType: GraphNodeTag) {
+    private fun navigateAllCommand(nodeType: GraphNodeTag) {
         if (nodeType !in getValidTagNames()) {
-            ChatUtils.userError("Target type is invalid on this island!")
+            ChatUtils.userError("${nodeType.displayName} §cis invalid for navigation on this island!")
             return
         }
 
         val graph = IslandGraphs.currentIslandGraph ?: return
         val targetNodes = graph.getNodesWithTags(nodeType)
-        currentNodeType = nodeType
+
+        navigateAll(
+            targetNodes,
+            nodeType.displayName,
+            onFinish = { ChatUtils.chat("Reached all ${StringUtils.pluralize(total, nodeType.displayName, withNumber = true)}§e.") },
+            continueNavigationCondition = NavigationCondition.None,
+            condition = { true },
+        )
+    }
+
+    /**
+     * Navigate to all the inputted nodes.
+     *
+     * @param nodes The list of nodes that should be navigated to.
+     * @param targetName The name of what is being navigated to.
+     * @param onFound What should be done upon reaching the location of a node.
+     * @param onFinish What should be done upon reaching all nodes.
+     * @param continueNavigationCondition The condition that must be met before moving to the next node.
+     * @param condition The condition for the navigation to be shown.
+     *
+     * Existing features should be switched to use a more abstract version of this
+     * These features include: Fast Fairy Souls, Spider Relic Pathfind, Shulker Finder
+     */
+    fun navigateAll(
+        nodes: List<GraphNode>,
+        targetName: String,
+        onFound: (GraphNode) -> Unit = {},
+        onFinish: () -> Unit,
+        continueNavigationCondition: NavigationCondition,
+        condition: () -> Boolean,
+    ) {
+        currentTargetName = targetName
+        this.onFound = onFound
+        this.onFinish = onFinish
+        this.continueNavigationCondition = continueNavigationCondition
+        this.condition = condition
 
         // Coroutine for calculateRoute()
         pathfindCoroutine.launch {
-            route = emptyList()
-            route = calculateRoute(targetNodes)
+            route = calculateRoute(nodes)
             total = route.size
 
-            ChatUtils.chat("Navigating to $total ${nodeType.displayName}")
+            ChatUtils.chat("§aNavigating to ${StringUtils.pluralize(total, targetName, withNumber = true)}§a.")
+            ChatUtils.chat("§aUse §e/shnavall skip §ato skip a target.")
 
             recursiveNavigate()
         }
     }
 
     private fun recursiveNavigate() {
-        if (route.isEmpty()) return
+        waitingOnCondition = false
+
+        if (route.isEmpty()) {
+            onFinish()
+            currentTargetName = null
+            return
+        }
 
         val target = route.first()
+        currentTarget = target
         route = route.drop(1)
 
         IslandGraphs.pathFind(
-            target,
-            "${currentNodeType?.displayName} ${total - route.size}/$total",
+            target.position,
+            "$currentTargetName ${total - route.size}/$total",
             onFound = {
-                if (route.isEmpty()) currentNodeType = null
-                recursiveNavigate()
+                currentTarget?.let { onFound(it) }
+
+                when (continueNavigationCondition) {
+                    NavigationCondition.None -> recursiveNavigate()
+                    is NavigationCondition.ChatMessage -> waitingOnCondition = true
+                    is NavigationCondition.SecondPassed -> {
+                        if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition()) {
+                            recursiveNavigate()
+                        } else {
+                            waitingOnCondition = true
+                        }
+                    }
+                }
             },
-            condition = { currentNodeType != null },
+            condition = { currentTargetName != null && condition() },
         )
     }
 
-    private fun calculateRoute(targetNodes: List<GraphNode>): List<LorenzVec> = NavigationUtils.getRoute(targetNodes)
+    private fun calculateRoute(targetNodes: List<GraphNode>): List<GraphNode> = NavigationUtils.getRoute(targetNodes)
+
+    @HandleEvent
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        if (!waitingOnCondition) return
+        if (continueNavigationCondition !is NavigationCondition.ChatMessage) return
+
+        if ((continueNavigationCondition as NavigationCondition.ChatMessage).condition(event.cleanMessage)) {
+            recursiveNavigate()
+        }
+    }
+
+    @HandleEvent
+    private fun onSecondPassed() {
+        if (!waitingOnCondition) return
+
+        if (currentlyNavigating && (currentTarget?.position?.distanceToPlayer() ?: 0.0) > 5) {
+            currentTarget?.let { route = listOf(it) + route }
+            recursiveNavigate()
+        }
+
+        if (continueNavigationCondition !is NavigationCondition.SecondPassed) return
+        if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition()) {
+            recursiveNavigate()
+        }
+    }
 
     private fun handleSkip() {
         if (route.isEmpty()) {
-            if (currentNodeType != null) {
-                currentNodeType = null
-            } else {
+            if (currentTargetName == null) {
                 ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
             }
             return
         }
 
-        // TODO In future it should recalculate the route taking into account that we dont need the skipped node anymore
-        recursiveNavigate()
+        ChatUtils.chat("Skipping a $currentTargetName§e.")
+
+        pathfindCoroutine.launch {
+            route = calculateRoute(route)
+            recursiveNavigate()
+        }
     }
 
     @HandleEvent
     private fun onIslandLeave() {
         route = emptyList()
-        total = 0
-        currentNodeType = null
+        currentTargetName = null
+        waitingOnCondition = false
     }
 
     @HandleEvent
@@ -124,7 +212,7 @@ object NavigateAllHelper {
                 ) { it in allowedMultiNavigationTags },
                 BrigadierUtils.dynamicSuggestionProvider { getValidTagNames().map { it.cleanName } },
             ) { nodeType ->
-                navigateAll(nodeType)
+                navigateAllCommand(nodeType)
             }
             literalCallback("skip") {
                 handleSkip()

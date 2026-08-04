@@ -40,6 +40,11 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
+    @ConfigOption(name = "Honeyhive Reminder", desc = "")
+    @Accordion
+    val honeyhive = HoneyhiveReminderConfig()
+
+    @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
