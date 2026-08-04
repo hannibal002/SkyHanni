@@ -189,7 +189,7 @@ object SlayerApi {
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
                 ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
-                data.currentState = ActiveQuestState.FAILED
+                data.currentState = FAILED
                 data.currentStateRaw = "no slayer"
                 SlayerStateChangeEvent(FAILED).post()
             }
@@ -218,18 +218,18 @@ object SlayerApi {
         return emptyList<String>() to SlayerLinesSource.NONE
     }
 
+    // returns null if no slayer quest is found, and exception if the parsing fails
     private fun getParsedSlayerOrNull(lines: List<String>): ParsedSlayer? {
         val questIndex = lines.indexOfFirst { Type.getByName(it) != null }
         if (questIndex == -1) return null
 
         val category = lines[questIndex]
         val type = Type.getByName(category) ?: return null
-        val progress = lines.getOrNull(questIndex + 1)
-        requireNotNull(progress) { "Progress line missing for category '$category'" }
+        val progress = lines.getOrNull(questIndex + 1) ?: throw SlayerParseException("Progress line missing for category '$category'")
 
         val tierString = category.substringAfterLast(' ', "")
-        val parsedTier = tierString.romanToDecimalIfNecessaryOrNull()
-        requireNotNull(parsedTier) { "Failed to parse tier from category '$category'" }
+        val parsedTier =
+            tierString.romanToDecimalIfNecessaryOrNull() ?: throw SlayerParseException("Failed to parse tier from category '$category'")
 
         return ParsedSlayer(
             type = type,
@@ -245,7 +245,7 @@ object SlayerApi {
         val (lines, source) = getSlayerLines()
         val parsed = try {
             getParsedSlayerOrNull(lines)
-        } catch (e: Exception) {
+        } catch (e: SlayerParseException) {
             invalidUpdates++
             if (invalidUpdates == GRACE_UPDATE_COUNT) {
                 val message = "Slayer Exception: ${e.message}"
@@ -409,4 +409,6 @@ object SlayerApi {
         val tier: Int,
         val progress: String,
     )
+
+    private class SlayerParseException(message: String) : Exception(message)
 }
