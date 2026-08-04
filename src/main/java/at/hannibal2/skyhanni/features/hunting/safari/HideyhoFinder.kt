@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.misc.pathfind.NavigateAllHelper
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationCondition
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.getEntitiesNearby
 import at.hannibal2.skyhanni.utils.EntityUtils.getSkinTexture
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.RemotePlayer
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HideyhoFinder {
@@ -70,7 +72,10 @@ object HideyhoFinder {
         }
 
         if (beginHidingPattern.matches(event.cleanMessage)) {
-            beginNavigation()
+            // Wait for Hideyho to teleport first
+            DelayedRun.runDelayed(2.seconds) {
+                beginNavigation()
+            }
         }
     }
 
