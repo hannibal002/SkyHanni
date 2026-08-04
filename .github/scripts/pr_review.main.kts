@@ -1,6 +1,7 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 // Execution context: base branch
-// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, and check_dependencies.yml
+// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
+// and keyword-labels.yml
 
 import com.google.gson.*
 import java.net.URI
@@ -11,6 +12,34 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import kotlin.io.path.*
 import kotlin.system.exitProcess
+
+
+
+/**
+ * A keyword an author can put on its own line in the pull request description to control a label.
+ * The line has to match exactly, the same way ChangelogVerification handles "exclude_from_changelog".
+ *
+ * [description] explains the label in the comment posted when it gets added.
+ * [blocking] additionally publishes a commit status, so the pull request cannot be merged while the keyword is present.
+ */
+data class KeywordLabel(
+    val keyword: String,
+    val label: String,
+    val description: String,
+    val blocking: Boolean,
+)
+
+// The label of every blocking entry doubles as its status context and is also used by the set-pending job in
+// keyword-labels.yml, both must stay in sync.
+val keywordLabels = listOf(
+    KeywordLabel(
+        keyword = "waiting_on_hypixel_alpha",
+        label = "Waiting on Hypixel",
+        description = "The relevant feature is only available on the Hypixel alpha server, so this pull request can " +
+            "only be tested there. It must not be merged before the feature reaches the main server.",
+        blocking = true,
+    ),
+)
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
 
@@ -908,9 +937,66 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
     }
 }
 
+fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
+    appendLine("This pull request is now labeled **${entry.label}**.")
+    appendLine()
+    appendLine(entry.description)
+    appendLine()
+    append("The label disappears automatically once the line `${entry.keyword}` ")
+    append("is removed from the pull request description.")
+}
+
+fun buildKeywordLabelRemovedComment(entry: KeywordLabel): String = buildString {
+    append("The line `${entry.keyword}` is no longer part of the pull request description, ")
+    append("so the **${entry.label}** label was removed.")
+}
+
+fun setKeywordLabelStatus(headSha: String, entry: KeywordLabel, keywordPresent: Boolean) {
+    val payload = mutableMapOf<String, Any>(
+        "state" to if (keywordPresent) "failure" else "success",
+        "context" to entry.label,
+        "description" to if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
+    )
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
+
+    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
+    status.requireSuccess("Error: could not update \"${entry.label}\" status for $headSha (HTTP $status)")
+}
+
+fun runKeywordLabelMode(prNumber: String) {
+    val (status, body) = ghRepoGet("/pulls/$prNumber")
+    if (status.isHttpError) error("Error: could not fetch PR #$prNumber (HTTP $status)")
+    val pr = body as? JsonObject ?: error("Error: unexpected response format for PR #$prNumber")
+    val prBody = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+    val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
+        ?: error("Error: head SHA missing for PR #$prNumber")
+
+    val bodyLines = prBody.lines()
+    val currentLabels = getPrLabels(prNumber)
+
+    for (entry in keywordLabels) {
+        val keywordPresent = entry.keyword in bodyLines
+        val wasLabeled = entry.label in currentLabels
+
+        // Only comment on an actual state change, otherwise every unrelated description edit would post again.
+        if (keywordPresent != wasLabeled) {
+            setLabel(prNumber, entry.label, keywordPresent)
+            val comment = if (keywordPresent) buildKeywordLabelAddedComment(entry)
+            else buildKeywordLabelRemovedComment(entry)
+            postPrComment(prNumber, comment) { "Error: could not post \"${entry.label}\" comment (HTTP $it)" }
+        }
+
+        // Always published, also when nothing changed, so the status exists on every head SHA.
+        if (entry.blocking) setKeywordLabelStatus(headSha, entry, keywordPresent)
+
+        println("PR #$prNumber: ${entry.keyword} is ${if (keywordPresent) "present" else "absent"}")
+    }
+}
+
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
-if (mode == "mergeconflict") {
+if (mode == "merge_conflict") {
     if (prNumberEnv != null) {
         runMergeConflictMode(prNumberEnv)
     } else {
@@ -933,5 +1019,6 @@ when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
     "changelog" -> runChangelogMode(prNumber)
+    "keyword_labels" -> runKeywordLabelMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
