@@ -25,7 +25,6 @@ import net.minecraft.client.gui.Hud;
 /*import net.minecraft.client.gui.Gui;
 *///?}
 
-
 //~ if < 26.2 'Hud' -> 'Gui'
 @Mixin(Hud.class)
 public abstract class MixinHud {
