@@ -52,7 +52,8 @@ object IslandExceptions {
             IslandType.GARDEN -> garden(baseEntity)
             IslandType.KUUDRA_ARENA -> kuudraArena(baseEntity, nextEntity)
             IslandType.WINTER -> winterIsland(baseEntity)
-            IslandType.GALATEA -> ModernIslandExceptions.galatea(baseEntity, armorStand, nextEntity)
+            IslandType.GALATEA -> ModernIslandExceptions.moongladeMarsh(baseEntity, armorStand, nextEntity)
+            IslandType.TORRHUS_CANYON -> ModernIslandExceptions.torrhus(baseEntity, armorStand, nextEntity)
 
             else -> null
         }
