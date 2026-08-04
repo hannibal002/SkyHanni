@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.pathfind
 
+import at.hannibal2.skyhanni.data.model.graph.GraphNode
+
 sealed interface NavigationCondition {
 
     /**
@@ -15,6 +17,6 @@ sealed interface NavigationCondition {
     /**
      * A condition that the must be passed, is checked every second. Is also checked immediately upon reaching
      */
-    data class SecondPassed(val condition: () -> Boolean) : NavigationCondition
+    data class SecondPassed(val condition: (GraphNode) -> Boolean) : NavigationCondition
 
 }

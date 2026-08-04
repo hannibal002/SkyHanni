@@ -29,7 +29,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object HoneyhiveReminder {
 
-    private val config get() = SkyHanniMod.feature.foraging.honeyhiveConfig
+    private val config get() = SkyHanniMod.feature.foraging.honeyhiveReminder
 
     private val storage get() = ProfileStorageData.profileSpecific?.foraging
 
@@ -52,7 +52,7 @@ object HoneyhiveReminder {
     )
 
     private var notifyOnIslandSwap = false
-    private var currentlyNavigating = true
+    private var currentlyNavigating = false
 
     @HandleEvent(onlyOnIsland = IslandType.TORRHUS_CANYON)
     private fun onChat(event: SkyHanniChatEvent.Allow) {
@@ -98,14 +98,16 @@ object HoneyhiveReminder {
         storage.honeyhiveRemindTime = 5.minutes.fromNow()
     }
 
-    // If location is null then we are excluding the closest hive to that location
+    // If location is not null then we are excluding the closest hive to that location
     private fun startHiveNavigation(startMessage: String, location: LorenzVec? = null) {
         val storage = storage ?: return
 
         val graph = IslandGraphs.currentIslandGraph ?: return
         val nodes = graph.getNodesWithTags(GraphNodeTag.HONEYHIVE).toMutableList()
 
-        location?.let {
+        if (nodes.isEmpty()) return
+
+        location?.let { location ->
             val closest = nodes.minBy { it.position.distance(location) }
             nodes.remove(closest)
         }
@@ -123,7 +125,7 @@ object HoneyhiveReminder {
                     GraphNodeTag.HONEYHIVE.displayName,
                     GraphNodeTag.HONEYHIVE.color.toColor(),
                     onFinish = {
-                        ChatUtils.chat("You visited all ${StringUtils.pluralize(nodes.size, GraphNodeTag.HONEYHIVE.displayName)}s§e.")
+                        ChatUtils.chat("You visited all ${StringUtils.pluralize(nodes.size, GraphNodeTag.HONEYHIVE.displayName)}§e.")
                         storage.honeyhiveRemindTime = 1.hours.fromNow()
                         currentlyNavigating = false
                     },

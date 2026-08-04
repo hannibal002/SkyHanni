@@ -42,7 +42,7 @@ class ForagingConfig {
     @Expose
     @ConfigOption(name = "Honeyhive Reminder", desc = "")
     @Accordion
-    val honeyhiveConfig = HoneyhiveReminderConfig()
+    val honeyhiveReminder = HoneyhiveReminderConfig()
 
     @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Moonglade Marsh.")
