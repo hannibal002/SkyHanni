@@ -18,6 +18,7 @@ class SkyHanniStyleProvider : RuleSetProvider {
                 RuleName("IsInIslandEarlyReturn") to ::IsInIslandEarlyReturn,
                 RuleName("OnlyOnIslandSpecificity") to ::OnlyOnIslandSpecificity,
                 RuleName("PrivateEventListener") to ::PrivateEventListener,
+                RuleName("NoTopLevelDefinition") to ::NoTopLevelDefinition,
             ),
         )
     }

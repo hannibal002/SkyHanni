@@ -113,6 +113,273 @@
     <ID>NoNameShadowing:Renderable.kt:Renderable.Companion.&lt;no name provided&gt;$verticalAlign</ID>
     <ID>NoNameShadowing:Renderable.kt:Renderable.Companion.&lt;no name provided&gt;$width</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt:ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
+    <ID>NoTopLevelDefinition:ArrayNormalization.kt:fun &lt;T&gt; Array&lt;T&gt;.normalizeAsArray</ID>
+    <ID>NoTopLevelDefinition:ArrayNormalization.kt:inline fun &lt;reified T&gt; List&lt;T&gt;.normalizeAsArray</ID>
+    <ID>NoTopLevelDefinition:BlazeSlayerDaggerHelper.kt:private fun HellionShield.other: HellionShield</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addDoublePlant</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addLavas</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addLeaves</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addLeaves2</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addLog</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addLog2</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addModernLogs</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addRedFlower</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addRedstoneOres</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addTallGrass</ID>
+    <ID>NoTopLevelDefinition:BlockCompat.kt:fun MutableList&lt;Block&gt;.addWaters</ID>
+    <ID>NoTopLevelDefinition:BlockRendererDispatcherHook.kt:fun modifyGetModelFromBlockState</ID>
+    <ID>NoTopLevelDefinition:BorderRingConfig.kt:private val DEFAULT_XP_FILLED_COLOR = ChromaColour.fromRGB(0, 255, 255, 0, 255)</ID>
+    <ID>NoTopLevelDefinition:BorderRingConfig.kt:private val DEFAULT_XP_UNFILLED_COLOR = ChromaColour.fromRGB(192, 192, 192, 0, 255)</ID>
+    <ID>NoTopLevelDefinition:CameraRenderStateCompat.kt:fun Camera.getRenderState: CameraRenderState</ID>
+    <ID>NoTopLevelDefinition:CameraRenderStateCompat.kt:fun CameraRenderState.rotation: Quaternionf</ID>
+    <ID>NoTopLevelDefinition:CameraRenderStateCompat.kt:val CameraRenderState.position: Vec3 get() = pos</ID>
+    <ID>NoTopLevelDefinition:CarnivalGoal.kt:private val patternGroup = RepoPattern.group("event.carnival.goals")</ID>
+    <ID>NoTopLevelDefinition:ChatSoundResponse.kt:private const val END_PATTERN = "(?: |§.|!|\\?|\\.)*(?:\$| .*\$)"</ID>
+    <ID>NoTopLevelDefinition:ChatSoundResponse.kt:private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"</ID>
+    <ID>NoTopLevelDefinition:ChatUtils.kt:private const val CHAT_PREFIX = "[SkyHanni] "</ID>
+    <ID>NoTopLevelDefinition:ChatUtils.kt:private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"</ID>
+    <ID>NoTopLevelDefinition:ChatUtils.kt:private const val USER_ERROR_PREFIX = "§c[SkyHanni] "</ID>
+    <ID>NoTopLevelDefinition:ChunkedStatsLine.kt:private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines</ID>
+    <ID>NoTopLevelDefinition:ConfigManager.kt:private fun getBackupFile: File</ID>
+    <ID>NoTopLevelDefinition:CurrentPetDisplay.kt:internal fun PetDisplayConfig.requiresExactCurrentPetXp: Boolean</ID>
+    <ID>NoTopLevelDefinition:DVDLogoRenderable.kt:private fun Renderable.generateRandomStartingPosition</ID>
+    <ID>NoTopLevelDefinition:DeferredItemStack.kt:@Suppress("UNCHECKED_CAST") private fun DataComponentPatch.Builder.removeUnchecked</ID>
+    <ID>NoTopLevelDefinition:DeferredItemStack.kt:@Suppress("UNCHECKED_CAST") private fun DataComponentPatch.Builder.setUnchecked</ID>
+    <ID>NoTopLevelDefinition:DijkstraTree.kt:@Suppress("MapGetWithNotNullAssertionOperator", "UnsafeCallOnNullableType") fun DijkstraTree.findPathToDestination: Pair&lt;Graph, Double&gt;</ID>
+    <ID>NoTopLevelDefinition:DiscordActivityPayload.kt:internal fun buildActivityPayload</ID>
+    <ID>NoTopLevelDefinition:DiscordStatus.kt:private fun getCropMilestoneDisplay: String</ID>
+    <ID>NoTopLevelDefinition:DiscordStatus.kt:private fun getPetDisplay: String</ID>
+    <ID>NoTopLevelDefinition:DragNDrop.kt:fun SafeItemStack.toDragItem</ID>
+    <ID>NoTopLevelDefinition:EliteWeightJson.kt:val EliteLeaderboardType.crop: CropType? get() = (this as? Crop)?.crop</ID>
+    <ID>NoTopLevelDefinition:EliteWeightJson.kt:val EliteLeaderboardType.pest: PestType? get() = (this as? Pest)?.pest</ID>
+    <ID>NoTopLevelDefinition:Enchant.kt:private val PROMISING_SHOVEL = "PROMISING_SHOVEL".toInternalName()</ID>
+    <ID>NoTopLevelDefinition:Enchant.kt:private val STONK_PICKAXE = "STONK_PICKAXE".toInternalName()</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun ArmorStand.getEquipmentSlots: Map&lt;EquipmentSlot, SafeItemStack?&gt;</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun ArmorStand.getHandItem: SafeItemStack?</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun ArmorStand.getInventoryItems: Array&lt;SafeItemStack&gt;</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun ArmorStand.getStandHelmet: SafeItemStack?</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun Entity.getEntityLevel: Level</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun LivingEntity.findHealthReal: Float</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun LivingEntity.getAllEquipment</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") fun Mob.getEntityHelmet: SafeItemStack?</ID>
+    <ID>NoTopLevelDefinition:EntityCompat.kt:@Deprecated("use EntityCompat directly") val Entity.deceased: Boolean get() = this.isRemoved</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:fun clearEntity</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:fun getEntity: Entity?</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:fun getEntityRenderState: EntityRenderState?</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:fun setEntity</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:private var savedEntity: Entity? = null</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:private var savedEntityRenderState: EntityRenderState? = null</ID>
+    <ID>NoTopLevelDefinition:EntityRenderDispatcherHook.kt:val activeHolographicEntities: MutableSet&lt;LivingEntity&gt; = Collections.newSetFromMap(IdentityHashMap())</ID>
+    <ID>NoTopLevelDefinition:ErrorManager.kt:@Suppress("unused") fun requireDevEnv</ID>
+    <ID>NoTopLevelDefinition:ErrorManager.kt:fun requireDevEnv</ID>
+    <ID>NoTopLevelDefinition:EventWaypoint.kt:fun loadEventWaypoints: Map&lt;String, MutableSet&lt;EventWaypoint&gt;&gt;</ID>
+    <ID>NoTopLevelDefinition:FakePlayerRenderable.kt:fun Renderable.Companion.fakePlayer</ID>
+    <ID>NoTopLevelDefinition:FakePlayerRenderable.kt:private fun drawEntityWithoutScissor</ID>
+    <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:fun &lt;T&gt; tabListGuarded: T</ID>
+    <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:fun getPlayerName</ID>
+    <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:operator fun &lt;T&gt; ThreadLocal&lt;T&gt;.getValue: T</ID>
+    <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:operator fun &lt;T&gt; ThreadLocal&lt;T&gt;.setValue</ID>
+    <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:private var tabListGuard by object : ThreadLocal&lt;Boolean&gt;() { override fun initialValue(): Boolean { return false } }</ID>
+    <ID>NoTopLevelDefinition:HideArmorHook.kt:fun shouldHideArmor: Boolean</ID>
+    <ID>NoTopLevelDefinition:HideArmorHook.kt:fun shouldHideHead</ID>
+    <ID>NoTopLevelDefinition:HotfData.kt:private fun calculateCenterOfTheForestLoot: Map&lt;HotfReward, Double&gt;</ID>
+    <ID>NoTopLevelDefinition:HotfData.kt:private val chatConfig get() = SkyHanniMod.feature.chat</ID>
+    <ID>NoTopLevelDefinition:HotfData.kt:private val patternGroup = RepoPattern.group("foraging.hotf")</ID>
+    <ID>NoTopLevelDefinition:HotmData.kt:private fun calculateCoreOfTheMountainLoot: Map&lt;HotmReward, Double&gt;</ID>
+    <ID>NoTopLevelDefinition:HotmData.kt:private val chatConfig get() = SkyHanniMod.feature.chat</ID>
+    <ID>NoTopLevelDefinition:HotmData.kt:private val coreOfTheMountainPerks = mutableMapOf&lt;Int, Map&lt;HotmReward, Double&gt;&gt;()</ID>
+    <ID>NoTopLevelDefinition:HotmData.kt:private val patternGroup = RepoPattern.group("mining.hotm")</ID>
+    <ID>NoTopLevelDefinition:InventoryCompat.kt:fun LocalPlayer.getItemOnCursor: SafeItemStack?</ID>
+    <ID>NoTopLevelDefinition:InventoryCompat.kt:fun slotUnderCursor: Slot?</ID>
+    <ID>NoTopLevelDefinition:InventoryCompat.kt:fun stackUnderCursor: SafeItemStack?</ID>
+    <ID>NoTopLevelDefinition:InventoryCompat.kt:val ContainerScreen.container: AbstractContainerMenu get() = this.menu</ID>
+    <ID>NoTopLevelDefinition:InventoryConfig.kt:private const val EVOLVING_ITEMS_SEARCH_TAG = "Time Pocket, Bottle of Jyrre, Dark Cacao Truffle, Discrite, Moby-Duck, Rosewater Flask"</ID>
+    <ID>NoTopLevelDefinition:ItemCompat.kt:fun Item.getIdentifierString: String</ID>
+    <ID>NoTopLevelDefinition:ItemCompat.kt:fun SafeItemStack.getTooltip: MutableList&lt;Component&gt;</ID>
+    <ID>NoTopLevelDefinition:ItemCompat.kt:fun SafeItemStack.getTooltipCompat: MutableList&lt;String&gt;</ID>
+    <ID>NoTopLevelDefinition:ItemCompat.kt:fun SafeItemStack.setCustomItemName: SafeItemStack</ID>
+    <ID>NoTopLevelDefinition:ItemCompat.kt:fun String.getVanillaItem: Item?</ID>
+    <ID>NoTopLevelDefinition:JacobContestFFNeededDisplay.kt:private fun CropType.getRealBlocksPerSecond: Double</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:fun File.getJson: JsonElement?</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:fun File.writeJson: Boolean</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:fun Iterable&lt;JsonElement&gt;.toJsonArray: JsonArray</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:fun JsonElement.addElementsAfter: JsonArray</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:fun JsonElement.shDeepCopy: JsonElement</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:inline fun &lt;reified T : Any&gt; Gson.fromJson: T</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:inline fun &lt;reified T : Any&gt; Gson.fromJsonOrNull: T?</ID>
+    <ID>NoTopLevelDefinition:JsonUtils.kt:val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun AABB.expand: AABB</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Array&lt;Double&gt;.toLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun BlockPos.toLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun ClientboundLevelParticlesPacket.toLorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun ClientboundLevelParticlesPacket.toOffset</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Entity.getLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Entity.getMotionLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Entity.getPositionLog</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Entity.getPrevLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Entity.getServerLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Rotations.toLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:LorenzVec.kt:fun Vec3.toLorenzVec: LorenzVec</ID>
+    <ID>NoTopLevelDefinition:MayorOverlay.kt:private fun renderPerson: Renderable</ID>
+    <ID>NoTopLevelDefinition:MayorOverlay.kt:private val config get() = SkyHanniMod.feature.gui.mayorOverlay</ID>
+    <ID>NoTopLevelDefinition:MiningEventType.kt:private fun createPlayerHead: SafeItemStack</ID>
+    <ID>NoTopLevelDefinition:ModifyVisualWords.kt:private fun List&lt;StyledCharacter&gt;.toLegacyString: String</ID>
+    <ID>NoTopLevelDefinition:ModifyVisualWords.kt:private fun List&lt;StyledCharacter&gt;.toStyleRuns: List&lt;Pair&lt;String, Style&gt;&gt;</ID>
+    <ID>NoTopLevelDefinition:ModifyVisualWords.kt:private fun String.toStyledCharacterList: List&lt;StyledCharacter&gt;</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getBooleanOrDefault: Boolean</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getByteOrDefault: Byte?</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getCompoundOrDefault: CompoundTag</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getDoubleOrDefault: Double</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getFloatOrDefault: Float</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getIntOrDefault: Int</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getLongOrDefault: Long</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun CompoundTag.getStringOrDefault: String</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun ListTag.getCompoundOrDefault: CompoundTag</ID>
+    <ID>NoTopLevelDefinition:NbtCompat.kt:fun ListTag.getStringOrDefault: String</ID>
+    <ID>NoTopLevelDefinition:NeuNbtInfoJson.kt:fun SkullOwnerInfo.toGameProfile: GameProfile</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:/** * TODO * * arrow in direction in 2d user frame space: if close to player point is out of player looking direction/frustum * * show distance to target 5 blocks in front of path * option to show x more worse paths, in different colors, only the ones that actually have a different * node structure around the 5 blocks in front of you * * if the closest node and the path to it is not visible, move further down the line of currently moves paths to * find the spot where to start the curve from. and if that also doesn't work, find a new edge on the actual graph to start the path on. * * do not jump forward if the path is higher than the user location * * fix the rendering being weird when moving up a ladder, same issue when diving */ private const val SUBDIVISION_STEP = 0.5</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:// blocks to look ahead along the path when computing the bezier tangent at the curve endpoint private const val TANGENT_LOOKAHEAD = 1.5</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:// distance in blocks above/below a water surface crossing where depth testing is disabled private const val PEEK_DISTANCE = 4.0</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val ANCHOR_FORWARD_DIST = 0.7</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val ANCHOR_Y_OFFSET = -1.0</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val CONTROL_POINT_SCALE = 0.5</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val CURVE_RADIUS = 8.0</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val FAR_LINE_WIDTH = 4</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private const val NEAR_LINE_WIDTH = 6</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private fun LorenzVec.isWater: Boolean</ID>
+    <ID>NoTopLevelDefinition:PathRenderer.kt:private val waterBlocks = buildList { addWaters() }</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:internal fun PetDisplayConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun BorderRingConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun ExpSharePetDisplayConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun IconConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun IconRotationConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun PetItemConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun PetTextDisplaySettings.settingsRenderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun RarityBackgroundConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun TextPetDisplayConfig.ExpSharePetTextConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun TextPetDisplayConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun VisualPetDisplayConfig.BackgroundColorConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderHash.kt:private fun VisualPetDisplayConfig.renderHash: Int</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderables.kt:internal fun ChromaColour.withOpacity: ChromaColour</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderables.kt:internal fun Renderable.anchorToSelf</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderables.kt:internal fun Renderable.wrapInPetItemOrSelf: Renderable</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderables.kt:internal fun buildCircularContainer: Renderable</ID>
+    <ID>NoTopLevelDefinition:PetDisplayRenderables.kt:private fun Renderable.renderCentered</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:internal fun List&lt;ExpSharePetState&gt;.buildBundledExpShareTextRenderables: List&lt;Renderable&gt;</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:internal fun PetData.buildTextRenderableOrNull: Renderable?</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:internal fun Renderable.withWidgetWarning: Renderable</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:internal fun combineMainAndExpShareTextRenderables: Renderable?</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:internal fun combineVisualAndTextRenderables: Renderable?</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun Double.formatExpByConfigOption</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun Double.formatLevelProgressionPercentage: String</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun Renderable.renderAt</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun combineAnchoredVisualAndTextRenderables: Renderable</ID>
+    <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun formatExpPairByConfigOption: String</ID>
+    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.empty</ID>
+    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.emptyText</ID>
+    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.placeholder</ID>
+    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:private val empty = Renderable.placeholder(0, 0)</ID>
+    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:private val emptyText = Renderable.placeholder(0, 10)</ID>
+    <ID>NoTopLevelDefinition:RenderItemHook.kt:fun renderItemOverlayPost</ID>
+    <ID>NoTopLevelDefinition:RenderItemHook.kt:fun renderItemReturn</ID>
+    <ID>NoTopLevelDefinition:RenderableUtils.kt:@JvmName("componentListToRenderables") fun List&lt;Component&gt;.toRenderables: List&lt;Renderable&gt;</ID>
+    <ID>NoTopLevelDefinition:RenderableUtils.kt:@JvmName("stringListToRenderables") fun List&lt;String&gt;.toRenderables: List&lt;Renderable&gt;</ID>
+    <ID>NoTopLevelDefinition:RenderableUtils.kt:fun MutableList&lt;Renderable&gt;.addLine</ID>
+    <ID>NoTopLevelDefinition:RepoFileSystem.kt:private const val MAX_EMPTY_TGZ_ENTRIES = 10</ID>
+    <ID>NoTopLevelDefinition:SafeItemStack.kt://~ if &lt; 26.1 ' item?.value() ?: Items.AIR' -&gt; ' item' val SafeItemStack.itemType: Item get() = item?.value() ?: Items.AIR</ID>
+    <ID>NoTopLevelDefinition:SafeItemStack.kt:fun SafeItemStack: SafeItemStack</ID>
+    <ID>NoTopLevelDefinition:SafeItemStack.kt:private fun createItemStackTemplate: ItemStackTemplate</ID>
+    <ID>NoTopLevelDefinition:SafeItemStackUtils.kt:fun SafeItemStack.ensureComponentsBound: SafeItemStack</ID>
+    <ID>NoTopLevelDefinition:ScoreboardCompat.kt:fun Collection&lt;PlayerScoreEntry&gt;.getPlayerNames: List&lt;Component&gt;</ID>
+    <ID>NoTopLevelDefinition:ScoreboardCompat.kt:fun Scoreboard.getSidebarObjective: Objective?</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:const val SEARCH_PREFIX = "§eSearch: §7"</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun List&lt;Searchable&gt;.buildSearchBox: Renderable</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun List&lt;Searchable&gt;.buildSearchableScrollable: Renderable</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun List&lt;Searchable&gt;.toMap</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun List&lt;Searchable&gt;.toRenderable</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun Map&lt;List&lt;Renderable&gt;, String&gt;.buildSearchableTable: Renderable</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun Renderable.toSearchable</ID>
+    <ID>NoTopLevelDefinition:Searchable.kt:fun Searchable.toRenderable</ID>
+    <ID>NoTopLevelDefinition:SizeLimitedCache.kt:@Deprecated("Use at.hannibal2.skyhanni.utils.collection.SizeLimitedCache import instead") fun &lt;K : Any, V : Any&gt; SizeLimitedCache: SizeLimitedCache&lt;K, V&gt;</ID>
+    <ID>NoTopLevelDefinition:SizeLimitedSet.kt:@Deprecated("Use at.hannibal2.skyhanni.utils.collection.SizeLimitedSet import instead") fun &lt;T : Any&gt; SizeLimitedSet: SizeLimitedSet&lt;T&gt;</ID>
+    <ID>NoTopLevelDefinition:SkyHanniTypeAdapters.kt:@Suppress("UNCHECKED_CAST") fun GsonBuilder.registerSkyHanniAdapters: GsonBuilder</ID>
+    <ID>NoTopLevelDefinition:SkyblockGuideHighlightFeature.kt:private const val KEY_PREFIX_CONDITION = "condition"</ID>
+    <ID>NoTopLevelDefinition:SkyblockGuideHighlightFeature.kt:private const val KEY_PREFIX_INVENTORY = "inventory"</ID>
+    <ID>NoTopLevelDefinition:SkyblockGuideHighlightFeature.kt:private val patternGroup = RepoPattern.group("skyblockguide.highlight")</ID>
+    <ID>NoTopLevelDefinition:SkyblockStat.kt:@Language("RegExp") private const val VALUE_PATTERN = "(?&lt;value&gt;[\\d,.]+)(?: .*)?"</ID>
+    <ID>NoTopLevelDefinition:SkyblockStat.kt:private val patternGroup = RepoPattern.group("stats")</ID>
+    <ID>NoTopLevelDefinition:SlidingWindow.kt:fun &lt;F&gt; SlidingWindow.absoluteProvider: (elements: Iterable&lt;F&gt;) -&gt; IntRange</ID>
+    <ID>NoTopLevelDefinition:SlidingWindow.kt:fun &lt;P&gt; SlidingWindow.relativeProvider: (elements: Iterable&lt;P&gt;) -&gt; IntRange</ID>
+    <ID>NoTopLevelDefinition:TabWidget.kt:private val repoGroup by RepoPattern.exclusiveGroup("tab.widgetcomponent.enum")</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@Deprecated("Use string unless you really need color codes") @Suppress("DEPRECATION") fun Component?.formattedTextCompatLeadingWhite: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@Deprecated("Use string unless you really need color codes") @Suppress("DEPRECATION") fun Component?.formattedTextCompatLeadingWhiteLessResets: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@Deprecated("Use string unless you really need color codes") @Suppress("DEPRECATION") fun Component?.formattedTextCompatLessResets: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@Deprecated("Use string unless you really need color codes") fun Component.unformattedTextCompat: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@Deprecated("Use string unless you really need color codes") fun Component.unformattedTextForChatCompat: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:@JvmOverloads @Deprecated("Use string unless you really need color codes") fun Component?.formattedTextCompat: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun ClickEvent.value: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.append: MutableComponent</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.changeColor: Component</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.convertToJsonString: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.copyIfNeeded: MutableComponent</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.iterator: Sequence&lt;Component&gt;</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Component.replace: MutableComponent?</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun HoverEvent.value: Component</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun List&lt;Any&gt;.mapToComponents: List&lt;Component&gt;</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun MutableComponent.append: MutableComponent</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun MutableComponent.appendWithColor: MutableComponent</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun MutableComponent.withColor: MutableComponent</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Style.chatStyle</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Style.setClickRunCommand: Style</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Style.setHoverShowText: Style</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Style.takeUnlessEmpty: Style?</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun Style?.orEmpty: Style</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun TextColor.toChatFormatting: ChatFormatting?</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun addChatMessageToChat</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun addDeletableMessageToChat</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun componentBuilder: Component</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun createHoverEvent: HoverEvent?</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun createResourceLocation: Identifier</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:fun idToMessageSignature: MessageSignature</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:operator fun Component.plus: Component</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private fun Component.computeUnformattedTextCompat: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private fun Component?.computeFormattedTextCompat: String</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private fun replace: MutableComponent?</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private val formattedTextCache = TimeLimitedCache&lt;TextCacheKey, String&gt;(3.minutes)</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private val textColorLUT = ChatFormatting.entries .mapNotNull { formatting -&gt; TextColor.fromLegacyFormat(formatting)?.let { it.value to formatting } } .toMap()</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:private val unformattedTextCache = TimeLimitedCache&lt;Component, String&gt;(3.minutes)</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:val ALWAYS get(): (Style?) -&gt; Boolean = { true }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:val defaultStyleConstructor: Style get() = Style.EMPTY</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:val formattingPattern = Regex("§.(?:§.)?")</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:val map = mutableMapOf&lt;Int, MessageSignature&gt;()</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.command: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.RUN_COMMAND }?.let { (it as ClickEvent.RunCommand).command } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.RunCommand(value.orEmpty()))) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.hover: Component? get() = this.style.hoverEvent?.takeIf { it.action() == HoverEvent.Action.SHOW_TEXT }?.let { (it as HoverEvent.ShowText).value } set(value) { value?.let { new -&gt; this.copyIfNeeded().withStyle { it.withHoverEvent(HoverEvent.ShowText(new)) } } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.stackHover: SafeItemStack? get() = this.style.hoverEvent?.takeIf { it.action() == HoverEvent.Action.SHOW_ITEM }?.let { //~ if &lt; 26.1 '.item.create()' -&gt; '.item' (it as HoverEvent.ShowItem).item.create() } set(value) { value?.let { new -&gt; this.copyIfNeeded().withStyle { //~ if &lt; 26.1 'ItemStackTemplate.fromNonEmptyStack(new)' -&gt; 'new' it.withHoverEvent(HoverEvent.ShowItem(ItemStackTemplate.fromNonEmptyStack(new))) } } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.suggest: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.SUGGEST_COMMAND }?.let { (it as ClickEvent.SuggestCommand).command } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.SuggestCommand(value.orEmpty()))) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var Component.url: String? get() = this.style.clickEvent?.takeIf { it.action() == ClickEvent.Action.OPEN_URL }?.let { (it as ClickEvent.OpenUrl).uri.toString() } set(value) { this.copyIfNeeded().withStyle { (it.withClickEvent(ClickEvent.OpenUrl(URI.create(value.orEmpty())))) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.bold: Boolean get() = this.style.isBold set(value) { this.withStyle { it.withBold(value) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.italic: Boolean get() = this.style.isItalic set(value) { this.withStyle { it.withItalic(value) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.obfuscated: Boolean get() = this.style.isObfuscated set(value) { this.withStyle { it.withObfuscated(value) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.strikethrough: Boolean get() = this.style.isStrikethrough set(value) { this.withStyle { it.withStrikethrough(value) } }</ID>
+    <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.underlined: Boolean get() = this.style.isUnderlined set(value) { this.withStyle { it.withUnderlined(value) } }</ID>
+    <ID>NoTopLevelDefinition:TextRenderable.kt:fun Renderable.Companion.text</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_DAYS = FACTOR_HOURS * 24</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_HOURS = FACTOR_MINUTES * 60</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_MINUTES = FACTOR_SECONDS * 60</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_SECONDS = 1000L</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_YEARS = (FACTOR_DAYS * 365.25).toLong()</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.inPartialDays: Double get() = toDouble(DurationUnit.DAYS)</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.inPartialHours: Double get() = toDouble(DurationUnit.HOURS)</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.inPartialMilliseconds: Double get() = toDouble(DurationUnit.MILLISECONDS)</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.inPartialMinutes: Double get() = toDouble(DurationUnit.MINUTES)</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Duration.roundedUpSeconds: Int get() = ceil(inPartialSeconds).toInt()</ID>
+    <ID>NoTopLevelDefinition:TimeUtils.kt:val Long.years: Duration get() = this.times(365.25).days</ID>
+    <ID>NoTopLevelDefinition:ToolTipTextEvent.kt:fun MutableList&lt;Component&gt;.add</ID>
+    <ID>NoTopLevelDefinition:ToolTipTextEvent.kt:fun MutableList&lt;Component&gt;.addAll</ID>
+    <ID>NoTopLevelDefinition:UnknownLinesHandler.kt:internal fun recentUnknownLines</ID>
+    <ID>NoTopLevelDefinition:UnknownLinesHandler.kt:internal var allUnknownLines = listOf&lt;UnknownLine&gt;()</ID>
+    <ID>NoTopLevelDefinition:UnknownLinesHandler.kt:internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()</ID>
     <ID>NoUnusedImports:CarnivalQuickStart.kt:at.hannibal2.skyhanni.features.event.carnival.CarnivalQuickStart.kt</ID>
     <ID>NoUnusedImports:CarnivalShopHelper.kt:at.hannibal2.skyhanni.features.inventory.CarnivalShopHelper.kt</ID>
     <ID>NoUnusedImports:CraftMaterialCollector.kt:at.hannibal2.skyhanni.features.inventory.bazaar.CraftMaterialCollector.kt</ID>
@@ -143,9 +410,6 @@
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent fun onMobDeSpawn</ID>
     <ID>PrivateEventListener:ActiveBossTransparency.kt:ActiveBossTransparency$@HandleEvent(onlyOnSkyblock = true) fun onClickEntity</ID>
     <ID>PrivateEventListener:ActualGemstonePowderDisplay.kt:ActualGemstonePowderDisplay$@HandleEvent(priority = HandleEvent.LOW) fun onChat</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:AnitaExtraFarmingFortune.kt:AnitaExtraFarmingFortune$@HandleEvent fun onToolTip</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AnitaMedalProfit.kt:AnitaMedalProfit$@HandleEvent fun onInventoryClose</ID>
@@ -209,11 +473,6 @@
     <ID>PrivateEventListener:AttributeOverlay.kt:AttributeOverlay$@HandleEvent fun onRenderItemOverlayPost</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(InventoryUpdatedEvent::class, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:AttributeShardOverlay.kt:AttributeShardOverlay$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.HIGHEST) fun onShardGain</ID>
-    <ID>PrivateEventListener:AttributeShardsData.kt:AttributeShardsData$@HandleEvent(priority = HandleEvent.LOWEST) fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:AttributesShardsInventory.kt:AttributesShardsInventory$@HandleEvent(onlyOnSkyblock = true) fun onRenderItemTip</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:AuctionHouseCopyUnderbidPrice.kt:AuctionHouseCopyUnderbidPrice$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
@@ -370,9 +629,6 @@
     <ID>PrivateEventListener:CFApi.kt:CFApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(InventoryCloseEvent::class) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CFBarnManager.kt:CFBarnManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onCommandSend</ID>
-    <ID>PrivateEventListener:CFBlockOpen.kt:CFBlockOpen$@HandleEvent(onlyOnSkyblock = true) fun onSlotClick</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:CFCustomReminder.kt:CFCustomReminder$@HandleEvent fun onConfigFix</ID>
@@ -451,8 +707,6 @@
     <ID>PrivateEventListener:CakeTracker.kt:CakeTracker$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:CakeTracker.kt:CakeTracker$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:Calculator.kt:Calculator$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:CalendarApi.kt:CalendarApi$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.HIGH) fun onInventoryOpen</ID>
-    <ID>PrivateEventListener:CalendarApi.kt:CalendarApi$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onInventoryClose</ID>
     <ID>PrivateEventListener:CarnivalAPI.kt:CarnivalAPI$@HandleEvent fun onAreaChange</ID>
     <ID>PrivateEventListener:CarnivalAPI.kt:CarnivalAPI$@HandleEvent(MayorChangeEvent::class, onlyOnIsland = IslandType.HUB) fun onMayorChange</ID>
     <ID>PrivateEventListener:CarnivalFruitDigging.kt:CarnivalFruitDigging$@HandleEvent fun onBlockChange</ID>
@@ -701,9 +955,6 @@
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:CruxTalismanDisplay.kt:CruxTalismanDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:CrystalHollowsNamesInCore.kt:CrystalHollowsNamesInCore$@HandleEvent(SecondPassedEvent::class, onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:CrystalHollowsWalls.kt:CrystalHollowsWalls$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:CrystalNucleusApi.kt:CrystalNucleusApi$@HandleEvent fun onIslandChange</ID>
     <ID>PrivateEventListener:CrystalNucleusApi.kt:CrystalNucleusApi$@HandleEvent fun onOwnInventoryItemUpdate</ID>
@@ -895,14 +1146,6 @@
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onItemAdd</ID>
     <ID>PrivateEventListener:DragonProfitTracker.kt:DragonProfitTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onScoreboardUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTabUpdate</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onTablistChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onBlockClick</ID>
-    <ID>PrivateEventListener:DungeonApi.kt:DungeonApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:DungeonArchitectFeatures.kt:DungeonArchitectFeatures$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onDungeonEnd</ID>
     <ID>PrivateEventListener:DungeonBossApi.kt:DungeonBossApi$@HandleEvent fun onWorldChange</ID>
@@ -997,13 +1240,6 @@
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:EasterEggWaypoints.kt:EasterEggWaypoints$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun readPestRepellent</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun readSalts</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
-    <ID>PrivateEventListener:EffectApi.kt:EffectApi$@HandleEvent(onlyOnSkyblock = true) fun readEffects</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:EggAchievement.kt:EggAchievement$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:ElectionApi.kt:ElectionApi$@HandleEvent fun onConfigLoad</ID>
@@ -1383,15 +1619,6 @@
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:GardenLevelDisplay.kt:GardenLevelDisplay$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent fun onWidgetUpdate</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.ChestGuiOverlayRenderEvent::class) fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(InventoryCloseEvent::class, onlyOnIsland = IslandType.GARDEN) fun onInventoryClose</ID>
-    <ID>PrivateEventListener:GardenNextJacobContest.kt:GardenNextJacobContest$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:GardenNextPlotPrice.kt:GardenNextPlotPrice$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onToolTip</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent fun onGardenToolChange</ID>
     <ID>PrivateEventListener:GardenOptimalAngles.kt:GardenOptimalAngles$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onGuiOpen</ID>
@@ -1485,20 +1712,6 @@
     <ID>PrivateEventListener:GeyserFishing.kt:GeyserFishing$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onRenderWorld</ID>
     <ID>PrivateEventListener:GeyserFishing.kt:GeyserFishing$@HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true) fun onParticle</ID>
     <ID>PrivateEventListener:GfSKeybind.kt:GfSKeybind$@HandleEvent fun onKey</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onIslandChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onItemAdd</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onPurseChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onSackChange</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onShard</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onSkillExp</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent fun onWidgetUpdate</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:GhostTracker.kt:GhostTracker$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:GiftApi.kt:GiftApi$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:GiftApi.kt:GiftApi$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
     <ID>PrivateEventListener:GiftCleanDisplay.kt:GiftCleanDisplay$@HandleEvent(onlyOnSkyblock = true) fun onNameTagRender</ID>
@@ -1525,7 +1738,6 @@
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onPlayerMove</ID>
     <ID>PrivateEventListener:GraphEditor.kt:GraphEditor$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:GraphEditorBugFinder.kt:GraphEditorBugFinder$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:GraphEditorInput.kt:GraphEditorInput$@HandleEvent(onlyOnSkyblock = true) fun onPlayerMove</ID>
     <ID>PrivateEventListener:GraphEditorRenderer.kt:GraphEditorRenderer$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:GraphEditorRenderer.kt:GraphEditorRenderer$@HandleEvent(priority = HandleEvent.HIGHEST) fun onRenderWorld</ID>
@@ -1569,12 +1781,6 @@
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onKeyPress</ID>
     <ID>PrivateEventListener:GuiEditManager.kt:GuiEditManager$@HandleEvent fun onTick</ID>
     <ID>PrivateEventListener:GuildApi.kt:GuildApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onAreaChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onArmorChange</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onEntityClick</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:GummyWarning.kt:GummyWarning$@HandleEvent(onlyOnSkyblock = true) fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:HalloweenBasketWaypoints.kt:HalloweenBasketWaypoints$@HandleEvent fun onRenderWorld</ID>
@@ -1622,15 +1828,8 @@
     <ID>PrivateEventListener:HideMobNames.kt:HideMobNames$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:HideMobNames.kt:HideMobNames$@HandleEvent(onlyOnSkyblock = true) fun onCheckRender</ID>
     <ID>PrivateEventListener:HideNotClickableConfig.kt:HideNotClickableConfig.Companion$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent fun onSlotClick</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent(onlyOnSkyblock = true) fun onForegroundDrawn</ID>
-    <ID>PrivateEventListener:HideNotClickableItems.kt:HideNotClickableItems$@HandleEvent(priority = HandleEvent.LOWEST) fun onTooltip</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onEntityHealthUpdate</ID>
     <ID>PrivateEventListener:HideSlayerSpawnParticles.kt:HideSlayerSpawnParticles$@HandleEvent(onlyOnSkyblock = true) fun onParticle</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(IslandChangeEvent::class) fun onIslandChange</ID>
-    <ID>PrivateEventListener:HideonleafFinder.kt:HideonleafFinder$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onKeyPress</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent fun onConfigFixEvent</ID>
     <ID>PrivateEventListener:HideonleafHighlighter.kt:HideonleafHighlighter$@HandleEvent(onlyOnIsland = IslandType.GALATEA) fun onMob</ID>
     <ID>PrivateEventListener:HighHeatSound.kt:HighHeatSound$@HandleEvent fun onPlaySound</ID>
@@ -1730,13 +1929,6 @@
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(SecondPassedEvent::class) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityEggsManager.kt:HoppityEggsManager$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HoppityEggsShared.kt:HoppityEggsShared$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onEggSpawned</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent fun onRabbitFound</ID>
-    <ID>PrivateEventListener:HoppityEventSummary.kt:HoppityEventSummary$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderTop</ID>
     <ID>PrivateEventListener:HoppityLiveDisplay.kt:HoppityLiveDisplay$@HandleEvent(onlyOnSkyblock = true) fun onKeyPress</ID>
@@ -1770,7 +1962,6 @@
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
     <ID>PrivateEventListener:HotxFeatures.kt:HotxFeatures$@HandleEvent(onlyOnSkyblock = true) fun onRenderTip</ID>
-    <ID>PrivateEventListener:HuntingBoxValue.kt:HuntingBoxValue$@HandleEvent(onlyOnSkyblock = true) fun onChestGuiRender</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onItemInHandChange</ID>
     <ID>PrivateEventListener:HuntingProfitTracker.kt:HuntingProfitTracker$@HandleEvent fun onRepoReload</ID>
@@ -1847,15 +2038,6 @@
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(HypixelJoinEvent::class) fun onHypixelJoin</ID>
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
     <ID>PrivateEventListener:IslandDetectionWatcher.kt:IslandDetectionWatcher$@HandleEvent(WorldChangeEvent::class) fun onWorldChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onIslandJoin</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onRenderWorld</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(ScoreboardAreaChangeEvent::class) fun onAreaChange</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(onlyOnSkyblock = true) fun onPlayerMove</ID>
-    <ID>PrivateEventListener:IslandGraphs.kt:IslandGraphs$@HandleEvent(priority = -1) fun onTick</ID>
     <ID>PrivateEventListener:IslandType.kt:IslandType.Companion$@HandleEvent(priority = HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:IslandTypeTag.kt:IslandTypeTag.Companion$@HandleEvent fun onRepoReload</ID>
     <ID>PrivateEventListener:ItemAbilityCooldown.kt:ItemAbilityCooldown$@HandleEvent fun onActionBarUpdate</ID>
@@ -2008,10 +2190,6 @@
     <ID>PrivateEventListener:LoadoutApi.kt:LoadoutApi$@HandleEvent(priority = HandleEvent.HIGH, onlyOnSkyblock = true) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:LoadoutSlotHighlight.kt:LoadoutSlotHighlight$@HandleEvent(onlyOnSkyblock = true) fun onBackgroundDrawn</ID>
     <ID>PrivateEventListener:LocationFixData.kt:LocationFixData$@HandleEvent(priority = HandleEvent.LOW) fun onRepoReload</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onChestGuiRender</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryClose</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onInventoryFullyOpened</ID>
-    <ID>PrivateEventListener:LogBookStats.kt:LogBookStats$@HandleEvent fun onProfileChange</ID>
     <ID>PrivateEventListener:LowHealthAlert.kt:LowHealthAlert$@HandleEvent(onlyOnIsland = IslandType.CATACOMBS) fun onScoreboardChange</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:MagicalPowerAchievement.kt:MagicalPowerAchievement$@HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW) fun onAccessoryBagUpdate</ID>
@@ -2027,12 +2205,6 @@
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onEntityEnterWorld</ID>
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onWidgetUpdate</ID>
     <ID>PrivateEventListener:MarkedPlayerManager.kt:MarkedPlayerManager$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(GraphAreaChangeEvent::class, onlyOnIsland = IslandType.CRIMSON_ISLE) fun onGraphAreaChange</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(IslandGraphReloadEvent::class) fun onIslandGraphReload</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onMobDespawn</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onMobSpawn</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:MatriarchHelper.kt:MatriarchHelper$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onTick</ID>
     <ID>PrivateEventListener:MaxPurseItems.kt:MaxPurseItems$@HandleEvent fun onChestGuiRender</ID>
     <ID>PrivateEventListener:MaxwellApi.kt:MaxwellApi$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:MaxwellApi.kt:MaxwellApi$@HandleEvent fun onRepoReload</ID>
@@ -2080,18 +2252,6 @@
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:MineshaftWaypoints.kt:MineshaftWaypoints$@HandleEvent(onlyOnIsland = IslandType.MINESHAFT) fun onPacketReceived</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onBlockChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onBlockClick</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onIslandChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onPlaySound</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onPlayerDeath</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onRepoReload</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onScoreboardChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:MiningApi.kt:MiningApi$@HandleEvent(ScoreboardAreaChangeEvent::class) fun onAreaChange</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:MiningCommissionsBlocksColor.kt:MiningCommissionsBlocksColor$@HandleEvent fun onDebugDataCollect</ID>
@@ -2229,7 +2389,6 @@
     <ID>PrivateEventListener:MythologicalCreatureTracker.kt:MythologicalCreatureTracker$@HandleEvent fun onRepoLoaded</ID>
     <ID>PrivateEventListener:NavigationFeedback.kt:NavigationFeedback$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NavigationFeedback.kt:NavigationFeedback$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:NavigationHelper.kt:NavigationHelper$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NeuItemStackProvider.kt:NeuItemStackProvider.Companion$@HandleEvent(priority = HandleEvent.LOW) fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:NeuItems.kt:NeuItems$@HandleEvent fun onNeuRepoReload</ID>
     <ID>PrivateEventListener:NeuItems.kt:NeuItems$@HandleEvent fun onRepoReload</ID>
@@ -2241,14 +2400,6 @@
     <ID>PrivateEventListener:NoBitsWarning.kt:NoBitsWarning$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:NoBreak.kt:NoBreak$@HandleEvent(onlyOnIsland = IslandType.GARDEN) fun onBlockClick</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onEffectUpdate</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onProfileJoin</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onSecondPassed</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:NonGodPotEffectDisplay.kt:NonGodPotEffectDisplay$@HandleEvent(onlyOnSkyblock = true) fun onTabUpdate</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:NotificationManager.kt:NotificationManager$@HandleEvent fun onKeyPress</ID>
@@ -2547,11 +2698,6 @@
     <ID>PrivateEventListener:ReforgeHelper.kt:ReforgeHelper$@HandleEvent fun onSlotClick</ID>
     <ID>PrivateEventListener:ReforgeHelper.kt:ReforgeHelper$@HandleEvent(onlyOnSkyblock = true) fun onInventoryFullyOpened</ID>
     <ID>PrivateEventListener:ReindrakeWarpHelper.kt:ReindrakeWarpHelper$@HandleEvent fun onChat</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent fun onSlayerProgressChange</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent fun onSystemMessage</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(GraphAreaChangeEvent::class) fun onAreaChange</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(ProfileJoinEvent::class) fun onProfileJoin</ID>
-    <ID>PrivateEventListener:RemainingSlayerKills.kt:RemainingSlayerKills$@HandleEvent(priority = HIGHEST) fun onRepoReload</ID>
     <ID>PrivateEventListener:ReminderHudDisplay.kt:ReminderHudDisplay$@HandleEvent(onlyOnSkyblock = true) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:ReminderHudDisplay.kt:ReminderHudDisplay$@HandleEvent(onlyOnSkyblock = true) fun onSecondPassed</ID>
     <ID>PrivateEventListener:ReminderManager.kt:ReminderManager$@HandleEvent fun onCommandRegistration</ID>
@@ -2832,13 +2978,6 @@
     <ID>PrivateEventListener:SkyhanniTimedTracker.kt:SkyhanniTimedTracker.Companion$@HandleEvent fun onConfigLoad</ID>
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent fun onAchievementRegistration</ID>
     <ID>PrivateEventListener:SlayerAchievements.kt:SlayerAchievements$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent fun onDebugDataCollect</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(ConfigLoadEvent::class) fun onConfigLoad</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(GraphAreaChangeEvent::class, priority = -1) fun onAreaChange</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(ScoreboardUpdateEvent::class, onlyOnSkyblock = true) fun onScoreboardChange</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onChat</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onTick</ID>
-    <ID>PrivateEventListener:SlayerApi.kt:SlayerApi$@HandleEvent(onlyOnSkyblock = true) fun onWidgetUpdate</ID>
     <ID>PrivateEventListener:SlayerBossSpawnSoon.kt:SlayerBossSpawnSoon$@HandleEvent fun onSlayerProgressChange</ID>
     <ID>PrivateEventListener:SlayerCocoonWarning.kt:SlayerCocoonWarning$@HandleEvent fun onChatMessage</ID>
     <ID>PrivateEventListener:SlayerConfig.kt:SlayerConfig.Companion$@HandleEvent fun onConfigFix</ID>
@@ -2949,14 +3088,6 @@
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent fun onRenderWorld</ID>
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:SummoningSoulsName.kt:SummoningSoulsName$@HandleEvent(SkyHanniTickEvent::class) fun onTick</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onActionBar</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onAreaChanged</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onChat</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onGuiRender</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onInventoryUpdated</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onMobSpawn</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onScoreboardUpdate</ID>
-    <ID>PrivateEventListener:SunGeckoHelper.kt:SunGeckoHelper$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onTick</ID>
     <ID>PrivateEventListener:SuperCraftFeatures.kt:SuperCraftFeatures$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:SuperCraftPresets.kt:SuperCraftPresets$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:SuperCraftPresets.kt:SuperCraftPresets$@HandleEvent(onlyOnSkyblock = true) fun onGuiOpen</ID>
@@ -2974,12 +3105,6 @@
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryOpen</ID>
     <ID>PrivateEventListener:SuperpairsClicksAlert.kt:SuperpairsClicksAlert$@HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND) fun onInventoryUpdated</ID>
     <ID>PrivateEventListener:TabComplete.kt:TabComplete$@HandleEvent fun handleTabComplete</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent fun onTick</ID>
-    <ID>PrivateEventListener:TabListData.kt:TabListData$@HandleEvent(receiveCancelled = true) fun onPacketReceive</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListFooterUpdate</ID>
-    <ID>PrivateEventListener:TabListReader.kt:TabListReader$@HandleEvent(onlyOnSkyblock = true) fun onTabListUpdate</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onConfigFix</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent fun onSkipTablistLine</ID>
     <ID>PrivateEventListener:TabListRenderer.kt:TabListRenderer$@HandleEvent(onlyOnSkyblock = true) fun onRenderOverlayPre</ID>
@@ -3115,23 +3240,8 @@
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onGuildChat</ID>
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onPartyChat</ID>
     <ID>PrivateEventListener:TranslatorCommand.kt:TranslatorCommand$@HandleEvent(priority = HandleEvent.LOWEST) fun onPrivateChat</ID>
-    <ID>PrivateEventListener:TravelingZooPetInCalendar.kt:TravelingZooPetInCalendar$@HandleEvent fun onTooltip</ID>
     <ID>PrivateEventListener:TreeProgressDisplay.kt:TreeProgressDisplay$@HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onGuiRenderOverlay</ID>
     <ID>PrivateEventListener:TreeProgressDisplay.kt:TreeProgressDisplay$@OptIn(AllEntitiesGetter::class) @HandleEvent(onlyOnIslandTypeTag = [IslandTypeTag.FORAGING_CUSTOM_TREES]) fun onTick</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onConfigFix</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onGraphAreaChange</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onTabListUpdate</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent fun onWorldChange</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(GuiRenderEvent.GuiOverlayRenderEvent::class, priority = HandleEvent.LOWEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onGuiRenderOverlay</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onChat</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onEntityEnterWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onEntityLeaveWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onKeyPress</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onRenderWorld</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onSecondPassed</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onTick</ID>
-    <ID>PrivateEventListener:TrevorFeatures.kt:TrevorFeatures$@HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onCheckRender</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent fun onWorldChange</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onChat</ID>
     <ID>PrivateEventListener:TrevorTracker.kt:TrevorTracker$@HandleEvent(onlyOnIsland = IslandType.THE_FARMING_ISLANDS) fun onGuiRenderOverlay</ID>
@@ -3232,12 +3342,6 @@
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onVanquisherDeath</ID>
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE) fun onVanquisherSpawn</ID>
     <ID>PrivateEventListener:VanquisherWaypointShare.kt:VanquisherWaypointShare$@HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE, receiveCancelled = true) fun onReadChat</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onAreaChange</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onConfigLoad</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityEnterWorld</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityEquipmentChange</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onEntityMaxHealthUpdate</ID>
-    <ID>PrivateEventListener:VerminHighlighter.kt:VerminHighlighter$@HandleEvent fun onItemInHandChange</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent fun onCommandRegistration</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent fun onIslandChange</ID>
     <ID>PrivateEventListener:VerminTracker.kt:VerminTracker$@HandleEvent(onlyOnIsland = IslandType.THE_RIFT) fun onChat</ID>
@@ -3280,7 +3384,6 @@
     <ID>PrivateEventListener:WikiManager.kt:WikiManager$@HandleEvent(onlyOnSkyblock = true) fun onMessageSendToServer</ID>
     <ID>PrivateEventListener:WikiManager.kt:WikiManager$@HandleEvent(priority = HandleEvent.LOW) fun onRepoReload</ID>
     <ID>PrivateEventListener:WikiNpcComparator.kt:WikiNpcComparator$@HandleEvent fun onCommandRegistration</ID>
-    <ID>PrivateEventListener:WinterApi.kt:WinterApi$@HandleEvent fun onAreaChange</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onBlockClick</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onChat</ID>
     <ID>PrivateEventListener:WoodenButtonsHelper.kt:WoodenButtonsHelper$@HandleEvent fun onItemClick</ID>
@@ -3647,7 +3750,6 @@
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalPrice!!</ID>
     <ID>UnsafeCallOnNullableType:VisitorRewardWarning.kt:VisitorRewardWarning$visitor.totalReward!!</ID>
     <ID>UnsafeCallOnNullableType:WorldRenderUtils.kt:WorldRenderUtils$it.name!!</ID>
-    <ID>UnusedParameter:ChromaFontManager.kt:text: String</ID>
     <ID>UnusedParameter:CropType.kt:CropType.Companion$pos: LorenzVec</ID>
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$armorStand: ArmorStand?</ID>
