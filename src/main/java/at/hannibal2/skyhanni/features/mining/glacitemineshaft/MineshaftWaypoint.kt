@@ -37,6 +37,12 @@ data class MineshaftWaypoint(
             fillColor = { LorenzColor.YELLOW },
             renderCondition = { config.types.ladder },
         ),
+        POTENTIAL_CORPSE(
+            label = { "Potential Corpse" },
+            labelColor = LorenzColor.AQUA,
+            fillColor = { LorenzColor.AQUA },
+            renderCondition = { config.types.potentialCorpse },
+        ),
         FOUND_CORPSE(
             label = { "${it.corpseType?.type ?: "Unknown"} Corpse" },
             labelColor = LorenzColor.YELLOW,
