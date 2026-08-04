@@ -41,7 +41,7 @@ object HideyhoFinder {
         "end", "\\[MOB] Hideyho: Aah! You found me!",
     )
 
-    val HIDEYHO_TEXTURE get() = SkullTextureHolder.getTexture("HIDEYHO")
+    private val HIDEYHO_TEXTURE get() = SkullTextureHolder.getTexture("HIDEYHO")
 
     private var currentlyNavigating = true
     private var startLocation: LorenzVec? = null
