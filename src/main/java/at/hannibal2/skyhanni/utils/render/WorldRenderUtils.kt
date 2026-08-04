@@ -923,7 +923,10 @@ object WorldRenderUtils {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
             listOf(
-                exactPlayerCrosshairLocation(),
+                this.exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle
+                    .toLorenzVec()
+                    /* .rotateXZ(-Math.PI / 72.0) */
+                    .times(2),
             )
         } else {
             emptyList()
@@ -1054,10 +1057,8 @@ object WorldRenderUtils {
         return exactLocation(player).add(y = eyeHeight)
     }
 
-    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec {
-        val look = Vector3f(0f, 0f, -1f).rotate(camera.rotation())
-        return camera.position.toLorenzVec() + LorenzVec(look.x.toDouble(), look.y.toDouble(), look.z.toDouble()).times(2)
-    }
+    internal fun SkyHanniRenderWorldEvent.exactPlayerCrosshairLocation(): LorenzVec =
+        exactPlayerEyeLocation() + MinecraftCompat.localPlayerOrThrow.lookAngle.toLorenzVec().times(2)
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AABB {
         if (entity.deceased) return entity.boundingBox
