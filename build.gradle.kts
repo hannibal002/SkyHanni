@@ -299,6 +299,7 @@ val mixinTest = tasks.register<Test>("mixinTest") {
     group = "verification"
     testClassesDirs = sourceSets.test.get().output.classesDirs
     classpath = sourceSets.test.get().output + sourceSets.main.get().output + mixinTestRuntime
+    systemProperty("skyhanni.minecraftIsObfuscated", !isDeobf)
     filter {
         includeTestsMatching("at.hannibal2.skyhanni.test.MixinTest")
     }

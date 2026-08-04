@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuAttributeShardJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.item.ShardEvent
@@ -24,8 +25,9 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
+import at.hannibal2.skyhanni.utils.ItemUtils.getCleanLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -36,7 +38,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
-import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
@@ -58,9 +59,7 @@ object AttributeShardsData {
     val attributeMenuInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { processAttributeMenuItems() } },
     ) { attributeMenuPattern }
-    val huntingBoxInventory = InventoryDetector(
-        onOpenInventory = { DelayedRun.runNextTick { processHuntingBoxItems() } },
-    ) { huntingBoxPattern }
+    val huntingBoxInventory = InventoryDetector { huntingBoxPattern }
     val bazaarShardsInventory = InventoryDetector(
         onOpenInventory = { DelayedRun.runNextTick { AttributeShardOverlay.updateDisplay() } },
     ) { bazaarShardsInventoryPattern }
@@ -127,167 +126,197 @@ object AttributeShardsData {
     )
 
     /**
-     * REGEX-TEST: §6Nature Elemental
-     * REGEX-TEST: §6Berry Eater IX
-     * REGEX-TEST: §6Essence of Ice I
-     * REGEX-TEST: §6Advanced Mode
+     * REGEX-TEST: Nature Elemental
+     * REGEX-TEST: Berry Eater IX
+     * REGEX-TEST: Essence of Ice I
+     * REGEX-TEST: Advanced Mode
      */
     val attributeShardNamePattern by patternGroup.pattern(
-        "name",
-        "§6(?<name>.+?) ?(?<tier>[IVXL]+)?$",
+        "name.colorless",
+        "(?<name>.+?) ?(?<tier>[IVXL]+)?$",
     )
 
     /**
-     * REGEX-TEST: §7Enabled: §aYes
-     * REGEX-TEST: §7Enabled: §cNo
+     * REGEX-TEST: Enabled: Yes
+     * REGEX-TEST: Enabled: No
      */
     private val attributeStatePattern by patternGroup.pattern(
-        "state",
-        "§7Enabled: §.(?<state>.+)",
+        "state.colorless",
+        "Enabled: (?<state>.+)",
     )
 
     /**
-     * REGEX-TEST: §7Syphon §b1 §7shard to unlock!
-     * REGEX-TEST: §7Syphon §b1 §7shard to level up!
-     * REGEX-TEST: §7Syphon §b3 §7shards to level up!
+     * REGEX-TEST: Syphon 1 shard to unlock!
+     * REGEX-TEST: Syphon 1 shard to level up!
+     * REGEX-TEST: Syphon 3 shards to level up!
      */
     private val syphonAmountPattern by patternGroup.pattern(
-        "syphon.amount",
-        "§7Syphon §b(?<amount>\\d+) §7shards? to (?:level up|unlock)!",
+        "syphon.amount.colorless",
+        "Syphon (?<amount>\\d+) shards? to (?:level up|unlock)!",
     )
 
     /**
-     * REGEX-TEST: §6Veil §8(Combat)
-     * REGEX-TEST: §6Yummy X §8(Foraging)
+     * REGEX-TEST: Veil (Combat)
+     * REGEX-TEST: Yummy X (Foraging)
      */
     private val attributeShardNameLorePattern by patternGroup.pattern(
-        "name.lore",
-        "§6(?<name>.+?) ?(?<tier>[IVXL]+)? §8\\(\\w+\\)$",
+        "name.lore.colorless",
+        "(?<name>.+?) ?(?<tier>[IVXL]+)? \\(\\w+\\)$",
     )
 
     /**
-     * REGEX-TEST: §7Owned: §b1 Shard
-     * REGEX-TEST: §7Owned: §b3 Shards
-     * REGEX-TEST: §7Owned: §b71 Shards
-     * REGEX-TEST: §7Owned: §b1,729 Shards
+     * REGEX-TEST: Owned: 1 Shard
+     * REGEX-TEST: Owned: 3 Shards
+     * REGEX-TEST: Owned: 71 Shards
+     * REGEX-TEST: Owned: 1,729 Shards
      */
     val amountOwnedPattern by patternGroup.pattern(
-        "owned",
-        "§7Owned: §b(?<amount>[\\d,]+) Shards?",
+        "owned.colorless",
+        "Owned: (?<amount>[\\d,]+) Shards?",
     )
 
     /**
-     * REGEX-TEST: §7Required to fuse: §b5
+     * REGEX-TEST: Required to fuse: 5
      */
     val requiredToFusePattern by patternGroup.pattern(
-        "fuse.required",
-        "§7Required to fuse: §b(?<amount>\\d)",
+        "fuse.required.colorless",
+        "Required to fuse: (?<amount>\\d+)",
     )
 
     /**
-     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 1) - 2 more to upgrade!
-     * REGEX-TEST: §a+1 Arthropod Ruler Attribute §r§7(Level 2) - 3 more to upgrade!
-     * REGEX-TEST: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
-     * REGEX-TEST: §a+6 Ender Ruler Attribute §r§7(Level 3) - 3 more to upgrade!
-     * REGEX-FAIL: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
+     * REGEX-TEST: +1 Arthropod Ruler Attribute (Level 1) - 2 more to upgrade!
+     * REGEX-TEST: +1 Arthropod Ruler Attribute (Level 2) - 3 more to upgrade!
+     * REGEX-TEST: +2 Essence of Ice Attribute (Level 2) - 1 more to upgrade!
+     * REGEX-TEST: +6 Ender Ruler Attribute (Level 3) - 3 more to upgrade!
+     * REGEX-FAIL: +43 Essence of Ice Attribute (Level 10) MAXED
      */
     private val shardSyphonedPattern by patternGroup.pattern(
-        "chat.syphoned",
-        "§a\\+(?<amount>\\d+) (?<attributeName>.+) Attribute §r§7\\(Level (?<level>\\d+)\\) - (?<untilNext>\\d+) more to upgrade!",
+        "chat.syphoned.colorless",
+        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) - (?<untilNext>\\d+) more to upgrade!",
     )
 
     /**
-     * REGEX-TEST: §a+43 Essence of Ice Attribute §r§7(Level 10) §r§a§lMAXED
-     * REGEX-FAIL: §a+2 Essence of Ice Attribute §r§7(Level 2) - 1 more to upgrade!
+     * REGEX-TEST: +43 Essence of Ice Attribute (Level 10) MAXED
+     * REGEX-FAIL: +2 Essence of Ice Attribute (Level 2) - 1 more to upgrade!
      */
     private val shardSyphonedMaxedPattern by patternGroup.pattern(
-        "chat.syphoned.maxed",
-        "§a\\+(?<amount>\\d+) (?<attributeName>.+) Attribute §r§7\\(Level (?<level>\\d+)\\) §r§a§lMAXED",
+        "chat.syphoned.maxed.colorless",
+        "\\+(?<amount>\\d+) (?<attributeName>.+) Attribute \\(Level (?<level>\\d+)\\) MAXED",
     )
 
     /**
-     * REGEX-TEST: §aand 7 more...
+     * REGEX-TEST: and 7 more...
      */
     private val andMoreMessagePattern by patternGroup.pattern(
-        "chat.and.more",
-        "§aand (?<amount>\\d+) more\\.\\.\\.",
+        "chat.and.more.colorless",
+        "and (?<amount>\\d+) more\\.\\.\\.",
     )
 
-    private val advancedModeNotUnlocked by patternGroup.pattern(
-        "advanced.mode",
-        "§7§cAdvanced Mode unlocked at 30",
+    private val advancedModeNotUnlockedPattern by patternGroup.pattern(
+        "advanced.mode.colorless",
+        "Advanced Mode unlocked at 30",
     )
 
     /**
-     * REGEX-TEST: §6Nature Elemental §r§ais now enabled!
+     * REGEX-TEST: Nature Elemental is now enabled!
      */
     private val attributeEnabledPattern by patternGroup.pattern(
-        "chat.enabled",
-        "§6(?<attributeName>.+) §r§ais now enabled!",
+        "chat.enabled.colorless",
+        "(?<attributeName>.+) is now enabled!",
     )
 
     /**
-     * REGEX-TEST: §6Nature Elemental §r§cis now disabled!
+     * REGEX-TEST: Nature Elemental is now disabled!
      */
     private val attributeDisabledPattern by patternGroup.pattern(
-        "chat.disabled",
-        "§6(?<attributeName>.+) §r§cis now disabled!",
+        "chat.disabled.colorless",
+        "(?<attributeName>.+) is now disabled!",
     )
 
     /**
-     * REGEX-TEST: §aYou caught §7x2 §5Bal §aShards§a!
-     * REGEX-TEST: §aYou caught a §fBirries §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught an §9Invisibug §aShard!
-     * REGEX-TEST: §aYou caught §7x2 §fHideonleaf §aShards§a!
-     * REGEX-TEST: §aYou caught §7x2 §fVoracious Spider §aShards§a!
+     * REGEX-TEST: You caught x2 Bal Shards!
+     * REGEX-TEST: You caught a Birries Shard!
+     * REGEX-TEST: You caught an Invisibug Shard!
+     * REGEX-TEST: You caught an Invisibug Shard!
+     * REGEX-TEST: You caught x2 Hideonleaf Shards!
+     * REGEX-TEST: You caught x2 Voracious Spider Shards!
      */
     private val caughtShardsPattern by patternGroup.pattern(
-        "caught.shards",
-        "§aYou caught(?: [an]+)?(?: §7x(?<amount>\\d+))? §.(?<shardName>.+) §aShard(?:s§a)?!",
+        "caught.shards.colorless",
+        "You caught(?: [an]+)?(?: x(?<amount>\\d+))? (?<shardName>.+) Shards?!",
     )
 
     /**
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received a §9Glacite Walker §fShard for assisting §bMealoan§f!
-     * REGEX-TEST: §e§lLOOT SHARE §fYou received §b2 §aMossybit §fShards for assisting §bFallenYeti§f!
+     * REGEX-TEST: LOOT SHARE You received a Glacite Walker Shard for assisting Mealoan!
+     * REGEX-TEST: LOOT SHARE You received 2 Mossybit Shards for assisting FallenYeti!
      */
     private val lootShareShardPattern by patternGroup.pattern(
-        "loot.share.shard",
-        "§e§lLOOT SHARE §fYou received (?:an?|§.(?<amount>\\d+)) §.(?<shardName>.+) §fShards? for assisting .*§f!",
+        "loot.share.shard.colorless",
+        "LOOT SHARE You received (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? for assisting .*!",
     )
 
     /**
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained §9Bolt Shard §8x2§7! §d§lNEW!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7!
-     * REGEX-TEST: §5§lFUSION! §7You obtained a §fTadgang Shard§7! §d§lNEW!
+     * REGEX-TEST: FUSION! You obtained Bolt Shard x2!
+     * REGEX-TEST: FUSION! You obtained Bolt Shard x2! NEW!
+     * REGEX-TEST: FUSION! You obtained a Tadgang Shard!
+     * REGEX-TEST: FUSION! You obtained a Tadgang Shard! NEW!
      */
     private val fusionShardPattern by patternGroup.pattern(
-        "fusion.shard",
-        "§5§lFUSION! §7You obtained(?: an?)? (?:§.)+(?<shardName>.+) Shard(?: §8x(?<amount>\\d+))?§7!(?: §d§lNEW!)?",
+        "fusion.shard.colorless",
+        "FUSION! You obtained(?: an?)? (?<shardName>.+) Shard(?: x(?<amount>\\d+))?!(?: NEW!)?",
     )
 
     /**
-     * REGEX-TEST: §d§lSALT§7 You charmed a §aMagma Slug§7 and captured §93 Shards §7from it.§r
-     * REGEX-TEST: §d§lSALT§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §5§lCHARM§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
-     * REGEX-TEST: §6§lNAGA§7 You charmed a §fLapis Zombie§7 and captured its §9Shard§7.
+     * REGEX-TEST: SALT You charmed a Magma Slug and captured 3 Shards from it.
+     * REGEX-TEST: SALT You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: CHARM You charmed a Lapis Zombie and captured its Shard.
+     * REGEX-TEST: NAGA You charmed a Lapis Zombie and captured its Shard.
      */
-    @Suppress("MaxLineLength")
     private val charmedShardPattern by patternGroup.pattern(
-        "charmed.shard",
-        "§.§l(?<charmType>CHARM|SALT|NAGA)§7 You charmed an? §.(?<shardName>.+)§7 and captured (?:§.(?<amount>\\d+) Shards §7from it|its §9Shard§7)\\.(?:§.)*",
+        "charmed.shard.colorless",
+        "(?<charmType>CHARM|SALT|NAGA) You charmed an? (?<shardName>.+) and captured (?:(?<amount>\\d+) Shards from it|its Shard)\\.",
     )
 
     /**
-     * REGEX-TEST: §7You sent §aan §9Invisibug Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §a6 §fVoracious Spider Shards §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent §aa §fVoracious Spider Shard §7to your §aHunting Box§7.
-     * REGEX-TEST: §7You sent a §fVerdant Shard §7to your §aHunting Box§7.
+     * REGEX-TEST: You sent an Invisibug Shard to your Hunting Box.
+     * REGEX-TEST: You sent 6 Voracious Spider Shards to your Hunting Box.
+     * REGEX-TEST: You sent a Voracious Spider Shard to your Hunting Box.
+     * REGEX-TEST: You sent a Verdant Shard to your Hunting Box.
      */
     private val sentToHuntingBoxPattern by patternGroup.pattern(
-        "sent.to.hunting.box",
-        "§7You sent (?:§a)?(?:an?|(?<amount>\\d+)) §.(?<shardName>.+) Shards? §7to your §aHunting Box§7.",
+        "sent.to.hunting.box.colorless",
+        "You sent (?:an?|(?<amount>\\d+)) (?<shardName>.+) Shards? to your Hunting Box.",
+    )
+
+    /**
+     * REGEX-TEST: CAPTURE! You caught a Strongarm and gained a Strongarm Shard!
+     * REGEX-TEST: CAPTURE! You caught a Gimmiegold and gained a Gimmiegold Shard!
+     * REGEX-TEST: CAPTURE! You caught an Areita and gained an Areita Shard!
+     * REGEX-TEST: CAPTURE! You caught a Solsnatcher and gained 2x Solsnatcher Shard!
+     * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you a Hideyho Shard!
+     * REGEX-TEST: CAPTURE! You found Hideyho, and as a reward he gave you 4x Hideyho Shard!
+     */
+    @Suppress("MaxLineLength")
+    private val capturedShardPattern by patternGroup.pattern(
+        "captured.shard",
+        "CAPTURE! You (?:caught an?|found) .+ and (?:gained|as a reward (?:he|she|they) gave you) (?:an?|(?<amount>\\d+)x) (?<shardName>.+) Shard!",
+    )
+
+    /**
+     * REGEX-TEST: FLOOR DROP! You found Litterbug Shard on the ground!
+     * REGEX-TEST: FLOOR DROP! You found Solsnatcher Shard on the ground!
+     */
+    private val floorDropShardPattern by patternGroup.pattern(
+        "floor-drop.shard",
+        "FLOOR DROP! You found (?<shardName>.+) Shard on the ground!",
+    )
+
+    /**
+     * REGEX-TEST: You have been given a Gimmiegold!
+     */
+    private val givenShardsPattern by patternGroup.pattern(
+        "given.shards",
+        "You have been given a (?<shardName>.+)!",
     )
 
     // the boolean is if it should post the shard gain event
@@ -296,10 +325,13 @@ object AttributeShardsData {
         lootShareShardPattern to (true to ShardSource.HUNT),
         charmedShardPattern to (true to null),
         sentToHuntingBoxPattern to (false to ShardSource.SENT_TO_HUNTING_BOX),
+        capturedShardPattern to (true to ShardSource.CAPTURED),
+        floorDropShardPattern to (true to ShardSource.FLOOR_DROP),
+        givenShardsPattern to (true to ShardSource.GIVEN),
     )
 
     @HandleEvent(priority = HandleEvent.LOWEST)
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+    private fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val attributesJson = event.getConstant<NeuAttributeShardJson>("attribute_shards")
         attributeLevelling = attributesJson.attributeLevelling
         unconsumableAttributes = attributesJson.unconsumableAttributes
@@ -314,8 +346,8 @@ object AttributeShardsData {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onChat(event: SkyHanniChatEvent.Allow) {
-        val message = event.message
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
+        val message = event.cleanMessage
         shardSyphonedPattern.matchMatcher(message) {
             val attributeName = group("attributeName")
             val level = group("level").toInt()
@@ -412,7 +444,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Active Attribute Levels")
         event.addIrrelevant {
             for (shardName in attributeInfo.keys) {
@@ -428,10 +460,10 @@ object AttributeShardsData {
             if (!isAttributeShard(internalName)) continue
             var tier = 0
             var toNextTier = 0
-            attributeShardNamePattern.matchMatcher(item.hoverName.formattedTextCompatLeadingWhiteLessResets()) {
+            attributeShardNamePattern.matchMatcher(item.cleanName) {
                 tier = groupOrNull("tier")?.romanToDecimal() ?: 0
             }
-            val lore = item.getLore()
+            val lore = item.getCleanLore()
             syphonAmountPattern.firstMatcher(lore) {
                 toNextTier = group("amount").toInt()
             }
@@ -443,8 +475,8 @@ object AttributeShardsData {
         }
 
         val advancedModeStack = InventoryUtils.getSlotAtIndex(52)?.item?.orNull()
-        val advancedModeLore = advancedModeStack?.getLore().orEmpty()
-        advancedModeNotUnlocked.firstMatcher(advancedModeLore) {
+        val advancedModeLore = advancedModeStack?.getCleanLore().orEmpty()
+        advancedModeNotUnlockedPattern.firstMatcher(advancedModeLore) {
             addAllMissingShards()
         }
 
@@ -463,15 +495,16 @@ object AttributeShardsData {
         }
     }
 
-    private fun processHuntingBoxItems() {
-        val slots = InventoryUtils.getItemsInOpenChest()
-        val items = slots.map { it.item }
-        for (item in items) {
+    @HandleEvent(onlyOnSkyblock = true)
+    private fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!huntingBoxInventory.isInside()) return
+        val items = event.inventoryItems
+        for ((_, item) in items) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (!isAttributeShard(internalName)) continue
             var tier = 0
             var toNextTier = 0
-            for (line in item.getLore()) {
+            for (line in item.getCleanLore()) {
                 attributeShardNameLorePattern.matchMatcher(line) {
                     tier = groupOrNull("tier")?.romanToDecimal() ?: 0
                 }
@@ -488,11 +521,11 @@ object AttributeShardsData {
             }
             processShard(internalName, tier, toNextTier)
         }
-        HuntingBoxValue.processInventory(slots)
+        HuntingBoxValue.processInventory(items)
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onShardGain(event: ShardEvent) {
+    private fun onShardGain(event: ShardEvent) {
         val attributeName = shardInternalNameToShardName(event.shardInternalName)
         val existing = storage?.get(attributeName)?.amountInBox ?: 0
         val newAmount = (existing + event.amount).coerceAtLeast(0)
@@ -634,7 +667,7 @@ object AttributeShardsData {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shresethuntingbox") {
             description = "Resets stored hunting box shards"
             category = CommandCategory.USERS_RESET
