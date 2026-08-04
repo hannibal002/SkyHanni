@@ -15,7 +15,7 @@ sealed interface NavigationCondition {
     data class ChatMessage(val condition: (String) -> Boolean) : NavigationCondition
 
     /**
-     * A condition that the must be passed, is checked every second. Is also checked immediately upon reaching
+     * A condition that must be passed, is checked every second. Is also checked immediately upon reaching
      */
     data class SecondPassed(val condition: (GraphNode) -> Boolean) : NavigationCondition
 

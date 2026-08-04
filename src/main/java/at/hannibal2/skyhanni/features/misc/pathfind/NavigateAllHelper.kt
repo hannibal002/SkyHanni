@@ -175,7 +175,7 @@ object NavigateAllHelper {
 
         val target = currentTarget ?: return
 
-        if (currentlyNavigating && (currentTarget?.position?.distanceToPlayer() ?: 0.0) > NAVIGATE_AGAIN_DISTANCE) {
+        if (currentlyNavigating && (target.position.distanceToPlayer()) > NAVIGATE_AGAIN_DISTANCE) {
             route = listOf(target) + route
             recursiveNavigate()
             return
