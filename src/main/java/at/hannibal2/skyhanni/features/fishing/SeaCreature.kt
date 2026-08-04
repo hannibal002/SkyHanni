@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
+import at.hannibal2.skyhanni.utils.compat.bold
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import net.minecraft.network.chat.Component
 
@@ -16,9 +17,9 @@ data class SeaCreature(
 ) {
 
     val displayName: Component get() = componentBuilder {
-        appendWithColor(rare() + name, rgbColor)
+        appendWithColor(name, rgbColor) {
+            bold = rare
+        }
     }
-
-    private fun rare() = if (rare) "§l" else ""
 }
 
