@@ -30,7 +30,7 @@ object HideyhoFinder {
     private val patternGroup = RepoPattern.group("hunting.safari.hideyho-finder")
 
     private val startPattern by patternGroup.pattern(
-        "start", "\\[MOB] Hideyho: Hehe, you found me!",
+        "first-found", "\\[MOB] Hideyho: Hehe, you found me!",
     )
 
     private val beginHidingPattern by patternGroup.pattern(
@@ -38,10 +38,10 @@ object HideyhoFinder {
     )
 
     private val endPattern by patternGroup.pattern(
-        "end", "\\[MOB] Hideyho: Aah! You found me!",
+        "found-after-hiding", "\\[MOB] Hideyho: Aah! You found me!",
     )
 
-    private val HIDEYHO_TEXTURE by SkullTextureHolder.texture("HIDEYHO")
+    private val SKIN_TEXTURE by SkullTextureHolder.texture("HIDEYHO")
 
     private var currentlyNavigating = false
     private var startLocation: LorenzVec? = null
@@ -51,19 +51,21 @@ object HideyhoFinder {
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!config.hideyhoFinder) return
 
+        val playerLocation = LocationUtils.playerLocation()
+
         if (startPattern.matches(event.cleanMessage)) {
-            startLocation = LocationUtils.playerLocation().nearbyHideyhoLocation(10.0)
+            startLocation = playerLocation.nearbyLocation(10.0)
             return
         }
 
         if (endPattern.matches(event.cleanMessage)) {
             if (!reportBug) return
 
-            val playerLocation = LocationUtils.playerLocation()
-            val nearbyHideyho = playerLocation.nearbyHideyhoLocation(10.0)
+            val playerLocation = playerLocation
+            val nearbyHideyho = playerLocation.nearbyLocation(10.0)
 
             IslandGraphs.reportLocation(
-                LocationUtils.playerLocation(),
+                playerLocation,
                 userFacingReason = "unknown hideyho location",
                 technicalInfo = "user found a hideyho while far from known hideyho locations",
                 "nearbyHideyho" to nearbyHideyho,
@@ -105,24 +107,28 @@ object HideyhoFinder {
                 NavigateAllHelper.handleStop()
             },
             continueNavigationCondition = NavigationCondition.SecondPassed { nodeLocation ->
-                val isNearby = nodeLocation.position.nearbyHideyhoLocation(5.0) != null
+                val isNearby = nodeLocation.position.nearbyLocation(5.0) != null
 
                 if (isNearby) {
-                    ChatUtils.chat("§aFound Hideyho!")
-                    currentlyNavigating = false
-                    NavigateAllHelper.handleStop()
+                    finishNavigation()
                 }
 
                 // If there is no Hideyho nearby then we go to the next location
                 !isNearby
             },
-            condition = { currentlyNavigating },
+            condition = { config.hideyhoFinder && currentlyNavigating },
         )
     }
 
-    private fun LorenzVec.nearbyHideyhoLocation(radius: Double): LorenzVec? {
+    private fun finishNavigation() {
+        ChatUtils.chat("§aFound Hideyho!")
+        currentlyNavigating = false
+        NavigateAllHelper.handleStop()
+    }
+
+    private fun LorenzVec.nearbyLocation(radius: Double): LorenzVec? {
         val nearbyEntities = this.getEntitiesNearby<RemotePlayer>(radius)
-        return nearbyEntities.firstOrNull { it.getSkinTexture()?.equals(HIDEYHO_TEXTURE) ?: false }?.getLorenzVec()
+        return nearbyEntities.firstOrNull { it.getSkinTexture() == SKIN_TEXTURE }?.getLorenzVec()
     }
 
     @HandleEvent
