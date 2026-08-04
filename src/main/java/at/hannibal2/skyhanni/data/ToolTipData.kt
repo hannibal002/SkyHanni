@@ -19,7 +19,7 @@ import net.minecraft.world.inventory.Slot
 object ToolTipData {
 
     init {
-        ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
+        ItemTooltipCallback.EVENT.register { stack, _, _, originalToolTip ->
             val slot = lastSlot
             if (ToolTipTextEvent(slot, stack, originalToolTip).post().isCancelled) {
                 originalToolTip.clear()

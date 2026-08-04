@@ -71,19 +71,19 @@ object BitsPerCookieVisual {
         val newAvailable = BitsApi.bitsAvailable + gain
         val duration = 4 * cookieAmount
 
-        var index = positionIndex
+        var index = positionIndex - 1
 
         if (timeReplaced) {
-            if (config.bulkBuyCookieTime) toolTip.add(index++, "§7§b$duration §7days")
-            toolTip.add(index++, "")
+            if (config.bulkBuyCookieTime) toolTip.add(++index, "§7§b$duration §7days")
+            toolTip.add(++index, "")
         } else {
-            toolTip.add(index++, "")
-            if (config.bulkBuyCookieTime) toolTip.add(index++, "§8‣ §7Cookie Buff for §b$duration §7days")
+            toolTip.add(++index, "")
+            if (config.bulkBuyCookieTime) toolTip.add(++index, "§8‣ §7Cookie Buff for §b$duration §7days")
         }
 
-        if (config.showBitsOnCookie) toolTip.add(index++, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
+        if (config.showBitsOnCookie) toolTip.add(++index, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
         if (config.showBitsChangeOnCookie) toolTip.add(
-            index++,
+            ++index,
             "§8‣ §7Available Bits: §3${BitsApi.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
         )
     }

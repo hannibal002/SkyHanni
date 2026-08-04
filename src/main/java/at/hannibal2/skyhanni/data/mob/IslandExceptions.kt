@@ -88,7 +88,7 @@ object IslandExceptions {
             ?.takeIf { getNextEntity(it, -1)?.takeIf { entity -> entity.name.formattedTextCompatLessResets().contains("Livid") } == null }
             .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
-        baseEntity is IronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.formattedTextCompatLessResets().orEmpty()) ->
+        baseEntity is IronGolem && MobFilter.wokeSleepingGolemPattern.matches(armorStand?.name.formattedTextCompatLessResets()) ->
             MobData.MobResult.found(Mob(baseEntity, MobCategory.DUNGEON, armorStand, "Sleeping Golem")) // Consistency fix
 
         else -> null
