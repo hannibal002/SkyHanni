@@ -25,6 +25,8 @@ private class SkyHanniDisplayBoundsProvider : DisplayBoundsProvider<SkyHanniBase
     }
 
     override fun getScreenBounds(screen: SkyHanniBaseScreen): Rectangle? {
+        // If the screen does not want to show the item list, return null to indicate no bounds
+        // Should not happen because shouldScreenBeOverlaid should have been called first, but just in case
         if (!screen.shouldShowItemList()) return null
         val rectangle = screen.rectangle
         val position = rectangle.position
