@@ -12,7 +12,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     FARMING("Farming", Items.GOLDEN_HOE, 60),
     FISHING("Fishing", Items.FISHING_ROD, 50),
     MINING("Mining", Items.GOLDEN_PICKAXE, 60),
-    FORAGING("Foraging", Items.GOLDEN_AXE, 54),
+    FORAGING("Foraging", Items.GOLDEN_AXE, 57),
     ENCHANTING("Enchanting", Blocks.ENCHANTING_TABLE, 60),
     ALCHEMY("Alchemy", Items.BREWING_STAND, 50),
     CARPENTRY("Carpentry", Blocks.CRAFTING_TABLE, 50),
