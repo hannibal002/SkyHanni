@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
+import at.hannibal2.skyhanni.features.chroma.ChromaFontManager;
 import at.hannibal2.skyhanni.utils.render.SkyHanniRenderLayers;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -27,7 +27,7 @@ public abstract class MixinGlyphRenderTypes {
 
     @Inject(method = "select", at = @At("HEAD"), cancellable = true)
     private void getRenderLayer(CallbackInfoReturnable<RenderType> cir) {
-        if (ChromaFontManagerKt.getGlyphIsChroma()) {
+        if (ChromaFontManager.getGlyphIsChroma()) {
             cir.setReturnValue(SkyHanniRenderLayers.INSTANCE.getChromaTexturedWithIdentifier(skyhanni$identifier));
         }
     }
