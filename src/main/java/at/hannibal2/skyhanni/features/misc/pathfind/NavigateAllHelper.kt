@@ -42,7 +42,9 @@ object NavigateAllHelper {
 
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
 
-    val currentlyNavigating get() = currentTargetName != null
+    private val currentlyNavigating get() = currentTargetName != null
+
+    private const val NAVIGATE_AGAIN_DISTANCE = 5
 
     private var route: List<GraphNode> = listOf()
     private var total = 0
@@ -152,7 +154,7 @@ object NavigateAllHelper {
                     }
                 }
             },
-            condition = { currentTargetName != null && condition() },
+            condition = { currentlyNavigating && condition() },
         )
     }
 
@@ -161,9 +163,9 @@ object NavigateAllHelper {
     @HandleEvent
     private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!waitingOnCondition) return
-        if (continueNavigationCondition !is NavigationCondition.ChatMessage) return
+        val messageCondition = (continueNavigationCondition as? NavigationCondition.ChatMessage)?.condition ?: return
 
-        if ((continueNavigationCondition as NavigationCondition.ChatMessage).condition(event.cleanMessage)) {
+        if (messageCondition(event.cleanMessage)) {
             recursiveNavigate()
         }
     }
@@ -172,13 +174,15 @@ object NavigateAllHelper {
     private fun onSecondPassed() {
         if (!waitingOnCondition) return
 
-        if (currentlyNavigating && (currentTarget?.position?.distanceToPlayer() ?: 0.0) > 5) {
+        if (currentlyNavigating && (currentTarget?.position?.distanceToPlayer() ?: 0.0) > NAVIGATE_AGAIN_DISTANCE) {
             currentTarget?.let { route = listOf(it) + route }
             recursiveNavigate()
+            return
         }
 
-        if (continueNavigationCondition !is NavigationCondition.SecondPassed) return
-        if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition()) {
+        val secondPassedCondition = (continueNavigationCondition as? NavigationCondition.SecondPassed)?.condition ?: return
+
+        if (secondPassedCondition()) {
             recursiveNavigate()
         }
     }
