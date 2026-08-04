@@ -21,10 +21,7 @@ class SkyHanniPipCoordinatorRenderer(
 
     fun clearPendingStates() = pendingStates.clear()
 
-    override fun renderToTexture(
-        state: SkyHanniGuiItemRenderState,
-        poseStack: PoseStack,
-    ) = Unit
+    override fun renderToTexture(state: SkyHanniGuiItemRenderState, poseStack: PoseStack) = Unit
     override fun blitTexture(state: SkyHanniGuiItemRenderState, guiRenderState: GuiRenderState) = Unit
     override fun getRenderStateClass(): Class<SkyHanniGuiItemRenderState> = SkyHanniGuiItemRenderState::class.java
     override fun getTranslateY(i: Int, j: Int): Float = i / 2.0f

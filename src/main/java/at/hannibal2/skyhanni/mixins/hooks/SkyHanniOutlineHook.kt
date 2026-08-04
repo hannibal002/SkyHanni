@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.mojang.blaze3d.systems.RenderSystem
@@ -39,17 +39,16 @@ object SkyHanniOutlineHook {
     private var customDepthAttachmentView: GpuTextureView? = null
 
     @JvmStatic
-    @get:JvmName("isCurrentlyActive")
-    var currentlyActive = false
+    var isCurrentlyActive = false
         private set
 
     private fun beginRendering() {
-        currentlyActive = true
+        isCurrentlyActive = true
         RenderSystem.outputDepthTextureOverride = customDepthAttachmentView
     }
 
     private fun finishRendering() {
-        currentlyActive = false
+        isCurrentlyActive = false
         RenderSystem.outputDepthTextureOverride = null
     }
 

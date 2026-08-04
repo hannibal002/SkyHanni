@@ -70,7 +70,7 @@ object WorldRenderUtils {
     }
     //?}
 
-    private inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
+    inline fun SkyHanniRenderWorldEvent.submitCustomGeometry(
         layer: RenderType,
         crossinline render: (VertexConsumer) -> Unit,
     ) {
@@ -216,7 +216,7 @@ object WorldRenderUtils {
             return
         }
 
-        val layer = SkyHanniRenderLayers.getFilled(seeThroughBlocks)
+        val layer = SkyHanniRenderLayers.getFilled(throughWalls = seeThroughBlocks)
         submitCustomGeometry(layer) { buf ->
             matrices.pushPose()
 
@@ -458,7 +458,7 @@ object WorldRenderUtils {
         depth: Boolean = true,
         segments: Int = 32,
     ) {
-        val layer = SkyHanniRenderLayers.getTriangleFan(!depth)
+        val layer = SkyHanniRenderLayers.getTriangleFan(throughWalls = !depth)
         submitCustomGeometry(layer) { buf ->
             matrices.pushPose()
 
@@ -507,7 +507,7 @@ object WorldRenderUtils {
     ) {
         val segments = 64
 
-        val layer = SkyHanniRenderLayers.getFilled(false)
+        val layer = SkyHanniRenderLayers.getFilled(throughWalls = false)
         submitCustomGeometry(layer) { buf ->
             matrices.pushPose()
 
@@ -551,7 +551,7 @@ object WorldRenderUtils {
             return
         }
 
-        val layer = SkyHanniRenderLayers.getTriangles(!depth)
+        val layer = SkyHanniRenderLayers.getTriangles(throughWalls = !depth)
         submitCustomGeometry(layer) { buf ->
             matrices.pushPose()
 
@@ -602,7 +602,7 @@ object WorldRenderUtils {
         radius: Float,
         segments: Int = 32,
     ) {
-        val layer = SkyHanniRenderLayers.getQuads(false)
+        val layer = SkyHanniRenderLayers.getQuads(throughWalls = false)
         submitCustomGeometry(layer) { buf ->
             matrices.pushPose()
 
