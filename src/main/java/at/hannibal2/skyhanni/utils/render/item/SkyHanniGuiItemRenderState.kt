@@ -18,6 +18,12 @@ import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
+//? if >= 26.1 {
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
+//?} else {
+/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGH
+*///?}
+
 data class SkyHanniGuiItemRenderState(
     val itemStack: SafeItemStack,
     val guiItemRenderState: GuiItemRenderState,
@@ -109,7 +115,7 @@ data class SkyHanniGuiItemRenderState(
         )
         if (rotated) setAnimated()
 
-        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
+        trackingState.submit(ps, featureRenderDispatcher.submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
         featureRenderDispatcher.renderAllFeatures()
         bufferSource.endBatch()
     }

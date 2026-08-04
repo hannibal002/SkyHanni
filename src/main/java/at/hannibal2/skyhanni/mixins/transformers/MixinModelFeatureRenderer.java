@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -18,19 +18,19 @@ import org.spongepowered.asm.mixin.injection.At;
 @Mixin(ModelFeatureRenderer.class)
 public abstract class MixinModelFeatureRenderer {
 
-    @WrapOperation(method = "renderModel(Lnet/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit;Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
+    @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
     private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
-            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), color);
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
             original.call(outlineConsumer, color);
         }
     }
 
-    @WrapOperation(method = "renderModel(Lnet/minecraft/client/renderer/SubmitNodeStorage$ModelSubmit;Lnet/minecraft/client/renderer/rendertype/RenderType;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
+    @WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"))
     private VertexConsumer getSkyHanniOutlineBuffer(OutlineBufferSource outlineConsumer, RenderType layer, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
-            return original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), layer);
+            return original.call(SkyHanniOutlineHook.getVertexConsumers(), layer);
         } else {
             return original.call(outlineConsumer, layer);
         }

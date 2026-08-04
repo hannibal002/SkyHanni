@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -28,7 +28,7 @@ public abstract class MixinModelPartFeatureRenderer {
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
     ) {
         if (skyhanni$usesCustomOutline(modelPart)) {
-            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), color);
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
             original.call(outlineConsumer, color);
         }
@@ -48,7 +48,7 @@ public abstract class MixinModelPartFeatureRenderer {
         @Local SubmitNodeStorage.ModelPartSubmit modelPart
     ) {
         if (skyhanni$usesCustomOutline(modelPart)) {
-            return original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), layer);
+            return original.call(SkyHanniOutlineHook.getVertexConsumers(), layer);
         } else {
             return original.call(outlineConsumer, layer);
         }

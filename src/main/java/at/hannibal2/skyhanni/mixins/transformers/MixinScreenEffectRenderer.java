@@ -16,17 +16,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class MixinScreenEffectRenderer {
 
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
-    private static void renderFire(PoseStack poseStack, MultiBufferSource multiBufferSource, TextureAtlasSprite textureAtlasSprite, CallbackInfo ci) {
+    private static void renderFire(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.FIRE).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
-    private static void renderWater(Minecraft client, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
+    private static void renderWater(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.WATER).post().isCancelled()) ci.cancel();
     }
 
     @Inject(method = "renderTex", at = @At("HEAD"), cancellable = true)
-    private static void renderBlock(TextureAtlasSprite sprite, PoseStack matrices, MultiBufferSource vertexConsumers, CallbackInfo ci) {
+    private static void renderBlock(CallbackInfo ci) {
         if (new BlockOverlayRenderEvent(OverlayType.BLOCK).post().isCancelled()) ci.cancel();
     }
 }
