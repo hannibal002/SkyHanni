@@ -32,7 +32,6 @@ import net.minecraft.world.entity.Entity
 import net.minecraft.world.level.material.FogType
 import net.minecraft.world.phys.AABB
 import org.joml.Matrix4f
-import org.joml.Vector3f
 import java.awt.Color
 import kotlin.math.cos
 import kotlin.math.sin
