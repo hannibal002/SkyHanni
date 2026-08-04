@@ -16,7 +16,7 @@ object SlayerSwapReminder {
 
     private val config get() = SlayerApi.config.slayerSwapReminder
 
-    private var hasAlertedForCurrentBoss = false
+    private var hasRemindedForCurrentBoss = false
 
     @HandleEvent(onlyOnSkyblock = true)
     private fun onBossHealthChange(event: BossHealthChangeEvent) {
@@ -29,13 +29,13 @@ object SlayerSwapReminder {
         val currentHealth = event.health.toDouble()
         val maxHealth = event.maxHealth.toDouble()
 
-        // Ignore uninitialized / zero health states when boss first spawns
+        // Ignore uninitialized or dead mob health states
         if (maxHealth <= 0 || currentHealth <= 0) return
 
         val hpPercentage = (currentHealth / maxHealth) * 100.0
         if (hpPercentage > config.hpThreshold) return
 
-        hasAlertedForCurrentBoss = true
+        hasRemindedForCurrentBoss = true
 
         val formattedTitle = config.titleText.replace('&', '§')
 
@@ -52,10 +52,9 @@ object SlayerSwapReminder {
 
     @HandleEvent
     private fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        val mob = event.mob
-        if (mob.category != MobCategory.SLAYER || !mob.belongsToPlayer()) return
+        if (event.mob.category != MobCategory.SLAYER || !event.mob.belongsToPlayer()) return
 
-        hasAlertedForCurrentBoss = false
+        hasRemindedForCurrentBoss = false
     }
 
     private fun isActive() = config.enabled && SlayerApi.isInBossFight()
