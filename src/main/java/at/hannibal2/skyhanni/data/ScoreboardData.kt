@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
@@ -28,18 +27,15 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.network.protocol.game.ClientboundSetObjectivePacket
 import net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket
 import net.minecraft.network.protocol.game.ClientboundSetScorePacket
-import net.minecraft.world.scores.criteria.ObjectiveCriteria
 
 @SkyHanniModule
 object ScoreboardData {
-
     var sidebarLinesFormatted: List<String> = emptyList()
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
     val objectiveTitle: String
-        get() =
-            MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat().orEmpty()
+        get() = MinecraftCompat.localWorldOrNull?.scoreboard?.getSidebarObjective()?.displayName.formattedTextCompat()
 
     private var dirty = false
 
@@ -80,7 +76,7 @@ object ScoreboardData {
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onPacketReceive(event: PacketReceivedEvent) {
+    private fun onPacketReceive(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is ClientboundSetScorePacket -> {
                 if (packet.objectiveName == "update") {
@@ -96,7 +92,7 @@ object ScoreboardData {
 
             is ClientboundSetObjectivePacket -> {
                 val type = packet.renderType
-                if (type != ObjectiveCriteria.RenderType.INTEGER) return
+                if (type != INTEGER) return
                 val objectiveName = packet.objectiveName
                 if (objectiveName == "health") return
                 val objectiveValue = packet.displayName.formattedTextCompat()
@@ -125,7 +121,7 @@ object ScoreboardData {
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
-    fun onTick() {
+    private fun onTick() {
         if (!dirty) return
         dirty = false
         monitor()
@@ -201,18 +197,18 @@ object ScoreboardData {
     }
 
     enum class Season(val prefix: String, val color: ChatFormatting) {
-        EARLY_SPRING("Early Spring", ChatFormatting.LIGHT_PURPLE),
-        SPRING("Spring", ChatFormatting.LIGHT_PURPLE),
-        LATE_SPRING("Late Spring", ChatFormatting.LIGHT_PURPLE),
-        EARLY_SUMMER("Early Summer", ChatFormatting.GOLD),
-        SUMMER("Summer", ChatFormatting.GOLD),
-        LATE_SUMMER("Late Summer", ChatFormatting.GOLD),
-        EARLY_AUTUMN("Early Autumn", ChatFormatting.YELLOW),
-        AUTUMN("Autumn", ChatFormatting.YELLOW),
-        LATE_AUTUMN("Late Autumn", ChatFormatting.YELLOW),
-        EARLY_WINTER("Early Winter", ChatFormatting.BLUE),
-        WINTER("Winter", ChatFormatting.BLUE),
-        LATE_WINTER("Late Winter", ChatFormatting.BLUE)
+        EARLY_SPRING("Early Spring", LIGHT_PURPLE),
+        SPRING("Spring", LIGHT_PURPLE),
+        LATE_SPRING("Late Spring", LIGHT_PURPLE),
+        EARLY_SUMMER("Early Summer", GOLD),
+        SUMMER("Summer", GOLD),
+        LATE_SUMMER("Late Summer", GOLD),
+        EARLY_AUTUMN("Early Autumn", YELLOW),
+        AUTUMN("Autumn", YELLOW),
+        LATE_AUTUMN("Late Autumn", YELLOW),
+        EARLY_WINTER("Early Winter", BLUE),
+        WINTER("Winter", BLUE),
+        LATE_WINTER("Late Winter", BLUE)
     }
 
     // TODO USE SH-REPO
@@ -235,11 +231,11 @@ object ScoreboardData {
     )
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shdebugscoreboard") {
             description = "Monitors the scoreboard changes: " +
                 "Prints the raw scoreboard lines in the console after each update, with time since last update."
-            category = CommandCategory.DEVELOPER_DEBUG
+            category = DEVELOPER_DEBUG
             simpleCallback {
                 monitor = !monitor
                 val action = if (monitor) "Enabled" else "Disabled"

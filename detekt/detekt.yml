@@ -55,17 +55,14 @@ style:
     UnusedParameter:
         active: true
         ignoreAnnotated:
-            - 'SubscribeEvent'
             - 'HandleEvent'
-            - 'Mod.EventHandler'
+        allowedNames: "^(unused|_)$"
     ReturnCount:
         active: true
         max: 5
         excludeGuardClauses: true
         ignoreAnnotated:
-            - 'SubscribeEvent'
             - 'HandleEvent'
-            - 'Mod.EventHandler'
     MaxLineLength:
         active: true
         maxLineLength: 140
@@ -90,6 +87,12 @@ style:
         active: true
         maxDestructuringEntries: 5
     AbstractClassCanBeConcreteClass: # this is usually intentional
+        active: false
+    UnusedVariable: # reported by compiler
+        active: false
+    UselessCallOnNotNull: # reported by compiler
+        active: false
+    VarCouldBeVal: # reported by compiler
         active: false
 
 ktlint:
@@ -145,6 +148,8 @@ ktlint:
         active: false
     TrailingCommaOnCallSite:
         active: false
+    StringTemplate: # reported by compiler
+        active: false
 
 complexity:
     CyclomaticComplexMethod: # default allowedComplexity of 14, caught almost every complex method
@@ -195,7 +200,7 @@ potential-bugs:
         active: true
     ImmutableTypesWithExpectedInteriorMutabilityInConfig:
         active: true
-    UnreachableCode:
+    UnreachableCode: # reported by compiler
         active: false
     IgnoredReturnValue:
         active: true
@@ -204,3 +209,11 @@ potential-bugs:
             - 'java.util.concurrent.ConcurrentHashMap.remove'
             - 'kotlin.collections.MutableMap.put'
             - 'kotlin.collections.MutableMap.remove'
+    UnnecessaryNotNullOperator: # reported by compiler
+        active: false
+    UnnecessarySafeCall: # reported by compiler
+        active: false
+    UnsafeCast: # reported by compiler
+        active: false
+    UselessPostfixExpression: # reported by compiler
+        active: false

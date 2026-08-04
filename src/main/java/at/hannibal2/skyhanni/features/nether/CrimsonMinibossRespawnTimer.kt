@@ -31,7 +31,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CrimsonMinibossRespawnTimer {
-
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
     private val patternGroup = RepoPattern.group("crimson.miniboss")
@@ -57,7 +56,7 @@ object CrimsonMinibossRespawnTimer {
     private var display: Renderable? = null
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message
         downPattern.matchMatcher(message) {
@@ -80,14 +79,14 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onGuiRenderOverlay() {
+    private fun onGuiRenderOverlay() {
         if (!isEnabled()) return
         val renderable = display ?: drawDisplay()
         config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
     }
 
     @HandleEvent
-    fun onSecondPassed() {
+    private fun onSecondPassed() {
         if (!isEnabled()) return
         updateArea()
         update()
@@ -174,7 +173,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onWorldChange() {
+    private fun onWorldChange() {
         MiniBoss.entries.forEach {
             it.nextSpawnTime = null
             it.possibleSpawnTime = null
@@ -186,7 +185,7 @@ object CrimsonMinibossRespawnTimer {
     }
 
     @HandleEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+    private fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Crimson Isle Miniboss")
         event.addIrrelevant {
             if (!isEnabled()) {
@@ -199,7 +198,7 @@ object CrimsonMinibossRespawnTimer {
                 add(it.displayName)
                 add("   Timer ${it.nextSpawnTime?.timeUntil()?.format()}")
                 add(
-                    "   Possible Timer ${it.possibleSpawnTime?.first?.timeUntil()?.format()} - " + "${
+                    "   Possible Timer ${it.possibleSpawnTime?.first?.timeUntil()?.format()} - ${
                         it.possibleSpawnTime?.second?.timeUntil()?.format()
                     }",
                 )
@@ -268,5 +267,4 @@ object CrimsonMinibossRespawnTimer {
     }
 
     private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossRespawnTimer
-
 }

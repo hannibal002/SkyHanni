@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.achievements.AchievementManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -141,7 +140,7 @@ object QuiverApi {
     )
 
     @HandleEvent
-    fun onChat(event: SkyHanniChatEvent.Allow) {
+    private fun onChat(event: SkyHanniChatEvent.Allow) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -227,7 +226,7 @@ object QuiverApi {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
 
@@ -237,7 +236,7 @@ object QuiverApi {
 
         val stacks = event.inventoryItems
         for (stack in stacks.values) {
-            if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
+            if (stack.getItemCategoryOrNull() != ARROW) continue
             val arrow = stack.getInternalNameOrNull() ?: continue
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
             arrowType.amount += stack.count
@@ -247,7 +246,7 @@ object QuiverApi {
     private const val ARROW_ACHIEVEMENT = "100 grand arrows"
 
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         val achievement = Achievement(
             "Arrowslinger".asComponent(),
             "Shoot 100,000 Arrows".asComponent(),
@@ -258,7 +257,7 @@ object QuiverApi {
     }
 
     @HandleEvent
-    fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
+    private fun onOwnInventoryMenuUpdate(event: OwnInventoryMenuUpdateEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
         val lore = stack.getLoreComponent().map { it.string }
@@ -337,11 +336,9 @@ object QuiverApi {
 
     fun hasBowInInventory() = hasBow
 
-    fun isHoldingBow(): Boolean {
-        InventoryUtils.getItemInHand()?.let {
-            return it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
-        } ?: return false
-    }
+    fun isHoldingBow(): Boolean = InventoryUtils.getItemInHand()?.let {
+        it.getItem() is BowItem && !fakeBowsPattern.matches(it.getInternalName().asString())
+    } ?: false
 
     fun getArrowByNameOrNull(name: String): ArrowType? {
         return arrows.firstOrNull { it.arrow == name }
@@ -375,7 +372,7 @@ object QuiverApi {
     }
 
     @HandleEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    private fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {
             checkChestplate()
@@ -385,7 +382,7 @@ object QuiverApi {
 
     // Load arrows from repo
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.toInternalName()) }
 

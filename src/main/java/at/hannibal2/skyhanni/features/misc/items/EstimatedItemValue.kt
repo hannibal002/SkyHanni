@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -44,7 +43,6 @@ private typealias NeuGemstoneCostJson = HashMap<NeuInternalName, HashMap<String,
 
 @SkyHanniModule
 object EstimatedItemValue {
-
     val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     private val repoReloadCoroutine = CoroutineSettings("estimated item value repo reload")
@@ -242,27 +240,23 @@ object EstimatedItemValue {
         lastToolTipTime = SimpleTimeMark.now()
     }
 
-    private fun SafeItemStack.shouldIgnoreDraw(): Boolean {
-        this.getInternalNameOrNull()?.let { internalName ->
-            val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
-            return (
-                this.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK ||
-                    name.contains("Salesperson") ||
-                    name == "§6☘ Category: Item Ability (Passive)" ||
-                    internalName.isRune() ||
-                    internalName.startsWith("ULTIMATE_ULTIMATE_") ||
-                    internalName.startsWith("CATACOMBS_PASS_") ||
-                    internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
-                    internalName.startsWith("MAP-") ||
-                    internalName.contains("UNIQUE_RUNE") ||
-                    internalName.contains("WISP_POTION") ||
-                    (
-                        !InventoryUtils.isSlotInPlayerInventory(this) &&
-                            InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
-                        )
+    private fun SafeItemStack.shouldIgnoreDraw(): Boolean = this.getInternalNameOrNull()?.let { internalName ->
+        val name = this.hoverName.formattedTextCompatLeadingWhiteLessResets()
+        this.getItemCategoryOrNull() == ENCHANTED_BOOK ||
+            name.contains("Salesperson") ||
+            name == "§6☘ Category: Item Ability (Passive)" ||
+            internalName.isRune() ||
+            internalName.startsWith("ULTIMATE_ULTIMATE_") ||
+            internalName.startsWith("CATACOMBS_PASS_") ||
+            internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
+            internalName.startsWith("MAP-") ||
+            internalName.contains("UNIQUE_RUNE") ||
+            internalName.contains("WISP_POTION") ||
+            (
+                !InventoryUtils.isSlotInPlayerInventory(this) &&
+                    InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
                 )
-        } ?: return true
-    }
+    } ?: true
 
     private fun draw(stack: SafeItemStack): List<Renderable> {
         if (stack.shouldIgnoreDraw()) return listOf()

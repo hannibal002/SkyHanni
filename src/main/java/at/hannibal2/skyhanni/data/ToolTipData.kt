@@ -17,9 +17,8 @@ import net.minecraft.world.inventory.Slot
 
 // Please use ToolTipTextEvent over ToolTipEvent, ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
-
     init {
-        ItemTooltipCallback.EVENT.register { stack, context, type, originalToolTip ->
+        ItemTooltipCallback.EVENT.register { stack, _, _, originalToolTip ->
             val slot = lastSlot
             if (ToolTipTextEvent(slot, stack, originalToolTip).post().isCancelled) {
                 originalToolTip.clear()
@@ -81,5 +80,4 @@ object ToolTipData {
     }
 
     var lastSlot: Slot? = null
-
 }

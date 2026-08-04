@@ -27,7 +27,8 @@ object RenderEvents {
             RenderEvents::postGui
         )
 
-        PictureInPictureRendererRegistry.register { ctx ->
+        //~ if < 26.2 '_' -> 'ctx'
+        PictureInPictureRendererRegistry.register { _ ->
             SkyHanniPipCoordinatorRenderer(
                 //? if < 26.2
                 //ctx.bufferSource()
@@ -36,18 +37,19 @@ object RenderEvents {
     }
 
     @HandleEvent
-    fun onResourcePackReload() {
+    private fun onResourcePackReload() {
         SkyHanniItemRenderCoordinator.invalidateAtlas()
     }
 
-    private fun postGui(context: GuiGraphicsExtractor, tick: DeltaTracker) {
+    // The unused parameter is required to conform to the SAM interface
+    private fun postGui(context: GuiGraphicsExtractor, unused: DeltaTracker) {
         if (MinecraftCompat.hideGui) return
         if (config.hideGuiInDebugMenu && MinecraftCompat.showDebugHud) return
         RenderData.postRenderOverlay(context)
     }
 
     // GameOverlayRenderPreEvent
-    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPre(context: GuiGraphicsExtractor) =
         GameOverlayRenderPreEvent(context, RenderLayer.HOTBAR).post()
@@ -65,7 +67,7 @@ object RenderEvents {
         GameOverlayRenderPreEvent(context, RenderLayer.PLAYER_LIST).post()
 
     // GameOverlayRenderPostEvent
-    // todo need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
+    // TODO need to post the rest of these, sadly fapi doesn't have the same layers as 1.8 does
     @JvmStatic
     fun postHotbarLayerEventPost(context: GuiGraphicsExtractor) =
         GameOverlayRenderPostEvent(context, RenderLayer.HOTBAR).post()

@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompatLeadingWhiteLessResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -30,7 +30,7 @@ object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
     private var contactAmount: Int?
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
-        private set(value) {
+        set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
 
@@ -77,7 +77,7 @@ object MagicalPowerDisplay {
     )
 
     @HandleEvent
-    fun onRenderItemTip(event: RenderItemTipEvent) {
+    private fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
 
@@ -99,7 +99,7 @@ object MagicalPowerDisplay {
     }
 
     @HandleEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    private fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!abiphoneNamePattern.matches(event.inventoryName)) return
 
@@ -126,7 +126,7 @@ object MagicalPowerDisplay {
 
     private fun SafeItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
         val category = this.getItemCategoryOrNull() ?: return null
-        if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
+        if (!category.equalsOneOf(ACCESSORY, HATCESSORY)) return null
         return this.getItemRarityOrNull()
     }
 
