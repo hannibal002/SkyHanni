@@ -151,15 +151,14 @@ class ModuleProcessor(
 
         if (isDirty) {
             for (function in symbol.getDeclaredFunctions()) {
-                val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT }
-                    ?: continue
+                val handleEvent = function.annotations.find { it.getQualifiedName() == HANDLE_EVENT } ?: continue
 
                 val event = skyHanniEvent ?: return symbol
                 val eventParameterType = function.extensionReceiver?.resolve()
                     ?: function.parameters.firstOrNull()?.type?.resolve()
                 val parameterCount = function.parameters.size + if (function.extensionReceiver != null) 1 else 0
                 val hasPrimaryFunction = function.simpleName.asString() in primaryFunctionNames
-                val hasExplicitEventSpec = handleEvent?.hasExplicitEventSpec() == true
+                val hasExplicitEventSpec = handleEvent.hasExplicitEventSpec() == true
                 val name = (function.qualifiedName ?: function.simpleName).asString()
 
                 when (parameterCount) {
