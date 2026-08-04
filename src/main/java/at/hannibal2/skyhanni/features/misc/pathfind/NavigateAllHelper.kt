@@ -148,7 +148,9 @@ object NavigateAllHelper {
                         if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition(target)) {
                             recursiveNavigate()
                         } else {
-                            waitingOnCondition = true
+                            if (currentlyNavigating) {
+                                waitingOnCondition = true
+                            }
                         }
                     }
                 }
@@ -202,10 +204,14 @@ object NavigateAllHelper {
         }
     }
 
-    private fun handleStop() {
+    fun handleStop(manual: Boolean = false) {
         if (!currentlyNavigating) {
             ChatUtils.userError("No current navigation to stop. §eUse /shnavigateall to start navigation")
             return
+        }
+
+        if (manual) {
+            ChatUtils.userError("Manually stopped navigation")
         }
 
         route = emptyList()
@@ -242,7 +248,7 @@ object NavigateAllHelper {
                 handleSkip()
             }
             literalCallback("stop") {
-                handleStop()
+                handleStop(manual = true)
             }
             simpleCallback {
                 ChatUtils.userError("Usage: /shnavigateall <location type>")
