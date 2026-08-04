@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -77,6 +78,7 @@ object HoneyhiveReminder {
                     NavigateAllHelper.navigateAll(
                         nodes,
                         GraphNodeTag.HONEYHIVE.displayName,
+                        LorenzColor.GOLD.toColor(),
                         onFinish = {
                             ChatUtils.chat("You visited all ${GraphNodeTag.HONEYHIVE.displayName}s")
                             storage.honeyhiveRemindTime = 1.hours.fromNow()

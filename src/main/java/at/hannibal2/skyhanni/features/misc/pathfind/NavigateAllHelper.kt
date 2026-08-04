@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.navigation.NavigationUtils
+import java.awt.Color
 
 @SkyHanniModule
 object NavigateAllHelper {
@@ -46,6 +48,7 @@ object NavigateAllHelper {
     private var total = 0
     private var currentTarget: GraphNode? = null
     private var currentTargetName: String? = null
+    private var color = LorenzColor.WHITE.toColor()
     private var waitingOnCondition: Boolean = false
 
     private var onFound: (GraphNode) -> Unit = {}
@@ -68,6 +71,7 @@ object NavigateAllHelper {
         navigateAll(
             targetNodes,
             nodeType.displayName,
+            nodeType.color.toColor(),
             onFinish = { ChatUtils.chat("Reached all ${StringUtils.pluralize(total, nodeType.displayName, withNumber = true)}§e.") },
             continueNavigationCondition = NavigationCondition.None,
             condition = { true },
@@ -90,12 +94,14 @@ object NavigateAllHelper {
     fun navigateAll(
         nodes: List<GraphNode>,
         targetName: String,
+        color: Color,
         onFound: (GraphNode) -> Unit = {},
         onFinish: () -> Unit,
         continueNavigationCondition: NavigationCondition,
         condition: () -> Boolean,
     ) {
         currentTargetName = targetName
+        this.color = color
         this.onFound = onFound
         this.onFinish = onFinish
         this.continueNavigationCondition = continueNavigationCondition
@@ -129,6 +135,7 @@ object NavigateAllHelper {
         IslandGraphs.pathFind(
             target.position,
             "$currentTargetName ${total - route.size}/$total",
+            color = color,
             onFound = {
                 currentTarget?.let { onFound(it) }
 
