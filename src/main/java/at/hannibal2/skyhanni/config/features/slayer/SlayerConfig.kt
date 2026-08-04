@@ -202,7 +202,7 @@ class SlayerConfig {
     @SkyHanniModule
     companion object {
         @HandleEvent
-        fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        private fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
             val oldPath = "slayer."
             event.move(126, "${oldPath}hideIrrelevantMobsOpacity", "${oldPath}hideIrrelevantMobsTransparency")
             val remainingKillsPath = "${oldPath}slayerRemainingKills."
