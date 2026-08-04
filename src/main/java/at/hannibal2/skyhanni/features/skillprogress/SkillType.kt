@@ -17,7 +17,7 @@ enum class SkillType(val displayName: String, icon: Item, val maxLevel: Int) {
     ALCHEMY("Alchemy", Items.BREWING_STAND, 50),
     CARPENTRY("Carpentry", Blocks.CRAFTING_TABLE, 50),
     TAMING("Taming", Items.POLAR_BEAR_SPAWN_EGG, 60),
-    HUNTING("Hunting", Items.LEAD, 25),
+    HUNTING("Hunting", Items.LEAD, 50),
     ;
 
     constructor(displayName: String, block: Block, maxLevel: Int) : this(displayName, block.asItem(), maxLevel)
