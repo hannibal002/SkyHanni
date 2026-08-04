@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.utils.chat.TextHelper.asComponent
 import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
+import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
-import com.mojang.authlib.GameProfile
 import net.minecraft.network.chat.contents.objects.PlayerSprite
 import net.minecraft.world.item.component.ResolvableProfile
 
