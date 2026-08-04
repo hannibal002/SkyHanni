@@ -184,10 +184,8 @@ object NavigateAllHelper {
     }
 
     private fun handleSkip() {
-        if (route.isEmpty()) {
-            if (currentTargetName == null) {
-                ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
-            }
+        if (!currentlyNavigating) {
+            ChatUtils.userError("No current navigation to skip. §eUse /shnavigateall to start navigation")
             return
         }
 
@@ -197,6 +195,19 @@ object NavigateAllHelper {
             route = calculateRoute(route)
             recursiveNavigate()
         }
+    }
+
+    private fun handleStop() {
+        if (!currentlyNavigating) {
+            ChatUtils.userError("No current navigation to stop. §eUse /shnavigateall to start navigation")
+            return
+        }
+
+        route = emptyList()
+        currentTargetName = null
+        waitingOnCondition = false
+
+        IslandGraphs.stopNavigation()
     }
 
     @HandleEvent
@@ -224,6 +235,9 @@ object NavigateAllHelper {
             }
             literalCallback("skip") {
                 handleSkip()
+            }
+            literalCallback("stop") {
+                handleStop()
             }
             simpleCallback {
                 ChatUtils.userError("Usage: /shnavigateall <location type>")
