@@ -21,6 +21,7 @@ import java.awt.Color
 @SkyHanniModule
 object NavigateAllHelper {
 
+    private const val NAVIGATE_AGAIN_DISTANCE = 5
 
     private val allowedMultiNavigationTags = setOf(
         GraphNodeTag.HOPPITY,
@@ -43,8 +44,6 @@ object NavigateAllHelper {
     private val pathfindCoroutine = CoroutineSettings("navigate all pathfind")
 
     private val currentlyNavigating get() = currentTargetName != null
-
-    private const val NAVIGATE_AGAIN_DISTANCE = 5
 
     private var route: List<GraphNode> = listOf()
     private var total = 0
@@ -140,7 +139,7 @@ object NavigateAllHelper {
             "$currentTargetName ${total - route.size}/$total",
             color = color,
             onFound = {
-                currentTarget?.let { onFound(target) }
+                onFound(target)
 
                 when (continueNavigationCondition) {
                     NavigationCondition.None -> recursiveNavigate()
