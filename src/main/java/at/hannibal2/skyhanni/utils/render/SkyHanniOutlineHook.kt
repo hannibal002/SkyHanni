@@ -39,7 +39,9 @@ object SkyHanniOutlineHook {
     private var customDepthAttachmentView: GpuTextureView? = null
 
     @JvmStatic
+    @get:JvmName("isCurrentlyActive")
     var currentlyActive = false
+        private set
 
     private fun beginRendering() {
         currentlyActive = true

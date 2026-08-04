@@ -22,7 +22,7 @@ public abstract class MixinRenderPipeline {
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
         if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
-        if (!SkyHanniOutlineHook.getCurrentlyActive()) return original;
+        if (!SkyHanniOutlineHook.isCurrentlyActive()) return original;
         return original != null
             ? new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, original.writeDepth(), original.depthBiasScaleFactor(), original.depthBiasConstant())
             : new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);
@@ -32,7 +32,7 @@ public abstract class MixinRenderPipeline {
     private DepthTestFunction setGlowDepth(DepthTestFunction original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
         if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
-        return SkyHanniOutlineHook.getCurrentlyActive() ? DepthTestFunction.LEQUAL_DEPTH_TEST : original;
+        return SkyHanniOutlineHook.isCurrentlyActive() ? DepthTestFunction.LEQUAL_DEPTH_TEST : original;
     }
     *///?}
 }
