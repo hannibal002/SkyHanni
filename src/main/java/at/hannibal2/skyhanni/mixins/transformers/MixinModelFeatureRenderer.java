@@ -23,11 +23,11 @@ public abstract class MixinModelFeatureRenderer {
 
     //? if < 26.2 {
     /*@WrapOperation(method = "renderModel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V"))
-    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
+    private void setSkyHanniOutlineColor(OutlineBufferSource instance, int color, Operation<Void> original, @Local(argsOnly = true) SubmitNodeStorage.ModelSubmit<?> model) {
         if (skyhanni$usesCustomOutline(model)) {
             original.call(SkyHanniOutlineHook.getVertexConsumers(), color);
         } else {
-            original.call(outlineConsumer, color);
+            original.call(instance, color);
         }
     }
     *///?}
