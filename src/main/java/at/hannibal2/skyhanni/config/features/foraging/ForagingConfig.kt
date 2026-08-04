@@ -40,11 +40,6 @@ class ForagingConfig {
     val tracker = ForagingTrackerConfig()
 
     @Expose
-    @ConfigOption(name = "Safari", desc = "")
-    @Accordion
-    val safari = SafariConfig()
-
-    @Expose
     @ConfigOption(name = "Mute Phantoms", desc = "Silences Phantoms in Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.foraging.safari
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.pathfind.AreaNode
@@ -14,7 +13,7 @@ import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.drawDynamicText
 @SkyHanniModule
 object SafariNamesInCenter {
 
-    private val config get() = SkyHanniMod.feature.foraging.safari
+    private val config get() = SkyHanniMod.feature.hunting.safari
     private val areaLocations = mapOf(
         LorenzVec(-27.1, 66.0, 22.8) to "§2Forest Biome",
         LorenzVec(-25.5, 66.0, -23.2) to "§5Haunted Biome",
