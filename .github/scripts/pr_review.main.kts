@@ -14,20 +14,30 @@ import java.nio.charset.StandardCharsets
 import kotlin.io.path.*
 import kotlin.system.exitProcess
 
-
 /**
  * A keyword an author can put on its own line in the pull request description to control a label.
  * The line has to match exactly, the same way ChangelogVerification handles "exclude_from_changelog".
  *
  * [description] explains the label in the comment posted when it gets added.
  * [blocking] additionally publishes a commit status, so the pull request cannot be merged while the keyword is present.
+ * [markerId] identifies the comments this entry posts, see [CommentType]. It is spelled out instead of derived
+ * from [keyword] or [label], because both of those can be renamed while the markers already sit on open pull
+ * requests.
  */
 data class KeywordLabel(
     val keyword: String,
     val label: String,
+    val markerId: String,
     val description: String,
     val blocking: Boolean,
-)
+) {
+    val comment: CommentType = CommentType(markerId, "Show previous status")
+}
+
+// Announced in the state marker of every comment this mode posts, so a later run can tell which direction was
+// announced last. Both have to stay within the character set stateMarkerRegex accepts.
+val keywordStateActive = "active"
+val keywordStateInactive = "inactive"
 
 // The label of every blocking entry doubles as its status context and is also used by the set-pending job in
 // keyword-labels.yml, both must stay in sync.
@@ -35,6 +45,7 @@ val keywordLabels = listOf(
     KeywordLabel(
         keyword = "waiting_on_hypixel_alpha",
         label = "Waiting on Hypixel",
+        markerId = "keyword-label-waiting-on-hypixel",
         description = "The relevant feature is only available on the Hypixel alpha server, so this pull request can " +
             "only be tested there. It must not be merged before the feature reaches the main server.",
         blocking = true,
@@ -42,7 +53,6 @@ val keywordLabels = listOf(
 )
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
-
 
 /**
  * Identifies a comment posted by this script, so a later run finds its own previous comment again.
@@ -54,7 +64,8 @@ val workflowFailedMarker = "<!-- workflow-failed -->"
  *
  * A mode that only ever announces one direction uses [marker], because the resolved case posts nothing and the
  * presence of the marker is the whole information. A mode that announces both directions uses [stateMarker],
- * because there the presence of a marker cannot tell which direction was announced.
+ * because there the presence of a marker cannot tell which direction was announced. The keyword label mode is
+ * the second kind, it announces the label being added and being removed.
  */
 data class CommentType(val markerId: String, val expandLabel: String) {
     val marker: String = "<!-- $markerId -->"
@@ -396,6 +407,9 @@ fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> Stri
 
 // A collapsed comment loses its active marker, including the state variant. Only the stale marker remains, so
 // it can never be mistaken for the current announcement.
+//
+// Every body posted under a CommentType needs a line starting with "### ", it becomes the title of the spoiler
+// the collapsed comment turns into. A body without one ends up under [fallbackTitle].
 fun CommentType.markAsStale(comment: PrComment, fallbackTitle: String = "Unknown") {
     val cleanedOld = comment.body
         .lineSequence()
@@ -1053,6 +1067,8 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
 }
 
 fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
+    appendLine("### Labeled ${entry.label}")
+    appendLine()
     appendLine("This pull request is now labeled **${entry.label}**.")
     appendLine()
     appendLine(entry.description)
@@ -1062,6 +1078,8 @@ fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
 }
 
 fun buildKeywordLabelRemovedComment(entry: KeywordLabel): String = buildString {
+    appendLine("### Removed ${entry.label}")
+    appendLine()
     append("The line `${entry.keyword}` is no longer part of the pull request description, ")
     append("so the **${entry.label}** label was removed.")
 }
@@ -1093,13 +1111,30 @@ fun runKeywordLabelMode(prNumber: String) {
     for (entry in keywordLabels) {
         val keywordPresent = entry.keyword in bodyLines
         val wasLabeled = entry.label in currentLabels
+        val currentState = if (keywordPresent) keywordStateActive else keywordStateInactive
 
-        // Only comment on an actual state change, otherwise every unrelated description edit would post again.
-        if (keywordPresent != wasLabeled) {
-            setLabel(prNumber, entry.label, keywordPresent)
-            val comment = if (keywordPresent) buildKeywordLabelAddedComment(entry)
+        if (keywordPresent != wasLabeled) setLabel(prNumber, entry.label, keywordPresent)
+
+        // The label says what a maintainer sees, the marker says what this script announced. Only the second one
+        // decides, so neither a label edited by hand nor a label write that only logged a warning can turn into a
+        // duplicated or a missing comment.
+        val announced = entry.comment.findNewestState(prNumber)
+        // A pull request that never carried the label has no announcement at all, which is the same thing as
+        // having announced the inactive state. Comparing the nullable value directly would make every untouched
+        // pull request differ from inactive and get a label-removed comment it never earned.
+        val announcedState = announced?.state ?: keywordStateInactive
+
+        if (announcedState != currentState) {
+            val body = if (keywordPresent) buildKeywordLabelAddedComment(entry)
             else buildKeywordLabelRemovedComment(entry)
-            postPrComment(prNumber, comment) { "Error: could not post \"${entry.label}\" comment (HTTP $it)" }
+            entry.comment.post(prNumber, entry.comment.stateMarker(currentState), body) {
+                "Error: could not post \"${entry.label}\" comment (HTTP $it)"
+            }
+            // Collapsed after the new comment exists, unlike the detekt and build modes which collapse first.
+            // A failed collapse only leaves a second comment behind that the newest-state lookup ignores. A
+            // failed post after a collapse would be worse: the announcement is gone, the absent marker reads as
+            // inactive, and a change back towards inactive would then never be announced again.
+            announced?.let { entry.comment.markAsStale(it.comment) }
         }
 
         // Always published, also when nothing changed, so the status exists on every head SHA.
