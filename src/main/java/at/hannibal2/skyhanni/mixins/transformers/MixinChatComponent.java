@@ -1,8 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.features.chat.ChatPeek;
-import at.hannibal2.skyhanni.features.chroma.ChromaFontManagerKt;
-import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords;
+import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import net.minecraft.client.Minecraft;
@@ -75,12 +74,6 @@ public abstract class MixinChatComponent {
         ChatComponent.DisplayMode displayMode,
         Operation<Void> original
     ) {
-        ChromaFontManagerKt.setRenderingChat(true);
-        ModifyVisualWords.INSTANCE.setChangeWords(false);
-
-        original.call(chatGraphicsAccess, screenHeight, ticks, displayMode);
-
-        ChromaFontManagerKt.setRenderingChat(false);
-        ModifyVisualWords.INSTANCE.setChangeWords(true);
+        GuiChatHook.wrapChatRender(original, chatGraphicsAccess, screenHeight, ticks, displayMode);
     }
 }
