@@ -34,7 +34,7 @@ object NavigateAllHelper {
         GraphNodeTag.HIDEONLEAF,
         GraphNodeTag.HIDEONSUN,
         GraphNodeTag.TREE_PROTECTION_ORDER,
-        GraphNodeTag.HONEY_HIVE,
+        GraphNodeTag.HONEYHIVE,
         GraphNodeTag.SAFARI_BELL,
         GraphNodeTag.HIDEYHO_LOCATION,
     )

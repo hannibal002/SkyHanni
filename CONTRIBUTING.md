@@ -312,7 +312,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation. Extension functions and unqualified enum entries in `when` blocks are exceptions to this rule.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Enum entries may be written without their enum class name wherever the compiler resolves them from context. This is
+  preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
+  branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
+  `MyEnum.ENTRY` and `ENTRY` in the same place.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
