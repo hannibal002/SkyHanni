@@ -26,6 +26,9 @@ import org.joml.Matrix4f
 import org.joml.Vector3f
 import org.joml.Vector4f
 
+//? if >= 26.1
+import net.minecraft.client.renderer.Projection
+
 object RoundedShapeDrawer {
 
     val projectionMatrix = ProjectionMatrixBuffer(
@@ -81,8 +84,8 @@ object RoundedShapeDrawer {
             val w = window.width.toFloat() / window.guiScale.toFloat()
             val h = window.height.toFloat() / window.guiScale.toFloat()
             RenderSystem.setProjectionMatrix(
-                //~ if < 26.1 'Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)' -> 'w, h'
-                projectionMatrix.getBuffer(Matrix4f().setOrtho(0f, w, h, 0f, 1000f, 11000f)),
+                //~ if < 26.1 'Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) }' -> 'w, h'
+                projectionMatrix.getBuffer(Projection().apply { this.setupOrtho(1000f, 11000f, w, h, true) }),
                 ProjectionType.ORTHOGRAPHIC,
             )
             val dynamicTransforms = RenderSystem.getDynamicUniforms().writeTransform(

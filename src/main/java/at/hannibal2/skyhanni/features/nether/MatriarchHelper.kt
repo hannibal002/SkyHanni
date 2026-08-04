@@ -43,8 +43,8 @@ object MatriarchHelper {
     private var exitNode: GraphNode? = null
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onMobSpawn(event: MobEvent.Spawn.Special) {
-        if (!isHeavyPearl(event)) return
+    private fun onMobSpawn(event: MobEvent.Spawn.Special) {
+        if (!event.isHeavyPearl()) return
         val node = IslandGraphs.findClosestNode(event.mob.baseEntity.getLorenzVec().up(1.2), { true })
         if (node == null) {
             ErrorManager.logErrorStateWithData(
@@ -67,11 +67,11 @@ object MatriarchHelper {
         }
     }
 
-    private fun isHeavyPearl(event: MobEvent) = isEnabled() && event.mob.name == "Heavy Pearl"
+    private fun MobEvent.isHeavyPearl() = isEnabled() && mob.name == "Heavy Pearl"
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
-        if (!isHeavyPearl(event)) return
+    private fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
+        if (!event.isHeavyPearl()) return
         pearlList.removeIf { it.first == event.mob }
     }
 
@@ -84,7 +84,7 @@ object MatriarchHelper {
         if (config.useShortestDistance) {
             val path = tspCache ?: NavigationUtils.getRoute(
                 pearlList.map { it.second },
-                maxIterations = 5,
+                maxIterations = 5
             ).also {
                 val pearls = path.size
                 if (pearls != lastTspPearls) {
@@ -99,7 +99,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onTick() {
+    private fun onTick() {
         if (SkyBlockUtils.graphArea != AREA_NAME) return
         path.clear()
         path.addAll(accessPearls())
@@ -110,7 +110,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(GraphAreaChangeEvent::class, onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onGraphAreaChange() {
+    private fun onAreaChange() {
         if (SkyBlockUtils.graphArea != AREA_NAME) {
             tspCache = null
             lastTspPearls = 0
@@ -120,7 +120,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRIMSON_ISLE)
-    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+    private fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {
             val color = config.highlightColor
@@ -147,7 +147,7 @@ object MatriarchHelper {
     }
 
     @HandleEvent(IslandGraphReloadEvent::class)
-    fun onIslandGraphReload() {
+    private fun onIslandGraphReload() {
         exitNode = null
     }
 
