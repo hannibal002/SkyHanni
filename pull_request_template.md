@@ -9,6 +9,12 @@ When your PR is marked as ready for review, some of our maintainers will look th
 
 Make sure to only mark your PR as "Ready to review" when it is. If you still want to do major changes, you can keep a draft PR open until then.
 
+
+## Keyword Labels
+
+Some labels are controlled by keywords in this description. Write `waiting_on_hypixel_alpha` on its own line if the feature your PR relies on is currently only available on the Hypixel alpha server. This adds the "Waiting on Hypixel" label and blocks the PR from being merged until you remove the line again. See CONTRIBUTING.md for details.
+
+
 -->
 
 ## Dependencies

@@ -1,8 +1,10 @@
 @file:DependsOn("com.google.code.gson:gson:2.10.1")
 // Execution context: base branch
-// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, and check_dependencies.yml
+// called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
+// and keyword-labels.yml
 
 import com.google.gson.*
+import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -11,6 +13,33 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import kotlin.io.path.*
 import kotlin.system.exitProcess
+
+
+/**
+ * A keyword an author can put on its own line in the pull request description to control a label.
+ * The line has to match exactly, the same way ChangelogVerification handles "exclude_from_changelog".
+ *
+ * [description] explains the label in the comment posted when it gets added.
+ * [blocking] additionally publishes a commit status, so the pull request cannot be merged while the keyword is present.
+ */
+data class KeywordLabel(
+    val keyword: String,
+    val label: String,
+    val description: String,
+    val blocking: Boolean,
+)
+
+// The label of every blocking entry doubles as its status context and is also used by the set-pending job in
+// keyword-labels.yml, both must stay in sync.
+val keywordLabels = listOf(
+    KeywordLabel(
+        keyword = "waiting_on_hypixel_alpha",
+        label = "Waiting on Hypixel",
+        description = "The relevant feature is only available on the Hypixel alpha server, so this pull request can " +
+            "only be tested there. It must not be merged before the feature reaches the main server.",
+        blocking = true,
+    ),
+)
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
 
@@ -38,6 +67,15 @@ val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
 val maxLogChars = 10_000
+
+val maxRequestAttempts = 3
+val retryDelayMillis = 2_000L
+val retryStatusCodes = setOf(502, 503, 504)
+
+// POST endpoints that end in the same state no matter how often they are sent. Adding a label twice is a no-op,
+// and only the newest commit status per context is ever shown. Creating a comment is deliberately not on this
+// list: a gateway timeout that the server applied anyway would post the same comment twice on retry.
+val idempotentPostEndpoints = listOf("labels", "statuses")
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
 val token: String = System.getenv("GH_TOKEN") ?: error("GH_TOKEN not set")
@@ -108,13 +146,27 @@ data class DependencyCheckResult(
     val openDependencies: List<Dependency>,
 )
 
-fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
+class DependencyCheckException(message: String) : Exception(message)
+
+// PRs whose dependency check could not be completed. Collected instead of aborting, so one unreachable
+// PR cannot stop the remaining ones from getting their label and status updated.
+val failedDependencyChecks = mutableListOf<String>()
+
+fun dependencyError(message: String): Nothing = throw DependencyCheckException(message)
+
+fun sendGhRequest(request: HttpRequest): Pair<Int, JsonElement> {
+    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+    val body = runCatching { JsonParser.parseString(response.body()) }.getOrDefault(JsonNull.INSTANCE)
+    return response.statusCode() to body
+}
+
+fun buildGhRequest(method: String, path: String, payload: Any?): HttpRequest {
     val bodyPublisher = if (payload != null)
         HttpRequest.BodyPublishers.ofString(gson.toJson(payload))
     else
         HttpRequest.BodyPublishers.noBody()
 
-    val request = HttpRequest.newBuilder()
+    return HttpRequest.newBuilder()
         .uri(URI.create("https://api.github.com$path"))
         .header("Authorization", "Bearer $token")
         .header("Accept", "application/vnd.github+json")
@@ -122,11 +174,46 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
         .header("Content-Type", "application/json")
         .method(method, bodyPublisher)
         .build()
-
-    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
-    val body = runCatching { JsonParser.parseString(response.body()) }.getOrDefault(JsonNull.INSTANCE)
-    return response.statusCode() to body
 }
+
+// Retrying a request must not change the outcome when the server already applied it. Every GET, PATCH and
+// DELETE this script sends is a read, an edit of one known comment, or a label removal, and repeating any of
+// them lands in the same state. POST creates something, so it is only retried for the endpoints listed as
+// idempotent. The decision lives here instead of at the call site, so a newly added POST cannot inherit the
+// retry by accident. An endpoint missing from the list only loses its retry, which is harmless, while the
+// opposite default would silently duplicate a comment.
+fun isRetryable(method: String, path: String): Boolean {
+    if (method != "POST") return true
+    // Whole path segments only, and only those behind the "/repos/<owner>/<name>" prefix, so neither the
+    // repository name nor any other interpolated value can be mistaken for an endpoint name.
+    val segments = path.substringBefore("?")
+        .removePrefix("/repos/$repo")
+        .split("/")
+        .filter { it.isNotEmpty() }
+    return segments.any { it in idempotentPostEndpoints }
+}
+
+fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
+    val request = buildGhRequest(method, path, payload)
+    if (!isRetryable(method, path)) return sendGhRequest(request)
+
+    // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
+    // must not fail the whole workflow run. The last attempt returns whatever it gets.
+    repeat(maxRequestAttempts - 1) { index ->
+        val attempt = index + 1
+        val reason = try {
+            val result = sendGhRequest(request)
+            if (result.first !in retryStatusCodes) return result
+            "HTTP ${result.first}"
+        } catch (e: IOException) {
+            e.toString()
+        }
+        System.err.println("Warning: $method $path failed ($reason), retry $attempt of ${maxRequestAttempts - 1}")
+        Thread.sleep(retryDelayMillis * attempt)
+    }
+    return sendGhRequest(request)
+}
+
 
 fun ghRepoGet(path: String): Pair<Int, JsonElement> = ghRequest("GET", "/repos/$repo$path")
 
@@ -716,7 +803,7 @@ fun isDependencyOpen(dep: Dependency): Boolean {
         return false
     }
     if (status.isHttpError) {
-        error("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
+        dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
     return state == "open"
@@ -738,18 +825,23 @@ fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>) {
     if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
 
     val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    status.requireSuccess("Error: could not update dependency status for $headSha (HTTP $status)")
+    if (status.isHttpError) {
+        dependencyError("Error: could not update dependency status for $headSha (HTTP $status)")
+    }
 }
 
+// Throws DependencyCheckException when this PR could not be evaluated. Callers that iterate over many PRs
+// must use checkPrDependenciesOrNull instead.
 fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
     val (status, body) = ghRepoGet("/pulls/$issueNumber")
     if (status.isHttpError) {
-        error("Error: could not fetch PR #$issueNumber (HTTP $status)")
+        dependencyError("Error: could not fetch PR #$issueNumber (HTTP $status)")
     }
-    val pr = body as? JsonObject ?: error("Error: unexpected response format for PR #$issueNumber")
+    val pr = body as? JsonObject ?: dependencyError("Error: unexpected response format for PR #$issueNumber")
     val prBody = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
     val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
-        ?: error("Error: head SHA missing for PR #$issueNumber")
+        ?: dependencyError("Error: head SHA missing for PR #$issueNumber")
 
     if ("## Dependencies" !in prBody) {
         println("PR #$issueNumber: no Dependencies section, skipping")
@@ -778,6 +870,24 @@ fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
     return DependencyCheckResult(deps, openDeps)
 }
 
+
+fun skipFailedDependencyCheck(issueNumber: String, reason: String): DependencyCheckResult? {
+    System.err.println("Warning: could not evaluate dependencies of PR #$issueNumber ($reason), skipping")
+    failedDependencyChecks.add(issueNumber)
+    return null
+}
+
+// A dropped connection has to be treated like a repeated gateway timeout, otherwise a transport failure
+// still aborts the whole loop while an HTTP failure does not.
+fun checkPrDependenciesOrNull(issueNumber: String): DependencyCheckResult? = try {
+    checkPrDependencies(issueNumber)
+} catch (e: DependencyCheckException) {
+    skipFailedDependencyCheck(issueNumber, e.message ?: e.toString())
+} catch (e: IOException) {
+    skipFailedDependencyCheck(issueNumber, e.toString())
+}
+
+
 fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     val result = mutableListOf<JsonObject>()
     val encoded = URLEncoder.encode(dependencyLabel, StandardCharsets.UTF_8).replace("+", "%20")
@@ -785,7 +895,7 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     while (true) {
         val (status, body) = ghRepoGet("/issues?labels=$encoded&state=open&per_page=100&page=$page")
         if (status.isHttpError) {
-            error("Error: could not fetch labeled PRs (HTTP $status)")
+            error("Error: could not fetch labeled PRs (HTTP $status)", commentError = false)
         }
         val array = body as? JsonArray ?: break
         for (element in array) {
@@ -831,7 +941,7 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
         if ("## Dependencies" !in body) continue
         val deps = parseDependencies(body)
         if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
-            checkPrDependencies(num)
+            checkPrDependenciesOrNull(num)
         }
     }
 }
@@ -879,26 +989,28 @@ fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remain
     }
 }
 
-fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
-    if (prState != "closed") {
-        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
-        checkPrDependencies(num)
-        val prAction = System.getenv("PR_ACTION") ?: ""
-        if (prAction == "reopened") {
-            val targetPrNum = num.toIntOrNull()
-            if (targetPrNum != null) recheckPRsDependingOn(targetPrNum)
-        }
-        return
-    }
 
-    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
-    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event")
+fun runDependenciesModeForOpenPr(prNum: String?) {
+    val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
+    // This PR is the one the workflow was triggered for, so a failure belongs on it as a comment.
+    try {
+        checkPrDependencies(num)
+    } catch (e: DependencyCheckException) {
+        error(e.message ?: "Error: dependency check failed for PR #$num")
+    }
+    if (System.getenv("PR_ACTION") == "reopened") {
+        val targetPrNum = num.toIntOrNull() ?: return
+        recheckPRsDependingOn(targetPrNum)
+    }
+}
+
+fun recheckLabeledPRsAfterClose(closedPrNum: Int, merged: Boolean) {
     val repoOwner = repo.substringBefore("/")
     val repoName = repo.substringAfter("/")
 
     for (pr in fetchAllLabeledOpenPRs()) {
         val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-        val result = checkPrDependencies(num)
+        val result = checkPrDependenciesOrNull(num) ?: continue
         val isDirectDep = result.dependencies.any {
             it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum
         }
@@ -909,9 +1021,77 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
     }
 }
 
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+    if (prState != "closed") {
+        runDependenciesModeForOpenPr(prNum)
+        return
+    }
+
+    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
+    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event", commentError = false)
+    recheckLabeledPRsAfterClose(closedPrNum, merged)
+}
+
+fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
+    appendLine("This pull request is now labeled **${entry.label}**.")
+    appendLine()
+    appendLine(entry.description)
+    appendLine()
+    append("The label disappears automatically once the line `${entry.keyword}` ")
+    append("is removed from the pull request description.")
+}
+
+fun buildKeywordLabelRemovedComment(entry: KeywordLabel): String = buildString {
+    append("The line `${entry.keyword}` is no longer part of the pull request description, ")
+    append("so the **${entry.label}** label was removed.")
+}
+
+fun setKeywordLabelStatus(headSha: String, entry: KeywordLabel, keywordPresent: Boolean) {
+    val payload = mutableMapOf<String, Any>(
+        "state" to if (keywordPresent) "failure" else "success",
+        "context" to entry.label,
+        "description" to if (keywordPresent) "Marked as \"${entry.label}\"" else "Not marked as \"${entry.label}\"",
+    )
+    val runId = System.getenv("GITHUB_RUN_ID")
+    if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
+
+    val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
+    status.requireSuccess("Error: could not update \"${entry.label}\" status for $headSha (HTTP $status)")
+}
+
+fun runKeywordLabelMode(prNumber: String) {
+    val (status, body) = ghRepoGet("/pulls/$prNumber")
+    if (status.isHttpError) error("Error: could not fetch PR #$prNumber (HTTP $status)")
+    val pr = body as? JsonObject ?: error("Error: unexpected response format for PR #$prNumber")
+    val prBody = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+    val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
+        ?: error("Error: head SHA missing for PR #$prNumber")
+
+    val bodyLines = prBody.lines()
+    val currentLabels = getPrLabels(prNumber)
+
+    for (entry in keywordLabels) {
+        val keywordPresent = entry.keyword in bodyLines
+        val wasLabeled = entry.label in currentLabels
+
+        // Only comment on an actual state change, otherwise every unrelated description edit would post again.
+        if (keywordPresent != wasLabeled) {
+            setLabel(prNumber, entry.label, keywordPresent)
+            val comment = if (keywordPresent) buildKeywordLabelAddedComment(entry)
+            else buildKeywordLabelRemovedComment(entry)
+            postPrComment(prNumber, comment) { "Error: could not post \"${entry.label}\" comment (HTTP $it)" }
+        }
+
+        // Always published, also when nothing changed, so the status exists on every head SHA.
+        if (entry.blocking) setKeywordLabelStatus(headSha, entry, keywordPresent)
+
+        println("PR #$prNumber: ${entry.keyword} is ${if (keywordPresent) "present" else "absent"}")
+    }
+}
+
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
-if (mode == "mergeconflict") {
+if (mode == "merge_conflict") {
     if (prNumberEnv != null) {
         runMergeConflictMode(prNumberEnv)
     } else {
@@ -927,6 +1107,13 @@ if (mode == "dependencies") {
     val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
     val prMerged = System.getenv("PR_MERGED") == "true"
     runDependenciesMode(prState, prNumberEnv, prMerged)
+    if (failedDependencyChecks.isNotEmpty()) {
+        // No comment here, PR_NUMBER points at the triggering PR, not at the ones that failed.
+        error(
+            "Error: could not evaluate dependencies of ${failedDependencyChecks.joinToString(", ") { "#$it" }}",
+            commentError = false,
+        )
+    }
     exitProcess(0)
 }
 
@@ -934,5 +1121,6 @@ when (mode) {
     "detekt" -> runDetektMode(prNumber)
     "build" -> runBuildMode(prNumber)
     "changelog" -> runChangelogMode(prNumber)
+    "keyword_labels" -> runKeywordLabelMode(prNumber)
     else -> error("Unsupported MODE: $mode")
 }
