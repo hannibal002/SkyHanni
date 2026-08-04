@@ -173,7 +173,6 @@
     <ID>NoTopLevelDefinition:ErrorManager.kt:@Suppress("unused") fun requireDevEnv</ID>
     <ID>NoTopLevelDefinition:ErrorManager.kt:fun requireDevEnv</ID>
     <ID>NoTopLevelDefinition:EventWaypoint.kt:fun loadEventWaypoints: Map&lt;String, MutableSet&lt;EventWaypoint&gt;&gt;</ID>
-    <ID>NoTopLevelDefinition:FakePlayerRenderable.kt:fun Renderable.Companion.fakePlayer</ID>
     <ID>NoTopLevelDefinition:FakePlayerRenderable.kt:private fun drawEntityWithoutScissor</ID>
     <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:fun &lt;T&gt; tabListGuarded: T</ID>
     <ID>NoTopLevelDefinition:GuiPlayerTabOverlayHook.kt:fun getPlayerName</ID>
@@ -275,9 +274,6 @@
     <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun Renderable.renderAt</ID>
     <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun combineAnchoredVisualAndTextRenderables: Renderable</ID>
     <ID>NoTopLevelDefinition:PetDisplayTextRenderables.kt:private fun formatExpPairByConfigOption: String</ID>
-    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.empty</ID>
-    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.emptyText</ID>
-    <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:fun Renderable.Companion.placeholder</ID>
     <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:private val empty = Renderable.placeholder(0, 0)</ID>
     <ID>NoTopLevelDefinition:PlaceholderRenderable.kt:private val emptyText = Renderable.placeholder(0, 10)</ID>
     <ID>NoTopLevelDefinition:RenderItemHook.kt:fun renderItemOverlayPost</ID>
@@ -362,7 +358,6 @@
     <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.obfuscated: Boolean get() = this.style.isObfuscated set(value) { this.withStyle { it.withObfuscated(value) } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.strikethrough: Boolean get() = this.style.isStrikethrough set(value) { this.withStyle { it.withStrikethrough(value) } }</ID>
     <ID>NoTopLevelDefinition:TextCompat.kt:var MutableComponent.underlined: Boolean get() = this.style.isUnderlined set(value) { this.withStyle { it.withUnderlined(value) } }</ID>
-    <ID>NoTopLevelDefinition:TextRenderable.kt:fun Renderable.Companion.text</ID>
     <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_DAYS = FACTOR_HOURS * 24</ID>
     <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_HOURS = FACTOR_MINUTES * 60</ID>
     <ID>NoTopLevelDefinition:TimeUtils.kt:private const val FACTOR_MINUTES = FACTOR_SECONDS * 60</ID>
