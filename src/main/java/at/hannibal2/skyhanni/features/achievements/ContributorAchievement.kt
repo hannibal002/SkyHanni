@@ -17,6 +17,10 @@ import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.compat.componentBuilder
 import at.hannibal2.skyhanni.utils.compat.hover
 import net.minecraft.ChatFormatting
+import net.minecraft.network.chat.Component
+import com.mojang.authlib.GameProfile
+import net.minecraft.network.chat.contents.objects.PlayerSprite
+import net.minecraft.world.item.component.ResolvableProfile
 
 @SkyHanniModule
 object ContributorAchievement {
@@ -128,15 +132,19 @@ object ContributorAchievement {
         }
     }
 
-    fun onUniqueContributorSeen(username: String) {
+    fun onUniqueContributorSeen(profile: GameProfile, username: String) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (completed || config.discoverContributorMessage) {
+            val resolveProfile = ResolvableProfile.createResolved(profile)
+            val sprite = PlayerSprite(resolveProfile, false)
+            val player = Component.`object`(sprite)
             ChatUtils.chat {
                 appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
                 appendWithColor(" (hover)", ChatFormatting.GRAY)
                 hover = componentBuilder {
                     appendWithColor("You have encountered ", ChatFormatting.GRAY)
-                    appendWithColor(username, ChatFormatting.AQUA)
+                    append(player)
+                    appendWithColor(" $username", ChatFormatting.AQUA)
                     appendWithColor(" for the first time!", ChatFormatting.GRAY)
                 }
             }

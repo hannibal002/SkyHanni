@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.compat.appendWithColor
 import at.hannibal2.skyhanni.utils.coroutines.CoroutineSettings
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import com.mojang.authlib.GameProfile
 import net.minecraft.ChatFormatting
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.player.Player
@@ -325,20 +326,21 @@ object ContributorManager {
     @HandleEvent
     private fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
         val gameProfile = event.entity.gameProfile
-        getSuffix(gameProfile.id)?.let {
-            recordSeenContributor(gameProfile.id, gameProfile.name)
+        val uuid = gameProfile.id
+        getSuffix(uuid)?.let {
+            recordSeenContributor(gameProfile, uuid, gameProfile.name)
             if (!config.contributorNametags) return
             if (contribNametagAppendSpacePattern.find(event.chatComponent)) event.chatComponent.append(" ")
             event.chatComponent.append(it)
         }
     }
 
-    private fun recordSeenContributor(uuid: UUID, username: String) {
+    private fun recordSeenContributor(gameProfile: GameProfile, uuid: UUID, username: String) {
         if (uuid == PlayerUtils.getRawUuid()) return
         if (uuid in seenContributors) return
         seenContributors[uuid] = SimpleTimeMark.now()
         saveConfig("added new seen contributor")
-        ContributorAchievement.onUniqueContributorSeen(username)
+        ContributorAchievement.onUniqueContributorSeen(gameProfile, username)
     }
 
     fun getDisplayNameFromUUID(uuid: UUID): String? = contributors[uuid]?.displayName
