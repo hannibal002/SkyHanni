@@ -15,4 +15,15 @@ class SafariConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var namesInCenter: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Hideyho Finder",
+        desc = "Shows the names of the 4 areas while in the center of the Critter Safari.",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var hideyhoFinder: Boolean = false
+
+
 }
