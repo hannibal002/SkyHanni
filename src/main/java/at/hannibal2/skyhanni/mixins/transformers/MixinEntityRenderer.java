@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
 //? if >= 26.1 {
 import at.hannibal2.skyhanni.data.EntityData;
 import at.hannibal2.skyhanni.utils.SkyBlockUtils;
@@ -83,7 +82,7 @@ public abstract class MixinEntityRenderer {
         index = 3
     )
     private Component modifyRenderLabelIfPresentArgs(Component text) {
-        if (SkyBlockUtils.INSTANCE.getInSkyBlock()) {
+        if (SkyBlockUtils.getInSkyBlock()) {
             return EntityData.getHealthDisplay(text);
         }
         return text;
