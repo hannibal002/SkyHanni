@@ -47,7 +47,7 @@ object ReforgeApi {
         SWORD_AND_ROD(ItemCategory.SWORD, ItemCategory.GAUNTLET, ItemCategory.LONGSWORD, ItemCategory.FISHING_ROD),
         SPECIAL_ITEMS,
         VACUUM(ItemCategory.VACUUM),
-        FISHING_NET(ItemCategory.FISHING_NET)
+        FISHING_NET(ItemCategory.FISHING_NET),
     }
 
     sealed interface ReforgeData {
