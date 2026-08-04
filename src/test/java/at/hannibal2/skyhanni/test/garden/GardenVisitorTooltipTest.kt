@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import net.minecraft.world.item.Items
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
@@ -41,7 +42,7 @@ class GardenVisitorTooltipTest {
 
     @Test
     fun `visitor tooltip parses copper line and rare reward with heart suffix`() {
-        val offerItem = ItemUtils.createItemStack(Items.GREEN_TERRACOTTA, "§aAccept Offer", spacemanLore)
+        val offerItem = ItemUtils.createItemStack(ColoredBlockCompat.GREEN.clayBlock.asItem(), "§aAccept Offer", spacemanLore)
         val visitor = VisitorApi.Visitor(
             visitorName = "§cSpaceman",
             status = VisitorApi.VisitorStatus.NEW,

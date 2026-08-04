@@ -3436,12 +3436,7 @@
     <ID>StatementWrapping:PetData.kt:PetData${ specifiedRarity.oneAbove() ?: specifiedRarity }</ID>
     <ID>StatementWrapping:SkyHanniRealtimeItemSlot.kt:SkyHanniRealtimeItemSlot${ allocate(slotSize) }</ID>
     <ID>StorageVarOrVal:ChatSoundResponseConfig.kt:ChatSoundResponseConfig$@Expose @ConfigOption(name = "Sound Responses", desc = "Add animal sounds to play when certain words are said in chat.") @ConfigEditorDraggableList var soundResponses = SoundResponseTypes.entries.toMutableList()</ID>
-    <ID>StorageVarOrVal:GalateaMobHighlightConfig.kt:GalateaMobHighlightConfig$@Expose @ConfigOption(name = "Birries Highlight", desc = "") @Accordion var birries = BirriesHighlightConfig()</ID>
-    <ID>StorageVarOrVal:GalateaMobHighlightConfig.kt:GalateaMobHighlightConfig$@Expose @ConfigOption(name = "Hideonleaf Highlight", desc = "") @Accordion var hideonleaf = HideonleafHighlightConfig()</ID>
-    <ID>StorageVarOrVal:GalateaMobHighlightConfig.kt:GalateaMobHighlightConfig$@Expose @ConfigOption(name = "Invisibug Highlight", desc = "") @Accordion var invisibug = InvisibugHighlightConfig()</ID>
     <ID>StorageVarOrVal:GuiConfig.kt:GuiConfig$@Expose @ConfigOption(name = "Mayor Overlay", desc = "Settings for the mayor overlay.") @Accordion var mayorOverlay = MayorOverlayConfig()</ID>
-    <ID>StorageVarOrVal:HuntingConfig.kt:HuntingConfig$@Expose @Category(name = "Fusion Keybinds", desc = "Settings for fusion keybinds") @SearchTag("hunting box") var fusionKeybinds = FusionKeybindsConfig()</ID>
-    <ID>StorageVarOrVal:HuntingConfig.kt:HuntingConfig$@Expose @Category(name = "Galatea Mob Highlights", desc = "Settings for Galatea mob highlights") var mobHighlight = GalateaMobHighlightConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Colors", desc = "Configure colors for each class and dead teammates.", ) @Accordion var colorConfig = SpiritLeapColorConfig()</ID>
     <ID>StorageVarOrVal:SpiritLeapConfig.kt:SpiritLeapConfig$@Expose @ConfigOption( name = "Spirit Leap Keybinds", desc = "Set keybinds and show keybind hints for Spirit Leap." ) @Accordion var spiritLeapKeybindConfig = SpiritLeapKeybindConfig()</ID>
     <ID>StorageVarOrVal:SuperCraftingConfig.kt:SuperCraftingConfig$@Expose @Accordion @ConfigOption(name = "Presets", desc = "") var presets = SuperCraftPresetsConfig()</ID>
@@ -3655,6 +3650,7 @@
     <ID>UnusedParameter:ChromaFontManager.kt:text: String</ID>
     <ID>UnusedParameter:CropType.kt:CropType.Companion$pos: LorenzVec</ID>
     <ID>UnusedParameter:MobUtils.kt:MobUtils$partialTicks: Float</ID>
+    <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$armorStand: ArmorStand?</ID>
     <ID>UnusedParameter:ModernIslandExceptions.kt:ModernIslandExceptions$nextEntity: LivingEntity?</ID>
     <ID>UnusedParameter:RenderEvents.kt:RenderEvents$tick: DeltaTracker</ID>
     <ID>UnusedPrivateProperty:BetterContainers.kt:BetterContainers$private val x: Identifier = Identifier.fromNamespaceAndPath("skyhanni", "dynamic_54")</ID>
