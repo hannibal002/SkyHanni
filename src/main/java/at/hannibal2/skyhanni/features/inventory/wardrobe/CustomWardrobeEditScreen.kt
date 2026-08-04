@@ -60,7 +60,7 @@ class CustomWardrobeEditScreen(
             unhoveredColor = color.darker(0.8),
             onClick = {
                 CustomWardrobe.exitEditMode()
-            }
+            },
         )
     }
 }

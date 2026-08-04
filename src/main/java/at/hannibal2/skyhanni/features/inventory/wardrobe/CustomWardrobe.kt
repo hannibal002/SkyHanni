@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
-
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig
@@ -44,6 +43,7 @@ import kotlin.math.min
 
 @Suppress("TooManyFunctions")
 object CustomWardrobe {
+
     val config: CustomWardrobeConfig get() = SkyHanniMod.feature.inventory.customWardrobe
 
     internal var switchingScreens = false

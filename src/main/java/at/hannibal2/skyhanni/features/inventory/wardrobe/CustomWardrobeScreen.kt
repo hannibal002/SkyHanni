@@ -18,8 +18,9 @@ class CustomWardrobeScreen(
         CustomWardrobe.renderableTopCorner.first,
         CustomWardrobe.renderableTopCorner.second,
         CustomWardrobe.renderableDimensions.first,
-        CustomWardrobe.renderableDimensions.second
+        CustomWardrobe.renderableDimensions.second,
     )
+
     override fun shouldShowItemList(): Boolean = CustomWardrobe.config.showReiItems
 
     override fun onInitGui() {
