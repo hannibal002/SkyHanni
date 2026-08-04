@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory.wardrobe
+package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
@@ -12,6 +12,10 @@ import net.minecraft.world.inventory.ChestMenu
 import net.minecraft.world.inventory.ContainerListener
 
 // Reference: https://github.com/SkyblockerMod/Skyblocker/blob/main/src/main/java/de/hysky/skyblocker/skyblock/dungeon/LeapOverlay.java
+/**
+ * An abstract class that replaces a skyblock menu screen with a custom one.
+ * Look at [at.hannibal2.skyhanni.mixins.hooks.MenuScreensHook] for when to use your custom menu screen.
+ */
 abstract class AbstractCustomMenuScreen(
     initialMenu: ChestMenu,
     title: Component,

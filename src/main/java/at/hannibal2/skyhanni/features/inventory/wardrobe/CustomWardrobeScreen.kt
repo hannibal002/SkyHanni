@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
+import at.hannibal2.skyhanni.utils.AbstractCustomMenuScreen
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SafeItemStack
 import at.hannibal2.skyhanni.utils.compat.MinecraftCompat
