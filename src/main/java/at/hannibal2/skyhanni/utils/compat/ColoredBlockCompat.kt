@@ -20,10 +20,10 @@ import net.minecraft.world.level.block.state.BlockState
 enum class ColoredBlockCompat(
     private val metaColor: Int,
     private val color: LorenzColor,
-    private val glassBlock: Block,
-    private val glassPaneBlock: Block,
-    private val woolBlock: Block,
-    private val clayBlock: Block,
+    val glassBlock: Block,
+    val glassPaneBlock: Block,
+    val woolBlock: Block,
+    val clayBlock: Block,
 ) {
     WHITE(
         0,
