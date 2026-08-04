@@ -24,8 +24,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer
 import io.github.notenoughupdates.moulconfig.ChromaColour
 import net.minecraft.client.Camera
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.client.renderer.blockentity.BeaconRenderer
+import net.minecraft.client.renderer.rendertype.RenderType
 import net.minecraft.core.Direction
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity

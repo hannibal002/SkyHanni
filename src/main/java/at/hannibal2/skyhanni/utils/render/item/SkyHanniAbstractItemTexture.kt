@@ -26,7 +26,12 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
         textureView = device.createTextureView(texture!!)
         depthTexture = device.createTexture(depthLabel, usageInt, TextureFormat.DEPTH32, size, size, 1, 1)
         depthTextureView = device.createTextureView(depthTexture!!)
-        device.createCommandEncoder().clearColorAndDepthTextures(texture!!, GuiRenderer.CLEAR_COLOR, depthTexture!!, RenderCompat.CLEAR_DEPTH)
+        device.createCommandEncoder().clearColorAndDepthTextures(
+            texture!!,
+            GuiRenderer.CLEAR_COLOR,
+            depthTexture!!,
+            RenderCompat.CLEAR_DEPTH,
+        )
     }
 
     override fun close() {
