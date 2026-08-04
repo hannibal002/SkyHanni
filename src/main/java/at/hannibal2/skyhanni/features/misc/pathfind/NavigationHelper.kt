@@ -29,7 +29,7 @@ object NavigationHelper {
 
     private val messageId = ChatUtils.getUniqueMessageId()
 
-    val allowedTags = listOf(
+    val allowedSingleNavigationTags = setOf(
         GraphNodeTag.NPC,
         GraphNodeTag.AREA,
         GraphNodeTag.SMALL_AREA,
@@ -84,7 +84,7 @@ object NavigationHelper {
                 node.pathFind(label = name, allowRerouting = true, condition = { true })
                 sendNavigateMessage(name, goBack)
             }
-            val tag = node.tags.first { it in allowedTags }
+            val tag = node.tags.first { it in allowedSingleNavigationTags }
             val hoverText = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
             component.hover = hoverText.asComponent()
             component
@@ -108,7 +108,7 @@ object NavigationHelper {
             if (node.name == AreaNode.NO_AREA) continue
             // no need to navigate to the current area
             if (node.name == SkyBlockUtils.graphArea) continue
-            val tag = node.tags.first { it in allowedTags }
+            val tag = node.tags.first { it in allowedSingleNavigationTags }
             val name = "${node.cleanName} §7(${tag.displayName}§7)"
             if (name in names) continue
             names[name] = node
@@ -126,7 +126,7 @@ object NavigationHelper {
         for (node in graph) {
             if (!node.enabled) continue
             val name = node.cleanName ?: continue
-            val remainingTags = node.tags.filter { it in allowedTags }
+            val remainingTags = node.tags.filter { it in allowedSingleNavigationTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
                 distances[node] = GraphUtils.findShortestDistance(closestNode, node)
@@ -139,12 +139,12 @@ object NavigationHelper {
     }
 
     @HandleEvent
-    fun onCommandRegistration(event: CommandRegistrationEvent) {
+    private fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.registerBrigadier("shnavigate") {
-            description = "Using path finder to go to locations"
+            description = "Use the path finder to go to a specific location"
             aliases = listOf("shnav")
             argCallback("coords", LorenzVecArgumentType.double()) { location ->
-                pathFind(location.add(-1, -1, -1), "Custom Goal", condition = { true })
+                pathFind(location, "Custom Goal", condition = { true })
                 ChatUtils.chat("Started Navigating to custom goal at §f${location.toLocalFormat()}", messageId = messageId)
             }
             argCallback("search", BrigadierArguments.greedyString(), BrigadierUtils.dynamicSuggestionProvider { getNames() }) {
@@ -167,6 +167,6 @@ object NavigationHelper {
         val name = name ?: return false
         if (name == AreaNode.NO_AREA) return false
         if (name == SkyBlockUtils.graphArea) return false
-        return tags.any { it in allowedTags }
+        return tags.any { it in allowedSingleNavigationTags }
     }
 }
