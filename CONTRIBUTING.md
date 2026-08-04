@@ -461,7 +461,8 @@ Most workflows use a two-workflow split to allow write-operations on fork PRs wi
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
 triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
 `pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
-the head branch of the triggering workflow run. The Merge Conflict Comment and Dependency Label sections do not use this split.
+the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
+do not use this split.
 
 #### Automated Detekt Review
 
@@ -504,7 +505,7 @@ conflicts are resolved, the comment is collapsed into a `<details>` spoiler and 
 - `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
   beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
   provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
-- `.github/scripts/pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=merge_conflict`): Queries the GitHub Pulls API for the `mergeable` field of
   the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
@@ -549,6 +550,24 @@ Known limitation: if a dependency PR in an external repository merges, the workf
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
 Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_review.main.kts`.
+
+#### Description Keyword Labels
+
+Some labels are controlled by keywords in the pull request description. Writing the keyword on its own line adds the label, removing
+the line removes it again. Every change posts a comment on the PR explaining what happened.
+
+Supported keywords:
+
+- `waiting_on_hypixel_alpha` adds the `Waiting on Hypixel` label. Use it when the relevant feature is only available on the Hypixel
+  alpha server, so the pull request can only be tested there and must not be merged before the feature reaches the main server. This
+  keyword also publishes a failing commit status while the line is present.
+
+The line has to match exactly, the same way `exclude_from_changelog` works. Leading or trailing spaces, list markers such as `- `, and
+a different capitalization all prevent the keyword from being recognized.
+
+The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
+
+Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
 
 ## Access Wideners
 
