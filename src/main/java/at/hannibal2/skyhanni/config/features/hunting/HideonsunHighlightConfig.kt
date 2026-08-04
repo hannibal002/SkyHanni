@@ -10,17 +10,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag
 import java.awt.Color
 
-class HideonleafHighlightConfig {
+class HideonsunHighlightConfig {
 
     @Expose
-    @ConfigOption(name = "Highlight Hideonleaf", desc = "Highlights nearby Hideonleaf.")
+    @ConfigOption(name = "Highlight Hideonsun", desc = "Highlights nearby Hideonsun.")
     @FeatureToggle
     @ConfigEditorBoolean
     @SearchTag("shulker")
     var enabled: Boolean = true
 
     @Expose
-    @ConfigOption(name = "Color", desc = "Color for the Hideonleaf highlight.")
+    @ConfigOption(name = "Color", desc = "Color for the Hideonsun highlight.")
     @ConfigEditorColour
     @SearchTag("shulker")
     var color: ChromaColour = Color.MAGENTA.toChromaColor()
