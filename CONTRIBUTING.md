@@ -126,6 +126,11 @@ You can do this by following the instructions within the IntelliJ window in the 
 
 Please use a prefix for the PR name (e.g., Feature, Improvement, Fix, Backend, etc.).
 
+Bug fixes should generally be submitted as standalone PRs. Including a bug fix alongside other changes is only acceptable if the
+total PR size is small (under 500 lines changed). Large PRs whose primary goal is not a bug fix should not include **Fixes**
+changelog entries. If you discover a bug while working on a large PR, extract the fix into a separate standalone PR instead of
+including it in the current one.
+
 When writing the PR description, ensure you fill out the template with all the necessary information.
 In the **What** section, write technical details or explanations that don't belong in the changelog.
 Including that field is optional for small changes.
@@ -203,6 +208,7 @@ Make sure such pull requests have a good explanation in the **What** section.
       blocked from the repository.
 - Use the coding conventions for [Kotlin](https://kotlinlang.org/docs/coding-conventions.html)
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
+
 - **My build is failing due to `detekt`, what do I do?**
     - `detekt` is our code quality tool. It checks for code smells and style issues.
     - When you open or update a pull request, Detekt runs automatically in CI. Any findings are posted as a comment on
@@ -212,6 +218,18 @@ Make sure such pull requests have a good explanation in the **What** section.
     - **There are valid reasons to deviate from the norm**
         - If you have such a case, either use `@Suppress("rule_name")`, or re-build the `baseline-main.xml` file,
           using `./gradlew detektBaselineMain`.
+- **Setting up the Detekt IntelliJ plugin (one time, per machine)**
+    - Install the [Detekt](https://plugins.jetbrains.com/plugin/10761-detekt) plugin from the JetBrains Marketplace to
+      see Detekt findings inline while editing.
+    - Open `Settings → Tools → Detekt` and set:
+        - `Configuration Files` to `detekt/detekt.yml`
+        - `Baseline File` to `detekt/baseline-main.xml`
+  - Both `detekt.yml` and `baseline-main.xml` are committed to the repository, but the plugin's reference to them
+    is stored per machine, not shared through git. Every contributor needs to set this link once after cloning the
+    repository. Without it, the plugin flags issues that CI does not (rules disabled in `detekt.yml`, or issues
+    already covered by the baseline).
+- When the SkyHanni IntelliJ plugin flags issues in a file you are already editing, fix those issues in the
+  same PR. Do not create standalone PRs to sweep plugin warnings across the entire codebase.
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
     - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
@@ -219,13 +237,17 @@ Make sure such pull requests have a good explanation in the **What** section.
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-    - Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Keep mixin code minimal. The mixin method should contain only a single call to a Kotlin function. All logic belongs in Kotlin.
+      Exception: a standalone `if` that calls `ci.cancel()` is acceptable when the `CallbackInfo` object must stay in the mixin.
 - New features should be made in Kotlin objects unless there is a specific reason for it not to.
     - If the feature needs to register Fabric events, uses SkyHanni events or creates repo patterns, annotate the feature class with
       `@SkyHanniModule`
     - This will automatically register all events to the respective event bus, and loads the repo patterns.
     - Until the project is compiled for the first time, the IDE will show a red error in `SkyHanniMod.kt`. This is expected and resolves
       after the first build.
+- All functions and properties must be defined inside a class or object. Top-level Kotlin functions and properties are not
+  permitted.
+- Use `Unit` instead of `Void` in Kotlin code.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
@@ -251,6 +273,9 @@ Make sure such pull requests have a good explanation in the **What** section.
         - RenderingSkyHanniEvent: An event in which listeners are allowed to do GUI rendering.
     - Events can also use the `SkyHanniEvent.Cancellable` and `SkyHanniEvent.Rendering`
       interfaces directly if needed.
+    - Functions annotated with `@HandleEvent` must be declared `private`.
+      The [SkyHanni IntelliJ plugin](https://github.com/hannibal002/SkyHanniDevelopment) flags non-private handlers and provides a quick
+      fix.
 - Do not subscribe to Fabric events directly in feature classes. Instead, subscribe to SkyHanni events.
   Only backend data classes in the `api` packages should listen to Fabric events. Their job is to process
   the Fabric event and fire a corresponding SkyHanni event that feature classes then use.
@@ -287,7 +312,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation. Extension functions and unqualified enum entries in `when` blocks are exceptions to this rule.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Enum entries may be written without their enum class name wherever the compiler resolves them from context. This is
+  preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
+  branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
+  `MyEnum.ENTRY` and `ENTRY` in the same place.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -325,6 +354,17 @@ Helps you write Minecraft specific code such as mixins and access wideners.
 ### [Stonecutter Development](https://plugins.jetbrains.com/plugin/25044-stonecutter-dev)
 
 Provides syntax highlighting and quick version switching for our multiversion development setup.
+
+### [SkyHanni Development Plugin](https://github.com/hannibal002/SkyHanniDevelopment)
+
+An IntelliJ plugin with SkyHanni-specific development assistance. It validates, for example, event handler
+declarations, flags missing or incorrect `@HandleEvent`, `@PrimaryFunction`, and `@SkyHanniModule`
+annotations, resolves config paths, and suppresses false-positive IntelliJ warnings in SkyHanni-specific
+patterns such as RepoPattern keys and Brigadier command names.
+
+Install it manually: download the latest release from the
+[GitHub releases page](https://github.com/hannibal002/SkyHanniDevelopment/releases/latest) and install via
+<kbd>Settings</kbd> → <kbd>Plugins</kbd> → <kbd>⚙</kbd> → <kbd>Install plugin from disk...</kbd>.
 
 ## Software Used in SkyHanni
 
@@ -421,7 +461,8 @@ Most workflows use a two-workflow split to allow write-operations on fork PRs wi
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
 triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
 `pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
-the head branch of the triggering workflow run. The Merge Conflict Comment and Dependency Label sections do not use this split.
+the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
+do not use this split.
 
 #### Automated Detekt Review
 
@@ -464,7 +505,7 @@ conflicts are resolved, the comment is collapsed into a `<details>` spoiler and 
 - `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
   beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
   provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
-- `.github/scripts/pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=merge_conflict`): Queries the GitHub Pulls API for the `mergeable` field of
   the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
@@ -509,6 +550,24 @@ Known limitation: if a dependency PR in an external repository merges, the workf
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
 Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_review.main.kts`.
+
+#### Description Keyword Labels
+
+Some labels are controlled by keywords in the pull request description. Writing the keyword on its own line adds the label, removing
+the line removes it again. Every change posts a comment on the PR explaining what happened.
+
+Supported keywords:
+
+- `waiting_on_hypixel_alpha` adds the `Waiting on Hypixel` label. Use it when the relevant feature is only available on the Hypixel
+  alpha server, so the pull request can only be tested there and must not be merged before the feature reaches the main server. This
+  keyword also publishes a failing commit status while the line is present.
+
+The line has to match exactly, the same way `exclude_from_changelog` works. Leading or trailing spaces, list markers such as `- `, and
+a different capitalization all prevent the keyword from being recognized.
+
+The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
+
+Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
 
 ## Access Wideners
 

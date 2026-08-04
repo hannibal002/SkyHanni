@@ -19,7 +19,7 @@ enum class IslandTypeTag(vararg types: Any) {
     GARDEN_ISLAND(IslandType.GARDEN, IslandType.GARDEN_GUEST),
     PERSONAL_ISLAND(PRIVATE_ISLAND, GARDEN_ISLAND),
 
-    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT),
+    IS_COLD(IslandType.DWARVEN_MINES, IslandType.MINESHAFT, IslandType.SAFARI),
     NORMAL_MINING(IslandType.GOLD_MINES, IslandType.DEEP_CAVERNS),
     ADVANCED_MINING(IS_COLD, IslandType.CRYSTAL_HOLLOWS),
     MINING(NORMAL_MINING, ADVANCED_MINING),
@@ -33,7 +33,7 @@ enum class IslandTypeTag(vararg types: Any) {
     CONTESTS_SHOWN(IslandType.GARDEN, IslandType.HUB, IslandType.THE_FARMING_ISLANDS),
 
     /** Busy islands are islands where a player is doing something considered 'important'. */
-    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.NONE, IslandType.UNKNOWN),
+    BUSY(IslandType.DARK_AUCTION, IslandType.MINESHAFT, IslandType.THE_RIFT, IslandType.SAFARI, IslandType.NONE, IslandType.UNKNOWN),
 
     /** islands without npc locations that are fixed. */
     NO_FIXED_NPC_LOCATIONS(
@@ -53,6 +53,8 @@ enum class IslandTypeTag(vararg types: Any) {
         IslandType.THE_PARK,
         IslandType.CRIMSON_ISLE,
         IslandType.WINTER,
+        IslandType.SPIDER_DEN,
+        IslandType.TORRHUS_CANYON,
     ),
     WORMHOLE(
         IslandType.LOTUS_ATOLL,
@@ -80,6 +82,8 @@ enum class IslandTypeTag(vararg types: Any) {
     fun isInIsland(): Boolean = SkyBlockUtils.inSkyBlock && contains(SkyBlockUtils.currentIsland)
 
     operator fun contains(type: IslandType) = type in types
+
+    fun getTypes(): Set<IslandType> = types.toSet()
 
     @SkyHanniModule
     companion object {

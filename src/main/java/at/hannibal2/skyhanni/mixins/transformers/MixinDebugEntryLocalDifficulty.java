@@ -1,10 +1,10 @@
-//? if < 26.1 {
-/*package at.hannibal2.skyhanni.mixins.transformers;
+package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
+//? if < 26.1 {
+/*import at.hannibal2.skyhanni.utils.compat.MinecraftCompat;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.client.gui.components.debug.DebugEntryLocalDifficulty;
+import net.minecraft.client.gui.components.debug.DebugScreenDisplayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(DebugEntryLocalDifficulty.class)
-public class MixinDebugEntryLocalDifficulty {
+public abstract class MixinDebugEntryLocalDifficulty {
 
     @Inject(method = "display", at = @At(value = "HEAD"))
     public void render(DebugScreenDisplayer lines, Level world, LevelChunk clientChunk, LevelChunk chunk, CallbackInfo ci) {
@@ -25,6 +25,5 @@ public class MixinDebugEntryLocalDifficulty {
             lines.addLine("Local Difficulty: ?? (Day " + time / 24000L + ")");
         }
     }
-
 }
 *///?}

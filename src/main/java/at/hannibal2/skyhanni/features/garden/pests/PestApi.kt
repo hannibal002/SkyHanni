@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.collection.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.compat.formattedTextCompat
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,10 +51,14 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PestApi {
 
+    private val SPRAYONATOR = "SPRAYONATOR".toInternalName()
+    private val JUICY_SPRAYONATOR = "JUICY_SPRAYONATOR".toInternalName()
+    private val SALTY_SPRAYONATOR = "SALTY_SPRAYONATOR".toInternalName()
+
     val config get() = GardenApi.config.pests
     val storage get() = GardenApi.storage
+
     val lastPestKillTimes = TimeLimitedCache<PestType, SimpleTimeMark>(15.seconds)
-    private val SPRAYONATOR_ITEM = "SPRAYONATOR".toInternalName()
 
     var scoreboardPests: Int
         get() = storage?.scoreboardPests ?: 0
@@ -71,7 +77,10 @@ object PestApi {
     fun hasVacuumInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.VACUUM
     fun hasLassoInHand() = InventoryUtils.getItemInHand()?.getItemCategoryOrNull() == ItemCategory.LASSO
     fun hasVacuumOrLassoInHand() = hasVacuumInHand() || hasLassoInHand()
-    fun hasSprayonatorInHand() = InventoryUtils.itemInHandId == SPRAYONATOR_ITEM
+
+    private fun NeuInternalName.isSprayonator() = equalsOneOf(SPRAYONATOR, JUICY_SPRAYONATOR, SALTY_SPRAYONATOR)
+
+    fun hasSprayonatorInHand(): Boolean = InventoryUtils.itemInHandId.isSprayonator()
 
     fun SprayType.getPests() = PestType.filterableEntries.filter { it.spray == this }
 
@@ -155,9 +164,9 @@ object PestApi {
      */
     private val stereoInventoryPattern by patternGroup.pattern(
         "stereo.inventory",
-        "Stereo Harmony"
+        "Stereo Harmony",
     )
-    val stereoInventory = InventoryDetector { name -> stereoInventoryPattern.matches(name) }
+    val stereoInventory = InventoryDetector { stereoInventoryPattern }
 
     /**
      * REGEX-TEST: §7Now Playing: §aWings of Harmony §8(Moth)
@@ -165,7 +174,7 @@ object PestApi {
      */
     val stereoPlayingPattern by patternGroup.pattern(
         "stereo.playing",
-        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*"
+        "§7Now Playing: (?:§.)*(?<vinyl>[^§]+).*",
     )
 
     /**
