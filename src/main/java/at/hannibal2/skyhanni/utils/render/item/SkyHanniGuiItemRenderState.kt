@@ -21,7 +21,7 @@ import org.joml.Matrix3x2f
 //? if >= 26.1 {
 import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 //?} else {
-/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGH
+/*import net.minecraft.client.renderer.LightTexture.FULL_BRIGHT
 *///?}
 
 data class SkyHanniGuiItemRenderState(
