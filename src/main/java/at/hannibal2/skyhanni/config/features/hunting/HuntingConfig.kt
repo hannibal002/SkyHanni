@@ -47,7 +47,7 @@ class HuntingConfig {
     @ConfigOption(name = "Fusion Keybinds", desc = "")
     @SearchTag("hunting box")
     @Accordion
-    var fusionKeybinds = FusionKeybindsConfig()
+    val fusionKeybinds = FusionKeybindsConfig()
 
     @Expose
     @ConfigOption(
