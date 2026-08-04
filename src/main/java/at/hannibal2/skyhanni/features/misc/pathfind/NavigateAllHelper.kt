@@ -83,6 +83,7 @@ object NavigateAllHelper {
      *
      * @param nodes The list of nodes that should be navigated to.
      * @param targetName The name of what is being navigated to.
+     * @param color The color of the pathfinding line.
      * @param onFound What should be done upon reaching the location of a node.
      * @param onFinish What should be done upon reaching all nodes.
      * @param continueNavigationCondition The condition that must be met before moving to the next node.
