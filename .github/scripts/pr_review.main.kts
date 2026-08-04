@@ -31,6 +31,7 @@ val changelogMarker = "<!-- changelog-check-review -->"
 val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
 
 val dependencyLabel = "Waiting on Dependency PR"
+// Also used by the set-pending job in check_dependencies.yml, both must stay in sync.
 val dependencyStatusContext = "Check PR Dependencies"
 
 val warningIcon = "⚠\uFE0F"
