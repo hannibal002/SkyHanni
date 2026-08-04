@@ -183,12 +183,12 @@ object SlayerApi {
                 questStartTime = SimpleTimeMark.now()
             }
             questCompletePattern.matches(message) -> {
-                ChatUtils.debug("Slayer quest complete detected, posting SlayerQuestCompleteEvent")
+                ChatUtils.debug("SlayerApi: Slayer quest complete detected, posting SlayerQuestCompleteEvent")
                 SlayerQuestCompleteEvent.post()
             }
             questFailedPattern.matches(message) -> {
                 val data = getCurrentData()
-                ChatUtils.debug("Slayer quest failed, posting SlayerStateChangeEvent")
+                ChatUtils.debug("SlayerApi: Slayer quest failed, posting SlayerStateChangeEvent")
                 data.currentState = FAILED
                 data.currentStateRaw = "no slayer"
                 SlayerStateChangeEvent(FAILED).post()
@@ -275,14 +275,14 @@ object SlayerApi {
         latestCategory = category
         tier = parsed?.tier ?: 0
 
-        ChatUtils.debug("$old -> $category")
+        ChatUtils.debug("SlayerApi: $old -> $category")
         SlayerChangeEvent(old, category).post()
     }
 
     private fun updateProgress(progress: String) {
         if (progress == latestProgress) return
 
-        ChatUtils.debug("$latestProgress -> $progress")
+        ChatUtils.debug("SlayerApi: $latestProgress -> $progress")
         SlayerProgressChangeEvent(latestProgress, progress).post()
         latestProgress = progress
     }
@@ -300,16 +300,16 @@ object SlayerApi {
 
         // If the player kills the boss immediately after the boss spawns
         if (data.currentState == BOSS_FIGHT && newState == GRINDING) {
-            ChatUtils.debug("Intermediate state change detected: BOSS_FIGHT -> SLAIN -> GRINDING")
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: BOSS_FIGHT -> SLAIN -> GRINDING")
             SlayerStateChangeEvent(SLAIN).post()
         }
         if (data.currentState == GRINDING && newState == SLAIN) {
-            ChatUtils.debug("Intermediate state change detected: GRINDING -> BOSS_FIGHT -> SLAIN")
+            ChatUtils.debug("SlayerApi: Intermediate state change detected: GRINDING -> BOSS_FIGHT -> SLAIN")
             SlayerStateChangeEvent(BOSS_FIGHT).post()
         }
 
         if (newState != data.currentState) {
-            ChatUtils.debug("${data.currentState} -> $newState")
+            ChatUtils.debug("SlayerApi: ${data.currentState} -> $newState")
             data.currentState = newState
             SlayerStateChangeEvent(newState).post()
         }
