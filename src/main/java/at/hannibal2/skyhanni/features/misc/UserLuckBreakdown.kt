@@ -27,12 +27,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.compat.ColoredBlockCompat
 import at.hannibal2.skyhanni.utils.compat.InventoryCompat.orNull
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.chat.Component
 import net.minecraft.world.SimpleContainer
 import net.minecraft.world.item.Items
-import net.minecraft.world.level.block.Blocks
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -49,7 +49,7 @@ object UserLuckBreakdown {
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private var fillerItem: SafeItemStack? = null
-    private val fillerID = Blocks.BLACK_STAINED_GLASS_PANE.asItem()
+    private val fillerID = ColoredBlockCompat.BLACK.glassPaneBlock.asItem()
 
     private var showAllStats = true
 
