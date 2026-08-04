@@ -134,8 +134,7 @@ object TextHelper {
                         newLine += color.toChatFormatting()
                     }
                 }
-                var newFormatting = ""
-                newFormatting = if (style.isBold) "§l"
+                val newFormatting = if (style.isBold) "§l"
                 else if (style.isItalic) "§o"
                 else if (style.isUnderlined) "§n"
                 else if (style.isStrikethrough) "§m"
