@@ -43,21 +43,43 @@ val keywordLabels = listOf(
 
 val workflowFailedMarker = "<!-- workflow-failed -->"
 
+
+/**
+ * Identifies a comment posted by this script, so a later run finds its own previous comment again.
+ *
+ * [markerId] is a permanent identifier. The comments carrying it outlive every run, so changing it orphans
+ * every marker sitting on every currently open pull request. Never derive it from something that can be
+ * renamed.
+ * [expandLabel] names the spoiler an outdated comment is collapsed into.
+ *
+ * A mode that only ever announces one direction uses [marker], because the resolved case posts nothing and the
+ * presence of the marker is the whole information. A mode that announces both directions uses [stateMarker],
+ * because there the presence of a marker cannot tell which direction was announced.
+ */
+data class CommentType(val markerId: String, val expandLabel: String) {
+    val marker: String = "<!-- $markerId -->"
+
+    // Deliberately a suffix and not a colon, so a collapsed comment no longer matches stateMarkerRegex.
+    val staleMarker: String = "<!-- $markerId-stale -->"
+
+    // Requires the closing arrow and a restricted character set, so arbitrary text in a comment body cannot be
+    // read as an announced state.
+    val stateMarkerRegex: Regex = Regex("""<!-- ${Regex.escape(markerId)}:([a-z0-9_-]+) -->""")
+
+    fun stateMarker(state: String): String = "<!-- $markerId:$state -->"
+}
+
 val detektLabel = "Detekt"
-val detektMarker = "<!-- detekt-review -->"
-val detektStaleMarker = "<!-- detekt-review-stale -->"
+val detektComment = CommentType("detekt-review", "Show previous warnings")
 
 val buildLabel = "Fails Multi-Version"
-val buildMarker = "<!-- build-failure-review -->"
-val buildStaleMarker = "<!-- build-failure-review-stale -->"
+val buildComment = CommentType("build-failure-review", "Show previous errors")
 
 val conflictLabel = "Merge Conflicts"
-val conflictMarker = "<!-- merge-conflict-review -->"
-val conflictStaleMarker = "<!-- merge-conflict-review-stale -->"
+val conflictComment = CommentType("merge-conflict-review", "Show previous conflicts")
 
 val changelogLabel = "Wrong Title/Changelog"
-val changelogMarker = "<!-- changelog-check-review -->"
-val changelogStaleMarker = "<!-- changelog-check-review-stale -->"
+val changelogComment = CommentType("changelog-check-review", "Show previous issues")
 
 val dependencyLabel = "Waiting on Dependency PR"
 // Also used by the set-pending job in check_dependencies.yml, both must stay in sync.
@@ -271,7 +293,6 @@ fun StringBuilder.appendWarningTitle(title: String) {
 }
 
 fun buildDetektBody(findings: List<Finding>): String = buildString {
-    appendLine(detektMarker)
     appendWarningTitle("Detekt found ${findings.size} ${if (findings.size == 1) "issue" else "issues"}")
     appendLine("")
     val direct = findings.take(maxDirectFindings)
@@ -313,40 +334,73 @@ fun StringBuilder.appendFull(findings: List<Finding>) {
     }
 }
 
-fun findExistingComment(prNumber: String, searchMarker: String): Long? {
+data class PrComment(val id: Long, val body: String)
+
+data class StateComment(val comment: PrComment, val state: String)
+
+// Iterates every comment of a pull request, oldest first, which is the order the API documents. [action]
+// returns false to stop early.
+fun forEachComment(prNumber: String, action: (PrComment) -> Boolean) {
     var page = 1
     while (true) {
         val (status, body) = ghRepoGet("/issues/$prNumber/comments?per_page=100&page=$page")
         status.requireSuccess("Error: could not fetch PR comments (HTTP $status), aborting")
         val array = body as? JsonArray ?: error("Error: unexpected response format for PR comments, aborting")
-        if (array.size() == 0) return null
         for (element in array) {
-            if (!element.isJsonObject) continue
-            val bodyText = element.asJsonObject.get("body")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-            if (searchMarker in bodyText) return element.asJsonObject.get("id")?.takeIf { it.isJsonPrimitive }?.asLong
+            val obj = element as? JsonObject ?: continue
+            val id = obj.get("id")?.takeIf { it.isJsonPrimitive }?.asLong ?: continue
+            val commentBody = obj.get("body")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
+            if (!action(PrComment(id, commentBody))) return
         }
-        if (array.size() < 100) return null
+        if (array.size() < 100) return
         page++
     }
 }
 
-fun getCommentBody(commentId: Long): String? {
-    val (status, body) = ghRepoGet("/issues/comments/$commentId")
-    status.requireSuccess("Error: could not fetch comment body (HTTP $status), aborting")
-    return (body as? JsonObject)?.get("body")?.takeIf { it.isJsonPrimitive }?.asString
+// Whole line instead of substring. Substring matching happens to be safe for the marker strings in use, but a
+// newly added marker id that is a prefix of another one would break it silently.
+fun String.hasMarkerLine(marker: String): Boolean = lineSequence().any { it.trim() == marker }
+
+fun CommentType.findExisting(prNumber: String): PrComment? {
+    var found: PrComment? = null
+    forEachComment(prNumber) { comment ->
+        val matches = comment.body.hasMarkerLine(marker)
+        if (matches) found = comment
+        !matches
+    }
+    return found
 }
 
-fun markCommentAsStale(
-    commentId: Long,
-    activeMarker: String,
-    staleMarker: String,
-    expandLabel: String,
-) {
-    val oldBody = getCommentBody(commentId)
-        ?: error("Error: comment body was null for comment $commentId, aborting")
+// Walks every page and keeps the last hit, because the issue specific comments endpoint accepts only since,
+// per_page and page. There is no way to ask for the newest comment directly.
+fun CommentType.findNewestState(prNumber: String): StateComment? {
+    var newest: StateComment? = null
+    forEachComment(prNumber) { comment ->
+        val state = comment.body.lineSequence()
+            .firstNotNullOfOrNull { stateMarkerRegex.matchEntire(it.trim()) }
+            ?.groupValues?.get(1)
+        if (state != null) newest = StateComment(comment, state)
+        true
+    }
+    return newest
+}
 
-    val cleanedOld = oldBody
-        .replace(activeMarker, "")
+fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
+    postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
+}
+
+fun CommentType.post(prNumber: String, body: String, errorMessage: (Int) -> String) {
+    post(prNumber, marker, body, errorMessage)
+}
+
+
+// A collapsed comment loses its active marker, including the state variant. Only the stale marker remains, so
+// it can never be mistaken for the current announcement.
+fun CommentType.markAsStale(comment: PrComment, fallbackTitle: String = "Unknown") {
+    val cleanedOld = comment.body
+        .lineSequence()
+        .filterNot { it.trim() == marker || stateMarkerRegex.matches(it.trim()) }
+        .joinToString("\n")
         .trim()
 
     val header = cleanedOld
@@ -355,7 +409,7 @@ fun markCommentAsStale(
         ?.removePrefix("###")
         ?.replace(warningIcon, "")
         ?.trim()
-        ?: "Unknown"
+        ?: fallbackTitle
 
     val staleBody = buildString {
         appendLine(staleMarker)
@@ -368,9 +422,14 @@ fun markCommentAsStale(
         appendLine("</details>")
     }
 
-    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/$commentId", mapOf("body" to staleBody))
+    val (status, _) = ghRequest("PATCH", "/repos/$repo/issues/comments/${comment.id}", mapOf("body" to staleBody))
 
     status.requireSuccess("Error: could not mark comment as stale (HTTP $status), aborting")
+}
+
+fun CommentType.staleExisting(prNumber: String, fallbackTitle: String = "Unknown") {
+    val existing = findExisting(prNumber) ?: return
+    markAsStale(existing, fallbackTitle)
 }
 
 fun readBuildLog(artifactDirPath: String?): String? {
@@ -477,7 +536,6 @@ fun getJobIdsByVersion(runId: String, versionLabels: List<String>): Map<String, 
 }
 
 fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = buildString {
-    appendLine(buildMarker)
     val workflowRunId = System.getenv("WORKFLOW_RUN_ID") ?: error("WORKFLOW_RUN_ID not set")
     val headSha = System.getenv("HEAD_SHA") ?: error("HEAD_SHA not set")
     val allVersionParts = versions.flatMap { (v, _) -> v.split(" and ").map { it.trim() } }.distinct()
@@ -561,7 +619,6 @@ fun getAllOpenPRNumbers(): List<String> {
 }
 
 fun buildConflictBody(): String = buildString {
-    appendLine(conflictMarker)
     appendWarningTitle("Merge conflicts detected")
     append("This pull request has conflicts with the base branch. Please resolve them before this PR can be merged.")
 }
@@ -579,31 +636,18 @@ fun runMergeConflictMode(prNumber: String) {
             println("PR #$prNumber: conflicts found, already labeled, skipping")
             return
         }
-        val existingId = findExistingComment(prNumber, conflictMarker)
-        if (existingId != null) markCommentAsStale(
-            existingId,
-            conflictMarker,
-            conflictStaleMarker,
-            "Show previous conflicts",
-        )
-        postPrComment(prNumber, buildConflictBody()) { "Error: could not post conflict comment (HTTP $it)" }
+        conflictComment.staleExisting(prNumber)
+        conflictComment.post(prNumber, buildConflictBody()) { "Error: could not post conflict comment (HTTP $it)" }
         setLabel(prNumber, conflictLabel, true)
         println("PR #$prNumber: conflicts found, comment posted")
     } else {
-        val existingId = findExistingComment(prNumber, conflictMarker)
-        if (existingId != null) markCommentAsStale(
-            existingId,
-            conflictMarker,
-            conflictStaleMarker,
-            "Show previous conflicts",
-        )
+        conflictComment.staleExisting(prNumber)
         setLabel(prNumber, conflictLabel, false)
         println("PR #$prNumber: no conflicts")
     }
 }
 
 fun buildDetektCrashBody(logContent: String): String = buildString {
-    appendLine(detektMarker)
     appendWarningTitle("Detekt could not run")
     appendLine()
     val oneLiner = parseOneLiner(logContent)
@@ -622,13 +666,7 @@ fun buildDetektCrashBody(logContent: String): String = buildString {
 }
 
 fun runDetektMode(prNumber: String) {
-    val existingId = findExistingComment(prNumber, detektMarker)
-    if (existingId != null) markCommentAsStale(
-        existingId,
-        detektMarker,
-        detektStaleMarker,
-        "Show previous warnings"
-    )
+    detektComment.staleExisting(prNumber)
 
     val artifactDir = Path(System.getenv("ARTIFACT_DIR") ?: "detekt-artifact")
     val sarifFile = artifactDir / "main.sarif"
@@ -641,7 +679,7 @@ fun runDetektMode(prNumber: String) {
             val logContent = runCatching { logFile.takeIf { it.exists() }?.readText() }.getOrNull()
             if (!logContent.isNullOrBlank()) {
                 val body = buildDetektCrashBody(logContent)
-                postPrComment(prNumber, body) { "Error: could not post workflow error as comment (HTTP $it)" }
+                detektComment.post(prNumber, body) { "Error: could not post workflow error as comment (HTTP $it)" }
                 println("Detekt workflow did not complete successfully; posted explanatory comment")
                 exitProcess(0)
             } else {
@@ -670,7 +708,7 @@ fun runDetektMode(prNumber: String) {
         exitProcess(0)
     }
 
-    postPrComment(prNumber, buildDetektBody(findings)) { "Error: could not post comment (HTTP $it)" }
+    detektComment.post(prNumber, buildDetektBody(findings)) { "Error: could not post comment (HTTP $it)" }
     setLabel(prNumber, detektLabel, true)
     println("Done: ${findings.size} finding(s) posted")
 }
@@ -705,29 +743,18 @@ fun runBuildMode(prNumber: String) {
     val log1 = readBuildLog(System.getenv("ARTIFACT_DIR_1"))
     val log2 = readBuildLog(System.getenv("ARTIFACT_DIR_2"))
 
-    val existingId = findExistingComment(prNumber, buildMarker)
+    buildComment.staleExisting(prNumber)
 
     if (log1.isNullOrBlank() && log2.isNullOrBlank()) {
         println("No build failures found, removing build label")
-        if (existingId != null) markCommentAsStale(
-            existingId,
-            buildMarker,
-            buildStaleMarker,
-            "Show previous errors"
-        )
         setLabel(prNumber, buildLabel, false)
         exitProcess(0)
     }
 
-    if (existingId != null) markCommentAsStale(
-        existingId,
-        buildMarker,
-        buildStaleMarker,
-        "Show previous errors"
-    )
-
     val versions = filterStonecutterDuplicates(listOf("26.1" to log1, "26.2" to log2))
-    postPrComment(prNumber, buildBuildFailureBody(versions)) { "Error: could not post build failure comment (HTTP $it)" }
+    buildComment.post(prNumber, buildBuildFailureBody(versions)) {
+        "Error: could not post build failure comment (HTTP $it)"
+    }
     setLabel(prNumber, buildLabel, true)
     println("Done: build failure comment posted, added label")
 }
@@ -742,7 +769,6 @@ fun readChangelogErrors(artifactDirPath: String?): String? {
 }
 
 fun buildChangelogBody(errors: String): String = buildString {
-    appendLine(changelogMarker)
     appendWarningTitle("Changelog verification failed")
     appendLine()
     append(errors.trimEnd())
@@ -750,16 +776,10 @@ fun buildChangelogBody(errors: String): String = buildString {
 
 fun runChangelogMode(prNumber: String) {
     val workflowConclusion = System.getenv("WORKFLOW_CONCLUSION") ?: ""
-    val existingId = findExistingComment(prNumber, changelogMarker)
-
-    fun staleExisting() {
-        val id = existingId ?: return
-        markCommentAsStale(id, changelogMarker, changelogStaleMarker, "Show previous issues")
-    }
 
     if (workflowConclusion == "success") {
         println("Changelog check passed, cleaning up")
-        staleExisting()
+        changelogComment.staleExisting(prNumber)
         setLabel(prNumber, changelogLabel, false)
         exitProcess(0)
     }
@@ -767,9 +787,9 @@ fun runChangelogMode(prNumber: String) {
     val errors = readChangelogErrors(System.getenv("ARTIFACT_DIR"))
         ?: error("Artifact missing - changelog step likely failed before artifact upload")
 
-    staleExisting()
+    changelogComment.staleExisting(prNumber)
 
-    postPrComment(prNumber, buildChangelogBody(errors)) { "Error: could not post changelog comment (HTTP $it)" }
+    changelogComment.post(prNumber, buildChangelogBody(errors)) { "Error: could not post changelog comment (HTTP $it)" }
     setLabel(prNumber, changelogLabel, true)
     println("Done: changelog check comment posted")
 }

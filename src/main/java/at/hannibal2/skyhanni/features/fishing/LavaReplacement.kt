@@ -47,6 +47,7 @@ object LavaReplacement {
         FluidStateModelSet.WATER_MODEL.overlayMaterial(),
         FluidStateModelSet.WATER_MODEL.tintSource(),
     )
+
     private val config get() = SkyHanniMod.feature.fishing.lavaReplacement
 
     private var isActive: Boolean = false
