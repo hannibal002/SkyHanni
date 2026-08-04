@@ -2,15 +2,8 @@ package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.mixins.init.SkyHanniMixinPlugin
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.Type
-import org.objectweb.asm.tree.AnnotationNode
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.MethodNode
 import org.spongepowered.asm.mixin.MixinEnvironment
-import org.spongepowered.asm.mixin.MixinEnvironment.Option
 import org.spongepowered.asm.mixin.transformer.IMixinTransformer
 
 /**
