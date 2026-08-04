@@ -148,7 +148,9 @@ object NavigateAllHelper {
                         if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition(target)) {
                             recursiveNavigate()
                         } else {
-                            waitingOnCondition = true
+                            if (currentlyNavigating) {
+                                waitingOnCondition = true
+                            }
                         }
                     }
                 }

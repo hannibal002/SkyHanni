@@ -106,15 +106,14 @@ object HideyhoFinder {
                 currentlyNavigating = false
                 NavigateAllHelper.handleStop()
             },
-            continueNavigationCondition = NavigationCondition.SecondPassed { nodeLocation ->
-                val isNearby = nodeLocation.position.nearbyLocation(5.0) != null
+            continueNavigationCondition = NavigationCondition.SecondPassed { node ->
+                val isNearby = node.position.nearbyLocation(5.0) != null
 
                 if (isNearby) {
                     finishNavigation()
-                    return@SecondPassed false
                 }
 
-                // If there is no Hideyho nearby then we go to the next location
+                // Always return true as we either go to next or stop navigating
                 return@SecondPassed true
             },
             condition = { config.hideyhoFinder && currentlyNavigating },
