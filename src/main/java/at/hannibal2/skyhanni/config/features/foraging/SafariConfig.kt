@@ -19,11 +19,10 @@ class SafariConfig {
     @Expose
     @ConfigOption(
         name = "Hideyho Finder",
-        desc = "Shows the names of the 4 areas while in the center of the Critter Safari.",
+        desc = "Helps you find where Hideyho is hiding.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    var hideyhoFinder: Boolean = false
-
+    var hideyhoFinder: Boolean = true
 
 }

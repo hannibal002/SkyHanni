@@ -140,13 +140,13 @@ object NavigateAllHelper {
             "$currentTargetName ${total - route.size}/$total",
             color = color,
             onFound = {
-                currentTarget?.let { onFound(it) }
+                currentTarget?.let { onFound(target) }
 
                 when (continueNavigationCondition) {
                     NavigationCondition.None -> recursiveNavigate()
                     is NavigationCondition.ChatMessage -> waitingOnCondition = true
                     is NavigationCondition.SecondPassed -> {
-                        if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition()) {
+                        if ((continueNavigationCondition as NavigationCondition.SecondPassed).condition(target)) {
                             recursiveNavigate()
                         } else {
                             waitingOnCondition = true
@@ -174,15 +174,17 @@ object NavigateAllHelper {
     private fun onSecondPassed() {
         if (!waitingOnCondition) return
 
+        val target = currentTarget ?: return
+
         if (currentlyNavigating && (currentTarget?.position?.distanceToPlayer() ?: 0.0) > NAVIGATE_AGAIN_DISTANCE) {
-            currentTarget?.let { route = listOf(it) + route }
+            route = listOf(target) + route
             recursiveNavigate()
             return
         }
 
         val secondPassedCondition = (continueNavigationCondition as? NavigationCondition.SecondPassed)?.condition ?: return
 
-        if (secondPassedCondition()) {
+        if (secondPassedCondition(target)) {
             recursiveNavigate()
         }
     }
@@ -201,7 +203,7 @@ object NavigateAllHelper {
         }
     }
 
-    private fun handleStop() {
+    fun handleStop() {
         if (!currentlyNavigating) {
             ChatUtils.userError("No current navigation to stop. §eUse /shnavigateall to start navigation")
             return
