@@ -977,6 +977,18 @@ object ScoreboardPattern {
         "§eMiria's Contest §a.*",
     )
 
+    // Safari
+    private val safariSB = scoreboardGroup.group("safari")
+
+    /**
+     * REGEX-TEST: Captured Mobs: §e0
+     * REGEX-TEST: Captured Mobs: §e14
+     */
+    val capturedMobsPattern by safariSB.pattern(
+        "captured-mobs",
+        "Captured Mobs: §e(?<capturedMobs>\\d+)",
+    )
+
     /**
      * Sometimes when the scoreboard updates, it only updates half way,
      * causing some lines to become mixed with other lines -> broken.
