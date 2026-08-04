@@ -16,7 +16,7 @@ import net.minecraft.client.renderer.state.gui.GuiRenderState
 import kotlin.math.roundToInt
 
 //? if >= 26.1
-import org.joml.Matrix4f
+import net.minecraft.client.renderer.Projection
 
 internal class SkyHanniItemAtlasRenderer(
     private val sizePixels: Int,
@@ -31,8 +31,8 @@ internal class SkyHanniItemAtlasRenderer(
         block: () -> Unit,
     ) {
         val size = sizePixels.toFloat()
-        //~ if < 26.1 'Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f)' -> 'size, size'
-        val bufferSlice = projectionBuffer.getBuffer(Matrix4f().setOrtho(0f, size, size, 0f, -1000f, 1000f))
+        //~ if < 26.1 'Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) }' -> 'size, size'
+        val bufferSlice = projectionBuffer.getBuffer(Projection().apply { this.setupOrtho(-1000f, 1000f, size, size, true) })
         RenderSystem.setProjectionMatrix(bufferSlice, ProjectionType.ORTHOGRAPHIC)
         RenderSystem.outputColorTextureOverride = textureView
         RenderSystem.outputDepthTextureOverride = depthTextureView
