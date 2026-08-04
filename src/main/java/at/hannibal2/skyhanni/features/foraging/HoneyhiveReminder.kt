@@ -114,12 +114,12 @@ object HoneyhiveReminder {
 
         if (nodes.isEmpty()) return
 
-        currentlyNavigating = true
         ChatUtils.clickToActionOrDisable(
             startMessage,
             config::enabled,
             actionName = "navigate to all Honeyhives",
             action = {
+                currentlyNavigating = true
                 NavigateAllHelper.navigateAll(
                     nodes,
                     GraphNodeTag.HONEYHIVE.displayName,

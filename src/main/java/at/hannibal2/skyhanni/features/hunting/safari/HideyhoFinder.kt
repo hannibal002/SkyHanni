@@ -43,7 +43,7 @@ object HideyhoFinder {
 
     private val HIDEYHO_TEXTURE by SkullTextureHolder.texture("HIDEYHO")
 
-    private var currentlyNavigating = true
+    private var currentlyNavigating = false
     private var startLocation: LorenzVec? = null
     private var reportBug = false
 
@@ -53,6 +53,7 @@ object HideyhoFinder {
 
         if (startPattern.matches(event.cleanMessage)) {
             startLocation = LocationUtils.playerLocation().nearbyHideyhoLocation(10.0)
+            return
         }
 
         if (endPattern.matches(event.cleanMessage)) {
@@ -84,9 +85,10 @@ object HideyhoFinder {
         val startLocation = startLocation ?: return
         val graph = IslandGraphs.currentIslandGraph ?: return
         val locations = graph.getNodesWithTags(GraphNodeTag.HIDEYHO_LOCATION).toMutableList()
-        val current = locations.minBy { it.position.distance(startLocation) }
+        val current = locations.minByOrNull { it.position.distance(startLocation) }
 
         locations.remove(current)
+        if (locations.isEmpty()) return
 
         currentlyNavigating = true
         NavigateAllHelper.navigateAll(
@@ -95,6 +97,9 @@ object HideyhoFinder {
             GraphNodeTag.HIDEYHO_LOCATION.color.toColor(),
             onFinish = {
                 // If we finish going to all locations but do not find a Hideyho then we have a new location, so we get users to report
+                // Or maybe someone else already found one in your lobby
+                // TODO is there a lootshare message we can use to end navigation early in this case
+                ChatUtils.chat("Could not find any hidden Hideyho, maybe someone else already found it.")
                 reportBug = true
                 currentlyNavigating = false
                 NavigateAllHelper.handleStop()
