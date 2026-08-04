@@ -227,8 +227,7 @@ class SkyblockGuideHighlightFeature private constructor(
             SkyblockGuideHighlightFeature(
                 { skyblockGuideConfig.minionGuide },
                 "minion",
-                // TODO: Not duplicate from MinionCraftHelper
-                "Crafted Minions",
+                "(?:\\(\\d/\\d\\) )?(?:Crafted Minions|\\w+ ➜ Minions)",
                 "§c ?✖.*|§7You haven't crafted this minion.",
             )
             SkyblockGuideHighlightFeature(

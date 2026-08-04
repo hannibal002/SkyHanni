@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.events.slayer.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.features.inventory.CurrentEquipmentApi
 import at.hannibal2.skyhanni.features.misc.effects.NonGodPotEffectDisplay
@@ -122,12 +121,12 @@ object RemainingSlayerKills {
     private var killComboWisdom = 0
 
     @HandleEvent(priority = HIGHEST)
-    fun onRepoReload(event: RepositoryReloadEvent) {
+    private fun onRepoReload(event: RepositoryReloadEvent) {
         data = event.getConstant<SlayerData>("Slayer")
     }
 
     @HandleEvent(ProfileJoinEvent::class)
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         lastMissing = null
         lastMax = null
         lastReminder = SimpleTimeMark.farPast()
@@ -135,7 +134,7 @@ object RemainingSlayerKills {
     }
 
     @HandleEvent
-    fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
+    private fun onSlayerProgressChange(event: SlayerProgressChangeEvent) {
         if (!isEnabled()) return
 
         val progress = event.newProgress.removeColor()
@@ -149,14 +148,14 @@ object RemainingSlayerKills {
         update()
     }
 
-    @HandleEvent(GraphAreaChangeEvent::class)
-    fun onAreaChange() {
+    @HandleEvent
+    private fun onAreaChange() {
         if (!isEnabled()) return
         update()
     }
 
     @HandleEvent
-    fun onSystemMessage(event: SystemMessageEvent.Allow) {
+    private fun onSystemMessage(event: SystemMessageEvent.Allow) {
         val message = event.cleanMessage
         if (comboExpiredPattern.matches(message)) {
             killComboWisdom = 0
