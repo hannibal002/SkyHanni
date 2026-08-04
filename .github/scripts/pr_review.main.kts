@@ -4,6 +4,7 @@
 // and keyword-labels.yml
 
 import com.google.gson.*
+import java.io.IOException
 import java.net.URI
 import java.net.URLEncoder
 import java.net.http.HttpClient
@@ -12,7 +13,6 @@ import java.net.http.HttpResponse
 import java.nio.charset.StandardCharsets
 import kotlin.io.path.*
 import kotlin.system.exitProcess
-
 
 
 /**
@@ -67,6 +67,10 @@ val warningIcon = "⚠\uFE0F"
 
 val maxDirectFindings = 15
 val maxLogChars = 10_000
+
+val maxRequestAttempts = 3
+val retryDelayMillis = 2_000L
+val retryStatusCodes = setOf(502, 503, 504)
 
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
 val token: String = System.getenv("GH_TOKEN") ?: error("GH_TOKEN not set")
@@ -137,13 +141,27 @@ data class DependencyCheckResult(
     val openDependencies: List<Dependency>,
 )
 
-fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
+class DependencyCheckException(message: String) : Exception(message)
+
+// PRs whose dependency check could not be completed. Collected instead of aborting, so one unreachable
+// PR cannot stop the remaining ones from getting their label and status updated.
+val failedDependencyChecks = mutableListOf<String>()
+
+fun dependencyError(message: String): Nothing = throw DependencyCheckException(message)
+
+fun sendGhRequest(request: HttpRequest): Pair<Int, JsonElement> {
+    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
+    val body = runCatching { JsonParser.parseString(response.body()) }.getOrDefault(JsonNull.INSTANCE)
+    return response.statusCode() to body
+}
+
+fun buildGhRequest(method: String, path: String, payload: Any?): HttpRequest {
     val bodyPublisher = if (payload != null)
         HttpRequest.BodyPublishers.ofString(gson.toJson(payload))
     else
         HttpRequest.BodyPublishers.noBody()
 
-    val request = HttpRequest.newBuilder()
+    return HttpRequest.newBuilder()
         .uri(URI.create("https://api.github.com$path"))
         .header("Authorization", "Bearer $token")
         .header("Accept", "application/vnd.github+json")
@@ -151,16 +169,39 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
         .header("Content-Type", "application/json")
         .method(method, bodyPublisher)
         .build()
-
-    val response = httpClient.send(request, HttpResponse.BodyHandlers.ofString())
-    val body = runCatching { JsonParser.parseString(response.body()) }.getOrDefault(JsonNull.INSTANCE)
-    return response.statusCode() to body
 }
+
+fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
+    val request = buildGhRequest(method, path, payload)
+
+    // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
+    // must not fail the whole workflow run. The last attempt returns whatever it gets.
+    repeat(maxRequestAttempts - 1) { index ->
+        val attempt = index + 1
+        val reason = try {
+            val result = sendGhRequest(request)
+            if (result.first !in retryStatusCodes) return result
+            "HTTP ${result.first}"
+        } catch (e: IOException) {
+            e.toString()
+        }
+        System.err.println("Warning: $method $path failed ($reason), retry $attempt of ${maxRequestAttempts - 1}")
+        Thread.sleep(retryDelayMillis * attempt)
+    }
+    return sendGhRequest(request)
+}
+
+// Creating a comment is the only request in this script that is not idempotent. A gateway timeout that the
+// server applied anyway would post the same comment twice on retry, so this one is sent exactly once.
+// Everything else stays retried, in particular label and commit status writes, which are idempotent.
+fun ghRequestWithoutRetry(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> =
+    sendGhRequest(buildGhRequest(method, path, payload))
+
 
 fun ghRepoGet(path: String): Pair<Int, JsonElement> = ghRequest("GET", "/repos/$repo$path")
 
 fun postComment(prNumber: String, body: String): Int {
-    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
+    val (status, _) = ghRequestWithoutRetry("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
     return status
 }
 
@@ -745,7 +786,7 @@ fun isDependencyOpen(dep: Dependency): Boolean {
         return false
     }
     if (status.isHttpError) {
-        error("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
+        dependencyError("Error: unexpected status $status for dependency ${dep.owner}/${dep.repoName}#${dep.pullNumber}")
     }
     val state = (body as? JsonObject)?.get("state")?.takeIf { it.isJsonPrimitive }?.asString
     return state == "open"
@@ -767,18 +808,23 @@ fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>) {
     if (runId != null) payload["target_url"] = "https://github.com/$repo/actions/runs/$runId"
 
     val (status, _) = ghRequest("POST", "/repos/$repo/statuses/$headSha", payload)
-    status.requireSuccess("Error: could not update dependency status for $headSha (HTTP $status)")
+    if (status.isHttpError) {
+        dependencyError("Error: could not update dependency status for $headSha (HTTP $status)")
+    }
 }
 
+// Throws DependencyCheckException when this PR could not be evaluated. Callers that iterate over many PRs
+// must use checkPrDependenciesOrNull instead.
 fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
     val (status, body) = ghRepoGet("/pulls/$issueNumber")
     if (status.isHttpError) {
-        error("Error: could not fetch PR #$issueNumber (HTTP $status)")
+        dependencyError("Error: could not fetch PR #$issueNumber (HTTP $status)")
     }
-    val pr = body as? JsonObject ?: error("Error: unexpected response format for PR #$issueNumber")
+    val pr = body as? JsonObject ?: dependencyError("Error: unexpected response format for PR #$issueNumber")
     val prBody = pr.get("body")?.takeIf { !it.isJsonNull }?.asString ?: ""
+
     val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
-        ?: error("Error: head SHA missing for PR #$issueNumber")
+        ?: dependencyError("Error: head SHA missing for PR #$issueNumber")
 
     if ("## Dependencies" !in prBody) {
         println("PR #$issueNumber: no Dependencies section, skipping")
@@ -807,6 +853,24 @@ fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
     return DependencyCheckResult(deps, openDeps)
 }
 
+
+fun skipFailedDependencyCheck(issueNumber: String, reason: String): DependencyCheckResult? {
+    System.err.println("Warning: could not evaluate dependencies of PR #$issueNumber ($reason), skipping")
+    failedDependencyChecks.add(issueNumber)
+    return null
+}
+
+// A dropped connection has to be treated like a repeated gateway timeout, otherwise a transport failure
+// still aborts the whole loop while an HTTP failure does not.
+fun checkPrDependenciesOrNull(issueNumber: String): DependencyCheckResult? = try {
+    checkPrDependencies(issueNumber)
+} catch (e: DependencyCheckException) {
+    skipFailedDependencyCheck(issueNumber, e.message ?: e.toString())
+} catch (e: IOException) {
+    skipFailedDependencyCheck(issueNumber, e.toString())
+}
+
+
 fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     val result = mutableListOf<JsonObject>()
     val encoded = URLEncoder.encode(dependencyLabel, StandardCharsets.UTF_8).replace("+", "%20")
@@ -814,7 +878,7 @@ fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     while (true) {
         val (status, body) = ghRepoGet("/issues?labels=$encoded&state=open&per_page=100&page=$page")
         if (status.isHttpError) {
-            error("Error: could not fetch labeled PRs (HTTP $status)")
+            error("Error: could not fetch labeled PRs (HTTP $status)", commentError = false)
         }
         val array = body as? JsonArray ?: break
         for (element in array) {
@@ -860,7 +924,7 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
         if ("## Dependencies" !in body) continue
         val deps = parseDependencies(body)
         if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
-            checkPrDependencies(num)
+            checkPrDependenciesOrNull(num)
         }
     }
 }
@@ -908,26 +972,28 @@ fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remain
     }
 }
 
-fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
-    if (prState != "closed") {
-        val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
-        checkPrDependencies(num)
-        val prAction = System.getenv("PR_ACTION") ?: ""
-        if (prAction == "reopened") {
-            val targetPrNum = num.toIntOrNull()
-            if (targetPrNum != null) recheckPRsDependingOn(targetPrNum)
-        }
-        return
-    }
 
-    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
-    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event")
+fun runDependenciesModeForOpenPr(prNum: String?) {
+    val num = prNum ?: run { println("PR_NUMBER not set, skipping"); return }
+    // This PR is the one the workflow was triggered for, so a failure belongs on it as a comment.
+    try {
+        checkPrDependencies(num)
+    } catch (e: DependencyCheckException) {
+        error(e.message ?: "Error: dependency check failed for PR #$num")
+    }
+    if (System.getenv("PR_ACTION") == "reopened") {
+        val targetPrNum = num.toIntOrNull() ?: return
+        recheckPRsDependingOn(targetPrNum)
+    }
+}
+
+fun recheckLabeledPRsAfterClose(closedPrNum: Int, merged: Boolean) {
     val repoOwner = repo.substringBefore("/")
     val repoName = repo.substringAfter("/")
 
     for (pr in fetchAllLabeledOpenPRs()) {
         val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-        val result = checkPrDependencies(num)
+        val result = checkPrDependenciesOrNull(num) ?: continue
         val isDirectDep = result.dependencies.any {
             it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum
         }
@@ -936,6 +1002,17 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
             postDependencyNotification(num, closedPrNum, merged, result.openDependencies.size)
         }
     }
+}
+
+fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
+    if (prState != "closed") {
+        runDependenciesModeForOpenPr(prNum)
+        return
+    }
+
+    println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
+    val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event", commentError = false)
+    recheckLabeledPRsAfterClose(closedPrNum, merged)
 }
 
 fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
@@ -1013,6 +1090,13 @@ if (mode == "dependencies") {
     val prState = System.getenv("PR_STATE") ?: error("PR_STATE not set")
     val prMerged = System.getenv("PR_MERGED") == "true"
     runDependenciesMode(prState, prNumberEnv, prMerged)
+    if (failedDependencyChecks.isNotEmpty()) {
+        // No comment here, PR_NUMBER points at the triggering PR, not at the ones that failed.
+        error(
+            "Error: could not evaluate dependencies of ${failedDependencyChecks.joinToString(", ") { "#$it" }}",
+            commentError = false,
+        )
+    }
     exitProcess(0)
 }
 
