@@ -72,6 +72,11 @@ val maxRequestAttempts = 3
 val retryDelayMillis = 2_000L
 val retryStatusCodes = setOf(502, 503, 504)
 
+// POST endpoints that end in the same state no matter how often they are sent. Adding a label twice is a no-op,
+// and only the newest commit status per context is ever shown. Creating a comment is deliberately not on this
+// list: a gateway timeout that the server applied anyway would post the same comment twice on retry.
+val idempotentPostEndpoints = listOf("labels", "statuses")
+
 val repo: String = System.getenv("GITHUB_REPOSITORY") ?: error("GITHUB_REPOSITORY not set")
 val token: String = System.getenv("GH_TOKEN") ?: error("GH_TOKEN not set")
 val mode: String = System.getenv("MODE") ?: error("MODE not set")
@@ -171,8 +176,26 @@ fun buildGhRequest(method: String, path: String, payload: Any?): HttpRequest {
         .build()
 }
 
+// Retrying a request must not change the outcome when the server already applied it. Every GET, PATCH and
+// DELETE this script sends is a read, an edit of one known comment, or a label removal, and repeating any of
+// them lands in the same state. POST creates something, so it is only retried for the endpoints listed as
+// idempotent. The decision lives here instead of at the call site, so a newly added POST cannot inherit the
+// retry by accident. An endpoint missing from the list only loses its retry, which is harmless, while the
+// opposite default would silently duplicate a comment.
+fun isRetryable(method: String, path: String): Boolean {
+    if (method != "POST") return true
+    // Whole path segments only, and only those behind the "/repos/<owner>/<name>" prefix, so neither the
+    // repository name nor any other interpolated value can be mistaken for an endpoint name.
+    val segments = path.substringBefore("?")
+        .removePrefix("/repos/$repo")
+        .split("/")
+        .filter { it.isNotEmpty() }
+    return segments.any { it in idempotentPostEndpoints }
+}
+
 fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
     val request = buildGhRequest(method, path, payload)
+    if (!isRetryable(method, path)) return sendGhRequest(request)
 
     // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
     // must not fail the whole workflow run. The last attempt returns whatever it gets.
@@ -191,17 +214,11 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     return sendGhRequest(request)
 }
 
-// Creating a comment is the only request in this script that is not idempotent. A gateway timeout that the
-// server applied anyway would post the same comment twice on retry, so this one is sent exactly once.
-// Everything else stays retried, in particular label and commit status writes, which are idempotent.
-fun ghRequestWithoutRetry(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> =
-    sendGhRequest(buildGhRequest(method, path, payload))
-
 
 fun ghRepoGet(path: String): Pair<Int, JsonElement> = ghRequest("GET", "/repos/$repo$path")
 
 fun postComment(prNumber: String, body: String): Int {
-    val (status, _) = ghRequestWithoutRetry("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
+    val (status, _) = ghRequest("POST", "/repos/$repo/issues/$prNumber/comments", mapOf("body" to body))
     return status
 }
 
