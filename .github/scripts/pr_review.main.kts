@@ -911,7 +911,7 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
 
 val prNumberEnv: String? = System.getenv("PR_NUMBER")?.takeIf { it.isNotEmpty() }
 
-if (mode == "mergeconflict") {
+if (mode == "merge_conflict") {
     if (prNumberEnv != null) {
         runMergeConflictMode(prNumberEnv)
     } else {
