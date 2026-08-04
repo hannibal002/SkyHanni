@@ -50,15 +50,14 @@ object HideyhoFinder {
         if (!config.hideyhoFinder) return
 
         if (startPattern.matches(event.cleanMessage)) {
-            startLocation = LocationUtils.playerLocation().nearbyHideyhoLocation()
+            startLocation = LocationUtils.playerLocation().nearbyHideyhoLocation(10.0)
         }
 
         if (endPattern.matches(event.cleanMessage)) {
             if (!reportBug) return
 
             val playerLocation = LocationUtils.playerLocation()
-
-            val nearbyHideyho = playerLocation.nearbyHideyhoLocation()
+            val nearbyHideyho = playerLocation.nearbyHideyhoLocation(10.0)
 
             IslandGraphs.reportLocation(
                 LocationUtils.playerLocation(),
@@ -68,51 +67,51 @@ object HideyhoFinder {
             )
 
             reportBug = false
-            return
         }
+
         if (beginHidingPattern.matches(event.cleanMessage)) {
-            val startLocation = startLocation ?: return
-            val nearbyEntities = startLocation.getEntitiesNearby<RemotePlayer>(10.0)
-
-            val hideyhoLocation = nearbyEntities.firstOrNull { it.getSkinTexture()?.equals(HIDEYHO_TEXTURE) ?: false }
-
-            hideyhoLocation ?: return
-
-            val graph = IslandGraphs.currentIslandGraph ?: return
-            val locations = graph.getNodesWithTags(GraphNodeTag.HIDEYHO_LOCATION).toMutableList()
-            val current = locations.minBy { it.position.distance(hideyhoLocation.getLorenzVec()) }
-            locations.remove(current)
-
-            currentlyNavigating = true
-            NavigateAllHelper.navigateAll(
-                locations,
-                GraphNodeTag.HIDEYHO_LOCATION.displayName,
-                GraphNodeTag.HIDEYHO_LOCATION.color.toColor(),
-                onFinish = {
-                    // If we finish going to all locations but do not find a hideyho then we have a new location
-                    currentlyNavigating = false
-                    reportBug = true
-                    NavigateAllHelper.handleStop()
-                },
-                continueNavigationCondition = NavigationCondition.SecondPassed { nodeLocation ->
-                    val isNearby = nodeLocation.position.getEntitiesNearby<RemotePlayer>(5.0)
-                        .any { it.getSkinTexture()?.equals(HIDEYHO_TEXTURE) ?: false }
-
-                    if (isNearby) {
-                        ChatUtils.chat("§aFound Hideyho!")
-                        currentlyNavigating = false
-                        NavigateAllHelper.handleStop()
-                    }
-
-                    !isNearby
-                },
-                condition = { currentlyNavigating },
-            )
+            beginNavigation()
         }
     }
 
-    private fun LorenzVec.nearbyHideyhoLocation(): LorenzVec? {
-        val nearbyEntities = this.getEntitiesNearby<RemotePlayer>(10.0)
+    // TODO in future once NavigateAllHelper has the technology we can skip nodes that don't have a hideyho after doing a sight check
+    private fun beginNavigation() {
+        val startLocation = startLocation ?: return
+        val graph = IslandGraphs.currentIslandGraph ?: return
+        val locations = graph.getNodesWithTags(GraphNodeTag.HIDEYHO_LOCATION).toMutableList()
+        val current = locations.minBy { it.position.distance(startLocation) }
+
+        locations.remove(current)
+
+        currentlyNavigating = true
+        NavigateAllHelper.navigateAll(
+            locations,
+            GraphNodeTag.HIDEYHO_LOCATION.displayName,
+            GraphNodeTag.HIDEYHO_LOCATION.color.toColor(),
+            onFinish = {
+                // If we finish going to all locations but do not find a Hideyho then we have a new location, so we get users to report
+                reportBug = true
+                currentlyNavigating = false
+                NavigateAllHelper.handleStop()
+            },
+            continueNavigationCondition = NavigationCondition.SecondPassed { nodeLocation ->
+                val isNearby = nodeLocation.position.nearbyHideyhoLocation(5.0) != null
+
+                if (isNearby) {
+                    ChatUtils.chat("§aFound Hideyho!")
+                    currentlyNavigating = false
+                    NavigateAllHelper.handleStop()
+                }
+
+                // If there is no Hideyho nearby then we go to the next location
+                !isNearby
+            },
+            condition = { currentlyNavigating },
+        )
+    }
+
+    private fun LorenzVec.nearbyHideyhoLocation(radius: Double): LorenzVec? {
+        val nearbyEntities = this.getEntitiesNearby<RemotePlayer>(radius)
         return nearbyEntities.firstOrNull { it.getSkinTexture()?.equals(HIDEYHO_TEXTURE) ?: false }?.getLorenzVec()
     }
 
