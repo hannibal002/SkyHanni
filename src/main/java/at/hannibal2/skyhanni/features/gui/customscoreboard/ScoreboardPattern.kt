@@ -986,7 +986,7 @@ object ScoreboardPattern {
      */
     val capturedMobsPattern by safariSB.pattern(
         "captured-mobs",
-        "Captured Mobs: §e(?<capturedMobs>\\d+)"
+        "Captured Mobs: §e(?<capturedMobs>\\d+)",
     )
 
     /**

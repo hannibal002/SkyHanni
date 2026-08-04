@@ -12,7 +12,7 @@ object ScoreboardEventSafari : ScoreboardEvent() {
     override val configLine = "§7(All Safari Lines)"
 
     override val elementPatterns = listOf(
-        ScoreboardPattern.capturedMobsPattern
+        ScoreboardPattern.capturedMobsPattern,
     )
 
 }
