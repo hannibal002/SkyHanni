@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 //? if >= 26.2 {
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import net.minecraft.client.renderer.StagedVertexBuffer;
@@ -25,12 +25,12 @@ public abstract class MixinRenderTypeFeatureRenderer {
         StagedVertexBuffer.ExecuteInfo executeInfo,
         Operation<Void> original
     ) {
-        boolean hasCustomOutline = SkyHanniOutlineVertexConsumerProvider.isCustomOutlinePipeline(renderType.pipeline());
-        if (hasCustomOutline) SkyHanniOutlineVertexConsumerProvider.beginRendering();
+        boolean hasCustomOutline = SkyHanniOutlineHook.isCustomOutlinePipeline(renderType.pipeline());
+        if (hasCustomOutline) SkyHanniOutlineHook.beginRendering();
         try {
             original.call(renderType, executeInfo);
         } finally {
-            if (hasCustomOutline) SkyHanniOutlineVertexConsumerProvider.finishRendering();
+            if (hasCustomOutline) SkyHanniOutlineHook.finishRendering();
         }
     }
 }

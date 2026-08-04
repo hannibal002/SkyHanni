@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.feature.FeatureRenderDispatcher
 import net.minecraft.client.renderer.state.gui.GuiItemRenderState
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.util.LightCoordsUtil.FULL_BRIGHT
 import net.minecraft.world.phys.Vec3
 import org.joml.Matrix3x2f
 
@@ -116,7 +117,7 @@ data class SkyHanniGuiItemRenderState(
         if (rotated) setAnimated()
 
         //~ if < 26.2 'submitNodeStorage' -> 'featureRenderDispatcher.submitNodeStorage'
-        trackingState.submit(ps, submitNodeStorage, 15728880, OverlayTexture.NO_OVERLAY, 0)
+        trackingState.submit(ps, submitNodeStorage, FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0)
         //? if >= 26.2 {
         featureRenderDispatcher.renderAllFeatures(submitNodeStorage)
         //?} else {

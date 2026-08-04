@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -154,14 +154,14 @@ public abstract class MixinLevelRenderer {
     @Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/CommandEncoder;clearColorAndDepthTextures(Lcom/mojang/blaze3d/textures/GpuTexture;Lorg/joml/Vector4fc;Lcom/mojang/blaze3d/textures/GpuTexture;D)V", ordinal = 0, shift = At.Shift.AFTER))
     private void setGlowDepth(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
-        SkyHanniOutlineVertexConsumerProvider.checkIfDepthAttachmentNeedsUpdating();
+        SkyHanniOutlineHook.checkIfDepthAttachmentNeedsUpdating();
     }
 
     //? if < 26.2 {
     /*@Inject(method = "lambda$addMainPass$0", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;endOutlineBatch()V"))
     private void renderSkyhanniGlow(CallbackInfo ci) {
         if (!RenderLivingEntityHelper.isUsingCustomGlow()) return;
-        SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().endOutlineBatch();
+        SkyHanniOutlineHook.getVertexConsumers().endOutlineBatch();
     }
     *///?} else {
     /*@Inject(

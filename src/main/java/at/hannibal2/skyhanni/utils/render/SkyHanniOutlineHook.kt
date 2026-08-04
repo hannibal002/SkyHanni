@@ -27,12 +27,12 @@ import net.minecraft.client.renderer.OutlineBufferSource
 import net.minecraft.client.renderer.rendertype.RenderType
 *///?}
 
-// The idea and implementation for this class was inspired by SkyBlocker.
-// This implementation has been modified from the original SkyBlocker code to work across multiple versions.
-object SkyHanniOutlineVertexConsumerProvider {
+// The idea and implementation for this class was inspired by Skyblocker.
+// This implementation has been modified from the original Skyblocker code to work across multiple versions.
+object SkyHanniOutlineHook {
 
     //? if < 26.2 {
-    /*class SkyHanniOutlineVertexConsumerProviderImpl : OutlineBufferSource() {
+    /*class SkyHanniOutlineVertexConsumerProvider : OutlineBufferSource() {
         override fun endOutlineBatch() {
             beginRendering()
             super.endOutlineBatch()
@@ -49,7 +49,7 @@ object SkyHanniOutlineVertexConsumerProvider {
 
     @JvmStatic
     val vertexConsumers by lazy {
-        SkyHanniOutlineVertexConsumerProviderImpl()
+        SkyHanniOutlineVertexConsumerProvider()
     }
     *///?}
 
@@ -61,7 +61,9 @@ object SkyHanniOutlineVertexConsumerProvider {
     private var customDepthAttachmentFormat: GpuFormat? = null
 
     @JvmStatic
+    @get:JvmName("isCurrentlyActive")
     var currentlyActive = false
+        private set
 
     @JvmStatic
     fun beginRendering() {

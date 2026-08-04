@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.render.item
 
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
@@ -41,7 +42,7 @@ abstract class SkyHanniAbstractItemTexture : AbstractTexture(), AutoCloseable {
         //~ if < 26.2 'GpuFormat.D32_FLOAT' -> 'TextureFormat.DEPTH32'
         depthTexture = device.createTexture(depthLabel, usageInt, GpuFormat.D32_FLOAT, size, size, 1, 1)
         depthTextureView = device.createTextureView(depthTexture!!)
-        device.createCommandEncoder().clearColorAndDepthTextures(texture!!, GuiRenderer.CLEAR_COLOR, depthTexture!!, CLEAR_DEPTH)
+        device.createCommandEncoder().clearColorAndDepthTextures(texture!!, GuiRenderer.CLEAR_COLOR, depthTexture!!, RenderCompat.CLEAR_DEPTH)
     }
 
     override fun close() {
