@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.utils.render
+package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.client.Minecraft
@@ -61,20 +61,19 @@ object SkyHanniOutlineHook {
     private var customDepthAttachmentFormat: GpuFormat? = null
 
     @JvmStatic
-    @get:JvmName("isCurrentlyActive")
-    var currentlyActive = false
+    var isCurrentlyActive = false
         private set
 
     @JvmStatic
     fun beginRendering() {
         val depthAttachmentView = customDepthAttachmentView ?: return
-        currentlyActive = true
+        isCurrentlyActive = true
         RenderSystem.outputDepthTextureOverride = depthAttachmentView
     }
 
     @JvmStatic
     fun finishRendering() {
-        currentlyActive = false
+        isCurrentlyActive = false
         RenderSystem.outputDepthTextureOverride = null
     }
 
@@ -142,7 +141,7 @@ object SkyHanniOutlineHook {
 
     @JvmStatic
     fun getCustomOutlinePipeline(pipeline: RenderPipeline): RenderPipeline {
-        if (!currentlyActive) return pipeline
+        if (!isCurrentlyActive) return pipeline
         return when (pipeline) {
             RenderPipelines.OUTLINE_CULL -> customOutlineCullPipeline
             RenderPipelines.OUTLINE_NO_CULL -> customOutlineNoCullPipeline

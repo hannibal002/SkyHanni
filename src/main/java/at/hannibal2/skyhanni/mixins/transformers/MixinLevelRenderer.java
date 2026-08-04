@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent;
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineHook;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import at.hannibal2.skyhanni.utils.render.WorldRenderUtils;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;

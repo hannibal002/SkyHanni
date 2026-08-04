@@ -2,18 +2,12 @@ package at.hannibal2.skyhanni.utils.render
 
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.render.WorldRenderUtils.submitCustomGeometry
 import com.mojang.blaze3d.vertex.VertexConsumer
 import net.minecraft.client.renderer.rendertype.RenderType
 import java.awt.Color
 
 class QuadDrawer @PublishedApi internal constructor(val event: SkyHanniRenderWorldEvent) {
-
-    private fun SkyHanniRenderWorldEvent.submitCustomGeometry(layer: RenderType, block: (VertexConsumer) -> Unit) {
-        //? if >= 26.2 {
-        event.submitNodeStorage.submitCustomGeometry(event.matrices, layer) { _, buf -> block(buf) }
-        //?} else
-        //block(event.bufferSource.getBuffer(layer))
-    }
 
     fun draw(
         middlePoint: LorenzVec,
