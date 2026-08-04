@@ -92,6 +92,7 @@ object AchievementManager {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.ACHIEVEMENTS, "achievement progress update")
     }
 
+    // This function returns true if the achievement was completed, false if it was already completed or if Hypixel Alpha is enabled
     fun completeAchievement(id: String): Boolean {
         if (HypixelData.hypixelAlpha) return false
         val achievement = config[id] ?: ErrorManager.skyHanniError("Achievement with unknown id", "id" to id)

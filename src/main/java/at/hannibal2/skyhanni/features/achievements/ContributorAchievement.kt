@@ -28,8 +28,10 @@ object ContributorAchievement {
     private const val CONTRIBUTOR_REJECTED_ACHIEVEMENT = "Contrib Rejected"
     private const val CONTRIBUTOR_FAMOUS_ACHIEVEMENT = "Contrib Famous"
 
+    const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
+
     @HandleEvent
-    fun onAchievementRegistration(event: AchievementRegistrationEvent) {
+    private fun onAchievementRegistration(event: AchievementRegistrationEvent) {
         event.register(
             Achievement(
                 name = "EEEEKK!".asComponent(),
@@ -98,7 +100,7 @@ object ContributorAchievement {
     }
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onProfileJoin() {
+    private fun onProfileJoin() {
         val friends = FriendApi.getAllFriends()
         if (friends.any { it.name in ContributorManager.contributorNames }) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
@@ -106,21 +108,21 @@ object ContributorAchievement {
     }
 
     @HandleEvent
-    fun onFriendAdd(event: FriendAddEvent) {
+    private fun onFriendAdd(event: FriendAddEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_FRIEND_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
-    fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
+    private fun onFriendRequestExpired(event: FriendRequestExpiredEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_NOBODY_ACHIEVEMENT)
         }
     }
 
     @HandleEvent
-    fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
+    private fun onFriendRequestDeclined(event: FriendRequestDeclinedEvent) {
         if (event.playerName in ContributorManager.contributorNames) {
             AchievementManager.completeAchievement(CONTRIBUTOR_REJECTED_ACHIEVEMENT)
         }
@@ -130,7 +132,7 @@ object ContributorAchievement {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (completed || config.discoverContributorMessage) {
             ChatUtils.chat {
-                appendWithColor(ContributorManager.FOUND_WILD_CONTRIBUTOR, ChatFormatting.GOLD)
+                appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
                 appendWithColor(" (hover)", ChatFormatting.GRAY)
                 hover = componentBuilder {
                     appendWithColor("You have encountered ", ChatFormatting.GRAY)

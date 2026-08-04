@@ -61,8 +61,6 @@ object ContributorManager {
     private val contributorMentions get() = SkyHanniMod.seenContributorStorage.contributorMentions
     private val contributorMentionersThisSession = mutableSetOf<String>()
 
-    private const val CONTRIBUTOR_ACHIEVEMENT_GOT = "Achievement Get! EEEEKK!!"
-    const val FOUND_WILD_CONTRIBUTOR = "A wild SkyHanni contributor appears!"
     private val patternGroup = RepoPattern.group("contributor")
 
     /**
@@ -91,7 +89,7 @@ object ContributorManager {
     private val repoReloadCoroutine = CoroutineSettings("contributor list repo reload")
 
     @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
+    private fun onRepoReload(event: RepositoryReloadEvent) = repoReloadCoroutine.launch {
         val map = event.getConstantAsync<ContributorsJson>("ContributorList").contributors
 
         contributors = map.mapKeysNotNull {
@@ -110,7 +108,7 @@ object ContributorManager {
 
     // <editor-fold desc="Commands">
     @HandleEvent
-    fun onCommand(event: CommandRegistrationEvent) {
+    private fun onCommand(event: CommandRegistrationEvent) {
         event.registerBrigadier("shlistseencontributors") {
             description = "List all contributors you've seen in chat or in nametags"
             category = CommandCategory.USERS_ACTIVE
@@ -264,7 +262,7 @@ object ContributorManager {
     // </editor-fold>
 
     @HandleEvent
-    fun onPlayerAllChat(event: PlayerAllChatEvent.Allow) {
+    private fun onChat(event: PlayerAllChatEvent.Allow) {
         if (!isSelfContributor()) return
         if (!config.contributorMentionTracker) return
         val msg = event.messageComponent.getText()
@@ -318,15 +316,14 @@ object ContributorManager {
 
     private fun isContributorMentionMessage(message: String): Boolean {
         val cleanMessage = message.removePrefix("[SkyHanni] ")
-        if (cleanMessage.startsWith(CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
-        if (cleanMessage.startsWith(FOUND_WILD_CONTRIBUTOR)) return true
+        if (cleanMessage.startsWith(ContributorAchievement.CONTRIBUTOR_ACHIEVEMENT_GOT)) return true
 
         val msg = cleanMessage.lowercase()
         return contribMentionPattern.find(msg)
     }
 
     @HandleEvent
-    fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
+    private fun onRenderNametag(event: EntityDisplayNameEvent<Player>) {
         val gameProfile = event.entity.gameProfile
         getSuffix(gameProfile.id)?.let {
             recordSeenContributor(gameProfile.id, gameProfile.name)
