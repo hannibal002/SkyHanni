@@ -172,12 +172,13 @@ fun Int.requireSuccess(message: String, commentError: Boolean = true) {
 
 data class Finding(val path: String, val line: Int, val ruleId: String, val message: String)
 
-data class Dependency(val owner: String, val repoName: String, val pullNumber: Int)
+data class Dependency(val owner: String, val repoName: String, val pullNumber: Int) {
+    val link: String = "https://github.com/$owner/$repoName/pull/$pullNumber"
+}
 
-data class DependencyCheckResult(
-    val dependencies: List<Dependency>,
-    val openDependencies: List<Dependency>,
-)
+// The closed pull request that triggered this run, used only when it is a dependency.
+data class DependencyTrigger(val pullNumber: Int, val merged: Boolean)
+
 
 class DependencyCheckException(message: String) : Exception(message)
 
@@ -865,8 +866,8 @@ fun setDependencyStatus(headSha: String, openDependencies: List<Dependency>) {
 }
 
 // Throws DependencyCheckException when this PR could not be evaluated. Callers that iterate over many PRs
-// must use checkPrDependenciesOrNull instead.
-fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
+// must use tryCheckPrDependencies instead.
+fun checkPrDependencies(issueNumber: String, trigger: DependencyTrigger? = null) {
     val (status, body) = ghRepoGet("/pulls/$issueNumber")
     if (status.isHttpError) {
         dependencyError("Error: could not fetch PR #$issueNumber (HTTP $status)")
@@ -877,50 +878,42 @@ fun checkPrDependencies(issueNumber: String): DependencyCheckResult {
     val headSha = (pr.get("head") as? JsonObject)?.get("sha")?.takeIf { it.isJsonPrimitive }?.asString
         ?: dependencyError("Error: head SHA missing for PR #$issueNumber")
 
-    if ("## Dependencies" !in prBody) {
-        println("PR #$issueNumber: no Dependencies section, skipping")
-        setLabel(issueNumber, dependencyLabel, false)
-        setDependencyStatus(headSha, emptyList())
-        return DependencyCheckResult(emptyList(), emptyList())
-    }
-
-    val deps = parseDependencies(prBody)
-    if (deps.isEmpty()) {
-        println("PR #$issueNumber: no dependency links found, skipping")
-        setLabel(issueNumber, dependencyLabel, false)
-        setDependencyStatus(headSha, emptyList())
-        return DependencyCheckResult(emptyList(), emptyList())
-    }
-
-    val openDeps = deps.filter { isDependencyOpen(it) }
-    val hasOpen = openDeps.isNotEmpty()
     val wasAlreadyLabeled = dependencyLabel in getPrLabels(issueNumber)
-    setLabel(issueNumber, dependencyLabel, hasOpen)
-    setDependencyStatus(headSha, openDeps)
-    if (hasOpen && !wasAlreadyLabeled) {
-        postDependencyWaitingComment(issueNumber, openDeps)
+
+    // A missing section and a section without parseable links end in the same state as a pull request whose
+    // dependencies are all closed, so they take the same path instead of returning early.
+    val hasSection = "## Dependencies" in prBody
+    val deps = if (hasSection) parseDependencies(prBody) else emptyList()
+    if (deps.isEmpty()) {
+        println("PR #$issueNumber: ${if (hasSection) "no dependency links found" else "no Dependencies section"}")
+        setLabel(issueNumber, dependencyLabel, false)
+        setDependencyStatus(headSha, emptyList())
+        handleDependencyComment(issueNumber, deps, emptyList(), trigger, wasAlreadyLabeled)
+        return
     }
-    println("PR #$issueNumber: ${if (hasOpen) "has open dependencies" else "all dependencies resolved"}")
-    return DependencyCheckResult(deps, openDeps)
+    val openDeps = deps.filter { isDependencyOpen(it) }
+    setLabel(issueNumber, dependencyLabel, openDeps.isNotEmpty())
+    setDependencyStatus(headSha, openDeps)
+    handleDependencyComment(issueNumber, deps, openDeps, trigger, wasAlreadyLabeled)
+    println("PR #$issueNumber: ${if (openDeps.isNotEmpty()) "has open dependencies" else "all dependencies resolved"}")
 }
 
-
-fun skipFailedDependencyCheck(issueNumber: String, reason: String): DependencyCheckResult? {
+fun skipFailedDependencyCheck(issueNumber: String, reason: String) {
     System.err.println("Warning: could not evaluate dependencies of PR #$issueNumber ($reason), skipping")
     failedDependencyChecks.add(issueNumber)
-    return null
 }
 
 // A dropped connection has to be treated like a repeated gateway timeout, otherwise a transport failure
 // still aborts the whole loop while an HTTP failure does not.
-fun checkPrDependenciesOrNull(issueNumber: String): DependencyCheckResult? = try {
-    checkPrDependencies(issueNumber)
-} catch (e: DependencyCheckException) {
-    skipFailedDependencyCheck(issueNumber, e.message ?: e.toString())
-} catch (e: IOException) {
-    skipFailedDependencyCheck(issueNumber, e.toString())
+fun tryCheckPrDependencies(issueNumber: String, trigger: DependencyTrigger? = null) {
+    try {
+        checkPrDependencies(issueNumber, trigger)
+    } catch (e: DependencyCheckException) {
+        skipFailedDependencyCheck(issueNumber, e.message ?: e.toString())
+    } catch (e: IOException) {
+        skipFailedDependencyCheck(issueNumber, e.toString())
+    }
 }
-
 
 fun fetchAllLabeledOpenPRs(): List<JsonObject> {
     val result = mutableListOf<JsonObject>()
@@ -975,52 +968,64 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
         if ("## Dependencies" !in body) continue
         val deps = parseDependencies(body)
         if (deps.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == targetPrNum }) {
-            checkPrDependenciesOrNull(num)
+            tryCheckPrDependencies(num)
         }
     }
 }
 
-fun buildDependencyWaitingComment(deps: List<Dependency>): String = buildString {
-    if (deps.size == 1) {
-        val dep = deps.first()
-        val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
-        appendLine("This PR is now waiting on [#${dep.pullNumber}]($link).")
-    } else {
-        appendLine("This PR is now waiting on the following dependencies:")
-        for (dep in deps) {
-            val link = "https://github.com/${dep.owner}/${dep.repoName}/pull/${dep.pullNumber}"
-            appendLine("- [#${dep.pullNumber}]($link)")
+fun buildDependencyComment(trigger: DependencyTrigger?, openDependencies: List<Dependency>): String = buildString {
+    if (trigger != null) {
+        val closedLink = "https://github.com/$repo/pull/${trigger.pullNumber}"
+        val what = if (trigger.merged) "was merged" else "was closed without merging"
+        appendLine("[PR #${trigger.pullNumber}]($closedLink) $what.")
+        appendLine()
+    }
+
+    when (openDependencies.size) {
+        // Avoids "resolved": a closed dependency may not have been merged.
+        0 -> appendLine("All dependencies resolved.")
+        1 -> {
+            val dep = openDependencies.first()
+            appendLine("This PR is now waiting on [#${dep.pullNumber}](${dep.link}).")
         }
+
+        else -> {
+            appendLine("This PR is now waiting on the following dependencies:")
+            for (dep in openDependencies) {
+                appendLine("- [#${dep.pullNumber}](${dep.link})")
+            }
+        }
+    }
+
+    if (trigger != null && !trigger.merged) {
+        appendLine()
+        append("You may need to re-evaluate this PR's dependencies.")
     }
 }
 
-fun postDependencyWaitingComment(prNum: String, openDeps: List<Dependency>) {
-    val message = buildDependencyWaitingComment(openDeps)
-    val status = postComment(prNum, message)
-    if (status.isHttpError) System.err.println("Warning: could not post dependency waiting comment on PR #$prNum (HTTP $status)")
-    else println("PR #$prNum: posted dependency waiting comment")
-}
-
-fun postDependencyNotification(prNum: String, closedPrNum: Int, merged: Boolean, remainingOpen: Int) {
-    val message = buildDependencyNotificationMessage(closedPrNum, merged, remainingOpen)
-    val status = postComment(prNum, message)
-    if (status.isHttpError) System.err.println("Warning: could not post notification on PR #$prNum (HTTP $status)")
-    else println("PR #$prNum: posted dependency notification")
-}
-
-fun buildDependencyNotificationMessage(closedPrNum: Int, merged: Boolean, remainingOpen: Int): String = buildString {
-    val closedLink = "https://github.com/$repo/pull/$closedPrNum"
-    if (merged) {
-        append("[PR #$closedPrNum]($closedLink) was merged.")
-        when (remainingOpen) {
-            0 -> append(" This PR now has all dependencies resolved.")
-            1 -> append(" This PR still has 1 open dependency.")
-            else -> append(" This PR still has $remainingOpen open dependencies.")
-        }
-    } else {
-        append("[PR #$closedPrNum]($closedLink) was closed without merging.")
-        append(" You may need to re-evaluate this PR's dependencies.")
+fun handleDependencyComment(
+    issueNumber: String,
+    dependencies: List<Dependency>,
+    openDependencies: List<Dependency>,
+    trigger: DependencyTrigger?,
+    wasAlreadyLabeled: Boolean,
+) {
+    val repoOwner = repo.substringBefore("/")
+    val repoName = repo.substringAfter("/")
+    // A close event matters only if the closed pull request is listed as a dependency. Removing the line
+    // before the event runs is therefore intentionally silent.
+    val matchingTrigger = trigger?.takeIf { closed ->
+        dependencies.any { it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closed.pullNumber }
     }
+
+    // Without a trigger only a pull request that just started waiting is new. The other direction needs a
+    // record of what was announced before, which the label cannot provide.
+    val startedWaiting = openDependencies.isNotEmpty() && !wasAlreadyLabeled
+    if (matchingTrigger == null && !startedWaiting) return
+
+    val status = postComment(issueNumber, buildDependencyComment(matchingTrigger, openDependencies))
+    if (status.isHttpError) System.err.println("Warning: could not post dependency comment on PR #$issueNumber (HTTP $status)")
+    else println("PR #$issueNumber: posted dependency comment")
 }
 
 
@@ -1038,20 +1043,10 @@ fun runDependenciesModeForOpenPr(prNum: String?) {
     }
 }
 
-fun recheckLabeledPRsAfterClose(closedPrNum: Int, merged: Boolean) {
-    val repoOwner = repo.substringBefore("/")
-    val repoName = repo.substringAfter("/")
-
+fun recheckLabeledPRsAfterClose(trigger: DependencyTrigger) {
     for (pr in fetchAllLabeledOpenPRs()) {
         val num = pr.get("number")?.takeIf { it.isJsonPrimitive }?.asString ?: continue
-        val result = checkPrDependenciesOrNull(num) ?: continue
-        val isDirectDep = result.dependencies.any {
-            it.owner == repoOwner && it.repoName == repoName && it.pullNumber == closedPrNum
-        }
-
-        if (isDirectDep) {
-            postDependencyNotification(num, closedPrNum, merged, result.openDependencies.size)
-        }
+        tryCheckPrDependencies(num, trigger)
     }
 }
 
@@ -1063,7 +1058,7 @@ fun runDependenciesMode(prState: String, prNum: String?, merged: Boolean) {
 
     println("PR ${prNum ?: "unknown"} closed (merged=$merged), rechecking all open PRs with label \"$dependencyLabel\"")
     val closedPrNum = prNum?.toIntOrNull() ?: error("PR_NUMBER not set or invalid for closed event", commentError = false)
-    recheckLabeledPRsAfterClose(closedPrNum, merged)
+    recheckLabeledPRsAfterClose(DependencyTrigger(closedPrNum, merged))
 }
 
 fun buildKeywordLabelAddedComment(entry: KeywordLabel): String = buildString {
