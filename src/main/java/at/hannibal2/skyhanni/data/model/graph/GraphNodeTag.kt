@@ -169,11 +169,11 @@ enum class GraphNodeTag(
         onlyIslands = IslandTypeTag.FORAGING_CUSTOM_TREES,
     ),
 
-    HONEY_HIVE(
-        "honey_hive",
+    HONEYHIVE(
+        "honeyhive",
         LorenzColor.GOLD,
-        "Honey Hive",
-        "Lootable Honey Hive.",
+        "Honeyhive",
+        "Lootable Honeyhive.",
         onlyIsland = IslandType.TORRHUS_CANYON,
     ),
 
