@@ -396,15 +396,14 @@ fun CommentType.findExisting(prNumber: String): PrComment? {
     return found
 }
 
-// Keeps the last hit, because the issue specific comments endpoint accepts only since, per_page and page.
-// There is no way to ask for the newest comment directly. Takes the comments instead of fetching them, so a
-// caller looking up several marker types pays for one fetch.
-fun CommentType.findNewestState(comments: List<PrComment>): StateComment? = comments.mapNotNull { comment ->
+// Every comment still carrying an active state marker, oldest first, so the last one is the current
+// announcement. More than one is a leftover from a race or from a collapse that only warned.
+fun CommentType.findAllStates(comments: List<PrComment>): List<StateComment> = comments.mapNotNull { comment ->
     val state = comment.body.lineSequence()
         .firstNotNullOfOrNull { stateMarkerRegex.matchEntire(it.trim()) }
         ?.groupValues?.get(1)
     state?.let { StateComment(comment, it) }
-}.lastOrNull()
+}
 
 fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
     postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
@@ -459,6 +458,10 @@ fun CommentType.markAsStale(
 fun CommentType.staleExisting(prNumber: String, fallbackTitle: String = "Unknown") {
     val existing = findExisting(prNumber) ?: return
     markAsStale(existing, fallbackTitle)
+}
+
+fun CommentType.staleAll(states: List<StateComment>, onFailure: (String) -> Unit = { error(it) }) {
+    for (state in states) markAsStale(state.comment, onFailure = onFailure)
 }
 
 fun readBuildLog(artifactDirPath: String?): String? {
@@ -1062,14 +1065,14 @@ fun handleDependencyComment(
     // Skips this pull request instead of ending the loop over all of them. Reading no comments must not count as
     // nothing announced, the missing marker would read as resolved and post the announcement twice.
     val comments = fetchComments(issueNumber) { dependencyError(it) }
-    val announced = dependencyComment.findNewestState(comments)
+    val announcedStates = dependencyComment.findAllStates(comments)
+    val announced = announcedStates.lastOrNull()
     // A pull request that was never announced is in the same position as one whose dependencies are all closed.
     val announcedState = announced?.state ?: dependencyStateResolved
     val currentState = if (openDependencies.isEmpty()) dependencyStateResolved else dependencyStateWaiting
 
     val body = buildDependencyComment(matchingTrigger, openDependencies)
-    // The state alone does not cover a second dependency being added while the pull request keeps waiting, so
-    // the state lines of both comments are compared as well.
+    // The state alone misses a second dependency being added while the pull request keeps waiting.
     val stateChanged = announcedState != currentState ||
         (announced != null && dependencyStateLines(announced.comment.body) != dependencyStateLines(body))
     // Read out of the text instead of a second marker. Only the newest comment still carrying an active marker
@@ -1080,24 +1083,23 @@ fun handleDependencyComment(
         }
     val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced
 
-
-    if (!stateChanged && !triggerIsNew) return
-
-    // Not routed through CommentType.post, that aborts the run on failure. This one runs in a loop over every
-    // labeled pull request, where one unreachable pull request must not stop the rest.
-    val status = postComment(issueNumber, "${dependencyComment.stateMarker(currentState)}\n$body")
-    if (status.isHttpError) {
-        System.err.println("Warning: could not post dependency comment on PR #$issueNumber (HTTP $status)")
-        return
-    }
-    println("PR #$issueNumber: posted dependency comment")
-    // Collapsed after the new comment exists, a failed post before that would leave no announcement at all.
-    // The leftover of a failed collapse is harmless, so this only warns.
-    announced?.let { previous ->
-        dependencyComment.markAsStale(previous.comment) {
-            System.err.println("Warning: $it on PR #$issueNumber")
+    val posting = stateChanged || triggerIsNew
+    if (posting) {
+        // Not routed through CommentType.post, that aborts the run on failure. This one runs in a loop over
+        // every labeled pull request, where one unreachable pull request must not stop the rest.
+        val status = postComment(issueNumber, "${dependencyComment.stateMarker(currentState)}\n$body")
+        if (status.isHttpError) {
+            System.err.println("Warning: could not post dependency comment on PR #$issueNumber (HTTP $status)")
+            return
         }
+        println("PR #$issueNumber: posted dependency comment")
     }
+
+    // After the post, so a failed post cannot erase the announcement. Leftovers go on every run, without a post
+    // the newest one stays as the current announcement. Warns per comment, one that cannot be patched must not
+    // block the rest.
+    val outdated = if (posting) announcedStates else announcedStates.dropLast(1)
+    dependencyComment.staleAll(outdated) { System.err.println("Warning: $it on PR #$issueNumber") }
 }
 
 fun runDependenciesModeForOpenPr(prNum: String?) {
@@ -1185,26 +1187,28 @@ fun runKeywordLabelMode(prNumber: String) {
 
         if (keywordPresent != wasLabeled) setLabel(prNumber, entry.label, keywordPresent)
 
-        // The label says what a maintainer sees, the marker says what this script announced. Only the second one
-        // decides, so neither a label edited by hand nor a label write that only logged a warning can turn into a
-        // duplicated or a missing comment.
-        val announced = entry.comment.findNewestState(comments)
-        // A pull request that never carried the label has no announcement at all, which is the same thing as
-        // having announced the inactive state. Comparing the nullable value directly would make every untouched
-        // pull request differ from inactive and get a label-removed comment it never earned.
+        // The marker decides, not the label, so neither a hand-edited label nor a label write that only warned
+        // can turn into a duplicated or a missing comment.
+        val announcedStates = entry.comment.findAllStates(comments)
+        val announced = announcedStates.lastOrNull()
+        // Never announced is the same as having announced inactive. Comparing the nullable value directly would
+        // post a label-removed comment on every untouched pull request.
         val announcedState = announced?.state ?: keywordStateInactive
 
-        if (announcedState != currentState) {
+        val posting = announcedState != currentState
+        if (posting) {
             val body = if (keywordPresent) buildKeywordLabelAddedComment(entry)
             else buildKeywordLabelRemovedComment(entry)
             entry.comment.post(prNumber, entry.comment.stateMarker(currentState), body) {
                 "Error: could not post \"${entry.label}\" comment (HTTP $it)"
             }
-            // Collapsed after the new comment exists, unlike the detekt and build modes which collapse first.
-            // A failed collapse only leaves a second comment behind that the newest-state lookup ignores. A
-            // failed post after a collapse would be worse: the announcement is gone, the absent marker reads as
-            // inactive, and a change back towards inactive would then never be announced again.
-            announced?.let { entry.comment.markAsStale(it.comment) }
+        }
+
+        // After the post, unlike the detekt and build modes: a failed post after a collapse would leave the
+        // announcement gone and the absent marker reads as inactive. Leftovers go on every run, without a post
+        // the newest one stays. Warns instead of ending the run, which would skip the commit status below.
+        entry.comment.staleAll(if (posting) announcedStates else announcedStates.dropLast(1)) {
+            System.err.println("Warning: $it on PR #$prNumber")
         }
 
         // Always published, also when nothing changed, so the status exists on every head SHA.
