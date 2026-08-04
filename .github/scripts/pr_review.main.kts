@@ -356,8 +356,8 @@ data class PrComment(val id: Long, val body: String)
 
 data class StateComment(val comment: PrComment, val state: String)
 
-// Iterates every comment of a pull request, oldest first, which is the order the API documents. [action]
-// returns false to stop early.
+// Iterates every comment of a pull request in ascending comment id, which is the order the API documents.
+// [action] returns false to stop early.
 //
 // [onFailure] must not return: continuing would hand out the pages read so far as if they were the whole listing.
 fun forEachComment(prNumber: String, onFailure: (String) -> Nothing = { error(it) }, action: (PrComment) -> Boolean) {
@@ -381,6 +381,11 @@ fun forEachComment(prNumber: String, onFailure: (String) -> Nothing = { error(it
 // newly added marker id that is a prefix of another one would break it silently.
 fun String.hasMarkerLine(marker: String): Boolean = lineSequence().any { it.trim() == marker }
 
+// One pagination run per pull request instead of one per lookup, so a mode looking up once per configured
+// entry does not silently multiply its requests when a second entry is added.
+fun fetchComments(prNumber: String, onFailure: (String) -> Nothing = { error(it) }): List<PrComment> =
+    buildList { forEachComment(prNumber, onFailure) { comment -> add(comment); true } }
+
 fun CommentType.findExisting(prNumber: String): PrComment? {
     var found: PrComment? = null
     forEachComment(prNumber) { comment ->
@@ -391,19 +396,15 @@ fun CommentType.findExisting(prNumber: String): PrComment? {
     return found
 }
 
-// Walks every page and keeps the last hit, because the issue specific comments endpoint accepts only since,
-// per_page and page. There is no way to ask for the newest comment directly.
-fun CommentType.findNewestState(prNumber: String, onFailure: (String) -> Nothing = { error(it) }): StateComment? {
-    var newest: StateComment? = null
-    forEachComment(prNumber, onFailure) { comment ->
-        val state = comment.body.lineSequence()
-            .firstNotNullOfOrNull { stateMarkerRegex.matchEntire(it.trim()) }
-            ?.groupValues?.get(1)
-        if (state != null) newest = StateComment(comment, state)
-        true
-    }
-    return newest
-}
+// Keeps the last hit, because the issue specific comments endpoint accepts only since, per_page and page.
+// There is no way to ask for the newest comment directly. Takes the comments instead of fetching them, so a
+// caller looking up several marker types pays for one fetch.
+fun CommentType.findNewestState(comments: List<PrComment>): StateComment? = comments.mapNotNull { comment ->
+    val state = comment.body.lineSequence()
+        .firstNotNullOfOrNull { stateMarkerRegex.matchEntire(it.trim()) }
+        ?.groupValues?.get(1)
+    state?.let { StateComment(comment, it) }
+}.lastOrNull()
 
 fun CommentType.post(prNumber: String, marker: String, body: String, errorMessage: (Int) -> String) {
     postPrComment(prNumber, "$marker\n$body", errorMessage = errorMessage)
@@ -1060,7 +1061,8 @@ fun handleDependencyComment(
 
     // Skips this pull request instead of ending the loop over all of them. Reading no comments must not count as
     // nothing announced, the missing marker would read as resolved and post the announcement twice.
-    val announced = dependencyComment.findNewestState(issueNumber) { dependencyError(it) }
+    val comments = fetchComments(issueNumber) { dependencyError(it) }
+    val announced = dependencyComment.findNewestState(comments)
     // A pull request that was never announced is in the same position as one whose dependencies are all closed.
     val announcedState = announced?.state ?: dependencyStateResolved
     val currentState = if (openDependencies.isEmpty()) dependencyStateResolved else dependencyStateWaiting
@@ -1171,6 +1173,10 @@ fun runKeywordLabelMode(prNumber: String) {
 
     val bodyLines = prBody.lines()
     val currentLabels = getPrLabels(prNumber)
+    // Fetched once for all entries. A comment posted inside the loop is missing here and a collapsed one still
+    // carries its old text, but every entry only ever matches its own marker id, so neither can reach another
+    // entry.
+    val comments = fetchComments(prNumber)
 
     for (entry in keywordLabels) {
         val keywordPresent = entry.keyword in bodyLines
@@ -1182,7 +1188,7 @@ fun runKeywordLabelMode(prNumber: String) {
         // The label says what a maintainer sees, the marker says what this script announced. Only the second one
         // decides, so neither a label edited by hand nor a label write that only logged a warning can turn into a
         // duplicated or a missing comment.
-        val announced = entry.comment.findNewestState(prNumber)
+        val announced = entry.comment.findNewestState(comments)
         // A pull request that never carried the label has no announcement at all, which is the same thing as
         // having announced the inactive state. Comparing the nullable value directly would make every untouched
         // pull request differ from inactive and get a label-removed comment it never earned.
