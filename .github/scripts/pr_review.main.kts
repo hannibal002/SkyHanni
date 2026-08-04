@@ -13,6 +13,34 @@ import java.nio.charset.StandardCharsets
 import kotlin.io.path.*
 import kotlin.system.exitProcess
 
+
+
+/**
+ * A keyword an author can put on its own line in the pull request description to control a label.
+ * The line has to match exactly, the same way ChangelogVerification handles "exclude_from_changelog".
+ *
+ * [description] explains the label in the comment posted when it gets added.
+ * [blocking] additionally publishes a commit status, so the pull request cannot be merged while the keyword is present.
+ */
+data class KeywordLabel(
+    val keyword: String,
+    val label: String,
+    val description: String,
+    val blocking: Boolean,
+)
+
+// The label of every blocking entry doubles as its status context and is also used by the set-pending job in
+// keyword-labels.yml, both must stay in sync.
+val keywordLabels = listOf(
+    KeywordLabel(
+        keyword = "waiting_on_hypixel_alpha",
+        label = "Waiting on Hypixel",
+        description = "The relevant feature is only available on the Hypixel alpha server, so this pull request can " +
+            "only be tested there. It must not be merged before the feature reaches the main server.",
+        blocking = true,
+    ),
+)
+
 val workflowFailedMarker = "<!-- workflow-failed -->"
 
 val detektLabel = "Detekt"
@@ -107,32 +135,6 @@ data class Dependency(val owner: String, val repoName: String, val pullNumber: I
 data class DependencyCheckResult(
     val dependencies: List<Dependency>,
     val openDependencies: List<Dependency>,
-)
-
-/**
- * A keyword an author can put on its own line in the pull request description to control a label.
- * The line has to match exactly, the same way ChangelogVerification handles "exclude_from_changelog".
- *
- * [description] explains the label in the comment posted when it gets added.
- * [blocking] additionally publishes a commit status, so the pull request cannot be merged while the keyword is present.
- */
-data class KeywordLabel(
-    val keyword: String,
-    val label: String,
-    val description: String,
-    val blocking: Boolean,
-)
-
-// The label of every blocking entry doubles as its status context and is also used by the set-pending job in
-// keyword-labels.yml, both must stay in sync.
-val keywordLabels = listOf(
-    KeywordLabel(
-        keyword = "waiting_on_hypixel_alpha",
-        label = "Waiting on Hypixel",
-        description = "The relevant feature is only available on the Hypixel alpha server, so this pull request can " +
-            "only be tested there. It must not be merged before the feature reaches the main server.",
-        blocking = true,
-    ),
 )
 
 fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, JsonElement> {
