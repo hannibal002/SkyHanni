@@ -312,7 +312,11 @@ Make sure such pull requests have a good explanation in the **What** section.
 - Use American English spelling conventions (e.g., "color" not "colour").
 - When creating/updating a command, move it out of the `Commands.kt` class, if it isn't already, into the class that it belongs to.
 - Avoid direct function imports. Always access functions or members through their respective namespaces or parent classes to improve
-  readability and maintain encapsulation. Extension functions and unqualified enum entries in `when` blocks are exceptions to this rule.
+  readability and maintain encapsulation. Extension functions are an exception to this rule.
+- Enum entries may be written without their enum class name wherever the compiler resolves them from context. This is
+  preferred, not just tolerated, because the enum class name carries no information there. It covers `when` subjects and
+  branches, comparisons, assignments and arguments with a known parameter type. Stay consistent within a block: do not mix
+  `MyEnum.ENTRY` and `ENTRY` in the same place.
 - Use named parameters for boolean and numeric arguments where the meaning is not immediately clear from context (e.g.,
   `findMobHeight(height, above = true)` instead of `findMobHeight(height, true)`).
 - Follow Kotlin conventions for acronym naming:
@@ -450,14 +454,23 @@ a [Discord Bot](https://github.com/SkyHanniStudios/DiscordBot) that helps with s
 Several GitHub Actions workflows run automatically on pull requests to enforce code quality and keep PR metadata up to date.
 All workflows use `.github/scripts/pr_review.main.kts` as the shared review script, invoked with a `MODE` parameter.
 
-When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. If issues still exist, a new
-comment is posted at the bottom of the conversation. When all issues are resolved, the label is removed and no new comment is posted.
+When a PR is updated, any existing comment posted by a workflow is collapsed into a `<details>` spoiler. What follows depends on the
+workflow. The Detekt, Build Failure, Merge Conflict and Changelog Check comments only ever announce that something is wrong: a new comment
+is posted while issues still exist, and once everything is resolved the label is removed without a new comment. The Dependency Label and
+Description Keyword Labels comments announce both directions, so they also post when the situation resolves.
+
+Every one of these comments carries an invisible marker that lets a later run recognize its own previous comment. For the two that announce
+both directions the marker also records which direction was announced last, and that record decides whether a new comment is needed. The
+label does not. A label edited by hand therefore no longer influences whether a comment appears. Labels are still read elsewhere: they
+select which PRs get re-evaluated after a dependency PR is closed, and the Merge Conflict workflow skips a PR that already carries its
+label.
 
 Most workflows use a two-workflow split to allow write-operations on fork PRs without granting untrusted code elevated permissions.
 The first workflow is triggered by `pull_request`, runs with limited permissions, and uploads results as an artifact. The second is
 triggered by `workflow_run` on completion of the first, always uses the base branch version, carries write access (`issues: write`,
 `pull-requests: write`, `actions: read`), and runs the review script against the artifact. The PR number is resolved at runtime from
-the head branch of the triggering workflow run. The Merge Conflict Comment and Dependency Label sections do not use this split.
+the head branch of the triggering workflow run. The Merge Conflict Comment, Dependency Label and Description Keyword Labels sections
+do not use this split.
 
 #### Automated Detekt Review
 
@@ -500,7 +513,7 @@ conflicts are resolved, the comment is collapsed into a `<details>` spoiler and 
 - `.github/workflows/label-merge-conflict.yml`: Triggered by `pull_request_target` on `opened` and `synchronize` events, and by `push` to
   beta. Runs with `issues: write` and `pull-requests: write`. Does not use the two-workflow split because `pull_request_target` already
   provides write access while running base branch code. On a push to beta, no PR number is available and all open PRs are rechecked.
-- `.github/scripts/pr_review.main.kts` (invoked with `MODE=mergeconflict`): Queries the GitHub Pulls API for the `mergeable` field of
+- `.github/scripts/pr_review.main.kts` (invoked with `MODE=merge_conflict`): Queries the GitHub Pulls API for the `mergeable` field of
   the PR. If `null` (GitHub has not yet computed the state), the script exits without making any changes. If `false`, an existing conflict
   comment is staled and a new one is posted, and the label is added. If `true`, an existing conflict comment is staled and the label is
   removed.
@@ -538,6 +551,10 @@ Two dependency formats are supported:
 Dependencies on `hannibal002/SkyHanni-REPO` are explicitly excluded from the open check, as that repository is considered part of the same
 release unit.
 
+A comment is posted when a PR starts waiting, when the list of open dependencies changes, and when a dependency PR is closed. It names the
+closed PR if the run was triggered by one, followed by the dependencies that are still open, or by the note that the PR is no longer waiting
+on any. A run that has nothing new to announce, neither a changed list nor a newly closed dependency, produces no comment.
+
 The check runs on every `opened`, `edited`, `closed`, and `synchronize` event via `pull_request_target`. On `closed`, all open PRs currently
 carrying the label are re-evaluated so the label is removed from dependent PRs when their dependency merges.
 
@@ -545,6 +562,25 @@ Known limitation: if a dependency PR in an external repository merges, the workf
 dependent PR remains until the PR itself is edited or another supported event occurs.
 
 Relevant files: `.github/workflows/check_dependencies.yml`, `.github/scripts/pr_review.main.kts`.
+
+#### Description Keyword Labels
+
+Some labels are controlled by keywords in the pull request description. Writing the keyword on its own line adds the label, removing
+the line removes it again. Both directions post a comment on the PR explaining what happened, but only when the state actually changed
+compared to what the last comment announced. Editing the description without touching the keyword line posts nothing.
+
+Supported keywords:
+
+- `waiting_on_hypixel_alpha` adds the `Waiting on Hypixel` label. Use it when the relevant feature is only available on the Hypixel
+  alpha server, so the pull request can only be tested there and must not be merged before the feature reaches the main server. This
+  keyword also publishes a failing commit status while the line is present.
+
+The line has to match exactly, the same way `exclude_from_changelog` works. Leading or trailing spaces, list markers such as `- `, and
+a different capitalization all prevent the keyword from being recognized.
+
+The check runs on every `opened`, `edited`, `reopened`, and `synchronize` event via `pull_request_target`.
+
+Relevant files: `.github/workflows/keyword-labels.yml`, `.github/scripts/pr_review.main.kts` (invoked with `MODE=keyword_labels`).
 
 ## Access Wideners
 
