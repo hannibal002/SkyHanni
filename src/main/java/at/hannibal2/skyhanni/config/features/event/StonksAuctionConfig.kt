@@ -31,5 +31,5 @@ class StonksAuctionConfig {
 
     @Expose
     @ConfigLink(owner = StonksAuctionConfig::class, field = "countdown")
-    val countdownPosition: Position = Position(10, 10)
+    val countdownPosition: Position = Position(-10, 10)
 }

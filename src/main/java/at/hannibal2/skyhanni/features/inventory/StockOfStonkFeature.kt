@@ -11,9 +11,11 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.collection.CollectionUtils.transformAt
@@ -61,7 +63,7 @@ object StockOfStonkFeature {
      */
     private val currentBidPattern by patternGroup.pattern(
         "currentbid",
-        "Your current bid: (?<bid>.+)",
+        "Your current bid: (?:None|(?<amount>[\\d,]+) Coins)",
     )
 
     /**
@@ -123,20 +125,21 @@ object StockOfStonkFeature {
     private fun updateAuctionData(event: ToolTipTextEvent) {
         val storage = ProfileStorageData.profileSpecific ?: return
         var roundEnd: SimpleTimeMark? = null
-        var hasBid = false
+        var bidAmount: Long? = null
         for (line in event.toolTip) {
             auctionEndsPattern.matchMatcher(line) {
                 val duration = TimeUtils.getDurationOrNull(group("duration")) ?: return@matchMatcher
-                roundEnd = SimpleTimeMark.now() + duration
+                roundEnd = duration.fromNow()
             }
             currentBidPattern.matchMatcher(line) {
-                hasBid = group("bid") != "None"
+                bidAmount = groupOrNull("amount")?.formatLong()
             }
         }
         val newRoundEnd = roundEnd ?: return
         storage.stonksAuctionRoundEnd = newRoundEnd
-        if (hasBid) {
+        bidAmount?.let {
             storage.stonksAuctionLastBidRoundEnd = newRoundEnd
+            storage.stonksAuctionBidAmount = it
         }
     }
 }

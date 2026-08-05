@@ -83,8 +83,7 @@ class EventConfig {
     @Expose
     val yearOfTheWitch: YearOfTheWitchConfig = YearOfTheWitchConfig()
 
-    @ConfigOption(name = "Stonks Auction", desc = "")
-    @Accordion
+    @Category(name = "Stonks Auction", desc = "Features for the Stonks Auction while the Stock Exchange perk is active.")
     @Expose
     val stonksAuction: StonksAuctionConfig = StonksAuctionConfig()
 

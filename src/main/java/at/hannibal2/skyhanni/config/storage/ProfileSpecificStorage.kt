@@ -432,6 +432,9 @@ class ProfileSpecificStorage(
     @Expose
     var stonksAuctionLastBidRoundEnd: SimpleTimeMark = farPast()
 
+    @Expose
+    var stonksAuctionBidAmount: Long = 0L
+
     // - fishing
     @Expose
     var fishing: FishingStorage = FishingStorage()
