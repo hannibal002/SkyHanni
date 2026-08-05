@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState
 class SkyHanniRenderWorldEvent(
     val matrices: PoseStack,
     val camera: CameraRenderState,
-    val vertexConsumers: MultiBufferSource.BufferSource,
+    val bufferSource: MultiBufferSource.BufferSource,
     val partialTicks: Float,
     var isCurrentlyDeferring: Boolean = true,
 ) : SkyHanniEvent()

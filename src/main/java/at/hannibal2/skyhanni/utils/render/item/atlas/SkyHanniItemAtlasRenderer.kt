@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.utils.render.item.atlas
 
+import at.hannibal2.skyhanni.utils.compat.RenderCompat
 import at.hannibal2.skyhanni.utils.render.item.SkyHanniGuiItemRenderState
 import com.mojang.blaze3d.ProjectionType
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.textures.FilterMode
 import com.mojang.blaze3d.textures.GpuTexture
 import com.mojang.blaze3d.textures.GpuTextureView
+import net.minecraft.client.gui.render.GuiRenderer
 import net.minecraft.client.gui.render.TextureSetup
 import net.minecraft.client.renderer.MultiBufferSource
 import net.minecraft.client.renderer.Projection
@@ -90,7 +92,7 @@ internal class SkyHanniItemAtlasRenderer(
 
     fun clearSlot(x: Int, y: Int, size: Int) {
         RenderSystem.getDevice().createCommandEncoder().clearColorAndDepthTextures(
-            texture, 0, depthTexture, 1.0,
+            texture, GuiRenderer.CLEAR_COLOR, depthTexture, RenderCompat.CLEAR_DEPTH,
             x, sizePixels - y - size, size, size,
         )
     }

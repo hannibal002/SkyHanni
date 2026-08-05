@@ -990,29 +990,25 @@ fun recheckPRsDependingOn(targetPrNum: Int) {
 
 val dependencyReEvaluateNote = "You may need to re-evaluate this PR's dependencies."
 
-// The trigger line is found again by this prefix, so building it and recognizing it have to stay together.
-// A plain permalink search cannot be used: the state lines list every open dependency with its permalink, so a
-// dependency that was listed as open and then gets closed is already in the previous text.
-fun dependencyTriggerPrefix(pullNumber: Int): String = "[PR #$pullNumber]("
+// Starts all state texts and marks the end of the trigger section.
+// Must remain exact, otherwise dependencyStateLines drops the entire comment.
+val dependencyStatePrefix = "This PR is"
 
-// Matches any trigger line, used to drop it before comparing two comments by their state lines.
-val anyDependencyTriggerPrefix = "[PR #"
+// Trigger link format must stay identical when building and recognizing trigger entries.
+fun dependencyTriggerLink(pullNumber: Int): String = "- https://github.com/$repo/pull/$pullNumber"
 
 fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
-    when (openDependencies.size) {
-        // Avoids "resolved": a closed dependency may not have been merged.
-        0 -> appendLine("This PR is no longer waiting on any open dependency PRs.")
-        1 -> {
-            val dep = openDependencies.first()
-            appendLine("This PR is now waiting on [#${dep.pullNumber}](${dep.link}).")
-        }
+    if (openDependencies.isEmpty()) {
+        // Closed does not imply merged.
+        appendLine("$dependencyStatePrefix no longer waiting on any open dependency PRs.")
+        return
+    }
 
-        else -> {
-            appendLine("This PR is now waiting on the following dependencies:")
-            for (dep in openDependencies) {
-                appendLine("- [#${dep.pullNumber}](${dep.link})")
-            }
-        }
+    val word = if (openDependencies.size == 1) "dependency" else "dependencies"
+    appendLine("$dependencyStatePrefix now waiting on the following $word:")
+
+    for (dep in openDependencies) {
+        appendLine("- ${dep.link}")
     }
 }
 
@@ -1021,9 +1017,9 @@ fun buildDependencyComment(trigger: DependencyTrigger?, openDependencies: List<D
     appendLine()
 
     if (trigger != null) {
-        val closedLink = "https://github.com/$repo/pull/${trigger.pullNumber}"
         val what = if (trigger.merged) "was merged" else "was closed without merging"
-        appendLine("${dependencyTriggerPrefix(trigger.pullNumber)}$closedLink) $what.")
+        appendLine("The following dependency PR $what:")
+        appendLine(dependencyTriggerLink(trigger.pullNumber))
         appendLine()
     }
 
@@ -1036,14 +1032,13 @@ fun buildDependencyComment(trigger: DependencyTrigger?, openDependencies: List<D
 }
 
 
-// Everything a comment says about the current state, without the marker, the header, the trigger line and the
-// closing note. Comparing these tells whether the list of open dependencies changed while the state itself
-// stayed the same, which a comparison of the announced state alone cannot see.
+// Extracts state text and open dependencies to detect changes.
+// Drops the trigger section because its links look identical to open dependencies.
 fun dependencyStateLines(body: String): List<String> = body.lineSequence()
     .map { it.trim() }
     .filter { it.isNotEmpty() }
-    .filterNot { it.startsWith("<!--") || it.startsWith("### ") }
-    .filterNot { it.startsWith(anyDependencyTriggerPrefix) || it == dependencyReEvaluateNote }
+    .dropWhile { !it.startsWith(dependencyStatePrefix) }
+    .filterNot { it == dependencyReEvaluateNote }
     .toList()
 
 
@@ -1074,12 +1069,15 @@ fun handleDependencyComment(
     // The state alone misses a second dependency being added while the pull request keeps waiting.
     val stateChanged = announcedState != currentState ||
         (announced != null && dependencyStateLines(announced.comment.body) != dependencyStateLines(body))
-    // Read out of the text instead of a second marker. Only the newest comment still carrying an active marker
-    // is searched, a collapsed one keeps its old text but loses the marker.
+
+    // Searches only the trigger section of the newest comment that still carries an active marker
+    // Ignores the state section to prevent false positive matches with open dependencies.
     val triggerAlreadyAnnounced = matchingTrigger != null && announced != null &&
-        announced.comment.body.lineSequence().any {
-            it.trim().startsWith(dependencyTriggerPrefix(matchingTrigger.pullNumber))
-        }
+        announced.comment.body.lineSequence()
+            .map { it.trim() }
+            .takeWhile { !it.startsWith(dependencyStatePrefix) }
+            .any { it == dependencyTriggerLink(matchingTrigger.pullNumber) }
+
     val triggerIsNew = matchingTrigger != null && !triggerAlreadyAnnounced
 
     val posting = stateChanged || triggerIsNew

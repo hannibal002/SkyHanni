@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.blaze3d.pipeline.DepthStencilState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
@@ -16,7 +16,7 @@ public abstract class MixinRenderPipeline {
     private DepthStencilState setGlowDepth(DepthStencilState original) {
         RenderPipeline thisPipeline = (RenderPipeline) (Object) this;
         if (thisPipeline != RenderPipelines.OUTLINE_CULL && thisPipeline != RenderPipelines.OUTLINE_NO_CULL) return original;
-        if (!SkyHanniOutlineVertexConsumerProvider.getCurrentlyActive()) return original;
+        if (!SkyHanniOutlineHook.isCurrentlyActive()) return original;
         return original != null
             ? new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, original.writeDepth(), original.depthBiasScaleFactor(), original.depthBiasConstant())
             : new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, true);

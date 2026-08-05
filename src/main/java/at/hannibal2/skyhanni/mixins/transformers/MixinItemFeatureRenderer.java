@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.mixins.transformers;
 import at.hannibal2.skyhanni.data.entity.EntityTransparencyManager;
 import at.hannibal2.skyhanni.mixins.hooks.EntityRenderDispatcherHookKt;
 import at.hannibal2.skyhanni.mixins.hooks.GlowingStateStore;
-import at.hannibal2.skyhanni.utils.render.SkyHanniOutlineVertexConsumerProvider;
+import at.hannibal2.skyhanni.mixins.hooks.SkyHanniOutlineHook;
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
@@ -24,7 +24,7 @@ import org.spongepowered.asm.mixin.injection.ModifyArg;
 public abstract class MixinItemFeatureRenderer {
 
     @ModifyArg(
-        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        method = "renderItem",
         at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/QuadInstance;setColor(I)V"), index = 0)
     private int modifyAlpha(int originalColor) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -37,7 +37,7 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @ModifyExpressionValue(
-        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        method = "renderItem",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/model/geometry/BakedQuad$MaterialInfo;itemRenderType()Lnet/minecraft/client/renderer/rendertype/RenderType;"))
     private RenderType modifyRenderLayer(RenderType layer) {
         if (EntityRenderDispatcherHookKt.getEntity() instanceof LivingEntity livingEntity) {
@@ -48,30 +48,30 @@ public abstract class MixinItemFeatureRenderer {
     }
 
     @WrapOperation(
-        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        method = "renderItem",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/OutlineBufferSource;setColor(I)V")
     )
-    private void setSkyHanniOutlineColor(OutlineBufferSource outlineConsumer, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
+    private void setSkyHanniOutlineColor(OutlineBufferSource instance, int i, Operation<Void> original, @Local SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            original.call(SkyHanniOutlineVertexConsumerProvider.getVertexConsumers(), i);
+            original.call(SkyHanniOutlineHook.getVertexConsumers(), i);
         } else {
-            original.call(outlineConsumer, i);
+            original.call(instance, i);
         }
     }
 
     @WrapOperation(
-        method = "renderItem(Lnet/minecraft/client/renderer/MultiBufferSource$BufferSource;Lnet/minecraft/client/renderer/OutlineBufferSource;Lnet/minecraft/client/renderer/SubmitNodeStorage$ItemSubmit;)V",
+        method = "renderItem",
         at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/renderer/OutlineBufferSource;getBuffer(Lnet/minecraft/client/renderer/rendertype/RenderType;)Lcom/mojang/blaze3d/vertex/VertexConsumer;"
         )
     )
-    private VertexConsumer modifyOutlineVertexConsumerProvider(OutlineBufferSource outlineConsumer, RenderType renderType, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand) {
+    private VertexConsumer modifyOutlineVertexConsumerProvider(OutlineBufferSource instance, RenderType renderType, Operation<VertexConsumer> original, @Local(argsOnly = true) SubmitNodeStorage.ItemSubmit itemCommand) {
         Object obj = (Object) itemCommand;
         if (obj instanceof GlowingStateStore casted && casted.skyhanni$isUsingCustomOutline()) {
-            return SkyHanniOutlineVertexConsumerProvider.getVertexConsumers().getBuffer(renderType);
+            return SkyHanniOutlineHook.getVertexConsumers().getBuffer(renderType);
         }
-        return original.call(outlineConsumer, renderType);
+        return original.call(instance, renderType);
     }
 }
