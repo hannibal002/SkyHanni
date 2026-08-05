@@ -29,7 +29,7 @@ object TreeFellTitle {
         "[A-Z]+! You felled the entire Tree!"
     )
 
-    @HandleEvent(onlyOnIslandTypeTag = [FORAGING])
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_TREES])
     private fun onChat(event: SystemMessageEvent.Allow) {
         if (!isEnabled()) return
         if (treeFellPattern.matches(event.cleanMessage)) {
@@ -39,7 +39,7 @@ object TreeFellTitle {
         }
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [FORAGING])
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_TREES])
     private fun onGuiRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val display = display ?: return
@@ -50,7 +50,7 @@ object TreeFellTitle {
         config.treeFellPosition.renderRenderable(display, posLabel = "Tree Fell Title")
     }
 
-    @HandleEvent(onlyOnIslandTypeTag = [FORAGING])
+    @HandleEvent(onlyOnIslandTypeTag = [HAS_TREES])
     private fun onWorldChange() {
         display = null
     }
