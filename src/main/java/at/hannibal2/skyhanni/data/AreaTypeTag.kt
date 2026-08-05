@@ -151,6 +151,12 @@ class AreaTypeTag private constructor(
             AreaType.TIME_CHAMBER,
         )
 
+        val IS_COLD = create(
+            "IS_COLD",
+            MINABLE_GLACITE_TUNNELS,
+            AreaType.ICY_BIOME
+        )
+
         val entries: List<AreaTypeTag>
             get() = entriesList
 

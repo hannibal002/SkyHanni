@@ -102,6 +102,7 @@ class AreaType private constructor(
         val WIZARD_BRAWL = create("Wizard Brawl")
         val WALK_OF_FAME = create("Walk of Fame")
         val TIME_CHAMBER = create("Time Chamber")
+        val ICY_BIOME = create("Icy Biome")
         val YOUR_ISLAND = create("Your Island")
         val VILLAGE = create("Village")
 
