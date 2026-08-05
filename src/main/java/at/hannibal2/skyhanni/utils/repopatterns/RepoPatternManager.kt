@@ -52,7 +52,7 @@ object RepoPatternManager {
      * Map containing all keys and their repo values. Used for filling in new values after an update, and for
      * checking duplicate registrations.
      */
-    private var usedKeys: NavigableMap<String, RepoValue<*, *>> = TreeMap()
+    private val usedKeys: NavigableMap<String, RepoValue<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
 
@@ -72,7 +72,7 @@ object RepoPatternManager {
     private val localLoading: Boolean
         get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || SkyHanniRepoManager.isUsingBackup
 
-    private val logger = LogManager.getLogger("SkyHanni")
+    internal val logger = LogManager.getLogger("SkyHanni")
 
     /**
      * Crash if in a development environment.

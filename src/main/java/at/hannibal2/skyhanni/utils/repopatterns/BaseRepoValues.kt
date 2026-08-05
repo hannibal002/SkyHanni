@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.StringUtils
 import java.util.NavigableMap
 import kotlin.properties.ReadOnlyProperty
@@ -111,8 +110,8 @@ abstract class BaseSingleRepoValue<C>(
         if (!forceLocal && remoteString != null) {
             isLoadedRemotely = true
             wasOverridden = remoteString != defaultRaw
-            _value = runCatching { parse(remoteString) }.getOrElse {
-                ErrorManager.logErrorWithData(it, "Failed to parse remote value for $key", "remote" to remoteString)
+            _value = runCatching { parse(remoteString) }.getOrElse { e ->
+                RepoPatternManager.logger.error("Failed to parse remote value for $key", e)
                 parse(defaultRaw)
             }
         } else {
@@ -161,7 +160,10 @@ abstract class BaseListRepoValue<C>(
             isLoadedRemotely = true
             val parsedList = matchingEntries.values.mapNotNull { rawValue ->
                 runCatching { parse(rawValue) }.onFailure { e ->
-                    ErrorManager.logErrorWithData(e, "Failed to parse remote value for list $key", "remote" to rawValue)
+                    RepoPatternManager.logger.error(
+                        "Failed to parse remote value for list $key (value: $rawValue)",
+                        e,
+                    )
                 }.getOrNull()
             }
             wasOverridden = parsedList.map { it.toString() } != defaultRaw.map { parse(it).toString() }
