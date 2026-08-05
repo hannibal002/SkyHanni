@@ -343,6 +343,10 @@ fun sanitize(text: String, maxLen: Int = 300): String = text
     .replace(">", "&gt;")
     .replace("@", "&#64;")
 
+// Only backticks have to go, one would close the code span early. Everything else, an "@" mention included, is
+// inert inside a span, and sanitize would leave its backslashes visible there.
+fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
+
 fun StringBuilder.appendWarningTitle(title: String) {
     appendLine("### $warningIcon $title $warningIcon")
 }
@@ -366,8 +370,9 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
 fun StringBuilder.appendCompact(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
+        // The message renders outside the code span, so it keeps the full markdown escaping.
         val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
         appendLine("- ```$className:$line```: $message")
     }
@@ -376,11 +381,11 @@ fun StringBuilder.appendCompact(findings: List<Finding>) {
 fun StringBuilder.appendFull(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
-        val ruleId = sanitize(finding.ruleId)
-        val message = sanitize(finding.message)
-        val className = sanitize(fileName)
+        val ruleId = sanitizeCodeSpan(finding.ruleId)
+        val message = sanitizeCodeSpan(finding.message)
+        val className = sanitizeCodeSpan(fileName)
         val line = finding.line
-        val path = sanitize(finding.path)
+        val path = sanitizeCodeSpan(finding.path)
         appendLine("- ```$className:$line```")
         appendLine("  message: `$message`")
         appendLine("  rule: `$ruleId`")
@@ -621,11 +626,10 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
                         if (workspace.isNotEmpty()) it.replace("file://$workspace/", "").replace("$workspace/", "")
                         else it
                     }
-                    .take(300)
-                appendLine("- `$display`")
+                appendLine("- `${sanitizeCodeSpan(display)}`")
                 if (rawLine.trimStart().startsWith("e: ")) {
                     for (cont in parseErrorContinuations(logContent, rawLine)) {
-                        appendLine("  - `${cont.take(300)}`")
+                        appendLine("  - `${sanitizeCodeSpan(cont)}`")
                     }
                 }
             }
@@ -633,8 +637,8 @@ fun buildBuildFailureBody(versions: List<Pair<String, String?>>): String = build
         } else {
             val oneLiner = parseOneLiner(logContent)
             if (oneLiner != null) {
-                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-                appendLine("`$displayLine`")
+                val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+                appendLine("`${sanitizeCodeSpan(displayLine)}`")
             }
         }
         if ("warnings found and -Werror specified" in logContent) {
@@ -721,8 +725,8 @@ fun buildDetektCrashBody(logContent: String): String = buildString {
     appendLine()
     val oneLiner = parseOneLiner(logContent)
     if (oneLiner != null) {
-        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ").take(300)
-        appendLine("`$displayLine`")
+        val displayLine = oneLiner.trim().removePrefix("e: ").removePrefix("w: ")
+        appendLine("`${sanitizeCodeSpan(displayLine)}`")
         appendLine()
     }
     appendLine("<details><summary>Excerpt</summary>")
@@ -1123,10 +1127,6 @@ fun StringBuilder.appendDependencyState(openDependencies: List<Dependency>) {
         appendLine("- ${dep.link}")
     }
 }
-
-// Rendered inside a code span, so only backticks have to go: one would close the span early and let the rest
-// render as markdown. Everything else, an "@" mention included, is inert there and stays readable as typed.
-fun sanitizeCodeSpan(text: String, maxLen: Int = 300): String = text.take(maxLen).replace("`", "'")
 
 fun StringBuilder.appendProblemLines(lines: List<String>) {
     for (line in lines) {
