@@ -51,6 +51,12 @@ class ForagingConfig {
     var mutePhantoms = true
 
     @Expose
+    @ConfigOption(name = "Mute Beeheemoth", desc = "Silences Beeheemoth sounds in Moonglade Marsh.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var muteBeeheemoth = true
+
+    @Expose
     @ConfigOption(name = "Mute Fusion Machine", desc = "Silences Fusion Machine sounds in Moonglade Marsh.")
     @ConfigEditorBoolean
     @FeatureToggle
