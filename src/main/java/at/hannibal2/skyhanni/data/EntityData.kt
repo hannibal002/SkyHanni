@@ -15,13 +15,14 @@ import at.hannibal2.skyhanni.utils.collection.TimeLimitedCache
 import net.minecraft.network.chat.Component
 import net.minecraft.world.entity.Entity
 import net.minecraft.world.entity.LivingEntity
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<Int, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, Component>(50.milliseconds, useWeakKeys = true)
+    private val nametagCache = TimeLimitedCache<UUID, Component>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<Component, Component>(50.milliseconds)
     private val lastVisibilityCheck = TimeLimitedCache<Int, Boolean>(200.milliseconds)
 
@@ -60,7 +61,7 @@ object EntityData {
         EntityLeaveWorldEvent(entity).post()
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity) {
+    private fun postRenderNametag(entity: Entity, chatComponent: Component) = nametagCache.getOrPut(entity.uuid) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.post()
         event.chatComponent
