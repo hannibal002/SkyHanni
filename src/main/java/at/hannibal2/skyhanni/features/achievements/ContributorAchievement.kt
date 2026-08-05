@@ -135,8 +135,8 @@ object ContributorAchievement {
     fun onUniqueContributorSeen(profile: GameProfile, username: String) {
         val completed = AchievementManager.completeAchievement(CONTRIBUTOR_ACHIEVEMENT)
         if (completed || config.discoverContributorMessage) {
-            val resolveProfile = ResolvableProfile.createResolved(profile)
-            val sprite = PlayerSprite(resolveProfile, false)
+            val resolvedProfile = ResolvableProfile.createResolved(profile)
+            val sprite = PlayerSprite(resolvedProfile, false)
             val player = Component.`object`(sprite)
             ChatUtils.chat {
                 appendWithColor("A wild SkyHanni contributor appears!", ChatFormatting.GOLD)
