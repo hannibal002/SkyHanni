@@ -53,7 +53,7 @@ enum class IslandType(private val nameFallback: String, private val apiNameFallb
 
     // Special
     THE_RIFT("The Rift", "rift"),
-    SAFARI("Safari", "safari"),
+    SAFARI("Critter Safari", "safari"),
 
     // Special values
     NONE("", null),

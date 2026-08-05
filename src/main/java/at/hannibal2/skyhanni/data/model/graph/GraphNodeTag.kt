@@ -186,7 +186,7 @@ enum class GraphNodeTag(
     ),
 
     HIDEYHO_LOCATION(
-        "hideyho_location",
+        "hideyho",
         LorenzColor.LIGHT_PURPLE,
         "Hideyho Location",
         "A location that Hideyho can be found.",
