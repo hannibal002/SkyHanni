@@ -212,7 +212,7 @@ enum class DependencyState {
     UNRESOLVED
 }
 
-// Split during parsing, not derived afterwards: a line on hannibal002/SkyHanni-REPO is valid and deliberately
+// Split during parsing, not derived afterward: a line on hannibal002/SkyHanni-REPO is valid and deliberately
 // produces no dependency, so subtracting the recognized entries would report it as malformed.
 data class ParsedDependencySection(val dependencies: List<Dependency>, val unrecognizedLines: List<String>)
 
@@ -287,7 +287,7 @@ fun ghRequest(method: String, path: String, payload: Any? = null): Pair<Int, Jso
     val request = buildGhRequest(method, path, payload)
     if (!isRetryable(method, path)) return sendGhRequest(request)
 
-    // The GitHub API answers with 502/503/504 every now and then. Those are transient, so a single one
+    // The GitHub API answers with 502/503/504 occasionally. Those are transient, so a single one
     // must not fail the whole workflow run. The last attempt returns whatever it gets.
     repeat(maxRequestAttempts - 1) { index ->
         val attempt = index + 1
@@ -383,7 +383,7 @@ fun buildDetektBody(findings: List<Finding>): String = buildString {
 fun StringBuilder.appendCompact(findings: List<Finding>) {
     for (finding in findings) {
         val fileName = finding.path.substringAfterLast('/')
-        // The message renders outside the code span, so it keeps the full markdown escaping.
+        // The message renders outside the code span, so it keeps the full Markdown escaping.
         val message = sanitize(finding.message)
         val className = sanitizeCodeSpan(fileName)
         val line = finding.line
