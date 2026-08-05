@@ -3,6 +3,8 @@
 // called from detekt-review.yml, build-review.yml, label-merge-conflict.yml, changelog-review.yml, check_dependencies.yml,
 // and keyword-labels.yml
 
+@file:Suppress("CyclomaticComplexMethod")
+
 import com.google.gson.Gson
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -473,8 +475,8 @@ fun CommentType.postState(prNumber: String, state: String, body: String, errorMe
 // A collapsed comment loses its active marker, including the state variant. Only the stale marker remains, so
 // it can never be mistaken for the current announcement.
 //
-// Every body posted under a CommentType needs a line starting with "### ", it becomes the title of the spoiler
-// the collapsed comment turns into. A body without one ends up under [fallbackTitle].
+// Every body posted under a CommentType needs a line starting with "###" followed by a space, it becomes
+// the title of the spoiler the collapsed comment turns into. A body without one ends up under [fallbackTitle].
 // A failed collapse is harmless, so [onFailure] may return: the newest-state lookup ignores the leftover.
 fun CommentType.markAsStale(
     comment: PrComment,
